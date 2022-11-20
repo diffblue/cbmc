@@ -151,6 +151,7 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 , <a class="el" href="classif__exprt.html#ae918afc88b7d3b9733601e5b7a4eec66">if_exprt</a>
 , <a class="el" href="classinterval__uniont.html#a702e37c97b89d36a6fb83d624f92c44e">interval_uniont</a>
 , <a class="el" href="classjava__instanceof__exprt.html#a4745bf5c780d836f4421117db7fcfa61">java_instanceof_exprt</a>
+, <a class="el" href="classjournalling__symbol__tablet.html#a47d6de5acf1609dbf1f6b0fb75addd89">journalling_symbol_tablet</a>
 , <a class="el" href="classlazy__goto__modelt.html#a6f45855d5d41c0de34a7203511cfe4c7">lazy_goto_modelt</a>
 , <a class="el" href="classlet__exprt.html#a73298003a7ee87ea8990590e8c9d171d">let_exprt</a>
 , <a class="el" href="classmember__exprt.html#a9ebc74b16fb120c13c569eb13db97a5f">member_exprt</a>
@@ -202,7 +203,9 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 , <a class="el" href="structsmt__core__theoryt_1_1xort.html#aad9e476bb35ad70ba6af90d6bcbf55a3">smt_core_theoryt::xort</a>
 , <a class="el" href="classssa__exprt.html#a38144eb2e8806eab94684918aa7b1398">ssa_exprt</a>
 , <a class="el" href="class_s_s_a__stept.html#a21804d640952ad007812a10f578429a2">SSA_stept</a>
-, <a class="el" href="classsymbol__tablet.html#ae53d5f4808ef2aae61e83c2626862073">symbol_tablet</a>
+, <a class="el" href="classsymbol__table__baset.html#a3793b9a8dcf88f3784159b674d393043">symbol_table_baset</a>
+, <a class="el" href="classsymbol__table__buildert.html#a77e3c0ffce2a5b5e2bb203d31bd2ef21">symbol_table_buildert</a>
+, <a class="el" href="classsymbol__tablet.html#afe02534073901d7f666cbb265c937821">symbol_tablet</a>
 , <a class="el" href="classsymex__target__equationt.html#a67fd4e9dafda2876392130c23d965a37">symex_target_equationt</a>
 , <a class="el" href="classternary__exprt.html#a16fffb07c5c821595f7c118eaacbb74c">ternary_exprt</a>
 , <a class="el" href="classtypet.html#ad5c5c9efcf41db5bae19b91da2227fb8">typet</a>
@@ -354,7 +357,7 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 : <a class="el" href="classvalue__set__analysis__templatet.html#a92e2611124a845790fb1507b91144992">value_set_analysis_templatet&lt; VSDT &gt;</a>
 </li>
 <li>value_set_dereferencet()
-: <a class="el" href="classvalue__set__dereferencet.html#a1c4e0c492f35d70c666506cfd14bdd26">value_set_dereferencet</a>
+: <a class="el" href="classvalue__set__dereferencet.html#a20f2892cc0fb57ed54348a1375cc65a6">value_set_dereferencet</a>
 </li>
 <li>value_set_evaluator()
 : <a class="el" href="classvalue__set__evaluator.html#a6fd1d62f51dbd6d4018c9e77af1fe169">value_set_evaluator</a>
@@ -387,7 +390,7 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 </li>
 <li>value_sett
 : <a class="el" href="classabstract__object__sett.html#ab7dafed8a339f343fd63b7133b418dba">abstract_object_sett</a>
-, <a class="el" href="classvalue__sett.html#a278fd23aa4de79ccf735baea0a0a3b7c">value_sett</a>
+, <a class="el" href="classvalue__sett.html#a38e484197141a0d9dac2cf9cf1912df7">value_sett</a>
 </li>
 <li>value_stack
 : <a class="el" href="classconstant__pointer__abstract__objectt.html#a1741b733b01def19829fcf67ae528982">constant_pointer_abstract_objectt</a>
@@ -527,7 +530,7 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 </li>
 <li>variable_sensitivity_dependence_domaint()
 : <a class="el" href="classvariable__sensitivity__dependence__domaint.html#aab77ae03f48bff01cc71cc0e39a4d677">variable_sensitivity_dependence_domaint</a>
-, <a class="el" href="classvariable__sensitivity__dependence__grapht.html#a8f2191d091230e051e5c93205283c313">variable_sensitivity_dependence_grapht</a>
+, <a class="el" href="classvariable__sensitivity__dependence__grapht.html#ae1d31e8df8a5ad6e0f96328cb093d9fd">variable_sensitivity_dependence_grapht</a>
 </li>
 <li>variable_sensitivity_dependence_grapht
 : <a class="el" href="classlocation__sensitive__storaget.html#a0d8924f2d0d725bce65c248630ec49ef">location_sensitive_storaget</a>
@@ -540,10 +543,10 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 : <a class="el" href="classvariable__sensitivity__domaint.html#a3e9ebeafe49b6ad0d9ef5265f71c440c">variable_sensitivity_domaint</a>
 </li>
 <li>variable_sensitivity_object_factoryt()
-: <a class="el" href="classvariable__sensitivity__object__factoryt.html#a5cf60e5c1504170033835ab3650b3d9e">variable_sensitivity_object_factoryt</a>
+: <a class="el" href="classvariable__sensitivity__object__factoryt.html#a64dfea68dcee78dc1d5722d69dbccac6">variable_sensitivity_object_factoryt</a>
 </li>
 <li>variables()
-: <a class="el" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">binding_exprt</a>
+: <a class="el" href="classbinding__exprt.html#a80cbcdf32c6f356306106cbbfba3886d">binding_exprt</a>
 , <a class="el" href="classjava__bytecode__convert__methodt.html#a97b5acb632e942cabe52f85d88e8173b">java_bytecode_convert_methodt</a>
 , <a class="el" href="classlet__exprt.html#a643fbc4d991b8149b57f04a225160eda">let_exprt</a>
 , <a class="el" href="structsolver__hardnesst_1_1sat__hardnesst.html#acc9322563bec25ac82d2fe7d2e622ec5">solver_hardnesst::sat_hardnesst</a>
@@ -559,16 +562,16 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 , <a class="el" href="classjava__bytecode__convert__methodt.html#a25b19add4b6bf2a3f5733d47e0ed5762">java_bytecode_convert_methodt</a>
 </li>
 <li>variablet()
-: <a class="el" href="classjava__bytecode__convert__methodt_1_1variablet.html#af19c287a4b14dd0cf984926f2d7d0289">java_bytecode_convert_methodt::variablet</a>
+: <a class="el" href="classjava__bytecode__convert__methodt_1_1variablet.html#a6c80f7a77b8d65725c081db9aaa11ef5">java_bytecode_convert_methodt::variablet</a>
 </li>
 <li>vcc()
 : <a class="el" href="classgoto__symext.html#a26ad7ad89b5cabd494390fc203c980bb">goto_symext</a>
 </li>
 <li>vector1()
-: <a class="el" href="classshuffle__vector__exprt.html#abd5a50cd985f034976238c31e0202d19">shuffle_vector_exprt</a>
+: <a class="el" href="classshuffle__vector__exprt.html#abf34fc5aa51acd3d92c73454d0b65197">shuffle_vector_exprt</a>
 </li>
 <li>vector2()
-: <a class="el" href="classshuffle__vector__exprt.html#a9edeca367c12317f90f284ad0f8b7a7f">shuffle_vector_exprt</a>
+: <a class="el" href="classshuffle__vector__exprt.html#a2954caa4e6fb140b639ac50b0c3368bd">shuffle_vector_exprt</a>
 </li>
 <li>vector_exprt()
 : <a class="el" href="classvector__exprt.html#ae578b96bf1e9f6f53594d2b7c6fdf0af">vector_exprt</a>
@@ -626,20 +629,20 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 <li>visit()
 : <a class="el" href="structabstract__objectt_1_1abstract__object__visitort.html#a4205d30d931cec63a5527ca7c7625c5e">abstract_objectt::abstract_object_visitort</a>
 , <a class="el" href="classai__baset.html#a1c73fb1be93767a88c8f4e40dea80f5c">ai_baset</a>
-, <a class="el" href="classexprt.html#a7033c2804c1af690bd6aa39c48e2e449">exprt</a>
+, <a class="el" href="classexprt.html#aa5f4f235ef9ecb834c0315f89d4add56">exprt</a>
 , <a class="el" href="classflow__insensitive__analysis__baset.html#a94826f58d11fa75a5c05198c0cc70c25">flow_insensitive_analysis_baset</a>
 , <a class="el" href="classlocation__update__visitort.html#a7b941759a7f2264af65a40ed3a6ddb42">location_update_visitort</a>
 , <a class="el" href="classmerge__location__update__visitort.html#a8f18b7466e6c08b5ba88400710d79e2c">merge_location_update_visitort</a>
-, <a class="el" href="classsmt__command__to__string__convertert.html#af72cae6b8b569f5dbb59a1a7ccc05c8d">smt_command_to_string_convertert</a>
-, <a class="el" href="classsmt__index__const__downcast__visitort.html#a7c1afed14f8bea04f6093026b33b2c5a">smt_index_const_downcast_visitort</a>
+, <a class="el" href="classsmt__command__to__string__convertert.html#a13378770beeaeae13ca5d160f0093b81">smt_command_to_string_convertert</a>
+, <a class="el" href="classsmt__index__const__downcast__visitort.html#a83f00d47960336527f898f4f2727d3f9">smt_index_const_downcast_visitort</a>
 , <a class="el" href="classsmt__index__output__visitort.html#a08e76b5f58de5a6dffdc0f0e35d36ca3">smt_index_output_visitort</a>
 , <a class="el" href="classsmt__option__to__string__convertert.html#a04f094ecc28ebe7f326577f55db96dd6">smt_option_to_string_convertert</a>
 , <a class="el" href="classsmt__sort__output__visitort.html#aa6f7d3df30f4a22703b9e082be204ab9">smt_sort_output_visitort</a>
-, <a class="el" href="classsmt__term__to__string__convertert.html#a1967628b3d33c239ef7c9f1a038980b1">smt_term_to_string_convertert</a>
+, <a class="el" href="classsmt__term__to__string__convertert.html#a94e699f3387138cf735455eab82b39c2">smt_term_to_string_convertert</a>
 , <a class="el" href="structsort__based__cast__to__bit__vector__convertert.html#a761131d2524e304f6692060953bb6645">sort_based_cast_to_bit_vector_convertert</a>
 , <a class="el" href="structsort__based__literal__convertert.html#a1975679f068c6195ea7b867c6947434f">sort_based_literal_convertert</a>
 , <a class="el" href="classstatic__analysis__baset.html#a32eaa85eb8d48c9114c73f1261d63810">static_analysis_baset</a>
-, <a class="el" href="classvalue__expr__from__smt__factoryt.html#a81478eafff97a5edef6f7f882b522f80">value_expr_from_smt_factoryt</a>
+, <a class="el" href="classvalue__expr__from__smt__factoryt.html#a1f6ab34a97464af58d0ed151737cf841">value_expr_from_smt_factoryt</a>
 </li>
 <li>visit_cfg()
 : <a class="el" href="classinstrumentert_1_1cfg__visitort.html#abe8c49ccab00846598a0c2821d4f2eab">instrumentert::cfg_visitort</a>
@@ -701,7 +704,7 @@ $(document).ready(function(){initNavTree('functions_v.html',''); initResizable()
 : <a class="el" href="classai__baset.html#a61d690e5b56f11a357be98b9b0c46efa">ai_baset</a>
 </li>
 <li>visit_post()
-: <a class="el" href="classexprt.html#a861d47e00d92d783fe347384b816304d">exprt</a>
+: <a class="el" href="classexprt.html#abb069f3f8f25619139d97853e4c1740b">exprt</a>
 </li>
 <li>visit_pre()
 : <a class="el" href="classexprt.html#a5a331dafe7711470a9d3097b69691251">exprt</a>

@@ -1,49 +1,48 @@
 <map id="/home/runner/work/cbmc/cbmc/src/xmllang/graphml.cpp" name="/home/runner/work/cbmc/cbmc/src/xmllang/graphml.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="932,5,1159,47"/>
-<area shape="rect" id="node2" href="$graphml_8h.html" title=" " alt="" coords="276,543,364,569"/>
-<area shape="rect" id="node32" href="$src_2util_2message_8h.html" title=" " alt="" coords="1613,468,1732,495"/>
-<area shape="rect" id="node37" href="$xml__parser_8h.html" title=" " alt="" coords="992,95,1099,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="395,841,459,868"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1216,991,1275,1017"/>
-<area shape="rect" id="node5" href="$irep_8h.html" title=" " alt="" coords="884,617,968,644"/>
-<area shape="rect" id="node26" href="$graph_8h.html" title=" " alt="" coords="232,767,328,793"/>
-<area shape="rect" id="node31" href="$xml_8h.html" title=" " alt="" coords="50,767,134,793"/>
-<area shape="rect" id="node6" title=" " alt="" coords="286,916,349,943"/>
-<area shape="rect" id="node7" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1058,841,1150,868"/>
-<area shape="rect" id="node11" href="$irep__ids_8h.html" title=" " alt="" coords="723,692,808,719"/>
-<area shape="rect" id="node21" href="$forward__list__as__map_8h.html" title=" " alt="" coords="934,692,1104,719"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1009,916,1074,943"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1150,916,1224,943"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1249,916,1341,943"/>
-<area shape="rect" id="node12" href="$dstring_8h.html" title=" " alt="" coords="729,767,808,793"/>
-<area shape="rect" id="node20" title=" " alt="" coords="555,767,654,793"/>
-<area shape="rect" id="node13" href="$magic_8h.html" title="Magic numbers used throughout the codebase." alt="" coords="374,916,448,943"/>
-<area shape="rect" id="node15" href="$string__container_8h.html" title=" " alt="" coords="694,841,832,868"/>
-<area shape="rect" id="node14" title=" " alt="" coords="438,991,509,1017"/>
-<area shape="rect" id="node16" title=" " alt="" coords="116,916,159,943"/>
-<area shape="rect" id="node17" title=" " alt="" coords="625,916,749,943"/>
-<area shape="rect" id="node18" href="$memory__units_8h.html" title=" " alt="" coords="472,916,600,943"/>
-<area shape="rect" id="node19" href="$string__hash_8h.html" title=" " alt="" coords="774,916,883,943"/>
-<area shape="rect" id="node22" title=" " alt="" coords="534,841,619,868"/>
-<area shape="rect" id="node23" title=" " alt="" coords="934,767,1032,793"/>
-<area shape="rect" id="node24" href="$as__const_8h.html" title=" " alt="" coords="1160,767,1251,793"/>
-<area shape="rect" id="node25" href="$narrow_8h.html" title=" " alt="" coords="1057,767,1136,793"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1730,841,1817,868"/>
-<area shape="rect" id="node28" title=" " alt="" coords="50,841,100,868"/>
-<area shape="rect" id="node29" title=" " alt="" coords="176,841,238,868"/>
-<area shape="rect" id="node30" title=" " alt="" coords="262,841,320,868"/>
-<area shape="rect" id="node33" href="$deprecate_8h.html" title=" " alt="" coords="1435,617,1534,644"/>
-<area shape="rect" id="node34" href="$source__location_8h.html" title=" " alt="" coords="1330,543,1466,569"/>
-<area shape="rect" id="node35" href="$optional_8h.html" title=" " alt="" coords="1273,617,1360,644"/>
-<area shape="rect" id="node36" title=" " alt="" coords="1332,692,1482,719"/>
-<area shape="rect" id="node38" href="$parser_8h.html" title=" " alt="" coords="1280,169,1379,196"/>
-<area shape="rect" id="node47" href="$xml__parse__tree_8h.html" title=" " alt="" coords="694,169,829,196"/>
-<area shape="rect" id="node39" href="$expr_8h.html" title=" " alt="" coords="1298,244,1361,271"/>
-<area shape="rect" id="node46" href="$file__util_8h.html" title=" " alt="" coords="1776,244,1859,271"/>
-<area shape="rect" id="node40" href="$type_8h.html" title=" " alt="" coords="1341,319,1404,345"/>
-<area shape="rect" id="node43" href="$validation__mode_8h.html" title=" " alt="" coords="1288,468,1430,495"/>
-<area shape="rect" id="node44" href="$validate__types_8h.html" title=" " alt="" coords="1222,393,1352,420"/>
-<area shape="rect" id="node45" href="$validate__expressions_8h.html" title=" " alt="" coords="1428,319,1600,345"/>
-<area shape="rect" id="node41" href="$validate_8h.html" title=" " alt="" coords="1478,393,1565,420"/>
-<area shape="rect" id="node42" href="$exception__utils_8h.html" title=" " alt="" coords="1455,468,1588,495"/>
+<area shape="rect" id="node1" title=" " alt="" coords="292,5,518,47"/>
+<area shape="rect" id="node2" href="$graphml_8h.html" title=" " alt="" coords="316,543,404,569"/>
+<area shape="rect" id="node32" href="$xml__parser_8h.html" title=" " alt="" coords="397,95,504,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="378,841,442,868"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1146,991,1205,1017"/>
+<area shape="rect" id="node5" href="$irep_8h.html" title=" " alt="" coords="848,617,932,644"/>
+<area shape="rect" id="node26" href="$graph_8h.html" title=" " alt="" coords="226,767,322,793"/>
+<area shape="rect" id="node31" href="$xml_8h.html" title=" " alt="" coords="67,767,151,793"/>
+<area shape="rect" id="node6" title=" " alt="" coords="320,916,383,943"/>
+<area shape="rect" id="node7" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1175,841,1267,868"/>
+<area shape="rect" id="node11" href="$irep__ids_8h.html" title=" " alt="" coords="717,692,802,719"/>
+<area shape="rect" id="node21" href="$forward__list__as__map_8h.html" title=" " alt="" coords="994,692,1163,719"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1094,916,1159,943"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1184,916,1258,943"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1334,916,1426,943"/>
+<area shape="rect" id="node12" href="$dstring_8h.html" title=" " alt="" coords="723,767,802,793"/>
+<area shape="rect" id="node20" title=" " alt="" coords="600,767,698,793"/>
+<area shape="rect" id="node13" href="$magic_8h.html" title="Magic numbers used throughout the codebase." alt="" coords="408,916,482,943"/>
+<area shape="rect" id="node15" href="$string__container_8h.html" title=" " alt="" coords="728,841,866,868"/>
+<area shape="rect" id="node14" title=" " alt="" coords="472,991,543,1017"/>
+<area shape="rect" id="node16" title=" " alt="" coords="100,916,142,943"/>
+<area shape="rect" id="node17" title=" " alt="" coords="659,916,783,943"/>
+<area shape="rect" id="node18" href="$memory__units_8h.html" title=" " alt="" coords="506,916,634,943"/>
+<area shape="rect" id="node19" href="$string__hash_8h.html" title=" " alt="" coords="808,916,917,943"/>
+<area shape="rect" id="node22" title=" " alt="" coords="517,841,602,868"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1029,767,1128,793"/>
+<area shape="rect" id="node24" href="$as__const_8h.html" title=" " alt="" coords="1256,767,1346,793"/>
+<area shape="rect" id="node25" href="$narrow_8h.html" title=" " alt="" coords="1152,767,1231,793"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1568,841,1655,868"/>
+<area shape="rect" id="node28" title=" " alt="" coords="33,841,84,868"/>
+<area shape="rect" id="node29" title=" " alt="" coords="159,841,222,868"/>
+<area shape="rect" id="node30" title=" " alt="" coords="246,841,303,868"/>
+<area shape="rect" id="node33" href="$parser_8h.html" title=" " alt="" coords="965,169,1064,196"/>
+<area shape="rect" id="node46" href="$xml__parse__tree_8h.html" title=" " alt="" coords="164,169,299,196"/>
+<area shape="rect" id="node34" href="$expr_8h.html" title=" " alt="" coords="1282,244,1344,271"/>
+<area shape="rect" id="node44" href="$src_2util_2message_8h.html" title=" " alt="" coords="1429,468,1522,495"/>
+<area shape="rect" id="node45" href="$file__util_8h.html" title=" " alt="" coords="1566,244,1649,271"/>
+<area shape="rect" id="node35" href="$type_8h.html" title=" " alt="" coords="1351,319,1414,345"/>
+<area shape="rect" id="node41" href="$validation__mode_8h.html" title=" " alt="" coords="1598,468,1740,495"/>
+<area shape="rect" id="node42" href="$validate__types_8h.html" title=" " alt="" coords="1136,393,1266,420"/>
+<area shape="rect" id="node43" href="$validate__expressions_8h.html" title=" " alt="" coords="1103,319,1275,345"/>
+<area shape="rect" id="node36" href="$source__location_8h.html" title=" " alt="" coords="1193,543,1329,569"/>
+<area shape="rect" id="node39" href="$validate_8h.html" title=" " alt="" coords="1358,393,1444,420"/>
+<area shape="rect" id="node37" href="$deprecate_8h.html" title=" " alt="" coords="1298,617,1397,644"/>
+<area shape="rect" id="node38" href="$optional_8h.html" title=" " alt="" coords="1136,617,1223,644"/>
+<area shape="rect" id="node40" href="$exception__utils_8h.html" title=" " alt="" coords="1272,468,1405,495"/>
 </map>

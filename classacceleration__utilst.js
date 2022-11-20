@@ -4,8 +4,8 @@ var classacceleration__utilst =
     [ "expr_pairst", "classacceleration__utilst.html#a98be94fbbddb057ecd2cce96c901bf7b", null ],
     [ "expr_pairt", "classacceleration__utilst.html#a30cd2e95384ea8e6732ce746e3549f98", null ],
     [ "polynomial_array_assignmentst", "classacceleration__utilst.html#a2e1d6216ce4a0887b19d14a286faab6f", null ],
-    [ "acceleration_utilst", "classacceleration__utilst.html#a05c66281c1c9659767a760c5048302b5", null ],
-    [ "acceleration_utilst", "classacceleration__utilst.html#a90cc058c6b380899ae24d651b382df25", null ],
+    [ "acceleration_utilst", "classacceleration__utilst.html#a841e606aa2e3686971bf10d34e25bd69", null ],
+    [ "acceleration_utilst", "classacceleration__utilst.html#ae52470a353ef346ebaef2883ca321579", null ],
     [ "abstract_arrays", "classacceleration__utilst.html#a9038029567d26e0af0be11ff850abd23", null ],
     [ "array_assignments2polys", "classacceleration__utilst.html#a2737354af58e22d8d33eb55c10aa7aa9", null ],
     [ "assign_array", "classacceleration__utilst.html#a6a47876bcd631532228df421d7d29c81", null ],
@@ -34,5 +34,5 @@ var classacceleration__utilst =
     [ "message_handler", "classacceleration__utilst.html#a5b5a57912aae6e58194735f5a2268239", null ],
     [ "nil", "classacceleration__utilst.html#ac0c43a0f0707fb6ddba7c8a84160a77f", null ],
     [ "ns", "classacceleration__utilst.html#a355b518d6b2afbb6ae25823cbf4cf1d1", null ],
-    [ "symbol_table", "classacceleration__utilst.html#a9e2422892ffde9b9285974e68a513e13", null ]
+    [ "symbol_table", "classacceleration__utilst.html#a0afec00205e53ac7a7ee940adb497cda", null ]
 ];

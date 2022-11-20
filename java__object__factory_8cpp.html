@@ -101,12 +101,13 @@ $(document).ready(function(){initNavTree('java__object__factory_8cpp.html',''); 
 <code>#include &lt;<a class="el" href="array__element__from__pointer_8h_source.html">util/array_element_from_pointer.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__initializer_8h_source.html">util/expr_initializer.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="fresh__symbol_8h_source.html">util/fresh_symbol.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="interval__constraint_8h_source.html">util/interval_constraint.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="nondet__bool_8h_source.html">util/nondet_bool.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="class__identifier_8h_source.html">goto-programs/class_identifier.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__functions_8h_source.html">goto-programs/goto_functions.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="interval__constraint_8h_source.html">util/interval_constraint.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="generic__parameter__specialization__map__keys_8h_source.html">generic_parameter_specialization_map_keys.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__object__factory__parameters_8h_source.html">java_object_factory_parameters.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__static__initializers_8h_source.html">java_static_initializers.h</a>&quot;</code><br />
@@ -119,7 +120,7 @@ $(document).ready(function(){initNavTree('java__object__factory_8cpp.html',''); 
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__object__factory_8cpp__incl.svg" width="3815" height="634"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__object__factory_8cpp__incl.svg" width="3704" height="559"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -153,12 +154,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a5835b73472fe2cbeb25bed4080a18c8b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a5835b73472fe2cbeb25bed4080a18c8b">array_primitive_init_code</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;assignments, const <a class="el" href="classexprt.html">exprt</a> &amp;init_array_expr, const <a class="el" href="classtypet.html">typet</a> &amp;element_type, const <a class="el" href="classexprt.html">exprt</a> &amp;max_length_expr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="nondet_8h.html#a6efaa8683a2b110a4ad81d0f8a0e0567">allocate_local_symbolt</a> &amp;allocate_local_symbol)</td></tr>
 <tr class="memdesc:a5835b73472fe2cbeb25bed4080a18c8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create code to nondeterministically initialize arrays of primitive type.  <a href="java__object__factory_8cpp.html#a5835b73472fe2cbeb25bed4080a18c8b">More...</a><br /></td></tr>
 <tr class="separator:a5835b73472fe2cbeb25bed4080a18c8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aede2bd73e251ea02c3c1a561e0b6a399"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#aede2bd73e251ea02c3c1a561e0b6a399">array_loop_init_code</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;assignments, const <a class="el" href="classexprt.html">exprt</a> &amp;init_array_expr, const <a class="el" href="classexprt.html">exprt</a> &amp;length_expr, const <a class="el" href="classtypet.html">typet</a> &amp;element_type, const <a class="el" href="classexprt.html">exprt</a> &amp;max_length_expr, <a class="el" href="java__object__factory_8h.html#a19118201f2fa63cf6bf138bd9e1e39a2">update_in_placet</a> update_in_place, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="java__object__factory_8h.html#a0d59c55b8dc5386351e61d136f987bd3">array_element_generatort</a> &amp;element_generator, const <a class="el" href="nondet_8h.html#a6efaa8683a2b110a4ad81d0f8a0e0567">allocate_local_symbolt</a> &amp;allocate_local_symbol, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:aede2bd73e251ea02c3c1a561e0b6a399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create code to nondeterministically initialize each element of an array in a loop.  <a href="java__object__factory_8cpp.html#aede2bd73e251ea02c3c1a561e0b6a399">More...</a><br /></td></tr>
-<tr class="separator:aede2bd73e251ea02c3c1a561e0b6a399"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad17d55a019e83ed3d6236609aef502a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__blockt.html">code_blockt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#aad17d55a019e83ed3d6236609aef502a">gen_nondet_array_init</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="java__object__factory_8h.html#a19118201f2fa63cf6bf138bd9e1e39a2">update_in_placet</a> update_in_place, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="java__object__factory_8h.html#a0d59c55b8dc5386351e61d136f987bd3">array_element_generatort</a> &amp;element_generator, const <a class="el" href="nondet_8h.html#a6efaa8683a2b110a4ad81d0f8a0e0567">allocate_local_symbolt</a> &amp;allocate_local_symbol, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const size_t max_nondet_array_length)</td></tr>
-<tr class="memdesc:aad17d55a019e83ed3d6236609aef502a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synthesize GOTO for generating a array of nondet length to be stored in the <code>expr</code>.  <a href="java__object__factory_8cpp.html#aad17d55a019e83ed3d6236609aef502a">More...</a><br /></td></tr>
-<tr class="separator:aad17d55a019e83ed3d6236609aef502a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4dd77516d00c141fd67726a819ffc64"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#ab4dd77516d00c141fd67726a819ffc64">array_loop_init_code</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;assignments, const <a class="el" href="classexprt.html">exprt</a> &amp;init_array_expr, const <a class="el" href="classexprt.html">exprt</a> &amp;length_expr, const <a class="el" href="classtypet.html">typet</a> &amp;element_type, const <a class="el" href="classexprt.html">exprt</a> &amp;max_length_expr, <a class="el" href="java__object__factory_8h.html#a19118201f2fa63cf6bf138bd9e1e39a2">update_in_placet</a> update_in_place, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="java__object__factory_8h.html#a0d59c55b8dc5386351e61d136f987bd3">array_element_generatort</a> &amp;element_generator, const <a class="el" href="nondet_8h.html#a6efaa8683a2b110a4ad81d0f8a0e0567">allocate_local_symbolt</a> &amp;allocate_local_symbol, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:ab4dd77516d00c141fd67726a819ffc64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create code to nondeterministically initialize each element of an array in a loop.  <a href="java__object__factory_8cpp.html#ab4dd77516d00c141fd67726a819ffc64">More...</a><br /></td></tr>
+<tr class="separator:ab4dd77516d00c141fd67726a819ffc64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acac93159c363a5ddc975bc2ec764439a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__blockt.html">code_blockt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#acac93159c363a5ddc975bc2ec764439a">gen_nondet_array_init</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="java__object__factory_8h.html#a19118201f2fa63cf6bf138bd9e1e39a2">update_in_placet</a> update_in_place, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="java__object__factory_8h.html#a0d59c55b8dc5386351e61d136f987bd3">array_element_generatort</a> &amp;element_generator, const <a class="el" href="nondet_8h.html#a6efaa8683a2b110a4ad81d0f8a0e0567">allocate_local_symbolt</a> &amp;allocate_local_symbol, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const size_t max_nondet_array_length)</td></tr>
+<tr class="memdesc:acac93159c363a5ddc975bc2ec764439a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synthesize GOTO for generating a array of nondet length to be stored in the <code>expr</code>.  <a href="java__object__factory_8cpp.html#acac93159c363a5ddc975bc2ec764439a">More...</a><br /></td></tr>
+<tr class="separator:acac93159c363a5ddc975bc2ec764439a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a006572081f78e5f35f12627e51007300"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a006572081f78e5f35f12627e51007300">assert_type_consistency</a> (const <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;assignments)</td></tr>
 <tr class="separator:a006572081f78e5f35f12627e51007300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45ef8dfbc573e86b52302800100af310"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a45ef8dfbc573e86b52302800100af310">object_factory</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> base_name, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;init_code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> parameters, <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> lifetime, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;loc, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;log)</td></tr>
@@ -167,9 +168,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a0dfa7b249fd7093217a2be11c222042c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a0dfa7b249fd7093217a2be11c222042c">gen_nondet_init</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;init_code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;loc, bool skip_classid, <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> lifetime, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="java__object__factory_8h.html#a19118201f2fa63cf6bf138bd9e1e39a2">update_in_placet</a> update_in_place, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;log)</td></tr>
 <tr class="memdesc:a0dfa7b249fd7093217a2be11c222042c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a primitive-typed or reference-typed object tree rooted at <code>expr</code>, allocating child objects as necessary and nondet-initializing their members, or if MAY_ or MUST_UPDATE_IN_PLACE is set, re-initializing already-allocated objects.  <a href="java__object__factory_8cpp.html#a0dfa7b249fd7093217a2be11c222042c">More...</a><br /></td></tr>
 <tr class="separator:a0dfa7b249fd7093217a2be11c222042c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a5e7abbd86b85d06d727c6139b5627d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a0a5e7abbd86b85d06d727c6139b5627d">object_factory</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> base_name, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;init_code, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> lifetime, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;log)</td></tr>
-<tr class="memdesc:a0a5e7abbd86b85d06d727c6139b5627d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="java__object__factory_8cpp.html#a45ef8dfbc573e86b52302800100af310" title="Similar to gen_nondet_init below, but instead of allocating and non-deterministically initializing th...">object_factory()</a> above with a default (identity) pointer_type_selector.  <a href="java__object__factory_8cpp.html#a0a5e7abbd86b85d06d727c6139b5627d">More...</a><br /></td></tr>
-<tr class="separator:a0a5e7abbd86b85d06d727c6139b5627d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38539c334871caafe108f9fddc6a0c4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a38539c334871caafe108f9fddc6a0c4a">object_factory</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> base_name, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;init_code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> lifetime, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;log)</td></tr>
+<tr class="memdesc:a38539c334871caafe108f9fddc6a0c4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="java__object__factory_8cpp.html#a45ef8dfbc573e86b52302800100af310" title="Similar to gen_nondet_init below, but instead of allocating and non-deterministically initializing th...">object_factory()</a> above with a default (identity) pointer_type_selector.  <a href="java__object__factory_8cpp.html#a38539c334871caafe108f9fddc6a0c4a">More...</a><br /></td></tr>
+<tr class="separator:a38539c334871caafe108f9fddc6a0c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a983536d126da4c3537440152a1cc4f53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__object__factory_8cpp.html#a983536d126da4c3537440152a1cc4f53">gen_nondet_init</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;init_code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;loc, bool skip_classid, <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> lifetime, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, <a class="el" href="java__object__factory_8h.html#a19118201f2fa63cf6bf138bd9e1e39a2">update_in_placet</a> update_in_place, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;log)</td></tr>
 <tr class="memdesc:a983536d126da4c3537440152a1cc4f53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="java__object__factory_8cpp.html#a0dfa7b249fd7093217a2be11c222042c" title="Initializes a primitive-typed or reference-typed object tree rooted at expr, allocating child objects...">gen_nondet_init()</a> above with a default (identity) pointer_type_selector.  <a href="java__object__factory_8cpp.html#a983536d126da4c3537440152a1cc4f53">More...</a><br /></td></tr>
 <tr class="separator:a983536d126da4c3537440152a1cc4f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -252,12 +253,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01141">1141</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01142">1142</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aede2bd73e251ea02c3c1a561e0b6a399"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aede2bd73e251ea02c3c1a561e0b6a399">&#9670;&nbsp;</a></span>array_loop_init_code()</h2>
+<a id="ab4dd77516d00c141fd67726a819ffc64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4dd77516d00c141fd67726a819ffc64">&#9670;&nbsp;</a></span>array_loop_init_code()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -322,7 +323,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -371,7 +372,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01329">1329</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01330">1330</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -451,7 +452,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01185">1185</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01186">1186</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -479,7 +480,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01519">1519</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01520">1520</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -541,12 +542,12 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Code block constructing the auxiliary nondet integer and an assume statement that the integer is equal to the value of the expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00940">940</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00941">941</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aad17d55a019e83ed3d6236609aef502a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad17d55a019e83ed3d6236609aef502a">&#9670;&nbsp;</a></span>gen_nondet_array_init()</h2>
+<a id="acac93159c363a5ddc975bc2ec764439a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acac93159c363a5ddc975bc2ec764439a">&#9670;&nbsp;</a></span>gen_nondet_array_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -584,7 +585,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -616,7 +617,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The GOTO that approximates: ``` array_length = NONDET(int) ASSUME(array_length &lt; max_nondet_array_length) expr = java_new_array(max_nondet_array_length) expr-&gt;length = array_length for (int i = 0; i &lt; array_length; ++i) <code>element_generator()</code> ``` </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01375">1375</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01376">1376</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -711,7 +712,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01623">1623</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01624">1624</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -785,7 +786,7 @@ Variables</h2></td></tr>
 
 <p>Call <a class="el" href="java__object__factory_8cpp.html#a0dfa7b249fd7093217a2be11c222042c" title="Initializes a primitive-typed or reference-typed object tree rooted at expr, allocating child objects...">gen_nondet_init()</a> above with a default (identity) pointer_type_selector. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01680">1680</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01681">1681</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -832,7 +833,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A vector that can be passed to generate_nondet_switch </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00728">728</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00729">729</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -938,7 +939,7 @@ Variables</h2></td></tr>
 <div class="line">  .data=*string_data_pointer</div>
 </div><!-- fragment --><p>Unit tests in <code>unit/java_bytecode/java_object_factory/</code> ensure it is the case. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00364">364</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00365">365</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -968,12 +969,80 @@ Variables</h2></td></tr>
 
 <p>Converts and <a class="el" href="integer__interval_8h.html#a35c92211cace2a7df8a36381a8762884">integer_intervalt</a> to a a string of the for [lower]-[upper]. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00316">316</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l00317">317</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a38539c334871caafe108f9fddc6a0c4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38539c334871caafe108f9fddc6a0c4a">&#9670;&nbsp;</a></span>object_factory() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> object_factory </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
+          <td class="paramname"><em>base_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcode__blockt.html">code_blockt</a> &amp;&#160;</td>
+          <td class="paramname"><em>init_code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
+          <td class="paramname"><em>symbol_table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;&#160;</td>
+          <td class="paramname"><em>object_factory_parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a>&#160;</td>
+          <td class="paramname"><em>lifetime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>location</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>log</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Call <a class="el" href="java__object__factory_8cpp.html#a45ef8dfbc573e86b52302800100af310" title="Similar to gen_nondet_init below, but instead of allocating and non-deterministically initializing th...">object_factory()</a> above with a default (identity) pointer_type_selector. </p>
+
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01657">1657</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a45ef8dfbc573e86b52302800100af310"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45ef8dfbc573e86b52302800100af310">&#9670;&nbsp;</a></span>object_factory() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a45ef8dfbc573e86b52302800100af310">&#9670;&nbsp;</a></span>object_factory() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1044,75 +1113,7 @@ Variables</h2></td></tr>
 <p>See gen_nondet_init for a description of the parameters. The only new one is <code>type</code>, which is the type of the object to create.</p>
 <dl class="section return"><dt>Returns</dt><dd>The object created, the <code>symbol_table</code> gains any new symbols created, and <code>init_code</code> gains any instructions required to initialize either the returned value or its child objects </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01546">1546</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a0a5e7abbd86b85d06d727c6139b5627d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a5e7abbd86b85d06d727c6139b5627d">&#9670;&nbsp;</a></span>object_factory() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classexprt.html">exprt</a> object_factory </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
-          <td class="paramname"><em>base_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcode__blockt.html">code_blockt</a> &amp;&#160;</td>
-          <td class="paramname"><em>init_code</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
-          <td class="paramname"><em>symbol_table</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;&#160;</td>
-          <td class="paramname"><em>object_factory_parameters</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a>&#160;</td>
-          <td class="paramname"><em>lifetime</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
-          <td class="paramname"><em>location</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
-          <td class="paramname"><em>log</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Call <a class="el" href="java__object__factory_8cpp.html#a45ef8dfbc573e86b52302800100af310" title="Similar to gen_nondet_init below, but instead of allocating and non-deterministically initializing th...">object_factory()</a> above with a default (identity) pointer_type_selector. </p>
-
-<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01656">1656</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__object__factory_8cpp_source.html#l01547">1547</a> of file <a class="el" href="java__object__factory_8cpp_source.html">java_object_factory.cpp</a>.</p>
 
 </div>
 </div>

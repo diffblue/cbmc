@@ -105,20 +105,21 @@ $(document).ready(function(){initNavTree('value__set__dereference_8cpp.html','')
 <code>#include &lt;<a class="el" href="fresh__symbol_8h_source.html">util/fresh_symbol.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="json_8h_source.html">util/json.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="range_8h_source.html">util/range.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
-<code>#include &lt;deque&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol_8h_source.html">util/symbol.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="dereference__callback_8h_source.html">dereference_callback.h</a>&quot;</code><br />
+<code>#include &lt;deque&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for value_set_dereference.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="value__set__dereference_8cpp__incl.svg" width="3218" height="843"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="value__set__dereference_8cpp__incl.svg" width="3472" height="828"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -166,7 +167,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00666">666</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00667">667</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -197,7 +198,7 @@ Functions</h2></td></tr>
 <p>Returns true if <code>expr</code> is complicated enough that a local definition (using a let expression) is preferable to repeating it, potentially many times. </p>
 <p>Of course this is just a heuristic &ndash; currently we allow any expression that only involves one symbol, such as "x", "(type*)x", "x[0]" (but not "x[y]"). Particularly we want to make sure to insist on a local definition of <code>expr</code> is a large if-expression, such as <code>p == &amp;o1 ? o1 : p == &amp;o2 ? o2 : ...</code>, as can result from dereferencing a subexpression (though note that <a class="el" href="classvalue__set__dereferencet.html#aa1b74cf1877d611aac52a357afb881ca">value_set_dereferencet::dereference</a> special-cases <a class="el" href="classif__exprt.html" title="The trinary if-then-else operator.">if_exprt</a>, and therefore handles the specific case of a double-dereference (**p) without an intervening member operator, typecast, pointer arithmetic, etc.) </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00049">49</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00050">50</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -237,7 +238,7 @@ Functions</h2></td></tr>
 
 <p>If <code>expr</code> is of the form (c1 ? e1[o1] : c2 ? e2[o2] : c3 ? ...) then return <code>c1 ? e1[o1 + offset] : e2[o2 + offset] : c3 ? ...</code> otherwise return an empty optionalt. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00106">106</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00107">107</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +288,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00066">66</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00067">67</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>

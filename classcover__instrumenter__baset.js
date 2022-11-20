@@ -2,7 +2,7 @@ var classcover__instrumenter__baset =
 [
     [ "assertion_factoryt", "classcover__instrumenter__baset.html#afcc476761859d709c84f5e8a6f62565d", null ],
     [ "~cover_instrumenter_baset", "classcover__instrumenter__baset.html#ac37af5f49be7460f593a3ae5b506515d", null ],
-    [ "cover_instrumenter_baset", "classcover__instrumenter__baset.html#a1a614aa80322cb0f6b91415d5a461af4", null ],
+    [ "cover_instrumenter_baset", "classcover__instrumenter__baset.html#a4b139cd61ddc98ba45c9536bfa6f6796", null ],
     [ "initialize_source_location", "classcover__instrumenter__baset.html#af0f71ebd644af5802d9baf45e167d50b", null ],
     [ "instrument", "classcover__instrumenter__baset.html#a34d77f867f0ce627a83428d713162405", null ],
     [ "is_non_cover_assertion", "classcover__instrumenter__baset.html#abef8e13fac33d32ca93c533426ae4b9c", null ],

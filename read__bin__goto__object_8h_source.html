@@ -109,24 +109,24 @@ $(document).ready(function(){initNavTree('read__bin__goto__object_8h_source.html
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;iosfwd&gt;</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span><a class="code" href="classsymbol__tablet.html">symbol_tablet</a>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span><a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a>;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">class </span><a class="code" href="classgoto__functionst.html">goto_functionst</a>;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">class </span><a class="code" href="classmessage__handlert.html">message_handlert</a>;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="read__bin__goto__object_8h.html#ac85ad18b96feb9567f0d0f5d5241e2c8">read_bin_goto_object</a>(</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="read__bin__goto__object_8h.html#ae73d6315ff1b51fb15805d9001867509">read_bin_goto_object</a>(</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::istream &amp;in,</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif // CPROVER_GOTO_PROGRAMS_READ_BIN_GOTO_OBJECT_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclasssymbol__tablet_html"><div class="ttname"><a href="classsymbol__tablet.html">symbol_tablet</a></div><div class="ttdoc">The symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table_8h_source.html#l00013">symbol_table.h:13</a></div></div>
-<div class="ttc" id="aread__bin__goto__object_8h_html_ac85ad18b96feb9567f0d0f5d5241e2c8"><div class="ttname"><a href="read__bin__goto__object_8h.html#ac85ad18b96feb9567f0d0f5d5241e2c8">read_bin_goto_object</a></div><div class="ttdeci">bool read_bin_goto_object(std::istream &amp;in, const std::string &amp;filename, symbol_tablet &amp;symbol_table, goto_functionst &amp;goto_functions, message_handlert &amp;message_handler)</div><div class="ttdoc">reads a goto binary file back into a symbol and a function table</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00176">read_bin_goto_object.cpp:176</a></div></div>
+<div class="ttc" id="aclasssymbol__table__baset_html"><div class="ttname"><a href="classsymbol__table__baset.html">symbol_table_baset</a></div><div class="ttdoc">The symbol table base class interface.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table__base_8h_source.html#l00021">symbol_table_base.h:21</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html"><div class="ttname"><a href="classgoto__functionst.html">goto_functionst</a></div><div class="ttdoc">A collection of goto functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00024">goto_functions.h:24</a></div></div>
+<div class="ttc" id="aread__bin__goto__object_8h_html_ae73d6315ff1b51fb15805d9001867509"><div class="ttname"><a href="read__bin__goto__object_8h.html#ae73d6315ff1b51fb15805d9001867509">read_bin_goto_object</a></div><div class="ttdeci">bool read_bin_goto_object(std::istream &amp;in, const std::string &amp;filename, symbol_table_baset &amp;symbol_table, goto_functionst &amp;goto_functions, message_handlert &amp;message_handler)</div><div class="ttdoc">reads a goto binary file back into a symbol and a function table</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00176">read_bin_goto_object.cpp:176</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

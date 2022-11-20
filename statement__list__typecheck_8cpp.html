@@ -97,21 +97,21 @@ $(document).ready(function(){initNavTree('statement__list__typecheck_8cpp.html',
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="statement__list__typecheck_8h_source.html">statement_list_typecheck.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="statement__list__types_8h_source.html">converters/statement_list_types.h</a>&quot;</code><br />
-<code>#include &lt;<a class="el" href="goto__instruction__code_8h_source.html">goto-programs/goto_instruction_code.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="cprover__prefix_8h_source.html">util/cprover_prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="goto__instruction__code_8h_source.html">goto-programs/goto_instruction_code.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="statement__list__types_8h_source.html">converters/statement_list_types.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for statement_list_typecheck.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="statement__list__typecheck_8cpp__incl.svg" width="1583" height="694"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="statement__list__typecheck_8cpp__incl.svg" width="1760" height="918"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -145,9 +145,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a2e93cd17d6dae55e61e31dbae260a7e5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__typecheck_8cpp.html#a2e93cd17d6dae55e61e31dbae260a7e5">create_data_block_parameter</a> (const <a class="el" href="classstruct__typet.html">struct_typet</a> &amp;data_block_type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_block_name)</td></tr>
 <tr class="memdesc:a2e93cd17d6dae55e61e31dbae260a7e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates the artificial data block parameter with a generic name and the specified type.  <a href="statement__list__typecheck_8cpp.html#a2e93cd17d6dae55e61e31dbae260a7e5">More...</a><br /></td></tr>
 <tr class="separator:a2e93cd17d6dae55e61e31dbae260a7e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f4e2a137df3cf75fcb72823ebc5e29f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__typecheck_8cpp.html#a8f4e2a137df3cf75fcb72823ebc5e29f">statement_list_typecheck</a> (const <a class="el" href="classstatement__list__parse__treet.html">statement_list_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::string &amp;module, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:a8f4e2a137df3cf75fcb72823ebc5e29f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check.">statement_list_typecheckt</a> object and perform a type check to fill the symbol table.  <a href="statement__list__typecheck_8cpp.html#a8f4e2a137df3cf75fcb72823ebc5e29f">More...</a><br /></td></tr>
-<tr class="separator:a8f4e2a137df3cf75fcb72823ebc5e29f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a005f4c8b17c45099e7d5f2f509da3b27"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__typecheck_8cpp.html#a005f4c8b17c45099e7d5f2f509da3b27">statement_list_typecheck</a> (const <a class="el" href="classstatement__list__parse__treet.html">statement_list_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const std::string &amp;module, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:a005f4c8b17c45099e7d5f2f509da3b27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check.">statement_list_typecheckt</a> object and perform a type check to fill the symbol table.  <a href="statement__list__typecheck_8cpp.html#a005f4c8b17c45099e7d5f2f509da3b27">More...</a><br /></td></tr>
+<tr class="separator:a005f4c8b17c45099e7d5f2f509da3b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -175,7 +175,7 @@ Variables</h2></td></tr>
 
 <p>Name of the CBMC assert function. </p>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00034">34</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00035">35</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -193,7 +193,7 @@ Variables</h2></td></tr>
 
 <p>Name of the CBMC assume function. </p>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00036">36</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00037">37</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -211,7 +211,7 @@ Variables</h2></td></tr>
 
 <p>Name of the RLO symbol used in some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00038">38</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00039">39</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -229,7 +229,7 @@ Variables</h2></td></tr>
 
 <p>Artificial name for the data block interface of a function block. </p>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00030">30</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00031">31</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -247,7 +247,7 @@ Variables</h2></td></tr>
 
 <p>Postfix for the type of a data block. </p>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00032">32</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00033">33</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +265,7 @@ Variables</h2></td></tr>
 
 <p>Size of pointers in Siemens TIA. </p>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00026">26</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00027">27</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -281,7 +281,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00028">28</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00029">29</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -330,12 +330,12 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Parameter of the data block. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00069">69</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00070">70</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a8f4e2a137df3cf75fcb72823ebc5e29f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f4e2a137df3cf75fcb72823ebc5e29f">&#9670;&nbsp;</a></span>statement_list_typecheck()</h2>
+<a id="a005f4c8b17c45099e7d5f2f509da3b27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a005f4c8b17c45099e7d5f2f509da3b27">&#9670;&nbsp;</a></span>statement_list_typecheck()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -349,7 +349,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -384,7 +384,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>False if no errors occurred, true otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00081">81</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00082">82</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -423,7 +423,7 @@ Variables</h2></td></tr>
 <div class="line">  ID_statement_list_xor_not_nested,</div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00040">40</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00041">41</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>
@@ -454,7 +454,7 @@ Variables</h2></td></tr>
 <div class="line">  ID_statement_list_assign,</div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00055">55</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__typecheck_8cpp_source.html#l00056">56</a> of file <a class="el" href="statement__list__typecheck_8cpp_source.html">statement_list_typecheck.cpp</a>.</p>
 
 </div>
 </div>

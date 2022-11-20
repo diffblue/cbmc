@@ -103,22 +103,22 @@ $(document).ready(function(){initNavTree('flatten__ok__expr_8h_source.html','');
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#ifndef CPROVER_CPROVER_FLATTEN_OK_EXPR_H</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#define CPROVER_CPROVER_FLATTEN_OK_EXPR_H</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="state_8h.html">state.h</a>&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// X_ok(p, s) &lt;--&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">//   live_object(p)</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">// ∧ offset(p)+s≤object_size(p)</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// ∧ writeable_object(p)           if applicable</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="flatten__ok__expr_8h.html#aa014b5875e008f283627c5a14831e155">flatten</a>(<span class="keyword">const</span> <a class="code" href="classstate__ok__exprt.html">state_ok_exprt</a> &amp;);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif // CPROVER_CPROVER_FLATTEN_OK_EXPR_H</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">class </span><a class="code" href="classexprt.html">exprt</a>;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">class </span><a class="code" href="classstate__ok__exprt.html">state_ok_exprt</a>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">// X_ok(p, s) &lt;--&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">//   live_object(p)</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// ∧ offset(p)+s≤object_size(p)</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">// ∧ writeable_object(p)           if applicable</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="flatten__ok__expr_8h.html#aa014b5875e008f283627c5a14831e155">flatten</a>(<span class="keyword">const</span> <a class="code" href="classstate__ok__exprt.html">state_ok_exprt</a> &amp;);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif // CPROVER_CPROVER_FLATTEN_OK_EXPR_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
-<div class="ttc" id="aflatten__ok__expr_8h_html_aa014b5875e008f283627c5a14831e155"><div class="ttname"><a href="flatten__ok__expr_8h.html#aa014b5875e008f283627c5a14831e155">flatten</a></div><div class="ttdeci">exprt flatten(const state_ok_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="flatten__ok__expr_8cpp_source.html#l00013">flatten_ok_expr.cpp:13</a></div></div>
+<div class="ttc" id="aflatten__ok__expr_8h_html_aa014b5875e008f283627c5a14831e155"><div class="ttname"><a href="flatten__ok__expr_8h.html#aa014b5875e008f283627c5a14831e155">flatten</a></div><div class="ttdeci">exprt flatten(const state_ok_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="flatten__ok__expr_8cpp_source.html#l00015">flatten_ok_expr.cpp:15</a></div></div>
 <div class="ttc" id="aclassstate__ok__exprt_html"><div class="ttname"><a href="classstate__ok__exprt.html">state_ok_exprt</a></div><div class="ttdef"><b>Definition:</b> <a href="state_8h_source.html#l00822">state.h:822</a></div></div>
-<div class="ttc" id="astate_8h_html"><div class="ttname"><a href="state_8h.html">state.h</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

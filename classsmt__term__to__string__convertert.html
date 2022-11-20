@@ -180,7 +180,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><dl class="section note"><dt>Note</dt><dd>The printing algorithm in the <code><a class="el" href="classsmt__term__to__string__convertert.html">smt_term_to_string_convertert</a></code> class is implemented using an explicit <code>std::stack</code> rather than using recursion and the call stack. This is done in order to ensure we can print smt terms which are nested arbitrarily deeply without risk of exceeding the maximum depth of the call stack.</dd></dl>
 <p>The set of <code>visit</code> functions push functions to <code>output_stack</code>, which capture the value to be printed. When called these functions may either print to the output stream or push further functions to the stack in the case of nodes in the tree which have child nodes which also need to be printed. The <code>push_output(s)</code> functions exist as convenience functions to allow pushing the capturing functions to the stack in the reverse order required for printing, whilst keeping the visit functions easier to read by keeping the outputs in reading order and separating the capturing code. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00119">119</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00118">118</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a24b1311d979b7c0a9f5c54aeea9a7732"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a24b1311d979b7c0a9f5c54aeea9a7732">&#9670;&nbsp;</a></span>output_functiont</h2>
@@ -202,7 +202,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00122">122</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00121">121</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -270,7 +270,7 @@ Private Attributes</h2></td></tr>
 <p>This function is complete the external interface to this class. </p>
 <p>All construction of this class and printing of terms should be carried out via this function. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00300">300</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00299">299</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -298,7 +298,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00180">180</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00179">179</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -326,7 +326,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00186">186</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00185">185</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -354,7 +354,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00192">192</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00191">191</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +382,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00211">211</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00210">210</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -410,7 +410,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00173">173</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00172">172</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -440,7 +440,7 @@ template&lt;typename elementt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00199">199</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00198">198</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -472,7 +472,7 @@ template&lt;typename outputt &gt; </div>
 
 <p>Single argument version of <code>push_outputs</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00230">230</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00229">229</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +501,7 @@ template&lt;typename outputt &gt; </div>
 
 <p>Base case for the recursive <code>push_outputs</code> function template below. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00235">235</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00234">234</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -545,7 +545,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 <p>This variadic template supports any (compile time fixed) number of output arguments.</p>
 <p>The arguments are pushed in order from right to left, so that they are subsequently in left to right order when popped off the stack. The types of argument supported are those supported by the overloads of the <code>make_output_function</code> function. </p><dl class="section note"><dt>Note</dt><dd>This is implemented recursively, but does not risk exceeding the maximum depth of the call stack. This is because the number of times it recurses depends only on the number of arguments supplied in the source code at compile time. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00240">240</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00239">239</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +573,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00269">269</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00268">268</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -601,7 +601,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00248">248</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00247">247</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -629,7 +629,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00292">292</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00291">291</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -657,7 +657,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00285">285</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00284">284</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -685,7 +685,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00277">277</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00276">276</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -713,7 +713,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00254">254</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00253">253</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>
@@ -738,7 +738,7 @@ template&lt;typename outputt , typename... outputst&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00123">123</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__to__smt2__string_8cpp_source.html#l00122">122</a> of file <a class="el" href="smt__to__smt2__string_8cpp_source.html">smt_to_smt2_string.cpp</a>.</p>
 
 </div>
 </div>

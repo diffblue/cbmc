@@ -95,19 +95,20 @@ $(document).ready(function(){initNavTree('builtin__factory_8cpp.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="builtin__factory_8h_source.html">builtin_factory.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ansi__c__internal__additions_8h_source.html">ansi_c_internal_additions.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ansi__c__parser_8h_source.html">ansi_c_parser.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ansi__c__typecheck_8h_source.html">ansi_c_typecheck.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string__utils_8h_source.html">util/string_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="ansi__c__internal__additions_8h_source.html">ansi_c_internal_additions.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ansi__c__parser_8h_source.html">ansi_c_parser.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ansi__c__typecheck_8h_source.html">ansi_c_typecheck.h</a>&quot;</code><br />
 <code>#include &lt;sstream&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for builtin_factory.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="builtin__factory_8cpp__incl.svg" width="2714" height="1038"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="builtin__factory_8cpp__incl.svg" width="2670" height="888"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -117,15 +118,15 @@ $(document).ready(function(){initNavTree('builtin__factory_8cpp.html',''); initR
 Functions</h2></td></tr>
 <tr class="memitem:aff3a6fc6006f0abc2d5dc57c57c557be"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="builtin__factory_8cpp.html#aff3a6fc6006f0abc2d5dc57c57c557be">find_pattern</a> (const std::string &amp;pattern, const char *header_file, std::ostream &amp;out)</td></tr>
 <tr class="separator:aff3a6fc6006f0abc2d5dc57c57c557be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15a889cea9f20b1a2bc649eecc1bb5ba"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="builtin__factory_8cpp.html#a15a889cea9f20b1a2bc649eecc1bb5ba">convert</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const std::ostringstream &amp;s, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="separator:a15a889cea9f20b1a2bc649eecc1bb5ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23e74e558077af99c9f335327c104415"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="builtin__factory_8cpp.html#a23e74e558077af99c9f335327c104415">builtin_factory</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;mh)</td></tr>
-<tr class="memdesc:a23e74e558077af99c9f335327c104415"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether given identifier is a compiler built-in.  <a href="builtin__factory_8cpp.html#a23e74e558077af99c9f335327c104415">More...</a><br /></td></tr>
-<tr class="separator:a23e74e558077af99c9f335327c104415"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d36441a298ad693bcd45d36d0ba87f1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="builtin__factory_8cpp.html#a5d36441a298ad693bcd45d36d0ba87f1">convert</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const std::ostringstream &amp;s, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="separator:a5d36441a298ad693bcd45d36d0ba87f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41f87a28443cea7232e72c2e8e176c32"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="builtin__factory_8cpp.html#a41f87a28443cea7232e72c2e8e176c32">builtin_factory</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;mh)</td></tr>
+<tr class="memdesc:a41f87a28443cea7232e72c2e8e176c32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether given identifier is a compiler built-in.  <a href="builtin__factory_8cpp.html#a41f87a28443cea7232e72c2e8e176c32">More...</a><br /></td></tr>
+<tr class="separator:a41f87a28443cea7232e72c2e8e176c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a23e74e558077af99c9f335327c104415"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23e74e558077af99c9f335327c104415">&#9670;&nbsp;</a></span>builtin_factory()</h2>
+<a id="a41f87a28443cea7232e72c2e8e176c32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41f87a28443cea7232e72c2e8e176c32">&#9670;&nbsp;</a></span>builtin_factory()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -139,7 +140,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -159,12 +160,12 @@ Functions</h2></td></tr>
 <p>Check whether given identifier is a compiler built-in. </p>
 <p>If so, add declaration to symbol table. </p><dl class="section return"><dt>Returns</dt><dd>'true' on error </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="builtin__factory_8cpp_source.html#l00097">97</a> of file <a class="el" href="builtin__factory_8cpp_source.html">builtin_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="builtin__factory_8cpp_source.html#l00098">98</a> of file <a class="el" href="builtin__factory_8cpp_source.html">builtin_factory.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a15a889cea9f20b1a2bc649eecc1bb5ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15a889cea9f20b1a2bc649eecc1bb5ba">&#9670;&nbsp;</a></span>convert()</h2>
+<a id="a5d36441a298ad693bcd45d36d0ba87f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d36441a298ad693bcd45d36d0ba87f1">&#9670;&nbsp;</a></span>convert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -187,7 +188,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -209,7 +210,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="builtin__factory_8cpp_source.html#l00041">41</a> of file <a class="el" href="builtin__factory_8cpp_source.html">builtin_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="builtin__factory_8cpp_source.html#l00042">42</a> of file <a class="el" href="builtin__factory_8cpp_source.html">builtin_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +254,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="builtin__factory_8cpp_source.html#l00021">21</a> of file <a class="el" href="builtin__factory_8cpp_source.html">builtin_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="builtin__factory_8cpp_source.html#l00022">22</a> of file <a class="el" href="builtin__factory_8cpp_source.html">builtin_factory.cpp</a>.</p>
 
 </div>
 </div>

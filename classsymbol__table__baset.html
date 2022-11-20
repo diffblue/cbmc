@@ -198,6 +198,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac5d9e2a3cc9bf28089a8d28fde345c0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cf8c71f5c76462e4eac667861efddde"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classsymbol__table__baset.html#a6bd1e0131908dc95baee87414289e581">const_iteratort</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a3cf8c71f5c76462e4eac667861efddde">end</a> () const</td></tr>
 <tr class="separator:a3cf8c71f5c76462e4eac667861efddde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3793b9a8dcf88f3784159b674d393043"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a3793b9a8dcf88f3784159b674d393043">validate</a> (const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a> vm=<a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a>) const =0</td></tr>
+<tr class="separator:a3793b9a8dcf88f3784159b674d393043"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -546,7 +548,7 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classsymbol__tablet.html#a3331954a71bea91f811b11e8240446ad">symbol_tablet</a>, <a class="el" href="classsymbol__table__buildert.html#ae807903096b2b41bbc7cbb476aefa1ad">symbol_table_buildert</a>, and <a class="el" href="classjournalling__symbol__tablet.html#a3451b2e82e85b12d5e3581e19977bff7">journalling_symbol_tablet</a>.</p>
+<p>Implemented in <a class="el" href="classsymbol__tablet.html#a3331954a71bea91f811b11e8240446ad">symbol_tablet</a>, <a class="el" href="classsymbol__table__buildert.html#ae807903096b2b41bbc7cbb476aefa1ad">symbol_table_buildert</a>, and <a class="el" href="classjournalling__symbol__tablet.html#acab26ab1da246e6a7f8899b0aecb5af7">journalling_symbol_tablet</a>.</p>
 
 </div>
 </div>
@@ -868,7 +870,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classjournalling__symbol__tablet.html#ac76e2b94292dbb6d37a97e071876a729">journalling_symbol_tablet</a>, and <a class="el" href="classsymbol__table__buildert.html#a8c9eb21c7e3ff7cff03d0d445a380caa">symbol_table_buildert</a>.</p>
+<p>Reimplemented in <a class="el" href="classsymbol__table__buildert.html#a8c9eb21c7e3ff7cff03d0d445a380caa">symbol_table_buildert</a>, and <a class="el" href="classjournalling__symbol__tablet.html#ac76e2b94292dbb6d37a97e071876a729">journalling_symbol_tablet</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="symbol__table__base_8h_source.html#l00072">72</a> of file <a class="el" href="symbol__table__base_8h_source.html">symbol_table_base.h</a>.</p>
 
@@ -1052,6 +1054,34 @@ Public Attributes</h2></td></tr>
 <p>Build and return a lexicographically sorted vector of symbol names from all symbols stored in this symbol table. </p>
 
 <p class="definition">Definition at line <a class="el" href="symbol__table__base_8cpp_source.html#l00036">36</a> of file <a class="el" href="symbol__table__base_8cpp_source.html">symbol_table_base.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3793b9a8dcf88f3784159b674d393043"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3793b9a8dcf88f3784159b674d393043">&#9670;&nbsp;</a></span>validate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void symbol_table_baset::validate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a>&#160;</td>
+          <td class="paramname"><em>vm</em> = <code><a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classjournalling__symbol__tablet.html#a47d6de5acf1609dbf1f6b0fb75addd89">journalling_symbol_tablet</a>, <a class="el" href="classsymbol__tablet.html#afe02534073901d7f666cbb265c937821">symbol_tablet</a>, and <a class="el" href="classsymbol__table__buildert.html#a77e3c0ffce2a5b5e2bb203d31bd2ef21">symbol_table_buildert</a>.</p>
 
 </div>
 </div>

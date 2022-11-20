@@ -106,230 +106,229 @@ $(document).ready(function(){initNavTree('rw__set_8cpp_source.html',''); initRes
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="rw__set_8h.html">rw_set.h</a>&quot;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__code_8h.html">util/std_code.h</a>&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="language__util_8h.html">langapi/language_util.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__program__dereference_8h.html">pointer-analysis/goto_program_dereference.h</a>&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classrw__set__baset.html#ac5bac2a0dffba75aec675ecfb4147226">   23</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classrw__set__baset.html#ac5bac2a0dffba75aec675ecfb4147226">rw_set_baset::output</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;READ:\n&quot;</span>;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordflow">for</span>(entriest::const_iterator it=<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>.begin();</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      it!=<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>.end();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      it++)</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  {</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    out &lt;&lt; it-&gt;second.object &lt;&lt; <span class="stringliteral">&quot; if &quot;</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(<a class="code" href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">ns</a>, it-&gt;second.object, it-&gt;second.guard) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  }</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;WRITE:\n&quot;</span>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">for</span>(entriest::const_iterator it=<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>.begin();</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      it!=<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>.end();</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      it++)</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    out &lt;&lt; it-&gt;second.object &lt;&lt; <span class="stringliteral">&quot; if &quot;</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(<a class="code" href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">ns</a>, it-&gt;second.object, it-&gt;second.guard) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="class__rw__set__loct.html#a72b2fdfba577585d3e5d9a4c3b311324">   46</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class__rw__set__loct.html#a72b2fdfba577585d3e5d9a4c3b311324">_rw_set_loct::compute</a>()</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_assign())</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">assign</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;assign_lhs(), <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;assign_rhs());</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_goto() ||</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;          <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_assume() ||</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;          <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_assert())</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;condition());</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_function_call())</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_function());</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="comment">// do operands</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">for</span>(code_function_callt::argumentst::const_iterator it =</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;          <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_arguments().begin();</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        it != <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_arguments().end();</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        it++)</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(*it);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_lhs().is_not_nil())</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <a class="code" href="class__rw__set__loct.html#aa1ceb7c43d2e7b1b98668db73f50d937">write</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_lhs());</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">   74</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">_rw_set_loct::assign</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;rhs)</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;{</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(rhs);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(lhs, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>());</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">   80</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">_rw_set_loct::read_write_rec</a>(</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>,</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordtype">bool</span> w,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;guard_conjuncts)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;{</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_symbol)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol_expr=<a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(expr);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">object</span>=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(symbol_expr.<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>())+suffix;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>)</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;entry = <a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>.emplace(</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordtype">object</span>, <a class="code" href="structrw__set__baset_1_1entryt.html">entryt</a>(symbol_expr, <span class="keywordtype">object</span>, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(guard_conjuncts)));</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <a class="code" href="classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1">track_deref</a>(entry.first-&gt;second, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    }</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordflow">if</span>(w)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;entry = <a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>.emplace(</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="keywordtype">object</span>, <a class="code" href="structrw__set__baset_1_1entryt.html">entryt</a>(symbol_expr, <span class="keywordtype">object</span>, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(guard_conjuncts)));</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <a class="code" href="classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1">track_deref</a>(entry.first-&gt;second, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;member_expr = <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">const</span> std::string &amp;component_name =</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member_expr.get_component_name());</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      member_expr.compound(),</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>,</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      w,</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="stringliteral">&quot;.&quot;</span> + component_name + suffix,</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      guard_conjuncts);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_index)</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">// we don&#39;t distinguish the array elements for now</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;index_expr = <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(index_expr.array(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, <span class="stringliteral">&quot;[]&quot;</span> + suffix, guard_conjuncts);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(index_expr.index(), guard_conjuncts);</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dereference)</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="classrw__set__baset.html#aeb25279168a4141a24e4375d00133497">set_track_deref</a>();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(<a class="code" href="pointer__expr_8h.html#a6b698bc1a6c73da6c1a015bb67d063dc">to_dereference_expr</a>(expr).pointer(), guard_conjuncts);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <a class="code" href="classexprt.html">exprt</a> tmp=expr;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">    #ifdef LOCAL_MAY</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keyword">const</span> std::set&lt;exprt&gt; aliases=local_may.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>, expr);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">for</span>(std::set&lt;exprt&gt;::const_iterator it=aliases.begin();</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      it!=aliases.end();</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      ++it)</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">      #ifndef LOCAL_MAY_SOUND</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">if</span>(it-&gt;id()==ID_unknown)</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="comment">/* as an under-approximation */</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="comment">// std::cout &lt;&lt; &quot;Sorry, LOCAL_MAY too imprecise. &quot;</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="comment">//           &lt;&lt; Omitting some variables.\n&quot;;</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">object</span>=ID_unknown;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <a class="code" href="structrw__set__baset_1_1entryt.html">entryt</a> &amp;entry=<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>[object];</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        entry.<a class="code" href="structrw__set__baset_1_1entryt.html#a48ed22e9dbb0c6731765727f453767a4">object</a>=object;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        entry.<a class="code" href="structrw__set__baset_1_1entryt.html#aecd3a763435b8341e0086018fb720ee6">symbol_expr</a>=<a class="code" href="classsymbol__exprt.html">symbol_exprt</a>(ID_unknown);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        entry.<a class="code" href="structrw__set__baset_1_1entryt.html#a7a3dac889faf149d77e58b2dfdb41806">guard</a> = <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(guard_conjuncts); <span class="comment">// should &#39;OR&#39;</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      }</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">      #endif</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(*it, <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="preprocessor">    #else</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <a class="code" href="goto__program__dereference_8cpp.html#a26e427bd4f1f3d201885c35a14993452">dereference</a>(<a class="code" href="class__rw__set__loct.html#a535579c3d2da451dc8534ec485944b66">function_id</a>, <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>, tmp, <a class="code" href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">ns</a>, <a class="code" href="class__rw__set__loct.html#a637e9ee5fcc91293cce3e53a82b0d2b7">value_sets</a>);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(tmp, <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <a class="code" href="classrw__set__baset.html#a973c1c6159f73d02fcf43f82158ee506">reset_track_deref</a>();</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_typecast)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr).op(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  }</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_address_of)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    assert(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()==1);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  }</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_if)</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  {</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;if_expr = <a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(expr);</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(if_expr.cond(), guard_conjuncts);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> true_guard = guard_conjuncts;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    true_guard.push_back(if_expr.cond());</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(if_expr.true_case(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, true_guard);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> false_guard = guard_conjuncts;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    false_guard.push_back(<a class="code" href="classnot__exprt.html">not_exprt</a>(if_expr.cond()));</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(if_expr.false_case(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, false_guard);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(*it, <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  }</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;}</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
-<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">  194</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">rw_set_functiont::compute_rec</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">function</span>)</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;{</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">function</span>.<span class="keywordtype">id</span>()==ID_symbol)</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  {</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id = <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(<span class="keyword">function</span>).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    goto_functionst::function_mapt::const_iterator f_it =</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(function_id);</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">if</span>(f_it!=<a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    {</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;body=f_it-&gt;second.body;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="preprocessor">#ifdef LOCAL_MAY</span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      <a class="code" href="classlocal__may__aliast.html">local_may_aliast</a> local_may(f_it-&gt;second);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordflow">for</span>(goto_functionst::function_mapt::const_iterator</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;          g_it=<a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.begin();</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;          g_it!=<a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end(); ++g_it)</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        local_may(g_it-&gt;second);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="language__util_8h.html">langapi/language_util.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__program__dereference_8h.html">pointer-analysis/goto_program_dereference.h</a>&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="classrw__set__baset.html#ac5bac2a0dffba75aec675ecfb4147226">   22</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classrw__set__baset.html#ac5bac2a0dffba75aec675ecfb4147226">rw_set_baset::output</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;READ:\n&quot;</span>;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordflow">for</span>(entriest::const_iterator it=<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>.begin();</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      it!=<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>.end();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      it++)</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    out &lt;&lt; it-&gt;second.object &lt;&lt; <span class="stringliteral">&quot; if &quot;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(<a class="code" href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">ns</a>, it-&gt;second.object, it-&gt;second.guard) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  }</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;WRITE:\n&quot;</span>;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">for</span>(entriest::const_iterator it=<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>.begin();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      it!=<a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>.end();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      it++)</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    out &lt;&lt; it-&gt;second.object &lt;&lt; <span class="stringliteral">&quot; if &quot;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(<a class="code" href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">ns</a>, it-&gt;second.object, it-&gt;second.guard) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="class__rw__set__loct.html#a72b2fdfba577585d3e5d9a4c3b311324">   45</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class__rw__set__loct.html#a72b2fdfba577585d3e5d9a4c3b311324">_rw_set_loct::compute</a>()</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;{</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_assign())</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">assign</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;assign_lhs(), <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;assign_rhs());</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_goto() ||</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;          <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_assume() ||</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;          <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_assert())</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;condition());</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;is_function_call())</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_function());</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="comment">// do operands</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">for</span>(code_function_callt::argumentst::const_iterator it =</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;          <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_arguments().begin();</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        it != <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_arguments().end();</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        it++)</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(*it);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_lhs().is_not_nil())</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <a class="code" href="class__rw__set__loct.html#aa1ceb7c43d2e7b1b98668db73f50d937">write</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>-&gt;call_lhs());</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">   73</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">_rw_set_loct::assign</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;rhs)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(rhs);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(lhs, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>());</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">   79</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">_rw_set_loct::read_write_rec</a>(</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordtype">bool</span> w,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;guard_conjuncts)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;{</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_symbol)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol_expr=<a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(expr);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">object</span>=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(symbol_expr.<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>())+suffix;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;entry = <a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>.emplace(</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keywordtype">object</span>, <a class="code" href="structrw__set__baset_1_1entryt.html">entryt</a>(symbol_expr, <span class="keywordtype">object</span>, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(guard_conjuncts)));</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <a class="code" href="classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1">track_deref</a>(entry.first-&gt;second, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">if</span>(w)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;entry = <a class="code" href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">w_entries</a>.emplace(</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordtype">object</span>, <a class="code" href="structrw__set__baset_1_1entryt.html">entryt</a>(symbol_expr, <span class="keywordtype">object</span>, <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(guard_conjuncts)));</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <a class="code" href="classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1">track_deref</a>(entry.first-&gt;second, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;member_expr = <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keyword">const</span> std::string &amp;component_name =</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member_expr.get_component_name());</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      member_expr.compound(),</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>,</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      w,</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <span class="stringliteral">&quot;.&quot;</span> + component_name + suffix,</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      guard_conjuncts);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_index)</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  {</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// we don&#39;t distinguish the array elements for now</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;index_expr = <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(index_expr.array(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, <span class="stringliteral">&quot;[]&quot;</span> + suffix, guard_conjuncts);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(index_expr.index(), guard_conjuncts);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  }</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dereference)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <a class="code" href="classrw__set__baset.html#aeb25279168a4141a24e4375d00133497">set_track_deref</a>();</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(<a class="code" href="pointer__expr_8h.html#a6b698bc1a6c73da6c1a015bb67d063dc">to_dereference_expr</a>(expr).pointer(), guard_conjuncts);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <a class="code" href="classexprt.html">exprt</a> tmp=expr;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">    #ifdef LOCAL_MAY</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">const</span> std::set&lt;exprt&gt; aliases=local_may.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(<a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>, expr);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">for</span>(std::set&lt;exprt&gt;::const_iterator it=aliases.begin();</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      it!=aliases.end();</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      ++it)</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    {</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">      #ifndef LOCAL_MAY_SOUND</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <span class="keywordflow">if</span>(it-&gt;id()==ID_unknown)</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      {</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="comment">/* as an under-approximation */</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="comment">// std::cout &lt;&lt; &quot;Sorry, LOCAL_MAY too imprecise. &quot;</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="comment">//           &lt;&lt; Omitting some variables.\n&quot;;</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">object</span>=ID_unknown;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <a class="code" href="structrw__set__baset_1_1entryt.html">entryt</a> &amp;entry=<a class="code" href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">r_entries</a>[object];</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        entry.<a class="code" href="structrw__set__baset_1_1entryt.html#a48ed22e9dbb0c6731765727f453767a4">object</a>=object;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        entry.<a class="code" href="structrw__set__baset_1_1entryt.html#aecd3a763435b8341e0086018fb720ee6">symbol_expr</a>=<a class="code" href="classsymbol__exprt.html">symbol_exprt</a>(ID_unknown);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        entry.<a class="code" href="structrw__set__baset_1_1entryt.html#a7a3dac889faf149d77e58b2dfdb41806">guard</a> = <a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(guard_conjuncts); <span class="comment">// should &#39;OR&#39;</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      }</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="preprocessor">      #endif</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(*it, <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    }</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="preprocessor">    #else</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <a class="code" href="goto__program__dereference_8cpp.html#a26e427bd4f1f3d201885c35a14993452">dereference</a>(<a class="code" href="class__rw__set__loct.html#a535579c3d2da451dc8534ec485944b66">function_id</a>, <a class="code" href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">target</a>, tmp, <a class="code" href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">ns</a>, <a class="code" href="class__rw__set__loct.html#a637e9ee5fcc91293cce3e53a82b0d2b7">value_sets</a>);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(tmp, <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <a class="code" href="classrw__set__baset.html#a973c1c6159f73d02fcf43f82158ee506">reset_track_deref</a>();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_typecast)</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr).op(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  }</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_address_of)</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  {</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    assert(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()==1);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_if)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  {</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;if_expr = <a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(expr);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <a class="code" href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">read</a>(if_expr.cond(), guard_conjuncts);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> true_guard = guard_conjuncts;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    true_guard.push_back(if_expr.cond());</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(if_expr.true_case(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, true_guard);</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> false_guard = guard_conjuncts;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    false_guard.push_back(<a class="code" href="classnot__exprt.html">not_exprt</a>(if_expr.cond()));</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(if_expr.false_case(), <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, false_guard);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  {</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <a class="code" href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">read_write_rec</a>(*it, <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, w, suffix, guard_conjuncts);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  }</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">  193</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">rw_set_functiont::compute_rec</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">function</span>)</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;{</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">function</span>.<span class="keywordtype">id</span>()==ID_symbol)</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  {</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id = <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(<span class="keyword">function</span>).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    goto_functionst::function_mapt::const_iterator f_it =</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(function_id);</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">if</span>(f_it!=<a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;body=f_it-&gt;second.body;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="preprocessor">#ifdef LOCAL_MAY</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <a class="code" href="classlocal__may__aliast.html">local_may_aliast</a> local_may(f_it-&gt;second);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">for</span>(goto_functionst::function_mapt::const_iterator</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;          g_it=<a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.begin();</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;          g_it!=<a class="code" href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end(); ++g_it)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        local_may(g_it-&gt;second);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <a class="code" href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a>(i_it, body)</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      {</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        *<span class="keyword">this</span> += <a class="code" href="classrw__set__loct.html">rw_set_loct</a>(</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;          <a class="code" href="classrw__set__functiont.html#a7d01021503a8afb057d55c710fd0a3f3">ns</a>,</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;          <a class="code" href="classrw__set__functiont.html#ad9dfd99a212b5858b5a395981f36b7b1">value_sets</a>,</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;          function_id,</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;          i_it</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;#ifdef LOCAL_MAY</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          ,</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          local_may</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;#endif</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        ); <span class="comment">// NOLINT(whitespace/parens)</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      }</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keyword">function</span>.<span class="keywordtype">id</span>()==ID_if)</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  {</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <a class="code" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">compute_rec</a>(<a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(<span class="keyword">function</span>).true_case());</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <a class="code" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">compute_rec</a>(<a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(<span class="keyword">function</span>).false_case());</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  }</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;}</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <a class="code" href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a>(i_it, body)</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        *<span class="keyword">this</span> += <a class="code" href="classrw__set__loct.html">rw_set_loct</a>(</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;          <a class="code" href="classrw__set__functiont.html#a7d01021503a8afb057d55c710fd0a3f3">ns</a>,</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;          <a class="code" href="classrw__set__functiont.html#ad9dfd99a212b5858b5a395981f36b7b1">value_sets</a>,</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;          function_id,</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;          i_it</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;#ifdef LOCAL_MAY</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;          ,</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          local_may</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;#endif</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        ); <span class="comment">// NOLINT(whitespace/parens)</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      }</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    }</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keyword">function</span>.<span class="keywordtype">id</span>()==ID_if)</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  {</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <a class="code" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">compute_rec</a>(<a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(<span class="keyword">function</span>).true_case());</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <a class="code" href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">compute_rec</a>(<a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(<span class="keyword">function</span>).false_case());</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  }</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00036">dstring.h:36</a></div></div>
+<div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:38</a></div></div>
 <div class="ttc" id="aclassrw__set__functiont_html_a1730583da712a6030ac13b2ddd14097a"><div class="ttname"><a href="classrw__set__functiont.html#a1730583da712a6030ac13b2ddd14097a">rw_set_functiont::goto_functions</a></div><div class="ttdeci">const goto_functionst &amp; goto_functions</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00220">rw_set.h:220</a></div></div>
 <div class="ttc" id="astd__expr_8cpp_html_a009993933b4e656e434c7b1a51b83291"><div class="ttname"><a href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a></div><div class="ttdeci">exprt conjunction(const exprt::operandst &amp;op)</div><div class="ttdoc">1) generates a conjunction for two or more operands 2) for one operand, returns the operand 3) return...</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8cpp_source.html#l00063">std_expr.cpp:63</a></div></div>
 <div class="ttc" id="astructrw__set__baset_1_1entryt_html"><div class="ttname"><a href="structrw__set__baset_1_1entryt.html">rw_set_baset::entryt</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00043">rw_set.h:43</a></div></div>
@@ -337,10 +336,10 @@ $(document).ready(function(){initNavTree('rw__set_8cpp_source.html',''); initRes
 <div class="ttc" id="astructrw__set__baset_1_1entryt_html_a7a3dac889faf149d77e58b2dfdb41806"><div class="ttname"><a href="structrw__set__baset_1_1entryt.html#a7a3dac889faf149d77e58b2dfdb41806">rw_set_baset::entryt::guard</a></div><div class="ttdeci">exprt guard</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00047">rw_set.h:47</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_af3504ad7009663c1eef67bafedf71206"><div class="ttname"><a href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a></div><div class="ttdeci">const index_exprt &amp; to_index_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an index_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01478">std_expr.h:1478</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a12b435d4696cdc708b3c69e958544ae4"><div class="ttname"><a href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a></div><div class="ttdeci">const if_exprt &amp; to_if_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an if_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02403">std_expr.h:2403</a></div></div>
-<div class="ttc" id="aclass__rw__set__loct_html_a1f3add235c4e3f54c7f2513fd9a58bed"><div class="ttname"><a href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">_rw_set_loct::assign</a></div><div class="ttdeci">void assign(const exprt &amp;lhs, const exprt &amp;rhs)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00074">rw_set.cpp:74</a></div></div>
+<div class="ttc" id="aclass__rw__set__loct_html_a1f3add235c4e3f54c7f2513fd9a58bed"><div class="ttname"><a href="class__rw__set__loct.html#a1f3add235c4e3f54c7f2513fd9a58bed">_rw_set_loct::assign</a></div><div class="ttdeci">void assign(const exprt &amp;lhs, const exprt &amp;rhs)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00073">rw_set.cpp:73</a></div></div>
 <div class="ttc" id="aclass__rw__set__loct_html_aa4c793af9d8734fa8dc73ff95625503d"><div class="ttname"><a href="class__rw__set__loct.html#aa4c793af9d8734fa8dc73ff95625503d">_rw_set_loct::target</a></div><div class="ttdeci">const goto_programt::const_targett target</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00143">rw_set.h:143</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
-<div class="ttc" id="aclassrw__set__functiont_html_a48bbf97679e2a2327fef9f516f287b03"><div class="ttname"><a href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">rw_set_functiont::compute_rec</a></div><div class="ttdeci">void compute_rec(const exprt &amp;function)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00194">rw_set.cpp:194</a></div></div>
+<div class="ttc" id="aclassrw__set__functiont_html_a48bbf97679e2a2327fef9f516f287b03"><div class="ttname"><a href="classrw__set__functiont.html#a48bbf97679e2a2327fef9f516f287b03">rw_set_functiont::compute_rec</a></div><div class="ttdeci">void compute_rec(const exprt &amp;function)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00193">rw_set.cpp:193</a></div></div>
 <div class="ttc" id="aclassrw__set__baset_html_ae8e787202c99eb6379469f3082dbecbd"><div class="ttname"><a href="classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd">rw_set_baset::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00099">rw_set.h:99</a></div></div>
 <div class="ttc" id="aclass__rw__set__loct_html_a5f8a433245cefd584bb7c88e94654864"><div class="ttname"><a href="class__rw__set__loct.html#a5f8a433245cefd584bb7c88e94654864">_rw_set_loct::read</a></div><div class="ttdeci">void read(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00149">rw_set.h:149</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
@@ -348,7 +347,7 @@ $(document).ready(function(){initNavTree('rw__set_8cpp_source.html',''); initRes
 <div class="ttc" id="aclassrw__set__baset_html_a973c1c6159f73d02fcf43f82158ee506"><div class="ttname"><a href="classrw__set__baset.html#a973c1c6159f73d02fcf43f82158ee506">rw_set_baset::reset_track_deref</a></div><div class="ttdeci">virtual void reset_track_deref()</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00097">rw_set.h:97</a></div></div>
 <div class="ttc" id="aclassrw__set__baset_html_a1d82a9a4a49f6e57d36dc56a3578a73f"><div class="ttname"><a href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">rw_set_baset::r_entries</a></div><div class="ttdeci">entriest r_entries</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00059">rw_set.h:59</a></div></div>
 <div class="ttc" id="aclasslocal__may__aliast_html"><div class="ttname"><a href="classlocal__may__aliast.html">local_may_aliast</a></div><div class="ttdef"><b>Definition:</b> <a href="local__may__alias_8h_source.html#l00025">local_may_alias.h:25</a></div></div>
-<div class="ttc" id="aclassirept_html_a419293b53104ea25f073e5d8fc452b07"><div class="ttname"><a href="classirept.html#a419293b53104ea25f073e5d8fc452b07">irept::get</a></div><div class="ttdeci">const irep_idt &amp; get(const irep_idt &amp;name) const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00045">irep.cpp:45</a></div></div>
+<div class="ttc" id="aclassirept_html_a419293b53104ea25f073e5d8fc452b07"><div class="ttname"><a href="classirept.html#a419293b53104ea25f073e5d8fc452b07">irept::get</a></div><div class="ttdeci">const irep_idt &amp; get(const irep_idt &amp;name) const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00044">irep.cpp:44</a></div></div>
 <div class="ttc" id="aclass__rw__set__loct_html_a535579c3d2da451dc8534ec485944b66"><div class="ttname"><a href="class__rw__set__loct.html#a535579c3d2da451dc8534ec485944b66">_rw_set_loct::function_id</a></div><div class="ttdeci">const irep_idt function_id</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00142">rw_set.h:142</a></div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>
 <div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
@@ -361,10 +360,9 @@ $(document).ready(function(){initNavTree('rw__set_8cpp_source.html',''); initRes
 <div class="ttc" id="aclassrw__set__baset_html_abe17842d7b66dd8a8f614963a7eea222"><div class="ttname"><a href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">rw_set_baset::w_entries</a></div><div class="ttdeci">entriest w_entries</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00059">rw_set.h:59</a></div></div>
 <div class="ttc" id="aclass__rw__set__loct_html_a637e9ee5fcc91293cce3e53a82b0d2b7"><div class="ttname"><a href="class__rw__set__loct.html#a637e9ee5fcc91293cce3e53a82b0d2b7">_rw_set_loct::value_sets</a></div><div class="ttdeci">value_setst &amp; value_sets</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00141">rw_set.h:141</a></div></div>
 <div class="ttc" id="aclassrw__set__baset_html_a66cb22deed5dc725365900bcd8c4a4c1"><div class="ttname"><a href="classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1">rw_set_baset::track_deref</a></div><div class="ttdeci">virtual void track_deref(const entryt &amp;, bool read)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00092">rw_set.h:92</a></div></div>
-<div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
 <div class="ttc" id="aclassrw__set__loct_html"><div class="ttname"><a href="classrw__set__loct.html">rw_set_loct</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00176">rw_set.h:176</a></div></div>
 <div class="ttc" id="aclassrw__set__functiont_html_ad9dfd99a212b5858b5a395981f36b7b1"><div class="ttname"><a href="classrw__set__functiont.html#ad9dfd99a212b5858b5a395981f36b7b1">rw_set_functiont::value_sets</a></div><div class="ttdeci">value_setst &amp; value_sets</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00219">rw_set.h:219</a></div></div>
-<div class="ttc" id="aclass__rw__set__loct_html_a25fe2c2b9ec7b00f8446f955a2eaf983"><div class="ttname"><a href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">_rw_set_loct::read_write_rec</a></div><div class="ttdeci">void read_write_rec(const exprt &amp;expr, bool r, bool w, const std::string &amp;suffix, const exprt::operandst &amp;guard_conjuncts)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00080">rw_set.cpp:80</a></div></div>
+<div class="ttc" id="aclass__rw__set__loct_html_a25fe2c2b9ec7b00f8446f955a2eaf983"><div class="ttname"><a href="class__rw__set__loct.html#a25fe2c2b9ec7b00f8446f955a2eaf983">_rw_set_loct::read_write_rec</a></div><div class="ttdeci">void read_write_rec(const exprt &amp;expr, bool r, bool w, const std::string &amp;suffix, const exprt::operandst &amp;guard_conjuncts)</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00079">rw_set.cpp:79</a></div></div>
 <div class="ttc" id="arw__set_8h_html"><div class="ttname"><a href="rw__set_8h.html">rw_set.h</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a5a136f5dafc188edca7e6a28d671cf07"><div class="ttname"><a href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a></div><div class="ttdeci">const typecast_exprt &amp; to_typecast_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a typecast_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02051">std_expr.h:2051</a></div></div>
 <div class="ttc" id="agoto__program__dereference_8h_html"><div class="ttname"><a href="goto__program__dereference_8h.html">goto_program_dereference.h</a></div></div>
@@ -377,9 +375,9 @@ $(document).ready(function(){initNavTree('rw__set_8cpp_source.html',''); initRes
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00060">irep_hash.h:60</a></div></div>
 <div class="ttc" id="agoto__program__dereference_8cpp_html_a26e427bd4f1f3d201885c35a14993452"><div class="ttname"><a href="goto__program__dereference_8cpp.html#a26e427bd4f1f3d201885c35a14993452">dereference</a></div><div class="ttdeci">void dereference(const irep_idt &amp;function_id, goto_programt::const_targett target, exprt &amp;expr, const namespacet &amp;ns, value_setst &amp;value_sets)</div><div class="ttdoc">Remove dereferences in expr using value_sets to determine to what objects the pointers may be pointin...</div><div class="ttdef"><b>Definition:</b> <a href="goto__program__dereference_8cpp_source.html#l00278">goto_program_dereference.cpp:278</a></div></div>
 <div class="ttc" id="astructrw__set__baset_1_1entryt_html_aecd3a763435b8341e0086018fb720ee6"><div class="ttname"><a href="structrw__set__baset_1_1entryt.html#aecd3a763435b8341e0086018fb720ee6">rw_set_baset::entryt::symbol_expr</a></div><div class="ttdeci">symbol_exprt symbol_expr</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00045">rw_set.h:45</a></div></div>
-<div class="ttc" id="aclass__rw__set__loct_html_a72b2fdfba577585d3e5d9a4c3b311324"><div class="ttname"><a href="class__rw__set__loct.html#a72b2fdfba577585d3e5d9a4c3b311324">_rw_set_loct::compute</a></div><div class="ttdeci">void compute()</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00046">rw_set.cpp:46</a></div></div>
+<div class="ttc" id="aclass__rw__set__loct_html_a72b2fdfba577585d3e5d9a4c3b311324"><div class="ttname"><a href="class__rw__set__loct.html#a72b2fdfba577585d3e5d9a4c3b311324">_rw_set_loct::compute</a></div><div class="ttdeci">void compute()</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00045">rw_set.cpp:45</a></div></div>
 <div class="ttc" id="alanguage__util_8cpp_html_a75d53cac2f22bbbcd9d5168860147063"><div class="ttname"><a href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a></div><div class="ttdeci">std::string from_expr(const namespacet &amp;ns, const irep_idt &amp;identifier, const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="language__util_8cpp_source.html#l00038">language_util.cpp:38</a></div></div>
-<div class="ttc" id="aclassrw__set__baset_html_ac5bac2a0dffba75aec675ecfb4147226"><div class="ttname"><a href="classrw__set__baset.html#ac5bac2a0dffba75aec675ecfb4147226">rw_set_baset::output</a></div><div class="ttdeci">void output(std::ostream &amp;out) const</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00023">rw_set.cpp:23</a></div></div>
+<div class="ttc" id="aclassrw__set__baset_html_ac5bac2a0dffba75aec675ecfb4147226"><div class="ttname"><a href="classrw__set__baset.html#ac5bac2a0dffba75aec675ecfb4147226">rw_set_baset::output</a></div><div class="ttdeci">void output(std::ostream &amp;out) const</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8cpp_source.html#l00022">rw_set.cpp:22</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a21f949b9c8de9b9a887eb6e593d51728"><div class="ttname"><a href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a></div><div class="ttdeci">#define forall_goto_program_instructions(it, program)</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01237">goto_program.h:1237</a></div></div>
 <div class="ttc" id="aclassrw__set__baset_html_aeb25279168a4141a24e4375d00133497"><div class="ttname"><a href="classrw__set__baset.html#aeb25279168a4141a24e4375d00133497">rw_set_baset::set_track_deref</a></div><div class="ttdeci">virtual void set_track_deref()</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00096">rw_set.h:96</a></div></div>
 <div class="ttc" id="aclassnot__exprt_html"><div class="ttname"><a href="classnot__exprt.html">not_exprt</a></div><div class="ttdoc">Boolean negation.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02277">std_expr.h:2277</a></div></div>

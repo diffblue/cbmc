@@ -681,7 +681,7 @@ Public Attributes</h2></td></tr>
 
 <p>Compute for each instruction the set of instructions it is a successor of. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00750">750</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00752">752</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -763,7 +763,7 @@ Public Attributes</h2></td></tr>
 <p>Assign each loop in the goto program a unique index.</p>
 <p>Every backwards goto is considered a loop. The loops are numbered starting from zero and in the order they appear in the goto program. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00609">609</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00611">611</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -786,7 +786,7 @@ Public Attributes</h2></td></tr>
 <p>Assign each target (i.e., an instruction that is in the <code>targets</code> list of another instruction) a unique index.</p>
 <p>Instructions that are not targets get target number <a class="el" href="classgoto__programt_1_1instructiont.html#aa5b3e59c3470dd63b6b3b0c4bc9e527f" title="Uniquely identify an invalid target or location.">instructiont::nil_target</a>. The targets are numbered starting from one and in the order they appear in the goto program. An instruction is considered a target if it is the target of a control-flow instruction (either GOTO or START_THREAD), i.e., it is contained in the <code>targets</code> list of those instructions. Instructions that are reached via straight-line control flow (fall-through for GOTO instructions) only are not considered targets. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00645">645</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00647">647</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -876,7 +876,7 @@ Public Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00699">699</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00701">701</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -998,7 +998,7 @@ Public Attributes</h2></td></tr>
 
 <p>Syntactic equality: two <a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a> are equal if, and only if, they have the same number of instructions, each pair of instructions compares equal, and relative jumps have the same distance. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l01138">1138</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l01140">1140</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -1020,7 +1020,7 @@ Public Attributes</h2></td></tr>
 
 <p>get the variables in decl statements </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00317">317</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00319">319</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -1138,7 +1138,7 @@ template&lt;typename Target &gt; </div>
 <p>Does the goto program have an assertion? </p>
 <p>Returns true if the goto program includes an <code>ASSERT</code> instruction the guard of which is not trivially true. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00740">740</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00742">742</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -2041,7 +2041,7 @@ template&lt;typename Target &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00031">31</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00033">33</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -2427,7 +2427,7 @@ template&lt;typename Target &gt; </div>
 
 <p>Output goto-program to given stream. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00625">625</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00627">627</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -2532,7 +2532,7 @@ template&lt;typename Target &gt; </div>
 
 <p>Update all indices. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00617">617</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l00619">619</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
 
 </div>
 </div>

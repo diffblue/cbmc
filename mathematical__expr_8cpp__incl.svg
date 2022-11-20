@@ -12,10 +12,10 @@
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="176.5,-448.5 176.5,-489.5 329.5,-489.5 329.5,-448.5 176.5,-448.5"/>
-<text text-anchor="start" x="184.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="184.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/mathematical</text>
-<text text-anchor="middle" x="253" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">_expr.cpp</text>
+<polygon fill="#bfbfbf" stroke="black" points="132.5,-448.5 132.5,-489.5 285.5,-489.5 285.5,-448.5 132.5,-448.5"/>
+<text text-anchor="start" x="140.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="140.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/mathematical</text>
+<text text-anchor="middle" x="209" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">_expr.cpp</text>
 </a>
 </g>
 </g>
@@ -31,8 +31,8 @@
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M253,-448.5C253,-440.07 253,-430.24 253,-421.87"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="256.5,-421.65 253,-411.65 249.5,-421.65 256.5,-421.65"/>
+<path fill="none" stroke="midnightblue" d="M222.2,-448.5C228.3,-439.49 235.48,-428.89 241.37,-420.19"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="244.44,-421.9 247.14,-411.65 238.64,-417.97 244.44,-421.9"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -46,23 +46,8 @@
 <!-- Node1&#45;&gt;Node3 -->
 <g id="edge41" class="edge">
 <title>Node1&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M219.53,-448.48C206.4,-439.11 192.47,-426.71 184,-412 165.41,-379.71 163.37,-334.92 163.93,-309.88"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="167.44,-309.73 164.34,-299.6 160.44,-309.45 167.44,-309.73"/>
-</g>
-<!-- Node45 -->
-<g id="node26" class="node">
-<title>Node45</title>
-<g id="a_node26"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="331,-392.5 331,-411.5 369,-411.5 369,-392.5 331,-392.5"/>
-<text text-anchor="middle" x="350" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">map</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node45 -->
-<g id="edge42" class="edge">
-<title>Node1&#45;&gt;Node45</title>
-<path fill="none" stroke="midnightblue" d="M282.1,-448.5C296.98,-438.53 314.76,-426.61 328.4,-417.48"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="330.73,-420.13 337.09,-411.65 326.83,-414.31 330.73,-420.13"/>
+<path fill="none" stroke="midnightblue" d="M198.65,-448.27C193.54,-437.76 187.69,-424.46 184,-412 173.57,-376.78 168.57,-334 166.41,-309.9"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="169.88,-309.36 165.57,-299.68 162.9,-309.93 169.88,-309.36"/>
 </g>
 <!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">

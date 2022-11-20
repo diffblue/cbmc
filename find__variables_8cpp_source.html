@@ -105,41 +105,38 @@ $(document).ready(function(){initNavTree('find__variables_8cpp_source.html','');
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="state_8h.html">state.h</a>&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">   18</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a>(</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;result)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_object_address)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    result.insert(<a class="code" href="pointer__expr_8h.html#ad1089e5afb8cd6fe844213ec213988fd">to_object_address_expr</a>(src).object_expr());</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;op : src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <a class="code" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a>(op, result);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  }</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;std::unordered_set&lt;symbol_exprt, irep_hash&gt;</div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="find__variables_8h.html#a86f380258197e8c7f328dfbe0f1e7979">   32</a></span>&#160;<a class="code" href="find__variables_8cpp.html#a68eb6e872dc6ceb1cea96a5755fdd091">find_variables</a>(<span class="keyword">const</span> std::vector&lt;exprt&gt; &amp;src)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  std::unordered_set&lt;symbol_exprt, irep_hash&gt; result;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;expr : src)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a>(expr, result);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">   16</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a>(</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;result)</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_object_address)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    result.insert(<a class="code" href="pointer__expr_8h.html#ad1089e5afb8cd6fe844213ec213988fd">to_object_address_expr</a>(src).object_expr());</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;op : src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <a class="code" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a>(op, result);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  }</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;}</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;std::unordered_set&lt;symbol_exprt, irep_hash&gt;</div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="find__variables_8h.html#a86f380258197e8c7f328dfbe0f1e7979">   30</a></span>&#160;<a class="code" href="find__variables_8cpp.html#a68eb6e872dc6ceb1cea96a5755fdd091">find_variables</a>(<span class="keyword">const</span> std::vector&lt;exprt&gt; &amp;src)</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;{</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  std::unordered_set&lt;symbol_exprt, irep_hash&gt; result;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;expr : src)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a>(expr, result);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="afind__variables_8cpp_html_a68eb6e872dc6ceb1cea96a5755fdd091"><div class="ttname"><a href="find__variables_8cpp.html#a68eb6e872dc6ceb1cea96a5755fdd091">find_variables</a></div><div class="ttdeci">std::unordered_set&lt; symbol_exprt, irep_hash &gt; find_variables(const std::vector&lt; exprt &gt; &amp;src)</div><div class="ttdoc">Returns the set of program variables (as identified by object_address expressions) in the given expre...</div><div class="ttdef"><b>Definition:</b> <a href="find__variables_8cpp_source.html#l00032">find_variables.cpp:32</a></div></div>
+<div class="ttc" id="afind__variables_8cpp_html_a68eb6e872dc6ceb1cea96a5755fdd091"><div class="ttname"><a href="find__variables_8cpp.html#a68eb6e872dc6ceb1cea96a5755fdd091">find_variables</a></div><div class="ttdeci">std::unordered_set&lt; symbol_exprt, irep_hash &gt; find_variables(const std::vector&lt; exprt &gt; &amp;src)</div><div class="ttdoc">Returns the set of program variables (as identified by object_address expressions) in the given expre...</div><div class="ttdef"><b>Definition:</b> <a href="find__variables_8cpp_source.html#l00030">find_variables.cpp:30</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html_ad1089e5afb8cd6fe844213ec213988fd"><div class="ttname"><a href="pointer__expr_8h.html#ad1089e5afb8cd6fe844213ec213988fd">to_object_address_expr</a></div><div class="ttdeci">const object_address_exprt &amp; to_object_address_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an object_address_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00526">pointer_expr.h:526</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html"><div class="ttname"><a href="pointer__expr_8h.html">pointer_expr.h</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
-<div class="ttc" id="astate_8h_html"><div class="ttname"><a href="state_8h.html">state.h</a></div></div>
-<div class="ttc" id="afind__variables_8cpp_html_a53136205b628d6edc4187e51df8f7c5e"><div class="ttname"><a href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a></div><div class="ttdeci">static void find_variables_rec(const exprt &amp;src, std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;result)</div><div class="ttdef"><b>Definition:</b> <a href="find__variables_8cpp_source.html#l00018">find_variables.cpp:18</a></div></div>
+<div class="ttc" id="afind__variables_8cpp_html_a53136205b628d6edc4187e51df8f7c5e"><div class="ttname"><a href="find__variables_8cpp.html#a53136205b628d6edc4187e51df8f7c5e">find_variables_rec</a></div><div class="ttdeci">static void find_variables_rec(const exprt &amp;src, std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;result)</div><div class="ttdef"><b>Definition:</b> <a href="find__variables_8cpp_source.html#l00016">find_variables.cpp:16</a></div></div>
 <div class="ttc" id="afind__variables_8h_html"><div class="ttname"><a href="find__variables_8h.html">find_variables.h</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

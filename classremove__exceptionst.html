@@ -191,7 +191,7 @@ Private Types</h2></td></tr>
 <p>FUNCTION_CALL instructions are also affected: if the callee may abort due to an escaping instruction, a dispatch sequence is inserted to check whether the callee aborted and propagate the exception further if so.</p>
 <p>Exception propagation is implemented using a global variable per function (named function_name::exception_value) that carries a reference to an in-flight exception, or is null during normal control flow. THROW assigns it a reference to the thrown instance; CALL instructions copy between the exception_value for the callee and caller, catch_push and catch_pop instructions indicate how they should be checked to dispatch the right exception type to the right catch block, and landingpad instructions copy back to an ordinary local variable (or other expression) and set #exception_value back to null, indicating the exception has been caught and normal control flow resumed. </p>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00084">84</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00081">81</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a94ef17deaa876b2d7c133a5c02953619"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a94ef17deaa876b2d7c133a5c02953619">&#9670;&nbsp;</a></span>catch_handlerst</h2>
@@ -213,7 +213,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00087">87</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00084">84</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -229,7 +229,7 @@ Private Types</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00091">91</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00088">88</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +253,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00088">88</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00085">85</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -283,7 +283,7 @@ Private Types</h2></td></tr>
 <tr><td class="fieldname"><a id="a94e6587f5091fe899fc6abec2ed81845ae088436f711477c711ec9e794901603e"></a>ADDED_CODE_WITH_MAY_THROW&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00125">125</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00122">122</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -340,7 +340,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00093">93</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00090">90</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -409,7 +409,7 @@ Private Types</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00323">323</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00320">320</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -471,7 +471,7 @@ Private Types</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired exception handler </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00285">285</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00282">282</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +508,7 @@ Private Types</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if any throw or throwing call was found </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00190">190</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00187">187</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -537,7 +537,7 @@ Private Types</h2></td></tr>
 
 <p>Create a global named java::@inflight_exception that holds any exception that has been thrown but not yet caught. </p>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00175">175</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00172">172</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -591,7 +591,7 @@ Private Types</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00226">226</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00223">223</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -632,7 +632,7 @@ Private Types</h2></td></tr>
 <p>instruments throws, function calls that may escape exceptions and exception handlers. </p>
 <p>Additionally, it re-computes the live-range of local variables in order to add DEAD instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00488">488</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00485">485</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -690,7 +690,7 @@ Private Types</h2></td></tr>
 
 <p>instruments each function call that may escape exceptions with conditional GOTOS to the corresponding exception handlers </p>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00430">430</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00427">427</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -748,7 +748,7 @@ Private Types</h2></td></tr>
 
 <p>instruments each throw with conditional GOTOS to the corresponding exception handlers </p>
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00399">399</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00396">396</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -778,7 +778,7 @@ Private Types</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00620">620</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00617">617</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -798,7 +798,7 @@ Private Types</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00613">613</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00610">610</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -823,7 +823,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00120">120</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00117">117</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -847,7 +847,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00121">121</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00118">118</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -871,7 +871,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00123">123</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00120">120</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -895,7 +895,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00122">122</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00119">119</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -919,7 +919,7 @@ Private Types</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00119">119</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__exceptions_8cpp_source.html#l00116">116</a> of file <a class="el" href="remove__exceptions_8cpp_source.html">remove_exceptions.cpp</a>.</p>
 
 </div>
 </div>

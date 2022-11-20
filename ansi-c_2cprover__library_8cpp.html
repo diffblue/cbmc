@@ -95,16 +95,17 @@ $(document).ready(function(){initNavTree('ansi-c_2cprover__library_8cpp.html',''
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="ansi-c_2cprover__library_8h_source.html">cprover_library.h</a>&quot;</code><br />
-<code>#include &lt;sstream&gt;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="cprover__prefix_8h_source.html">util/cprover_prefix.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="ansi__c__language_8h_source.html">ansi_c_language.h</a>&quot;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for cprover_library.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="ansi-c_2cprover__library_8cpp__incl.svg" width="2576" height="1202"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="ansi-c_2cprover__library_8cpp__incl.svg" width="2535" height="1351"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -112,22 +113,22 @@ $(document).ready(function(){initNavTree('ansi-c_2cprover__library_8cpp.html',''
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a790079b7aa9d59d675c1c24441fe1bbe"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a790079b7aa9d59d675c1c24441fe1bbe">get_cprover_library_text</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const bool force_load)</td></tr>
-<tr class="separator:a790079b7aa9d59d675c1c24441fe1bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac995cc0f22c47f7810bb5c562b8f26bf"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#ac995cc0f22c47f7810bb5c562b8f26bf">get_cprover_library_text</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const struct <a class="el" href="structcprover__library__entryt.html">cprover_library_entryt</a> cprover_library[], const std::string &amp;prologue, const bool force_load)</td></tr>
-<tr class="separator:ac995cc0f22c47f7810bb5c562b8f26bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fa21e0e3adfef0066cce39fb4fcbd8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a0fa21e0e3adfef0066cce39fb4fcbd8b">cprover_c_library_factory</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="separator:a0fa21e0e3adfef0066cce39fb4fcbd8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9392708c9a59d3de162fb03470572ccc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a9392708c9a59d3de162fb03470572ccc">add_library</a> (const std::string &amp;src, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;keep)</td></tr>
-<tr class="memdesc:a9392708c9a59d3de162fb03470572ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses and typechecks the given src and adds its contents to the symbol table.  <a href="ansi-c_2cprover__library_8cpp.html#a9392708c9a59d3de162fb03470572ccc">More...</a><br /></td></tr>
-<tr class="separator:a9392708c9a59d3de162fb03470572ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a475b7e03a3f71b76c60b409710f4d705"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a475b7e03a3f71b76c60b409710f4d705">cprover_c_library_factory_force_load</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:a475b7e03a3f71b76c60b409710f4d705"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the requested function symbols from the cprover library and add them to the symbol table regardless of the library config flags and usage.  <a href="ansi-c_2cprover__library_8cpp.html#a475b7e03a3f71b76c60b409710f4d705">More...</a><br /></td></tr>
-<tr class="separator:a475b7e03a3f71b76c60b409710f4d705"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dfadefd768b59182f7c5308652e9581"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a3dfadefd768b59182f7c5308652e9581">get_cprover_library_text</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const bool force_load)</td></tr>
+<tr class="separator:a3dfadefd768b59182f7c5308652e9581"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53baf826c57417a8d660db74962caf76"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a53baf826c57417a8d660db74962caf76">get_cprover_library_text</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const struct <a class="el" href="structcprover__library__entryt.html">cprover_library_entryt</a> cprover_library[], const std::string &amp;prologue, const bool force_load)</td></tr>
+<tr class="separator:a53baf826c57417a8d660db74962caf76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b41732eb8edfa3d165103089c2da856"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#a8b41732eb8edfa3d165103089c2da856">cprover_c_library_factory</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="separator:a8b41732eb8edfa3d165103089c2da856"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1dcd54e31c7a9a84f22d141938d56cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#aa1dcd54e31c7a9a84f22d141938d56cc">add_library</a> (const std::string &amp;src, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;keep)</td></tr>
+<tr class="memdesc:aa1dcd54e31c7a9a84f22d141938d56cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses and typechecks the given src and adds its contents to the symbol table.  <a href="ansi-c_2cprover__library_8cpp.html#aa1dcd54e31c7a9a84f22d141938d56cc">More...</a><br /></td></tr>
+<tr class="separator:aa1dcd54e31c7a9a84f22d141938d56cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8f05cb3460ba9bae1e962a8377e033e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi-c_2cprover__library_8cpp.html#ad8f05cb3460ba9bae1e962a8377e033e">cprover_c_library_factory_force_load</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:ad8f05cb3460ba9bae1e962a8377e033e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the requested function symbols from the cprover library and add them to the symbol table regardless of the library config flags and usage.  <a href="ansi-c_2cprover__library_8cpp.html#ad8f05cb3460ba9bae1e962a8377e033e">More...</a><br /></td></tr>
+<tr class="separator:ad8f05cb3460ba9bae1e962a8377e033e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a9392708c9a59d3de162fb03470572ccc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9392708c9a59d3de162fb03470572ccc">&#9670;&nbsp;</a></span>add_library()</h2>
+<a id="aa1dcd54e31c7a9a84f22d141938d56cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1dcd54e31c7a9a84f22d141938d56cc">&#9670;&nbsp;</a></span>add_library()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -141,7 +142,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
@@ -167,12 +168,12 @@ Functions</h2></td></tr>
 <p>Parses and typechecks the given src and adds its contents to the symbol table. </p>
 <p>Symbols with names found in <code>keep</code> will survive the symbol table cleanup pass and be found in the symbol_table. </p>
 
-<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00112">112</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00113">113</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a0fa21e0e3adfef0066cce39fb4fcbd8b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0fa21e0e3adfef0066cce39fb4fcbd8b">&#9670;&nbsp;</a></span>cprover_c_library_factory()</h2>
+<a id="a8b41732eb8edfa3d165103089c2da856"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b41732eb8edfa3d165103089c2da856">&#9670;&nbsp;</a></span>cprover_c_library_factory()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -186,7 +187,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -203,12 +204,12 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00098">98</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00099">99</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a475b7e03a3f71b76c60b409710f4d705"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a475b7e03a3f71b76c60b409710f4d705">&#9670;&nbsp;</a></span>cprover_c_library_factory_force_load()</h2>
+<a id="ad8f05cb3460ba9bae1e962a8377e033e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8f05cb3460ba9bae1e962a8377e033e">&#9670;&nbsp;</a></span>cprover_c_library_factory_force_load()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -222,7 +223,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -241,12 +242,12 @@ Functions</h2></td></tr>
 
 <p>Load the requested function symbols from the cprover library and add them to the symbol table regardless of the library config flags and usage. </p>
 
-<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00130">130</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00131">131</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a790079b7aa9d59d675c1c24441fe1bbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a790079b7aa9d59d675c1c24441fe1bbe">&#9670;&nbsp;</a></span>get_cprover_library_text() <span class="overload">[1/2]</span></h2>
+<a id="a3dfadefd768b59182f7c5308652e9581"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dfadefd768b59182f7c5308652e9581">&#9670;&nbsp;</a></span>get_cprover_library_text() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -263,7 +264,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -285,12 +286,12 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00018">18</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00019">19</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ac995cc0f22c47f7810bb5c562b8f26bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac995cc0f22c47f7810bb5c562b8f26bf">&#9670;&nbsp;</a></span>get_cprover_library_text() <span class="overload">[2/2]</span></h2>
+<a id="a53baf826c57417a8d660db74962caf76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53baf826c57417a8d660db74962caf76">&#9670;&nbsp;</a></span>get_cprover_library_text() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -304,7 +305,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -333,7 +334,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00059">59</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi-c_2cprover__library_8cpp_source.html#l00060">60</a> of file <a class="el" href="ansi-c_2cprover__library_8cpp_source.html">cprover_library.cpp</a>.</p>
 
 </div>
 </div>

@@ -221,11 +221,11 @@ var NAVTREEINDEX25 =
 "classdirtyt.html#af907b182a9783d0685a07638755c831f":[5,0,377,0],
 "classdisjunctive__polynomial__accelerationt.html":[5,0,378],
 "classdisjunctive__polynomial__accelerationt.html#a06a67586b13b9054d4d776fc7269bacb":[5,0,378,17],
-"classdisjunctive__polynomial__accelerationt.html#a0864e4d387429387d5736f9a8f5a1498":[5,0,378,26],
 "classdisjunctive__polynomial__accelerationt.html#a0a180d5f46fdc6b3b826f25361bf20ce":[5,0,378,13],
 "classdisjunctive__polynomial__accelerationt.html#a0faef81ef2604639604d2ff25aaeac16":[5,0,378,19],
 "classdisjunctive__polynomial__accelerationt.html#a1533c598c96f17530b0199c2a101965b":[5,0,378,14],
 "classdisjunctive__polynomial__accelerationt.html#a17b3700c6dbea840c382098e2ca3b8c2":[5,0,378,8],
+"classdisjunctive__polynomial__accelerationt.html#a29cb6ab9c923c66a0b13496f2c7aa164":[5,0,378,26],
 "classdisjunctive__polynomial__accelerationt.html#a2ee18d1b7fa5329a898ef807ac73d2d8":[5,0,378,24],
 "classdisjunctive__polynomial__accelerationt.html#a34d96c8895e9147dd1e0401bceb7048c":[5,0,378,5],
 "classdisjunctive__polynomial__accelerationt.html#a4143abca56855ca7936eb95b1ed1d229":[5,0,378,23],
@@ -239,7 +239,6 @@ var NAVTREEINDEX25 =
 "classdisjunctive__polynomial__accelerationt.html#a73c48d5dad1ae1f1926e84c4b2be73de":[5,0,378,16],
 "classdisjunctive__polynomial__accelerationt.html#a785669db6352f9c0784a797b7403cc72":[5,0,378,10],
 "classdisjunctive__polynomial__accelerationt.html#a7b5b15eee568d99dc2204a28effe8e37":[5,0,378,15],
-"classdisjunctive__polynomial__accelerationt.html#a81a309c50401f8761367ca4694714517":[5,0,378,2],
 "classdisjunctive__polynomial__accelerationt.html#a903ab82631520a457a4a55ea272427bb":[5,0,378,7],
 "classdisjunctive__polynomial__accelerationt.html#aa1d02c2200329fecc3866d1bd21e10a5":[5,0,378,25],
 "classdisjunctive__polynomial__accelerationt.html#aab2866dc932e9dcf41950780d2d7f088":[5,0,378,9],
@@ -248,6 +247,7 @@ var NAVTREEINDEX25 =
 "classdisjunctive__polynomial__accelerationt.html#aea82a7ee070abb98ebdfe56d17c42240":[5,0,378,27],
 "classdisjunctive__polynomial__accelerationt.html#aeef8a9a22d41b09538fb7d565950f3fc":[5,0,378,0],
 "classdisjunctive__polynomial__accelerationt.html#af9925df82ff6ba01e57222b34d143535":[5,0,378,1],
+"classdisjunctive__polynomial__accelerationt.html#afd77d3b44fe22fdb0720e2ef21407d7c":[5,0,378,2],
 "classdispatch__table__entryt.html":[5,0,379],
 "classdispatch__table__entryt.html#a6fda7a03780723a80ab79a8699c8f482":[5,0,379,0]
 };

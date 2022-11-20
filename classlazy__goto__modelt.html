@@ -229,7 +229,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
   model.process_whole_model_and_freeze();
 </pre><p>See the constructor <code><a class="el" href="classlazy__goto__modelt.html#aa6eda3fa70c0b423e1f35d25cbb8fa62" title="Construct a lazy GOTO model, supplying callbacks that customise its behaviour.">lazy_goto_modelt::lazy_goto_modelt</a></code> for more detail on the callbacks needed. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00042">42</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00041">41</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a9fdc11b834824d5b706164de4cbf3926"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9fdc11b834824d5b706164de4cbf3926">&#9670;&nbsp;</a></span>can_generate_function_bodyt</h2>
@@ -246,7 +246,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 <p>Callback function that determines whether the creator of a <code><a class="el" href="classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand.">lazy_goto_modelt</a></code> can itself supply a function body for a given name, whether as a fallback or an override. </p>
 <p>Only used from <code>can_produce_goto_function</code>, but should only return true for a function that <code>generate_function_body</code> can actually provide a body for, otherwise the <code><a class="el" href="classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand.">lazy_goto_modelt</a></code> user is likely to end up confused. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00070">70</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00069">69</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -265,7 +265,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 <p>Callback function that may provide a body for a GOTO function, either as a fallback (when we don't have source code for a function, often called a stub function) or as an override (when we do have source code, but want to e.g. </p>
 <p>replace a difficult-to-analyse function body with a simpler model, or outright omission). Gets parameters: <code>function_name</code>: a symbol-table symbol name we're asked to populate <code>symbol_table</code>: symbol table we should add new symbols to, such as function local variables. <code>function</code>: <code><a class="el" href="classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden...">goto_functiont</a></code> that we may populate. That could be done directly, or by populating the corresponding symbol in the symbol table and calling <code>goto_convert</code>. <code>body_available</code>: true if we have source code for the function body, and so the function will be given a body if this callback declines to provide one. If you only want to provide fallback (stub) bodies, check this is false before proceeding. If it is true and a body is supplied, we are overriding the source code definition. Returns: true if we provided a function body; false otherwise. When true is returned our definition is definitive; when false is returned a body will be generated from source code where available. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00093">93</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00092">92</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -284,7 +284,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 <p>Callback function that post-processes a whole GOTO model. </p>
 <p>The functions in the model have been produced by <code>goto_convert</code> and then passed through the corresponding <code>post_process_functiont</code>. Returns true on error, in which case <code><a class="el" href="classlazy__goto__modelt.html#af38a918fc33baed651ea496c2aac9263" title="The model returned here has access to the functions we&#39;ve already loaded but is frozen in the sense t...">lazy_goto_modelt::process_whole_model_and_freeze</a></code> will return null. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00061">61</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00060">60</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -303,7 +303,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 <p>Callback function that post-processes a GOTO function. </p>
 <p>The <code><a class="el" href="classgoto__model__functiont.html" title="Interface providing access to a single function in a GOTO model, plus its associated symbol table.">goto_model_functiont</a></code> passed in has just been produced by <code>goto_convert</code>, and so may contain function pointers, <code>RETURN</code> statements and other GOTO constructs that are conventionally post-processed away. The <code>model</code> parameter can be used to inspect other functions, but the implementation should be aware that there may be GOTO functions that are still to be converted, so it is not in its final state at this point. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00054">54</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00053">53</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -417,7 +417,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00186">186</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00185">185</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -456,7 +456,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#a6f99b3d8d5a53ba4ea6494863376c8a9">abstract_goto_modelt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00241">241</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00238">238</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -483,7 +483,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00216">216</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00213">213</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -545,7 +545,7 @@ template&lt;typename THandler &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00153">153</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00152">152</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -583,7 +583,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#a2333a60a1d158c1936ba8541d4d00870">abstract_goto_modelt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00238">238</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00237">237</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -615,7 +615,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#af4eba28aea1b673c1e4851d79faa5cd2">abstract_goto_modelt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00211">211</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00210">210</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -647,7 +647,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#ab3d05c71ce2342732a00ffa24982b7d5">abstract_goto_modelt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00216">216</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00215">215</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -687,7 +687,7 @@ template&lt;typename THandler &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00114">114</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00111">111</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -708,7 +708,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Eagerly loads all functions from the symbol table. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00187">187</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00184">184</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -736,7 +736,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00131">131</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00130">130</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -773,7 +773,7 @@ template&lt;typename THandler &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The frozen <a class="el" href="classgoto__modelt.html">goto_modelt</a> or an empty optional if freezing fails </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00198">198</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00197">197</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -816,7 +816,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#a3cb1643c6d5242cdf260bd9d2b53c0a3">abstract_goto_modelt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00247">247</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00246">246</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -841,7 +841,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00269">269</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00268">268</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -865,7 +865,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00270">270</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00269">269</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -889,7 +889,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00263">263</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00262">262</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -913,7 +913,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00256">256</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00255">255</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -937,7 +937,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00264">264</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00263">263</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -963,7 +963,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Logging helper field. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00273">273</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00272">272</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -987,7 +987,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00267">267</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00266">266</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -1011,7 +1011,7 @@ template&lt;typename THandler &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00268">268</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00267">267</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -1029,7 +1029,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Reference to symbol_table in the internal goto_model. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00260">260</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8h_source.html#l00259">259</a> of file <a class="el" href="lazy__goto__model_8h_source.html">lazy_goto_model.h</a>.</p>
 
 </div>
 </div>

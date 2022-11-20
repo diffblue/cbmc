@@ -94,22 +94,23 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="title">c_typecheck_gcc_polymorphic_builtins.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="c__typecheck__base_8h_source.html">c_typecheck_base.h</a>&quot;</code><br />
-<code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="cprover__prefix_8h_source.html">util/cprover_prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__types_8h_source.html">util/std_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string__constant_8h_source.html">util/string_constant.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__instruction__code_8h_source.html">goto-programs/goto_instruction_code.h</a>&gt;</code><br />
-<code>#include &lt;atomic&gt;</code><br />
 <code>#include &quot;<a class="el" href="c__expr_8h_source.html">c_expr.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="c__typecheck__base_8h_source.html">c_typecheck_base.h</a>&quot;</code><br />
+<code>#include &lt;atomic&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for c_typecheck_gcc_polymorphic_builtins.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="c__typecheck__gcc__polymorphic__builtins_8cpp__incl.svg" width="2148" height="1052"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="c__typecheck__gcc__polymorphic__builtins_8cpp__incl.svg" width="1918" height="903"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -139,36 +140,36 @@ Functions</h2></td></tr>
 <tr class="separator:a980613b21c29224678d5a15368f3cc28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0adda635a321086ba5f0db7e3b5791da"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a0adda635a321086ba5f0db7e3b5791da">typecheck_atomic_fetch_op</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="separator:a0adda635a321086ba5f0db7e3b5791da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2db26b5f7c7d63b1901b53e245a10cd7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbolt.html">symbolt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a2db26b5f7c7d63b1901b53e245a10cd7">result_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="separator:a2db26b5f7c7d63b1901b53e245a10cd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a1af32f0295c1417a9c3edf56145309"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a8a1af32f0295c1417a9c3edf56145309">instantiate_atomic_fetch_op</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:a8a1af32f0295c1417a9c3edf56145309"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a243fd43dd11c03488f83a261ee5cc2d7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a243fd43dd11c03488f83a261ee5cc2d7">instantiate_atomic_op_fetch</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:a243fd43dd11c03488f83a261ee5cc2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77d37b5d2ea3b965dddcdb24df7a8091"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbolt.html">symbolt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a77d37b5d2ea3b965dddcdb24df7a8091">result_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="separator:a77d37b5d2ea3b965dddcdb24df7a8091"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af83c17c634fe7a44eb9add59bdd6edfc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#af83c17c634fe7a44eb9add59bdd6edfc">instantiate_atomic_fetch_op</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:af83c17c634fe7a44eb9add59bdd6edfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10996cdd30600d2eb270ecb683ffde9c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a10996cdd30600d2eb270ecb683ffde9c">instantiate_atomic_op_fetch</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:a10996cdd30600d2eb270ecb683ffde9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace9d833a60eb456991b17a7c86a54e95"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#ace9d833a60eb456991b17a7c86a54e95">instantiate_sync_fetch</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:ace9d833a60eb456991b17a7c86a54e95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a4d3467c78730d1a8e2148c573a1190"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a9a4d3467c78730d1a8e2148c573a1190">instantiate_sync_bool_compare_and_swap</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:a9a4d3467c78730d1a8e2148c573a1190"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37d6d065438a244ae50a65f69ea8dc9b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a37d6d065438a244ae50a65f69ea8dc9b">instantiate_sync_val_compare_and_swap</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:a37d6d065438a244ae50a65f69ea8dc9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8599b17d7be4dad1d25de0974ba4a98f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a8599b17d7be4dad1d25de0974ba4a98f">instantiate_sync_lock_test_and_set</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:a8599b17d7be4dad1d25de0974ba4a98f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82243c8f326bef7fee89e0a338ba3a25"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a82243c8f326bef7fee89e0a338ba3a25">instantiate_sync_val_compare_and_swap</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:a82243c8f326bef7fee89e0a338ba3a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c13df2da7414ce060c4c9da8fbacecb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a2c13df2da7414ce060c4c9da8fbacecb">instantiate_sync_lock_test_and_set</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:a2c13df2da7414ce060c4c9da8fbacecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbe869d9372db074755c12acc0b59c17"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#acbe869d9372db074755c12acc0b59c17">instantiate_sync_lock_release</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:acbe869d9372db074755c12acc0b59c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2856f764190f15775bff42f9746cbdce"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a2856f764190f15775bff42f9746cbdce">instantiate_atomic_load</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:a2856f764190f15775bff42f9746cbdce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34995a07db38714368ec68b04b6621bc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a34995a07db38714368ec68b04b6621bc">instantiate_atomic_load_n</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:a34995a07db38714368ec68b04b6621bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57be080ae0ce996e98968018ccfe8ec7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a57be080ae0ce996e98968018ccfe8ec7">instantiate_atomic_load_n</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:a57be080ae0ce996e98968018ccfe8ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a548b9be36804fcd02f6a6ea6e069755b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a548b9be36804fcd02f6a6ea6e069755b">instantiate_atomic_store</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:a548b9be36804fcd02f6a6ea6e069755b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad27fe34ac6e97257e3c91127ce8f6776"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#ad27fe34ac6e97257e3c91127ce8f6776">instantiate_atomic_store_n</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:ad27fe34ac6e97257e3c91127ce8f6776"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a98b2f7fa76aa91bc8295e2637152f4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a0a98b2f7fa76aa91bc8295e2637152f4">instantiate_atomic_exchange</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:a0a98b2f7fa76aa91bc8295e2637152f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc1e1cde90d6e3f3a2561a92b2b2f2f6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#acc1e1cde90d6e3f3a2561a92b2b2f2f6">instantiate_atomic_exchange_n</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:acc1e1cde90d6e3f3a2561a92b2b2f2f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af28bb1139ee5d965f387d586cd63450e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#af28bb1139ee5d965f387d586cd63450e">instantiate_atomic_compare_exchange</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
-<tr class="separator:af28bb1139ee5d965f387d586cd63450e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0133c72bda3ad84677b0f584c4580114"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a0133c72bda3ad84677b0f584c4580114">instantiate_atomic_exchange_n</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:a0133c72bda3ad84677b0f584c4580114"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96849a7c007be35cf8fcee1984b7b7e9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a96849a7c007be35cf8fcee1984b7b7e9">instantiate_atomic_compare_exchange</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
+<tr class="separator:a96849a7c007be35cf8fcee1984b7b7e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a716bbd03857eff0504d2a4a28a83c40b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp.html#a716bbd03857eff0504d2a4a28a83c40b">instantiate_atomic_compare_exchange_n</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier_with_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;parameter_exprs, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;block)</td></tr>
 <tr class="separator:a716bbd03857eff0504d2a4a28a83c40b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -177,8 +178,8 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="c__typecheck__gcc__polymorphic__builtins_8cpp_source.html">c_typecheck_gcc_polymorphic_builtins.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="af28bb1139ee5d965f387d586cd63450e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af28bb1139ee5d965f387d586cd63450e">&#9670;&nbsp;</a></span>instantiate_atomic_compare_exchange()</h2>
+<a id="a96849a7c007be35cf8fcee1984b7b7e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96849a7c007be35cf8fcee1984b7b7e9">&#9670;&nbsp;</a></span>instantiate_atomic_compare_exchange()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -213,7 +214,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -351,8 +352,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="acc1e1cde90d6e3f3a2561a92b2b2f2f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc1e1cde90d6e3f3a2561a92b2b2f2f6">&#9670;&nbsp;</a></span>instantiate_atomic_exchange_n()</h2>
+<a id="a0133c72bda3ad84677b0f584c4580114"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0133c72bda3ad84677b0f584c4580114">&#9670;&nbsp;</a></span>instantiate_atomic_exchange_n()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -387,7 +388,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -413,8 +414,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8a1af32f0295c1417a9c3edf56145309"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a1af32f0295c1417a9c3edf56145309">&#9670;&nbsp;</a></span>instantiate_atomic_fetch_op()</h2>
+<a id="af83c17c634fe7a44eb9add59bdd6edfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af83c17c634fe7a44eb9add59bdd6edfc">&#9670;&nbsp;</a></span>instantiate_atomic_fetch_op()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -455,7 +456,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -537,8 +538,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a34995a07db38714368ec68b04b6621bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34995a07db38714368ec68b04b6621bc">&#9670;&nbsp;</a></span>instantiate_atomic_load_n()</h2>
+<a id="a57be080ae0ce996e98968018ccfe8ec7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57be080ae0ce996e98968018ccfe8ec7">&#9670;&nbsp;</a></span>instantiate_atomic_load_n()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -573,7 +574,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -599,8 +600,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a243fd43dd11c03488f83a261ee5cc2d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a243fd43dd11c03488f83a261ee5cc2d7">&#9670;&nbsp;</a></span>instantiate_atomic_op_fetch()</h2>
+<a id="a10996cdd30600d2eb270ecb683ffde9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10996cdd30600d2eb270ecb683ffde9c">&#9670;&nbsp;</a></span>instantiate_atomic_op_fetch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -641,7 +642,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -953,8 +954,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8599b17d7be4dad1d25de0974ba4a98f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8599b17d7be4dad1d25de0974ba4a98f">&#9670;&nbsp;</a></span>instantiate_sync_lock_test_and_set()</h2>
+<a id="a2c13df2da7414ce060c4c9da8fbacecb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c13df2da7414ce060c4c9da8fbacecb">&#9670;&nbsp;</a></span>instantiate_sync_lock_test_and_set()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -989,7 +990,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -1015,8 +1016,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a37d6d065438a244ae50a65f69ea8dc9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a37d6d065438a244ae50a65f69ea8dc9b">&#9670;&nbsp;</a></span>instantiate_sync_val_compare_and_swap()</h2>
+<a id="a82243c8f326bef7fee89e0a338ba3a25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82243c8f326bef7fee89e0a338ba3a25">&#9670;&nbsp;</a></span>instantiate_sync_val_compare_and_swap()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1051,7 +1052,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -1077,8 +1078,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2db26b5f7c7d63b1901b53e245a10cd7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2db26b5f7c7d63b1901b53e245a10cd7">&#9670;&nbsp;</a></span>result_symbol()</h2>
+<a id="a77d37b5d2ea3b965dddcdb24df7a8091"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77d37b5d2ea3b965dddcdb24df7a8091">&#9670;&nbsp;</a></span>result_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1107,7 +1108,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>

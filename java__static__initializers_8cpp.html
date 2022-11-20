@@ -102,7 +102,7 @@ $(document).ready(function(){initNavTree('java__static__initializers_8cpp.html',
 <code>#include &lt;<a class="el" href="json_8h_source.html">util/json.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="suffix_8h_source.html">util/suffix.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="class__hierarchy_8h_source.html">goto-programs/class_hierarchy.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__instruction__code_8h_source.html">goto-programs/goto_instruction_code.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="assignments__from__json_8h_source.html">assignments_from_json.h</a>&quot;</code><br />
@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('java__static__initializers_8cpp.html',
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__static__initializers_8cpp__incl.svg" width="2787" height="708"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__static__initializers_8cpp__incl.svg" width="2614" height="694"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -176,32 +176,32 @@ Functions</h2></td></tr>
 <tr class="memitem:a709c8ddd4b9e638a2be7d290fc178dc0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a709c8ddd4b9e638a2be7d290fc178dc0">clinit_wrapper_do_recursive_calls</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classcode__blockt.html">code_blockt</a> &amp;init_body, const bool <a class="el" href="nondet__static_8h.html#a3779909dc5d3b2f94bd137c9f0ae5350">nondet_static</a>, const bool replace_clinit, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a709c8ddd4b9e638a2be7d290fc178dc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates codet that iterates through the base types of the class specified by class_name, C, and recursively adds calls to their clinit wrapper.  <a href="java__static__initializers_8cpp.html#a709c8ddd4b9e638a2be7d290fc178dc0">More...</a><br /></td></tr>
 <tr class="separator:a709c8ddd4b9e638a2be7d290fc178dc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3ed1e6438e4fbd28ad53c0ae2adb995"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#aa3ed1e6438e4fbd28ad53c0ae2adb995">needs_clinit_wrapper</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:aa3ed1e6438e4fbd28ad53c0ae2adb995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a static initializer wrapper is needed for a given class, i.e.  <a href="java__static__initializers_8cpp.html#aa3ed1e6438e4fbd28ad53c0ae2adb995">More...</a><br /></td></tr>
-<tr class="separator:aa3ed1e6438e4fbd28ad53c0ae2adb995"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2afd799df7954f6e5c3722a997369dcf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a2afd799df7954f6e5c3722a997369dcf">create_function_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_base_name, const <a class="el" href="synthetic__methods__map_8h.html#a8be49407143295b2fa0829cf640be323">synthetic_method_typet</a> &amp;synthetic_method_type, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
-<tr class="separator:a2afd799df7954f6e5c3722a997369dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad81ef358fcb2fd15d91f83afc0c04c01"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#ad81ef358fcb2fd15d91f83afc0c04c01">create_clinit_wrapper_function_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
-<tr class="separator:ad81ef358fcb2fd15d91f83afc0c04c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad43882e23515076d6e07a98b543221a5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#ad43882e23515076d6e07a98b543221a5">create_user_specified_clinit_function_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
-<tr class="separator:ad43882e23515076d6e07a98b543221a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25cfd493bc44db4bf96ffd5819227759"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a25cfd493bc44db4bf96ffd5819227759">create_clinit_wrapper_symbols</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods, const bool thread_safe)</td></tr>
-<tr class="memdesc:a25cfd493bc44db4bf96ffd5819227759"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a static initializer wrapper symbol for the given class, along with a global boolean that tracks if it has been run already.  <a href="java__static__initializers_8cpp.html#a25cfd493bc44db4bf96ffd5819227759">More...</a><br /></td></tr>
-<tr class="separator:a25cfd493bc44db4bf96ffd5819227759"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdb6bf368ab15fc080b71d4cc888d881"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#afdb6bf368ab15fc080b71d4cc888d881">needs_clinit_wrapper</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:afdb6bf368ab15fc080b71d4cc888d881"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a static initializer wrapper is needed for a given class, i.e.  <a href="java__static__initializers_8cpp.html#afdb6bf368ab15fc080b71d4cc888d881">More...</a><br /></td></tr>
+<tr class="separator:afdb6bf368ab15fc080b71d4cc888d881"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bef5931bb88fa4bc732b72198c99100"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a1bef5931bb88fa4bc732b72198c99100">create_function_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_base_name, const <a class="el" href="synthetic__methods__map_8h.html#a8be49407143295b2fa0829cf640be323">synthetic_method_typet</a> &amp;synthetic_method_type, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
+<tr class="separator:a1bef5931bb88fa4bc732b72198c99100"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a613db86115365ee1a670824ec48e955e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a613db86115365ee1a670824ec48e955e">create_clinit_wrapper_function_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
+<tr class="separator:a613db86115365ee1a670824ec48e955e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cfffd33a2b98a5b2ca8522418b2390d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a5cfffd33a2b98a5b2ca8522418b2390d">create_user_specified_clinit_function_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
+<tr class="separator:a5cfffd33a2b98a5b2ca8522418b2390d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99f0810a10fc7f146de3681b7ebffa5a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a99f0810a10fc7f146de3681b7ebffa5a">create_clinit_wrapper_symbols</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods, const bool thread_safe)</td></tr>
+<tr class="memdesc:a99f0810a10fc7f146de3681b7ebffa5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a static initializer wrapper symbol for the given class, along with a global boolean that tracks if it has been run already.  <a href="java__static__initializers_8cpp.html#a99f0810a10fc7f146de3681b7ebffa5a">More...</a><br /></td></tr>
+<tr class="separator:a99f0810a10fc7f146de3681b7ebffa5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac16046ef29399f7db303a040d4bb9f30"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__blockt.html">code_blockt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#ac16046ef29399f7db303a040d4bb9f30">get_thread_safe_clinit_wrapper_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const bool <a class="el" href="nondet__static_8h.html#a3779909dc5d3b2f94bd137c9f0ae5350">nondet_static</a>, const bool replace_clinit, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:ac16046ef29399f7db303a040d4bb9f30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread safe version of the static initializer.  <a href="java__static__initializers_8cpp.html#ac16046ef29399f7db303a040d4bb9f30">More...</a><br /></td></tr>
 <tr class="separator:ac16046ef29399f7db303a040d4bb9f30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60ea6ee3867e0aab4042a9b2ea9a5d06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__ifthenelset.html">code_ifthenelset</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a60ea6ee3867e0aab4042a9b2ea9a5d06">get_clinit_wrapper_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const bool <a class="el" href="nondet__static_8h.html#a3779909dc5d3b2f94bd137c9f0ae5350">nondet_static</a>, const bool replace_clinit, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a60ea6ee3867e0aab4042a9b2ea9a5d06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produces the static initializer wrapper body for the given function.  <a href="java__static__initializers_8cpp.html#a60ea6ee3867e0aab4042a9b2ea9a5d06">More...</a><br /></td></tr>
 <tr class="separator:a60ea6ee3867e0aab4042a9b2ea9a5d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3b2ac40cedb906b3a022ef21f13d56b"><td class="memItemLeft" align="right" valign="top">std::unordered_multimap&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#ae3b2ac40cedb906b3a022ef21f13d56b">class_to_declared_symbols</a> (const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="separator:ae3b2ac40cedb906b3a022ef21f13d56b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac07d176c89c0eed7b32a72bd964a1b97"><td class="memItemLeft" align="right" valign="top">std::unordered_multimap&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#ac07d176c89c0eed7b32a72bd964a1b97">class_to_declared_symbols</a> (const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="separator:ac07d176c89c0eed7b32a72bd964a1b97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86cb5921f55f61e624979c79e8309df8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__blockt.html">code_blockt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a86cb5921f55f61e624979c79e8309df8">get_user_specified_clinit_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, const <a class="el" href="classjson__objectt.html">json_objectt</a> &amp;static_values_json, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods, size_t max_user_array_length, std::unordered_map&lt; std::string, <a class="el" href="structobject__creation__referencet.html">object_creation_referencet</a> &gt; &amp;references, const std::unordered_multimap&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a> &gt; &amp;class_to_declared_symbols_map)</td></tr>
 <tr class="memdesc:a86cb5921f55f61e624979c79e8309df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create the body of a user_specified_clinit function for a given class, which includes assignments for all static fields of the class to values read from an input file.  <a href="java__static__initializers_8cpp.html#a86cb5921f55f61e624979c79e8309df8">More...</a><br /></td></tr>
 <tr class="separator:a86cb5921f55f61e624979c79e8309df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11a741617dc54e374fc7f6b1e2fd69ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a11a741617dc54e374fc7f6b1e2fd69ef">create_static_initializer_symbols</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods, const bool thread_safe, const bool is_user_clinit_needed)</td></tr>
-<tr class="memdesc:a11a741617dc54e374fc7f6b1e2fd69ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create static initializer wrappers and possibly user-specified functions for initial static field value assignments for all classes that need them.  <a href="java__static__initializers_8cpp.html#a11a741617dc54e374fc7f6b1e2fd69ef">More...</a><br /></td></tr>
-<tr class="separator:a11a741617dc54e374fc7f6b1e2fd69ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31b076a02d675f00e5f0a1c2c45243df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#a31b076a02d675f00e5f0a1c2c45243df">create_static_initializer_symbols</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods, const bool thread_safe, const bool is_user_clinit_needed)</td></tr>
+<tr class="memdesc:a31b076a02d675f00e5f0a1c2c45243df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create static initializer wrappers and possibly user-specified functions for initial static field value assignments for all classes that need them.  <a href="java__static__initializers_8cpp.html#a31b076a02d675f00e5f0a1c2c45243df">More...</a><br /></td></tr>
+<tr class="separator:a31b076a02d675f00e5f0a1c2c45243df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac717242b6f83a164e6c1fea7e47657f3"><td class="memTemplParams" colspan="2">template&lt;class itertype &gt; </td></tr>
 <tr class="memitem:ac717242b6f83a164e6c1fea7e47657f3"><td class="memTemplItemLeft" align="right" valign="top">static itertype&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="java__static__initializers_8cpp.html#ac717242b6f83a164e6c1fea7e47657f3">advance_to_next_key</a> (itertype in, itertype end)</td></tr>
 <tr class="memdesc:ac717242b6f83a164e6c1fea7e47657f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advance map iterator to next distinct key.  <a href="java__static__initializers_8cpp.html#ac717242b6f83a164e6c1fea7e47657f3">More...</a><br /></td></tr>
@@ -366,12 +366,12 @@ template&lt;class itertype &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00912">912</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00913">913</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ae3b2ac40cedb906b3a022ef21f13d56b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3b2ac40cedb906b3a022ef21f13d56b">&#9670;&nbsp;</a></span>class_to_declared_symbols()</h2>
+<a id="ac07d176c89c0eed7b32a72bd964a1b97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac07d176c89c0eed7b32a72bd964a1b97">&#9670;&nbsp;</a></span>class_to_declared_symbols()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -379,7 +379,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="memname">std::unordered_multimap&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a>&gt; class_to_declared_symbols </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -387,7 +387,7 @@ template&lt;class itertype &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>map associating classes to the symbols they declare </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00783">783</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00784">784</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
@@ -721,8 +721,8 @@ template&lt;class itertype &gt; </div>
 
 </div>
 </div>
-<a id="ad81ef358fcb2fd15d91f83afc0c04c01"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad81ef358fcb2fd15d91f83afc0c04c01">&#9670;&nbsp;</a></span>create_clinit_wrapper_function_symbol()</h2>
+<a id="a613db86115365ee1a670824ec48e955e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a613db86115365ee1a670824ec48e955e">&#9670;&nbsp;</a></span>create_clinit_wrapper_function_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -739,7 +739,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -761,12 +761,12 @@ template&lt;class itertype &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00360">360</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00361">361</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a25cfd493bc44db4bf96ffd5819227759"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25cfd493bc44db4bf96ffd5819227759">&#9670;&nbsp;</a></span>create_clinit_wrapper_symbols()</h2>
+<a id="a99f0810a10fc7f146de3681b7ebffa5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99f0810a10fc7f146de3681b7ebffa5a">&#9670;&nbsp;</a></span>create_clinit_wrapper_symbols()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -783,7 +783,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -822,12 +822,12 @@ template&lt;class itertype &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00399">399</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00400">400</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a2afd799df7954f6e5c3722a997369dcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2afd799df7954f6e5c3722a997369dcf">&#9670;&nbsp;</a></span>create_function_symbol()</h2>
+<a id="a1bef5931bb88fa4bc732b72198c99100"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1bef5931bb88fa4bc732b72198c99100">&#9670;&nbsp;</a></span>create_function_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -862,7 +862,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -884,12 +884,12 @@ template&lt;class itertype &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00330">330</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00331">331</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a11a741617dc54e374fc7f6b1e2fd69ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11a741617dc54e374fc7f6b1e2fd69ef">&#9670;&nbsp;</a></span>create_static_initializer_symbols()</h2>
+<a id="a31b076a02d675f00e5f0a1c2c45243df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31b076a02d675f00e5f0a1c2c45243df">&#9670;&nbsp;</a></span>create_static_initializer_symbols()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -897,7 +897,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="memname">void create_static_initializer_symbols </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -937,12 +937,12 @@ template&lt;class itertype &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00878">878</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00879">879</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ad43882e23515076d6e07a98b543221a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad43882e23515076d6e07a98b543221a5">&#9670;&nbsp;</a></span>create_user_specified_clinit_function_symbol()</h2>
+<a id="a5cfffd33a2b98a5b2ca8522418b2390d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cfffd33a2b98a5b2ca8522418b2390d">&#9670;&nbsp;</a></span>create_user_specified_clinit_function_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -959,7 +959,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -981,7 +981,7 @@ template&lt;class itertype &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00375">375</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00376">376</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
@@ -1138,7 +1138,7 @@ template&lt;class itertype &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the body of the static initializer wrapper </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00722">722</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00723">723</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
@@ -1262,7 +1262,7 @@ template&lt;class itertype &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the body of the static initializer wrapper </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00524">524</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00525">525</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
@@ -1337,7 +1337,7 @@ template&lt;class itertype &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the body of the user_specified_clinit function as a code block. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00795">795</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__static__initializers_8cpp_source.html#l00796">796</a> of file <a class="el" href="java__static__initializers_8cpp_source.html">java_static_initializers.cpp</a>.</p>
 
 </div>
 </div>
@@ -1428,8 +1428,8 @@ template&lt;class itertype &gt; </div>
 
 </div>
 </div>
-<a id="aa3ed1e6438e4fbd28ad53c0ae2adb995"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3ed1e6438e4fbd28ad53c0ae2adb995">&#9670;&nbsp;</a></span>needs_clinit_wrapper()</h2>
+<a id="afdb6bf368ab15fc080b71d4cc888d881"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdb6bf368ab15fc080b71d4cc888d881">&#9670;&nbsp;</a></span>needs_clinit_wrapper()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1446,7 +1446,7 @@ template&lt;class itertype &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>

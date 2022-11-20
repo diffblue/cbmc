@@ -106,7 +106,6 @@ $(document).ready(function(){initNavTree('java__bytecode__language_8cpp.html',''
 <code>#include &lt;<a class="el" href="options_8h_source.html">util/options.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="suffix_8h_source.html">util/suffix.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="symbol__table__builder_8h_source.html">util/symbol_table_builder.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="json__parser_8h_source.html">json/json_parser.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="class__hierarchy_8h_source.html">goto-programs/class_hierarchy.h</a>&gt;</code><br />
@@ -134,7 +133,7 @@ $(document).ready(function(){initNavTree('java__bytecode__language_8cpp.html',''
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__language_8cpp__incl.svg" width="5618" height="559"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__language_8cpp__incl.svg" width="4458" height="559"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -149,24 +148,24 @@ Functions</h2></td></tr>
 <tr class="separator:ab6b2ed49e69597e31f4c33497001e5dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa46b250a536aa77e245b3efe45027032"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#aa46b250a536aa77e245b3efe45027032">throwMainClassLoadingError</a> (const std::string &amp;main_class)</td></tr>
 <tr class="separator:aa46b250a536aa77e245b3efe45027032"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ffedb633907d1181f996304ed637336"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a6ffedb633907d1181f996304ed637336">infer_opaque_type_fields</a> (const <a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a6ffedb633907d1181f996304ed637336"><td class="mdescLeft">&#160;</td><td class="mdescRight">Infer fields that must exist on opaque types from field accesses against them.  <a href="java__bytecode__language_8cpp.html#a6ffedb633907d1181f996304ed637336">More...</a><br /></td></tr>
-<tr class="separator:a6ffedb633907d1181f996304ed637336"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefe66d90ad7ab742bfd47445ddc32f23"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#aefe66d90ad7ab742bfd47445ddc32f23">get_or_create_class_literal_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:aefe66d90ad7ab742bfd47445ddc32f23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create if necessary, then return the constant global java.lang.Class symbol for a given class id.  <a href="java__bytecode__language_8cpp.html#aefe66d90ad7ab742bfd47445ddc32f23">More...</a><br /></td></tr>
-<tr class="separator:aefe66d90ad7ab742bfd47445ddc32f23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9acb51b0f811a6c567af346004ee423"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#ab9acb51b0f811a6c567af346004ee423">get_ldc_result</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;ldc_arg0, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, bool string_refinement_enabled)</td></tr>
-<tr class="memdesc:ab9acb51b0f811a6c567af346004ee423"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get result of a Java load-constant (ldc) instruction.  <a href="java__bytecode__language_8cpp.html#ab9acb51b0f811a6c567af346004ee423">More...</a><br /></td></tr>
-<tr class="separator:ab9acb51b0f811a6c567af346004ee423"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a715f56f6e07506c4a6c8b9fca110207c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a715f56f6e07506c4a6c8b9fca110207c">generate_constant_global_variables</a> (<a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, bool string_refinement_enabled)</td></tr>
-<tr class="memdesc:a715f56f6e07506c4a6c8b9fca110207c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates global variables for constants mentioned in a given method.  <a href="java__bytecode__language_8cpp.html#a715f56f6e07506c4a6c8b9fca110207c">More...</a><br /></td></tr>
-<tr class="separator:a715f56f6e07506c4a6c8b9fca110207c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a804fde4ecb2f7a094a782b7fb42cf714"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a804fde4ecb2f7a094a782b7fb42cf714">infer_opaque_type_fields</a> (const <a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a804fde4ecb2f7a094a782b7fb42cf714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Infer fields that must exist on opaque types from field accesses against them.  <a href="java__bytecode__language_8cpp.html#a804fde4ecb2f7a094a782b7fb42cf714">More...</a><br /></td></tr>
+<tr class="separator:a804fde4ecb2f7a094a782b7fb42cf714"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a7b9e981f92a8edf5f3895b78fd8cfa82">get_or_create_class_literal_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create if necessary, then return the constant global java.lang.Class symbol for a given class id.  <a href="java__bytecode__language_8cpp.html#a7b9e981f92a8edf5f3895b78fd8cfa82">More...</a><br /></td></tr>
+<tr class="separator:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c7b9e03dd1d40715e91cf62be86ad2d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a3c7b9e03dd1d40715e91cf62be86ad2d">get_ldc_result</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;ldc_arg0, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool string_refinement_enabled)</td></tr>
+<tr class="memdesc:a3c7b9e03dd1d40715e91cf62be86ad2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get result of a Java load-constant (ldc) instruction.  <a href="java__bytecode__language_8cpp.html#a3c7b9e03dd1d40715e91cf62be86ad2d">More...</a><br /></td></tr>
+<tr class="separator:a3c7b9e03dd1d40715e91cf62be86ad2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2264c5b9cf2bd8b9cb5895e63faf0632"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a2264c5b9cf2bd8b9cb5895e63faf0632">generate_constant_global_variables</a> (<a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool string_refinement_enabled)</td></tr>
+<tr class="memdesc:a2264c5b9cf2bd8b9cb5895e63faf0632"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates global variables for constants mentioned in a given method.  <a href="java__bytecode__language_8cpp.html#a2264c5b9cf2bd8b9cb5895e63faf0632">More...</a><br /></td></tr>
+<tr class="separator:a2264c5b9cf2bd8b9cb5895e63faf0632"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8cd501ec4d632a75872aef49e2b731d6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a8cd501ec4d632a75872aef49e2b731d6">create_stub_global_symbol</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;symbol_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;symbol_basename, const <a class="el" href="classtypet.html">typet</a> &amp;symbol_type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, bool force_nondet_init)</td></tr>
 <tr class="memdesc:a8cd501ec4d632a75872aef49e2b731d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a stub global symbol to the symbol table, initialising pointer-typed symbols with null and primitive-typed ones with an arbitrary (nondet) value.  <a href="java__bytecode__language_8cpp.html#a8cd501ec4d632a75872aef49e2b731d6">More...</a><br /></td></tr>
 <tr class="separator:a8cd501ec4d632a75872aef49e2b731d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8fdef61cafd2257dd8dc7db0fcfc82d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#ad8fdef61cafd2257dd8dc7db0fcfc82d">get_any_incomplete_ancestor_for_stub_static_field</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;start_class_id, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy)</td></tr>
-<tr class="memdesc:ad8fdef61cafd2257dd8dc7db0fcfc82d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find any incomplete ancestor of a given class that can have a stub static field attached to it.  <a href="java__bytecode__language_8cpp.html#ad8fdef61cafd2257dd8dc7db0fcfc82d">More...</a><br /></td></tr>
-<tr class="separator:ad8fdef61cafd2257dd8dc7db0fcfc82d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea06f54044638c3202e80f73de0e89df"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#aea06f54044638c3202e80f73de0e89df">get_any_incomplete_ancestor_for_stub_static_field</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;start_class_id, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy)</td></tr>
+<tr class="memdesc:aea06f54044638c3202e80f73de0e89df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find any incomplete ancestor of a given class that can have a stub static field attached to it.  <a href="java__bytecode__language_8cpp.html#aea06f54044638c3202e80f73de0e89df">More...</a><br /></td></tr>
+<tr class="separator:aea06f54044638c3202e80f73de0e89df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8b0155f36e0b852fc4216300e05c1e6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#ad8b0155f36e0b852fc4216300e05c1e6">create_stub_global_symbols</a> (const <a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy, <a class="el" href="classmessaget.html">messaget</a> &amp;log)</td></tr>
 <tr class="memdesc:ad8b0155f36e0b852fc4216300e05c1e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search for getstatic and putstatic instructions in a class' bytecode and create stub symbols for any static fields that aren't already in the symbol table.  <a href="java__bytecode__language_8cpp.html#ad8b0155f36e0b852fc4216300e05c1e6">More...</a><br /></td></tr>
 <tr class="separator:ad8b0155f36e0b852fc4216300e05c1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -313,8 +312,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a715f56f6e07506c4a6c8b9fca110207c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a715f56f6e07506c4a6c8b9fca110207c">&#9670;&nbsp;</a></span>generate_constant_global_variables()</h2>
+<a id="a2264c5b9cf2bd8b9cb5895e63faf0632"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2264c5b9cf2bd8b9cb5895e63faf0632">&#9670;&nbsp;</a></span>generate_constant_global_variables()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -331,7 +330,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -367,8 +366,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad8fdef61cafd2257dd8dc7db0fcfc82d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8fdef61cafd2257dd8dc7db0fcfc82d">&#9670;&nbsp;</a></span>get_any_incomplete_ancestor_for_stub_static_field()</h2>
+<a id="aea06f54044638c3202e80f73de0e89df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea06f54044638c3202e80f73de0e89df">&#9670;&nbsp;</a></span>get_any_incomplete_ancestor_for_stub_static_field()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -385,7 +384,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -438,12 +437,12 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00116">116</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00115">115</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ab9acb51b0f811a6c567af346004ee423"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9acb51b0f811a6c567af346004ee423">&#9670;&nbsp;</a></span>get_ldc_result()</h2>
+<a id="a3c7b9e03dd1d40715e91cf62be86ad2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c7b9e03dd1d40715e91cf62be86ad2d">&#9670;&nbsp;</a></span>get_ldc_result()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -460,7 +459,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -497,8 +496,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aefe66d90ad7ab742bfd47445ddc32f23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefe66d90ad7ab742bfd47445ddc32f23">&#9670;&nbsp;</a></span>get_or_create_class_literal_symbol()</h2>
+<a id="a7b9e981f92a8edf5f3895b78fd8cfa82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b9e981f92a8edf5f3895b78fd8cfa82">&#9670;&nbsp;</a></span>get_or_create_class_literal_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -515,7 +514,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -541,12 +540,12 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>java.lang.Class typed symbol expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00522">522</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00521">521</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a6ffedb633907d1181f996304ed637336"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ffedb633907d1181f996304ed637336">&#9670;&nbsp;</a></span>infer_opaque_type_fields()</h2>
+<a id="a804fde4ecb2f7a094a782b7fb42cf714"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a804fde4ecb2f7a094a782b7fb42cf714">&#9670;&nbsp;</a></span>infer_opaque_type_fields()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -563,7 +562,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -588,7 +587,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00457">457</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00456">456</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -693,7 +692,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00055">55</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00054">54</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -721,7 +720,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00321">321</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00320">320</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>

@@ -104,87 +104,86 @@ $(document).ready(function(){initNavTree('string__utils_8h_source.html',''); ini
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#ifndef CPROVER_UTIL_STRING_UTILS_H</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#define CPROVER_UTIL_STRING_UTILS_H</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;iosfwd&gt;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;std::string <a class="code" href="string__utils_8h.html#a7ddecd6d2b1681912e81f9911c74c111">strip_string</a>(<span class="keyword">const</span> std::string &amp;s);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;std::string <a class="code" href="string__utils_8h.html#aedf7437a6cb42083fa91ef582fe323a2">capitalize</a>(<span class="keyword">const</span> std::string &amp;str);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">void</span> <a class="code" href="string__utils_8h.html#a5c032730accee22c5f00e1a0a8f6854a">split_string</a>(</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">char</span> delim,</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  std::string &amp;left,</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::string &amp;right,</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordtype">bool</span> strip = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;std::vector&lt;std::string&gt; <a class="code" href="string__utils_8h.html#a5c032730accee22c5f00e1a0a8f6854a">split_string</a>(</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordtype">char</span> delim,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordtype">bool</span> strip = <span class="keyword">false</span>,</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordtype">bool</span> remove_empty = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;std::string <a class="code" href="string__utils_8h.html#a5e2747452efadd8ae11dd8f2a0a51d3a">trim_from_last_delimiter</a>(</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span> delim);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">template</span> &lt;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keyword">typename</span> Stream,</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keyword">typename</span> It,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keyword">typename</span> Delimiter,</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">typename</span> TransformFunc&gt;</div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">   62</a></span>&#160;Stream &amp;<a class="code" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a>(</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  Stream &amp;&amp;os,</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keyword">const</span> It b,</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keyword">const</span> It e,</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keyword">const</span> Delimiter &amp;delimiter,</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  TransformFunc &amp;&amp;transform_func)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keywordflow">if</span>(b==e)</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">return</span> os;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  os &lt;&lt; transform_func(*b);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it=std::next(b); it!=e; ++it)</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    os &lt;&lt; delimiter &lt;&lt; transform_func(*it);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordflow">return</span> os;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;}</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Stream, <span class="keyword">typename</span> It, <span class="keyword">typename</span> Delimiter&gt;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;Stream &amp;</div>
-<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="string__utils_8h.html#afbace7424312230d62e29204a832505d">   91</a></span>&#160;<a class="code" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a>(Stream &amp;&amp;os, <span class="keyword">const</span> It b, <span class="keyword">const</span> It e, <span class="keyword">const</span> Delimiter &amp;delimiter)</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keyword">using</span> value_type = decltype(*b);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="comment">// Call auxiliary function with identity function</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a>(</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    os, b, e, delimiter, [](<span class="keyword">const</span> value_type &amp;x) { <span class="keywordflow">return</span> x; });</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;}</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;std::string <a class="code" href="string__utils_8h.html#abc6a3d8c32ad2e32d96829e468a104db">escape</a>(<span class="keyword">const</span> std::string &amp;);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;std::string <a class="code" href="string__utils_8h.html#aa3180d180bdf1319641db91848dbf2bf">escape_non_alnum</a>(<span class="keyword">const</span> std::string &amp;to_escape);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;std::string <a class="code" href="string__utils_8h.html#a460e078b217ee7b9269945b8d67eb6d0">wrap_line</a>(</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keyword">const</span> std::string &amp;line,</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="keyword">const</span> std::size_t left_margin = 0,</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keyword">const</span> std::size_t width = 80);</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;std::string <a class="code" href="string__utils_8h.html#a460e078b217ee7b9269945b8d67eb6d0">wrap_line</a>(</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keyword">const</span> std::string::const_iterator left,</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="keyword">const</span> std::string::const_iterator right,</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keyword">const</span> std::size_t left_margin = 0,</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keyword">const</span> std::size_t width = 80);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;std::string <a class="code" href="string__utils_8h.html#a7ddecd6d2b1681912e81f9911c74c111">strip_string</a>(<span class="keyword">const</span> std::string &amp;s);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;std::string <a class="code" href="string__utils_8h.html#aedf7437a6cb42083fa91ef582fe323a2">capitalize</a>(<span class="keyword">const</span> std::string &amp;str);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">void</span> <a class="code" href="string__utils_8h.html#a5c032730accee22c5f00e1a0a8f6854a">split_string</a>(</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordtype">char</span> delim,</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  std::string &amp;left,</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  std::string &amp;right,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordtype">bool</span> strip = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;std::vector&lt;std::string&gt; <a class="code" href="string__utils_8h.html#a5c032730accee22c5f00e1a0a8f6854a">split_string</a>(</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keywordtype">char</span> delim,</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordtype">bool</span> strip = <span class="keyword">false</span>,</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordtype">bool</span> remove_empty = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;std::string <a class="code" href="string__utils_8h.html#a5e2747452efadd8ae11dd8f2a0a51d3a">trim_from_last_delimiter</a>(</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span> delim);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span> &lt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keyword">typename</span> Stream,</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keyword">typename</span> It,</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keyword">typename</span> Delimiter,</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keyword">typename</span> TransformFunc&gt;</div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">   61</a></span>&#160;Stream &amp;<a class="code" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a>(</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  Stream &amp;&amp;os,</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keyword">const</span> It b,</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keyword">const</span> It e,</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keyword">const</span> Delimiter &amp;delimiter,</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  TransformFunc &amp;&amp;transform_func)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;{</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordflow">if</span>(b==e)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordflow">return</span> os;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  os &lt;&lt; transform_func(*b);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it=std::next(b); it!=e; ++it)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    os &lt;&lt; delimiter &lt;&lt; transform_func(*it);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">return</span> os;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Stream, <span class="keyword">typename</span> It, <span class="keyword">typename</span> Delimiter&gt;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;Stream &amp;</div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="string__utils_8h.html#afbace7424312230d62e29204a832505d">   90</a></span>&#160;<a class="code" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a>(Stream &amp;&amp;os, <span class="keyword">const</span> It b, <span class="keyword">const</span> It e, <span class="keyword">const</span> Delimiter &amp;delimiter)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keyword">using</span> value_type = decltype(*b);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="comment">// Call auxiliary function with identity function</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a>(</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    os, b, e, delimiter, [](<span class="keyword">const</span> value_type &amp;x) { <span class="keywordflow">return</span> x; });</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;std::string <a class="code" href="string__utils_8h.html#abc6a3d8c32ad2e32d96829e468a104db">escape</a>(<span class="keyword">const</span> std::string &amp;);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;std::string <a class="code" href="string__utils_8h.html#aa3180d180bdf1319641db91848dbf2bf">escape_non_alnum</a>(<span class="keyword">const</span> std::string &amp;to_escape);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;std::string <a class="code" href="string__utils_8h.html#a460e078b217ee7b9269945b8d67eb6d0">wrap_line</a>(</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="keyword">const</span> std::string &amp;line,</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keyword">const</span> std::size_t left_margin = 0,</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="keyword">const</span> std::size_t width = 80);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;std::string <a class="code" href="string__utils_8h.html#a460e078b217ee7b9269945b8d67eb6d0">wrap_line</a>(</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keyword">const</span> std::string::const_iterator left,</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keyword">const</span> std::string::const_iterator right,</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="keyword">const</span> std::size_t left_margin = 0,</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keyword">const</span> std::size_t width = 80);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="astring__utils_8h_html_a460e078b217ee7b9269945b8d67eb6d0"><div class="ttname"><a href="string__utils_8h.html#a460e078b217ee7b9269945b8d67eb6d0">wrap_line</a></div><div class="ttdeci">std::string wrap_line(const std::string &amp;line, const std::size_t left_margin=0, const std::size_t width=80)</div><div class="ttdoc">Wrap line at spaces to not extend past the right margin, and include given padding with spaces to the...</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00184">string_utils.cpp:184</a></div></div>
 <div class="ttc" id="astring__utils_8h_html_abc6a3d8c32ad2e32d96829e468a104db"><div class="ttname"><a href="string__utils_8h.html#abc6a3d8c32ad2e32d96829e468a104db">escape</a></div><div class="ttdeci">std::string escape(const std::string &amp;)</div><div class="ttdoc">Generic escaping of strings; this is not meant to be a particular programming language.</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00138">string_utils.cpp:138</a></div></div>
 <div class="ttc" id="astring__utils_8h_html_aedf7437a6cb42083fa91ef582fe323a2"><div class="ttname"><a href="string__utils_8h.html#aedf7437a6cb42083fa91ef582fe323a2">capitalize</a></div><div class="ttdeci">std::string capitalize(const std::string &amp;str)</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00175">string_utils.cpp:175</a></div></div>
-<div class="ttc" id="astring__utils_8h_html_a45759bff62514000c5ca79c91608c2e7"><div class="ttname"><a href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a></div><div class="ttdeci">Stream &amp; join_strings(Stream &amp;&amp;os, const It b, const It e, const Delimiter &amp;delimiter, TransformFunc &amp;&amp;transform_func)</div><div class="ttdoc">Prints items to an stream, separated by a constant delimiter.</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8h_source.html#l00062">string_utils.h:62</a></div></div>
+<div class="ttc" id="astring__utils_8h_html_a45759bff62514000c5ca79c91608c2e7"><div class="ttname"><a href="string__utils_8h.html#a45759bff62514000c5ca79c91608c2e7">join_strings</a></div><div class="ttdeci">Stream &amp; join_strings(Stream &amp;&amp;os, const It b, const It e, const Delimiter &amp;delimiter, TransformFunc &amp;&amp;transform_func)</div><div class="ttdoc">Prints items to an stream, separated by a constant delimiter.</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8h_source.html#l00061">string_utils.h:61</a></div></div>
 <div class="ttc" id="astring__utils_8h_html_a5c032730accee22c5f00e1a0a8f6854a"><div class="ttname"><a href="string__utils_8h.html#a5c032730accee22c5f00e1a0a8f6854a">split_string</a></div><div class="ttdeci">void split_string(const std::string &amp;s, char delim, std::string &amp;left, std::string &amp;right, bool strip=false)</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00091">string_utils.cpp:91</a></div></div>
 <div class="ttc" id="astring__utils_8h_html_a5e2747452efadd8ae11dd8f2a0a51d3a"><div class="ttname"><a href="string__utils_8h.html#a5e2747452efadd8ae11dd8f2a0a51d3a">trim_from_last_delimiter</a></div><div class="ttdeci">std::string trim_from_last_delimiter(const std::string &amp;s, const char delim)</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00127">string_utils.cpp:127</a></div></div>
 <div class="ttc" id="astring__utils_8h_html_aa3180d180bdf1319641db91848dbf2bf"><div class="ttname"><a href="string__utils_8h.html#aa3180d180bdf1319641db91848dbf2bf">escape_non_alnum</a></div><div class="ttdeci">std::string escape_non_alnum(const std::string &amp;to_escape)</div><div class="ttdoc">Replace non-alphanumeric characters with _xx escapes, where xx are hex digits.</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00153">string_utils.cpp:153</a></div></div>

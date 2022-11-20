@@ -96,21 +96,21 @@ $(document).ready(function(){initNavTree('statement__list__entry__point_8cpp.htm
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="statement__list__entry__point_8h_source.html">statement_list_entry_point.h</a>&quot;</code><br />
-<code>#include &lt;<a class="el" href="adjust__float__expressions_8h_source.html">goto-programs/adjust_float_expressions.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="goto__functions_8h_source.html">goto-programs/goto_functions.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="adjust__float__expressions_8h_source.html">goto-programs/adjust_float_expressions.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="goto__functions_8h_source.html">goto-programs/goto_functions.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for statement_list_entry_point.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="statement__list__entry__point_8cpp__incl.svg" width="1998" height="1142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="statement__list__entry__point_8cpp__incl.svg" width="1974" height="1142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -127,27 +127,27 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a3fe4d7c2a715385a83ef32b0d56f0505"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a3fe4d7c2a715385a83ef32b0d56f0505">is_main_symbol_invalid</a> (const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;main_symbol_name)</td></tr>
-<tr class="memdesc:a3fe4d7c2a715385a83ef32b0d56f0505"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for symbols with the given name (which is considered to be the name of the main symbol) and returns false if there is exactly one symbol with that name in the given symbol table.  <a href="statement__list__entry__point_8cpp.html#a3fe4d7c2a715385a83ef32b0d56f0505">More...</a><br /></td></tr>
-<tr class="separator:a3fe4d7c2a715385a83ef32b0d56f0505"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af50b1a278a96bd5113cccdbab81d9cf7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#af50b1a278a96bd5113cccdbab81d9cf7">add_initialize_call</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;function_body, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;main_symbol_location)</td></tr>
-<tr class="memdesc:af50b1a278a96bd5113cccdbab81d9cf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a call to __CPROVER_initialize and adds it to the start function's body.  <a href="statement__list__entry__point_8cpp.html#af50b1a278a96bd5113cccdbab81d9cf7">More...</a><br /></td></tr>
-<tr class="separator:af50b1a278a96bd5113cccdbab81d9cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ba6e48eb2a134f10a5263958f647b2d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a8ba6e48eb2a134f10a5263958f647b2d">add_main_function_block_call</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;function_body, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;main_function_block)</td></tr>
-<tr class="memdesc:a8ba6e48eb2a134f10a5263958f647b2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a call to the main function block and adds it to the start function's body.  <a href="statement__list__entry__point_8cpp.html#a8ba6e48eb2a134f10a5263958f647b2d">More...</a><br /></td></tr>
-<tr class="separator:a8ba6e48eb2a134f10a5263958f647b2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b3acef840a9ac170ee1c37ba9665f33"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a9b3acef840a9ac170ee1c37ba9665f33">generate_statement_list_init_function</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a9b3acef840a9ac170ee1c37ba9665f33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates __CPROVER_initialize and adds it to the symbol table.  <a href="statement__list__entry__point_8cpp.html#a9b3acef840a9ac170ee1c37ba9665f33">More...</a><br /></td></tr>
-<tr class="separator:a9b3acef840a9ac170ee1c37ba9665f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82bfabdfb3577d5a1a1e1b2bd08f1326"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a82bfabdfb3577d5a1a1e1b2bd08f1326">generate_rounding_mode</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a82bfabdfb3577d5a1a1e1b2bd08f1326"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates __CPROVER_rounding_mode and adds it to the symbol table.  <a href="statement__list__entry__point_8cpp.html#a82bfabdfb3577d5a1a1e1b2bd08f1326">More...</a><br /></td></tr>
-<tr class="separator:a82bfabdfb3577d5a1a1e1b2bd08f1326"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac60bec7ca3aae6907dacfbb62135bb6e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#ac60bec7ca3aae6907dacfbb62135bb6e">generate_statement_list_start_function</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;<a class="el" href="jdiff__main_8cpp.html#a217dbf8b442f20279ea00b898af96f52">main</a>, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:ac60bec7ca3aae6907dacfbb62135bb6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a start function and adds it to the symbol table.  <a href="statement__list__entry__point_8cpp.html#ac60bec7ca3aae6907dacfbb62135bb6e">More...</a><br /></td></tr>
-<tr class="separator:ac60bec7ca3aae6907dacfbb62135bb6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb3853549a748ca2200c37600c418462"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#afb3853549a748ca2200c37600c418462">statement_list_entry_point</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:afb3853549a748ca2200c37600c418462"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entry point for the Statement List language.  <a href="statement__list__entry__point_8cpp.html#afb3853549a748ca2200c37600c418462">More...</a><br /></td></tr>
-<tr class="separator:afb3853549a748ca2200c37600c418462"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24e92d2490a6bff7b17e8ea8e9f49432"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a24e92d2490a6bff7b17e8ea8e9f49432">is_main_symbol_invalid</a> (const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;main_symbol_name)</td></tr>
+<tr class="memdesc:a24e92d2490a6bff7b17e8ea8e9f49432"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for symbols with the given name (which is considered to be the name of the main symbol) and returns false if there is exactly one symbol with that name in the given symbol table.  <a href="statement__list__entry__point_8cpp.html#a24e92d2490a6bff7b17e8ea8e9f49432">More...</a><br /></td></tr>
+<tr class="separator:a24e92d2490a6bff7b17e8ea8e9f49432"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a103a05afa0d1751a13b597d4fb4e4644"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a103a05afa0d1751a13b597d4fb4e4644">add_initialize_call</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;function_body, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;main_symbol_location)</td></tr>
+<tr class="memdesc:a103a05afa0d1751a13b597d4fb4e4644"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a call to __CPROVER_initialize and adds it to the start function's body.  <a href="statement__list__entry__point_8cpp.html#a103a05afa0d1751a13b597d4fb4e4644">More...</a><br /></td></tr>
+<tr class="separator:a103a05afa0d1751a13b597d4fb4e4644"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fb33aa903e47c31b064ebe8e728913c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a5fb33aa903e47c31b064ebe8e728913c">add_main_function_block_call</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;function_body, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classsymbolt.html">symbolt</a> &amp;main_function_block)</td></tr>
+<tr class="memdesc:a5fb33aa903e47c31b064ebe8e728913c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a call to the main function block and adds it to the start function's body.  <a href="statement__list__entry__point_8cpp.html#a5fb33aa903e47c31b064ebe8e728913c">More...</a><br /></td></tr>
+<tr class="separator:a5fb33aa903e47c31b064ebe8e728913c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aada9ec7e44ef93e583b86e25d08f3bc0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#aada9ec7e44ef93e583b86e25d08f3bc0">generate_statement_list_init_function</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:aada9ec7e44ef93e583b86e25d08f3bc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates __CPROVER_initialize and adds it to the symbol table.  <a href="statement__list__entry__point_8cpp.html#aada9ec7e44ef93e583b86e25d08f3bc0">More...</a><br /></td></tr>
+<tr class="separator:aada9ec7e44ef93e583b86e25d08f3bc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa29547edb1914160a1c5cb2a5df11205"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#aa29547edb1914160a1c5cb2a5df11205">generate_rounding_mode</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:aa29547edb1914160a1c5cb2a5df11205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates __CPROVER_rounding_mode and adds it to the symbol table.  <a href="statement__list__entry__point_8cpp.html#aa29547edb1914160a1c5cb2a5df11205">More...</a><br /></td></tr>
+<tr class="separator:aa29547edb1914160a1c5cb2a5df11205"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe90768a3ea8755d52804d244a439515"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#afe90768a3ea8755d52804d244a439515">generate_statement_list_start_function</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;<a class="el" href="jdiff__main_8cpp.html#a217dbf8b442f20279ea00b898af96f52">main</a>, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:afe90768a3ea8755d52804d244a439515"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a start function and adds it to the symbol table.  <a href="statement__list__entry__point_8cpp.html#afe90768a3ea8755d52804d244a439515">More...</a><br /></td></tr>
+<tr class="separator:afe90768a3ea8755d52804d244a439515"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31340f80bd042120d3d78cf38fcee902"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__entry__point_8cpp.html#a31340f80bd042120d3d78cf38fcee902">statement_list_entry_point</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:a31340f80bd042120d3d78cf38fcee902"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entry point for the Statement List language.  <a href="statement__list__entry__point_8cpp.html#a31340f80bd042120d3d78cf38fcee902">More...</a><br /></td></tr>
+<tr class="separator:a31340f80bd042120d3d78cf38fcee902"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Statement List Language Entry Point </p>
@@ -191,8 +191,8 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="af50b1a278a96bd5113cccdbab81d9cf7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af50b1a278a96bd5113cccdbab81d9cf7">&#9670;&nbsp;</a></span>add_initialize_call()</h2>
+<a id="a103a05afa0d1751a13b597d4fb4e4644"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a103a05afa0d1751a13b597d4fb4e4644">&#9670;&nbsp;</a></span>add_initialize_call()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,7 +209,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -245,8 +245,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8ba6e48eb2a134f10a5263958f647b2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ba6e48eb2a134f10a5263958f647b2d">&#9670;&nbsp;</a></span>add_main_function_block_call()</h2>
+<a id="a5fb33aa903e47c31b064ebe8e728913c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fb33aa903e47c31b064ebe8e728913c">&#9670;&nbsp;</a></span>add_main_function_block_call()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -263,7 +263,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -299,8 +299,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a82bfabdfb3577d5a1a1e1b2bd08f1326"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82bfabdfb3577d5a1a1e1b2bd08f1326">&#9670;&nbsp;</a></span>generate_rounding_mode()</h2>
+<a id="aa29547edb1914160a1c5cb2a5df11205"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa29547edb1914160a1c5cb2a5df11205">&#9670;&nbsp;</a></span>generate_rounding_mode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -311,7 +311,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void generate_rounding_mode </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -331,12 +331,12 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00146">146</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00147">147</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a9b3acef840a9ac170ee1c37ba9665f33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b3acef840a9ac170ee1c37ba9665f33">&#9670;&nbsp;</a></span>generate_statement_list_init_function()</h2>
+<a id="aada9ec7e44ef93e583b86e25d08f3bc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aada9ec7e44ef93e583b86e25d08f3bc0">&#9670;&nbsp;</a></span>generate_statement_list_init_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -347,7 +347,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void generate_statement_list_init_function </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -367,12 +367,12 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00124">124</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00125">125</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ac60bec7ca3aae6907dacfbb62135bb6e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac60bec7ca3aae6907dacfbb62135bb6e">&#9670;&nbsp;</a></span>generate_statement_list_start_function()</h2>
+<a id="afe90768a3ea8755d52804d244a439515"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe90768a3ea8755d52804d244a439515">&#9670;&nbsp;</a></span>generate_statement_list_start_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -386,7 +386,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -413,12 +413,12 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00165">165</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00166">166</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a3fe4d7c2a715385a83ef32b0d56f0505"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fe4d7c2a715385a83ef32b0d56f0505">&#9670;&nbsp;</a></span>is_main_symbol_invalid()</h2>
+<a id="a24e92d2490a6bff7b17e8ea8e9f49432"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24e92d2490a6bff7b17e8ea8e9f49432">&#9670;&nbsp;</a></span>is_main_symbol_invalid()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -429,7 +429,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static bool is_main_symbol_invalid </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -472,8 +472,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="afb3853549a748ca2200c37600c418462"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afb3853549a748ca2200c37600c418462">&#9670;&nbsp;</a></span>statement_list_entry_point()</h2>
+<a id="a31340f80bd042120d3d78cf38fcee902"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31340f80bd042120d3d78cf38fcee902">&#9670;&nbsp;</a></span>statement_list_entry_point()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -481,7 +481,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">bool statement_list_entry_point </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -507,7 +507,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00198">198</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="statement__list__entry__point_8cpp_source.html#l00199">199</a> of file <a class="el" href="statement__list__entry__point_8cpp_source.html">statement_list_entry_point.cpp</a>.</p>
 
 </div>
 </div>

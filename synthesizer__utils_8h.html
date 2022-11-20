@@ -89,23 +89,22 @@ $(document).ready(function(){initNavTree('synthesizer__utils_8h.html',''); initR
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">synthesizer_utils.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="goto__program_8h_source.html">goto-programs/goto_program.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="goto__program_8h_source.html">goto-programs/goto_program.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="loop__ids_8h_source.html">goto-programs/loop_ids.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="loop__analysis_8h_source.html">analyses/loop_analysis.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="loop__utils_8h_source.html">goto-instrument/loop_utils.h</a>&gt;</code><br />
+<code>#include &lt;map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for synthesizer_utils.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__incl.svg" width="2567" height="1395"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__incl.svg" width="1702" height="768"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -113,12 +112,18 @@ $(document).ready(function(){initNavTree('synthesizer__utils_8h.html',''); initR
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__dep__incl.svg" width="1082" height="542"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__dep__incl.svg" width="1008" height="438"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
 <p><a href="synthesizer__utils_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classloop__templatet.html">loop_templatet&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A loop, specified as a set of instructions.  <a href="classloop__templatet.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a64838a6fe2bdb68b1dfbc524788ea90c"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a></td></tr>
@@ -157,7 +162,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8h_source.html#l00019">19</a> of file <a class="el" href="synthesizer__utils_8h_source.html">synthesizer_utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8h_source.html#l00020">20</a> of file <a class="el" href="synthesizer__utils_8h_source.html">synthesizer_utils.h</a>.</p>
 
 </div>
 </div>
@@ -197,7 +202,7 @@ Functions</h2></td></tr>
 <p>Annotate the invariants in <code>invariant_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>invariant_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00093">93</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00095">95</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +235,7 @@ Functions</h2></td></tr>
 <p>Find and return the last instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00082">82</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00084">84</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +265,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00011">11</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00013">13</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +297,7 @@ Functions</h2></td></tr>
 
 <p>Find the goto instruction of <code>loop</code> that jumps to <code>loop_head</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00033">33</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00035">35</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -325,7 +330,7 @@ Functions</h2></td></tr>
 <p>Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00088">88</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00090">90</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -363,7 +368,7 @@ Functions</h2></td></tr>
 
 <p>Return loop head if <code>finding_head</code> is true, Otherwise return loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00055">55</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00057">57</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>

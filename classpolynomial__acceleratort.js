@@ -5,8 +5,8 @@ var classpolynomial__acceleratort =
     [ "expr_pairt", "classpolynomial__acceleratort.html#a52b62794ef753a8bd20e6bfebd389517", null ],
     [ "polynomial_array_assignmentst", "classpolynomial__acceleratort.html#a2d74e96f711ad02e69f3481296132f22", null ],
     [ "polynomial_array_assignmentt", "classpolynomial__acceleratort.html#a73c641029356a859720a286ec3815db6", null ],
-    [ "polynomial_acceleratort", "classpolynomial__acceleratort.html#ac51f69b01fee4a0772f9f2b0180c114c", null ],
-    [ "polynomial_acceleratort", "classpolynomial__acceleratort.html#a33fa2248bc9d8dcfd316cfd13ea52219", null ],
+    [ "polynomial_acceleratort", "classpolynomial__acceleratort.html#a62d5aa3faed931f15644843c091d3848", null ],
+    [ "polynomial_acceleratort", "classpolynomial__acceleratort.html#a2e75c4e9cd3408a6114fa8df8c2f72b3", null ],
     [ "accelerate", "classpolynomial__acceleratort.html#a6050b69bac4fba6c65dfb4ecda465e2e", null ],
     [ "array_assignments2polys", "classpolynomial__acceleratort.html#a5351c42ebe0093885bc7ae0a0dae5e9e", null ],
     [ "assert_for_values", "classpolynomial__acceleratort.html#a98f9c9e7efca232638adb5d07c08185b", null ],
@@ -29,6 +29,6 @@ var classpolynomial__acceleratort =
     [ "message_handler", "classpolynomial__acceleratort.html#afbeb08b324cbbff4f8f6c2f87b01a95f", null ],
     [ "nonrecursive", "classpolynomial__acceleratort.html#a3cf78413904d19842aef9e108b6d6467", null ],
     [ "ns", "classpolynomial__acceleratort.html#ac3196ff637e0853b5ecd7ad3a7ddf62a", null ],
-    [ "symbol_table", "classpolynomial__acceleratort.html#a94bb02394061d4e4c7efa2f0dc6eb4c5", null ],
+    [ "symbol_table", "classpolynomial__acceleratort.html#a3795763da5f11fe8f858ee2a64d0d550", null ],
     [ "utils", "classpolynomial__acceleratort.html#a0ce76394f7446c8414439db845e1f5f0", null ]
 ];

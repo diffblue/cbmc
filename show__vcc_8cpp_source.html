@@ -102,201 +102,202 @@ $(document).ready(function(){initNavTree('show__vcc_8cpp_source.html',''); initR
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="show__vcc_8h.html">show_vcc.h</a>&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="symex__target__equation_8h.html">symex_target_equation.h</a>&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="exception__utils_8h.html">util/exception_utils.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="format__expr_8h.html">util/format_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="json__irep_8h.html">util/json_irep.h</a>&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="ui__message_8h.html">util/ui_message.h</a>&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">   27</a></span>&#160;<a class="code" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a>(<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>, <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;equation)</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordtype">bool</span> has_threads = equation.<a class="code" href="classsymex__target__equationt.html#acff9eac6af4038f436d4aa04a3ceb90c">has_threads</a>();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordtype">bool</span> first = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">for</span>(symex_target_equationt::SSA_stepst::const_iterator s_it =</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      s_it != equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      s_it++)</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">if</span>(!s_it-&gt;is_assert())</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">if</span>(first)</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      first = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">if</span>(s_it-&gt;source.pc-&gt;source_location().is_not_nil())</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; s_it-&gt;source.pc-&gt;source_location() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">if</span>(!s_it-&gt;comment.empty())</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; s_it-&gt;comment &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    symex_target_equationt::SSA_stepst::const_iterator p_it =</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="comment">// we show everything in case there are threads</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    symex_target_equationt::SSA_stepst::const_iterator last_it =</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      has_threads ? equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end() : s_it;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">for</span>(std::size_t count = 1; p_it != last_it; p_it++)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">if</span>(p_it-&gt;is_assume() || p_it-&gt;is_assignment() || p_it-&gt;is_constraint())</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">if</span>(!p_it-&gt;ignore)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;          <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a62065b6451be658cccad126375ea1ace">messaget::faint</a> &lt;&lt; <span class="stringliteral">&quot;{-&quot;</span> &lt;&lt; count &lt;&lt; <span class="stringliteral">&quot;} &quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;              &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(p_it-&gt;cond_expr) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;          <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="stringliteral">&quot;GUARD: &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(p_it-&gt;guard) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;          <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          count++;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="comment">// Unicode equivalent of &quot;|--------------------------&quot;</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a62065b6451be658cccad126375ea1ace">messaget::faint</a> &lt;&lt; <a class="code" href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a><span class="stringliteral">&quot;\u251c&quot;</span>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i = 0; i &lt; 26; i++)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a><span class="stringliteral">&quot;\u2500&quot;</span>;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="comment">// split property into multiple disjunts, if applicable</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> disjuncts;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">if</span>(s_it-&gt;cond_expr.id() == ID_or)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      disjuncts = <a class="code" href="std__expr_8h.html#a24c025bc5b1f74d4084ba93090fb1e11">to_or_expr</a>(s_it-&gt;cond_expr).<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>();</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      disjuncts.push_back(s_it-&gt;cond_expr);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    std::size_t count = 1;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;disjunct : disjuncts)</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a62065b6451be658cccad126375ea1ace">messaget::faint</a> &lt;&lt; <span class="charliteral">&#39;{&#39;</span> &lt;&lt; count &lt;&lt; <span class="stringliteral">&quot;} &quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;          &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(disjunct) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      count++;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    }</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">  110</a></span>&#160;<a class="code" href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">show_vcc_json</a>(std::ostream &amp;<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>, <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;equation)</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;{</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <a class="code" href="classjson__objectt.html">json_objectt</a> json_result;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <a class="code" href="classjson__arrayt.html">json_arrayt</a> &amp;json_vccs = json_result[<span class="stringliteral">&quot;vccs&quot;</span>].<a class="code" href="classjsont.html#a261726632468c53cf0498c98c3afd324">make_array</a>();</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordtype">bool</span> has_threads = equation.<a class="code" href="classsymex__target__equationt.html#acff9eac6af4038f436d4aa04a3ceb90c">has_threads</a>();</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">for</span>(symex_target_equationt::SSA_stepst::const_iterator s_it =</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      s_it != equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end();</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      s_it++)</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">if</span>(!s_it-&gt;is_assert())</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">// vcc object</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <a class="code" href="classjson__objectt.html">json_objectt</a> &amp;<span class="keywordtype">object</span> = json_vccs.<a class="code" href="classjson__arrayt.html#a3c2ed0c8aa4c7cbb01f68b9c1f26b2ab">push_back</a>(<a class="code" href="classjsont.html">jsont</a>()).<a class="code" href="classjsont.html#a4f1e5bbf3421f0bca2410989685e6b04">make_object</a>();</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location =</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      s_it-&gt;source.pc-&gt;source_location();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">if</span>(source_location.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>())</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordtype">object</span>[<span class="stringliteral">&quot;sourceLocation&quot;</span>] = <a class="code" href="properties_8cpp.html#a3956db87b4c264a219fb7b8a5a5eca4b">json</a>(source_location);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">const</span> std::string &amp;s = s_it-&gt;comment;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">if</span>(!s.empty())</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="keywordtype">object</span>[<span class="stringliteral">&quot;comment&quot;</span>] = <a class="code" href="classjson__stringt.html">json_stringt</a>(s);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="comment">// we show everything in case there are threads</span></div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    symex_target_equationt::SSA_stepst::const_iterator last_it =</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      has_threads ? equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end() : s_it;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <a class="code" href="classjson__arrayt.html">json_arrayt</a> &amp;json_constraints = <span class="keywordtype">object</span>[<span class="stringliteral">&quot;constraints&quot;</span>].<a class="code" href="classjsont.html#a261726632468c53cf0498c98c3afd324">make_array</a>();</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">for</span>(symex_target_equationt::SSA_stepst::const_iterator p_it =</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;          equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        p_it != last_it;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        p_it++)</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        (p_it-&gt;is_assume() || p_it-&gt;is_assignment() || p_it-&gt;is_constraint()) &amp;&amp;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        !p_it-&gt;ignore)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      {</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        std::ostringstream string_value;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        string_value &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(p_it-&gt;cond_expr);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        json_constraints.<a class="code" href="classjson__arrayt.html#a3c2ed0c8aa4c7cbb01f68b9c1f26b2ab">push_back</a>(<a class="code" href="classjson__stringt.html">json_stringt</a>(string_value.str()));</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      }</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    std::ostringstream string_value;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    string_value &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(s_it-&gt;cond_expr);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordtype">object</span>[<span class="stringliteral">&quot;expression&quot;</span>] = <a class="code" href="classjson__stringt.html">json_stringt</a>(string_value.str());</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  }</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="stringliteral">&quot;,\n&quot;</span> &lt;&lt; json_result;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;}</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno"><a class="line" href="show__vcc_8h.html#ae527dce70a1a1fdab02bec30adb68824">  167</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="show__vcc_8cpp.html#ae527dce70a1a1fdab02bec30adb68824">show_vcc</a>(</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keyword">const</span> <a class="code" href="classoptionst.html">optionst</a> &amp;options,</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="classui__message__handlert.html">ui_message_handlert</a> &amp;ui_message_handler,</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;equation)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> msg(ui_message_handler);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keyword">const</span> std::string &amp;filename = options.<a class="code" href="classoptionst.html#a8263832eff668d3872989ca954878ffd">get_option</a>(<span class="stringliteral">&quot;outfile&quot;</span>);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keywordtype">bool</span> have_file = !filename.empty() &amp;&amp; filename != <span class="stringliteral">&quot;-&quot;</span>;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  std::ofstream of;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <span class="keywordflow">if</span>(have_file)</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    of.open(filename);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">if</span>(!of)</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>(</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="stringliteral">&quot;failed to open output file: &quot;</span> + filename, <span class="stringliteral">&quot;--outfile&quot;</span>);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  std::ostream &amp;<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> = have_file ? of : std::cout;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keywordflow">switch</span>(ui_message_handler.<a class="code" href="classui__message__handlert.html#a4919f7300bcf37134a46836b6061d8e5">get_ui</a>())</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ace1e130b2826522bdf9754945d769620">ui_message_handlert::uit::XML_UI</a>:</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    msg.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;XML UI not supported&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ac9bbfffade9998d8a234beb61a68f505">ui_message_handlert::uit::JSON_UI</a>:</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <a class="code" href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">show_vcc_json</a>(<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>, equation);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8af62eb0bf5e5c72e80983fbbac1cb70e5">ui_message_handlert::uit::PLAIN</a>:</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span>(have_file)</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      msg.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;Verification conditions written to file&quot;</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                   &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      <a class="code" href="classstream__message__handlert.html">stream_message_handlert</a> mout_handler(<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <a class="code" href="classmessaget.html">messaget</a> mout(mout_handler);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;      <a class="code" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a>(mout.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>(), equation);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    }</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    {</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      msg.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;VERIFICATION CONDITIONS:\n&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      <a class="code" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a>(msg.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>(), equation);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  }</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keywordflow">if</span>(have_file)</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    of.close();</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;}</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="exception__utils_8h.html">util/exception_utils.h</a>&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="format__expr_8h.html">util/format_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="json__irep_8h.html">util/json_irep.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="ui__message_8h.html">util/ui_message.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="symex__target__equation_8h.html">symex_target_equation.h</a>&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span> <span class="comment">// IWYU pragma: keep</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">   28</a></span>&#160;<a class="code" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a>(<a class="code" href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a> &amp;<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>, <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;equation)</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordtype">bool</span> has_threads = equation.<a class="code" href="classsymex__target__equationt.html#acff9eac6af4038f436d4aa04a3ceb90c">has_threads</a>();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">bool</span> first = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">for</span>(symex_target_equationt::SSA_stepst::const_iterator s_it =</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      s_it != equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      s_it++)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  {</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">if</span>(!s_it-&gt;is_assert())</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">if</span>(first)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      first = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">if</span>(s_it-&gt;source.pc-&gt;source_location().is_not_nil())</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; s_it-&gt;source.pc-&gt;source_location() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordflow">if</span>(!s_it-&gt;comment.empty())</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; s_it-&gt;comment &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    symex_target_equationt::SSA_stepst::const_iterator p_it =</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="comment">// we show everything in case there are threads</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    symex_target_equationt::SSA_stepst::const_iterator last_it =</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      has_threads ? equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end() : s_it;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">for</span>(std::size_t count = 1; p_it != last_it; p_it++)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <span class="keywordflow">if</span>(p_it-&gt;is_assume() || p_it-&gt;is_assignment() || p_it-&gt;is_constraint())</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">if</span>(!p_it-&gt;ignore)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;          <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a62065b6451be658cccad126375ea1ace">messaget::faint</a> &lt;&lt; <span class="stringliteral">&quot;{-&quot;</span> &lt;&lt; count &lt;&lt; <span class="stringliteral">&quot;} &quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;              &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(p_it-&gt;cond_expr) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;          <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="stringliteral">&quot;GUARD: &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(p_it-&gt;guard) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;          <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;          count++;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      }</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="comment">// Unicode equivalent of &quot;|--------------------------&quot;</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a62065b6451be658cccad126375ea1ace">messaget::faint</a> &lt;&lt; <a class="code" href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a><span class="stringliteral">&quot;\u251c&quot;</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i = 0; i &lt; 26; i++)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a><span class="stringliteral">&quot;\u2500&quot;</span>;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">// split property into multiple disjunts, if applicable</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> disjuncts;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">if</span>(s_it-&gt;cond_expr.id() == ID_or)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      disjuncts = <a class="code" href="std__expr_8h.html#a24c025bc5b1f74d4084ba93090fb1e11">to_or_expr</a>(s_it-&gt;cond_expr).<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      disjuncts.push_back(s_it-&gt;cond_expr);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    std::size_t count = 1;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;disjunct : disjuncts)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#a62065b6451be658cccad126375ea1ace">messaget::faint</a> &lt;&lt; <span class="charliteral">&#39;{&#39;</span> &lt;&lt; count &lt;&lt; <span class="stringliteral">&quot;} &quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;          &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(disjunct) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      count++;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    }</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno"><a class="line" href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">  111</a></span>&#160;<a class="code" href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">show_vcc_json</a>(std::ostream &amp;<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>, <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;equation)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <a class="code" href="classjson__objectt.html">json_objectt</a> json_result;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <a class="code" href="classjson__arrayt.html">json_arrayt</a> &amp;json_vccs = json_result[<span class="stringliteral">&quot;vccs&quot;</span>].<a class="code" href="classjsont.html#a261726632468c53cf0498c98c3afd324">make_array</a>();</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordtype">bool</span> has_threads = equation.<a class="code" href="classsymex__target__equationt.html#acff9eac6af4038f436d4aa04a3ceb90c">has_threads</a>();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordflow">for</span>(symex_target_equationt::SSA_stepst::const_iterator s_it =</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      s_it != equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      s_it++)</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  {</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">if</span>(!s_it-&gt;is_assert())</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">// vcc object</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="classjson__objectt.html">json_objectt</a> &amp;<span class="keywordtype">object</span> = json_vccs.<a class="code" href="classjson__arrayt.html#a3c2ed0c8aa4c7cbb01f68b9c1f26b2ab">push_back</a>(<a class="code" href="classjsont.html">jsont</a>()).<a class="code" href="classjsont.html#a4f1e5bbf3421f0bca2410989685e6b04">make_object</a>();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location =</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      s_it-&gt;source.pc-&gt;source_location();</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">if</span>(source_location.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>())</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="keywordtype">object</span>[<span class="stringliteral">&quot;sourceLocation&quot;</span>] = <a class="code" href="properties_8cpp.html#a3956db87b4c264a219fb7b8a5a5eca4b">json</a>(source_location);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keyword">const</span> std::string &amp;s = s_it-&gt;comment;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span>(!s.empty())</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <span class="keywordtype">object</span>[<span class="stringliteral">&quot;comment&quot;</span>] = <a class="code" href="classjson__stringt.html">json_stringt</a>(s);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">// we show everything in case there are threads</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    symex_target_equationt::SSA_stepst::const_iterator last_it =</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      has_threads ? equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.end() : s_it;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <a class="code" href="classjson__arrayt.html">json_arrayt</a> &amp;json_constraints = <span class="keywordtype">object</span>[<span class="stringliteral">&quot;constraints&quot;</span>].<a class="code" href="classjsont.html#a261726632468c53cf0498c98c3afd324">make_array</a>();</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">for</span>(symex_target_equationt::SSA_stepst::const_iterator p_it =</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;          equation.<a class="code" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.begin();</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        p_it != last_it;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        p_it++)</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        (p_it-&gt;is_assume() || p_it-&gt;is_assignment() || p_it-&gt;is_constraint()) &amp;&amp;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        !p_it-&gt;ignore)</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      {</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        std::ostringstream string_value;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        string_value &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(p_it-&gt;cond_expr);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        json_constraints.<a class="code" href="classjson__arrayt.html#a3c2ed0c8aa4c7cbb01f68b9c1f26b2ab">push_back</a>(<a class="code" href="classjson__stringt.html">json_stringt</a>(string_value.str()));</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      }</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    std::ostringstream string_value;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    string_value &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(s_it-&gt;cond_expr);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordtype">object</span>[<span class="stringliteral">&quot;expression&quot;</span>] = <a class="code" href="classjson__stringt.html">json_stringt</a>(string_value.str());</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  }</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> &lt;&lt; <span class="stringliteral">&quot;,\n&quot;</span> &lt;&lt; json_result;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;}</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00168"></a><span class="lineno"><a class="line" href="show__vcc_8h.html#ae527dce70a1a1fdab02bec30adb68824">  168</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="show__vcc_8cpp.html#ae527dce70a1a1fdab02bec30adb68824">show_vcc</a>(</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <span class="keyword">const</span> <a class="code" href="classoptionst.html">optionst</a> &amp;options,</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <a class="code" href="classui__message__handlert.html">ui_message_handlert</a> &amp;ui_message_handler,</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;equation)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;{</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> msg(ui_message_handler);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keyword">const</span> std::string &amp;filename = options.<a class="code" href="classoptionst.html#a8263832eff668d3872989ca954878ffd">get_option</a>(<span class="stringliteral">&quot;outfile&quot;</span>);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keywordtype">bool</span> have_file = !filename.empty() &amp;&amp; filename != <span class="stringliteral">&quot;-&quot;</span>;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  std::ofstream of;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keywordflow">if</span>(have_file)</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  {</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    of.open(filename);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordflow">if</span>(!of)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>(</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="stringliteral">&quot;failed to open output file: &quot;</span> + filename, <span class="stringliteral">&quot;--outfile&quot;</span>);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  }</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  std::ostream &amp;<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a> = have_file ? of : std::cout;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordflow">switch</span>(ui_message_handler.<a class="code" href="classui__message__handlert.html#a4919f7300bcf37134a46836b6061d8e5">get_ui</a>())</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ace1e130b2826522bdf9754945d769620">ui_message_handlert::uit::XML_UI</a>:</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    msg.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;XML UI not supported&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ac9bbfffade9998d8a234beb61a68f505">ui_message_handlert::uit::JSON_UI</a>:</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <a class="code" href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">show_vcc_json</a>(<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>, equation);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8af62eb0bf5e5c72e80983fbbac1cb70e5">ui_message_handlert::uit::PLAIN</a>:</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">if</span>(have_file)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      msg.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;Verification conditions written to file&quot;</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                   &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <a class="code" href="classstream__message__handlert.html">stream_message_handlert</a> mout_handler(<a class="code" href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">out</a>);</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;      <a class="code" href="classmessaget.html">messaget</a> mout(mout_handler);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <a class="code" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a>(mout.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>(), equation);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    }</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      msg.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;VERIFICATION CONDITIONS:\n&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      <a class="code" href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a>(msg.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>(), equation);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  }</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <span class="keywordflow">if</span>(have_file)</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    of.close();</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassmessaget_html"><div class="ttname"><a href="classmessaget.html">messaget</a></div><div class="ttdoc">Class that provides messages with a built-in verbosity 'level'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00154">message.h:154</a></div></div>
@@ -311,7 +312,7 @@ $(document).ready(function(){initNavTree('show__vcc_8cpp_source.html',''); initR
 <div class="ttc" id="aclassoptionst_html_a8263832eff668d3872989ca954878ffd"><div class="ttname"><a href="classoptionst.html#a8263832eff668d3872989ca954878ffd">optionst::get_option</a></div><div class="ttdeci">const std::string get_option(const std::string &amp;option) const</div><div class="ttdef"><b>Definition:</b> <a href="options_8cpp_source.html#l00067">options.cpp:67</a></div></div>
 <div class="ttc" id="abytecode__info_8h_html_ae4d1c3d548028e31400378ec81026110"><div class="ttname"><a href="bytecode__info_8h.html#ae4d1c3d548028e31400378ec81026110">u8</a></div><div class="ttdeci">uint64_t u8</div><div class="ttdef"><b>Definition:</b> <a href="bytecode__info_8h_source.html#l00058">bytecode_info.h:58</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a4ff7dd53c201e241ca4e86221a0e7259"><div class="ttname"><a href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">messaget::status</a></div><div class="ttdeci">mstreamt &amp; status() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00414">message.h:414</a></div></div>
-<div class="ttc" id="ashow__vcc_8cpp_html_a627ae66eed07b2a56db6c5d2ddca896b"><div class="ttname"><a href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">show_vcc_json</a></div><div class="ttdeci">static void show_vcc_json(std::ostream &amp;out, const symex_target_equationt &amp;equation)</div><div class="ttdoc">Output equations from equation in the JSON format to the given output stream out.</div><div class="ttdef"><b>Definition:</b> <a href="show__vcc_8cpp_source.html#l00110">show_vcc.cpp:110</a></div></div>
+<div class="ttc" id="ashow__vcc_8cpp_html_a627ae66eed07b2a56db6c5d2ddca896b"><div class="ttname"><a href="show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b">show_vcc_json</a></div><div class="ttdeci">static void show_vcc_json(std::ostream &amp;out, const symex_target_equationt &amp;equation)</div><div class="ttdoc">Output equations from equation in the JSON format to the given output stream out.</div><div class="ttdef"><b>Definition:</b> <a href="show__vcc_8cpp_source.html#l00111">show_vcc.cpp:111</a></div></div>
 <div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
 <div class="ttc" id="aclassjsont_html_a4f1e5bbf3421f0bca2410989685e6b04"><div class="ttname"><a href="classjsont.html#a4f1e5bbf3421f0bca2410989685e6b04">jsont::make_object</a></div><div class="ttdeci">json_objectt &amp; make_object()</div><div class="ttdef"><b>Definition:</b> <a href="json_8h_source.html#l00438">json.h:438</a></div></div>
 <div class="ttc" id="aclassjsont_html"><div class="ttname"><a href="classjsont.html">jsont</a></div><div class="ttdef"><b>Definition:</b> <a href="json_8h_source.html#l00026">json.h:26</a></div></div>
@@ -325,7 +326,7 @@ $(document).ready(function(){initNavTree('show__vcc_8cpp_source.html',''); initR
 <div class="ttc" id="aclassui__message__handlert_html_aa32a572a8a2b51e6c8019a208ccc17a8ac9bbfffade9998d8a234beb61a68f505"><div class="ttname"><a href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ac9bbfffade9998d8a234beb61a68f505">ui_message_handlert::uit::JSON_UI</a></div><div class="ttdeci">@ JSON_UI</div></div>
 <div class="ttc" id="aclassui__message__handlert_html_a4e3508c433775b88da5283b390743829"><div class="ttname"><a href="classui__message__handlert.html#a4e3508c433775b88da5283b390743829">ui_message_handlert::out</a></div><div class="ttdeci">std::ostream &amp; out</div><div class="ttdef"><b>Definition:</b> <a href="ui__message_8h_source.html#l00053">ui_message.h:53</a></div></div>
 <div class="ttc" id="aproperties_8cpp_html_a3956db87b4c264a219fb7b8a5a5eca4b"><div class="ttname"><a href="properties_8cpp.html#a3956db87b4c264a219fb7b8a5a5eca4b">json</a></div><div class="ttdeci">static void json(json_objectT &amp;result, const irep_idt &amp;property_id, const property_infot &amp;property_info)</div><div class="ttdef"><b>Definition:</b> <a href="properties_8cpp_source.html#l00120">properties.cpp:120</a></div></div>
-<div class="ttc" id="ashow__vcc_8cpp_html_a5592351617311aa29302c5dda7c129b0"><div class="ttname"><a href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a></div><div class="ttdeci">static void show_vcc_plain(messaget::mstreamt &amp;out, const symex_target_equationt &amp;equation)</div><div class="ttdoc">Output equations from equation in plain text format to the given output stream out.</div><div class="ttdef"><b>Definition:</b> <a href="show__vcc_8cpp_source.html#l00027">show_vcc.cpp:27</a></div></div>
+<div class="ttc" id="ashow__vcc_8cpp_html_a5592351617311aa29302c5dda7c129b0"><div class="ttname"><a href="show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0">show_vcc_plain</a></div><div class="ttdeci">static void show_vcc_plain(messaget::mstreamt &amp;out, const symex_target_equationt &amp;equation)</div><div class="ttdoc">Output equations from equation in plain text format to the given output stream out.</div><div class="ttdef"><b>Definition:</b> <a href="show__vcc_8cpp_source.html#l00028">show_vcc.cpp:28</a></div></div>
 <div class="ttc" id="aclassexprt_html_a10c073e5cdd14b181d56cf53def8b378"><div class="ttname"><a href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a></div><div class="ttdeci">std::vector&lt; exprt &gt; operandst</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00058">expr.h:58</a></div></div>
 <div class="ttc" id="aclassjsont_html_a261726632468c53cf0498c98c3afd324"><div class="ttname"><a href="classjsont.html#a261726632468c53cf0498c98c3afd324">jsont::make_array</a></div><div class="ttdeci">json_arrayt &amp; make_array()</div><div class="ttdef"><b>Definition:</b> <a href="json_8h_source.html#l00420">json.h:420</a></div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_acff9eac6af4038f436d4aa04a3ceb90c"><div class="ttname"><a href="classsymex__target__equationt.html#acff9eac6af4038f436d4aa04a3ceb90c">symex_target_equationt::has_threads</a></div><div class="ttdeci">bool has_threads() const</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8h_source.html#l00270">symex_target_equation.h:270</a></div></div>
@@ -333,7 +334,7 @@ $(document).ready(function(){initNavTree('show__vcc_8cpp_source.html',''); initR
 <div class="ttc" id="aclasssource__locationt_html"><div class="ttname"><a href="classsource__locationt.html">source_locationt</a></div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00019">source_location.h:19</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a24c025bc5b1f74d4084ba93090fb1e11"><div class="ttname"><a href="std__expr_8h.html#a24c025bc5b1f74d4084ba93090fb1e11">to_or_expr</a></div><div class="ttdeci">const or_exprt &amp; to_or_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a or_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02226">std_expr.h:2226</a></div></div>
 <div class="ttc" id="aformat__expr_8h_html"><div class="ttname"><a href="format__expr_8h.html">format_expr.h</a></div></div>
-<div class="ttc" id="ashow__vcc_8cpp_html_ae527dce70a1a1fdab02bec30adb68824"><div class="ttname"><a href="show__vcc_8cpp.html#ae527dce70a1a1fdab02bec30adb68824">show_vcc</a></div><div class="ttdeci">void show_vcc(const optionst &amp;options, ui_message_handlert &amp;ui_message_handler, const symex_target_equationt &amp;equation)</div><div class="ttdoc">Output equations from equation to a file or to the standard output.</div><div class="ttdef"><b>Definition:</b> <a href="show__vcc_8cpp_source.html#l00167">show_vcc.cpp:167</a></div></div>
+<div class="ttc" id="ashow__vcc_8cpp_html_ae527dce70a1a1fdab02bec30adb68824"><div class="ttname"><a href="show__vcc_8cpp.html#ae527dce70a1a1fdab02bec30adb68824">show_vcc</a></div><div class="ttdeci">void show_vcc(const optionst &amp;options, ui_message_handlert &amp;ui_message_handler, const symex_target_equationt &amp;equation)</div><div class="ttdoc">Output equations from equation to a file or to the standard output.</div><div class="ttdef"><b>Definition:</b> <a href="show__vcc_8cpp_source.html#l00168">show_vcc.cpp:168</a></div></div>
 <div class="ttc" id="aclassui__message__handlert_html_aa32a572a8a2b51e6c8019a208ccc17a8af62eb0bf5e5c72e80983fbbac1cb70e5"><div class="ttname"><a href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8af62eb0bf5e5c72e80983fbbac1cb70e5">ui_message_handlert::uit::PLAIN</a></div><div class="ttdeci">@ PLAIN</div></div>
 <div class="ttc" id="aclasssymex__target__equationt_html_a3180b42854c3ead00d443f3b2cd24343"><div class="ttname"><a href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">symex_target_equationt::SSA_steps</a></div><div class="ttdeci">SSA_stepst SSA_steps</div><div class="ttdef"><b>Definition:</b> <a href="symex__target__equation_8h_source.html#l00250">symex_target_equation.h:250</a></div></div>
 <div class="ttc" id="aclassmessaget_1_1mstreamt_html"><div class="ttname"><a href="classmessaget_1_1mstreamt.html">messaget::mstreamt</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00223">message.h:223</a></div></div>

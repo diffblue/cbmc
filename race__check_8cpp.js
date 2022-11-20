@@ -7,6 +7,6 @@ var race__check_8cpp =
     [ "has_shared_entries", "race__check_8cpp.html#a5047272eb86fcc2c67a9c0f7b0aef95f", null ],
     [ "is_shared", "race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113", null ],
     [ "race_check", "race__check_8cpp.html#ae1da0d1dfa1213663c5fcc3e2471ba1d", null ],
-    [ "race_check", "race__check_8cpp.html#a25fe09ee87ea93bb77fba9a2fbb8b7f1", null ],
-    [ "race_check", "race__check_8cpp.html#a3104627ebd4429da4b03a147e647a790", null ]
+    [ "race_check", "race__check_8cpp.html#ad1630bc3eb920dff6d992db6d5f4407f", null ],
+    [ "race_check", "race__check_8cpp.html#aa8510a93d0deb4c92743880ceed9244e", null ]
 ];

@@ -134,11 +134,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7c552691834c9fb011cc575109d392f4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a7c552691834c9fb011cc575109d392f4">parse</a> (std::istream &amp;instream, const std::string &amp;path) override</td></tr>
 <tr class="memdesc:a7c552691834c9fb011cc575109d392f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">We set the main class (i.e. class to start the class loading analysis, see <a class="el" href="classjava__class__loadert.html">java_class_loadert</a>) when we have a JAR file given via the -jar option: a) the argument of the &ndash;main-class command-line option, b) the manifest file of the JAR If no main class was found, all classes in the JAR file are loaded.  <a href="classjava__bytecode__languaget.html#a7c552691834c9fb011cc575109d392f4">More...</a><br /></td></tr>
 <tr class="separator:a7c552691834c9fb011cc575109d392f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79fb33cf504a6881562c6e7142f70f81"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a79fb33cf504a6881562c6e7142f70f81">generate_support_functions</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table) override</td></tr>
-<tr class="memdesc:a79fb33cf504a6881562c6e7142f70f81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create language-specific support functions, such as __CPROVER_start, __CPROVER_initialize and language-specific library functions.  <a href="classjava__bytecode__languaget.html#a79fb33cf504a6881562c6e7142f70f81">More...</a><br /></td></tr>
-<tr class="separator:a79fb33cf504a6881562c6e7142f70f81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd118512fc9d9d9a92042d91de95cafd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#abd118512fc9d9d9a92042d91de95cafd">typecheck</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;context, const std::string &amp;module) override</td></tr>
-<tr class="separator:abd118512fc9d9d9a92042d91de95cafd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31243aea64a86fc29d0630c55ead9d4a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a31243aea64a86fc29d0630c55ead9d4a">generate_support_functions</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table) override</td></tr>
+<tr class="memdesc:a31243aea64a86fc29d0630c55ead9d4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create language-specific support functions, such as __CPROVER_start, __CPROVER_initialize and language-specific library functions.  <a href="classjava__bytecode__languaget.html#a31243aea64a86fc29d0630c55ead9d4a">More...</a><br /></td></tr>
+<tr class="separator:a31243aea64a86fc29d0630c55ead9d4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33721fd8f6bdd6b1a43bfed8fd9bf957"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a33721fd8f6bdd6b1a43bfed8fd9bf957">typecheck</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;context, const std::string &amp;module) override</td></tr>
+<tr class="separator:a33721fd8f6bdd6b1a43bfed8fd9bf957"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a156d3fa6180bc761c44e9257e7ed5981"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a156d3fa6180bc761c44e9257e7ed5981">final</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;context) override</td></tr>
 <tr class="memdesc:a156d3fa6180bc761c44e9257e7ed5981"><td class="mdescLeft">&#160;</td><td class="mdescRight">Final adjustments, e.g.  <a href="classjava__bytecode__languaget.html#a156d3fa6180bc761c44e9257e7ed5981">More...</a><br /></td></tr>
 <tr class="separator:a156d3fa6180bc761c44e9257e7ed5981"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,14 +178,14 @@ Public Member Functions</h2></td></tr>
 <tr class="inherit_header pub_methods_classlanguaget"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classlanguaget')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classlanguaget.html">languaget</a></td></tr>
 <tr class="memitem:a586546ed18c04dfc50f96725850a8ec6 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a586546ed18c04dfc50f96725850a8ec6">dependencies</a> (const std::string &amp;module, std::set&lt; std::string &gt; &amp;modules)</td></tr>
 <tr class="separator:a586546ed18c04dfc50f96725850a8ec6 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab770df2482fca8af96f38020efe457ee inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#ab770df2482fca8af96f38020efe457ee">interfaces</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="separator:ab770df2482fca8af96f38020efe457ee inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a038757d00691cc2c964e844cef5d8e5b inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a038757d00691cc2c964e844cef5d8e5b">interfaces</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="separator:a038757d00691cc2c964e844cef5d8e5b inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a573d0d4bf2d92ddebbe0e56c381464b3">can_keep_file_local</a> ()</td></tr>
-<tr class="memdesc:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is it possible to call three-argument <a class="el" href="classlanguaget.html#a4323ef336c3849c8577b3e4c93237695">typecheck()</a> on this object?  <a href="classlanguaget.html#a573d0d4bf2d92ddebbe0e56c381464b3">More...</a><br /></td></tr>
+<tr class="memdesc:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is it possible to call three-argument <a class="el" href="classlanguaget.html#ad6e855cfc40439adf23ac60a7e4fc175">typecheck()</a> on this object?  <a href="classlanguaget.html#a573d0d4bf2d92ddebbe0e56c381464b3">More...</a><br /></td></tr>
 <tr class="separator:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf968c60685e65e069a6fed5a166f3c5 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#acf968c60685e65e069a6fed5a166f3c5">typecheck</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::string &amp;module, const bool keep_file_local)</td></tr>
-<tr class="memdesc:acf968c60685e65e069a6fed5a166f3c5 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">typecheck without removing specified entries from the symbol table  <a href="classlanguaget.html#acf968c60685e65e069a6fed5a166f3c5">More...</a><br /></td></tr>
-<tr class="separator:acf968c60685e65e069a6fed5a166f3c5 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed9a3b9d8a79439b68a773e1ab0c0a46 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#aed9a3b9d8a79439b68a773e1ab0c0a46">typecheck</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const std::string &amp;module, const bool keep_file_local)</td></tr>
+<tr class="memdesc:aed9a3b9d8a79439b68a773e1ab0c0a46 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">typecheck without removing specified entries from the symbol table  <a href="classlanguaget.html#aed9a3b9d8a79439b68a773e1ab0c0a46">More...</a><br /></td></tr>
+<tr class="separator:aed9a3b9d8a79439b68a773e1ab0c0a46 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7db107595ebe80a4c85b19ef50e75b5f inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a7db107595ebe80a4c85b19ef50e75b5f">type_to_name</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, std::string &amp;name, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a7db107595ebe80a4c85b19ef50e75b5f inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encodes the given type in a language-specific way.  <a href="classlanguaget.html#a7db107595ebe80a4c85b19ef50e75b5f">More...</a><br /></td></tr>
 <tr class="separator:a7db107595ebe80a4c85b19ef50e75b5f inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -228,17 +228,17 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ad383ff8c19c4382d5b347e0896591e35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#ad383ff8c19c4382d5b347e0896591e35">convert_single_method</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classlazy__class__to__declared__symbols__mapt.html">lazy_class_to_declared_symbols_mapt</a> &amp;<a class="el" href="java__static__initializers_8h.html#ae3b2ac40cedb906b3a022ef21f13d56b">class_to_declared_symbols</a>)</td></tr>
+<tr class="memitem:ad383ff8c19c4382d5b347e0896591e35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#ad383ff8c19c4382d5b347e0896591e35">convert_single_method</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classlazy__class__to__declared__symbols__mapt.html">lazy_class_to_declared_symbols_mapt</a> &amp;<a class="el" href="java__static__initializers_8h.html#ac07d176c89c0eed7b32a72bd964a1b97">class_to_declared_symbols</a>)</td></tr>
 <tr class="separator:ad383ff8c19c4382d5b347e0896591e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ca64b6efbe16dbcfeaf9152849311f8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a7ca64b6efbe16dbcfeaf9152849311f8">convert_single_method</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods, <a class="el" href="classlazy__class__to__declared__symbols__mapt.html">lazy_class_to_declared_symbols_mapt</a> &amp;<a class="el" href="java__static__initializers_8h.html#ae3b2ac40cedb906b3a022ef21f13d56b">class_to_declared_symbols</a>)</td></tr>
+<tr class="memitem:a7ca64b6efbe16dbcfeaf9152849311f8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a7ca64b6efbe16dbcfeaf9152849311f8">convert_single_method</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods, <a class="el" href="classlazy__class__to__declared__symbols__mapt.html">lazy_class_to_declared_symbols_mapt</a> &amp;<a class="el" href="java__static__initializers_8h.html#ac07d176c89c0eed7b32a72bd964a1b97">class_to_declared_symbols</a>)</td></tr>
 <tr class="memdesc:a7ca64b6efbe16dbcfeaf9152849311f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a method (one whose type is known but whose body hasn't been converted) if it doesn't already have a body, and lift clinit calls if requested by the user.  <a href="classjava__bytecode__languaget.html#a7ca64b6efbe16dbcfeaf9152849311f8">More...</a><br /></td></tr>
 <tr class="separator:a7ca64b6efbe16dbcfeaf9152849311f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6a05e35d0848beb9a4ad1181ef74394"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#aa6a05e35d0848beb9a4ad1181ef74394">convert_single_method_code</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods, <a class="el" href="classlazy__class__to__declared__symbols__mapt.html">lazy_class_to_declared_symbols_mapt</a> &amp;<a class="el" href="java__static__initializers_8h.html#ae3b2ac40cedb906b3a022ef21f13d56b">class_to_declared_symbols</a>)</td></tr>
+<tr class="memitem:aa6a05e35d0848beb9a4ad1181ef74394"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#aa6a05e35d0848beb9a4ad1181ef74394">convert_single_method_code</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods, <a class="el" href="classlazy__class__to__declared__symbols__mapt.html">lazy_class_to_declared_symbols_mapt</a> &amp;<a class="el" href="java__static__initializers_8h.html#ac07d176c89c0eed7b32a72bd964a1b97">class_to_declared_symbols</a>)</td></tr>
 <tr class="memdesc:aa6a05e35d0848beb9a4ad1181ef74394"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a method (one whose type is known but whose body hasn't been converted) but don't run typecheck, etc.  <a href="classjava__bytecode__languaget.html#aa6a05e35d0848beb9a4ad1181ef74394">More...</a><br /></td></tr>
 <tr class="separator:aa6a05e35d0848beb9a4ad1181ef74394"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78aedea343b0ce612e45dbbc88216e3c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a78aedea343b0ce612e45dbbc88216e3c">do_ci_lazy_method_conversion</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;)</td></tr>
-<tr class="memdesc:a78aedea343b0ce612e45dbbc88216e3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uses a simple context-insensitive ('ci') analysis to determine which methods may be reachable from the main entry point.  <a href="classjava__bytecode__languaget.html#a78aedea343b0ce612e45dbbc88216e3c">More...</a><br /></td></tr>
-<tr class="separator:a78aedea343b0ce612e45dbbc88216e3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90ffe977aee605c93d4695ffd56ef6f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a90ffe977aee605c93d4695ffd56ef6f0">do_ci_lazy_method_conversion</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;)</td></tr>
+<tr class="memdesc:a90ffe977aee605c93d4695ffd56ef6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uses a simple context-insensitive ('ci') analysis to determine which methods may be reachable from the main entry point.  <a href="classjava__bytecode__languaget.html#a90ffe977aee605c93d4695ffd56ef6f0">More...</a><br /></td></tr>
+<tr class="separator:a90ffe977aee605c93d4695ffd56ef6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0b514673bed7f6db3f15b2498988c68"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#ab0b514673bed7f6db3f15b2498988c68">get_pointer_type_selector</a> () const</td></tr>
 <tr class="separator:ab0b514673bed7f6db3f15b2498988c68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -266,7 +266,7 @@ Protected Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:aa7682c4fc378524ab3f82b2dab0f83fb"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="ci__lazy__methods_8h.html#af4586f7e6c32c30df769166ee2a3cf45">load_extra_methodst</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#aa7682c4fc378524ab3f82b2dab0f83fb">build_extra_entry_points</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;) const</td></tr>
+<tr class="memitem:aa7682c4fc378524ab3f82b2dab0f83fb"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="ci__lazy__methods_8h.html#a1c2f65a89d07daf27353fa390c0f988c">load_extra_methodst</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#aa7682c4fc378524ab3f82b2dab0f83fb">build_extra_entry_points</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;) const</td></tr>
 <tr class="memdesc:aa7682c4fc378524ab3f82b2dab0f83fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method should be overloaded to provide alternative approaches for specifying extra entry points.  <a href="classjava__bytecode__languaget.html#aa7682c4fc378524ab3f82b2dab0f83fb">More...</a><br /></td></tr>
 <tr class="separator:aa7682c4fc378524ab3f82b2dab0f83fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a338c520618f2393ecd0866ead49c10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a7a338c520618f2393ecd0866ead49c10">parse_from_main_class</a> ()</td></tr>
@@ -421,7 +421,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00308">308</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00306">306</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -448,7 +448,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00315">315</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00313">313</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -463,7 +463,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="ci__lazy__methods_8h.html#af4586f7e6c32c30df769166ee2a3cf45">load_extra_methodst</a> &gt; java_bytecode_languaget::build_extra_entry_points </td>
+          <td class="memname">std::vector&lt; <a class="el" href="ci__lazy__methods_8h.html#a1c2f65a89d07daf27353fa390c0f988c">load_extra_methodst</a> &gt; java_bytecode_languaget::build_extra_entry_points </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classoptionst.html">optionst</a> &amp;&#160;</td>
           <td class="paramname"><em>options</em></td><td>)</td>
@@ -574,7 +574,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00352">352</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00350">350</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -727,12 +727,12 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a1db4852627eb8d907d090ca52371d308">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00341">341</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00339">339</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
-<a id="a78aedea343b0ce612e45dbbc88216e3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78aedea343b0ce612e45dbbc88216e3c">&#9670;&nbsp;</a></span>do_ci_lazy_method_conversion()</h2>
+<a id="a90ffe977aee605c93d4695ffd56ef6f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90ffe977aee605c93d4695ffd56ef6f0">&#9670;&nbsp;</a></span>do_ci_lazy_method_conversion()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -743,7 +743,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">bool java_bytecode_languaget::do_ci_lazy_method_conversion </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -793,7 +793,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a4ef9ae04e57ed83bad04d54643b49e56">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00273">273</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00272">272</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -944,8 +944,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a79fb33cf504a6881562c6e7142f70f81"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79fb33cf504a6881562c6e7142f70f81">&#9670;&nbsp;</a></span>generate_support_functions()</h2>
+<a id="a31243aea64a86fc29d0630c55ead9d4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31243aea64a86fc29d0630c55ead9d4a">&#9670;&nbsp;</a></span>generate_support_functions()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -956,7 +956,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">bool java_bytecode_languaget::generate_support_functions </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -971,7 +971,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Create language-specific support functions, such as __CPROVER_start, __CPROVER_initialize and language-specific library functions. </p>
 <p>This runs after the <code>typecheck</code> phase but before lazy function loading. Anything that must wait until lazy function loading is done can be deferred until <code>final</code>, which runs after lazy function loading is complete. Functions introduced here are visible to lazy loading and can influence its decisions (e.g. picking the types of input parameters and globals), whereas anything introduced during <code>final</code> cannot. </p>
 
-<p>Implements <a class="el" href="classlanguaget.html#abba048f89e327b719a4e633a6f1b27f7">languaget</a>.</p>
+<p>Implements <a class="el" href="classlanguaget.html#ad9940e72ccb82fe2598b1981c8a60ab4">languaget</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01057">1057</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
@@ -1029,7 +1029,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a82505a4c60a113558ee4ab3a0fdf99ad">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00340">340</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00338">338</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1056,7 +1056,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00299">299</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00298">298</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1124,7 +1124,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a121922e66f5220361933282fc55bd720">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00278">278</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00277">277</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1153,7 +1153,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a747b4a0836507a6f4668cbfd3f89c7f2">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00337">337</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00335">335</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1182,7 +1182,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>We set the main class (i.e. class to start the class loading analysis, see <a class="el" href="classjava__class__loadert.html">java_class_loadert</a>) when we have have been given a main class. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00369">369</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00368">368</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1224,7 +1224,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a6e834f6839a657842c57cad0398d7109">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00384">384</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00383">383</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1251,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00327">327</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00326">326</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1299,7 +1299,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a1e9508a4da2df81880025e5a5c761224">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00284">284</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00283">283</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1331,7 +1331,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a09cda3839a791c263638ce57f3717b31">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00262">262</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00261">261</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1361,7 +1361,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classmessaget.html#a9ec2e501c0a66f8cd195ae3639b1bbba">messaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00293">293</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00292">292</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1459,8 +1459,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="abd118512fc9d9d9a92042d91de95cafd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd118512fc9d9d9a92042d91de95cafd">&#9670;&nbsp;</a></span>typecheck()</h2>
+<a id="a33721fd8f6bdd6b1a43bfed8fd9bf957"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33721fd8f6bdd6b1a43bfed8fd9bf957">&#9670;&nbsp;</a></span>typecheck()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1471,7 +1471,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">bool java_bytecode_languaget::typecheck </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>context</em>, </td>
         </tr>
         <tr>
@@ -1493,7 +1493,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classlanguaget.html#a4323ef336c3849c8577b3e4c93237695">languaget</a>.</p>
+<p>Implements <a class="el" href="classlanguaget.html#ad6e855cfc40439adf23ac60a7e4fc175">languaget</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00808">808</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
@@ -1520,7 +1520,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00395">395</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00393">393</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1544,7 +1544,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00380">380</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00378">378</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1568,7 +1568,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00377">377</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00375">375</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1592,7 +1592,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00378">378</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00376">376</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1616,7 +1616,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00379">379</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00377">377</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1640,7 +1640,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00382">382</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00380">380</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1664,7 +1664,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00381">381</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00379">379</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1688,7 +1688,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00388">388</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00386">386</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1715,7 +1715,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Map used in all calls to functions that deterministically create objects (currently only <a class="el" href="assignments__from__json_8h.html#a535a26c0ef50ff38b34e3333b8c296c6">assign_from_json</a>). </p>
 <p>It tracks objects that should be reference-equal to each other by mapping IDs of such objects to symbols that store their values. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00401">401</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00399">399</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1739,7 +1739,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00383">383</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00381">381</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1763,7 +1763,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00394">394</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00392">392</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1790,7 +1790,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Maps synthetic method names on to the particular type of synthetic method (static initializer, initializer wrapper, etc). </p>
 <p>For full documentation see synthetic_method_map.h </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00393">393</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00391">391</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>

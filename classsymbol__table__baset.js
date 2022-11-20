@@ -28,6 +28,7 @@ var classsymbol__table__baset =
     [ "remove", "classsymbol__table__baset.html#a2cf84522dd1857c9bd5866dca1df23d6", null ],
     [ "show", "classsymbol__table__baset.html#a7e6a78eb73e0b11e4cdbec40d1e003b5", null ],
     [ "sorted_symbol_names", "classsymbol__table__baset.html#a08da11e014c1ef9cc2d5bf59c635da22", null ],
+    [ "validate", "classsymbol__table__baset.html#a3793b9a8dcf88f3784159b674d393043", null ],
     [ "symbol_base_map", "classsymbol__table__baset.html#a0c894d3e5d7a2c4238bd1202f4c99ee4", null ],
     [ "symbol_module_map", "classsymbol__table__baset.html#a5bf18510b5d329d235c99b86eb2dd6ba", null ],
     [ "symbols", "classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb", null ]

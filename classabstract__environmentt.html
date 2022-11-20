@@ -212,7 +212,7 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00040">40</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00038">38</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a22e5e1403b807e5732b08c03ed9eb631"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a22e5e1403b807e5732b08c03ed9eb631">&#9670;&nbsp;</a></span>map_keyt</h2>
@@ -226,7 +226,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00043">43</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00041">41</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
 
 </div>
 </div>
@@ -280,7 +280,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00047">47</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00045">45</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
 
 </div>
 </div>
@@ -357,7 +357,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The abstract object that has been created </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00331">331</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00334">334</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -413,7 +413,7 @@ Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The abstract object that has been created</dd></dl>
 <p>Look at the configuration for the sensitivity and create an appropriate abstract_object, assigning an appropriate value Maybe the two abstract_object_factory methods should be compacted to one call... </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00323">323</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00326">326</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -475,7 +475,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The abstract object that has been created </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00312">312</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00315">315</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -533,7 +533,7 @@ Private Attributes</h2></td></tr>
 <p>As abstractions may split the assignment into multiple writes (for example pointers that could point to several locations, arrays with non-constant indexes), each of which has to handle the rest of the compound write, thus the stack is passed (to write, which does the actual updating) as an explicit argument rather than just via recursion.</p>
 <p>The same use case (but for the opposite reason; because you will only update one of the multiple objects) is also why a merge_write flag is needed. </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00147">147</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00150">150</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -582,7 +582,7 @@ Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>True if the assume changed the domain.</dd></dl>
 <p>Reduces the domain to (an over-approximation) of the cases when the the expression holds. Used to implement assume statements and conditional branches. It would be valid to simply return false here because it is an over-approximation. We try to do better than that. The better the implementation the more precise the results will be. </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00257">257</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00260">260</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -603,7 +603,7 @@ Private Attributes</h2></td></tr>
 
 <p>Exposes the environment configuration. </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00343">343</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00346">346</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -633,7 +633,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00300">300</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00303">303</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -662,7 +662,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00476">476</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00479">479</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -711,7 +711,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The abstract_object representing the value of the expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00094">94</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00097">97</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -749,7 +749,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00461">461</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00464">464</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -769,7 +769,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00527">527</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00530">530</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -806,7 +806,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <p>Set the domain to top </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00379">379</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00382">382</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -827,7 +827,7 @@ Private Attributes</h2></td></tr>
 
 <p>Gets whether the domain is bottom. </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00398">398</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00401">401</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -848,7 +848,7 @@ Private Attributes</h2></td></tr>
 
 <p>Gets whether the domain is top. </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00403">403</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00406">406</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -869,7 +869,7 @@ Private Attributes</h2></td></tr>
 
 <p>Set the domain to top (i.e. no possible states / unreachable) </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00392">392</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00395">395</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -890,7 +890,7 @@ Private Attributes</h2></td></tr>
 
 <p>Set the domain to top (i.e. everything) </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00385">385</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00388">388</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -945,7 +945,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A Boolean, true when the merge has changed something </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00348">348</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00351">351</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -988,7 +988,7 @@ Private Attributes</h2></td></tr>
 <p>Inputs are two <a class="el" href="classabstract__environmentt.html">abstract_environmentt</a>'s that need to be intersected for, so that we can find symbols that have changed between different domains.</p>
 <dl class="section return"><dt>Returns</dt><dd>An std::vector containing the symbols that are present in both environments. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00482">482</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00485">485</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -1034,7 +1034,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00408">408</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00411">411</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -1072,7 +1072,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00135">135</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00138">138</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -1094,7 +1094,7 @@ Private Attributes</h2></td></tr>
 <p>Gives a boolean condition that is true for all values represented by the environment. </p>
 <dl class="section return"><dt>Returns</dt><dd>An exprt describing the environment </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00425">425</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00428">428</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -1116,7 +1116,7 @@ Private Attributes</h2></td></tr>
 <p>Check the structural invariants are maintained. </p>
 <p>In this case this is checking there aren't any null pointer mapped values </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00449">449</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00452">452</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -1186,7 +1186,7 @@ Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A modified version of the rhs after the write has taken place</dd></dl>
 <p>Write an abstract object onto another respecting a stack of member, index and dereference access. This ping-pongs between this method and the relevant write methods in abstract_struct, abstract_pointer and abstract_array until the stack is empty </p>
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00237">237</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8cpp_source.html#l00240">240</a> of file <a class="el" href="abstract__environment_8cpp_source.html">abstract_environment.cpp</a>.</p>
 
 </div>
 </div>
@@ -1211,7 +1211,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00253">253</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00251">251</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
 
 </div>
 </div>
@@ -1235,7 +1235,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00262">262</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00260">260</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
 
 </div>
 </div>
@@ -1259,7 +1259,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00287">287</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstract__environment_8h_source.html#l00285">285</a> of file <a class="el" href="abstract__environment_8h_source.html">abstract_environment.h</a>.</p>
 
 </div>
 </div>

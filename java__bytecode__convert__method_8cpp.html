@@ -94,17 +94,7 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp.h
 <div class="title">java_bytecode_convert_method.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="bytecode__info_8h_source.html">bytecode_info.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__bytecode__convert__method_8h_source.html">java_bytecode_convert_method.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__expr_8h_source.html">java_expr.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__static__initializers_8h_source.html">java_static_initializers.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__string__library__preprocess_8h_source.html">java_string_library_preprocess.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__string__literal__expr_8h_source.html">java_string_literal_expr.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__types_8h_source.html">java_types.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="lambda__synthesis_8h_source.html">lambda_synthesis.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="pattern_8h_source.html">pattern.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="bitvector__expr_8h_source.html">util/bitvector_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
@@ -116,9 +106,20 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp.h
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix__filter_8h_source.html">util/prefix_filter.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="threeval_8h_source.html">util/threeval.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="resolve__inherited__component_8h_source.html">goto-programs/resolve_inherited_component.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="uncaught__exceptions__analysis_8h_source.html">analyses/uncaught_exceptions_analysis.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="bytecode__info_8h_source.html">bytecode_info.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__bytecode__convert__method_8h_source.html">java_bytecode_convert_method.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__expr_8h_source.html">java_expr.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__static__initializers_8h_source.html">java_static_initializers.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__string__library__preprocess_8h_source.html">java_string_library_preprocess.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__string__literal__expr_8h_source.html">java_string_literal_expr.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__types_8h_source.html">java_types.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="lambda__synthesis_8h_source.html">lambda_synthesis.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="pattern_8h_source.html">pattern.h</a>&quot;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;limits&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -126,7 +127,7 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp.h
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__convert__method_8cpp__incl.svg" width="4024" height="902"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__convert__method_8cpp__incl.svg" width="3799" height="1022"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -144,9 +145,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa924d187cecf1c837270eec8009548f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classjava__method__typet.html">java_method_typet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__method_8cpp.html#aa924d187cecf1c837270eec8009548f0">member_type_lazy</a> (const std::string &amp;descriptor, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt; &amp;signature, const std::string &amp;class_name, const std::string &amp;method_name, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:aa924d187cecf1c837270eec8009548f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the member type for a method, based on signature or descriptor.  <a href="java__bytecode__convert__method_8cpp.html#aa924d187cecf1c837270eec8009548f0">More...</a><br /></td></tr>
 <tr class="separator:aa924d187cecf1c837270eec8009548f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bb198316a89c0e40e40b04a026f419f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__method_8cpp.html#a1bb198316a89c0e40e40b04a026f419f">java_bytecode_convert_method_lazy</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;class_symbol, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;method_identifier, const <a class="el" href="structjava__bytecode__parse__treet_1_1methodt.html">java_bytecode_parse_treet::methodt</a> &amp;m, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:a1bb198316a89c0e40e40b04a026f419f"><td class="mdescLeft">&#160;</td><td class="mdescRight">This creates a method symbol in the symtab, but doesn't actually perform method conversion just yet.  <a href="java__bytecode__convert__method_8cpp.html#a1bb198316a89c0e40e40b04a026f419f">More...</a><br /></td></tr>
-<tr class="separator:a1bb198316a89c0e40e40b04a026f419f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2bff2f3b0636c018f11f3f562fc660e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__method_8cpp.html#af2bff2f3b0636c018f11f3f562fc660e">java_bytecode_convert_method_lazy</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;class_symbol, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;method_identifier, const <a class="el" href="structjava__bytecode__parse__treet_1_1methodt.html">java_bytecode_parse_treet::methodt</a> &amp;m, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:af2bff2f3b0636c018f11f3f562fc660e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This creates a method symbol in the symtab, but doesn't actually perform method conversion just yet.  <a href="java__bytecode__convert__method_8cpp.html#af2bff2f3b0636c018f11f3f562fc660e">More...</a><br /></td></tr>
+<tr class="separator:af2bff2f3b0636c018f11f3f562fc660e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4dcd8af05899774faf0a0291135d2680"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__method_8cpp.html#a4dcd8af05899774faf0a0291135d2680">get_method_identifier</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_identifier, const <a class="el" href="structjava__bytecode__parse__treet_1_1methodt.html">java_bytecode_parse_treet::methodt</a> &amp;method)</td></tr>
 <tr class="separator:a4dcd8af05899774faf0a0291135d2680"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4852145ef7c107d03efc0ad3ea84732"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__method_8cpp.html#ab4852145ef7c107d03efc0ad3ea84732">create_parameter_names</a> (const <a class="el" href="structjava__bytecode__parse__treet_1_1methodt.html">java_bytecode_parse_treet::methodt</a> &amp;m, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;method_identifier, <a class="el" href="classjava__method__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">java_method_typet::parameterst</a> &amp;parameters, const <a class="el" href="classjava__bytecode__convert__methodt.html#ac9b745c4aede089f1f3a527c4d381991">java_bytecode_convert_methodt::method_offsett</a> &amp;slots_for_parameters)</td></tr>
@@ -213,7 +214,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l02210">2210</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l02212">2212</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +268,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00060">60</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00062">62</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +309,7 @@ Functions</h2></td></tr>
 <p>Add typecast if necessary to <code>expr</code> to make it compatible with array type corresponding to <code>type_char</code> (see <a class="el" href="java__types_8h.html#a7ecbe4e4b0f146c9880aab7850c8cbf2">java_array_type(const char)</a>). </p>
 <p>Character 'b' is used both for <code>byte</code> and <code>boolean</code> arrays, so if <code>expr</code> is a boolean array and we are using a <code>b</code> operation we can skip the typecast. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l02984">2984</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l02986">2986</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -368,7 +369,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00092">92</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00094">94</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +422,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00427">427</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00429">429</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -457,7 +458,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00512">512</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00514">514</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +502,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00950">950</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00952">952</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -529,7 +530,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l01004">1004</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l01006">1006</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -557,7 +558,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00635">635</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00637">637</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -595,7 +596,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00418">418</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00420">420</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -623,7 +624,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00121">121</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00123">123</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -713,12 +714,12 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l03284">3284</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l03286">3286</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a1bb198316a89c0e40e40b04a026f419f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1bb198316a89c0e40e40b04a026f419f">&#9670;&nbsp;</a></span>java_bytecode_convert_method_lazy()</h2>
+<a id="af2bff2f3b0636c018f11f3f562fc660e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2bff2f3b0636c018f11f3f562fc660e">&#9670;&nbsp;</a></span>java_bytecode_convert_method_lazy()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -744,7 +745,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -773,7 +774,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00301">301</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00303">303</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -820,7 +821,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l03206">3206</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l03208">3208</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -881,7 +882,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the constructed member type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00231">231</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00233">233</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>
@@ -936,7 +937,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A member expression accessing the field, through base class components if necessary. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00661">661</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method_8cpp_source.html#l00663">663</a> of file <a class="el" href="java__bytecode__convert__method_8cpp_source.html">java_bytecode_convert_method.cpp</a>.</p>
 
 </div>
 </div>

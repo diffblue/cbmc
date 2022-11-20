@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/string_utils.h" name="/home/runner/work/cbmc/cbmc/src/util/string_utils.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4851,5,5035,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4623,5,4807,61"/>
 <area shape="rect" id="node2" href="$abstract__object__set_8cpp.html" title=" " alt="" coords="5,117,259,173"/>
 <area shape="rect" id="node3" href="$builtin__factory_8cpp.html" title=" " alt="" coords="283,117,467,173"/>
 <area shape="rect" id="node4" href="$expr2c_8cpp.html" title=" " alt="" coords="491,124,693,165"/>
@@ -27,26 +27,24 @@
 <area shape="rect" id="node26" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="5545,117,5749,173"/>
 <area shape="rect" id="node27" href="$gdb__api_8cpp.html" title=" " alt="" coords="5773,117,5977,173"/>
 <area shape="rect" id="node28" href="$external__sat_8cpp.html" title=" " alt="" coords="6001,117,6185,173"/>
-<area shape="rect" id="node29" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="6209,109,6439,180"/>
-<area shape="rect" id="node30" href="$smt__solver__process_8cpp.html" title=" " alt="" coords="6463,109,6647,180"/>
-<area shape="rect" id="node31" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="6671,109,6867,180"/>
-<area shape="rect" id="node32" href="$cmdline_8cpp.html" title=" " alt="" coords="6892,124,7084,165"/>
-<area shape="rect" id="node33" href="$config_8cpp.html" title=" " alt="" coords="7108,124,7292,165"/>
-<area shape="rect" id="node34" href="$console_8cpp.html" title=" " alt="" coords="7317,124,7507,165"/>
-<area shape="rect" id="node35" href="$format__expr_8cpp.html" title=" " alt="" coords="7532,117,7716,173"/>
-<area shape="rect" id="node36" href="$interval__union_8cpp.html" title=" " alt="" coords="7740,117,7924,173"/>
-<area shape="rect" id="node37" href="$lispexpr_8cpp.html" title=" " alt="" coords="7949,124,8139,165"/>
-<area shape="rect" id="node38" href="$parse__options_8cpp.html" title=" " alt="" coords="8163,124,8394,165"/>
-<area shape="rect" id="node39" href="$piped__process_8cpp.html" title=" " alt="" coords="8418,124,8651,165"/>
-<area shape="rect" id="node40" href="$string__utils_8cpp.html" title=" " alt="" coords="8676,117,8860,173"/>
-<area shape="rect" id="node41" href="$structured__data_8cpp.html" title=" " alt="" coords="8884,117,9068,173"/>
-<area shape="rect" id="node42" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="9093,117,9387,173"/>
-<area shape="rect" id="node49" href="$java__string__literals_8cpp.html" title=" " alt="" coords="9412,117,9631,173"/>
-<area shape="rect" id="node50" href="$java__utils_8cpp.html" title=" " alt="" coords="9655,117,9873,173"/>
-<area shape="rect" id="node43" href="$ci__lazy__methods__needed_8cpp.html" title=" " alt="" coords="8691,235,8909,291"/>
-<area shape="rect" id="node44" href="$generic__parameter__specialization__map_8cpp.html" title=" " alt="" coords="8933,235,9243,291"/>
-<area shape="rect" id="node45" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="9267,228,9514,299"/>
-<area shape="rect" id="node48" href="$select__pointer__type_8cpp.html" title=" " alt="" coords="9539,235,9757,291"/>
-<area shape="rect" id="node46" href="$generic__parameter__specialization__map__keys_8cpp.html" title=" " alt="" coords="9138,347,9385,417"/>
-<area shape="rect" id="node47" href="$java__object__factory_8cpp.html" title=" " alt="" coords="9409,354,9628,410"/>
+<area shape="rect" id="node29" href="$smt__solver__process_8cpp.html" title=" " alt="" coords="6209,109,6393,180"/>
+<area shape="rect" id="node30" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="6418,109,6614,180"/>
+<area shape="rect" id="node31" href="$cmdline_8cpp.html" title=" " alt="" coords="6639,124,6831,165"/>
+<area shape="rect" id="node32" href="$config_8cpp.html" title=" " alt="" coords="6855,124,7039,165"/>
+<area shape="rect" id="node33" href="$console_8cpp.html" title=" " alt="" coords="7063,124,7254,165"/>
+<area shape="rect" id="node34" href="$format__expr_8cpp.html" title=" " alt="" coords="7279,117,7463,173"/>
+<area shape="rect" id="node35" href="$interval__union_8cpp.html" title=" " alt="" coords="7487,117,7671,173"/>
+<area shape="rect" id="node36" href="$lispexpr_8cpp.html" title=" " alt="" coords="7695,124,7886,165"/>
+<area shape="rect" id="node37" href="$parse__options_8cpp.html" title=" " alt="" coords="7910,124,8141,165"/>
+<area shape="rect" id="node38" href="$string__utils_8cpp.html" title=" " alt="" coords="8165,117,8349,173"/>
+<area shape="rect" id="node39" href="$structured__data_8cpp.html" title=" " alt="" coords="8373,117,8557,173"/>
+<area shape="rect" id="node40" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="8582,117,8877,173"/>
+<area shape="rect" id="node47" href="$java__string__literals_8cpp.html" title=" " alt="" coords="8901,117,9120,173"/>
+<area shape="rect" id="node48" href="$java__utils_8cpp.html" title=" " alt="" coords="9144,117,9363,173"/>
+<area shape="rect" id="node41" href="$ci__lazy__methods__needed_8cpp.html" title=" " alt="" coords="8180,235,8399,291"/>
+<area shape="rect" id="node42" href="$generic__parameter__specialization__map_8cpp.html" title=" " alt="" coords="8423,235,8732,291"/>
+<area shape="rect" id="node43" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="8757,228,9003,299"/>
+<area shape="rect" id="node46" href="$select__pointer__type_8cpp.html" title=" " alt="" coords="9028,235,9247,291"/>
+<area shape="rect" id="node44" href="$generic__parameter__specialization__map__keys_8cpp.html" title=" " alt="" coords="8627,347,8874,417"/>
+<area shape="rect" id="node45" href="$java__object__factory_8cpp.html" title=" " alt="" coords="8899,354,9117,410"/>
 </map>

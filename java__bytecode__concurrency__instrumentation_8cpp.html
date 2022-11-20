@@ -96,22 +96,22 @@ $(document).ready(function(){initNavTree('java__bytecode__concurrency__instrumen
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="java__bytecode__concurrency__instrumentation_8h_source.html">java_bytecode_concurrency_instrumentation.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="expr2java_8h_source.html">expr2java.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__types_8h_source.html">java_types.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="cprover__prefix_8h_source.html">util/cprover_prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__iterator_8h_source.html">util/expr_iterator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__types_8h_source.html">util/std_types.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="expr2java_8h_source.html">expr2java.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__types_8h_source.html">java_types.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for java_bytecode_concurrency_instrumentation.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__concurrency__instrumentation_8cpp__incl.svg" width="2927" height="1022"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__concurrency__instrumentation_8cpp__incl.svg" width="2616" height="1022"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -119,9 +119,9 @@ $(document).ready(function(){initNavTree('java__bytecode__concurrency__instrumen
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae384950d84c650e80eb78f7be5f02a0c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbolt.html">symbolt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#ae384950d84c650e80eb78f7be5f02a0c">add_or_get_symbol</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;base_name, const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classexprt.html">exprt</a> &amp;value, const bool is_thread_local, const bool is_static_lifetime)</td></tr>
-<tr class="memdesc:ae384950d84c650e80eb78f7be5f02a0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a new symbol to the symbol table if it doesn't exist.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#ae384950d84c650e80eb78f7be5f02a0c">More...</a><br /></td></tr>
-<tr class="separator:ae384950d84c650e80eb78f7be5f02a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a554d07dafd7b3aecc206cd06dc0d39d4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbolt.html">symbolt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a554d07dafd7b3aecc206cd06dc0d39d4">add_or_get_symbol</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;base_name, const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classexprt.html">exprt</a> &amp;value, const bool is_thread_local, const bool is_static_lifetime)</td></tr>
+<tr class="memdesc:a554d07dafd7b3aecc206cd06dc0d39d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a new symbol to the symbol table if it doesn't exist.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a554d07dafd7b3aecc206cd06dc0d39d4">More...</a><br /></td></tr>
+<tr class="separator:a554d07dafd7b3aecc206cd06dc0d39d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bd4a4d636dd280e369aab8bf916ee4f"><td class="memItemLeft" align="right" valign="top">static const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a9bd4a4d636dd280e369aab8bf916ee4f">get_first_label_id</a> (const std::string &amp;id)</td></tr>
 <tr class="memdesc:a9bd4a4d636dd280e369aab8bf916ee4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the first label identifier.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a9bd4a4d636dd280e369aab8bf916ee4f">More...</a><br /></td></tr>
 <tr class="separator:a9bd4a4d636dd280e369aab8bf916ee4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,33 +131,33 @@ Functions</h2></td></tr>
 <tr class="memitem:a496feb47412d554ab5c7c72fe5151852"><td class="memItemLeft" align="right" valign="top">static const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a496feb47412d554ab5c7c72fe5151852">get_thread_block_identifier</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code)</td></tr>
 <tr class="memdesc:a496feb47412d554ab5c7c72fe5151852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a thread block identifier from a function call to CProver.startThread:(I)V or CProver.endThread:(I)V /param code: function call to CProver.startThread or CProver.endThread /return unique thread block identifier.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a496feb47412d554ab5c7c72fe5151852">More...</a><br /></td></tr>
 <tr class="separator:a496feb47412d554ab5c7c72fe5151852"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b4642b3fc4eae3e82c4b14110c4fb62"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcodet.html">codet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a6b4642b3fc4eae3e82c4b14110c4fb62">get_monitor_call</a> (const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, bool is_enter, const <a class="el" href="classexprt.html">exprt</a> &amp;object)</td></tr>
-<tr class="memdesc:a6b4642b3fc4eae3e82c4b14110c4fb62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a monitorenter/monitorexit <a class="el" href="classcode__function__callt.html" title="goto_instruction_codet representation of a function call statement.">code_function_callt</a> for the given synchronization object.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a6b4642b3fc4eae3e82c4b14110c4fb62">More...</a><br /></td></tr>
-<tr class="separator:a6b4642b3fc4eae3e82c4b14110c4fb62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf51419d7182ce90bf50b315c3c06267"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classcodet.html">codet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#abf51419d7182ce90bf50b315c3c06267">get_monitor_call</a> (const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool is_enter, const <a class="el" href="classexprt.html">exprt</a> &amp;object)</td></tr>
+<tr class="memdesc:abf51419d7182ce90bf50b315c3c06267"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a monitorenter/monitorexit <a class="el" href="classcode__function__callt.html" title="goto_instruction_codet representation of a function call statement.">code_function_callt</a> for the given synchronization object.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#abf51419d7182ce90bf50b315c3c06267">More...</a><br /></td></tr>
+<tr class="separator:abf51419d7182ce90bf50b315c3c06267"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ed64c59b86bf60274a1b86235183314"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a8ed64c59b86bf60274a1b86235183314">monitor_exits</a> (<a class="el" href="classcodet.html">codet</a> &amp;code, const <a class="el" href="classcodet.html">codet</a> &amp;monitorexit)</td></tr>
 <tr class="memdesc:a8ed64c59b86bf60274a1b86235183314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Introduces a monitorexit before every return recursively.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a8ed64c59b86bf60274a1b86235183314">More...</a><br /></td></tr>
 <tr class="separator:a8ed64c59b86bf60274a1b86235183314"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7976d79620efd14251c4582315d10021"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a7976d79620efd14251c4582315d10021">instrument_synchronized_code</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="classexprt.html">exprt</a> &amp;sync_object)</td></tr>
-<tr class="memdesc:a7976d79620efd14251c4582315d10021"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in <code>symbol.value</code>.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a7976d79620efd14251c4582315d10021">More...</a><br /></td></tr>
-<tr class="separator:a7976d79620efd14251c4582315d10021"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a511a9ccc2e10195b3e6419cb15cc630d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a511a9ccc2e10195b3e6419cb15cc630d">instrument_start_thread</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a511a9ccc2e10195b3e6419cb15cc630d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.startThread:(I)V into a block of code as described by the documentation of function convert_thread_block.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a511a9ccc2e10195b3e6419cb15cc630d">More...</a><br /></td></tr>
-<tr class="separator:a511a9ccc2e10195b3e6419cb15cc630d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05449ae1901f1638878fd2c5b90e29c3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a05449ae1901f1638878fd2c5b90e29c3">instrument_end_thread</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a05449ae1901f1638878fd2c5b90e29c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.endThread:(I)V into a block of code as described by the documentation of the function convert_thread_block.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a05449ae1901f1638878fd2c5b90e29c3">More...</a><br /></td></tr>
-<tr class="separator:a05449ae1901f1638878fd2c5b90e29c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a945366a718163e10dd8ba107c79367af"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a945366a718163e10dd8ba107c79367af">instrument_get_current_thread_id</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a945366a718163e10dd8ba107c79367af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.getCurrentThreadId:()I into a <a class="el" href="classcode__assignt.html" title="A goto_instruction_codet representing an assignment in the program.">code_assignt</a> as described by the documentation of the function convert_thread_block.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a945366a718163e10dd8ba107c79367af">More...</a><br /></td></tr>
-<tr class="separator:a945366a718163e10dd8ba107c79367af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4506ad669d1f6593fdc36cb7f9f88688"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a4506ad669d1f6593fdc36cb7f9f88688">instrument_get_monitor_count</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a4506ad669d1f6593fdc36cb7f9f88688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.getMonitorCount:(Ljava/lang/Object;)I into a <a class="el" href="classcode__assignt.html" title="A goto_instruction_codet representing an assignment in the program.">code_assignt</a> that assigns the cproverMonitorCount field of the java.lang.Object argument passed to getMonitorCount.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a4506ad669d1f6593fdc36cb7f9f88688">More...</a><br /></td></tr>
-<tr class="separator:a4506ad669d1f6593fdc36cb7f9f88688"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bca9ce063ae40af87d88f1c96443e62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a3bca9ce063ae40af87d88f1c96443e62">convert_threadblock</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a3bca9ce063ae40af87d88f1c96443e62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate through the symbol table to find and appropriately instrument thread-blocks.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a3bca9ce063ae40af87d88f1c96443e62">More...</a><br /></td></tr>
-<tr class="separator:a3bca9ce063ae40af87d88f1c96443e62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19478a30dbfa1b072a7e1b67dad68ec5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a19478a30dbfa1b072a7e1b67dad68ec5">convert_synchronized_methods</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:a19478a30dbfa1b072a7e1b67dad68ec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate through the symbol table to find and instrument synchronized methods.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a19478a30dbfa1b072a7e1b67dad68ec5">More...</a><br /></td></tr>
-<tr class="separator:a19478a30dbfa1b072a7e1b67dad68ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7bab9b1649d84ed01a196b3aef8361c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#ac7bab9b1649d84ed01a196b3aef8361c">instrument_synchronized_code</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="classexprt.html">exprt</a> &amp;sync_object)</td></tr>
+<tr class="memdesc:ac7bab9b1649d84ed01a196b3aef8361c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in <code>symbol.value</code>.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#ac7bab9b1649d84ed01a196b3aef8361c">More...</a><br /></td></tr>
+<tr class="separator:ac7bab9b1649d84ed01a196b3aef8361c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ee4f3d17a2fd71b9cdebf1c4052472"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a46ee4f3d17a2fd71b9cdebf1c4052472">instrument_start_thread</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a46ee4f3d17a2fd71b9cdebf1c4052472"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.startThread:(I)V into a block of code as described by the documentation of function convert_thread_block.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a46ee4f3d17a2fd71b9cdebf1c4052472">More...</a><br /></td></tr>
+<tr class="separator:a46ee4f3d17a2fd71b9cdebf1c4052472"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a9d90adceb8bd3389df16e08b050495"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a8a9d90adceb8bd3389df16e08b050495">instrument_end_thread</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a8a9d90adceb8bd3389df16e08b050495"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.endThread:(I)V into a block of code as described by the documentation of the function convert_thread_block.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a8a9d90adceb8bd3389df16e08b050495">More...</a><br /></td></tr>
+<tr class="separator:a8a9d90adceb8bd3389df16e08b050495"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9ea499c65f36591867bdc5e5fd26fac"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#ad9ea499c65f36591867bdc5e5fd26fac">instrument_get_current_thread_id</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:ad9ea499c65f36591867bdc5e5fd26fac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.getCurrentThreadId:()I into a <a class="el" href="classcode__assignt.html" title="A goto_instruction_codet representing an assignment in the program.">code_assignt</a> as described by the documentation of the function convert_thread_block.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#ad9ea499c65f36591867bdc5e5fd26fac">More...</a><br /></td></tr>
+<tr class="separator:ad9ea499c65f36591867bdc5e5fd26fac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a440b9137c534b5e3c769017042e38e93"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a440b9137c534b5e3c769017042e38e93">instrument_get_monitor_count</a> (const <a class="el" href="classcode__function__callt.html">code_function_callt</a> &amp;f_code, <a class="el" href="classcodet.html">codet</a> &amp;code, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a440b9137c534b5e3c769017042e38e93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the codet stored in in <code>f_code</code>, which is a call to function CProver.getMonitorCount:(Ljava/lang/Object;)I into a <a class="el" href="classcode__assignt.html" title="A goto_instruction_codet representing an assignment in the program.">code_assignt</a> that assigns the cproverMonitorCount field of the java.lang.Object argument passed to getMonitorCount.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a440b9137c534b5e3c769017042e38e93">More...</a><br /></td></tr>
+<tr class="separator:a440b9137c534b5e3c769017042e38e93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4f60986928f20f19446d87dd97f2e64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#af4f60986928f20f19446d87dd97f2e64">convert_threadblock</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:af4f60986928f20f19446d87dd97f2e64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate through the symbol table to find and appropriately instrument thread-blocks.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#af4f60986928f20f19446d87dd97f2e64">More...</a><br /></td></tr>
+<tr class="separator:af4f60986928f20f19446d87dd97f2e64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a940cd8b840ca00dd8c11d5bf0819a317"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__concurrency__instrumentation_8cpp.html#a940cd8b840ca00dd8c11d5bf0819a317">convert_synchronized_methods</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:a940cd8b840ca00dd8c11d5bf0819a317"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate through the symbol table to find and instrument synchronized methods.  <a href="java__bytecode__concurrency__instrumentation_8cpp.html#a940cd8b840ca00dd8c11d5bf0819a317">More...</a><br /></td></tr>
+<tr class="separator:a940cd8b840ca00dd8c11d5bf0819a317"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -167,8 +167,8 @@ Variables</h2></td></tr>
 <tr class="separator:a36d8966dc1bf81e0ff3dedd3cbf30d39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ae384950d84c650e80eb78f7be5f02a0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae384950d84c650e80eb78f7be5f02a0c">&#9670;&nbsp;</a></span>add_or_get_symbol()</h2>
+<a id="a554d07dafd7b3aecc206cd06dc0d39d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a554d07dafd7b3aecc206cd06dc0d39d4">&#9670;&nbsp;</a></span>add_or_get_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -179,7 +179,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">static <a class="el" href="classsymbolt.html">symbolt</a> add_or_get_symbol </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -234,12 +234,12 @@ Variables</h2></td></tr>
 <p>Adds a new symbol to the symbol table if it doesn't exist. </p>
 <p>Otherwise, returns the existing one. /param name: name of the symbol to be generated /param base_name: base name of the symbol to be generated /param type: type of the symbol to be generated /param value: initial value of the symbol to be generated /param is_thread_local: if true this symbol will be set as thread local /param is_static_lifetime: if true this symbol will be set as static /return returns new or existing symbol. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00035">35</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00036">36</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a19478a30dbfa1b072a7e1b67dad68ec5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19478a30dbfa1b072a7e1b67dad68ec5">&#9670;&nbsp;</a></span>convert_synchronized_methods()</h2>
+<a id="a940cd8b840ca00dd8c11d5bf0819a317"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a940cd8b840ca00dd8c11d5bf0819a317">&#9670;&nbsp;</a></span>convert_synchronized_methods()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,7 +247,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void convert_synchronized_methods </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -276,12 +276,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00605">605</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00606">606</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a3bca9ce063ae40af87d88f1c96443e62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3bca9ce063ae40af87d88f1c96443e62">&#9670;&nbsp;</a></span>convert_threadblock()</h2>
+<a id="af4f60986928f20f19446d87dd97f2e64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4f60986928f20f19446d87dd97f2e64">&#9670;&nbsp;</a></span>convert_threadblock()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -289,7 +289,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void convert_threadblock </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -324,7 +324,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00487">487</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00488">488</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
@@ -355,12 +355,12 @@ Variables</h2></td></tr>
 <p>Retrieve the first label identifier. </p>
 <p>This is used to mark the start of a thread block. /param id: unique thread block identifier /return fully qualified label identifier </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00068">68</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00069">69</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a6b4642b3fc4eae3e82c4b14110c4fb62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b4642b3fc4eae3e82c4b14110c4fb62">&#9670;&nbsp;</a></span>get_monitor_call()</h2>
+<a id="abf51419d7182ce90bf50b315c3c06267"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf51419d7182ce90bf50b315c3c06267">&#9670;&nbsp;</a></span>get_monitor_call()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -371,7 +371,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">static <a class="el" href="classcodet.html">codet</a> get_monitor_call </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -409,7 +409,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00103">103</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00104">104</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
@@ -440,7 +440,7 @@ Variables</h2></td></tr>
 <p>Retrieve the second label identifier. </p>
 <p>This is used to mark the end of a thread block. /param id: unique thread block identifier /return fully qualified label identifier </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00077">77</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00078">78</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
@@ -470,12 +470,12 @@ Variables</h2></td></tr>
 
 <p>Retrieves a thread block identifier from a function call to CProver.startThread:(I)V or CProver.endThread:(I)V /param code: function call to CProver.startThread or CProver.endThread /return unique thread block identifier. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00086">86</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00087">87</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a05449ae1901f1638878fd2c5b90e29c3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05449ae1901f1638878fd2c5b90e29c3">&#9670;&nbsp;</a></span>instrument_end_thread()</h2>
+<a id="a8a9d90adceb8bd3389df16e08b050495"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a9d90adceb8bd3389df16e08b050495">&#9670;&nbsp;</a></span>instrument_end_thread()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -498,7 +498,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -525,12 +525,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00341">341</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00342">342</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a945366a718163e10dd8ba107c79367af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a945366a718163e10dd8ba107c79367af">&#9670;&nbsp;</a></span>instrument_get_current_thread_id()</h2>
+<a id="ad9ea499c65f36591867bdc5e5fd26fac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9ea499c65f36591867bdc5e5fd26fac">&#9670;&nbsp;</a></span>instrument_get_current_thread_id()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -553,7 +553,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -580,12 +580,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00375">375</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00376">376</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a4506ad669d1f6593fdc36cb7f9f88688"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4506ad669d1f6593fdc36cb7f9f88688">&#9670;&nbsp;</a></span>instrument_get_monitor_count()</h2>
+<a id="a440b9137c534b5e3c769017042e38e93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a440b9137c534b5e3c769017042e38e93">&#9670;&nbsp;</a></span>instrument_get_monitor_count()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -608,7 +608,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -635,12 +635,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00406">406</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00407">407</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a511a9ccc2e10195b3e6419cb15cc630d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a511a9ccc2e10195b3e6419cb15cc630d">&#9670;&nbsp;</a></span>instrument_start_thread()</h2>
+<a id="a46ee4f3d17a2fd71b9cdebf1c4052472"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46ee4f3d17a2fd71b9cdebf1c4052472">&#9670;&nbsp;</a></span>instrument_start_thread()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -663,7 +663,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -690,12 +690,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00271">271</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00272">272</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a7976d79620efd14251c4582315d10021"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7976d79620efd14251c4582315d10021">&#9670;&nbsp;</a></span>instrument_synchronized_code()</h2>
+<a id="ac7bab9b1649d84ed01a196b3aef8361c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7bab9b1649d84ed01a196b3aef8361c">&#9670;&nbsp;</a></span>instrument_synchronized_code()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -706,7 +706,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">static void instrument_synchronized_code </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -776,7 +776,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00208">208</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00209">209</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
@@ -823,7 +823,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00135">135</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00136">136</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
@@ -840,7 +840,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00023">23</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00024">24</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>
@@ -856,7 +856,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00024">24</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html#l00025">25</a> of file <a class="el" href="java__bytecode__concurrency__instrumentation_8cpp_source.html">java_bytecode_concurrency_instrumentation.cpp</a>.</p>
 
 </div>
 </div>

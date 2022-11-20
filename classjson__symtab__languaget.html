@@ -120,9 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac6515846689001bca629537369d0d756"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#ac6515846689001bca629537369d0d756">parse</a> (std::istream &amp;instream, const std::string &amp;path) override</td></tr>
 <tr class="memdesc:ac6515846689001bca629537369d0d756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse a goto program in json form.  <a href="classjson__symtab__languaget.html#ac6515846689001bca629537369d0d756">More...</a><br /></td></tr>
 <tr class="separator:ac6515846689001bca629537369d0d756"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f2cf5f02a5bd718fc157182bd2a78eb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#a6f2cf5f02a5bd718fc157182bd2a78eb">typecheck</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::string &amp;module) override</td></tr>
-<tr class="memdesc:a6f2cf5f02a5bd718fc157182bd2a78eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Typecheck a goto program in json form.  <a href="classjson__symtab__languaget.html#a6f2cf5f02a5bd718fc157182bd2a78eb">More...</a><br /></td></tr>
-<tr class="separator:a6f2cf5f02a5bd718fc157182bd2a78eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f48b1574e8f02f7364402f48509bca7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#a2f48b1574e8f02f7364402f48509bca7">typecheck</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const std::string &amp;module) override</td></tr>
+<tr class="memdesc:a2f48b1574e8f02f7364402f48509bca7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Typecheck a goto program in json form.  <a href="classjson__symtab__languaget.html#a2f48b1574e8f02f7364402f48509bca7">More...</a><br /></td></tr>
+<tr class="separator:a2f48b1574e8f02f7364402f48509bca7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52a8de0a38305d3eea0781d846f40dab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#a52a8de0a38305d3eea0781d846f40dab">show_parse</a> (std::ostream &amp;out) override</td></tr>
 <tr class="memdesc:a52a8de0a38305d3eea0781d846f40dab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output the result of the parsed json file to the output stream passed as a parameter to this function.  <a href="classjson__symtab__languaget.html#a52a8de0a38305d3eea0781d846f40dab">More...</a><br /></td></tr>
 <tr class="separator:a52a8de0a38305d3eea0781d846f40dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,9 +137,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6084cea2fd0bd73b04dd3536c815709a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d3f71461d274170493df6c5b1c432cf"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classlanguaget.html">languaget</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#a4d3f71461d274170493df6c5b1c432cf">new_language</a> () override</td></tr>
 <tr class="separator:a4d3f71461d274170493df6c5b1c432cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab750fd1fd100795dc9830c2930102ec6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#ab750fd1fd100795dc9830c2930102ec6">generate_support_functions</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table) override</td></tr>
-<tr class="memdesc:ab750fd1fd100795dc9830c2930102ec6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create language-specific support functions, such as __CPROVER_start, __CPROVER_initialize and language-specific library functions.  <a href="classjson__symtab__languaget.html#ab750fd1fd100795dc9830c2930102ec6">More...</a><br /></td></tr>
-<tr class="separator:ab750fd1fd100795dc9830c2930102ec6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3025e86b7a4fe2aca689e86f6e1d0542"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#a3025e86b7a4fe2aca689e86f6e1d0542">generate_support_functions</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table) override</td></tr>
+<tr class="memdesc:a3025e86b7a4fe2aca689e86f6e1d0542"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create language-specific support functions, such as __CPROVER_start, __CPROVER_initialize and language-specific library functions.  <a href="classjson__symtab__languaget.html#a3025e86b7a4fe2aca689e86f6e1d0542">More...</a><br /></td></tr>
+<tr class="separator:a3025e86b7a4fe2aca689e86f6e1d0542"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52ffa53fdebd08680bc002e9678e3e1c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjson__symtab__languaget.html#a52ffa53fdebd08680bc002e9678e3e1c">~json_symtab_languaget</a> () override=default</td></tr>
 <tr class="separator:a52ffa53fdebd08680bc002e9678e3e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classlanguaget"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classlanguaget')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classlanguaget.html">languaget</a></td></tr>
@@ -153,7 +153,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a121922e66f5220361933282fc55bd720 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a121922e66f5220361933282fc55bd720">modules_provided</a> (std::set&lt; std::string &gt; &amp;modules)</td></tr>
 <tr class="separator:a121922e66f5220361933282fc55bd720 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1e5abdaf9c6aea7f4dcf8d4ebd75d7a inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#af1e5abdaf9c6aea7f4dcf8d4ebd75d7a">methods_provided</a> (std::unordered_set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;methods) const</td></tr>
-<tr class="memdesc:af1e5abdaf9c6aea7f4dcf8d4ebd75d7a inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should fill <code>methods</code> with the symbol identifiers of all methods this <code>languaget</code> can provide a body for, but doesn't populate that body in <a class="el" href="classlanguaget.html#a4323ef336c3849c8577b3e4c93237695">languaget::typecheck</a> (i.e.  <a href="classlanguaget.html#af1e5abdaf9c6aea7f4dcf8d4ebd75d7a">More...</a><br /></td></tr>
+<tr class="memdesc:af1e5abdaf9c6aea7f4dcf8d4ebd75d7a inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should fill <code>methods</code> with the symbol identifiers of all methods this <code>languaget</code> can provide a body for, but doesn't populate that body in <a class="el" href="classlanguaget.html#ad6e855cfc40439adf23ac60a7e4fc175">languaget::typecheck</a> (i.e.  <a href="classlanguaget.html#af1e5abdaf9c6aea7f4dcf8d4ebd75d7a">More...</a><br /></td></tr>
 <tr class="separator:af1e5abdaf9c6aea7f4dcf8d4ebd75d7a inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abaedee01126518c514653b28f955253a inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#abaedee01126518c514653b28f955253a">convert_lazy_method</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="memdesc:abaedee01126518c514653b28f955253a inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Requests this <code>languaget</code> should populate the body of method <code>function_id</code> in <code>symbol_table</code>.  <a href="classlanguaget.html#abaedee01126518c514653b28f955253a">More...</a><br /></td></tr>
@@ -161,14 +161,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0ba12f507e032e78edb4f8a21b59ec41 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a0ba12f507e032e78edb4f8a21b59ec41">final</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="memdesc:a0ba12f507e032e78edb4f8a21b59ec41 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Final adjustments, e.g.  <a href="classlanguaget.html#a0ba12f507e032e78edb4f8a21b59ec41">More...</a><br /></td></tr>
 <tr class="separator:a0ba12f507e032e78edb4f8a21b59ec41 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab770df2482fca8af96f38020efe457ee inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#ab770df2482fca8af96f38020efe457ee">interfaces</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="separator:ab770df2482fca8af96f38020efe457ee inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a038757d00691cc2c964e844cef5d8e5b inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a038757d00691cc2c964e844cef5d8e5b">interfaces</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="separator:a038757d00691cc2c964e844cef5d8e5b inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a573d0d4bf2d92ddebbe0e56c381464b3">can_keep_file_local</a> ()</td></tr>
-<tr class="memdesc:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is it possible to call three-argument <a class="el" href="classlanguaget.html#a4323ef336c3849c8577b3e4c93237695">typecheck()</a> on this object?  <a href="classlanguaget.html#a573d0d4bf2d92ddebbe0e56c381464b3">More...</a><br /></td></tr>
+<tr class="memdesc:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is it possible to call three-argument <a class="el" href="classlanguaget.html#ad6e855cfc40439adf23ac60a7e4fc175">typecheck()</a> on this object?  <a href="classlanguaget.html#a573d0d4bf2d92ddebbe0e56c381464b3">More...</a><br /></td></tr>
 <tr class="separator:a573d0d4bf2d92ddebbe0e56c381464b3 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf968c60685e65e069a6fed5a166f3c5 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#acf968c60685e65e069a6fed5a166f3c5">typecheck</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::string &amp;module, const bool keep_file_local)</td></tr>
-<tr class="memdesc:acf968c60685e65e069a6fed5a166f3c5 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">typecheck without removing specified entries from the symbol table  <a href="classlanguaget.html#acf968c60685e65e069a6fed5a166f3c5">More...</a><br /></td></tr>
-<tr class="separator:acf968c60685e65e069a6fed5a166f3c5 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed9a3b9d8a79439b68a773e1ab0c0a46 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#aed9a3b9d8a79439b68a773e1ab0c0a46">typecheck</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const std::string &amp;module, const bool keep_file_local)</td></tr>
+<tr class="memdesc:aed9a3b9d8a79439b68a773e1ab0c0a46 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">typecheck without removing specified entries from the symbol table  <a href="classlanguaget.html#aed9a3b9d8a79439b68a773e1ab0c0a46">More...</a><br /></td></tr>
+<tr class="separator:aed9a3b9d8a79439b68a773e1ab0c0a46 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a847eca622950c809780855374e1dd5c2 inherit pub_methods_classlanguaget"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlanguaget.html#a847eca622950c809780855374e1dd5c2">from_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, std::string &amp;code, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a847eca622950c809780855374e1dd5c2 inherit pub_methods_classlanguaget"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats the given expression in a language-specific way.  <a href="classlanguaget.html#a847eca622950c809780855374e1dd5c2">More...</a><br /></td></tr>
 <tr class="separator:a847eca622950c809780855374e1dd5c2 inherit pub_methods_classlanguaget"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -306,7 +306,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00024">24</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00025">25</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a52ffa53fdebd08680bc002e9678e3e1c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a52ffa53fdebd08680bc002e9678e3e1c">&#9670;&nbsp;</a></span>~json_symtab_languaget()</h2>
@@ -359,7 +359,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a1db4852627eb8d907d090ca52371d308">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00045">45</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00046">46</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>
@@ -388,12 +388,12 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a4ef9ae04e57ed83bad04d54643b49e56">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00050">50</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00051">51</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>
-<a id="ab750fd1fd100795dc9830c2930102ec6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab750fd1fd100795dc9830c2930102ec6">&#9670;&nbsp;</a></span>generate_support_functions()</h2>
+<a id="a3025e86b7a4fe2aca689e86f6e1d0542"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3025e86b7a4fe2aca689e86f6e1d0542">&#9670;&nbsp;</a></span>generate_support_functions()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -404,7 +404,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">bool json_symtab_languaget::generate_support_functions </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -419,9 +419,9 @@ Additional Inherited Members</h2></td></tr>
 <p>Create language-specific support functions, such as __CPROVER_start, __CPROVER_initialize and language-specific library functions. </p>
 <p>This runs after the <code>typecheck</code> phase but before lazy function loading. Anything that must wait until lazy function loading is done can be deferred until <code>final</code>, which runs after lazy function loading is complete. Functions introduced here are visible to lazy loading and can influence its decisions (e.g. picking the types of input parameters and globals), whereas anything introduced during <code>final</code> cannot. </p>
 
-<p>Implements <a class="el" href="classlanguaget.html#abba048f89e327b719a4e633a6f1b27f7">languaget</a>.</p>
+<p>Implements <a class="el" href="classlanguaget.html#ad9940e72ccb82fe2598b1981c8a60ab4">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00060">60</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00061">61</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>
@@ -450,7 +450,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a82505a4c60a113558ee4ab3a0fdf99ad">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00041">41</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00042">42</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>
@@ -479,7 +479,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a747b4a0836507a6f4668cbfd3f89c7f2">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00055">55</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00056">56</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>
@@ -529,7 +529,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a6e834f6839a657842c57cad0398d7109">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8cpp_source.html#l00021">21</a> of file <a class="el" href="json__symtab__language_8cpp_source.html">json_symtab_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8cpp_source.html#l00024">24</a> of file <a class="el" href="json__symtab__language_8cpp_source.html">json_symtab_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -567,7 +567,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#abb3fe1e64517c33fa221e41f3b76feb8">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8cpp_source.html#l00055">55</a> of file <a class="el" href="json__symtab__language_8cpp_source.html">json_symtab_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8cpp_source.html#l00058">58</a> of file <a class="el" href="json__symtab__language_8cpp_source.html">json_symtab_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -631,12 +631,12 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a6c37a101dc132e66ef607b91f3d7edcd">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00035">35</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00036">36</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>
-<a id="a6f2cf5f02a5bd718fc157182bd2a78eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f2cf5f02a5bd718fc157182bd2a78eb">&#9670;&nbsp;</a></span>typecheck()</h2>
+<a id="a2f48b1574e8f02f7364402f48509bca7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f48b1574e8f02f7364402f48509bca7">&#9670;&nbsp;</a></span>typecheck()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -647,7 +647,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">bool json_symtab_languaget::typecheck </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -679,9 +679,9 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>boolean signifying success or failure of the typechecking. </dd></dl>
 
-<p>Implements <a class="el" href="classlanguaget.html#a4323ef336c3849c8577b3e4c93237695">languaget</a>.</p>
+<p>Implements <a class="el" href="classlanguaget.html#ad6e855cfc40439adf23ac60a7e4fc175">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8cpp_source.html#l00032">32</a> of file <a class="el" href="json__symtab__language_8cpp_source.html">json_symtab_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8cpp_source.html#l00035">35</a> of file <a class="el" href="json__symtab__language_8cpp_source.html">json_symtab_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -706,7 +706,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00072">72</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="json__symtab__language_8h_source.html#l00073">73</a> of file <a class="el" href="json__symtab__language_8h_source.html">json_symtab_language.h</a>.</p>
 
 </div>
 </div>

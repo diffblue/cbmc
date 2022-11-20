@@ -1,5 +1,8 @@
 var NAVTREEINDEX130 =
 {
+"structzip__iteratort.html#a56bffc3666fad687790476ee75412e94":[5,0,1332,8],
+"structzip__iteratort.html#a634c95c844942a19989dcef2a40b6a06":[5,0,1332,9],
+"structzip__iteratort.html#a72042a7e46e3c2ca4e866c8c674e0a3a":[5,0,1332,15],
 "structzip__iteratort.html#a7b29ca337bf21e8a336eecd77545ea86":[5,0,1332,13],
 "structzip__iteratort.html#ad35b46c5eac589d3794af0080515140f":[5,0,1332,2],
 "structzip__iteratort.html#ae2496fb3995b1c345876f9b816bccbe8":[5,0,1332,11],
@@ -158,13 +161,13 @@ var NAVTREEINDEX130 =
 "synthesizer__utils_8cpp.html#afb89881deb14a893cfec18f49afa4cf8":[6,0,2,13,2,5,2],
 "synthesizer__utils_8cpp_source.html":[6,0,2,13,2,5],
 "synthesizer__utils_8h.html":[6,0,2,13,2,6],
-"synthesizer__utils_8h.html#a5b70f6fb5fede91018331caeb1991280":[6,0,2,13,2,6,5],
-"synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c":[6,0,2,13,2,6,0],
-"synthesizer__utils_8h.html#a92072c81085023f93375bc71c2b84a7f":[6,0,2,13,2,6,6],
-"synthesizer__utils_8h.html#ab0edb91380d03fcf49bea694f43eb93c":[6,0,2,13,2,6,4],
-"synthesizer__utils_8h.html#adbaf3cb86ea581b649f6598ae5caabee":[6,0,2,13,2,6,1],
-"synthesizer__utils_8h.html#ae0af75cc5b9107423465e2c30e582383":[6,0,2,13,2,6,2],
-"synthesizer__utils_8h.html#afb89881deb14a893cfec18f49afa4cf8":[6,0,2,13,2,6,3],
+"synthesizer__utils_8h.html#a5b70f6fb5fede91018331caeb1991280":[6,0,2,13,2,6,6],
+"synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c":[6,0,2,13,2,6,1],
+"synthesizer__utils_8h.html#a92072c81085023f93375bc71c2b84a7f":[6,0,2,13,2,6,7],
+"synthesizer__utils_8h.html#ab0edb91380d03fcf49bea694f43eb93c":[6,0,2,13,2,6,5],
+"synthesizer__utils_8h.html#adbaf3cb86ea581b649f6598ae5caabee":[6,0,2,13,2,6,2],
+"synthesizer__utils_8h.html#ae0af75cc5b9107423465e2c30e582383":[6,0,2,13,2,6,3],
+"synthesizer__utils_8h.html#afb89881deb14a893cfec18f49afa4cf8":[6,0,2,13,2,6,4],
 "synthesizer__utils_8h_source.html":[6,0,2,13,2,6],
 "synthetic__methods__map_8h.html":[6,0,1,0,1,117],
 "synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6":[6,0,1,0,1,117,0],
@@ -246,8 +249,5 @@ var NAVTREEINDEX130 =
 "tutorial.html#autotoc_md163":[0,4,13,0,0],
 "tutorial.html#autotoc_md164":[0,4,13,0,1],
 "tutorial.html#autotoc_md165":[0,4,13,0,1,0],
-"tutorial.html#autotoc_md166":[0,4,13,0,1,1],
-"tutorial.html#autotoc_md167":[0,4,13,0,2],
-"tutorial.html#autotoc_md168":[0,4,13,0,2,0],
-"tutorial.html#autotoc_md169":[0,4,13,0,2,1]
+"tutorial.html#autotoc_md166":[0,4,13,0,1,1]
 };

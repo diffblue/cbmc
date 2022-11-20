@@ -10,7 +10,7 @@ var java__utils_8h =
     [ "fresh_java_symbol", "java__utils_8h.html#a49fc9008a1330e6329658847b547673b", null ],
     [ "generate_class_stub", "java__utils_8h.html#a7f10462c30b86c07802295b9b5c8ed20", null ],
     [ "get_boxed_type_info_by_name", "java__utils_8h.html#a1880b5369568361210b15af9229e1f6f", null ],
-    [ "get_inherited_component", "java__utils_8h.html#a3e28c8be031c19211a562764d6edcfc8", null ],
+    [ "get_inherited_component", "java__utils_8h.html#af8bcdd9e42842c100435d61466ec707f", null ],
     [ "get_java_primitive_type_info", "java__utils_8h.html#a1680be1d39f1eba0f2f6efcfb9ee0d77", null ],
     [ "is_java_string_literal_id", "java__utils_8h.html#a08d6cb5375ab2c0670f299549a637fed", null ],
     [ "is_java_string_type", "java__utils_8h.html#a8768a3fe1b662f0925e9c1b5746a1e15", null ],

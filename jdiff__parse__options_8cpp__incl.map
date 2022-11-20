@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/jdiff/jdiff_parse_options.cpp" name="/home/runner/work/cbmc/cbmc/jbmc/src/jdiff/jdiff_parse_options.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1611,5,1795,61"/>
-<area shape="rect" id="node2" href="$jdiff__parse__options_8h.html" title=" " alt="" coords="219,117,376,143"/>
-<area shape="rect" id="node9" href="$show__properties_8h.html" title=" " alt="" coords="654,199,810,240"/>
-<area shape="rect" id="node13" href="$cover_8h.html" title=" " alt="" coords="451,206,629,233"/>
-<area shape="rect" id="node23" href="$config_8h.html" title=" " alt="" coords="1068,474,1167,501"/>
-<area shape="rect" id="node26" href="$exit__codes_8h.html" title=" " alt="" coords="669,117,798,143"/>
-<area shape="rect" id="node27" href="$options_8h.html" title=" " alt="" coords="1191,474,1297,501"/>
-<area shape="rect" id="node28" href="$version_8h.html" title=" " alt="" coords="873,117,980,143"/>
-<area shape="rect" id="node29" href="$adjust__float__expressions_8h.html" title=" " alt="" coords="1663,288,1825,329"/>
-<area shape="rect" id="node30" href="$goto__check_8h.html" title=" " alt="" coords="1055,109,1206,151"/>
-<area shape="rect" id="node31" href="$initialize__goto__model_8h.html" title=" " alt="" coords="1855,109,2033,151"/>
-<area shape="rect" id="node33" href="$instrument__preconditions_8h.html" title=" " alt="" coords="1282,109,1475,151"/>
-<area shape="rect" id="node34" href="$loop__ids_8h.html" title=" " alt="" coords="269,288,419,329"/>
-<area shape="rect" id="node35" href="$mm__io_8h.html" title=" " alt="" coords="1551,117,1729,143"/>
-<area shape="rect" id="node36" href="$remove__function__pointers_8h.html" title=" " alt="" coords="2010,467,2182,508"/>
-<area shape="rect" id="node38" href="$remove__returns_8h.html" title=" " alt="" coords="2975,377,3147,419"/>
-<area shape="rect" id="node40" href="$remove__skip_8h.html" title=" " alt="" coords="1349,199,1521,240"/>
-<area shape="rect" id="node41" href="$remove__virtual__functions_8h.html" title=" " alt="" coords="871,467,1043,508"/>
-<area shape="rect" id="node43" href="$set__properties_8h.html" title=" " alt="" coords="1759,474,1985,501"/>
-<area shape="rect" id="node44" href="$change__impact_8h.html" title=" " alt="" coords="2159,117,2351,143"/>
-<area shape="rect" id="node45" href="$unified__diff_8h.html" title=" " alt="" coords="1519,474,1684,501"/>
-<area shape="rect" id="node46" href="$java__bytecode__language_8h.html" title=" " alt="" coords="2561,377,2729,419"/>
-<area shape="rect" id="node56" href="$remove__exceptions_8h.html" title=" " alt="" coords="3765,631,3936,672"/>
-<area shape="rect" id="node57" href="$remove__instanceof_8h.html" title=" " alt="" coords="1913,199,2084,240"/>
-<area shape="rect" id="node58" href="$java__syntactic__diff_8h.html" title=" " alt="" coords="2706,117,2862,143"/>
-<area shape="rect" id="node59" title=" " alt="" coords="2886,117,2951,143"/>
-<area shape="rect" id="node60" title=" " alt="" coords="2976,117,3056,143"/>
-<area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="94,295,245,322"/>
-<area shape="rect" id="node7" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="132,474,249,501"/>
-<area shape="rect" id="node8" href="$show__goto__functions_8h.html" title=" " alt="" coords="219,199,375,240"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1071,795,1129,821"/>
-<area shape="rect" id="node5" href="$ui__message_8h.html" title=" " alt="" coords="183,385,295,411"/>
-<area shape="rect" id="node6" title=" " alt="" coords="413,556,491,583"/>
-<area shape="rect" id="node10" href="$irep_8h.html" title=" " alt="" coords="2420,720,2479,747"/>
-<area shape="rect" id="node12" href="$optional_8h.html" title=" " alt="" coords="950,556,1037,583"/>
-<area shape="rect" id="node11" title=" " alt="" coords="2595,795,2658,821"/>
-<area shape="rect" id="node14" href="$cover__filter_8h.html" title=" " alt="" coords="495,295,601,322"/>
-<area shape="rect" id="node21" href="$cover__instrument_8h.html" title=" " alt="" coords="546,474,694,501"/>
-<area shape="rect" id="node22" href="$make__unique_8h.html" title=" " alt="" coords="324,474,471,501"/>
-<area shape="rect" id="node15" href="$goto__functions_8h.html" title=" " alt="" coords="1666,377,1817,419"/>
-<area shape="rect" id="node16" href="$goto__function_8h.html" title=" " alt="" coords="1372,474,1495,501"/>
-<area shape="rect" id="node20" title=" " alt="" coords="1792,556,1843,583"/>
-<area shape="rect" id="node17" href="$goto__program_8h.html" title=" " alt="" coords="1352,556,1477,583"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1680,638,1744,665"/>
-<area shape="rect" id="node19" href="$namespace_8h.html" title=" " alt="" coords="1514,638,1649,665"/>
-<area shape="rect" id="node24" title=" " alt="" coords="1501,556,1544,583"/>
-<area shape="rect" id="node25" href="$ieee__float_8h.html" title=" " alt="" coords="1669,556,1768,583"/>
-<area shape="rect" id="node32" href="$goto__model_8h.html" title=" " alt="" coords="1850,295,1961,322"/>
-<area shape="rect" id="node37" title=" " alt="" coords="2675,556,2789,583"/>
-<area shape="rect" id="node39" title=" " alt="" coords="2513,556,2599,583"/>
-<area shape="rect" id="node42" href="$std__expr_8h.html" title=" " alt="" coords="811,556,925,583"/>
-<area shape="rect" id="node47" href="$ci__lazy__methods_8h.html" title=" " alt="" coords="2658,474,2801,501"/>
-<area shape="rect" id="node48" href="$synthetic__methods__map_8h.html" title=" " alt="" coords="2813,556,3008,583"/>
-<area shape="rect" id="node49" href="$ci__lazy__methods__needed_8h.html" title=" " alt="" coords="3493,474,3691,501"/>
-<area shape="rect" id="node50" href="$java__class__loader_8h.html" title=" " alt="" coords="2207,474,2356,501"/>
-<area shape="rect" id="node51" href="$java__object__factory__parameters_8h.html" title=" " alt="" coords="2825,467,2975,508"/>
-<area shape="rect" id="node52" href="$java__static__initializers_8h.html" title=" " alt="" coords="3238,474,3418,501"/>
-<area shape="rect" id="node53" href="$java__string__library__preprocess_8h.html" title=" " alt="" coords="2491,467,2634,508"/>
-<area shape="rect" id="node54" href="$select__pointer__type_8h.html" title=" " alt="" coords="3000,474,3163,501"/>
-<area shape="rect" id="node55" href="$json_8h.html" title=" " alt="" coords="2381,474,2467,501"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1655,5,1839,61"/>
+<area shape="rect" id="node2" href="$jdiff__parse__options_8h.html" title=" " alt="" coords="430,117,587,143"/>
+<area shape="rect" id="node8" href="$show__properties_8h.html" title=" " alt="" coords="1113,199,1269,240"/>
+<area shape="rect" id="node12" href="$cover_8h.html" title=" " alt="" coords="1611,206,1790,233"/>
+<area shape="rect" id="node21" href="$config_8h.html" title=" " alt="" coords="1319,295,1418,322"/>
+<area shape="rect" id="node24" href="$exit__codes_8h.html" title=" " alt="" coords="713,117,843,143"/>
+<area shape="rect" id="node25" href="$options_8h.html" title=" " alt="" coords="1053,295,1159,322"/>
+<area shape="rect" id="node26" href="$version_8h.html" title=" " alt="" coords="918,117,1025,143"/>
+<area shape="rect" id="node27" href="$adjust__float__expressions_8h.html" title=" " alt="" coords="662,199,825,240"/>
+<area shape="rect" id="node28" href="$goto__check_8h.html" title=" " alt="" coords="1100,109,1251,151"/>
+<area shape="rect" id="node29" href="$initialize__goto__model_8h.html" title=" " alt="" coords="1303,199,1482,240"/>
+<area shape="rect" id="node31" href="$instrument__preconditions_8h.html" title=" " alt="" coords="1327,109,1520,151"/>
+<area shape="rect" id="node32" href="$loop__ids_8h.html" title=" " alt="" coords="5,199,156,240"/>
+<area shape="rect" id="node33" href="$mm__io_8h.html" title=" " alt="" coords="1595,117,1774,143"/>
+<area shape="rect" id="node34" href="$remove__function__pointers_8h.html" title=" " alt="" coords="2208,288,2380,329"/>
+<area shape="rect" id="node36" href="$remove__returns_8h.html" title=" " alt="" coords="2483,288,2655,329"/>
+<area shape="rect" id="node38" href="$remove__skip_8h.html" title=" " alt="" coords="1815,199,1987,240"/>
+<area shape="rect" id="node39" href="$remove__virtual__functions_8h.html" title=" " alt="" coords="573,288,745,329"/>
+<area shape="rect" id="node41" href="$set__properties_8h.html" title=" " alt="" coords="1906,295,2133,322"/>
+<area shape="rect" id="node42" href="$change__impact_8h.html" title=" " alt="" coords="2051,117,2243,143"/>
+<area shape="rect" id="node43" href="$unified__diff_8h.html" title=" " alt="" coords="1442,295,1607,322"/>
+<area shape="rect" id="node44" href="$java__bytecode__language_8h.html" title=" " alt="" coords="2830,288,2998,329"/>
+<area shape="rect" id="node56" href="$remove__exceptions_8h.html" title=" " alt="" coords="2318,199,2489,240"/>
+<area shape="rect" id="node57" href="$remove__instanceof_8h.html" title=" " alt="" coords="849,199,1019,240"/>
+<area shape="rect" id="node58" href="$java__syntactic__diff_8h.html" title=" " alt="" coords="2615,117,2771,143"/>
+<area shape="rect" id="node59" title=" " alt="" coords="2795,117,2860,143"/>
+<area shape="rect" id="node60" title=" " alt="" coords="2885,117,2965,143"/>
+<area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="180,206,331,233"/>
+<area shape="rect" id="node6" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="437,385,554,411"/>
+<area shape="rect" id="node7" href="$show__goto__functions_8h.html" title=" " alt="" coords="355,199,511,240"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1882,541,1941,568"/>
+<area shape="rect" id="node5" href="$ui__message_8h.html" title=" " alt="" coords="293,295,405,322"/>
+<area shape="rect" id="node9" href="$irep_8h.html" title=" " alt="" coords="2233,467,2291,493"/>
+<area shape="rect" id="node11" href="$optional_8h.html" title=" " alt="" coords="943,385,1029,411"/>
+<area shape="rect" id="node10" title=" " alt="" coords="2180,541,2243,568"/>
+<area shape="rect" id="node13" href="$cover__filter_8h.html" title=" " alt="" coords="871,295,978,322"/>
+<area shape="rect" id="node16" href="$cover__instrument_8h.html" title=" " alt="" coords="1632,295,1780,322"/>
+<area shape="rect" id="node20" href="$make__unique_8h.html" title=" " alt="" coords="2401,385,2547,411"/>
+<area shape="rect" id="node14" href="$goto__functions_8h.html" title=" " alt="" coords="768,377,919,419"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1333,467,1383,493"/>
+<area shape="rect" id="node17" href="$namespace_8h.html" title=" " alt="" coords="1447,385,1581,411"/>
+<area shape="rect" id="node18" href="$goto__program_8h.html" title=" " alt="" coords="1606,385,1731,411"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1926,467,1990,493"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1278,385,1321,411"/>
+<area shape="rect" id="node23" href="$ieee__float_8h.html" title=" " alt="" coords="1155,385,1254,411"/>
+<area shape="rect" id="node30" href="$goto__model_8h.html" title=" " alt="" coords="1184,295,1295,322"/>
+<area shape="rect" id="node35" title=" " alt="" coords="2967,467,3082,493"/>
+<area shape="rect" id="node37" title=" " alt="" coords="2760,467,2847,493"/>
+<area shape="rect" id="node40" href="$std__expr_8h.html" title=" " alt="" coords="578,385,693,411"/>
+<area shape="rect" id="node45" href="$json_8h.html" title=" " alt="" coords="2036,385,2123,411"/>
+<area shape="rect" id="node46" href="$prefix__filter_8h.html" title=" " alt="" coords="3107,467,3239,493"/>
+<area shape="rect" id="node47" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1929,385,2011,411"/>
+<area shape="rect" id="node48" href="$language_8h.html" title=" " alt="" coords="2841,385,2987,411"/>
+<area shape="rect" id="node49" href="$ci__lazy__methods_8h.html" title=" " alt="" coords="2623,385,2765,411"/>
+<area shape="rect" id="node50" href="$ci__lazy__methods__needed_8h.html" title=" " alt="" coords="3061,385,3260,411"/>
+<area shape="rect" id="node51" href="$code__with__references_8h.html" title=" " alt="" coords="3502,385,3678,411"/>
+<area shape="rect" id="node52" href="$java__class__loader_8h.html" title=" " alt="" coords="1755,385,1905,411"/>
+<area shape="rect" id="node53" href="$java__object__factory__parameters_8h.html" title=" " alt="" coords="3703,377,3853,419"/>
+<area shape="rect" id="node54" href="$java__static__initializers_8h.html" title=" " alt="" coords="3877,385,4057,411"/>
+<area shape="rect" id="node55" href="$java__string__library__preprocess_8h.html" title=" " alt="" coords="3284,377,3427,419"/>
 </map>

@@ -1,7 +1,7 @@
 var classcone__of__influencet =
 [
     [ "cone_mapt", "classcone__of__influencet.html#ae8963ec397c02f8553cdc71920cd5020", null ],
-    [ "cone_of_influencet", "classcone__of__influencet.html#a6a4a3e012df43399393415fcae487139", null ],
+    [ "cone_of_influencet", "classcone__of__influencet.html#a1c5a58ac186048cb7e7ea3f8c821d50a", null ],
     [ "cone_of_influence", "classcone__of__influencet.html#a4d44d0932694ced9c46a45e1a027563a", null ],
     [ "cone_of_influence", "classcone__of__influencet.html#ad007bb5c9817559784c2fcf86a2ef572", null ],
     [ "cone_of_influence", "classcone__of__influencet.html#ae37dd10af37cfc2e88ac6600f1312c11", null ],

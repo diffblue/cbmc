@@ -110,349 +110,348 @@ $(document).ready(function(){initNavTree('sat__path__enumerator_8cpp_source.html
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__program_8h.html">goto-programs/goto_program.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="remove__skip_8h.html">goto-programs/remove_skip.h</a>&gt;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__code_8h.html">util/std_code.h</a>&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="scratch__program_8h.html">scratch_program.h</a>&quot;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="scratch__program_8h.html">scratch_program.h</a>&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">   25</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">sat_path_enumeratort::next</a>(<a class="code" href="path_8h.html#a9be8a7c61f609081c6d71fb9991ee541">patht</a> &amp;path)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> program{<a class="code" href="classsat__path__enumeratort.html#af7fe0b2d7e2c796c1c7ca3708986be42">symbol_table</a>, <a class="code" href="classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8">message_handler</a>, <a class="code" href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">guard_manager</a>};</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  program.append(<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  program.append(<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// Let&#39;s make sure that we get a path we have not seen before.</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;distinguish_valuest&gt;::iterator it=<a class="code" href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">accelerated_paths</a>.begin();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      it!=<a class="code" href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">accelerated_paths</a>.end();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      ++it)</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classexprt.html">exprt</a> new_path=<a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">for</span>(distinguish_valuest::iterator jt=it-&gt;begin();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        jt!=it-&gt;end();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        ++jt)</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    {</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <a class="code" href="classexprt.html">exprt</a> distinguisher=jt-&gt;first;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <span class="keywordtype">bool</span> taken=jt-&gt;second;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordflow">if</span>(taken)</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <a class="code" href="classnot__exprt.html">not_exprt</a> negated(distinguisher);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        distinguisher.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(negated);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      }</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <a class="code" href="classor__exprt.html">or_exprt</a> disjunct(new_path, distinguisher);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      new_path.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(disjunct);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    program.assume(new_path);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">   23</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">sat_path_enumeratort::next</a>(<a class="code" href="path_8h.html#a9be8a7c61f609081c6d71fb9991ee541">patht</a> &amp;path)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> program{<a class="code" href="classsat__path__enumeratort.html#a7d223c18984226dc1ebfe507f657408c">symbol_table</a>, <a class="code" href="classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8">message_handler</a>, <a class="code" href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">guard_manager</a>};</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  program.append(<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  program.append(<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// Let&#39;s make sure that we get a path we have not seen before.</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;distinguish_valuest&gt;::iterator it=<a class="code" href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">accelerated_paths</a>.begin();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      it!=<a class="code" href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">accelerated_paths</a>.end();</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      ++it)</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classexprt.html">exprt</a> new_path=<a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">for</span>(distinguish_valuest::iterator jt=it-&gt;begin();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        jt!=it-&gt;end();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        ++jt)</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <a class="code" href="classexprt.html">exprt</a> distinguisher=jt-&gt;first;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordtype">bool</span> taken=jt-&gt;second;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <span class="keywordflow">if</span>(taken)</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <a class="code" href="classnot__exprt.html">not_exprt</a> negated(distinguisher);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        distinguisher.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(negated);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <a class="code" href="classor__exprt.html">or_exprt</a> disjunct(new_path, distinguisher);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      new_path.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(disjunct);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    program.assume(new_path);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  program.add(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  program.add(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">if</span>(program.check_sat(<a class="code" href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">guard_manager</a>))</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;Found a path\n&quot;</span>;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <a class="code" href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">build_path</a>(program, path);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <a class="code" href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">record_path</a>(program);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::string &amp;s)</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Error in fitting polynomial SAT check: &quot;</span> &lt;&lt; s &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Error in fitting polynomial SAT check: &quot;</span> &lt;&lt; s &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4">   86</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4">sat_path_enumeratort::find_distinguishing_points</a>()</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="classloop__templatet.html#aa03f4396f37775debd4d110bb91cddcc">natural_loops_mutablet::natural_loopt::const_iterator</a> it = <a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#ad4eb426f5f046583a4f5fbbbe47ea95b">begin</a>();</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      it != <a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a0f5f2c2c6eeb495267a74128fbb3b425">end</a>();</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      ++it)</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> succs=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">get_successors</a>(*it);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span>(succs.size()&gt;1)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="comment">// This location has multiple successors -- each successor is a</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <span class="comment">// distinguishing point.</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;succ : succs)</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <a class="code" href="classsymbolt.html">symbolt</a> distinguisher_sym =</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;          <a class="code" href="classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09">utils</a>.<a class="code" href="classacceleration__utilst.html#a8bac92c3cc86724d5ebf48d38219d2e6">fresh_symbol</a>(<span class="stringliteral">&quot;polynomial::distinguisher&quot;</span>, <a class="code" href="classbool__typet.html">bool_typet</a>());</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> distinguisher=distinguisher_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>[succ]=distinguisher;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>.push_back(distinguisher);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      }</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;}</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">  111</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">sat_path_enumeratort::build_path</a>(</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> &amp;scratch_program,</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <a class="code" href="path_8h.html#a9be8a7c61f609081c6d71fb9991ee541">patht</a> &amp;path)</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=<a class="code" href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">loop_header</a>;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordflow">do</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> succs=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">get_successors</a>(t);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// We should have a looping path, so we should never hit a location</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">// with no successors.</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    assert(succs.size() &gt; 0);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">if</span>(succs.size()==1)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <span class="comment">// Only one successor -- accumulate it and move on.</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      path.push_back(<a class="code" href="classpath__nodet.html">path_nodet</a>(t));</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      t=succs.front();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">// We have multiple successors.  Examine the distinguisher variables</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">// to see which branch was taken.</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">bool</span> found_branch=<span class="keyword">false</span>;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;succ : succs)</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <a class="code" href="classexprt.html">exprt</a> &amp;distinguisher=<a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>[succ];</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordtype">bool</span> taken=scratch_program.<a class="code" href="classscratch__programt.html#abceb5f70e5b8174c179bd0f42c9febe7">eval</a>(distinguisher).<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>();</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="keywordflow">if</span>(taken)</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      {</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordflow">if</span>(!found_branch ||</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;           (succ-&gt;location_number &lt; <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>-&gt;location_number))</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;          <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>=succ;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        }</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        found_branch=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">if</span>(program.check_sat(<a class="code" href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">guard_manager</a>))</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;Found a path\n&quot;</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <a class="code" href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">build_path</a>(program, path);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <a class="code" href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">record_path</a>(program);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::string &amp;s)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Error in fitting polynomial SAT check: &quot;</span> &lt;&lt; s &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s)</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Error in fitting polynomial SAT check: &quot;</span> &lt;&lt; s &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4">   84</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4">sat_path_enumeratort::find_distinguishing_points</a>()</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;{</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="classloop__templatet.html#aa03f4396f37775debd4d110bb91cddcc">natural_loops_mutablet::natural_loopt::const_iterator</a> it = <a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#ad4eb426f5f046583a4f5fbbbe47ea95b">begin</a>();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      it != <a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a0f5f2c2c6eeb495267a74128fbb3b425">end</a>();</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      ++it)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> succs=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">get_successors</a>(*it);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">if</span>(succs.size()&gt;1)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="comment">// This location has multiple successors -- each successor is a</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="comment">// distinguishing point.</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;succ : succs)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <a class="code" href="classsymbolt.html">symbolt</a> distinguisher_sym =</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;          <a class="code" href="classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09">utils</a>.<a class="code" href="classacceleration__utilst.html#a8bac92c3cc86724d5ebf48d38219d2e6">fresh_symbol</a>(<span class="stringliteral">&quot;polynomial::distinguisher&quot;</span>, <a class="code" href="classbool__typet.html">bool_typet</a>());</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> distinguisher=distinguisher_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>[succ]=distinguisher;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>.push_back(distinguisher);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">  109</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">sat_path_enumeratort::build_path</a>(</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> &amp;scratch_program,</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <a class="code" href="path_8h.html#a9be8a7c61f609081c6d71fb9991ee541">patht</a> &amp;path)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=<a class="code" href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">loop_header</a>;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> succs=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">get_successors</a>(t);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="comment">// We should have a looping path, so we should never hit a location</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// with no successors.</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    assert(succs.size() &gt; 0);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">if</span>(succs.size()==1)</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="comment">// Only one successor -- accumulate it and move on.</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      path.push_back(<a class="code" href="classpath__nodet.html">path_nodet</a>(t));</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      t=succs.front();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    }</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="comment">// We have multiple successors.  Examine the distinguisher variables</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">// to see which branch was taken.</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordtype">bool</span> found_branch=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;succ : succs)</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <a class="code" href="classexprt.html">exprt</a> &amp;distinguisher=<a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>[succ];</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keywordtype">bool</span> taken=scratch_program.<a class="code" href="classscratch__programt.html#abceb5f70e5b8174c179bd0f42c9febe7">eval</a>(distinguisher).<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>();</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">if</span>(taken)</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      {</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="keywordflow">if</span>(!found_branch ||</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;           (succ-&gt;location_number &lt; <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>-&gt;location_number))</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        {</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;          <a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>=succ;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        }</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        found_branch=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      }</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    assert(found_branch);</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    assert(found_branch);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <a class="code" href="classexprt.html">exprt</a> cond=<a class="code" href="classnil__exprt.html">nil_exprt</a>();</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <a class="code" href="classexprt.html">exprt</a> cond=<a class="code" href="classnil__exprt.html">nil_exprt</a>();</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">if</span>(t-&gt;is_goto())</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    {</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="comment">// If this was a conditional branch (it probably was), figure out</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="comment">// if we hit the &quot;taken&quot; or &quot;not taken&quot; branch &amp; accumulate the</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="comment">// appropriate guard.</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      cond = <a class="code" href="classnot__exprt.html">not_exprt</a>(t-&gt;condition());</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordflow">for</span>(goto_programt::targetst::iterator it=t-&gt;targets.begin();</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;          it!=t-&gt;targets.end();</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;          ++it)</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>==*it)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;          cond = t-&gt;condition();</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;          <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      }</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">if</span>(t-&gt;is_goto())</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    {</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <span class="comment">// If this was a conditional branch (it probably was), figure out</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      <span class="comment">// if we hit the &quot;taken&quot; or &quot;not taken&quot; branch &amp; accumulate the</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="comment">// appropriate guard.</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      cond = <a class="code" href="classnot__exprt.html">not_exprt</a>(t-&gt;condition());</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <span class="keywordflow">for</span>(goto_programt::targetst::iterator it=t-&gt;targets.begin();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;          it!=t-&gt;targets.end();</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;          ++it)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>==*it)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;          cond = t-&gt;condition();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    path.push_back(<a class="code" href="classpath__nodet.html">path_nodet</a>(t, cond));</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    path.push_back(<a class="code" href="classpath__nodet.html">path_nodet</a>(t, cond));</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    t=<a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  } <span class="keywordflow">while</span>(t != <a class="code" href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">loop_header</a> &amp;&amp; <a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">contains</a>(t));</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;}</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment"> * Take the body of the loop we are accelerating and produce a fixed-path</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment"> * version of that body, suitable for use in the fixed-path acceleration we</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="comment"> * will be doing later.</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a4cb13e26d82d5193b578eaf1a054fd10">  189</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#a4cb13e26d82d5193b578eaf1a054fd10">sat_path_enumeratort::build_fixed</a>()</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;{</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> scratch{<a class="code" href="classsat__path__enumeratort.html#af7fe0b2d7e2c796c1c7ca3708986be42">symbol_table</a>, <a class="code" href="classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8">message_handler</a>, <a class="code" href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">guard_manager</a>};</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  std::map&lt;exprt, exprt&gt; shadow_distinguishers;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    t=<a class="code" href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">next</a>;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  } <span class="keywordflow">while</span>(t != <a class="code" href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">loop_header</a> &amp;&amp; <a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">contains</a>(t));</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;}</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment"> * Take the body of the loop we are accelerating and produce a fixed-path</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment"> * version of that body, suitable for use in the fixed-path acceleration we</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment"> * will be doing later.</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a4cb13e26d82d5193b578eaf1a054fd10">  187</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#a4cb13e26d82d5193b578eaf1a054fd10">sat_path_enumeratort::build_fixed</a>()</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;{</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> scratch{<a class="code" href="classsat__path__enumeratort.html#a7d223c18984226dc1ebfe507f657408c">symbol_table</a>, <a class="code" href="classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8">message_handler</a>, <a class="code" href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">guard_manager</a>};</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  std::map&lt;exprt, exprt&gt; shadow_distinguishers;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a0c9ee6f82538c7a2f012838f6363f3c6">copy_from</a>(<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>);</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a0c9ee6f82538c7a2f012838f6363f3c6">copy_from</a>(<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;instruction : <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  {</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">if</span>(instruction.is_assert())</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      instruction.turn_into_assume();</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  }</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="comment">// We&#39;re only interested in paths that loop back to the loop header.</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="comment">// As such, any path that jumps outside of the loop or jumps backwards</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="comment">// to a location other than the loop header (i.e. a nested loop) is not</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="comment">// one we&#39;re interested in, and we&#39;ll redirect it to this assume(false).</span></div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> kill =</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="comment">// Make a sentinel instruction to mark the end of the loop body.</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="comment">// We&#39;ll use this as the new target for any back-jumps to the loop</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="comment">// header.</span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> end = <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <span class="comment">// A pointer to the start of the fixed-path body.  We&#39;ll be using this to</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <span class="comment">// iterate over the fixed-path body, but for now it&#39;s just a pointer to the</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="comment">// first instruction.</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> fixedt=<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="comment">// Create shadow distinguisher variables.  These guys identify the path that</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="comment">// is taken through the fixed-path body.</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;exprt&gt;::iterator it=<a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>.begin();</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      it!=<a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>.end();</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      ++it)</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <a class="code" href="classexprt.html">exprt</a> &amp;distinguisher=*it;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> shadow_sym=<a class="code" href="classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09">utils</a>.<a class="code" href="classacceleration__utilst.html#a8bac92c3cc86724d5ebf48d38219d2e6">fresh_symbol</a>(<span class="stringliteral">&quot;polynomial::shadow_distinguisher&quot;</span>,</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        <a class="code" href="classbool__typet.html">bool_typet</a>());</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <a class="code" href="classexprt.html">exprt</a> shadow=shadow_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    shadow_distinguishers[distinguisher]=shadow;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      fixedt,</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(<a class="code" href="classcode__assignt.html">code_assignt</a>(shadow, <a class="code" href="classfalse__exprt.html">false_exprt</a>())));</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  }</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="comment">// We&#39;re going to iterate over the 2 programs in lockstep, which allows</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="comment">// us to figure out which distinguishing point we&#39;ve hit &amp; instrument</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="comment">// the relevant distinguisher variables.</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      t!=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      ++t, ++fixedt)</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    distinguish_mapt::iterator d=<a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>.find(t);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">contains</a>(t))</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="comment">// This instruction isn&#39;t part of the loop...  Just remove it.</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      fixedt-&gt;turn_into_skip();</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    }</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordflow">if</span>(d!=<a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>.end())</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <span class="comment">// We&#39;ve hit a distinguishing point.  Set the relevant shadow</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      <span class="comment">// distinguisher to true.</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <a class="code" href="classexprt.html">exprt</a> &amp;distinguisher=d-&gt;second;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      <a class="code" href="classexprt.html">exprt</a> &amp;shadow=shadow_distinguishers[distinguisher];</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> assign = <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        fixedt,</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(<a class="code" href="classcode__assignt.html">code_assignt</a>(shadow, <a class="code" href="classtrue__exprt.html">true_exprt</a>())));</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      assign-&gt;swap(*fixedt);</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      fixedt=assign;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">if</span>(t-&gt;is_goto())</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      assert(fixedt-&gt;is_goto());</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="comment">// If this is a forwards jump, it&#39;s either jumping inside the loop</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <span class="comment">// (in which case we leave it alone), or it jumps outside the loop.</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <span class="comment">// If it jumps out of the loop, it&#39;s on a path we don&#39;t care about</span></div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <span class="comment">// so we kill it.</span></div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      <span class="comment">//</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <span class="comment">// Otherwise, it&#39;s a backwards jump.  If it jumps back to the loop</span></div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;      <span class="comment">// header we&#39;re happy &amp; redirect it to our end-of-body sentinel.</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="comment">// If it jumps somewhere else, it&#39;s part of a nested loop and we</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      <span class="comment">// kill it.</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : t-&gt;targets)</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      {</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keywordflow">if</span>(target-&gt;location_number &gt; t-&gt;location_number)</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        {</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;          <span class="comment">// A forward jump...</span></div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;          <span class="keywordflow">if</span>(!<a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">contains</a>(target))</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;          {</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;            <span class="comment">// Case 1: a forward jump within the loop.  Do nothing.</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;            <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;          }</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;          {</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            <span class="comment">// Case 2: a forward jump out of the loop.  Kill.</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;          }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        }</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        {</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;          <span class="comment">// A backwards jump...</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;          <span class="keywordflow">if</span>(target==<a class="code" href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">loop_header</a>)</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;          {</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            <span class="comment">// Case 3: a backwards jump to the loop header.  Redirect</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            <span class="comment">// to sentinel.</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            fixedt-&gt;targets.push_back(end);</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;          }</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;          {</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            <span class="comment">// Case 4: a nested loop.  Kill.</span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;          }</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        }</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      }</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    }</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  }</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="comment">// OK, now let&#39;s assume that the path we took through the fixed-path</span></div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="comment">// body is the same as the master path.  We do this by assuming that</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="comment">// each of the shadow-distinguisher variables is equal to its corresponding</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <span class="comment">// master-distinguisher.</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : <a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>)</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  {</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;shadow=shadow_distinguishers[expr];</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      end, <a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="classequal__exprt.html">equal_exprt</a>(expr, shadow)));</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  }</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="comment">// Finally, let&#39;s remove all the skips we introduced and fix the</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <span class="comment">// jump targets.</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>);</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;}</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
-<div class="line"><a name="l00335"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">  335</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">sat_path_enumeratort::record_path</a>(<a class="code" href="classscratch__programt.html">scratch_programt</a> &amp;program)</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;{</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#aa428585b56183d45a892fd6749d64169">distinguish_valuest</a> path_val;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : <a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>)</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    path_val[expr]=program.<a class="code" href="classscratch__programt.html#abceb5f70e5b8174c179bd0f42c9febe7">eval</a>(expr).<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>();</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160; </div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">accelerated_paths</a>.push_back(path_val);</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;}</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;instruction : <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">if</span>(instruction.is_assert())</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      instruction.turn_into_assume();</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="comment">// We&#39;re only interested in paths that loop back to the loop header.</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="comment">// As such, any path that jumps outside of the loop or jumps backwards</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="comment">// to a location other than the loop header (i.e. a nested loop) is not</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="comment">// one we&#39;re interested in, and we&#39;ll redirect it to this assume(false).</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> kill =</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="comment">// Make a sentinel instruction to mark the end of the loop body.</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="comment">// We&#39;ll use this as the new target for any back-jumps to the loop</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="comment">// header.</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> end = <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="comment">// A pointer to the start of the fixed-path body.  We&#39;ll be using this to</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="comment">// iterate over the fixed-path body, but for now it&#39;s just a pointer to the</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <span class="comment">// first instruction.</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> fixedt=<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <span class="comment">// Create shadow distinguisher variables.  These guys identify the path that</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="comment">// is taken through the fixed-path body.</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;exprt&gt;::iterator it=<a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>.begin();</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      it!=<a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>.end();</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      ++it)</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  {</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <a class="code" href="classexprt.html">exprt</a> &amp;distinguisher=*it;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> shadow_sym=<a class="code" href="classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09">utils</a>.<a class="code" href="classacceleration__utilst.html#a8bac92c3cc86724d5ebf48d38219d2e6">fresh_symbol</a>(<span class="stringliteral">&quot;polynomial::shadow_distinguisher&quot;</span>,</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <a class="code" href="classbool__typet.html">bool_typet</a>());</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <a class="code" href="classexprt.html">exprt</a> shadow=shadow_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    shadow_distinguishers[distinguisher]=shadow;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      fixedt,</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(<a class="code" href="classcode__assignt.html">code_assignt</a>(shadow, <a class="code" href="classfalse__exprt.html">false_exprt</a>())));</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="comment">// We&#39;re going to iterate over the 2 programs in lockstep, which allows</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="comment">// us to figure out which distinguishing point we&#39;ve hit &amp; instrument</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="comment">// the relevant distinguisher variables.</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      t!=<a class="code" href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">goto_program</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      ++t, ++fixedt)</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    distinguish_mapt::iterator d=<a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>.find(t);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">contains</a>(t))</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    {</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="comment">// This instruction isn&#39;t part of the loop...  Just remove it.</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      fixedt-&gt;turn_into_skip();</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">if</span>(d!=<a class="code" href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">distinguishing_points</a>.end())</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    {</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="comment">// We&#39;ve hit a distinguishing point.  Set the relevant shadow</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      <span class="comment">// distinguisher to true.</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <a class="code" href="classexprt.html">exprt</a> &amp;distinguisher=d-&gt;second;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      <a class="code" href="classexprt.html">exprt</a> &amp;shadow=shadow_distinguishers[distinguisher];</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> assign = <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        fixedt,</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(<a class="code" href="classcode__assignt.html">code_assignt</a>(shadow, <a class="code" href="classtrue__exprt.html">true_exprt</a>())));</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      assign-&gt;swap(*fixedt);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      fixedt=assign;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordflow">if</span>(t-&gt;is_goto())</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    {</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      assert(fixedt-&gt;is_goto());</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      <span class="comment">// If this is a forwards jump, it&#39;s either jumping inside the loop</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="comment">// (in which case we leave it alone), or it jumps outside the loop.</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="comment">// If it jumps out of the loop, it&#39;s on a path we don&#39;t care about</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <span class="comment">// so we kill it.</span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <span class="comment">//</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <span class="comment">// Otherwise, it&#39;s a backwards jump.  If it jumps back to the loop</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      <span class="comment">// header we&#39;re happy &amp; redirect it to our end-of-body sentinel.</span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <span class="comment">// If it jumps somewhere else, it&#39;s part of a nested loop and we</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;      <span class="comment">// kill it.</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : t-&gt;targets)</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      {</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">if</span>(target-&gt;location_number &gt; t-&gt;location_number)</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        {</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;          <span class="comment">// A forward jump...</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;          <span class="keywordflow">if</span>(!<a class="code" href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">loop</a>.<a class="code" href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">contains</a>(target))</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;          {</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;            <span class="comment">// Case 1: a forward jump within the loop.  Do nothing.</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;          }</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;          {</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;            <span class="comment">// Case 2: a forward jump out of the loop.  Kill.</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;            fixedt-&gt;targets.clear();</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;          }</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        }</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        {</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;          <span class="comment">// A backwards jump...</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;          <span class="keywordflow">if</span>(target==<a class="code" href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">loop_header</a>)</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;          {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            <span class="comment">// Case 3: a backwards jump to the loop header.  Redirect</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            <span class="comment">// to sentinel.</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            fixedt-&gt;targets.clear();</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            fixedt-&gt;targets.push_back(end);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;          }</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;          {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;            <span class="comment">// Case 4: a nested loop.  Kill.</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;            fixedt-&gt;targets.clear();</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;          }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        }</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      }</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  }</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <span class="comment">// OK, now let&#39;s assume that the path we took through the fixed-path</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="comment">// body is the same as the master path.  We do this by assuming that</span></div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="comment">// each of the shadow-distinguisher variables is equal to its corresponding</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="comment">// master-distinguisher.</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : <a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>)</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  {</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;shadow=shadow_distinguishers[expr];</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      end, <a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="classequal__exprt.html">equal_exprt</a>(expr, shadow)));</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  }</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="comment">// Finally, let&#39;s remove all the skips we introduced and fix the</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="comment">// jump targets.</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>);</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;}</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
+<div class="line"><a name="l00333"></a><span class="lineno"><a class="line" href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">  333</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">sat_path_enumeratort::record_path</a>(<a class="code" href="classscratch__programt.html">scratch_programt</a> &amp;program)</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;{</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#aa428585b56183d45a892fd6749d64169">distinguish_valuest</a> path_val;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : <a class="code" href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">distinguishers</a>)</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    path_val[expr]=program.<a class="code" href="classscratch__programt.html#abceb5f70e5b8174c179bd0f42c9febe7">eval</a>(expr).<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>();</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160; </div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <a class="code" href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">accelerated_paths</a>.push_back(path_val);</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclasssat__path__enumeratort_html_aa428585b56183d45a892fd6749d64169"><div class="ttname"><a href="classsat__path__enumeratort.html#aa428585b56183d45a892fd6749d64169">sat_path_enumeratort::distinguish_valuest</a></div><div class="ttdeci">std::map&lt; exprt, bool &gt; distinguish_valuest</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00072">sat_path_enumerator.h:72</a></div></div>
-<div class="ttc" id="aclassacceleration__utilst_html_a8bac92c3cc86724d5ebf48d38219d2e6"><div class="ttname"><a href="classacceleration__utilst.html#a8bac92c3cc86724d5ebf48d38219d2e6">acceleration_utilst::fresh_symbol</a></div><div class="ttdeci">symbolt fresh_symbol(std::string base, typet type)</div><div class="ttdef"><b>Definition:</b> <a href="acceleration__utils_8cpp_source.html#l01248">acceleration_utils.cpp:1248</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_aee49c79723f8c8bd996851d0dd1ec9d4"><div class="ttname"><a href="classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4">sat_path_enumeratort::find_distinguishing_points</a></div><div class="ttdeci">void find_distinguishing_points()</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00086">sat_path_enumerator.cpp:86</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a7d223c18984226dc1ebfe507f657408c"><div class="ttname"><a href="classsat__path__enumeratort.html#a7d223c18984226dc1ebfe507f657408c">sat_path_enumeratort::symbol_table</a></div><div class="ttdeci">symbol_table_baset &amp; symbol_table</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00062">sat_path_enumerator.h:62</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_aa428585b56183d45a892fd6749d64169"><div class="ttname"><a href="classsat__path__enumeratort.html#aa428585b56183d45a892fd6749d64169">sat_path_enumeratort::distinguish_valuest</a></div><div class="ttdeci">std::map&lt; exprt, bool &gt; distinguish_valuest</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00070">sat_path_enumerator.h:70</a></div></div>
+<div class="ttc" id="aclassacceleration__utilst_html_a8bac92c3cc86724d5ebf48d38219d2e6"><div class="ttname"><a href="classacceleration__utilst.html#a8bac92c3cc86724d5ebf48d38219d2e6">acceleration_utilst::fresh_symbol</a></div><div class="ttdeci">symbolt fresh_symbol(std::string base, typet type)</div><div class="ttdef"><b>Definition:</b> <a href="acceleration__utils_8cpp_source.html#l01246">acceleration_utils.cpp:1246</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_aee49c79723f8c8bd996851d0dd1ec9d4"><div class="ttname"><a href="classsat__path__enumeratort.html#aee49c79723f8c8bd996851d0dd1ec9d4">sat_path_enumeratort::find_distinguishing_points</a></div><div class="ttdeci">void find_distinguishing_points()</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00084">sat_path_enumerator.cpp:84</a></div></div>
 <div class="ttc" id="aremove__skip_8cpp_html_aa6e82b3693efc89611c59d82db650af3"><div class="ttname"><a href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a></div><div class="ttdeci">void remove_skip(goto_programt &amp;goto_program, goto_programt::targett begin, goto_programt::targett end)</div><div class="ttdoc">remove unnecessary skip statements</div><div class="ttdef"><b>Definition:</b> <a href="remove__skip_8cpp_source.html#l00087">remove_skip.cpp:87</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a6c4f5d9f0693ca5fa4859fe293f9a8cb"><div class="ttname"><a href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">sat_path_enumeratort::loop_header</a></div><div class="ttdeci">goto_programt::targett loop_header</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00069">sat_path_enumerator.h:69</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a2d19ab1e24b01874b1371c8272da146b"><div class="ttname"><a href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">goto_programt::update</a></div><div class="ttdeci">void update()</div><div class="ttdoc">Update all indices.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00617">goto_program.cpp:617</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a0c9ee6f82538c7a2f012838f6363f3c6"><div class="ttname"><a href="classgoto__programt.html#a0c9ee6f82538c7a2f012838f6363f3c6">goto_programt::copy_from</a></div><div class="ttdeci">void copy_from(const goto_programt &amp;src)</div><div class="ttdoc">Copy a full goto program, preserving targets.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00699">goto_program.cpp:699</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a6c4f5d9f0693ca5fa4859fe293f9a8cb"><div class="ttname"><a href="classsat__path__enumeratort.html#a6c4f5d9f0693ca5fa4859fe293f9a8cb">sat_path_enumeratort::loop_header</a></div><div class="ttdeci">goto_programt::targett loop_header</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00067">sat_path_enumerator.h:67</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a2d19ab1e24b01874b1371c8272da146b"><div class="ttname"><a href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">goto_programt::update</a></div><div class="ttdeci">void update()</div><div class="ttdoc">Update all indices.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00619">goto_program.cpp:619</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a0c9ee6f82538c7a2f012838f6363f3c6"><div class="ttname"><a href="classgoto__programt.html#a0c9ee6f82538c7a2f012838f6363f3c6">goto_programt::copy_from</a></div><div class="ttdeci">void copy_from(const goto_programt &amp;src)</div><div class="ttdoc">Copy a full goto program, preserving targets.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00701">goto_program.cpp:701</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_ae29aea105d5cfc359c78900df8e3741f"><div class="ttname"><a href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">goto_programt::add</a></div><div class="ttdeci">targett add(instructiont &amp;&amp;instruction)</div><div class="ttdoc">Adds a given instruction at the end.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00717">goto_program.h:717</a></div></div>
 <div class="ttc" id="aclassloop__templatet_html_a0f5f2c2c6eeb495267a74128fbb3b425"><div class="ttname"><a href="classloop__templatet.html#a0f5f2c2c6eeb495267a74128fbb3b425">loop_templatet::end</a></div><div class="ttdeci">const_iterator end() const</div><div class="ttdoc">Iterator over this loop's instructions.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00055">loop_analysis.h:55</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
 <div class="ttc" id="aclasspath__nodet_html"><div class="ttname"><a href="classpath__nodet.html">path_nodet</a></div><div class="ttdef"><b>Definition:</b> <a href="path_8h_source.html#l00022">path.h:22</a></div></div>
 <div class="ttc" id="ascratch__program_8h_html"><div class="ttname"><a href="scratch__program_8h.html">scratch_program.h</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a10a0d6f834f4ffb2aefc7667c5aa946b"><div class="ttname"><a href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">sat_path_enumeratort::guard_manager</a></div><div class="ttdeci">guard_managert &amp; guard_manager</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00075">sat_path_enumerator.h:75</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a10a0d6f834f4ffb2aefc7667c5aa946b"><div class="ttname"><a href="classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b">sat_path_enumeratort::guard_manager</a></div><div class="ttdeci">guard_managert &amp; guard_manager</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00073">sat_path_enumerator.h:73</a></div></div>
 <div class="ttc" id="aclassbool__typet_html"><div class="ttname"><a href="classbool__typet.html">bool_typet</a></div><div class="ttdoc">The Boolean type.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00035">std_types.h:35</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_ab9c71d3111a417eb2cb13ba85d0f24a7"><div class="ttname"><a href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">goto_programt::get_successors</a></div><div class="ttdeci">std::list&lt; Target &gt; get_successors(Target target) const</div><div class="ttdoc">Get control-flow successors of a given instruction.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01125">goto_program.h:1125</a></div></div>
 <div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
 <div class="ttc" id="aclasssymbol__exprt_html"><div class="ttname"><a href="classsymbol__exprt.html">symbol_exprt</a></div><div class="ttdoc">Expression to hold a symbol (variable)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00112">std_expr.h:112</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a58af5ed41b7ddf241526303876faaa3c"><div class="ttname"><a href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">sat_path_enumeratort::next</a></div><div class="ttdeci">bool next(patht &amp;path)</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00025">sat_path_enumerator.cpp:25</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a58af5ed41b7ddf241526303876faaa3c"><div class="ttname"><a href="classsat__path__enumeratort.html#a58af5ed41b7ddf241526303876faaa3c">sat_path_enumeratort::next</a></div><div class="ttdeci">bool next(patht &amp;path)</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00023">sat_path_enumerator.cpp:23</a></div></div>
 <div class="ttc" id="aclassequal__exprt_html"><div class="ttname"><a href="classequal__exprt.html">equal_exprt</a></div><div class="ttdoc">Equality.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01305">std_expr.h:1305</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a726515a927b1fb7c550044370b5825d1"><div class="ttname"><a href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a></div><div class="ttdeci">static instructiont make_assignment(const code_assignt &amp;_code, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdoc">Create an assignment instruction.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01064">goto_program.h:1064</a></div></div>
 <div class="ttc" id="aclassloop__templatet_html_ad4eb426f5f046583a4f5fbbbe47ea95b"><div class="ttname"><a href="classloop__templatet.html#ad4eb426f5f046583a4f5fbbbe47ea95b">loop_templatet::begin</a></div><div class="ttdeci">const_iterator begin() const</div><div class="ttdoc">Iterator over this loop's instructions.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00049">loop_analysis.h:49</a></div></div>
@@ -463,33 +462,31 @@ $(document).ready(function(){initNavTree('sat__path__enumerator_8cpp_source.html
 <div class="ttc" id="aclassscratch__programt_html"><div class="ttname"><a href="classscratch__programt.html">scratch_programt</a></div><div class="ttdef"><b>Definition:</b> <a href="scratch__program_8h_source.html#l00061">scratch_program.h:61</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a979ac997ce319778c0754d196ae66d03"><div class="ttname"><a href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a></div><div class="ttdeci">static instructiont make_skip(const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00890">goto_program.h:890</a></div></div>
 <div class="ttc" id="aclassscratch__programt_html_abceb5f70e5b8174c179bd0f42c9febe7"><div class="ttname"><a href="classscratch__programt.html#abceb5f70e5b8174c179bd0f42c9febe7">scratch_programt::eval</a></div><div class="ttdeci">exprt eval(const exprt &amp;e)</div><div class="ttdef"><b>Definition:</b> <a href="scratch__program_8cpp_source.html#l00089">scratch_program.cpp:89</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a7572d9dac6435a9c4ce3bc1b8eaecaa3"><div class="ttname"><a href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">sat_path_enumeratort::build_path</a></div><div class="ttdeci">void build_path(scratch_programt &amp;scratch_program, patht &amp;path)</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00111">sat_path_enumerator.cpp:111</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a7572d9dac6435a9c4ce3bc1b8eaecaa3"><div class="ttname"><a href="classsat__path__enumeratort.html#a7572d9dac6435a9c4ce3bc1b8eaecaa3">sat_path_enumeratort::build_path</a></div><div class="ttdeci">void build_path(scratch_programt &amp;scratch_program, patht &amp;path)</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00109">sat_path_enumerator.cpp:109</a></div></div>
 <div class="ttc" id="aclassnil__exprt_html"><div class="ttname"><a href="classnil__exprt.html">nil_exprt</a></div><div class="ttdoc">The NIL expression.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03025">std_expr.h:3025</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_adfac1741a4adbb4660f31e5a6558d30a"><div class="ttname"><a href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">sat_path_enumeratort::distinguishers</a></div><div class="ttdeci">std::list&lt; exprt &gt; distinguishers</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00078">sat_path_enumerator.h:78</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_adfac1741a4adbb4660f31e5a6558d30a"><div class="ttname"><a href="classsat__path__enumeratort.html#adfac1741a4adbb4660f31e5a6558d30a">sat_path_enumeratort::distinguishers</a></div><div class="ttdeci">std::list&lt; exprt &gt; distinguishers</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00076">sat_path_enumerator.h:76</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_a9de2ce93a8d7b742d0d057110832c432"><div class="ttname"><a href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbolt::symbol_expr</a></div><div class="ttdeci">class symbol_exprt symbol_expr() const</div><div class="ttdoc">Produces a symbol_exprt for a symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8cpp_source.html#l00121">symbol.cpp:121</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a79d65e56fe3b7db0813a60fa46beade2"><div class="ttname"><a href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">sat_path_enumeratort::accelerated_paths</a></div><div class="ttdeci">std::list&lt; distinguish_valuest &gt; accelerated_paths</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00081">sat_path_enumerator.h:81</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a79d65e56fe3b7db0813a60fa46beade2"><div class="ttname"><a href="classsat__path__enumeratort.html#a79d65e56fe3b7db0813a60fa46beade2">sat_path_enumeratort::accelerated_paths</a></div><div class="ttdeci">std::list&lt; distinguish_valuest &gt; accelerated_paths</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00079">sat_path_enumerator.h:79</a></div></div>
 <div class="ttc" id="aclassirept_html_ad18d7e80452e8f3e26217db334ad5105"><div class="ttname"><a href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">irept::swap</a></div><div class="ttdeci">void swap(irept &amp;irep)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00442">irep.h:442</a></div></div>
 <div class="ttc" id="aclassfalse__exprt_html"><div class="ttname"><a href="classfalse__exprt.html">false_exprt</a></div><div class="ttdoc">The Boolean constant false.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03016">std_expr.h:3016</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_af8135227f1a09328747a4fd4d9dc6dba"><div class="ttname"><a href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">sat_path_enumeratort::fixed</a></div><div class="ttdeci">goto_programt fixed</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00080">sat_path_enumerator.h:80</a></div></div>
-<div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_ad1abff62f54b38d0912ccadb5502bacc"><div class="ttname"><a href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">sat_path_enumeratort::loop</a></div><div class="ttdeci">natural_loops_mutablet::natural_loopt &amp; loop</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00068">sat_path_enumerator.h:68</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_af8135227f1a09328747a4fd4d9dc6dba"><div class="ttname"><a href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">sat_path_enumeratort::fixed</a></div><div class="ttdeci">goto_programt fixed</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00078">sat_path_enumerator.h:78</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_ad1abff62f54b38d0912ccadb5502bacc"><div class="ttname"><a href="classsat__path__enumeratort.html#ad1abff62f54b38d0912ccadb5502bacc">sat_path_enumeratort::loop</a></div><div class="ttdeci">natural_loops_mutablet::natural_loopt &amp; loop</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00066">sat_path_enumerator.h:66</a></div></div>
 <div class="ttc" id="agoto__program_8h_html"><div class="ttname"><a href="goto__program_8h.html">goto_program.h</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a24bb9dff5d2d01662c092d2a0a7bf3f8"><div class="ttname"><a href="classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8">sat_path_enumeratort::message_handler</a></div><div class="ttdeci">message_handlert &amp; message_handler</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00056">sat_path_enumerator.h:56</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a24bb9dff5d2d01662c092d2a0a7bf3f8"><div class="ttname"><a href="classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8">sat_path_enumeratort::message_handler</a></div><div class="ttdeci">message_handlert &amp; message_handler</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00054">sat_path_enumerator.h:54</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00600">goto_program.h:600</a></div></div>
 <div class="ttc" id="asat__path__enumerator_8h_html"><div class="ttname"><a href="sat__path__enumerator_8h.html">sat_path_enumerator.h</a></div></div>
 <div class="ttc" id="apath_8h_html_a9be8a7c61f609081c6d71fb9991ee541"><div class="ttname"><a href="path_8h.html#a9be8a7c61f609081c6d71fb9991ee541">patht</a></div><div class="ttdeci">std::list&lt; path_nodet &gt; patht</div><div class="ttdef"><b>Definition:</b> <a href="path_8h_source.html#l00044">path.h:44</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a8564be3efe583f71d71e11d45fe4ca8d"><div class="ttname"><a href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">sat_path_enumeratort::goto_program</a></div><div class="ttdeci">goto_programt &amp; goto_program</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00067">sat_path_enumerator.h:67</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a8564be3efe583f71d71e11d45fe4ca8d"><div class="ttname"><a href="classsat__path__enumeratort.html#a8564be3efe583f71d71e11d45fe4ca8d">sat_path_enumeratort::goto_program</a></div><div class="ttdeci">goto_programt &amp; goto_program</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00065">sat_path_enumerator.h:65</a></div></div>
 <div class="ttc" id="aclasssymbolt_html"><div class="ttname"><a href="classsymbolt.html">symbolt</a></div><div class="ttdoc">Symbol table entry.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00027">symbol.h:27</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a89ab7f5604c4227bca7dc4f8a0834ccf"><div class="ttname"><a href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">sat_path_enumeratort::record_path</a></div><div class="ttdeci">void record_path(scratch_programt &amp;scratch_program)</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00335">sat_path_enumerator.cpp:335</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a4cb13e26d82d5193b578eaf1a054fd10"><div class="ttname"><a href="classsat__path__enumeratort.html#a4cb13e26d82d5193b578eaf1a054fd10">sat_path_enumeratort::build_fixed</a></div><div class="ttdeci">void build_fixed()</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00189">sat_path_enumerator.cpp:189</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a89ab7f5604c4227bca7dc4f8a0834ccf"><div class="ttname"><a href="classsat__path__enumeratort.html#a89ab7f5604c4227bca7dc4f8a0834ccf">sat_path_enumeratort::record_path</a></div><div class="ttdeci">void record_path(scratch_programt &amp;scratch_program)</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00333">sat_path_enumerator.cpp:333</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a4cb13e26d82d5193b578eaf1a054fd10"><div class="ttname"><a href="classsat__path__enumeratort.html#a4cb13e26d82d5193b578eaf1a054fd10">sat_path_enumeratort::build_fixed</a></div><div class="ttdeci">void build_fixed()</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8cpp_source.html#l00187">sat_path_enumerator.cpp:187</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a99b8eada755daa37331c52e53d2ee0b3"><div class="ttname"><a href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">goto_programt::insert_after</a></div><div class="ttdeci">targett insert_after(const_targett target)</div><div class="ttdoc">Insertion after the instruction pointed-to by the given instruction iterator target.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00686">goto_program.h:686</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a00263b318e5b3c4b70799b4e9a8c00d9"><div class="ttname"><a href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a></div><div class="ttdeci">static instructiont make_assumption(const exprt &amp;g, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00944">goto_program.h:944</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a1f0a34f80ddef52dd04035e2414fe76a"><div class="ttname"><a href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">sat_path_enumeratort::distinguishing_points</a></div><div class="ttdeci">distinguish_mapt distinguishing_points</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00077">sat_path_enumerator.h:77</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a1f0a34f80ddef52dd04035e2414fe76a"><div class="ttname"><a href="classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a">sat_path_enumeratort::distinguishing_points</a></div><div class="ttdeci">distinguish_mapt distinguishing_points</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00075">sat_path_enumerator.h:75</a></div></div>
 <div class="ttc" id="aremove__skip_8h_html"><div class="ttname"><a href="remove__skip_8h.html">remove_skip.h</a></div></div>
-<div class="ttc" id="aclasscode__assignt_html"><div class="ttname"><a href="classcode__assignt.html">code_assignt</a></div><div class="ttdoc">A goto_instruction_codet representing an assignment in the program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__instruction__code_8h_source.html#l00022">goto_instruction_code.h:22</a></div></div>
+<div class="ttc" id="aclasscode__assignt_html"><div class="ttname"><a href="classcode__assignt.html">code_assignt</a></div><div class="ttdoc">A goto_instruction_codet representing an assignment in the program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__instruction__code_8h_source.html#l00021">goto_instruction_code.h:21</a></div></div>
 <div class="ttc" id="aclasstrue__exprt_html"><div class="ttname"><a href="classtrue__exprt.html">true_exprt</a></div><div class="ttdoc">The Boolean constant true.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03007">std_expr.h:3007</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_a12e03e24e39207f854e4e5b003cebb09"><div class="ttname"><a href="classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09">sat_path_enumeratort::utils</a></div><div class="ttdeci">acceleration_utilst utils</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00074">sat_path_enumerator.h:74</a></div></div>
-<div class="ttc" id="aclasssat__path__enumeratort_html_af7fe0b2d7e2c796c1c7ca3708986be42"><div class="ttname"><a href="classsat__path__enumeratort.html#af7fe0b2d7e2c796c1c7ca3708986be42">sat_path_enumeratort::symbol_table</a></div><div class="ttdeci">symbol_tablet &amp; symbol_table</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00064">sat_path_enumerator.h:64</a></div></div>
+<div class="ttc" id="aclasssat__path__enumeratort_html_a12e03e24e39207f854e4e5b003cebb09"><div class="ttname"><a href="classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09">sat_path_enumeratort::utils</a></div><div class="ttdeci">acceleration_utilst utils</div><div class="ttdef"><b>Definition:</b> <a href="sat__path__enumerator_8h_source.html#l00072">sat_path_enumerator.h:72</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00594">goto_program.h:594</a></div></div>
 <div class="ttc" id="aclassloop__templatet_html_a9b55ec5740df6a5f17ddcf18636919bf"><div class="ttname"><a href="classloop__templatet.html#a9b55ec5740df6a5f17ddcf18636919bf">loop_templatet::contains</a></div><div class="ttdeci">virtual bool contains(const T instruction) const</div><div class="ttdoc">Returns true if instruction is in this loop.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00040">loop_analysis.h:40</a></div></div>
 <div class="ttc" id="aclassnot__exprt_html"><div class="ttname"><a href="classnot__exprt.html">not_exprt</a></div><div class="ttdoc">Boolean negation.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02277">std_expr.h:2277</a></div></div>

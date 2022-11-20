@@ -103,258 +103,259 @@ $(document).ready(function(){initNavTree('write__stack_8cpp_source.html',''); in
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="write__stack_8h.html">write_stack.h</a>&quot;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;unordered_set&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="arith__tools_8h.html">util/arith_tools.h</a>&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="c__types_8h.html">util/c_types.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__expr_8h.html">util/std_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="abstract__environment_8h.html">abstract_environment.h</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">   25</a></span>&#160;<a class="code" href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">write_stackt::write_stackt</a>() : stack(), top_stack(true)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;}</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#aed32a451d8be6f5b5a5a99895fc233bb">   33</a></span>&#160;<a class="code" href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">write_stackt::write_stackt</a>(</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array)</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">// We are assigning an array to a pointer, which is equivalent to assigning</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="comment">// the first element of that array</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">// &amp;(expr)[0]</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">construct_stack_to_pointer</a>(</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(<a class="code" href="classindex__exprt.html">index_exprt</a>(expr, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#a8dba1751309bc0448242ac61ed208cc2">signed_size_type</a>()))),</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      environment,</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      ns);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">construct_stack_to_pointer</a>(expr, environment, ns);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">   59</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">write_stackt::construct_stack_to_pointer</a>(</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_address_of)</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="comment">// resovle reminder, can either be a symbol, member or index of</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="comment">// otherwise unsupported</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">construct_stack_to_lvalue</a>(</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<span class="keywordtype">object</span>(), environment, ns);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_plus || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_minus)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="code" href="classexprt.html">exprt</a> base;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="classexprt.html">exprt</a> offset;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">const</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e">integral_resultt</a> &amp;which_side =</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <a class="code" href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">get_which_side_integral</a>(expr, base, offset);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      which_side != <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa">integral_resultt::NEITHER_INTEGRAL</a>,</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="stringliteral">&quot;An offset must be an integral amount&quot;</span>);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_minus)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      <span class="comment">// can&#39;t get a valid pointer by subtracting from a constant number</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="keywordflow">if</span>(which_side == <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75">integral_resultt::LHS_INTEGRAL</a>)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      offset = <a class="code" href="classunary__minus__exprt.html">unary_minus_exprt</a>(offset);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    }</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <a class="code" href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a> offset_value = environment.<a class="code" href="classabstract__environmentt.html#a3c4b664a18851d677794e9c8a578b402">eval</a>(offset, ns);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      std::make_shared&lt;offset_entryt&gt;(offset_value), environment, ns);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">// Build the pointer part</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">construct_stack_to_pointer</a>(base, environment, ns);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a>)</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="comment">// check the symbol at the bottom of the stack</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> access = <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.front()-&gt;get_access_expr();</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        !access.second &amp;&amp; access.first.id() == ID_symbol,</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="stringliteral">&quot;The base should be an addressable location (i.e. symbol)&quot;</span>);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      <span class="keywordflow">if</span>(access.first.type().id() != ID_array)</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      }</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    }</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  }</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="comment">// unknown expression type - play it safe and set to top</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;}</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">  128</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">write_stackt::construct_stack_to_lvalue</a>(</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;{</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a>)</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_member)</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(std::make_shared&lt;simple_entryt&gt;(expr), environment, ns);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">construct_stack_to_lvalue</a>(</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr).struct_op(), environment, ns);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    }</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_symbol || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_dynamic_object)</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(std::make_shared&lt;simple_entryt&gt;(expr), environment, ns);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_index)</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    {</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;      <a class="code" href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">construct_stack_to_array_index</a>(<a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr), environment, ns);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    }</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  }</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00160"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">  160</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">write_stackt::construct_stack_to_array_index</a>(</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> &amp;index_expr,</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;{</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <a class="code" href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a> offset_value =</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    environment.<a class="code" href="classabstract__environmentt.html#a3c4b664a18851d677794e9c8a578b402">eval</a>(index_expr.<a class="code" href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index</a>(), ns);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(std::make_shared&lt;offset_entryt&gt;(offset_value), environment, ns);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">construct_stack_to_lvalue</a>(index_expr.<a class="code" href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">array</a>(), environment, ns);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;}</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a5be5e633f8ce93601f5a639c67a0b65a">  175</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classwrite__stackt.html#a5be5e633f8ce93601f5a639c67a0b65a">write_stackt::to_expression</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="comment">// A top stack is useless and its expression should not be evaluated</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">is_top_value</a>());</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.empty());</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <a class="code" href="classexprt.html">exprt</a> access_expr = <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.front()-&gt;get_access_expr().first;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = std::next(<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.begin()); it != <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.end(); ++it)</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  {</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> access = (*it)-&gt;get_access_expr();</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">if</span>(access.second)</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      access_expr = <a class="code" href="classindex__exprt.html">index_exprt</a>{access_expr, access.first};</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      access_expr = access.first;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  }</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a> top_expr(access_expr);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordflow">return</span> std::move(top_expr);</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">  193</a></span>&#160;<span class="keywordtype">size_t</span> <a class="code" href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">write_stackt::depth</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.size();</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;}</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b">  198</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b">write_stackt::target_expression</a>(<span class="keywordtype">size_t</span> depth)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">is_top_value</a>());</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>[<a class="code" href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">depth</a>]-&gt;get_access_expr().first;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;}</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127">  204</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127">write_stackt::offset_expression</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">is_top_value</a>());</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> access = <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.back()-&gt;get_access_expr();</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="keywordflow">if</span>(access.second)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">return</span> access.first;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="keywordflow">if</span>(access.first.id() == ID_member || access.first.id() == ID_symbol)</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordflow">return</span> access.first;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <span class="keywordflow">if</span>(access.first.id() == ID_index)</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(access.first).<a class="code" href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index</a>();</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#a4bcf204fbdedb8363a96e5bea5750e22">unsigned_long_int_type</a>());</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;}</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">  224</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">write_stackt::is_top_value</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a>;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;}</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">  234</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">write_stackt::add_to_stack</a>(</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  std::shared_ptr&lt;write_stack_entryt&gt; entry_pointer,</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> environment,</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;{</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.empty() ||</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    !<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.front()-&gt;try_squash_in(entry_pointer, environment, ns))</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.insert(<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.begin(), entry_pointer);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00254"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">  254</a></span>&#160;<a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e">write_stackt::integral_resultt</a> <a class="code" href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">write_stackt::get_which_side_integral</a>(</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;out_base_expr,</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;out_integral_expr)</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;{</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size() == 2);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> binary_e = <a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(expr);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> std::unordered_set&lt;irep_idt, irep_id_hash&gt; integral_types = {</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    ID_signedbv, ID_unsignedbv, ID_integer};</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="keywordflow">if</span>(integral_types.find(binary_e.lhs().type().id()) != integral_types.cend())</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  {</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    out_integral_expr = binary_e.lhs();</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    out_base_expr = binary_e.rhs();</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75">integral_resultt::LHS_INTEGRAL</a>;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  }</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    integral_types.find(binary_e.rhs().type().id()) != integral_types.cend())</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  {</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    out_integral_expr = binary_e.rhs();</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    out_base_expr = binary_e.lhs();</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea336b77c59a41b84e0de049c773402fee">integral_resultt::RHS_INTEGRAL</a>;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  {</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    out_integral_expr.<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    out_base_expr.<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa">integral_resultt::NEITHER_INTEGRAL</a>;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  }</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;}</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="arith__tools_8h.html">util/arith_tools.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="c__types_8h.html">util/c_types.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__expr_8h.html">util/std_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="abstract__environment_8h.html">abstract_environment.h</a>&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="write__stack__entry_8h.html">write_stack_entry.h</a>&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;unordered_set&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">   26</a></span>&#160;<a class="code" href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">write_stackt::write_stackt</a>() : stack(), top_stack(true)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#aed32a451d8be6f5b5a5a99895fc233bb">   34</a></span>&#160;<a class="code" href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">write_stackt::write_stackt</a>(</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array)</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="comment">// We are assigning an array to a pointer, which is equivalent to assigning</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">// the first element of that array</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// &amp;(expr)[0]</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">construct_stack_to_pointer</a>(</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(<a class="code" href="classindex__exprt.html">index_exprt</a>(expr, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#a8dba1751309bc0448242ac61ed208cc2">signed_size_type</a>()))),</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      environment,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      ns);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">construct_stack_to_pointer</a>(expr, environment, ns);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;}</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">   60</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">write_stackt::construct_stack_to_pointer</a>(</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;{</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_address_of)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="comment">// resovle reminder, can either be a symbol, member or index of</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="comment">// otherwise unsupported</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">construct_stack_to_lvalue</a>(</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<span class="keywordtype">object</span>(), environment, ns);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_plus || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_minus)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="classexprt.html">exprt</a> base;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <a class="code" href="classexprt.html">exprt</a> offset;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keyword">const</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e">integral_resultt</a> &amp;which_side =</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <a class="code" href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">get_which_side_integral</a>(expr, base, offset);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      which_side != <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa">integral_resultt::NEITHER_INTEGRAL</a>,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="stringliteral">&quot;An offset must be an integral amount&quot;</span>);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_minus)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="comment">// can&#39;t get a valid pointer by subtracting from a constant number</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keywordflow">if</span>(which_side == <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75">integral_resultt::LHS_INTEGRAL</a>)</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      }</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      offset = <a class="code" href="classunary__minus__exprt.html">unary_minus_exprt</a>(offset);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a> offset_value = environment.<a class="code" href="classabstract__environmentt.html#a3c4b664a18851d677794e9c8a578b402">eval</a>(offset, ns);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      std::make_shared&lt;offset_entryt&gt;(offset_value), environment, ns);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">// Build the pointer part</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <a class="code" href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">construct_stack_to_pointer</a>(base, environment, ns);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a>)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    {</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="comment">// check the symbol at the bottom of the stack</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> access = <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.front()-&gt;get_access_expr();</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        !access.second &amp;&amp; access.first.id() == ID_symbol,</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="stringliteral">&quot;The base should be an addressable location (i.e. symbol)&quot;</span>);</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <span class="keywordflow">if</span>(access.first.type().id() != ID_array)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  }</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">// unknown expression type - play it safe and set to top</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  }</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">  129</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">write_stackt::construct_stack_to_lvalue</a>(</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;{</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a>)</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  {</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_member)</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(std::make_shared&lt;simple_entryt&gt;(expr), environment, ns);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">construct_stack_to_lvalue</a>(</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr).struct_op(), environment, ns);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    }</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_symbol || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_dynamic_object)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(std::make_shared&lt;simple_entryt&gt;(expr), environment, ns);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_index)</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    {</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      <a class="code" href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">construct_stack_to_array_index</a>(<a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr), environment, ns);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    {</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    }</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  }</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;}</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">  161</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">write_stackt::construct_stack_to_array_index</a>(</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> &amp;index_expr,</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> &amp;environment,</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;{</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <a class="code" href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a> offset_value =</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    environment.<a class="code" href="classabstract__environmentt.html#a3c4b664a18851d677794e9c8a578b402">eval</a>(index_expr.<a class="code" href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index</a>(), ns);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">add_to_stack</a>(std::make_shared&lt;offset_entryt&gt;(offset_value), environment, ns);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <a class="code" href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">construct_stack_to_lvalue</a>(index_expr.<a class="code" href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">array</a>(), environment, ns);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;}</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a5be5e633f8ce93601f5a639c67a0b65a">  176</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classwrite__stackt.html#a5be5e633f8ce93601f5a639c67a0b65a">write_stackt::to_expression</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <span class="comment">// A top stack is useless and its expression should not be evaluated</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">is_top_value</a>());</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.empty());</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <a class="code" href="classexprt.html">exprt</a> access_expr = <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.front()-&gt;get_access_expr().first;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = std::next(<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.begin()); it != <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.end(); ++it)</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  {</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> access = (*it)-&gt;get_access_expr();</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">if</span>(access.second)</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      access_expr = <a class="code" href="classindex__exprt.html">index_exprt</a>{access_expr, access.first};</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      access_expr = access.first;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  }</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a> top_expr(access_expr);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keywordflow">return</span> std::move(top_expr);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;}</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">  194</a></span>&#160;<span class="keywordtype">size_t</span> <a class="code" href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">write_stackt::depth</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.size();</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b">  199</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b">write_stackt::target_expression</a>(<span class="keywordtype">size_t</span> depth)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">is_top_value</a>());</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>[<a class="code" href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">depth</a>]-&gt;get_access_expr().first;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;}</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
+<div class="line"><a name="l00205"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127">  205</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127">write_stackt::offset_expression</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">is_top_value</a>());</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> access = <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.back()-&gt;get_access_expr();</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordflow">if</span>(access.second)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">return</span> access.first;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">if</span>(access.first.id() == ID_member || access.first.id() == ID_symbol)</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">return</span> access.first;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keywordflow">if</span>(access.first.id() == ID_index)</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(access.first).<a class="code" href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index</a>();</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#a4bcf204fbdedb8363a96e5bea5750e22">unsigned_long_int_type</a>());</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">  225</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">write_stackt::is_top_value</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">top_stack</a>;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;}</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">  235</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">write_stackt::add_to_stack</a>(</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  std::shared_ptr&lt;write_stack_entryt&gt; entry_pointer,</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keyword">const</span> <a class="code" href="classabstract__environmentt.html">abstract_environmentt</a> environment,</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;{</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.empty() ||</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    !<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.front()-&gt;try_squash_in(entry_pointer, environment, ns))</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  {</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.insert(<a class="code" href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">stack</a>.begin(), entry_pointer);</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;}</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno"><a class="line" href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">  255</a></span>&#160;<a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e">write_stackt::integral_resultt</a> <a class="code" href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">write_stackt::get_which_side_integral</a>(</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;out_base_expr,</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;out_integral_expr)</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;{</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size() == 2);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> binary_e = <a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(expr);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> std::unordered_set&lt;irep_idt, irep_id_hash&gt; integral_types = {</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    ID_signedbv, ID_unsignedbv, ID_integer};</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <span class="keywordflow">if</span>(integral_types.find(binary_e.lhs().type().id()) != integral_types.cend())</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  {</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    out_integral_expr = binary_e.lhs();</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    out_base_expr = binary_e.rhs();</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75">integral_resultt::LHS_INTEGRAL</a>;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  }</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    integral_types.find(binary_e.rhs().type().id()) != integral_types.cend())</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  {</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    out_integral_expr = binary_e.rhs();</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    out_base_expr = binary_e.lhs();</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea336b77c59a41b84e0de049c773402fee">integral_resultt::RHS_INTEGRAL</a>;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  }</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  {</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    out_integral_expr.<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    out_base_expr.<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa">integral_resultt::NEITHER_INTEGRAL</a>;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  }</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclasswrite__stackt_html_a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75"><div class="ttname"><a href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75">write_stackt::integral_resultt::LHS_INTEGRAL</a></div><div class="ttdeci">@ LHS_INTEGRAL</div></div>
 <div class="ttc" id="awrite__stack_8h_html"><div class="ttname"><a href="write__stack_8h.html">write_stack.h</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a55051d3ccc58bebd139a42200b33fc67"><div class="ttname"><a href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">write_stackt::is_top_value</a></div><div class="ttdeci">bool is_top_value() const</div><div class="ttdoc">Is the stack representing an unknown value and hence can't be written to or read from.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00224">write_stack.cpp:224</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a55051d3ccc58bebd139a42200b33fc67"><div class="ttname"><a href="classwrite__stackt.html#a55051d3ccc58bebd139a42200b33fc67">write_stackt::is_top_value</a></div><div class="ttdeci">bool is_top_value() const</div><div class="ttdoc">Is the stack representing an unknown value and hence can't be written to or read from.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00225">write_stack.cpp:225</a></div></div>
 <div class="ttc" id="aabstract__object_8h_html_ace6b57280e6bcbef1506199e2cb87617"><div class="ttname"><a href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a></div><div class="ttdeci">sharing_ptrt&lt; class abstract_objectt &gt; abstract_object_pointert</div><div class="ttdef"><b>Definition:</b> <a href="abstract__object_8h_source.html#l00069">abstract_object.h:69</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a841cb1b99a609550f849eab40ff34bb9"><div class="ttname"><a href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">write_stackt::depth</a></div><div class="ttdeci">size_t depth() const</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00193">write_stack.cpp:193</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a841cb1b99a609550f849eab40ff34bb9"><div class="ttname"><a href="classwrite__stackt.html#a841cb1b99a609550f849eab40ff34bb9">write_stackt::depth</a></div><div class="ttdeci">size_t depth() const</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00194">write_stack.cpp:194</a></div></div>
 <div class="ttc" id="aclassirept_html_aa8e14ca1bd9cdf71694f56172988e78a"><div class="ttname"><a href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">irept::make_nil</a></div><div class="ttdeci">void make_nil()</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00454">irep.h:454</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_af3504ad7009663c1eef67bafedf71206"><div class="ttname"><a href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a></div><div class="ttdeci">const index_exprt &amp; to_index_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an index_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01478">std_expr.h:1478</a></div></div>
 <div class="ttc" id="aclasswrite__stackt_html_a15735f8514fa6c4b5859200e7336b48ea336b77c59a41b84e0de049c773402fee"><div class="ttname"><a href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea336b77c59a41b84e0de049c773402fee">write_stackt::integral_resultt::RHS_INTEGRAL</a></div><div class="ttdeci">@ RHS_INTEGRAL</div></div>
-<div class="ttc" id="aclassabstract__environmentt_html"><div class="ttname"><a href="classabstract__environmentt.html">abstract_environmentt</a></div><div class="ttdef"><b>Definition:</b> <a href="abstract__environment_8h_source.html#l00040">abstract_environment.h:40</a></div></div>
+<div class="ttc" id="aclassabstract__environmentt_html"><div class="ttname"><a href="classabstract__environmentt.html">abstract_environmentt</a></div><div class="ttdef"><b>Definition:</b> <a href="abstract__environment_8h_source.html#l00038">abstract_environment.h:38</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a8fde3eed9e33fa5845c048d8c613d9bd"><div class="ttname"><a href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a></div><div class="ttdeci">const binary_exprt &amp; to_binary_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a binary_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00660">std_expr.h:660</a></div></div>
 <div class="ttc" id="ac__types_8cpp_html_a4bcf204fbdedb8363a96e5bea5750e22"><div class="ttname"><a href="c__types_8cpp.html#a4bcf204fbdedb8363a96e5bea5750e22">unsigned_long_int_type</a></div><div class="ttdeci">unsignedbv_typet unsigned_long_int_type()</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00091">c_types.cpp:91</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:90</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a0c2dfb9c1970787ab167c415a1df5cc5"><div class="ttname"><a href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">write_stackt::top_stack</a></div><div class="ttdeci">bool top_stack</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8h_source.html#l00072">write_stack.h:72</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a13df98fa03b2e27e3d21527859cb406b"><div class="ttname"><a href="classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b">write_stackt::target_expression</a></div><div class="ttdeci">exprt target_expression(size_t depth) const</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00198">write_stack.cpp:198</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a29d6b18206d65ad4c1614910590a6768"><div class="ttname"><a href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">write_stackt::construct_stack_to_lvalue</a></div><div class="ttdeci">void construct_stack_to_lvalue(const exprt &amp;expr, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdoc">Construct a stack up to a specific l-value (i.e.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00128">write_stack.cpp:128</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a0c2dfb9c1970787ab167c415a1df5cc5"><div class="ttname"><a href="classwrite__stackt.html#a0c2dfb9c1970787ab167c415a1df5cc5">write_stackt::top_stack</a></div><div class="ttdeci">bool top_stack</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8h_source.html#l00079">write_stack.h:79</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a13df98fa03b2e27e3d21527859cb406b"><div class="ttname"><a href="classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b">write_stackt::target_expression</a></div><div class="ttdeci">exprt target_expression(size_t depth) const</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00199">write_stack.cpp:199</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a29d6b18206d65ad4c1614910590a6768"><div class="ttname"><a href="classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768">write_stackt::construct_stack_to_lvalue</a></div><div class="ttdeci">void construct_stack_to_lvalue(const exprt &amp;expr, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdoc">Construct a stack up to a specific l-value (i.e.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00129">write_stack.cpp:129</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html"><div class="ttname"><a href="pointer__expr_8h.html">pointer_expr.h</a></div></div>
 <div class="ttc" id="aabstract__environment_8h_html"><div class="ttname"><a href="abstract__environment_8h.html">abstract_environment.h</a></div></div>
@@ -362,12 +363,12 @@ $(document).ready(function(){initNavTree('write__stack_8cpp_source.html',''); in
 <div class="ttc" id="aclassindex__exprt_html_afe2bc466e7b5865c7c2dd84761922b7f"><div class="ttname"><a href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index_exprt::index</a></div><div class="ttdeci">exprt &amp; index()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01450">std_expr.h:1450</a></div></div>
 <div class="ttc" id="aclassunary__minus__exprt_html"><div class="ttname"><a href="classunary__minus__exprt.html">unary_minus_exprt</a></div><div class="ttdoc">The unary minus expression.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00422">std_expr.h:422</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html_a677da95c5fed7e6548bcc311c3685a49"><div class="ttname"><a href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">index_exprt::array</a></div><div class="ttdeci">exprt &amp; array()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01440">std_expr.h:1440</a></div></div>
-<div class="ttc" id="aclassabstract__environmentt_html_a3c4b664a18851d677794e9c8a578b402"><div class="ttname"><a href="classabstract__environmentt.html#a3c4b664a18851d677794e9c8a578b402">abstract_environmentt::eval</a></div><div class="ttdeci">virtual abstract_object_pointert eval(const exprt &amp;expr, const namespacet &amp;ns) const</div><div class="ttdoc">These three are really the heart of the method.</div><div class="ttdef"><b>Definition:</b> <a href="abstract__environment_8cpp_source.html#l00094">abstract_environment.cpp:94</a></div></div>
+<div class="ttc" id="aclassabstract__environmentt_html_a3c4b664a18851d677794e9c8a578b402"><div class="ttname"><a href="classabstract__environmentt.html#a3c4b664a18851d677794e9c8a578b402">abstract_environmentt::eval</a></div><div class="ttdeci">virtual abstract_object_pointert eval(const exprt &amp;expr, const namespacet &amp;ns) const</div><div class="ttdoc">These three are really the heart of the method.</div><div class="ttdef"><b>Definition:</b> <a href="abstract__environment_8cpp_source.html#l00097">abstract_environment.cpp:97</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a5db1b9174d631091ea74c9799937b471"><div class="ttname"><a href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">write_stackt::construct_stack_to_pointer</a></div><div class="ttdeci">void construct_stack_to_pointer(const exprt &amp;expr, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdoc">Add to the stack the elements to get to a pointer.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00059">write_stack.cpp:59</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a149f0ef591582273ba4d18d00f512127"><div class="ttname"><a href="classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127">write_stackt::offset_expression</a></div><div class="ttdeci">exprt offset_expression() const</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00204">write_stack.cpp:204</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a1ad1b670168ea98c8c60ee0092686573"><div class="ttname"><a href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">write_stackt::get_which_side_integral</a></div><div class="ttdeci">static integral_resultt get_which_side_integral(const exprt &amp;expr, exprt &amp;out_base_expr, exprt &amp;out_integral_expr)</div><div class="ttdoc">Utility function to find out which side of a binary operation has an integral type,...</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00254">write_stack.cpp:254</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a0febbd1eaec2bb911e310610ae17fcec"><div class="ttname"><a href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">write_stackt::construct_stack_to_array_index</a></div><div class="ttdeci">void construct_stack_to_array_index(const index_exprt &amp;expr, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdoc">Construct a stack for an array position l-value.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00160">write_stack.cpp:160</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a5db1b9174d631091ea74c9799937b471"><div class="ttname"><a href="classwrite__stackt.html#a5db1b9174d631091ea74c9799937b471">write_stackt::construct_stack_to_pointer</a></div><div class="ttdeci">void construct_stack_to_pointer(const exprt &amp;expr, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdoc">Add to the stack the elements to get to a pointer.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00060">write_stack.cpp:60</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a149f0ef591582273ba4d18d00f512127"><div class="ttname"><a href="classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127">write_stackt::offset_expression</a></div><div class="ttdeci">exprt offset_expression() const</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00205">write_stack.cpp:205</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a1ad1b670168ea98c8c60ee0092686573"><div class="ttname"><a href="classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573">write_stackt::get_which_side_integral</a></div><div class="ttdeci">static integral_resultt get_which_side_integral(const exprt &amp;expr, exprt &amp;out_base_expr, exprt &amp;out_integral_expr)</div><div class="ttdoc">Utility function to find out which side of a binary operation has an integral type,...</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00255">write_stack.cpp:255</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a0febbd1eaec2bb911e310610ae17fcec"><div class="ttname"><a href="classwrite__stackt.html#a0febbd1eaec2bb911e310610ae17fcec">write_stackt::construct_stack_to_array_index</a></div><div class="ttdeci">void construct_stack_to_array_index(const index_exprt &amp;expr, const abstract_environmentt &amp;environment, const namespacet &amp;ns)</div><div class="ttdoc">Construct a stack for an array position l-value.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00161">write_stack.cpp:161</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_ab4e213ed656e2c729a3e85fa99f08fd4"><div class="ttname"><a href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a></div><div class="ttdeci">const member_exprt &amp; to_member_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a member_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02886">std_expr.h:2886</a></div></div>
 <div class="ttc" id="aclasswrite__stackt_html_a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa"><div class="ttname"><a href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa">write_stackt::integral_resultt::NEITHER_INTEGRAL</a></div><div class="ttdeci">@ NEITHER_INTEGRAL</div></div>
@@ -375,14 +376,15 @@ $(document).ready(function(){initNavTree('write__stack_8cpp_source.html',''); in
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html"><div class="ttname"><a href="classindex__exprt.html">index_exprt</a></div><div class="ttdoc">Array index operator.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01409">std_expr.h:1409</a></div></div>
 <div class="ttc" id="aclassaddress__of__exprt_html"><div class="ttname"><a href="classaddress__of__exprt.html">address_of_exprt</a></div><div class="ttdoc">Operator to return the address of an object.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00422">pointer_expr.h:422</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a15735f8514fa6c4b5859200e7336b48e"><div class="ttname"><a href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e">write_stackt::integral_resultt</a></div><div class="ttdeci">integral_resultt</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8h_source.html#l00059">write_stack.h:59</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a38beb265d17690f5fb58e9f7882f41d6"><div class="ttname"><a href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">write_stackt::write_stackt</a></div><div class="ttdeci">write_stackt()</div><div class="ttdoc">Build a topstack.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00025">write_stack.cpp:25</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_ad7c0fec2bcf1a0bc0fdaff92679f7296"><div class="ttname"><a href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">write_stackt::add_to_stack</a></div><div class="ttdeci">void add_to_stack(std::shared_ptr&lt; write_stack_entryt &gt; entry_pointer, const abstract_environmentt environment, const namespacet &amp;ns)</div><div class="ttdoc">Add an element to the top of the stack.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00234">write_stack.cpp:234</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_a5be5e633f8ce93601f5a639c67a0b65a"><div class="ttname"><a href="classwrite__stackt.html#a5be5e633f8ce93601f5a639c67a0b65a">write_stackt::to_expression</a></div><div class="ttdeci">exprt to_expression() const</div><div class="ttdoc">Convert the stack to an expression that can be used to write to.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00175">write_stack.cpp:175</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a15735f8514fa6c4b5859200e7336b48e"><div class="ttname"><a href="classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e">write_stackt::integral_resultt</a></div><div class="ttdeci">integral_resultt</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8h_source.html#l00066">write_stack.h:66</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a38beb265d17690f5fb58e9f7882f41d6"><div class="ttname"><a href="classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6">write_stackt::write_stackt</a></div><div class="ttdeci">write_stackt()</div><div class="ttdoc">Build a topstack.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00026">write_stack.cpp:26</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_ad7c0fec2bcf1a0bc0fdaff92679f7296"><div class="ttname"><a href="classwrite__stackt.html#ad7c0fec2bcf1a0bc0fdaff92679f7296">write_stackt::add_to_stack</a></div><div class="ttdeci">void add_to_stack(std::shared_ptr&lt; write_stack_entryt &gt; entry_pointer, const abstract_environmentt environment, const namespacet &amp;ns)</div><div class="ttdoc">Add an element to the top of the stack.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00235">write_stack.cpp:235</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_a5be5e633f8ce93601f5a639c67a0b65a"><div class="ttname"><a href="classwrite__stackt.html#a5be5e633f8ce93601f5a639c67a0b65a">write_stackt::to_expression</a></div><div class="ttdeci">exprt to_expression() const</div><div class="ttdoc">Convert the stack to an expression that can be used to write to.</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8cpp_source.html#l00176">write_stack.cpp:176</a></div></div>
 <div class="ttc" id="astd__expr_8h_html"><div class="ttname"><a href="std__expr_8h.html">std_expr.h</a></div></div>
-<div class="ttc" id="aclasswrite__stackt_html_aceebf0165ecd633a2c75f7aaef2e1d06"><div class="ttname"><a href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">write_stackt::stack</a></div><div class="ttdeci">continuation_stack_storet stack</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8h_source.html#l00071">write_stack.h:71</a></div></div>
+<div class="ttc" id="aclasswrite__stackt_html_aceebf0165ecd633a2c75f7aaef2e1d06"><div class="ttname"><a href="classwrite__stackt.html#aceebf0165ecd633a2c75f7aaef2e1d06">write_stackt::stack</a></div><div class="ttdeci">continuation_stack_storet stack</div><div class="ttdef"><b>Definition:</b> <a href="write__stack_8h_source.html#l00078">write_stack.h:78</a></div></div>
 <div class="ttc" id="ac__types_8h_html"><div class="ttname"><a href="c__types_8h.html">c_types.h</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
+<div class="ttc" id="awrite__stack__entry_8h_html"><div class="ttname"><a href="write__stack__entry_8h.html">write_stack_entry.h</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

@@ -1,35 +1,27 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_minisat.cpp" name="/home/runner/work/cbmc/cbmc/src/solvers/sat/satcheck_minisat.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1000,5,1184,61"/>
-<area shape="rect" id="node2" href="$satcheck__minisat_8h.html" title=" " alt="" coords="81,184,229,211"/>
-<area shape="rect" id="node12" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="305,632,397,659"/>
-<area shape="rect" id="node18" href="$threeval_8h.html" title=" " alt="" coords="201,408,314,435"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1129,109,1215,136"/>
-<area shape="rect" id="node23" title=" " alt="" coords="1239,109,1297,136"/>
-<area shape="rect" id="node24" href="$solver_8h.html" title=" " alt="" coords="884,109,959,136"/>
-<area shape="rect" id="node33" title=" " alt="" coords="1321,109,1388,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="50,632,113,659"/>
-<area shape="rect" id="node4" href="$cnf_8h.html" title=" " alt="" coords="211,259,264,285"/>
-<area shape="rect" id="node21" href="$resolution__proof_8h.html" title=" " alt="" coords="43,333,181,360"/>
-<area shape="rect" id="node5" href="$prop_8h.html" title=" " alt="" coords="205,333,352,360"/>
-<area shape="rect" id="node6" href="$src_2util_2message_8h.html" title=" " alt="" coords="338,408,457,435"/>
-<area shape="rect" id="node19" href="$literal_8h.html" title=" " alt="" coords="104,408,176,435"/>
-<area shape="rect" id="node7" title=" " alt="" coords="486,483,573,509"/>
-<area shape="rect" id="node8" title=" " alt="" coords="195,483,259,509"/>
-<area shape="rect" id="node9" title=" " alt="" coords="165,707,240,733"/>
-<area shape="rect" id="node10" title=" " alt="" coords="557,707,616,733"/>
-<area shape="rect" id="node11" href="$deprecate_8h.html" title=" " alt="" coords="435,557,533,584"/>
-<area shape="rect" id="node15" href="$source__location_8h.html" title=" " alt="" coords="597,483,733,509"/>
-<area shape="rect" id="node13" title=" " alt="" coords="394,707,459,733"/>
-<area shape="rect" id="node14" title=" " alt="" coords="278,707,370,733"/>
-<area shape="rect" id="node16" href="$irep_8h.html" title=" " alt="" coords="557,557,616,584"/>
-<area shape="rect" id="node17" href="$optional_8h.html" title=" " alt="" coords="641,557,727,584"/>
-<area shape="rect" id="node20" href="$narrow_8h.html" title=" " alt="" coords="230,557,309,584"/>
-<area shape="rect" id="node25" href="$expr_8h.html" title=" " alt="" coords="782,184,869,211"/>
-<area shape="rect" id="node26" href="$as__const_8h.html" title=" " alt="" coords="780,259,871,285"/>
-<area shape="rect" id="node27" href="$type_8h.html" title=" " alt="" coords="895,259,958,285"/>
-<area shape="rect" id="node30" href="$validation__mode_8h.html" title=" " alt="" coords="911,408,1054,435"/>
-<area shape="rect" id="node31" href="$validate__types_8h.html" title=" " alt="" coords="532,333,663,360"/>
-<area shape="rect" id="node32" href="$validate__expressions_8h.html" title=" " alt="" coords="533,259,705,285"/>
-<area shape="rect" id="node28" href="$validate_8h.html" title=" " alt="" coords="826,333,913,360"/>
-<area shape="rect" id="node29" href="$exception__utils_8h.html" title=" " alt="" coords="703,408,836,435"/>
+<area shape="rect" id="node1" title=" " alt="" coords="489,5,673,61"/>
+<area shape="rect" id="node2" href="$satcheck__minisat_8h.html" title=" " alt="" coords="257,109,405,136"/>
+<area shape="rect" id="node12" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="457,557,549,584"/>
+<area shape="rect" id="node18" href="$threeval_8h.html" title=" " alt="" coords="334,333,447,360"/>
+<area shape="rect" id="node22" title=" " alt="" coords="539,109,624,136"/>
+<area shape="rect" id="node23" title=" " alt="" coords="649,109,706,136"/>
+<area shape="rect" id="node24" href="$solver_8h.html" title=" " alt="" coords="5,184,80,211"/>
+<area shape="rect" id="node25" title=" " alt="" coords="869,109,936,136"/>
+<area shape="rect" id="node3" title=" " alt="" coords="137,557,199,584"/>
+<area shape="rect" id="node4" href="$cnf_8h.html" title=" " alt="" coords="335,184,388,211"/>
+<area shape="rect" id="node21" href="$resolution__proof_8h.html" title=" " alt="" coords="155,259,293,285"/>
+<area shape="rect" id="node5" href="$prop_8h.html" title=" " alt="" coords="317,259,464,285"/>
+<area shape="rect" id="node6" href="$src_2util_2message_8h.html" title=" " alt="" coords="491,333,610,360"/>
+<area shape="rect" id="node19" href="$literal_8h.html" title=" " alt="" coords="233,333,305,360"/>
+<area shape="rect" id="node7" title=" " alt="" coords="446,408,533,435"/>
+<area shape="rect" id="node8" title=" " alt="" coords="307,408,371,435"/>
+<area shape="rect" id="node9" title=" " alt="" coords="391,632,465,659"/>
+<area shape="rect" id="node10" title=" " alt="" coords="784,632,843,659"/>
+<area shape="rect" id="node11" href="$deprecate_8h.html" title=" " alt="" coords="501,483,600,509"/>
+<area shape="rect" id="node15" href="$source__location_8h.html" title=" " alt="" coords="659,408,795,435"/>
+<area shape="rect" id="node13" title=" " alt="" coords="490,632,555,659"/>
+<area shape="rect" id="node14" title=" " alt="" coords="274,632,366,659"/>
+<area shape="rect" id="node16" href="$irep_8h.html" title=" " alt="" coords="624,483,683,509"/>
+<area shape="rect" id="node17" href="$optional_8h.html" title=" " alt="" coords="707,483,794,509"/>
+<area shape="rect" id="node20" href="$narrow_8h.html" title=" " alt="" coords="281,483,359,509"/>
 </map>

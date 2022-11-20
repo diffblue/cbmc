@@ -97,8 +97,14 @@ $(document).ready(function(){initNavTree('java__bytecode__language_8h.html','');
 <div class="title">java_bytecode_language.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="ci__lazy__methods_8h_source.html">ci_lazy_methods.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="json_8h_source.html">util/json.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="make__unique_8h_source.html">util/make_unique.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="prefix__filter_8h_source.html">util/prefix_filter.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol_8h_source.html">util/symbol.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="language_8h_source.html">langapi/language.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="ci__lazy__methods_8h_source.html">ci_lazy_methods.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="ci__lazy__methods__needed_8h_source.html">ci_lazy_methods_needed.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="code__with__references_8h_source.html">code_with_references.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__class__loader_8h_source.html">java_class_loader.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__object__factory__parameters_8h_source.html">java_object_factory_parameters.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__static__initializers_8h_source.html">java_static_initializers.h</a>&quot;</code><br />
@@ -106,16 +112,12 @@ $(document).ready(function(){initNavTree('java__bytecode__language_8h.html','');
 <code>#include &quot;<a class="el" href="select__pointer__type_8h_source.html">select_pointer_type.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="synthetic__methods__map_8h_source.html">synthetic_methods_map.h</a>&quot;</code><br />
 <code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;<a class="el" href="json_8h_source.html">util/json.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="make__unique_8h_source.html">util/make_unique.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="prefix__filter_8h_source.html">util/prefix_filter.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="language_8h_source.html">langapi/language.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for java_bytecode_language.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__language_8h__incl.svg" width="4008" height="708"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__language_8h__incl.svg" width="3078" height="887"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -201,7 +203,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;                              public static void main(String[])\n&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;                              method of the given class.\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00151">151</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00153">153</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -226,7 +228,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;                              archives to search for class files.\n&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot; --main-class class-name      set the name of the main class\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00136">136</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00138">138</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -249,7 +251,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;                              of the class specified by --main-class\n&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;                              (checked in this order).\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00173">173</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00175">175</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -273,7 +275,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;                              class specified in the JAR manifest\n&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;                              (checked in this order).\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00161">161</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00163">163</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -293,7 +295,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;                              used as entry point, e.g.\n&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;                              mypackage.Myclass.foo:(I)Z\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00146">146</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00148">148</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -330,7 +332,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(static-values):&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(java-lift-clinit-calls)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00031">31</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00033">33</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -346,7 +348,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00053">53</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00055">55</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -378,7 +380,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00133">133</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00135">135</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -396,7 +398,7 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(gb):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00170">170</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00172">172</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -414,7 +416,7 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(jar):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00158">158</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00160">160</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -457,7 +459,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00116">116</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00115">115</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -515,13 +517,13 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00055">55</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00054">54</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="ajava__bytecode__language_8h_html_a789b19d601a12c5d7a1ad1ebce2053cd"><div class="ttname"><a href="java__bytecode__language_8h.html#a789b19d601a12c5d7a1ad1ebce2053cd">JAVA_CLASSPATH_SEPARATOR</a></div><div class="ttdeci">#define JAVA_CLASSPATH_SEPARATOR</div><div class="ttdef"><b>Definition:</b> <a href="java__bytecode__language_8h_source.html#l00133">java_bytecode_language.h:133</a></div></div>
+<div class="ttc" id="ajava__bytecode__language_8h_html_a789b19d601a12c5d7a1ad1ebce2053cd"><div class="ttname"><a href="java__bytecode__language_8h.html#a789b19d601a12c5d7a1ad1ebce2053cd">JAVA_CLASSPATH_SEPARATOR</a></div><div class="ttdeci">#define JAVA_CLASSPATH_SEPARATOR</div><div class="ttdef"><b>Definition:</b> <a href="java__bytecode__language_8h_source.html#l00135">java_bytecode_language.h:135</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

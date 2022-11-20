@@ -96,22 +96,24 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__class_8cpp.ht
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="java__bytecode__convert__class_8h_source.html">java_bytecode_convert_class.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ci__lazy__methods_8h_source.html">ci_lazy_methods.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__bytecode__convert__method_8h_source.html">java_bytecode_convert_method.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__root__class_8h_source.html">java_root_class.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__types_8h_source.html">java_types.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__initializer_8h_source.html">util/expr_initializer.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol__table__base_8h_source.html">util/symbol_table_base.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="ci__lazy__methods_8h_source.html">ci_lazy_methods.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__bytecode__convert__method_8h_source.html">java_bytecode_convert_method.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__string__library__preprocess_8h_source.html">java_string_library_preprocess.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__types_8h_source.html">java_types.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for java_bytecode_convert_class.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__convert__class_8cpp__incl.svg" width="4022" height="1126"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__convert__class_8cpp__incl.svg" width="2999" height="1126"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -130,12 +132,12 @@ Functions</h2></td></tr>
 <tr class="memitem:afdfae0fe23b9f2e35428f0f56164f157"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#afdfae0fe23b9f2e35428f0f56164f157">extract_generic_interface_reference</a> (const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt; &amp;signature, const std::string &amp;interface_name)</td></tr>
 <tr class="memdesc:afdfae0fe23b9f2e35428f0f56164f157"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auxiliary function to extract the generic interface reference of an interface with the specified name from the class signature.  <a href="java__bytecode__convert__class_8cpp.html#afdfae0fe23b9f2e35428f0f56164f157">More...</a><br /></td></tr>
 <tr class="separator:afdfae0fe23b9f2e35428f0f56164f157"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14b02ed6aa016e27cd0f4eef1a5f081a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a14b02ed6aa016e27cd0f4eef1a5f081a">add_java_array_types</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a14b02ed6aa016e27cd0f4eef1a5f081a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register in the <code>symbol_table</code> new symbols for the objects java::array[X] where X is byte, short, int, long, char, boolean, float, double and reference.  <a href="java__bytecode__convert__class_8cpp.html#a14b02ed6aa016e27cd0f4eef1a5f081a">More...</a><br /></td></tr>
-<tr class="separator:a14b02ed6aa016e27cd0f4eef1a5f081a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f7f1402cbfbc5f6265ae5c27edcfcf6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a4f7f1402cbfbc5f6265ae5c27edcfcf6">java_bytecode_convert_class</a> (const <a class="el" href="classjava__class__loadert.html#aef3bb8b6b47f9bd6372755a34720e7f1">java_class_loadert::parse_tree_with_overlayst</a> &amp;parse_trees, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, size_t max_array_length, <a class="el" href="classmethod__bytecodet.html">method_bytecodet</a> &amp;method_bytecode, <a class="el" href="classjava__string__library__preprocesst.html">java_string_library_preprocesst</a> &amp;string_preprocess, const std::unordered_set&lt; std::string &gt; &amp;no_load_classes)</td></tr>
-<tr class="memdesc:a4f7f1402cbfbc5f6265ae5c27edcfcf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">See class <a class="el" href="classjava__bytecode__convert__classt.html">java_bytecode_convert_classt</a>.  <a href="java__bytecode__convert__class_8cpp.html#a4f7f1402cbfbc5f6265ae5c27edcfcf6">More...</a><br /></td></tr>
-<tr class="separator:a4f7f1402cbfbc5f6265ae5c27edcfcf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33d01c009e7bdcc23ab2f640f00a6998"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a33d01c009e7bdcc23ab2f640f00a6998">add_java_array_types</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a33d01c009e7bdcc23ab2f640f00a6998"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register in the <code>symbol_table</code> new symbols for the objects java::array[X] where X is byte, short, int, long, char, boolean, float, double and reference.  <a href="java__bytecode__convert__class_8cpp.html#a33d01c009e7bdcc23ab2f640f00a6998">More...</a><br /></td></tr>
+<tr class="separator:a33d01c009e7bdcc23ab2f640f00a6998"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafc0f0c85515a991d0e1487edfae47b2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#aafc0f0c85515a991d0e1487edfae47b2">java_bytecode_convert_class</a> (const <a class="el" href="classjava__class__loadert.html#aef3bb8b6b47f9bd6372755a34720e7f1">java_class_loadert::parse_tree_with_overlayst</a> &amp;parse_trees, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, size_t max_array_length, <a class="el" href="classmethod__bytecodet.html">method_bytecodet</a> &amp;method_bytecode, <a class="el" href="classjava__string__library__preprocesst.html">java_string_library_preprocesst</a> &amp;string_preprocess, const std::unordered_set&lt; std::string &gt; &amp;no_load_classes)</td></tr>
+<tr class="memdesc:aafc0f0c85515a991d0e1487edfae47b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">See class <a class="el" href="classjava__bytecode__convert__classt.html">java_bytecode_convert_classt</a>.  <a href="java__bytecode__convert__class_8cpp.html#aafc0f0c85515a991d0e1487edfae47b2">More...</a><br /></td></tr>
+<tr class="separator:aafc0f0c85515a991d0e1487edfae47b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4120a0616ee791eefc7b88a430e1df6f"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a4120a0616ee791eefc7b88a430e1df6f">get_final_name_component</a> (const std::string &amp;name)</td></tr>
 <tr class="separator:a4120a0616ee791eefc7b88a430e1df6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1df9477ea71a3e7b674477d128d18272"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a1df9477ea71a3e7b674477d128d18272">get_without_final_name_component</a> (const std::string &amp;name)</td></tr>
@@ -152,17 +154,17 @@ Functions</h2></td></tr>
 <tr class="memitem:ae26ea6e44ba71de38e7fdc47dea6b50e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#ae26ea6e44ba71de38e7fdc47dea6b50e">convert_java_annotations</a> (const std::vector&lt; <a class="el" href="classjava__annotationt.html">java_annotationt</a> &gt; &amp;java_annotations, <a class="el" href="structjava__bytecode__parse__treet.html#a8dedee9d40b009a136b65ff0c3dea067">java_bytecode_parse_treet::annotationst</a> &amp;annotations)</td></tr>
 <tr class="memdesc:ae26ea6e44ba71de38e7fdc47dea6b50e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert java annotations, e.g.  <a href="java__bytecode__convert__class_8cpp.html#ae26ea6e44ba71de38e7fdc47dea6b50e">More...</a><br /></td></tr>
 <tr class="separator:ae26ea6e44ba71de38e7fdc47dea6b50e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fa61a1f0356851c429d7eb62a6b5a31"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a6fa61a1f0356851c429d7eb62a6b5a31">mark_java_implicitly_generic_class_type</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table)</td></tr>
-<tr class="memdesc:a6fa61a1f0356851c429d7eb62a6b5a31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the class is implicitly generic, i.e., it is an inner class of any generic class.  <a href="java__bytecode__convert__class_8cpp.html#a6fa61a1f0356851c429d7eb62a6b5a31">More...</a><br /></td></tr>
-<tr class="separator:a6fa61a1f0356851c429d7eb62a6b5a31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f382dbb21bba89369e101a596a5741c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__convert__class_8cpp.html#a8f382dbb21bba89369e101a596a5741c">mark_java_implicitly_generic_class_type</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memdesc:a8f382dbb21bba89369e101a596a5741c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the class is implicitly generic, i.e., it is an inner class of any generic class.  <a href="java__bytecode__convert__class_8cpp.html#a8f382dbb21bba89369e101a596a5741c">More...</a><br /></td></tr>
+<tr class="separator:a8f382dbb21bba89369e101a596a5741c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>JAVA Bytecode Language Conversion </p>
 
 <p class="definition">Definition in file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a14b02ed6aa016e27cd0f4eef1a5f081a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14b02ed6aa016e27cd0f4eef1a5f081a">&#9670;&nbsp;</a></span>add_java_array_types()</h2>
+<a id="a33d01c009e7bdcc23ab2f640f00a6998"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33d01c009e7bdcc23ab2f640f00a6998">&#9670;&nbsp;</a></span>add_java_array_types()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +172,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void add_java_array_types </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em></td><td>)</td>
           <td></td>
         </tr>
@@ -180,7 +182,7 @@ Functions</h2></td></tr>
 <p>Register in the <code>symbol_table</code> new symbols for the objects java::array[X] where X is byte, short, int, long, char, boolean, float, double and reference. </p>
 <p>Also registers a java::array[X].clone():Ljava/lang/Object; method for each type. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l00793">793</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l00796">796</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +221,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01141">1141</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01144">1144</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -258,7 +260,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01164">1164</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01167">1167</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +314,7 @@ Functions</h2></td></tr>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l00226">226</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l00229">229</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -354,7 +356,7 @@ Functions</h2></td></tr>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l00187">187</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l00190">190</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -401,7 +403,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01068">1068</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01071">1071</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -442,7 +444,7 @@ Functions</h2></td></tr>
 <p>Recursively find all generic type parameters of a given type and replace their identifiers if matching replacement parameter exist. </p>
 <p>Example: class <code>Outer&lt;T&gt;</code> has an inner class <code>Inner</code> that has a field <code>t</code> of type <code>Generic&lt;T&gt;</code>. This function ensures that the parameter points to <code>java::Outer::T</code> instead of <code>java::Outer$Inner::T</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01107">1107</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01110">1110</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -470,7 +472,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01046">1046</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01049">1049</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
@@ -498,12 +500,12 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01051">1051</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01054">1054</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a4f7f1402cbfbc5f6265ae5c27edcfcf6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f7f1402cbfbc5f6265ae5c27edcfcf6">&#9670;&nbsp;</a></span>java_bytecode_convert_class()</h2>
+<a id="aafc0f0c85515a991d0e1487edfae47b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafc0f0c85515a991d0e1487edfae47b2">&#9670;&nbsp;</a></span>java_bytecode_convert_class()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +519,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -560,12 +562,12 @@ Functions</h2></td></tr>
 
 <p>See class <a class="el" href="classjava__bytecode__convert__classt.html">java_bytecode_convert_classt</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01004">1004</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01007">1007</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a6fa61a1f0356851c429d7eb62a6b5a31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6fa61a1f0356851c429d7eb62a6b5a31">&#9670;&nbsp;</a></span>mark_java_implicitly_generic_class_type()</h2>
+<a id="a8f382dbb21bba89369e101a596a5741c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f382dbb21bba89369e101a596a5741c">&#9670;&nbsp;</a></span>mark_java_implicitly_generic_class_type()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -579,7 +581,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>&#160;</td>
         </tr>
         <tr>
@@ -593,7 +595,7 @@ Functions</h2></td></tr>
 <p>Checks if the class is implicitly generic, i.e., it is an inner class of any generic class. </p>
 <p>All uses of the implicit generic type parameters within the inner class are updated to point to the type parameters of the corresponding outer classes. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01189">1189</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__class_8cpp_source.html#l01192">1192</a> of file <a class="el" href="java__bytecode__convert__class_8cpp_source.html">java_bytecode_convert_class.cpp</a>.</p>
 
 </div>
 </div>

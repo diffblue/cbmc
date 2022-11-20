@@ -104,488 +104,487 @@ $(document).ready(function(){initNavTree('cnf_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cnf_8h.html">cnf.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;set&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="src_2util_2invariant_8h.html">util/invariant.h</a>&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">// #define VERBOSE</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">   24</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">cnft::gate_and</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="comment">// a*b=c &lt;==&gt; (a + o&#39;)( b + o&#39;)(a&#39;+b&#39;+o)</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  lits.clear();</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  lits.reserve(3);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a));</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b));</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o));</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">   47</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">cnft::gate_or</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="comment">// a+b=c &lt;==&gt; (a&#39; + c)( b&#39; + c)(a + b + c&#39;)</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  lits.resize(3);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">   69</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">cnft::gate_xor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="comment">// a xor b = o &lt;==&gt; (a&#39; + b&#39; + o&#39;)</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="comment">//                  (a + b + o&#39; )</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">//                  (a&#39; + b + o)</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">//                  (a + b&#39; + o)</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(3);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="classcnft.html#a8a9b8da96385d7cbebd26c75c8e7a139">  100</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a8a9b8da96385d7cbebd26c75c8e7a139">cnft::gate_nand</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;{</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="comment">// a Nand b = o &lt;==&gt; (a + o)( b + o)(a&#39; + b&#39; + o&#39;)</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  lits.resize(3);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;}</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="classcnft.html#a96e9e717f81018ee65d463fbdd3af625">  122</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a96e9e717f81018ee65d463fbdd3af625">cnft::gate_nor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;{</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="comment">// a Nor b = o &lt;==&gt; (a&#39; + o&#39;)( b&#39; + o&#39;)(a + b + o)</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  lits.resize(3);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;}</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno"><a class="line" href="classcnft.html#a23ee36c1b7b8bda85d26af2e061f0257">  144</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a23ee36c1b7b8bda85d26af2e061f0257">cnft::gate_equal</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;{</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <a class="code" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">gate_xor</a>(a, b, !o);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;}</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno"><a class="line" href="classcnft.html#aa8947d80c29569c7581c4bc682086876">  151</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#aa8947d80c29569c7581c4bc682086876">cnft::gate_implies</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;{</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <a class="code" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">gate_or</a>(!a, b, o);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="classcnft.html#a0fcc40400f2bc6494dc064654023f035">  159</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">cnft::land</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;{</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keywordflow">if</span>(bv.size()==1)</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">return</span> bv[0];</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordflow">if</span>(bv.size()==2)</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(bv[0], bv[1]);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">if</span>(l.is_false())</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">return</span> l;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classcnft.html#a1321f43d8f7504db0db6bae46f466e3c">is_all</a>(bv, <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>)))</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> new_bv=<a class="code" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">eliminate_duplicates</a>(bv);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> literal=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(literal);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  {</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(l);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  lits.clear();</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  lits.reserve(new_bv.size()+1);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(l));</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(literal));</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keywordflow">return</span> literal;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="classcnft.html#ae910f6c08505a67c3289b9992e46ae84">  202</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">cnft::lor</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;{</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keywordflow">if</span>(bv.size()==1)</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordflow">return</span> bv[0];</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="keywordflow">if</span>(bv.size()==2)</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(bv[0], bv[1]);</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">if</span>(l.is_true())</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keywordflow">return</span> l;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classcnft.html#a1321f43d8f7504db0db6bae46f466e3c">is_all</a>(bv, <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>)))</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> new_bv=<a class="code" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">eliminate_duplicates</a>(bv);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> literal=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(literal);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  {</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(l);</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  }</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  lits.clear();</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  lits.reserve(new_bv.size()+1);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    lits.push_back(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(l));</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(literal));</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keywordflow">return</span> literal;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;}</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno"><a class="line" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">  245</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">cnft::lxor</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;{</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordflow">if</span>(bv.size()==1)</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">return</span> bv[0];</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keywordflow">if</span>(bv.size()==2)</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">lxor</a>(bv[0], bv[1]);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> literal=<a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    literal=<a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">lxor</a>(l, literal);</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">return</span> literal;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;}</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno"><a class="line" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">  264</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">cnft::land</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;{</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>() || b.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">return</span> b;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>() || a.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="keywordflow">if</span>(a==b)</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <a class="code" href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">gate_and</a>(a, b, o);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="keywordflow">return</span> o;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;}</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160; </div>
-<div class="line"><a name="l00280"></a><span class="lineno"><a class="line" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">  280</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">cnft::lor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;{</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>() || b.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keywordflow">return</span> b;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>() || a.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="keywordflow">if</span>(a==b)</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <a class="code" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">gate_or</a>(a, b, o);</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="keywordflow">return</span> o;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;}</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
-<div class="line"><a name="l00296"></a><span class="lineno"><a class="line" href="classcnft.html#ad3d8517e1dd0ede989a19c3c41b049fa">  296</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">cnft::lxor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;{</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">return</span> b;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="keywordflow">return</span> a;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">return</span> !b;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordflow">return</span> !a;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="keywordflow">if</span>(a==b)</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="keywordflow">if</span>(a==!b)</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <a class="code" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">gate_xor</a>(a, b, o);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">return</span> o;</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;}</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
-<div class="line"><a name="l00318"></a><span class="lineno"><a class="line" href="classcnft.html#acbd086811774735a8d13b610154ce1a7">  318</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#acbd086811774735a8d13b610154ce1a7">cnft::lnand</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;{</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(a, b);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;}</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00325"></a><span class="lineno"><a class="line" href="classcnft.html#af90e7da6c3df5436355b667a44133f3a">  325</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#af90e7da6c3df5436355b667a44133f3a">cnft::lnor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;{</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(a, b);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;}</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
-<div class="line"><a name="l00330"></a><span class="lineno"><a class="line" href="classcnft.html#a9fd924a8c57d9c34a9d62be60ea9aa51">  330</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a9fd924a8c57d9c34a9d62be60ea9aa51">cnft::lequal</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;{</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">lxor</a>(a, b);</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;}</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
-<div class="line"><a name="l00335"></a><span class="lineno"><a class="line" href="classcnft.html#a71644fd7563b1eed1629657ea9ee58e8">  335</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a71644fd7563b1eed1629657ea9ee58e8">cnft::limplies</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;{</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(!a, b);</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;}</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160; </div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment">// Tino observed slow-downs up to 50% with OPTIMAL_COMPACT_ITE.</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160; </div>
-<div class="line"><a name="l00342"></a><span class="lineno"><a class="line" href="cnf_8cpp.html#a11ece1d71ffd6d8a03f7051e9e09641a">  342</a></span>&#160;<span class="preprocessor">#define COMPACT_ITE</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="comment">// #define OPTIMAL_COMPACT_ITE</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
-<div class="line"><a name="l00345"></a><span class="lineno"><a class="line" href="classcnft.html#a721f04c6ff98be4f2b8a4fcaac0b0703">  345</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a721f04c6ff98be4f2b8a4fcaac0b0703">cnft::lselect</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> c)</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;{</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="comment">// a?b:c = (a AND b) OR (/a AND c)</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">is_constant</a>())</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    <span class="keywordflow">return</span> a.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>() ? b : c;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <span class="keywordflow">if</span>(b==c)</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keywordflow">return</span> b;</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">is_constant</a>())</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="keywordflow">return</span> b.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>() ? <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(a, c) : <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(!a, c);</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="keywordflow">if</span>(c.<a class="code" href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">is_constant</a>())</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="keywordflow">return</span> c.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>() ? <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(!a, b) : <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(a, b);</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160; </div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="preprocessor">  #ifdef COMPACT_ITE</span></div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="comment">// (a+c&#39;+o) (a+c+o&#39;) (a&#39;+b&#39;+o) (a&#39;+b+o&#39;)</span></div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160; </div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160; </div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160; </div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(a, !c,  o);</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(a,  c, !o);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!a, !b,  o);</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!a,  b, !o);</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160; </div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="preprocessor">  #ifdef OPTIMAL_COMPACT_ITE</span></div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <span class="comment">// additional clauses to enable better propagation</span></div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(b,  c, !o);</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!b, !c,  o);</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  <span class="keywordflow">return</span> o;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;<span class="preprocessor">  #else</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(<a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(a, b), <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(!a, c));</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;}</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
-<div class="line"><a name="l00386"></a><span class="lineno"><a class="line" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">  386</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">cnft::new_variable</a>()</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;{</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> l(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  <a class="code" href="classcnft.html#a7cbef7303636e47d21b69f9b4536a6bb">set_no_variables</a>(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>+1);</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160; </div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keywordflow">return</span> l;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;}</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
-<div class="line"><a name="l00397"></a><span class="lineno"><a class="line" href="classcnft.html#a63cd419b6e5186a8a5100aa4bbd0f9b5">  397</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classcnft.html#a63cd419b6e5186a8a5100aa4bbd0f9b5">cnft::new_variables</a>(std::size_t width)</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;{</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> result;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  result.reserve(width);</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = <a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>; i &lt; <a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a> + width; ++i)</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    result.emplace_back(i, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160; </div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  <a class="code" href="classcnft.html#a7cbef7303636e47d21b69f9b4536a6bb">set_no_variables</a>(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a> + width);</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;}</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
-<div class="line"><a name="l00413"></a><span class="lineno"><a class="line" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">  413</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">cnft::eliminate_duplicates</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;{</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> dest = bv;</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  std::sort(dest.begin(), dest.end());</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <span class="keyword">auto</span> last = std::unique(dest.begin(), dest.end());</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  dest.erase(last, dest.end());</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160; </div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keywordflow">return</span> dest;</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;}</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
-<div class="line"><a name="l00425"></a><span class="lineno"><a class="line" href="classcnft.html#a4c5580c3b81dcdae1d6b186fe98f4daa">  425</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classcnft.html#a4c5580c3b81dcdae1d6b186fe98f4daa">cnft::process_clause</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv, <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;dest)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  dest.clear();</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160; </div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="comment">// empty clause! this is UNSAT</span></div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160; </div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  <span class="comment">// first check simple things</span></div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160; </div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  {</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="comment">// we never use index 0</span></div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(l.var_no() != 0, <span class="stringliteral">&quot;variable 0 must not be used&quot;</span>);</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="comment">// we never use &#39;unused_var_no&#39;</span></div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;      l.var_no() != <a class="code" href="classliteralt.html#ad8240f898da565b406543a43f47d8f37">literalt::unused_var_no</a>(),</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      <span class="stringliteral">&quot;variable &#39;unused_var_no&#39; must not be used&quot;</span>);</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keywordflow">if</span>(l.is_true())</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// clause satisfied</span></div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordflow">if</span>(l.is_false())</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      <span class="keywordflow">continue</span>; <span class="comment">// will remove later</span></div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;      l.var_no() &lt; <a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>,</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;      <span class="stringliteral">&quot;unknown variable &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(l.var_no()) +</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;        <span class="stringliteral">&quot; (no_variables = &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>) + <span class="stringliteral">&quot; )&quot;</span>);</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  }</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <span class="comment">// now copy</span></div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  dest.clear();</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  dest.reserve(bv.size());</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160; </div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  {</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="keywordflow">if</span>(l.is_false())</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;      <span class="keywordflow">continue</span>; <span class="comment">// remove</span></div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160; </div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    dest.push_back(l);</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;  }</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160; </div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  <span class="comment">// now sort</span></div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  std::sort(dest.begin(), dest.end());</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;  <span class="comment">// eliminate duplicates and find occurrences of a variable</span></div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <span class="comment">// and its negation</span></div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160; </div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  <span class="keywordflow">if</span>(dest.size()&gt;=2)</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  {</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    bvt::iterator it=dest.begin();</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> previous=*it;</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keywordflow">for</span>(it++;</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;        it!=dest.end();</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;        ) <span class="comment">// no it++</span></div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    {</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;      <a class="code" href="classliteralt.html">literalt</a> l=*it;</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;      <span class="comment">// prevent duplicate literals</span></div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;      <span class="keywordflow">if</span>(l==previous)</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;        it=dest.erase(it);</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(previous==!l)</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// clause satisfied trivially</span></div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;      {</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        previous=l;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;        it++;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;      }</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    }</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  }</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160; </div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;}</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="src_2util_2invariant_8h.html">util/invariant.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">// #define VERBOSE</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">   23</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">cnft::gate_and</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="comment">// a*b=c &lt;==&gt; (a + o&#39;)( b + o&#39;)(a&#39;+b&#39;+o)</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  lits.clear();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  lits.reserve(3);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a));</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o));</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">   46</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">cnft::gate_or</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="comment">// a+b=c &lt;==&gt; (a&#39; + c)( b&#39; + c)(a + b + c&#39;)</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  lits.resize(3);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">   68</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">cnft::gate_xor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="comment">// a xor b = o &lt;==&gt; (a&#39; + b&#39; + o&#39;)</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="comment">//                  (a + b + o&#39; )</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="comment">//                  (a&#39; + b + o)</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">//                  (a + b&#39; + o)</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(3);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="classcnft.html#a8a9b8da96385d7cbebd26c75c8e7a139">   99</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a8a9b8da96385d7cbebd26c75c8e7a139">cnft::gate_nand</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;{</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <span class="comment">// a Nand b = o &lt;==&gt; (a + o)( b + o)(a&#39; + b&#39; + o&#39;)</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  lits.resize(3);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="line" href="classcnft.html#a96e9e717f81018ee65d463fbdd3af625">  121</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a96e9e717f81018ee65d463fbdd3af625">cnft::gate_nor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;{</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="comment">// a Nor b = o &lt;==&gt; (a&#39; + o&#39;)( b&#39; + o&#39;)(a + b + o)</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(a);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(b);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(o);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  lits.resize(3);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(a);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(b);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  lits[2]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(o);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno"><a class="line" href="classcnft.html#a23ee36c1b7b8bda85d26af2e061f0257">  143</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#a23ee36c1b7b8bda85d26af2e061f0257">cnft::gate_equal</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;{</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <a class="code" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">gate_xor</a>(a, b, !o);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;}</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="classcnft.html#aa8947d80c29569c7581c4bc682086876">  150</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcnft.html#aa8947d80c29569c7581c4bc682086876">cnft::gate_implies</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> o)</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;{</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <a class="code" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">gate_or</a>(!a, b, o);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;}</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classcnft.html#a0fcc40400f2bc6494dc064654023f035">  158</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">cnft::land</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;{</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">if</span>(bv.size()==1)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">return</span> bv[0];</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordflow">if</span>(bv.size()==2)</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(bv[0], bv[1]);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">if</span>(l.is_false())</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="keywordflow">return</span> l;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classcnft.html#a1321f43d8f7504db0db6bae46f466e3c">is_all</a>(bv, <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>)))</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> new_bv=<a class="code" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">eliminate_duplicates</a>(bv);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> literal=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(literal);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  {</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    lits[0]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(l);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  }</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  lits.clear();</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  lits.reserve(new_bv.size()+1);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(l));</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(literal));</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  <span class="keywordflow">return</span> literal;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;}</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno"><a class="line" href="classcnft.html#ae910f6c08505a67c3289b9992e46ae84">  201</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">cnft::lor</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;{</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordflow">if</span>(bv.size()==1)</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">return</span> bv[0];</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keywordflow">if</span>(bv.size()==2)</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(bv[0], bv[1]);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">if</span>(l.is_true())</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      <span class="keywordflow">return</span> l;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classcnft.html#a1321f43d8f7504db0db6bae46f466e3c">is_all</a>(bv, <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>)))</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> new_bv=<a class="code" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">eliminate_duplicates</a>(bv);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits(2);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> literal=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  lits[1]=<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(literal);</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    lits[0]=<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(l);</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  lits.clear();</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  lits.reserve(new_bv.size()+1);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : new_bv)</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    lits.push_back(<a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a>(l));</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  lits.push_back(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>(literal));</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(lits);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="keywordflow">return</span> literal;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;}</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno"><a class="line" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">  244</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">cnft::lxor</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;{</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="keywordflow">if</span>(bv.size()==1)</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">return</span> bv[0];</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keywordflow">if</span>(bv.size()==2)</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">lxor</a>(bv[0], bv[1]);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> literal=<a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    literal=<a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">lxor</a>(l, literal);</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">return</span> literal;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;}</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno"><a class="line" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">  263</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">cnft::land</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;{</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>() || b.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keywordflow">return</span> b;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>() || a.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordflow">if</span>(a==b)</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <a class="code" href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">gate_and</a>(a, b, o);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keywordflow">return</span> o;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;}</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00279"></a><span class="lineno"><a class="line" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">  279</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">cnft::lor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;{</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>() || b.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordflow">return</span> b;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>() || a.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  <span class="keywordflow">if</span>(a==b)</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <a class="code" href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">gate_or</a>(a, b, o);</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="keywordflow">return</span> o;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;}</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
+<div class="line"><a name="l00295"></a><span class="lineno"><a class="line" href="classcnft.html#ad3d8517e1dd0ede989a19c3c41b049fa">  295</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">cnft::lxor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;{</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">return</span> b;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordflow">return</span> a;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordflow">return</span> !b;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordflow">return</span> !a;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <span class="keywordflow">if</span>(a==b)</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="keywordflow">if</span>(a==!b)</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160; </div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <a class="code" href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">gate_xor</a>(a, b, o);</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <span class="keywordflow">return</span> o;</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;}</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
+<div class="line"><a name="l00317"></a><span class="lineno"><a class="line" href="classcnft.html#acbd086811774735a8d13b610154ce1a7">  317</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#acbd086811774735a8d13b610154ce1a7">cnft::lnand</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;{</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(a, b);</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;}</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160; </div>
+<div class="line"><a name="l00324"></a><span class="lineno"><a class="line" href="classcnft.html#af90e7da6c3df5436355b667a44133f3a">  324</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#af90e7da6c3df5436355b667a44133f3a">cnft::lnor</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;{</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(a, b);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;}</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
+<div class="line"><a name="l00329"></a><span class="lineno"><a class="line" href="classcnft.html#a9fd924a8c57d9c34a9d62be60ea9aa51">  329</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a9fd924a8c57d9c34a9d62be60ea9aa51">cnft::lequal</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;{</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">lxor</a>(a, b);</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;}</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
+<div class="line"><a name="l00334"></a><span class="lineno"><a class="line" href="classcnft.html#a71644fd7563b1eed1629657ea9ee58e8">  334</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a71644fd7563b1eed1629657ea9ee58e8">cnft::limplies</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b)</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;{</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(!a, b);</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;}</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">// Tino observed slow-downs up to 50% with OPTIMAL_COMPACT_ITE.</span></div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160; </div>
+<div class="line"><a name="l00341"></a><span class="lineno"><a class="line" href="cnf_8cpp.html#a11ece1d71ffd6d8a03f7051e9e09641a">  341</a></span>&#160;<span class="preprocessor">#define COMPACT_ITE</span></div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="comment">// #define OPTIMAL_COMPACT_ITE</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
+<div class="line"><a name="l00344"></a><span class="lineno"><a class="line" href="classcnft.html#a721f04c6ff98be4f2b8a4fcaac0b0703">  344</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a721f04c6ff98be4f2b8a4fcaac0b0703">cnft::lselect</a>(<a class="code" href="classliteralt.html">literalt</a> a, <a class="code" href="classliteralt.html">literalt</a> b, <a class="code" href="classliteralt.html">literalt</a> c)</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;{</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <span class="comment">// a?b:c = (a AND b) OR (/a AND c)</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="keywordflow">if</span>(a.<a class="code" href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">is_constant</a>())</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keywordflow">return</span> a.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>() ? b : c;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="keywordflow">if</span>(b==c)</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="keywordflow">return</span> b;</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160; </div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">is_constant</a>())</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="keywordflow">return</span> b.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>() ? <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(a, c) : <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(!a, c);</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <span class="keywordflow">if</span>(c.<a class="code" href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">is_constant</a>())</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordflow">return</span> c.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>() ? <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(!a, b) : <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(a, b);</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="preprocessor">  #ifdef COMPACT_ITE</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  <span class="comment">// (a+c&#39;+o) (a+c+o&#39;) (a&#39;+b&#39;+o) (a&#39;+b+o&#39;)</span></div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160; </div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> o=<a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">new_variable</a>();</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160; </div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> lits;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(a, !c,  o);</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(a,  c, !o);</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!a, !b,  o);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!a,  b, !o);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="preprocessor">  #ifdef OPTIMAL_COMPACT_ITE</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <span class="comment">// additional clauses to enable better propagation</span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(b,  c, !o);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!b, !c,  o);</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <span class="keywordflow">return</span> o;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160; </div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;<span class="preprocessor">  #else</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">lor</a>(<a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(a, b), <a class="code" href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">land</a>(!a, c));</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;}</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160; </div>
+<div class="line"><a name="l00385"></a><span class="lineno"><a class="line" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">  385</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">cnft::new_variable</a>()</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;{</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> l(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160; </div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <a class="code" href="classcnft.html#a7cbef7303636e47d21b69f9b4536a6bb">set_no_variables</a>(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>+1);</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160; </div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  <span class="keywordflow">return</span> l;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;}</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
+<div class="line"><a name="l00396"></a><span class="lineno"><a class="line" href="classcnft.html#a63cd419b6e5186a8a5100aa4bbd0f9b5">  396</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classcnft.html#a63cd419b6e5186a8a5100aa4bbd0f9b5">cnft::new_variables</a>(std::size_t width)</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;{</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> result;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  result.reserve(width);</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = <a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>; i &lt; <a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a> + width; ++i)</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    result.emplace_back(i, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  <a class="code" href="classcnft.html#a7cbef7303636e47d21b69f9b4536a6bb">set_no_variables</a>(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a> + width);</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;}</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
+<div class="line"><a name="l00412"></a><span class="lineno"><a class="line" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">  412</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">cnft::eliminate_duplicates</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;{</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> dest = bv;</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  std::sort(dest.begin(), dest.end());</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  <span class="keyword">auto</span> last = std::unique(dest.begin(), dest.end());</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  dest.erase(last, dest.end());</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160; </div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  <span class="keywordflow">return</span> dest;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;}</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
+<div class="line"><a name="l00424"></a><span class="lineno"><a class="line" href="classcnft.html#a4c5580c3b81dcdae1d6b186fe98f4daa">  424</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classcnft.html#a4c5580c3b81dcdae1d6b186fe98f4daa">cnft::process_clause</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv, <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;dest)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  dest.clear();</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  <span class="comment">// empty clause! this is UNSAT</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="keywordflow">if</span>(bv.empty())</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  <span class="comment">// first check simple things</span></div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160; </div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  {</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="comment">// we never use index 0</span></div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(l.var_no() != 0, <span class="stringliteral">&quot;variable 0 must not be used&quot;</span>);</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160; </div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="comment">// we never use &#39;unused_var_no&#39;</span></div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;      l.var_no() != <a class="code" href="classliteralt.html#ad8240f898da565b406543a43f47d8f37">literalt::unused_var_no</a>(),</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;      <span class="stringliteral">&quot;variable &#39;unused_var_no&#39; must not be used&quot;</span>);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160; </div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="keywordflow">if</span>(l.is_true())</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// clause satisfied</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="keywordflow">if</span>(l.is_false())</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;      <span class="keywordflow">continue</span>; <span class="comment">// will remove later</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; </div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;      l.var_no() &lt; <a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>,</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;      <span class="stringliteral">&quot;unknown variable &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(l.var_no()) +</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;        <span class="stringliteral">&quot; (no_variables = &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>) + <span class="stringliteral">&quot; )&quot;</span>);</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  }</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160; </div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <span class="comment">// now copy</span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  dest.clear();</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  dest.reserve(bv.size());</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160; </div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l : bv)</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  {</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="keywordflow">if</span>(l.is_false())</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;      <span class="keywordflow">continue</span>; <span class="comment">// remove</span></div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160; </div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    dest.push_back(l);</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;  }</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160; </div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  <span class="comment">// now sort</span></div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  std::sort(dest.begin(), dest.end());</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  <span class="comment">// eliminate duplicates and find occurrences of a variable</span></div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;  <span class="comment">// and its negation</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160; </div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="keywordflow">if</span>(dest.size()&gt;=2)</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  {</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    bvt::iterator it=dest.begin();</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> previous=*it;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160; </div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    <span class="keywordflow">for</span>(it++;</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;        it!=dest.end();</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;        ) <span class="comment">// no it++</span></div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    {</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      <a class="code" href="classliteralt.html">literalt</a> l=*it;</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160; </div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;      <span class="comment">// prevent duplicate literals</span></div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;      <span class="keywordflow">if</span>(l==previous)</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        it=dest.erase(it);</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(previous==!l)</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// clause satisfied trivially</span></div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      {</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;        previous=l;</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        it++;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;      }</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    }</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  }</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160; </div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclasscnft_html_a4c5580c3b81dcdae1d6b186fe98f4daa"><div class="ttname"><a href="classcnft.html#a4c5580c3b81dcdae1d6b186fe98f4daa">cnft::process_clause</a></div><div class="ttdeci">bool process_clause(const bvt &amp;bv, bvt &amp;dest) const</div><div class="ttdoc">filter 'true' from clause, eliminate duplicates, recognise trivially satisfied clauses</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00425">cnf.cpp:425</a></div></div>
-<div class="ttc" id="aclasscnft_html_acbd086811774735a8d13b610154ce1a7"><div class="ttname"><a href="classcnft.html#acbd086811774735a8d13b610154ce1a7">cnft::lnand</a></div><div class="ttdeci">virtual literalt lnand(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00318">cnf.cpp:318</a></div></div>
+<div class="ttc" id="aclasscnft_html_a4c5580c3b81dcdae1d6b186fe98f4daa"><div class="ttname"><a href="classcnft.html#a4c5580c3b81dcdae1d6b186fe98f4daa">cnft::process_clause</a></div><div class="ttdeci">bool process_clause(const bvt &amp;bv, bvt &amp;dest) const</div><div class="ttdoc">filter 'true' from clause, eliminate duplicates, recognise trivially satisfied clauses</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00424">cnf.cpp:424</a></div></div>
+<div class="ttc" id="aclasscnft_html_acbd086811774735a8d13b610154ce1a7"><div class="ttname"><a href="classcnft.html#acbd086811774735a8d13b610154ce1a7">cnft::lnand</a></div><div class="ttdeci">virtual literalt lnand(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00317">cnf.cpp:317</a></div></div>
 <div class="ttc" id="aliteral_8h_html_afe9a214e6401c7ef6920677a5a066fdf"><div class="ttname"><a href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a></div><div class="ttdeci">literalt pos(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00194">literal.h:194</a></div></div>
-<div class="ttc" id="aclasscnft_html_a969839d9367d25b65c1a8f4ad1bd4ef4"><div class="ttname"><a href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">cnft::gate_xor</a></div><div class="ttdeci">void gate_xor(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of XOR of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00069">cnf.cpp:69</a></div></div>
+<div class="ttc" id="aclasscnft_html_a969839d9367d25b65c1a8f4ad1bd4ef4"><div class="ttname"><a href="classcnft.html#a969839d9367d25b65c1a8f4ad1bd4ef4">cnft::gate_xor</a></div><div class="ttdeci">void gate_xor(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of XOR of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00068">cnf.cpp:68</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
-<div class="ttc" id="aclasscnft_html_af90e7da6c3df5436355b667a44133f3a"><div class="ttname"><a href="classcnft.html#af90e7da6c3df5436355b667a44133f3a">cnft::lnor</a></div><div class="ttdeci">virtual literalt lnor(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00325">cnf.cpp:325</a></div></div>
+<div class="ttc" id="aclasscnft_html_af90e7da6c3df5436355b667a44133f3a"><div class="ttname"><a href="classcnft.html#af90e7da6c3df5436355b667a44133f3a">cnft::lnor</a></div><div class="ttdeci">virtual literalt lnor(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00324">cnf.cpp:324</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
-<div class="ttc" id="aclasscnft_html_a23ee36c1b7b8bda85d26af2e061f0257"><div class="ttname"><a href="classcnft.html#a23ee36c1b7b8bda85d26af2e061f0257">cnft::gate_equal</a></div><div class="ttdeci">void gate_equal(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of equality between two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00144">cnf.cpp:144</a></div></div>
-<div class="ttc" id="aclasscnft_html_aafe5b6d7553814654f95ab4904a861f2"><div class="ttname"><a href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">cnft::lxor</a></div><div class="ttdeci">virtual literalt lxor(const bvt &amp;bv) override</div><div class="ttdoc">Tseitin encoding of XOR between multiple literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00245">cnf.cpp:245</a></div></div>
+<div class="ttc" id="aclasscnft_html_a23ee36c1b7b8bda85d26af2e061f0257"><div class="ttname"><a href="classcnft.html#a23ee36c1b7b8bda85d26af2e061f0257">cnft::gate_equal</a></div><div class="ttdeci">void gate_equal(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of equality between two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00143">cnf.cpp:143</a></div></div>
+<div class="ttc" id="aclasscnft_html_aafe5b6d7553814654f95ab4904a861f2"><div class="ttname"><a href="classcnft.html#aafe5b6d7553814654f95ab4904a861f2">cnft::lxor</a></div><div class="ttdeci">virtual literalt lxor(const bvt &amp;bv) override</div><div class="ttdoc">Tseitin encoding of XOR between multiple literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00244">cnf.cpp:244</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
-<div class="ttc" id="aclasscnft_html_a96e9e717f81018ee65d463fbdd3af625"><div class="ttname"><a href="classcnft.html#a96e9e717f81018ee65d463fbdd3af625">cnft::gate_nor</a></div><div class="ttdeci">void gate_nor(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of NOR of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00122">cnf.cpp:122</a></div></div>
-<div class="ttc" id="aclasscnft_html_aa3f41fdcc01d30f9bc25c97f6b6a5045"><div class="ttname"><a href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">cnft::land</a></div><div class="ttdeci">virtual literalt land(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00264">cnf.cpp:264</a></div></div>
+<div class="ttc" id="aclasscnft_html_a96e9e717f81018ee65d463fbdd3af625"><div class="ttname"><a href="classcnft.html#a96e9e717f81018ee65d463fbdd3af625">cnft::gate_nor</a></div><div class="ttdeci">void gate_nor(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of NOR of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00121">cnf.cpp:121</a></div></div>
+<div class="ttc" id="aclasscnft_html_aa3f41fdcc01d30f9bc25c97f6b6a5045"><div class="ttname"><a href="classcnft.html#aa3f41fdcc01d30f9bc25c97f6b6a5045">cnft::land</a></div><div class="ttdeci">virtual literalt land(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00263">cnf.cpp:263</a></div></div>
 <div class="ttc" id="aclassliteralt_html_ad8240f898da565b406543a43f47d8f37"><div class="ttname"><a href="classliteralt.html#ad8240f898da565b406543a43f47d8f37">literalt::unused_var_no</a></div><div class="ttdeci">static var_not unused_var_no()</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00176">literal.h:176</a></div></div>
-<div class="ttc" id="aclasscnft_html_a65c512c21f25e6ba8e928cbfa8a3e822"><div class="ttname"><a href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">cnft::gate_or</a></div><div class="ttdeci">void gate_or(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of disjunction of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00047">cnf.cpp:47</a></div></div>
+<div class="ttc" id="aclasscnft_html_a65c512c21f25e6ba8e928cbfa8a3e822"><div class="ttname"><a href="classcnft.html#a65c512c21f25e6ba8e928cbfa8a3e822">cnft::gate_or</a></div><div class="ttdeci">void gate_or(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of disjunction of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00046">cnf.cpp:46</a></div></div>
 <div class="ttc" id="aclasscnft_html_a1321f43d8f7504db0db6bae46f466e3c"><div class="ttname"><a href="classcnft.html#a1321f43d8f7504db0db6bae46f466e3c">cnft::is_all</a></div><div class="ttdeci">static bool is_all(const bvt &amp;bv, literalt l)</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00061">cnf.h:61</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a0a901bd96c00af27c04d0aa63581f71b"><div class="ttname"><a href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">literalt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00156">literal.h:156</a></div></div>
-<div class="ttc" id="aclasscnft_html_afc4da4f498447cd0d1e8ae02881ff814"><div class="ttname"><a href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">cnft::lor</a></div><div class="ttdeci">virtual literalt lor(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00280">cnf.cpp:280</a></div></div>
+<div class="ttc" id="aclasscnft_html_afc4da4f498447cd0d1e8ae02881ff814"><div class="ttname"><a href="classcnft.html#afc4da4f498447cd0d1e8ae02881ff814">cnft::lor</a></div><div class="ttdeci">virtual literalt lor(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00279">cnf.cpp:279</a></div></div>
 <div class="ttc" id="aclasscnft_html_a7cbef7303636e47d21b69f9b4536a6bb"><div class="ttname"><a href="classcnft.html#a7cbef7303636e47d21b69f9b4536a6bb">cnft::set_no_variables</a></div><div class="ttdeci">virtual void set_no_variables(size_t no)</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00043">cnf.h:43</a></div></div>
-<div class="ttc" id="aclasscnft_html_a924703fc7d382dd3d4444bf76dc9be26"><div class="ttname"><a href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">cnft::new_variable</a></div><div class="ttdeci">virtual literalt new_variable() override</div><div class="ttdoc">Generate a new variable and return it as a literal.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00386">cnf.cpp:386</a></div></div>
-<div class="ttc" id="aclasscnft_html_a71644fd7563b1eed1629657ea9ee58e8"><div class="ttname"><a href="classcnft.html#a71644fd7563b1eed1629657ea9ee58e8">cnft::limplies</a></div><div class="ttdeci">virtual literalt limplies(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00335">cnf.cpp:335</a></div></div>
-<div class="ttc" id="aclasscnft_html_aa8947d80c29569c7581c4bc682086876"><div class="ttname"><a href="classcnft.html#aa8947d80c29569c7581c4bc682086876">cnft::gate_implies</a></div><div class="ttdeci">void gate_implies(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of implication between two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00151">cnf.cpp:151</a></div></div>
-<div class="ttc" id="aclasscnft_html_a85667f036376e8b14012eb19fbbf67d5"><div class="ttname"><a href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">cnft::eliminate_duplicates</a></div><div class="ttdeci">static bvt eliminate_duplicates(const bvt &amp;)</div><div class="ttdoc">eliminate duplicates from given vector of literals</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00413">cnf.cpp:413</a></div></div>
+<div class="ttc" id="aclasscnft_html_a924703fc7d382dd3d4444bf76dc9be26"><div class="ttname"><a href="classcnft.html#a924703fc7d382dd3d4444bf76dc9be26">cnft::new_variable</a></div><div class="ttdeci">virtual literalt new_variable() override</div><div class="ttdoc">Generate a new variable and return it as a literal.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00385">cnf.cpp:385</a></div></div>
+<div class="ttc" id="aclasscnft_html_a71644fd7563b1eed1629657ea9ee58e8"><div class="ttname"><a href="classcnft.html#a71644fd7563b1eed1629657ea9ee58e8">cnft::limplies</a></div><div class="ttdeci">virtual literalt limplies(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00334">cnf.cpp:334</a></div></div>
+<div class="ttc" id="aclasscnft_html_aa8947d80c29569c7581c4bc682086876"><div class="ttname"><a href="classcnft.html#aa8947d80c29569c7581c4bc682086876">cnft::gate_implies</a></div><div class="ttdeci">void gate_implies(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of implication between two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00150">cnf.cpp:150</a></div></div>
+<div class="ttc" id="aclasscnft_html_a85667f036376e8b14012eb19fbbf67d5"><div class="ttname"><a href="classcnft.html#a85667f036376e8b14012eb19fbbf67d5">cnft::eliminate_duplicates</a></div><div class="ttdeci">static bvt eliminate_duplicates(const bvt &amp;)</div><div class="ttdoc">eliminate duplicates from given vector of literals</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00412">cnf.cpp:412</a></div></div>
 <div class="ttc" id="aclassliteralt_html_acba32efda3807ebcc865b945dcce352e"><div class="ttname"><a href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">literalt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00161">literal.h:161</a></div></div>
 <div class="ttc" id="aliteral_8h_html_ad2dfd63c2c74c4a666f97dd385f57230"><div class="ttname"><a href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a></div><div class="ttdeci">literalt const_literal(bool value)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00188">literal.h:188</a></div></div>
-<div class="ttc" id="aclasscnft_html_a721f04c6ff98be4f2b8a4fcaac0b0703"><div class="ttname"><a href="classcnft.html#a721f04c6ff98be4f2b8a4fcaac0b0703">cnft::lselect</a></div><div class="ttdeci">virtual literalt lselect(literalt a, literalt b, literalt c) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00345">cnf.cpp:345</a></div></div>
+<div class="ttc" id="aclasscnft_html_a721f04c6ff98be4f2b8a4fcaac0b0703"><div class="ttname"><a href="classcnft.html#a721f04c6ff98be4f2b8a4fcaac0b0703">cnft::lselect</a></div><div class="ttdeci">virtual literalt lselect(literalt a, literalt b, literalt c) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00344">cnf.cpp:344</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a155aee401f2145171e9fe78a2578584a"><div class="ttname"><a href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">literalt::sign</a></div><div class="ttdeci">bool sign() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00088">literal.h:88</a></div></div>
-<div class="ttc" id="aclasscnft_html_ac34aaef64a739cc6c542fb94a8746865"><div class="ttname"><a href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">cnft::gate_and</a></div><div class="ttdeci">void gate_and(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of conjunction of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00024">cnf.cpp:24</a></div></div>
-<div class="ttc" id="aclasscnft_html_a8a9b8da96385d7cbebd26c75c8e7a139"><div class="ttname"><a href="classcnft.html#a8a9b8da96385d7cbebd26c75c8e7a139">cnft::gate_nand</a></div><div class="ttdeci">void gate_nand(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of NAND of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00100">cnf.cpp:100</a></div></div>
+<div class="ttc" id="aclasscnft_html_ac34aaef64a739cc6c542fb94a8746865"><div class="ttname"><a href="classcnft.html#ac34aaef64a739cc6c542fb94a8746865">cnft::gate_and</a></div><div class="ttdeci">void gate_and(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of conjunction of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00023">cnf.cpp:23</a></div></div>
+<div class="ttc" id="aclasscnft_html_a8a9b8da96385d7cbebd26c75c8e7a139"><div class="ttname"><a href="classcnft.html#a8a9b8da96385d7cbebd26c75c8e7a139">cnft::gate_nand</a></div><div class="ttdeci">void gate_nand(literalt a, literalt b, literalt o)</div><div class="ttdoc">Tseitin encoding of NAND of two literals.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00099">cnf.cpp:99</a></div></div>
 <div class="ttc" id="aclassliteralt_html"><div class="ttname"><a href="classliteralt.html">literalt</a></div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00025">literal.h:25</a></div></div>
 <div class="ttc" id="aclasscnft_html_a98476dd4043457fd71ebe7f5313c0b00"><div class="ttname"><a href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">cnft::_no_variables</a></div><div class="ttdeci">size_t _no_variables</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00057">cnf.h:57</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a15f7c923cbefde67e8acb4033a16bd10"><div class="ttname"><a href="classliteralt.html#a15f7c923cbefde67e8acb4033a16bd10">literalt::is_constant</a></div><div class="ttdeci">bool is_constant() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00166">literal.h:166</a></div></div>
-<div class="ttc" id="aclasscnft_html_a63cd419b6e5186a8a5100aa4bbd0f9b5"><div class="ttname"><a href="classcnft.html#a63cd419b6e5186a8a5100aa4bbd0f9b5">cnft::new_variables</a></div><div class="ttdeci">bvt new_variables(std::size_t width) override</div><div class="ttdoc">Generate a vector of new variables.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00397">cnf.cpp:397</a></div></div>
+<div class="ttc" id="aclasscnft_html_a63cd419b6e5186a8a5100aa4bbd0f9b5"><div class="ttname"><a href="classcnft.html#a63cd419b6e5186a8a5100aa4bbd0f9b5">cnft::new_variables</a></div><div class="ttdeci">bvt new_variables(std::size_t width) override</div><div class="ttdoc">Generate a vector of new variables.</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00396">cnf.cpp:396</a></div></div>
 <div class="ttc" id="aliteral_8h_html_a5f1735d8dc11129d5a7270b90ac04495"><div class="ttname"><a href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a></div><div class="ttdeci">literalt neg(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00193">literal.h:193</a></div></div>
 <div class="ttc" id="acnf_8h_html"><div class="ttname"><a href="cnf_8h.html">cnf.h</a></div></div>
 <div class="ttc" id="aclasspropt_html_aa88ae6f4f3a364cdb1178c53d9da0564"><div class="ttname"><a href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">propt::lcnf</a></div><div class="ttdeci">void lcnf(literalt l0, literalt l1)</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00056">prop.h:56</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
-<div class="ttc" id="aclasscnft_html_a9fd924a8c57d9c34a9d62be60ea9aa51"><div class="ttname"><a href="classcnft.html#a9fd924a8c57d9c34a9d62be60ea9aa51">cnft::lequal</a></div><div class="ttdeci">virtual literalt lequal(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00330">cnf.cpp:330</a></div></div>
+<div class="ttc" id="aclasscnft_html_a9fd924a8c57d9c34a9d62be60ea9aa51"><div class="ttname"><a href="classcnft.html#a9fd924a8c57d9c34a9d62be60ea9aa51">cnft::lequal</a></div><div class="ttdeci">virtual literalt lequal(literalt a, literalt b) override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8cpp_source.html#l00329">cnf.cpp:329</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

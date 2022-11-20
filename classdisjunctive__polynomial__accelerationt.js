@@ -2,7 +2,7 @@ var classdisjunctive__polynomial__accelerationt =
 [
     [ "distinguish_mapt", "classdisjunctive__polynomial__accelerationt.html#aeef8a9a22d41b09538fb7d565950f3fc", null ],
     [ "distinguish_valuest", "classdisjunctive__polynomial__accelerationt.html#af9925df82ff6ba01e57222b34d143535", null ],
-    [ "disjunctive_polynomial_accelerationt", "classdisjunctive__polynomial__accelerationt.html#a81a309c50401f8761367ca4694714517", null ],
+    [ "disjunctive_polynomial_accelerationt", "classdisjunctive__polynomial__accelerationt.html#afd77d3b44fe22fdb0720e2ef21407d7c", null ],
     [ "accelerate", "classdisjunctive__polynomial__accelerationt.html#a7035927c7d42f5eaaeea8ce81e6fa8d2", null ],
     [ "assert_for_values", "classdisjunctive__polynomial__accelerationt.html#a48e85e16ad12e43fe1e665a0eaa0d9c4", null ],
     [ "build_fixed", "classdisjunctive__polynomial__accelerationt.html#a34d96c8895e9147dd1e0401bceb7048c", null ],
@@ -26,6 +26,6 @@ var classdisjunctive__polynomial__accelerationt =
     [ "message_handler", "classdisjunctive__polynomial__accelerationt.html#a4143abca56855ca7936eb95b1ed1d229", null ],
     [ "modified", "classdisjunctive__polynomial__accelerationt.html#a2ee18d1b7fa5329a898ef807ac73d2d8", null ],
     [ "ns", "classdisjunctive__polynomial__accelerationt.html#aa1d02c2200329fecc3866d1bd21e10a5", null ],
-    [ "symbol_table", "classdisjunctive__polynomial__accelerationt.html#a0864e4d387429387d5736f9a8f5a1498", null ],
+    [ "symbol_table", "classdisjunctive__polynomial__accelerationt.html#a29cb6ab9c923c66a0b13496f2c7aa164", null ],
     [ "utils", "classdisjunctive__polynomial__accelerationt.html#aea82a7ee070abb98ebdfe56d17c42240", null ]
 ];

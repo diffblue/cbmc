@@ -3,7 +3,7 @@ var classgdb__value__extractort =
     [ "memory_scopet", "structgdb__value__extractort_1_1memory__scopet.html", "structgdb__value__extractort_1_1memory__scopet" ],
     [ "memory_addresst", "classgdb__value__extractort.html#af41e9adfdea2de85acd48aef7873117b", null ],
     [ "pointer_valuet", "classgdb__value__extractort.html#a2fbe5196d17c8df3edef4671cdee1069", null ],
-    [ "gdb_value_extractort", "classgdb__value__extractort.html#a90602cc9ec928d3310b5d256e6fb2369", null ],
+    [ "gdb_value_extractort", "classgdb__value__extractort.html#a6b00b44fc6a1d80a07810c35d70bb027", null ],
     [ "add_assignment", "classgdb__value__extractort.html#a4861f6c52f9cec5f79e89f34d16a9561", null ],
     [ "analyze_symbol", "classgdb__value__extractort.html#a30d9e3140b192504e529deca76dc3d54", null ],
     [ "analyze_symbols", "classgdb__value__extractort.html#aab24803379fff47846dee8a74400419c", null ],

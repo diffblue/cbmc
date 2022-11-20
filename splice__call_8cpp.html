@@ -96,15 +96,16 @@ $(document).ready(function(){initNavTree('splice__call_8cpp.html',''); initResiz
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="splice__call_8h_source.html">splice_call.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string__utils_8h_source.html">util/string_utils.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="symbol__table_8h_source.html">util/symbol_table.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="symbol_8h_source.html">util/symbol.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__functions_8h_source.html">goto-programs/goto_functions.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for splice_call.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="splice__call_8cpp__incl.svg" width="2244" height="1202"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="splice__call_8cpp__incl.svg" width="2147" height="1351"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -114,8 +115,8 @@ $(document).ready(function(){initNavTree('splice__call_8cpp.html',''); initResiz
 Functions</h2></td></tr>
 <tr class="memitem:a377daa52f2300bc9c1a24e2606893280"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="splice__call_8cpp.html#a377daa52f2300bc9c1a24e2606893280">parse_caller_callee</a> (const std::string &amp;callercallee, std::vector&lt; std::string &gt; &amp;result)</td></tr>
 <tr class="separator:a377daa52f2300bc9c1a24e2606893280"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3be5e38074cab765d635bbb146bc9428"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="splice__call_8cpp.html#a3be5e38074cab765d635bbb146bc9428">splice_call</a> (<a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, const std::string &amp;callercallee, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="separator:a3be5e38074cab765d635bbb146bc9428"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed912aa1073fbfd335032467e4cb011f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="splice__call_8cpp.html#aed912aa1073fbfd335032467e4cb011f">splice_call</a> (<a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, const std::string &amp;callercallee, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="separator:aed912aa1073fbfd335032467e4cb011f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Prepend a nullary call to another function useful for context/ environment setting in arbitrary nodes </p>
@@ -156,12 +157,12 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="splice__call_8cpp_source.html#l00026">26</a> of file <a class="el" href="splice__call_8cpp_source.html">splice_call.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="splice__call_8cpp_source.html#l00027">27</a> of file <a class="el" href="splice__call_8cpp_source.html">splice_call.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a3be5e38074cab765d635bbb146bc9428"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3be5e38074cab765d635bbb146bc9428">&#9670;&nbsp;</a></span>splice_call()</h2>
+<a id="aed912aa1073fbfd335032467e4cb011f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed912aa1073fbfd335032467e4cb011f">&#9670;&nbsp;</a></span>splice_call()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -181,7 +182,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_table</em>, </td>
         </tr>
         <tr>
@@ -198,7 +199,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="splice__call_8cpp_source.html#l00034">34</a> of file <a class="el" href="splice__call_8cpp_source.html">splice_call.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="splice__call_8cpp_source.html#l00035">35</a> of file <a class="el" href="splice__call_8cpp_source.html">splice_call.cpp</a>.</p>
 
 </div>
 </div>

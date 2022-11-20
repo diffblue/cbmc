@@ -1,5 +1,5 @@
 var ansi__c__entry__point_8h =
 [
-    [ "ansi_c_entry_point", "ansi__c__entry__point_8h.html#afbc58ec71fd88e27ee5ccb71483c23de", null ],
-    [ "generate_ansi_c_start_function", "ansi__c__entry__point_8h.html#a7a06fa1fe8940bcd2fede5075f53f598", null ]
+    [ "ansi_c_entry_point", "ansi__c__entry__point_8h.html#acca69b0d7e6aa840b737d24b97c72a29", null ],
+    [ "generate_ansi_c_start_function", "ansi__c__entry__point_8h.html#a02cf3646d20c33e7f0c5a34cf8af95ae", null ]
 ];

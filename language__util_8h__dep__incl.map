@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h" name="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4230,5,4430,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4131,5,4331,61"/>
 <area shape="rect" id="node2" href="$constant__propagator_8cpp.html" title=" " alt="" coords="5,117,212,173"/>
 <area shape="rect" id="node3" href="$custom__bitvector__analysis_8cpp.html" title=" " alt="" coords="236,117,435,173"/>
 <area shape="rect" id="node4" href="$goto__rw_8cpp.html" title=" " alt="" coords="459,117,643,173"/>
@@ -17,26 +17,25 @@
 <area shape="rect" id="node16" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="3123,109,3321,180"/>
 <area shape="rect" id="node17" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3345,109,3542,180"/>
 <area shape="rect" id="node18" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="3566,109,3769,180"/>
-<area shape="rect" id="node19" href="$havoc__assigns__clause__targets_8cpp.html" title=" " alt="" coords="3793,109,3987,180"/>
-<area shape="rect" id="node20" href="$instrument__spec__assigns_8cpp.html" title=" " alt="" coords="4011,109,4209,180"/>
-<area shape="rect" id="node21" href="$utils_8cpp.html" title=" " alt="" coords="4233,117,4427,173"/>
-<area shape="rect" id="node22" href="$cover__instrument__condition_8cpp.html" title=" " alt="" coords="4451,117,4686,173"/>
-<area shape="rect" id="node23" href="$cover__instrument__decision_8cpp.html" title=" " alt="" coords="4711,117,4939,173"/>
-<area shape="rect" id="node24" href="$cover__instrument__mcdc_8cpp.html" title=" " alt="" coords="4963,117,5172,173"/>
-<area shape="rect" id="node25" href="$cover__instrument__other_8cpp.html" title=" " alt="" coords="5196,117,5403,173"/>
-<area shape="rect" id="node26" href="$dot_8cpp.html" title=" " alt="" coords="5427,117,5620,173"/>
-<area shape="rect" id="node27" href="$rw__set_8cpp.html" title=" " alt="" coords="5644,117,5837,173"/>
-<area shape="rect" id="node28" href="$builtin__functions_8cpp.html" title=" " alt="" coords="5862,117,6046,173"/>
-<area shape="rect" id="node29" href="$goto__program_8cpp.html" title=" " alt="" coords="6070,117,6254,173"/>
-<area shape="rect" id="node30" href="$goto__trace_8cpp.html" title=" " alt="" coords="6278,117,6462,173"/>
-<area shape="rect" id="node31" href="$graphml__witness_8cpp.html" title=" " alt="" coords="6486,117,6670,173"/>
-<area shape="rect" id="node32" href="$interpreter__evaluate_8cpp.html" title=" " alt="" coords="6694,117,6881,173"/>
-<area shape="rect" id="node33" href="$json__goto__trace_8cpp.html" title=" " alt="" coords="6905,117,7089,173"/>
-<area shape="rect" id="node34" href="$show__properties_8cpp.html" title=" " alt="" coords="7113,117,7297,173"/>
-<area shape="rect" id="node35" href="$xml__goto__trace_8cpp.html" title=" " alt="" coords="7321,117,7505,173"/>
-<area shape="rect" id="node36" href="$show__program_8cpp.html" title=" " alt="" coords="7529,117,7733,173"/>
-<area shape="rect" id="node37" href="$symex__goto_8cpp.html" title=" " alt="" coords="7757,117,7972,173"/>
-<area shape="rect" id="node38" href="$language__util_8cpp.html" title=" " alt="" coords="7997,117,8197,173"/>
-<area shape="rect" id="node39" href="$linking_8cpp.html" title=" " alt="" coords="8221,124,8428,165"/>
-<area shape="rect" id="node40" href="$value__set__fi_8cpp.html" title=" " alt="" coords="8452,117,8645,173"/>
+<area shape="rect" id="node19" href="$instrument__spec__assigns_8cpp.html" title=" " alt="" coords="3793,109,3992,180"/>
+<area shape="rect" id="node20" href="$utils_8cpp.html" title=" " alt="" coords="4016,117,4209,173"/>
+<area shape="rect" id="node21" href="$cover__instrument__condition_8cpp.html" title=" " alt="" coords="4234,117,4469,173"/>
+<area shape="rect" id="node22" href="$cover__instrument__decision_8cpp.html" title=" " alt="" coords="4493,117,4721,173"/>
+<area shape="rect" id="node23" href="$cover__instrument__mcdc_8cpp.html" title=" " alt="" coords="4745,117,4955,173"/>
+<area shape="rect" id="node24" href="$cover__instrument__other_8cpp.html" title=" " alt="" coords="4979,117,5185,173"/>
+<area shape="rect" id="node25" href="$dot_8cpp.html" title=" " alt="" coords="5209,117,5403,173"/>
+<area shape="rect" id="node26" href="$rw__set_8cpp.html" title=" " alt="" coords="5427,117,5620,173"/>
+<area shape="rect" id="node27" href="$builtin__functions_8cpp.html" title=" " alt="" coords="5645,117,5829,173"/>
+<area shape="rect" id="node28" href="$goto__program_8cpp.html" title=" " alt="" coords="5853,117,6037,173"/>
+<area shape="rect" id="node29" href="$goto__trace_8cpp.html" title=" " alt="" coords="6061,117,6245,173"/>
+<area shape="rect" id="node30" href="$graphml__witness_8cpp.html" title=" " alt="" coords="6269,117,6453,173"/>
+<area shape="rect" id="node31" href="$interpreter__evaluate_8cpp.html" title=" " alt="" coords="6477,117,6663,173"/>
+<area shape="rect" id="node32" href="$json__goto__trace_8cpp.html" title=" " alt="" coords="6687,117,6871,173"/>
+<area shape="rect" id="node33" href="$show__properties_8cpp.html" title=" " alt="" coords="6895,117,7079,173"/>
+<area shape="rect" id="node34" href="$xml__goto__trace_8cpp.html" title=" " alt="" coords="7103,117,7287,173"/>
+<area shape="rect" id="node35" href="$show__program_8cpp.html" title=" " alt="" coords="7312,117,7516,173"/>
+<area shape="rect" id="node36" href="$symex__goto_8cpp.html" title=" " alt="" coords="7540,117,7755,173"/>
+<area shape="rect" id="node37" href="$language__util_8cpp.html" title=" " alt="" coords="7779,117,7979,173"/>
+<area shape="rect" id="node38" href="$linking_8cpp.html" title=" " alt="" coords="8004,124,8211,165"/>
+<area shape="rect" id="node39" href="$value__set__fi_8cpp.html" title=" " alt="" coords="8235,117,8428,173"/>
 </map>

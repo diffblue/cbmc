@@ -98,14 +98,14 @@ $(document).ready(function(){initNavTree('type__size__mapping_8h_source.html',''
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_TYPE_SIZE_MAPPING_H</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#define CPROVER_SOLVERS_SMT2_INCREMENTAL_TYPE_SIZE_MAPPING_H</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="expr_8h.html">util/expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="expr_8h.html">util/expr.h</a>&gt;</span> <span class="comment">// IWYU pragma: keep</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="smt__terms_8h.html">solvers/smt2_incremental/ast/smt_terms.h</a>&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="object__tracking_8h.html">solvers/smt2_incremental/object_tracking.h</a>&gt;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="smt__terms_8h.html">solvers/smt2_incremental/ast/smt_terms.h</a>&gt;</span>   <span class="comment">// IWYU pragma: keep</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="object__tracking_8h.html">solvers/smt2_incremental/object_tracking.h</a>&gt;</span> <span class="comment">// IWYU pragma: keep</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="smt__is__dynamic__object_8h.html">solvers/smt2_incremental/smt_is_dynamic_object.h</a>&gt;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="smt__object__size_8h.html">solvers/smt2_incremental/smt_object_size.h</a>&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="smt__object__size_8h.html">solvers/smt2_incremental/smt_object_size.h</a>&gt;</span> <span class="comment">// IWYU pragma: keep</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;unordered_map&gt;</span> <span class="comment">// IWYU pragma: keep</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">   18</a></span>&#160;<span class="keyword">using</span> <a class="code" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a> = std::unordered_map&lt;typet, smt_termt, irep_full_hash&gt;;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>

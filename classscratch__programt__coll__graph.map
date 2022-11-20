@@ -1,62 +1,62 @@
 <map id="scratch_programt" name="scratch_programt">
-<area shape="rect" id="node1" title=" " alt="" coords="2580,787,2716,814"/>
-<area shape="rect" id="node2" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="1715,121,1834,147"/>
-<area shape="rect" id="node3" title=" " alt="" coords="1084,83,1259,110"/>
-<area shape="rect" id="node4" href="$structstatement__list__parse__treet_1_1instructiont.html" title="Represents a regular Statement List instruction which consists out of one or more codet tokens." alt="" coords="645,5,803,47"/>
-<area shape="rect" id="node5" title="STL class." alt="" coords="670,286,778,313"/>
-<area shape="rect" id="node7" href="$classoptionst.html" title=" " alt="" coords="1536,310,1611,337"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1090,303,1253,344"/>
-<area shape="rect" id="node37" title=" " alt="" coords="1088,574,1255,601"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1104,369,1239,395"/>
-<area shape="rect" id="node52" title=" " alt="" coords="1285,831,1459,858"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,571,44,598"/>
-<area shape="rect" id="node10" title="STL class." alt="" coords="657,106,791,133"/>
-<area shape="rect" id="node13" title="STL class." alt="" coords="157,571,325,598"/>
-<area shape="rect" id="node14" title="STL class." alt="" coords="165,705,317,747"/>
-<area shape="rect" id="node47" title="STL class." alt="" coords="1495,1457,1652,1483"/>
-<area shape="rect" id="node9" title="STL class." alt="" coords="198,998,285,1025"/>
-<area shape="rect" id="node38" href="$class_s_s_a__stept.html" title="Single SSA step in the equation." alt="" coords="680,801,768,827"/>
-<area shape="rect" id="node60" href="$classsmt2__convt.html" title=" " alt="" coords="1927,1603,2026,1630"/>
-<area shape="rect" id="node56" title=" " alt="" coords="1098,135,1245,176"/>
-<area shape="rect" id="node11" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="1516,579,1631,606"/>
-<area shape="rect" id="node18" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="1923,787,2030,814"/>
-<area shape="rect" id="node45" href="$classgoto__symex__statet.html" title="Central data structure: state." alt="" coords="1903,1111,2050,1138"/>
-<area shape="rect" id="node12" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="647,1179,801,1206"/>
-<area shape="rect" id="node31" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1120,1406,1223,1433"/>
-<area shape="rect" id="node15" title=" " alt="" coords="647,395,801,436"/>
-<area shape="rect" id="node25" title=" " alt="" coords="643,461,805,517"/>
-<area shape="rect" id="node28" title=" " alt="" coords="600,721,848,777"/>
-<area shape="rect" id="node29" title=" " alt="" coords="637,604,811,645"/>
-<area shape="rect" id="node16" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,438,277,465"/>
-<area shape="rect" id="node17" href="$structscratch__program__symext.html" title=" " alt="" coords="2256,787,2443,814"/>
-<area shape="rect" id="node19" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1128,1035,1215,1062"/>
-<area shape="rect" id="node22" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1494,1039,1653,1066"/>
-<area shape="rect" id="node33" href="$classsymex__target__equationt.html" title="Inheriting the interface of symex_targett this class represents the SSA form of the input program as ..." alt="" coords="1483,695,1664,722"/>
-<area shape="rect" id="node40" href="$classcomplexity__limitert.html" title="Symex complexity module." alt="" coords="1498,926,1649,953"/>
-<area shape="rect" id="node49" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="1545,1355,1601,1382"/>
-<area shape="rect" id="node20" href="$classmessage__handlert.html" title=" " alt="" coords="653,1509,795,1535"/>
-<area shape="rect" id="node57" href="$classsmt2__dect.html" title="Decision procedure interface for various SMT 2.x solvers." alt="" coords="2304,1673,2395,1699"/>
-<area shape="rect" id="node21" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="642,1027,806,1054"/>
-<area shape="rect" id="node23" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="660,1129,788,1155"/>
-<area shape="rect" id="node24" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="1115,625,1227,651"/>
-<area shape="rect" id="node42" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="1531,370,1615,397"/>
-<area shape="rect" id="node26" href="$classincremental__dirtyt.html" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="653,1078,795,1105"/>
-<area shape="rect" id="node27" href="$classsymex__nondet__generatort.html" title="Functor generating fresh nondet symbols." alt="" coords="627,670,821,697"/>
-<area shape="rect" id="node30" href="$structguard__expr__managert.html" title="This is unused by this implementation of guards, but can be used by other implementations of the same..." alt="" coords="1491,1153,1656,1179"/>
-<area shape="rect" id="node53" href="$classpointer__logict.html" title=" " alt="" coords="1518,1406,1629,1433"/>
-<area shape="rect" id="node32" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="654,1406,794,1433"/>
-<area shape="rect" id="node34" href="$classsymex__targett.html" title="The interface of the target container for symbolic execution to record its symbolic steps into." alt="" coords="1113,726,1230,753"/>
-<area shape="rect" id="node35" href="$classmerge__irept.html" title=" " alt="" coords="1121,835,1222,862"/>
-<area shape="rect" id="node36" title=" " alt="" coords="647,852,801,893"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1496,747,1651,788"/>
-<area shape="rect" id="node41" href="$structsymex__configt.html" title="Configuration used for a symbolic execution." alt="" coords="1515,813,1632,839"/>
-<area shape="rect" id="node44" title=" " alt="" coords="2268,1160,2431,1201"/>
-<area shape="rect" id="node46" href="$classgoto__statet.html" title="Container for data that varies per program point, e.g." alt="" coords="1525,1254,1621,1281"/>
-<area shape="rect" id="node48" title=" " alt="" coords="1885,1313,2068,1339"/>
-<area shape="rect" id="node50" href="$classbv__pointerst.html" title=" " alt="" coords="1925,1254,2028,1281"/>
-<area shape="rect" id="node51" href="$classboolbvt.html" title=" " alt="" coords="1538,1305,1609,1331"/>
-<area shape="rect" id="node54" href="$classdecision__proceduret.html" title=" " alt="" coords="2273,1226,2426,1253"/>
-<area shape="rect" id="node55" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="2101,193,2223,219"/>
-<area shape="rect" id="node58" href="$classsmt2__stringstreamt.html" title=" " alt="" coords="1901,1786,2052,1813"/>
-<area shape="rect" id="node59" title="STL class." alt="" coords="1507,1746,1640,1773"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2548,724,2684,751"/>
+<area shape="rect" id="node2" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="2081,5,2200,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="1076,33,1251,60"/>
+<area shape="rect" id="node4" href="$structstatement__list__parse__treet_1_1instructiont.html" title="Represents a regular Statement List instruction which consists out of one or more codet tokens." alt="" coords="645,26,803,67"/>
+<area shape="rect" id="node5" title="STL class." alt="" coords="670,447,778,473"/>
+<area shape="rect" id="node7" href="$classoptionst.html" title=" " alt="" coords="1525,612,1600,639"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1082,601,1245,642"/>
+<area shape="rect" id="node38" title=" " alt="" coords="1080,1413,1247,1440"/>
+<area shape="rect" id="node44" title=" " alt="" coords="1096,499,1231,525"/>
+<area shape="rect" id="node52" title=" " alt="" coords="1275,404,1448,431"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,648,44,675"/>
+<area shape="rect" id="node10" title="STL class." alt="" coords="174,860,309,887"/>
+<area shape="rect" id="node14" title="STL class." alt="" coords="157,656,325,683"/>
+<area shape="rect" id="node15" title="STL class." alt="" coords="165,785,317,826"/>
+<area shape="rect" id="node47" title="STL class." alt="" coords="1484,499,1641,525"/>
+<area shape="rect" id="node9" title="STL class." alt="" coords="198,599,285,625"/>
+<area shape="rect" id="node39" href="$class_s_s_a__stept.html" title="Single SSA step in the equation." alt="" coords="680,1449,768,1476"/>
+<area shape="rect" id="node60" href="$classsmt2__convt.html" title=" " alt="" coords="1917,160,2015,187"/>
+<area shape="rect" id="node56" title=" " alt="" coords="651,1618,797,1659"/>
+<area shape="rect" id="node11" title=" " alt="" coords="5,784,44,811"/>
+<area shape="rect" id="node12" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="1304,775,1419,801"/>
+<area shape="rect" id="node46" href="$classgoto__symex__statet.html" title="Central data structure: state." alt="" coords="1893,696,2039,723"/>
+<area shape="rect" id="node13" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="647,663,801,689"/>
+<area shape="rect" id="node19" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="1913,1193,2019,1220"/>
+<area shape="rect" id="node32" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1112,264,1215,291"/>
+<area shape="rect" id="node16" title=" " alt="" coords="647,845,801,886"/>
+<area shape="rect" id="node26" title=" " alt="" coords="643,961,805,1017"/>
+<area shape="rect" id="node29" title=" " alt="" coords="600,1092,848,1148"/>
+<area shape="rect" id="node30" title=" " alt="" coords="637,1187,811,1229"/>
+<area shape="rect" id="node17" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,1224,277,1251"/>
+<area shape="rect" id="node18" href="$structscratch__program__symext.html" title=" " alt="" coords="2224,1061,2411,1088"/>
+<area shape="rect" id="node20" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1120,1244,1207,1271"/>
+<area shape="rect" id="node23" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1483,1143,1642,1169"/>
+<area shape="rect" id="node34" href="$classsymex__target__equationt.html" title="Inheriting the interface of symex_targett this class represents the SSA form of the input program as ..." alt="" coords="1472,1424,1653,1451"/>
+<area shape="rect" id="node41" href="$classcomplexity__limitert.html" title="Symex complexity module." alt="" coords="1487,1244,1638,1271"/>
+<area shape="rect" id="node49" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="1535,877,1591,904"/>
+<area shape="rect" id="node21" href="$classmessage__handlert.html" title=" " alt="" coords="653,793,795,820"/>
+<area shape="rect" id="node57" href="$classsmt2__dect.html" title="Decision procedure interface for various SMT 2.x solvers." alt="" coords="2272,160,2363,187"/>
+<area shape="rect" id="node22" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="642,1348,806,1375"/>
+<area shape="rect" id="node24" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="660,1399,788,1425"/>
+<area shape="rect" id="node25" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="1107,1015,1219,1041"/>
+<area shape="rect" id="node43" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="1521,776,1605,803"/>
+<area shape="rect" id="node27" href="$classincremental__dirtyt.html" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="653,911,795,937"/>
+<area shape="rect" id="node28" href="$classsymex__nondet__generatort.html" title="Functor generating fresh nondet symbols." alt="" coords="627,1041,821,1068"/>
+<area shape="rect" id="node31" href="$structguard__expr__managert.html" title="This is unused by this implementation of guards, but can be used by other implementations of the same..." alt="" coords="1480,928,1645,955"/>
+<area shape="rect" id="node53" href="$classpointer__logict.html" title=" " alt="" coords="1507,221,1618,248"/>
+<area shape="rect" id="node33" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="654,241,794,268"/>
+<area shape="rect" id="node35" href="$classsymex__targett.html" title="The interface of the target container for symbolic execution to record its symbolic steps into." alt="" coords="1105,1464,1222,1491"/>
+<area shape="rect" id="node36" href="$classmerge__irept.html" title=" " alt="" coords="1113,1515,1214,1541"/>
+<area shape="rect" id="node37" title=" " alt="" coords="647,1501,801,1542"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1485,1295,1640,1337"/>
+<area shape="rect" id="node42" href="$structsymex__configt.html" title="Configuration used for a symbolic execution." alt="" coords="1504,1193,1621,1220"/>
+<area shape="rect" id="node45" title=" " alt="" coords="2236,510,2399,551"/>
+<area shape="rect" id="node48" title=" " alt="" coords="1875,577,2057,604"/>
+<area shape="rect" id="node50" href="$classbv__pointerst.html" title=" " alt="" coords="1915,313,2017,340"/>
+<area shape="rect" id="node51" href="$classboolbvt.html" title=" " alt="" coords="1527,335,1598,361"/>
+<area shape="rect" id="node54" href="$classdecision__proceduret.html" title=" " alt="" coords="2241,1600,2394,1627"/>
+<area shape="rect" id="node55" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="1703,1603,1825,1629"/>
+<area shape="rect" id="node58" href="$classsmt2__stringstreamt.html" title=" " alt="" coords="1891,109,2041,136"/>
+<area shape="rect" id="node59" title="STL class." alt="" coords="1496,57,1629,84"/>
 </map>

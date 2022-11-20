@@ -103,256 +103,253 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="inductiveness_8h.html">inductiveness.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="arith__tools_8h.html">util/arith_tools.h</a>&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="console_8h.html">util/console.h</a>&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cout__message_8h.html">util/cout_message.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="format__expr_8h.html">util/format_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="simplify__expr_8h.html">util/simplify_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="console_8h.html">util/console.h</a>&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cout__message_8h.html">util/cout_message.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="format__expr_8h.html">util/format_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="satcheck_8h.html">solvers/sat/satcheck.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="satcheck_8h.html">solvers/sat/satcheck.h</a>&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="axioms_8h.html">axioms.h</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="bv__pointers__wide_8h.html">bv_pointers_wide.h</a>&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="counterexample__found_8h.html">counterexample_found.h</a>&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="propagate_8h.html">propagate.h</a>&quot;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="solver_8h.html">solver.h</a>&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;iomanip&gt;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">   31</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">is_subsumed</a>(</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a1,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a2,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a3,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;b,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>,</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// anything subsumes &#39;true&#39;</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">if</span>(a1.find(<a class="code" href="classfalse__exprt.html">false_exprt</a>()) != a1.end())</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// &#39;false&#39; subsumes anything</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span>(a1.find(b) != a1.end())</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// b is subsumed by a conjunct in a</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="classcout__message__handlert.html">cout_message_handlert</a> message_handler;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a> ? 10 : 1);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(1);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  satcheckt satcheck(message_handler);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="classbv__pointers__widet.html">bv_pointers_widet</a> <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(ns, satcheck, message_handler);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classaxiomst.html">axiomst</a> axioms(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, <a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>, ns);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// check if a =&gt; b is valid,</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// or (!a || b) is valid,</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// or (a &amp;&amp; !b) is unsat</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;a_conjunct : a1)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    axioms &lt;&lt; a_conjunct;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;a_conjunct : a2)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    axioms &lt;&lt; a_conjunct;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;a_conjunct : a3)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    axioms &lt;&lt; a_conjunct;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="axioms_8h.html">axioms.h</a>&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="bv__pointers__wide_8h.html">bv_pointers_wide.h</a>&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="counterexample__found_8h.html">counterexample_found.h</a>&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="propagate_8h.html">propagate.h</a>&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="solver_8h.html">solver.h</a>&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;iomanip&gt;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">   29</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">is_subsumed</a>(</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a1,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a2,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;exprt, irep_hash&gt; &amp;a3,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;b,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keywordflow">if</span>(b.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// anything subsumes &#39;true&#39;</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">if</span>(a1.find(<a class="code" href="classfalse__exprt.html">false_exprt</a>()) != a1.end())</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// &#39;false&#39; subsumes anything</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">if</span>(a1.find(b) != a1.end())</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// b is subsumed by a conjunct in a</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="classcout__message__handlert.html">cout_message_handlert</a> message_handler;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a> ? 10 : 1);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  message_handler.<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(1);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  satcheckt satcheck(message_handler);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <a class="code" href="classbv__pointers__widet.html">bv_pointers_widet</a> <a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>(ns, satcheck, message_handler);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <a class="code" href="classaxiomst.html">axiomst</a> axioms(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, <a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>, ns);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="comment">// check if a =&gt; b is valid,</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="comment">// or (!a || b) is valid,</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// or (a &amp;&amp; !b) is unsat</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;a_conjunct : a1)</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    axioms &lt;&lt; a_conjunct;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;a_conjunct : a2)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    axioms &lt;&lt; a_conjunct;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;a_conjunct : a3)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    axioms &lt;&lt; a_conjunct;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  axioms.<a class="code" href="classaxiomst.html#ab39e152b929a6f5c63a3756faa52c673">set_to_false</a>(b);</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  axioms.<a class="code" href="classaxiomst.html#ab39e152b929a6f5c63a3756faa52c673">set_to_false</a>(b);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">// instantiate our axioms</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  axioms.<a class="code" href="classaxiomst.html#a9a30d05c8d120251b69e214e4e367203">emit</a>();</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="comment">// now run solver</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">switch</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>())</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0ae832e8985e3878039c2ca0e08761f26d">decision_proceduret::resultt::D_SATISFIABLE</a>:</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <a class="code" href="counterexample__found_8cpp.html#aa238be26edb566710c23725f6de63dae">show_assignment</a>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a884d24c603cadb4630432f52133d3027">decision_proceduret::resultt::D_UNSATISFIABLE</a>:</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a53a299451b07d786124b2dd6f6ece682">decision_proceduret::resultt::D_ERROR</a>:</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;error reported by solver&quot;</span>;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// to silence a warning</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;}</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">   92</a></span>&#160;std::size_t <a class="code" href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a>(<span class="keyword">const</span> <a class="code" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a> &amp;path, <a class="code" href="classframe__reft.html">frame_reft</a> f)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keywordflow">return</span> std::count_if(path.begin(), path.end(), [f](<span class="keyword">const</span> <a class="code" href="classframe__reft.html">frame_reft</a> &amp;frame) {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    return f == frame;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  });</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;}</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="inductiveness_8h.html#a164d5866c1bded24fdf582baa2559895">   99</a></span>&#160;<a class="code" href="classinductiveness__resultt.html">inductiveness_resultt</a> <a class="code" href="inductiveness_8cpp.html#a20de011acfefcfa0aee2c26b0f719baf">inductiveness_check</a>(</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  std::vector&lt;framet&gt; &amp;frames,</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsolver__optionst.html">solver_optionst</a> &amp;solver_options,</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  std::vector&lt;propertyt&gt; &amp;properties,</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  std::size_t property_index)</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;{</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> frame_map = <a class="code" href="solver__types_8cpp.html#a318454dc4d7f0ac52526a83b1583556b">build_frame_map</a>(frames);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keyword">auto</span> &amp;<span class="keyword">property</span> = properties[property_index];</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="comment">// add properties proven so far as auxiliaries</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; property_index; i++)</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;p = properties[i];</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">if</span>(p.status == propertyt::PASS)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      frames[p.frame.index].add_auxiliary(p.condition);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  std::vector&lt;workt&gt; queue;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  std::vector&lt;workt&gt; dropped;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keyword">auto</span> propagator =</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    [&amp;frames,</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;     &amp;frame_map,</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;     &amp;queue,</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;     &amp;dropped,</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;     &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;     &amp;solver_options,</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;     &amp;ns](</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol, <a class="code" href="classexprt.html">exprt</a> invariant, <span class="keyword">const</span> <a class="code" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a> &amp;path) {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="keyword">auto</span> frame_ref = <a class="code" href="solver__types_8cpp.html#a157b887ec64af34a2ef5ccb02033d5fc">find_frame</a>(frame_map, symbol);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      <span class="keyword">auto</span> &amp;f = frames[frame_ref.index];</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      {</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;F: &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(symbol) &lt;&lt; <span class="stringliteral">&quot; &lt;- &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant)</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;                  &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      }</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="comment">// print the current invariants and obligations in the frame</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;invariant : f.invariants)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a> &lt;&lt; <a class="code" href="classconsolet.html#a3e58b3ba685e068692127229244bb0b2">consolet::blue</a>;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;          std::cout &lt;&lt; <span class="charliteral">&#39;I&#39;</span> &lt;&lt; std::setw(2) &lt;&lt; frame_ref.index &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;          std::cout &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;obligation : f.obligations)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        {</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a> &lt;&lt; <a class="code" href="classconsolet.html#a3e58b3ba685e068692127229244bb0b2">consolet::blue</a>;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;          std::cout &lt;&lt; <span class="charliteral">&#39;O&#39;</span> &lt;&lt; std::setw(2) &lt;&lt; frame_ref.index &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          std::cout &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(obligation);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      }</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;\u2192&quot;</span> &lt;&lt; <a class="code" href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a> &lt;&lt; std::setw(2)</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                  &lt;&lt; frame_ref.index &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <span class="comment">// trivially true?</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keywordflow">if</span>(invariant.is_true())</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      {</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;trivial\n&quot;</span>;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      }</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">is_subsumed</a>(</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                f.invariants_set,</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                f.obligations_set,</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                f.auxiliaries_set,</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                invariant,</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                solver_options.verbose,</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                ns))</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      {</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;subsumed &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      }</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a>(path, frame_ref) &gt; solver_options.loop_limit)</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="comment">// loop limit exceeded, drop it</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a9ff0a021055b1dd4ee8d8f8a732ada94">consolet::red</a> &lt;&lt; <span class="stringliteral">&quot;dropped&quot;</span> &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                    &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        dropped.emplace_back(frame_ref, invariant, path);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      }</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      {</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="comment">// propagate</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;          std::cout &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        <span class="comment">// store in frame</span></div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        frames[frame_ref.index].add_obligation(invariant);</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <span class="comment">// add to queue</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <span class="keyword">auto</span> new_path = path;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        new_path.push_back(frame_ref);</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        queue.emplace_back(f.ref, std::move(invariant), std::move(new_path));</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      }</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    };</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="comment">// stick invariants into the queue</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keywordflow">for</span>(std::size_t frame_index = 0; frame_index &lt; frames.size(); frame_index++)</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="classframe__reft.html">frame_reft</a> frame_ref(frame_index);</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;cond : frames[frame_index].invariants)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      queue.emplace_back(frame_ref, cond, <a class="code" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a>{frame_ref});</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <span class="comment">// clean up the obligations</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;frame : frames)</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  {</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    frame.obligations.clear();</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    frame.obligations_set.clear();</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="keywordflow">while</span>(!queue.empty())</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  {</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keyword">auto</span> work = queue.back();</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    queue.pop_back();</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">if</span>(solver_options.verbose)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    {</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <a class="code" href="solver__types_8cpp.html#ad6cbcce31a6971622e2ac74e2d67f3bd">dump</a>(frames, property, <span class="keyword">true</span>, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keyword">auto</span> <a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a> = <a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">::counterexample_found</a>(</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      frames, work, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, solver_options.verbose, ns);</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a>)</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      <span class="keyword">property</span>.trace = <a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a>.value();</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classinductiveness__resultt.html#a50e0e70d5a3b95b1882a53cdedc597e7">inductiveness_resultt::base_case_fail</a>(std::move(work));</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    }</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <a class="code" href="propagate_8cpp.html#a8dd82056e3f86d6b081647e63563a84b">propagate</a>(</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      frames, work, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, solver_options.verbose, ns, propagator);</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">// did we drop anything?</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">if</span>(!dropped.empty())</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classinductiveness__resultt.html#a2d6342785155832c4e12b785bac996e9">inductiveness_resultt::step_case_fail</a>(std::move(dropped.front()));</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="comment">// done, saturated</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classinductiveness__resultt.html#a20c72db8f9331dbe8390d0615556e367">inductiveness_resultt::inductive</a>();</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="comment">// instantiate our axioms</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  axioms.<a class="code" href="classaxiomst.html#a9a30d05c8d120251b69e214e4e367203">emit</a>();</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// now run solver</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keywordflow">switch</span>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>())</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0ae832e8985e3878039c2ca0e08761f26d">decision_proceduret::resultt::D_SATISFIABLE</a>:</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">verbose</a>)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <a class="code" href="counterexample__found_8cpp.html#aa238be26edb566710c23725f6de63dae">show_assignment</a>(<a class="code" href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a>);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a884d24c603cadb4630432f52133d3027">decision_proceduret::resultt::D_UNSATISFIABLE</a>:</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">case</span> <a class="code" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a53a299451b07d786124b2dd6f6ece682">decision_proceduret::resultt::D_ERROR</a>:</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;error reported by solver&quot;</span>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// to silence a warning</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">   90</a></span>&#160;std::size_t <a class="code" href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a>(<span class="keyword">const</span> <a class="code" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a> &amp;path, <a class="code" href="classframe__reft.html">frame_reft</a> f)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;{</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">return</span> std::count_if(path.begin(), path.end(), [f](<span class="keyword">const</span> <a class="code" href="classframe__reft.html">frame_reft</a> &amp;frame) {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    return f == frame;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  });</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="inductiveness_8h.html#a164d5866c1bded24fdf582baa2559895">   97</a></span>&#160;<a class="code" href="classinductiveness__resultt.html">inductiveness_resultt</a> <a class="code" href="inductiveness_8cpp.html#a20de011acfefcfa0aee2c26b0f719baf">inductiveness_check</a>(</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  std::vector&lt;framet&gt; &amp;frames,</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;symbol_exprt, irep_hash&gt; &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsolver__optionst.html">solver_optionst</a> &amp;solver_options,</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  std::vector&lt;propertyt&gt; &amp;properties,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  std::size_t property_index)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> frame_map = <a class="code" href="solver__types_8cpp.html#a318454dc4d7f0ac52526a83b1583556b">build_frame_map</a>(frames);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keyword">auto</span> &amp;<span class="keyword">property</span> = properties[property_index];</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="comment">// add properties proven so far as auxiliaries</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; property_index; i++)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;p = properties[i];</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">if</span>(p.status == propertyt::PASS)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      frames[p.frame.index].add_auxiliary(p.condition);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  std::vector&lt;workt&gt; queue;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  std::vector&lt;workt&gt; dropped;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keyword">auto</span> propagator =</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    [&amp;frames,</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;     &amp;frame_map,</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;     &amp;queue,</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;     &amp;dropped,</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;     &amp;<a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;     &amp;solver_options,</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;     &amp;ns](</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol, <a class="code" href="classexprt.html">exprt</a> invariant, <span class="keyword">const</span> <a class="code" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a> &amp;path) {</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <span class="keyword">auto</span> frame_ref = <a class="code" href="solver__types_8cpp.html#a157b887ec64af34a2ef5ccb02033d5fc">find_frame</a>(frame_map, symbol);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="keyword">auto</span> &amp;f = frames[frame_ref.index];</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      {</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;F: &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(symbol) &lt;&lt; <span class="stringliteral">&quot; &lt;- &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant)</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                  &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="comment">// print the current invariants and obligations in the frame</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;invariant : f.invariants)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a> &lt;&lt; <a class="code" href="classconsolet.html#a3e58b3ba685e068692127229244bb0b2">consolet::blue</a>;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;          std::cout &lt;&lt; <span class="charliteral">&#39;I&#39;</span> &lt;&lt; std::setw(2) &lt;&lt; frame_ref.index &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;          std::cout &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;obligation : f.obligations)</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a> &lt;&lt; <a class="code" href="classconsolet.html#a3e58b3ba685e068692127229244bb0b2">consolet::blue</a>;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;          std::cout &lt;&lt; <span class="charliteral">&#39;O&#39;</span> &lt;&lt; std::setw(2) &lt;&lt; frame_ref.index &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;          std::cout &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(obligation);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        }</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      }</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;\u2192&quot;</span> &lt;&lt; <a class="code" href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a> &lt;&lt; std::setw(2)</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                  &lt;&lt; frame_ref.index &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="comment">// trivially true?</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">if</span>(invariant.is_true())</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      {</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;trivial\n&quot;</span>;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      }</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">is_subsumed</a>(</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;                f.invariants_set,</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;                f.obligations_set,</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                f.auxiliaries_set,</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                invariant,</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>,</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                solver_options.verbose,</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                ns))</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      {</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;subsumed &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a>(path, frame_ref) &gt; solver_options.loop_limit)</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      {</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        <span class="comment">// loop limit exceeded, drop it</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;          std::cout &lt;&lt; <a class="code" href="classconsolet.html#a9ff0a021055b1dd4ee8d8f8a732ada94">consolet::red</a> &lt;&lt; <span class="stringliteral">&quot;dropped&quot;</span> &lt;&lt; <a class="code" href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a> &lt;&lt; <span class="charliteral">&#39; &#39;</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;                    &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        dropped.emplace_back(frame_ref, invariant, path);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <span class="comment">// propagate</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;          std::cout &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(invariant) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="comment">// store in frame</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        frames[frame_ref.index].add_obligation(invariant);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="comment">// add to queue</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keyword">auto</span> new_path = path;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        new_path.push_back(frame_ref);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        queue.emplace_back(f.ref, std::move(invariant), std::move(new_path));</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      }</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    };</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="comment">// stick invariants into the queue</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordflow">for</span>(std::size_t frame_index = 0; frame_index &lt; frames.size(); frame_index++)</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  {</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="classframe__reft.html">frame_reft</a> frame_ref(frame_index);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;cond : frames[frame_index].invariants)</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      queue.emplace_back(frame_ref, cond, <a class="code" href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a>{frame_ref});</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  }</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="comment">// clean up the obligations</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;frame : frames)</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  {</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    frame.obligations.clear();</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    frame.obligations_set.clear();</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  }</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">while</span>(!queue.empty())</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  {</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">auto</span> work = queue.back();</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    queue.pop_back();</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">if</span>(solver_options.verbose)</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <a class="code" href="solver__types_8cpp.html#ad6cbcce31a6971622e2ac74e2d67f3bd">dump</a>(frames, property, <span class="keyword">true</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    }</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keyword">auto</span> <a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a> = <a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">::counterexample_found</a>(</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      frames, work, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, solver_options.verbose, ns);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a>)</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    {</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keyword">property</span>.trace = <a class="code" href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a>.value();</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classinductiveness__resultt.html#a50e0e70d5a3b95b1882a53cdedc597e7">inductiveness_resultt::base_case_fail</a>(std::move(work));</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    }</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <a class="code" href="propagate_8cpp.html#a8dd82056e3f86d6b081647e63563a84b">propagate</a>(</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      frames, work, <a class="code" href="address__taken_8cpp.html#ae6cc382f1cb3c51e7a0081c97fedf233">address_taken</a>, solver_options.verbose, ns, propagator);</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">// did we drop anything?</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">if</span>(!dropped.empty())</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classinductiveness__resultt.html#a2d6342785155832c4e12b785bac996e9">inductiveness_resultt::step_case_fail</a>(std::move(dropped.front()));</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  }</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="comment">// done, saturated</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classinductiveness__resultt.html#a20c72db8f9331dbe8390d0615556e367">inductiveness_resultt::inductive</a>();</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
 <div class="ttc" id="aformat_8h_html_a74b453cb3c0deb818d6f2e0f683996ca"><div class="ttname"><a href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a></div><div class="ttdeci">static format_containert&lt; T &gt; format(const T &amp;o)</div><div class="ttdef"><b>Definition:</b> <a href="format_8h_source.html#l00037">format.h:37</a></div></div>
 <div class="ttc" id="asolver_8h_html"><div class="ttname"><a href="solver_8h.html">solver.h</a></div></div>
-<div class="ttc" id="ainductiveness_8cpp_html_a34aced9e7d506052781ffade390a5bdc"><div class="ttname"><a href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a></div><div class="ttdeci">std::size_t count_frame(const workt::patht &amp;path, frame_reft f)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8cpp_source.html#l00092">inductiveness.cpp:92</a></div></div>
-<div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
-<div class="ttc" id="aclasssolver__optionst_html"><div class="ttname"><a href="classsolver__optionst.html">solver_optionst</a></div><div class="ttdef"><b>Definition:</b> <a href="solver_8h_source.html#l00024">solver.h:24</a></div></div>
+<div class="ttc" id="ainductiveness_8cpp_html_a34aced9e7d506052781ffade390a5bdc"><div class="ttname"><a href="inductiveness_8cpp.html#a34aced9e7d506052781ffade390a5bdc">count_frame</a></div><div class="ttdeci">std::size_t count_frame(const workt::patht &amp;path, frame_reft f)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8cpp_source.html#l00090">inductiveness.cpp:90</a></div></div>
+<div class="ttc" id="aclasssolver__optionst_html"><div class="ttname"><a href="classsolver__optionst.html">solver_optionst</a></div><div class="ttdef"><b>Definition:</b> <a href="solver_8h_source.html#l00027">solver.h:27</a></div></div>
 <div class="ttc" id="aclassinductiveness__resultt_html_a20c72db8f9331dbe8390d0615556e367"><div class="ttname"><a href="classinductiveness__resultt.html#a20c72db8f9331dbe8390d0615556e367">inductiveness_resultt::inductive</a></div><div class="ttdeci">static inductiveness_resultt inductive()</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8h_source.html#l00029">inductiveness.h:29</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a91f42224f66dc43cc3c5dc077c1ae4fb"><div class="ttname"><a href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a></div><div class="ttdeci">static std::ostream &amp; faint(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00161">console.cpp:161</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a91f42224f66dc43cc3c5dc077c1ae4fb"><div class="ttname"><a href="classconsolet.html#a91f42224f66dc43cc3c5dc077c1ae4fb">consolet::faint</a></div><div class="ttdeci">static std::ostream &amp; faint(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00160">console.cpp:160</a></div></div>
 <div class="ttc" id="aclassdecision__proceduret_html_a2ed50735d8bf495b7be832fb80b9c8a0a884d24c603cadb4630432f52133d3027"><div class="ttname"><a href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a884d24c603cadb4630432f52133d3027">decision_proceduret::resultt::D_UNSATISFIABLE</a></div><div class="ttdeci">@ D_UNSATISFIABLE</div></div>
 <div class="ttc" id="aclassaxiomst_html_ab39e152b929a6f5c63a3756faa52c673"><div class="ttname"><a href="classaxiomst.html#ab39e152b929a6f5c63a3756faa52c673">axiomst::set_to_false</a></div><div class="ttdeci">void set_to_false(exprt)</div><div class="ttdef"><b>Definition:</b> <a href="axioms_8cpp_source.html#l00035">axioms.cpp:35</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:55</a></div></div>
@@ -362,35 +359,34 @@ $(document).ready(function(){initNavTree('inductiveness_8cpp_source.html',''); i
 <div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
 <div class="ttc" id="aclasssymbol__exprt_html"><div class="ttname"><a href="classsymbol__exprt.html">symbol_exprt</a></div><div class="ttdoc">Expression to hold a symbol (variable)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00112">std_expr.h:112</a></div></div>
 <div class="ttc" id="aclassaxiomst_html"><div class="ttname"><a href="classaxiomst.html">axiomst</a></div><div class="ttdef"><b>Definition:</b> <a href="axioms_8h_source.html#l00028">axioms.h:28</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a9ff0a021055b1dd4ee8d8f8a732ada94"><div class="ttname"><a href="classconsolet.html#a9ff0a021055b1dd4ee8d8f8a732ada94">consolet::red</a></div><div class="ttdeci">static std::ostream &amp; red(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00129">console.cpp:129</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a9ff0a021055b1dd4ee8d8f8a732ada94"><div class="ttname"><a href="classconsolet.html#a9ff0a021055b1dd4ee8d8f8a732ada94">consolet::red</a></div><div class="ttdeci">static std::ostream &amp; red(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00128">console.cpp:128</a></div></div>
 <div class="ttc" id="aclassdecision__proceduret_html_a2ed50735d8bf495b7be832fb80b9c8a0ae832e8985e3878039c2ca0e08761f26d"><div class="ttname"><a href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0ae832e8985e3878039c2ca0e08761f26d">decision_proceduret::resultt::D_SATISFIABLE</a></div><div class="ttdeci">@ D_SATISFIABLE</div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:90</a></div></div>
 <div class="ttc" id="aaxioms_8h_html"><div class="ttname"><a href="axioms_8h.html">axioms.h</a></div></div>
-<div class="ttc" id="acounterexample__found_8cpp_html_a1d92090d3e7e5ab279e9c014da1c2e24"><div class="ttname"><a href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a></div><div class="ttdeci">optionalt&lt; propertyt::tracet &gt; counterexample_found(const std::vector&lt; framet &gt; &amp;frames, const workt &amp;work, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, bool verbose, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="counterexample__found_8cpp_source.html#l00176">counterexample_found.cpp:176</a></div></div>
-<div class="ttc" id="aclasssolver__optionst_html_aa545bb83c80cb75098f43195293a39cf"><div class="ttname"><a href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">solver_optionst::verbose</a></div><div class="ttdeci">bool verbose</div><div class="ttdef"><b>Definition:</b> <a href="solver_8h_source.html#l00028">solver.h:28</a></div></div>
+<div class="ttc" id="acounterexample__found_8cpp_html_a1d92090d3e7e5ab279e9c014da1c2e24"><div class="ttname"><a href="counterexample__found_8cpp.html#a1d92090d3e7e5ab279e9c014da1c2e24">counterexample_found</a></div><div class="ttdeci">optionalt&lt; propertyt::tracet &gt; counterexample_found(const std::vector&lt; framet &gt; &amp;frames, const workt &amp;work, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, bool verbose, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="counterexample__found_8cpp_source.html#l00173">counterexample_found.cpp:173</a></div></div>
+<div class="ttc" id="aclasssolver__optionst_html_aa545bb83c80cb75098f43195293a39cf"><div class="ttname"><a href="classsolver__optionst.html#aa545bb83c80cb75098f43195293a39cf">solver_optionst::verbose</a></div><div class="ttdeci">bool verbose</div><div class="ttdef"><b>Definition:</b> <a href="solver_8h_source.html#l00031">solver.h:31</a></div></div>
 <div class="ttc" id="acout__message_8h_html"><div class="ttname"><a href="cout__message_8h.html">cout_message.h</a></div></div>
 <div class="ttc" id="aclassbv__pointers__widet_html"><div class="ttname"><a href="classbv__pointers__widet.html">bv_pointers_widet</a></div><div class="ttdef"><b>Definition:</b> <a href="bv__pointers__wide_8h_source.html#l00020">bv_pointers_wide.h:20</a></div></div>
-<div class="ttc" id="acounterexample__found_8cpp_html_aa238be26edb566710c23725f6de63dae"><div class="ttname"><a href="counterexample__found_8cpp.html#aa238be26edb566710c23725f6de63dae">show_assignment</a></div><div class="ttdeci">void show_assignment(const bv_pointers_widet &amp;solver)</div><div class="ttdef"><b>Definition:</b> <a href="counterexample__found_8cpp_source.html#l00027">counterexample_found.cpp:27</a></div></div>
+<div class="ttc" id="acounterexample__found_8cpp_html_aa238be26edb566710c23725f6de63dae"><div class="ttname"><a href="counterexample__found_8cpp.html#aa238be26edb566710c23725f6de63dae">show_assignment</a></div><div class="ttdeci">void show_assignment(const bv_pointers_widet &amp;solver)</div><div class="ttdef"><b>Definition:</b> <a href="counterexample__found_8cpp_source.html#l00024">counterexample_found.cpp:24</a></div></div>
 <div class="ttc" id="aclassframe__reft_html"><div class="ttname"><a href="classframe__reft.html">frame_reft</a></div><div class="ttdef"><b>Definition:</b> <a href="solver__types_8h_source.html#l00022">solver_types.h:22</a></div></div>
 <div class="ttc" id="aclassdecision__proceduret_html_a2ed50735d8bf495b7be832fb80b9c8a0a53a299451b07d786124b2dd6f6ece682"><div class="ttname"><a href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0a53a299451b07d786124b2dd6f6ece682">decision_proceduret::resultt::D_ERROR</a></div><div class="ttdeci">@ D_ERROR</div></div>
 <div class="ttc" id="aclassfalse__exprt_html"><div class="ttname"><a href="classfalse__exprt.html">false_exprt</a></div><div class="ttdoc">The Boolean constant false.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03016">std_expr.h:3016</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a3e58b3ba685e068692127229244bb0b2"><div class="ttname"><a href="classconsolet.html#a3e58b3ba685e068692127229244bb0b2">consolet::blue</a></div><div class="ttdeci">static std::ostream &amp; blue(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00105">console.cpp:105</a></div></div>
-<div class="ttc" id="aclassconsolet_html_a6d3593d920e93f841bee945e27eb85b2"><div class="ttname"><a href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a></div><div class="ttdeci">static std::ostream &amp; reset(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00177">console.cpp:177</a></div></div>
-<div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00053">solver.cpp:53</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a3e58b3ba685e068692127229244bb0b2"><div class="ttname"><a href="classconsolet.html#a3e58b3ba685e068692127229244bb0b2">consolet::blue</a></div><div class="ttdeci">static std::ostream &amp; blue(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00104">console.cpp:104</a></div></div>
+<div class="ttc" id="aclassconsolet_html_a6d3593d920e93f841bee945e27eb85b2"><div class="ttname"><a href="classconsolet.html#a6d3593d920e93f841bee945e27eb85b2">consolet::reset</a></div><div class="ttdeci">static std::ostream &amp; reset(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="console_8cpp_source.html#l00176">console.cpp:176</a></div></div>
+<div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00044">solver.cpp:44</a></div></div>
 <div class="ttc" id="aclassinductiveness__resultt_html"><div class="ttname"><a href="classinductiveness__resultt.html">inductiveness_resultt</a></div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8h_source.html#l00019">inductiveness.h:19</a></div></div>
 <div class="ttc" id="abv__pointers__wide_8h_html"><div class="ttname"><a href="bv__pointers__wide_8h.html">bv_pointers_wide.h</a></div></div>
-<div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html_a512e6c5fad1bd1f04a0deb4b1f055ecf"><div class="ttname"><a href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">message_handlert::set_verbosity</a></div><div class="ttdeci">void set_verbosity(unsigned _verbosity)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00053">message.h:53</a></div></div>
 <div class="ttc" id="asatcheck_8h_html"><div class="ttname"><a href="satcheck_8h.html">satcheck.h</a></div></div>
 <div class="ttc" id="aclasscout__message__handlert_html"><div class="ttname"><a href="classcout__message__handlert.html">cout_message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="cout__message_8h_source.html#l00015">cout_message.h:15</a></div></div>
 <div class="ttc" id="aformat__expr_8h_html"><div class="ttname"><a href="format__expr_8h.html">format_expr.h</a></div></div>
-<div class="ttc" id="ainductiveness_8cpp_html_a52041eaa3698f554c7ea6d3005eb4f1e"><div class="ttname"><a href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">is_subsumed</a></div><div class="ttdeci">bool is_subsumed(const std::unordered_set&lt; exprt, irep_hash &gt; &amp;a1, const std::unordered_set&lt; exprt, irep_hash &gt; &amp;a2, const std::unordered_set&lt; exprt, irep_hash &gt; &amp;a3, const exprt &amp;b, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, bool verbose, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8cpp_source.html#l00031">inductiveness.cpp:31</a></div></div>
+<div class="ttc" id="ainductiveness_8cpp_html_a52041eaa3698f554c7ea6d3005eb4f1e"><div class="ttname"><a href="inductiveness_8cpp.html#a52041eaa3698f554c7ea6d3005eb4f1e">is_subsumed</a></div><div class="ttdeci">bool is_subsumed(const std::unordered_set&lt; exprt, irep_hash &gt; &amp;a1, const std::unordered_set&lt; exprt, irep_hash &gt; &amp;a2, const std::unordered_set&lt; exprt, irep_hash &gt; &amp;a3, const exprt &amp;b, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, bool verbose, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8cpp_source.html#l00029">inductiveness.cpp:29</a></div></div>
 <div class="ttc" id="astructworkt_html_a9f997921f90215d5454d52875b13dbdd"><div class="ttname"><a href="structworkt.html#a9f997921f90215d5454d52875b13dbdd">workt::patht</a></div><div class="ttdeci">std::vector&lt; frame_reft &gt; patht</div><div class="ttdef"><b>Definition:</b> <a href="solver__types_8h_source.html#l00167">solver_types.h:167</a></div></div>
 <div class="ttc" id="aclassinductiveness__resultt_html_a2d6342785155832c4e12b785bac996e9"><div class="ttname"><a href="classinductiveness__resultt.html#a2d6342785155832c4e12b785bac996e9">inductiveness_resultt::step_case_fail</a></div><div class="ttdeci">static inductiveness_resultt step_case_fail(workt dropped)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8h_source.html#l00041">inductiveness.h:41</a></div></div>
 <div class="ttc" id="aclassinductiveness__resultt_html_a50e0e70d5a3b95b1882a53cdedc597e7"><div class="ttname"><a href="classinductiveness__resultt.html#a50e0e70d5a3b95b1882a53cdedc597e7">inductiveness_resultt::base_case_fail</a></div><div class="ttdeci">static inductiveness_resultt base_case_fail(workt refuted)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8h_source.html#l00034">inductiveness.h:34</a></div></div>
 <div class="ttc" id="aclassaxiomst_html_a9a30d05c8d120251b69e214e4e367203"><div class="ttname"><a href="classaxiomst.html#a9a30d05c8d120251b69e214e4e367203">axiomst::emit</a></div><div class="ttdeci">void emit()</div><div class="ttdef"><b>Definition:</b> <a href="axioms_8cpp_source.html#l00750">axioms.cpp:750</a></div></div>
 <div class="ttc" id="asolver__types_8cpp_html_ad6cbcce31a6971622e2ac74e2d67f3bd"><div class="ttname"><a href="solver__types_8cpp.html#ad6cbcce31a6971622e2ac74e2d67f3bd">dump</a></div><div class="ttdeci">void dump(const std::vector&lt; framet &gt; &amp;frames, const propertyt &amp;property, bool values, bool implications)</div><div class="ttdef"><b>Definition:</b> <a href="solver__types_8cpp_source.html#l00172">solver_types.cpp:172</a></div></div>
-<div class="ttc" id="ainductiveness_8cpp_html_a20de011acfefcfa0aee2c26b0f719baf"><div class="ttname"><a href="inductiveness_8cpp.html#a20de011acfefcfa0aee2c26b0f719baf">inductiveness_check</a></div><div class="ttdeci">inductiveness_resultt inductiveness_check(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8cpp_source.html#l00099">inductiveness.cpp:99</a></div></div>
+<div class="ttc" id="ainductiveness_8cpp_html_a20de011acfefcfa0aee2c26b0f719baf"><div class="ttname"><a href="inductiveness_8cpp.html#a20de011acfefcfa0aee2c26b0f719baf">inductiveness_check</a></div><div class="ttdeci">inductiveness_resultt inductiveness_check(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="inductiveness_8cpp_source.html#l00097">inductiveness.cpp:97</a></div></div>
 <div class="ttc" id="ainductiveness_8h_html"><div class="ttname"><a href="inductiveness_8h.html">inductiveness.h</a></div></div>
 <div class="ttc" id="apropagate_8h_html"><div class="ttname"><a href="propagate_8h.html">propagate.h</a></div></div>
 <div class="ttc" id="asolver__types_8cpp_html_a157b887ec64af34a2ef5ccb02033d5fc"><div class="ttname"><a href="solver__types_8cpp.html#a157b887ec64af34a2ef5ccb02033d5fc">find_frame</a></div><div class="ttdeci">frame_reft find_frame(const frame_mapt &amp;frame_map, const symbol_exprt &amp;frame_symbol)</div><div class="ttdef"><b>Definition:</b> <a href="solver__types_8cpp_source.html#l00124">solver_types.cpp:124</a></div></div>

@@ -103,93 +103,91 @@ $(document).ready(function(){initNavTree('cpp__name_8cpp_source.html',''); initR
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cpp__name_8h.html">cpp_name.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564">   16</a></span>&#160;<a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564">cpp_namet::get_base_name</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">subt</a> &amp;sub=<a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>();</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="comment">// find last &quot;::&quot;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  std::size_t base=0;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;sub.size(); i++)</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">if</span>(sub[i].<span class="keywordtype">id</span>()==<span class="stringliteral">&quot;::&quot;</span>)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      base=i+1;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  }</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordflow">if</span>(base&gt;=sub.size())</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>();</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">if</span>(sub[base].<span class="keywordtype">id</span>()==ID_name)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">return</span> sub[base].get(ID_identifier);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(base+1&lt;sub.size() &amp;&amp; sub[base].id()==ID_operator)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;operator&quot;</span>+sub[base+1].id_string();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(base+1&lt;sub.size() &amp;&amp; sub[base].id()==<span class="stringliteral">&quot;~&quot;</span> &amp;&amp; sub[base+1].id()==ID_name)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;~&quot;</span>+sub[base+1].get_string(ID_identifier);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keywordtype">void</span> <a class="code" href="builtin__factory_8cpp.html#a15a889cea9f20b1a2bc649eecc1bb5ba">cpp_namet::convert</a>(</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  std::string &amp;identifier,</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  std::string &amp;base_name)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : <a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>())</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  {</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">id</span> = irep.id();</div>
+<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564">   14</a></span>&#160;<a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564">cpp_namet::get_base_name</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">subt</a> &amp;sub=<a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>();</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="comment">// find last &quot;::&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  std::size_t base=0;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;sub.size(); i++)</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">if</span>(sub[i].<span class="keywordtype">id</span>()==<span class="stringliteral">&quot;::&quot;</span>)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      base=i+1;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  }</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">if</span>(base&gt;=sub.size())</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">if</span>(sub[base].<span class="keywordtype">id</span>()==ID_name)</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">return</span> sub[base].get(ID_identifier);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(base+1&lt;sub.size() &amp;&amp; sub[base].id()==ID_operator)</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;operator&quot;</span>+sub[base+1].id_string();</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(base+1&lt;sub.size() &amp;&amp; sub[base].id()==<span class="stringliteral">&quot;~&quot;</span> &amp;&amp; sub[base+1].id()==ID_name)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;~&quot;</span>+sub[base+1].get_string(ID_identifier);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keywordtype">void</span> <a class="code" href="builtin__factory_8cpp.html#a5d36441a298ad693bcd45d36d0ba87f1">cpp_namet::convert</a>(</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::string &amp;identifier,</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  std::string &amp;base_name)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : <a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>())</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">id</span> = irep.id();</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    std::string name_component;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    std::string name_component;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_name)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      name_component = irep.get_string(ID_identifier);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_template_args)</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      std::stringstream ss;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      ss &lt;&lt; location() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      ss &lt;&lt; <span class="stringliteral">&quot;no template arguments allowed here&quot;</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <span class="keywordflow">throw</span> ss.str();</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      name_component = irep.id_string();</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_name)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      name_component = irep.get_string(ID_identifier);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_template_args)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      std::stringstream ss;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      ss &lt;&lt; location() &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      ss &lt;&lt; <span class="stringliteral">&quot;no template arguments allowed here&quot;</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordflow">throw</span> ss.str();</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      name_component = irep.id_string();</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    identifier+=name_component;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    identifier+=name_component;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==<span class="stringliteral">&quot;::&quot;</span>)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      base_name.<a class="code" href="classdstringt.html#a3ecd16bde6ac9fcaaeb937025339e284">clear</a>();</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      base_name+=name_component;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classcpp__namet.html#abd9486a8ea2e7bd66462fda7e710dff5">   75</a></span>&#160;std::string <a class="code" href="classcpp__namet.html#abd9486a8ea2e7bd66462fda7e710dff5">cpp_namet::to_string</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  std::string str;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : <a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>())</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">if</span>(irep.id() == <span class="stringliteral">&quot;::&quot;</span>)</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      str += irep.id_string();</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(irep.id() == ID_template_args)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      str += <span class="stringliteral">&quot;&lt;...&gt;&quot;</span>;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      str += irep.get_string(ID_identifier);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keywordflow">return</span> str;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;}</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==<span class="stringliteral">&quot;::&quot;</span>)</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      base_name.<a class="code" href="classdstringt.html#a3ecd16bde6ac9fcaaeb937025339e284">clear</a>();</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      base_name+=name_component;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classcpp__namet.html#abd9486a8ea2e7bd66462fda7e710dff5">   73</a></span>&#160;std::string <a class="code" href="classcpp__namet.html#abd9486a8ea2e7bd66462fda7e710dff5">cpp_namet::to_string</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  std::string str;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : <a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>())</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">if</span>(irep.id() == <span class="stringliteral">&quot;::&quot;</span>)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      str += irep.id_string();</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(irep.id() == ID_template_args)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      str += <span class="stringliteral">&quot;&lt;...&gt;&quot;</span>;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      str += irep.get_string(ID_identifier);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordflow">return</span> str;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00036">dstring.h:36</a></div></div>
+<div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:38</a></div></div>
 <div class="ttc" id="airep_8h_html_a1ad4faefa9ca542d481e74be9cc01c2c"><div class="ttname"><a href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a></div><div class="ttdeci">dstringt irep_idt</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00037">irep.h:37</a></div></div>
-<div class="ttc" id="abuiltin__factory_8cpp_html_a15a889cea9f20b1a2bc649eecc1bb5ba"><div class="ttname"><a href="builtin__factory_8cpp.html#a15a889cea9f20b1a2bc649eecc1bb5ba">convert</a></div><div class="ttdeci">static bool convert(const irep_idt &amp;identifier, const std::ostringstream &amp;s, symbol_tablet &amp;symbol_table, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="builtin__factory_8cpp_source.html#l00041">builtin_factory.cpp:41</a></div></div>
-<div class="ttc" id="aclassdstringt_html_a3ecd16bde6ac9fcaaeb937025339e284"><div class="ttname"><a href="classdstringt.html#a3ecd16bde6ac9fcaaeb937025339e284">dstringt::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00158">dstring.h:158</a></div></div>
+<div class="ttc" id="aclassdstringt_html_a3ecd16bde6ac9fcaaeb937025339e284"><div class="ttname"><a href="classdstringt.html#a3ecd16bde6ac9fcaaeb937025339e284">dstringt::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00160">dstring.h:160</a></div></div>
 <div class="ttc" id="aclasssharing__treet_html_a53ba0d77826781a16fdb953969a0dbe8"><div class="ttname"><a href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">sharing_treet&lt; irept, forward_list_as_mapt&lt; irep_idt, irept &gt; &gt;::subt</a></div><div class="ttdeci">typename dt::subt subt</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00160">irep.h:160</a></div></div>
 <div class="ttc" id="aclassirept_html_a0ca41d4d612e6245e1225cb2ebeef6eb"><div class="ttname"><a href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">irept::get_sub</a></div><div class="ttdeci">subt &amp; get_sub()</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00456">irep.h:456</a></div></div>
-<div class="ttc" id="aclasscpp__namet_html_a5be24f46bc15e2b1bcbeb64ddb3f8564"><div class="ttname"><a href="classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564">cpp_namet::get_base_name</a></div><div class="ttdeci">irep_idt get_base_name() const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__name_8cpp_source.html#l00016">cpp_name.cpp:16</a></div></div>
-<div class="ttc" id="aclasscpp__namet_html_abd9486a8ea2e7bd66462fda7e710dff5"><div class="ttname"><a href="classcpp__namet.html#abd9486a8ea2e7bd66462fda7e710dff5">cpp_namet::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__name_8cpp_source.html#l00075">cpp_name.cpp:75</a></div></div>
+<div class="ttc" id="aclasscpp__namet_html_a5be24f46bc15e2b1bcbeb64ddb3f8564"><div class="ttname"><a href="classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564">cpp_namet::get_base_name</a></div><div class="ttdeci">irep_idt get_base_name() const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__name_8cpp_source.html#l00014">cpp_name.cpp:14</a></div></div>
+<div class="ttc" id="abuiltin__factory_8cpp_html_a5d36441a298ad693bcd45d36d0ba87f1"><div class="ttname"><a href="builtin__factory_8cpp.html#a5d36441a298ad693bcd45d36d0ba87f1">convert</a></div><div class="ttdeci">static bool convert(const irep_idt &amp;identifier, const std::ostringstream &amp;s, symbol_table_baset &amp;symbol_table, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="builtin__factory_8cpp_source.html#l00042">builtin_factory.cpp:42</a></div></div>
+<div class="ttc" id="aclasscpp__namet_html_abd9486a8ea2e7bd66462fda7e710dff5"><div class="ttname"><a href="classcpp__namet.html#abd9486a8ea2e7bd66462fda7e710dff5">cpp_namet::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdef"><b>Definition:</b> <a href="cpp__name_8cpp_source.html#l00073">cpp_name.cpp:73</a></div></div>
 <div class="ttc" id="acpp__name_8h_html"><div class="ttname"><a href="cpp__name_8h.html">cpp_name.h</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
