@@ -38,7 +38,7 @@ void goto_check_c(
   message_handlert &message_handler);
 
 #define OPT_GOTO_CHECK                                                         \
-  "(bounds-check)(pointer-check)(memory-leak-check)"                           \
+  "(bounds-check)(pointer-check)(memory-leak-check)(memory-cleanup-check)"     \
   "(div-by-zero-check)(enum-range-check)"                                      \
   "(signed-overflow-check)(unsigned-overflow-check)"                           \
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
@@ -54,6 +54,7 @@ void goto_check_c(
   " --bounds-check               enable array bounds checks\n" \
   " --pointer-check              enable pointer checks\n" /* NOLINT(whitespace/line_length) */ \
   " --memory-leak-check          enable memory leak checks\n" \
+  " --memory-cleanup-check       enable memory cleanup checks\n" \
   " --div-by-zero-check          enable division by zero checks\n" \
   " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */ \
   " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */  \
@@ -75,6 +76,7 @@ void goto_check_c(
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
   options.set_option("pointer-check", cmdline.isset("pointer-check")); \
   options.set_option("memory-leak-check", cmdline.isset("memory-leak-check")); \
+  options.set_option("memory-cleanup-check", cmdline.isset("memory-cleanup-check")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("div-by-zero-check", cmdline.isset("div-by-zero-check")); \
   options.set_option("enum-range-check", cmdline.isset("enum-range-check")); \
   options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); /* NOLINT(whitespace/line_length) */  \

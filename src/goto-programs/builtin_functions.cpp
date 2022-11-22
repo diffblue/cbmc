@@ -831,6 +831,7 @@ void goto_convertt::do_function_call_symbol(
     annotated_location = function.source_location();
     annotated_location.set("user-provided", true);
     dest.add(goto_programt::make_assumption(false_exprt(), annotated_location));
+    dest.instructions.back().labels.push_back("__VERIFIER_abort");
   }
   else if(
     identifier == "assert" &&
