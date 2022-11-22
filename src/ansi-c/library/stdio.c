@@ -1148,8 +1148,8 @@ int __VERIFIER_nondet_int();
 
 int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
 {
-  __CPROVER_HIDE:;
-  int result=__VERIFIER_nondet_int();
+__CPROVER_HIDE:;
+  int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
