@@ -116,7 +116,6 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-contract-replacemen
 <div class="line"> </div>
 <div class="line">  <span class="comment">// assert requires clauses</span></div>
 <div class="line">  assert(contract::requires(foo_params, requires_write_set));</div>
-<div class="line">  assert(contract::requires_contract(foo_params, requires_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// snapshot history variables</span></div>
 <div class="line">  hist1_t hist1 = ...;</div>
@@ -161,7 +160,6 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-contract-replacemen
 <div class="line"> </div>
 <div class="line">  <span class="comment">// assume post conditions</span></div>
 <div class="line">  assume(contract::ensures(foo_params, ensures_write_set));</div>
-<div class="line">  assume(contract::ensures_contract(foo_params, ensures_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// postamble</span></div>
 <div class="line">  assert(__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(ensures_write_set));</div>

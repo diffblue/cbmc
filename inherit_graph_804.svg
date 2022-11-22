@@ -8,9 +8,9 @@
  viewBox="0.00 0.00 1357.00 235.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 231.5)">
 <title>Graphical Class Hierarchy</title>
-<!-- Node1595 -->
+<!-- Node1594 -->
 <g id="node1" class="node">
-<title>Node1595</title>
+<title>Node1594</title>
 <g id="a_node1"><a xlink:href="classconflict__providert.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="358,-208 358,-227 459,-227 459,-208 358,-208"/>
 <text text-anchor="middle" x="408.5" y="-215" font-family="Helvetica,sans-Serif" font-size="10.00">conflict_providert</text>
@@ -26,9 +26,9 @@
 </a>
 </g>
 </g>
-<!-- Node1595&#45;&gt;Node1 -->
+<!-- Node1594&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
-<title>Node1595&#45;&gt;Node1</title>
+<title>Node1594&#45;&gt;Node1</title>
 <path fill="none" stroke="midnightblue" d="M462.4,-205.68C486.37,-200.32 514.32,-194.07 536.91,-189.02"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="461.39,-202.31 452.4,-207.91 462.92,-209.15 461.39,-202.31"/>
 </g>
@@ -167,63 +167,63 @@
 <path fill="none" stroke="midnightblue" d="M1204.31,-122.5C1216.6,-122.5 1229.61,-122.5 1241.82,-122.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1204.19,-119 1194.19,-122.5 1204.19,-126 1204.19,-119"/>
 </g>
-<!-- Node1518 -->
+<!-- Node1517 -->
 <g id="node12" class="node">
-<title>Node1518</title>
+<title>Node1517</title>
 <g id="a_node12"><a xlink:href="classdecision__proceduret.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="0,-50 0,-69 115,-69 115,-50 0,-50"/>
 <text text-anchor="middle" x="57.5" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">decision_proceduret</text>
 </a>
 </g>
 </g>
-<!-- Node1519 -->
+<!-- Node1518 -->
 <g id="node13" class="node">
-<title>Node1519</title>
+<title>Node1518</title>
 <g id="a_node13"><a xlink:href="classstack__decision__proceduret.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="151,-50 151,-69 297,-69 297,-50 151,-50"/>
 <text text-anchor="middle" x="224" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">stack_decision_proceduret</text>
 </a>
 </g>
 </g>
-<!-- Node1518&#45;&gt;Node1519 -->
+<!-- Node1517&#45;&gt;Node1518 -->
 <g id="edge11" class="edge">
-<title>Node1518&#45;&gt;Node1519</title>
+<title>Node1517&#45;&gt;Node1518</title>
 <path fill="none" stroke="midnightblue" d="M125.27,-59.5C133.71,-59.5 142.37,-59.5 150.89,-59.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="125.11,-56 115.11,-59.5 125.11,-63 125.11,-56"/>
 </g>
-<!-- Node1520 -->
+<!-- Node1519 -->
 <g id="node14" class="node">
-<title>Node1520</title>
+<title>Node1519</title>
 <g id="a_node14"><a xlink:href="classprop__convt.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="373,-170 373,-189 444,-189 444,-170 373,-170"/>
 <text text-anchor="middle" x="408.5" y="-177" font-family="Helvetica,sans-Serif" font-size="10.00">prop_convt</text>
 </a>
 </g>
 </g>
-<!-- Node1519&#45;&gt;Node1520 -->
+<!-- Node1518&#45;&gt;Node1519 -->
 <g id="edge12" class="edge">
-<title>Node1519&#45;&gt;Node1520</title>
+<title>Node1518&#45;&gt;Node1519</title>
 <path fill="none" stroke="midnightblue" d="M238.86,-77.08C257.72,-99.79 293.66,-138.97 333,-160.5 345.18,-167.17 359.76,-171.55 372.77,-174.41"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="241.52,-74.8 232.5,-69.25 236.09,-79.22 241.52,-74.8"/>
 </g>
-<!-- Node1521 -->
+<!-- Node1520 -->
 <g id="node15" class="node">
-<title>Node1521</title>
+<title>Node1520</title>
 <g id="a_node15"><a xlink:href="classsmt2__convt.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="371.5,-6 371.5,-25 445.5,-25 445.5,-6 371.5,-6"/>
 <text text-anchor="middle" x="408.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">smt2_convt</text>
 </a>
 </g>
 </g>
-<!-- Node1519&#45;&gt;Node1521 -->
+<!-- Node1518&#45;&gt;Node1520 -->
 <g id="edge14" class="edge">
-<title>Node1519&#45;&gt;Node1521</title>
+<title>Node1518&#45;&gt;Node1520</title>
 <path fill="none" stroke="midnightblue" d="M274.64,-47.53C305.21,-40.16 343.71,-30.88 371.38,-24.21"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="273.5,-44.21 264.6,-49.95 275.14,-51.01 273.5,-44.21"/>
 </g>
-<!-- Node1523 -->
+<!-- Node1522 -->
 <g id="node18" class="node">
-<title>Node1523</title>
+<title>Node1522</title>
 <g id="a_node18"><a xlink:href="classsmt2__incremental__decision__proceduret.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="333,-44.5 333,-74.5 484,-74.5 484,-44.5 333,-44.5"/>
 <text text-anchor="start" x="341" y="-62.5" font-family="Helvetica,sans-Serif" font-size="10.00">smt2_incremental_decision</text>
@@ -231,15 +231,15 @@
 </a>
 </g>
 </g>
-<!-- Node1519&#45;&gt;Node1523 -->
+<!-- Node1518&#45;&gt;Node1522 -->
 <g id="edge17" class="edge">
-<title>Node1519&#45;&gt;Node1523</title>
+<title>Node1518&#45;&gt;Node1522</title>
 <path fill="none" stroke="midnightblue" d="M307.14,-59.5C315.72,-59.5 324.41,-59.5 332.9,-59.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="307.13,-56 297.13,-59.5 307.13,-63 307.13,-56"/>
 </g>
-<!-- Node1520&#45;&gt;Node1 -->
+<!-- Node1519&#45;&gt;Node1 -->
 <g id="edge13" class="edge">
-<title>Node1520&#45;&gt;Node1</title>
+<title>Node1519&#45;&gt;Node1</title>
 <path fill="none" stroke="midnightblue" d="M454.54,-179.5C476.9,-179.5 504.03,-179.5 527.3,-179.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="454.31,-176 444.31,-179.5 454.31,-183 454.31,-176"/>
 </g>
@@ -252,15 +252,15 @@
 </a>
 </g>
 </g>
-<!-- Node1521&#45;&gt;Node283 -->
+<!-- Node1520&#45;&gt;Node283 -->
 <g id="edge15" class="edge">
-<title>Node1521&#45;&gt;Node283</title>
+<title>Node1520&#45;&gt;Node283</title>
 <path fill="none" stroke="midnightblue" d="M455.37,-25.6C464.95,-28.15 474.89,-31.14 484,-34.5 512.6,-45.06 544.01,-61.53 562.72,-71.91"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="456.14,-22.19 445.58,-23.1 454.41,-28.97 456.14,-22.19"/>
 </g>
-<!-- Node1522 -->
+<!-- Node1521 -->
 <g id="node17" class="node">
-<title>Node1522</title>
+<title>Node1521</title>
 <g id="a_node17"><a xlink:href="classstate__encoding__smt2__convt.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="520,-0.5 520,-30.5 641,-30.5 641,-0.5 520,-0.5"/>
 <text text-anchor="start" x="528" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">state_encoding_smt2</text>
@@ -268,9 +268,9 @@
 </a>
 </g>
 </g>
-<!-- Node1521&#45;&gt;Node1522 -->
+<!-- Node1520&#45;&gt;Node1521 -->
 <g id="edge16" class="edge">
-<title>Node1521&#45;&gt;Node1522</title>
+<title>Node1520&#45;&gt;Node1521</title>
 <path fill="none" stroke="midnightblue" d="M455.81,-15.5C475.52,-15.5 498.77,-15.5 519.75,-15.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="455.55,-12 445.55,-15.5 455.55,-19 455.55,-12"/>
 </g>

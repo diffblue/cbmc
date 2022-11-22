@@ -5,8 +5,6 @@ var classcode__contractst =
     [ "apply_function_contract", "classcode__contractst.html#a23235d91ecb26eb050ea72e1679a1ec7", null ],
     [ "apply_loop_contract", "classcode__contractst.html#a384938548a16b9729ab055335078d398", null ],
     [ "apply_loop_contracts", "classcode__contractst.html#a481adf4209178c6c05270908690c2bff", null ],
-    [ "assert_function_pointer_obeys_contract", "classcode__contractst.html#aeaa4c3462ad0171fd1598972f70d1cc4", null ],
-    [ "assume_function_pointer_obeys_contract", "classcode__contractst.html#a0651cbc32c14781e4af9f5e6812ae1a8", null ],
     [ "check_all_functions_found", "classcode__contractst.html#a39316dcec36f0a77c21f173c31c5966e", null ],
     [ "check_apply_loop_contracts", "classcode__contractst.html#a368a74a79d34576fb378b462f3ca60d8", null ],
     [ "check_frame_conditions_function", "classcode__contractst.html#a3d27bda0b7c2ca8427b40343129d221a", null ],

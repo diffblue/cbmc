@@ -118,7 +118,6 @@ var classc__typecheck__baset =
     [ "typecheck_spec_decreases", "classc__typecheck__baset.html#a51a642f44848bf4df93ac5b7674ba82a", null ],
     [ "typecheck_spec_frees", "classc__typecheck__baset.html#abc59dc2e25b62da265c89238619349b2", null ],
     [ "typecheck_spec_frees_target", "classc__typecheck__baset.html#a6e044732c3e87ac9be83bb3e4da18806", null ],
-    [ "typecheck_spec_function_pointer_obeys_contract", "classc__typecheck__baset.html#a5421a8eb88a64e7821f9c58737c75cb6", null ],
     [ "typecheck_spec_loop_invariant", "classc__typecheck__baset.html#ac8eeabced3b6bbfd4e60d1fb1c35401a", null ],
     [ "typecheck_start_thread", "classc__typecheck__baset.html#ac7abd88a8e81956eb51c0361ace40370", null ],
     [ "typecheck_switch", "classc__typecheck__baset.html#aa1add23573af2a68fbef8904dd65e158", null ],

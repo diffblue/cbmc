@@ -497,7 +497,6 @@ var annotated_dup =
     [ "function_filterst", "classfunction__filterst.html", "classfunction__filterst" ],
     [ "function_indicest", "classfunction__indicest.html", "classfunction__indicest" ],
     [ "function_name_manglert", "classfunction__name__manglert.html", "classfunction__name__manglert" ],
-    [ "function_pointer_obeys_contract_exprt", "classfunction__pointer__obeys__contract__exprt.html", "classfunction__pointer__obeys__contract__exprt" ],
     [ "function_pointer_restrictionst", "classfunction__pointer__restrictionst.html", "classfunction__pointer__restrictionst" ],
     [ "functions_in_scope_visitort", "classfunctions__in__scope__visitort.html", "classfunctions__in__scope__visitort" ],
     [ "functionst", "classfunctionst.html", "classfunctionst" ],

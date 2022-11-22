@@ -98,11 +98,9 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-reminder.html','');
 <div class="fragment"><div class="line">ret_t foo(parameters)</div>
 <div class="line"><span class="comment">// preconditions</span></div>
 <div class="line">__CPROVER_requires(R)</div>
-<div class="line">__CPROVER_requires_contract(P, C)</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// postconditions</span></div>
 <div class="line">__CPROVER_ensures(E)</div>
-<div class="line">__CPROVER_ensures_contract(P, C)</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// frame conditions</span></div>
 <div class="line">__CPROVER_assigns(A)</div>
@@ -110,9 +108,7 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-reminder.html','');
 <div class="line">;</div>
 </div><!-- fragment --><ul>
 <li>A <code>__CPROVER_requires</code> clause (<a class="el" href="contracts-requires-ensures.html">Requires and Ensures Clauses</a>) specifies a precondition as boolean expression R that may only depend on program globals, function parameters, <a class="el" href="contracts-memory-predicates.html">memory predicates</a> and deterministic, side effect-free function calls;</li>
-<li>A <code>__CPROVER_requires_contract</code> clause clause specifies the precondition that a function pointer expression P satisfies a contract C, where P may only depend on program globals and function parameters;</li>
 <li>A <code>__CPROVER_ensures</code> clause (<a class="el" href="contracts-requires-ensures.html">Requires and Ensures Clauses</a>) specifies a postcondition as boolean expression E that may only depend on program globals, function parameters, <a class="el" href="contracts-memory-predicates.html">memory predicates</a>, deterministic, side effect-free function calls, <a class="el" href="contracts-history-variables.html">history variables</a>, and the special variable <code>__CPROVER_return_value</code>;</li>
-<li>A <code>__CPROVER_ensures_contract</code> clause specifies the postcondition that a function pointer expression P satisfies a contract C, where P may only depend on program globals, function parameters, <a class="el" href="contracts-history-variables.html">history variables</a> and the special variable <code>__CPROVER_return_value</code>;</li>
 <li>A <code>__CPROVER_assigns</code> clause (<a class="el" href="contracts-assigns.html">Assigns Clauses</a>) specifies a set A of memory locations that may be assigned to by any function satisfying the contract;</li>
 <li>A <code>__CPROVER_frees</code> clause (<a class="el" href="contracts-frees.html">Frees Clauses</a>) specifies a set F of pointers that may be freed by any function satisfying the contract.</li>
 </ul>

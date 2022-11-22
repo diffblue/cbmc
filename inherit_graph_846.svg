@@ -8,27 +8,27 @@
  viewBox="0.00 0.00 436.00 77.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 73.5)">
 <title>Graphical Class Hierarchy</title>
-<!-- Node1599 -->
+<!-- Node1598 -->
 <g id="node1" class="node">
-<title>Node1599</title>
+<title>Node1598</title>
 <g id="a_node1"><a xlink:href="structbv__refinementt_1_1configt.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="0,-50 0,-69 130,-69 130,-50 0,-50"/>
 <text text-anchor="middle" x="65" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">bv_refinementt::configt</text>
 </a>
 </g>
 </g>
-<!-- Node1600 -->
+<!-- Node1599 -->
 <g id="node2" class="node">
-<title>Node1600</title>
+<title>Node1599</title>
 <g id="a_node2"><a xlink:href="structbv__refinementt_1_1infot.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="166,-50 166,-69 285,-69 285,-50 166,-50"/>
 <text text-anchor="middle" x="225.5" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">bv_refinementt::infot</text>
 </a>
 </g>
 </g>
-<!-- Node1599&#45;&gt;Node1600 -->
+<!-- Node1598&#45;&gt;Node1599 -->
 <g id="edge1" class="edge">
-<title>Node1599&#45;&gt;Node1600</title>
+<title>Node1598&#45;&gt;Node1599</title>
 <path fill="none" stroke="midnightblue" d="M140.1,-59.5C148.75,-59.5 157.48,-59.5 165.88,-59.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="140.01,-56 130.01,-59.5 140.01,-63 140.01,-56"/>
 </g>
@@ -42,9 +42,9 @@
 </a>
 </g>
 </g>
-<!-- Node1600&#45;&gt;Node1 -->
+<!-- Node1599&#45;&gt;Node1 -->
 <g id="edge2" class="edge">
-<title>Node1600&#45;&gt;Node1</title>
+<title>Node1599&#45;&gt;Node1</title>
 <path fill="none" stroke="midnightblue" d="M295.12,-49.23C303.78,-47.93 312.53,-46.62 320.89,-45.37"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="294.39,-45.8 285.02,-50.74 295.43,-52.72 294.39,-45.8"/>
 </g>

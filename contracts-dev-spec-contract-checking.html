@@ -164,7 +164,6 @@ Swapping-and-Wrapping Functions</h1>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// assume requires clauses</span></div>
 <div class="line">  assume(contract::requires(foo_params, requires_write_set));</div>
-<div class="line">  assume(contract::requires_contract(foo_params, requires_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check that requires clause do not allocate or deallocate dynamic memory</span></div>
 <div class="line">  assert(__CPROVER_contracts_write_set_allocated_deallocated_is_empty(requires_write_set));</div>
@@ -195,7 +194,6 @@ Swapping-and-Wrapping Functions</h1>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check post conditions</span></div>
 <div class="line">  assert(contract::ensures(foo_params, ensures_write_set));</div>
-<div class="line">  assert(contract::ensures_contract(foo_params, ensures_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check that requires clause do not allocate or deallocate dynamic memory</span></div>
 <div class="line">  assert(__CPROVER_contracts_write_set_allocated_deallocated_is_empty(ensures_write_set));</div>
