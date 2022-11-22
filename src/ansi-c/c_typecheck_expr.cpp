@@ -2872,12 +2872,13 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(infl_expr);
   }
-  else if(identifier==CPROVER_PREFIX "abs" ||
-          identifier==CPROVER_PREFIX "labs" ||
-          identifier==CPROVER_PREFIX "llabs" ||
-          identifier==CPROVER_PREFIX "fabs" ||
-          identifier==CPROVER_PREFIX "fabsf" ||
-          identifier==CPROVER_PREFIX "fabsl")
+  else if(
+    identifier == CPROVER_PREFIX "abs" || identifier == CPROVER_PREFIX "labs" ||
+    identifier == CPROVER_PREFIX "llabs" ||
+    identifier == CPROVER_PREFIX "imaxabs" ||
+    identifier == CPROVER_PREFIX "fabs" ||
+    identifier == CPROVER_PREFIX "fabsf" ||
+    identifier == CPROVER_PREFIX "fabsl")
   {
     if(expr.arguments().size()!=1)
     {
