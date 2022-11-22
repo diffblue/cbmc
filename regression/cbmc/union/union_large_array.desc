@@ -1,4 +1,4 @@
-CORE broken-z3-smt-backend
+CORE thorough-smt-backend
 union_large_array.c
 
 ^EXIT=10$
@@ -9,3 +9,8 @@ union_large_array.c
 --
 ^warning: ignoring
 --
+Union field sensitivity yields an equation over the (large) array member, which
+results in one assertion per array element. The formula is generated in 150
+seconds, with a file size of 98 MB. Solving requires several GB of memory.
+Adding --slice-formula would avoid the problem, but would remove all interesting
+parts of this regression test.

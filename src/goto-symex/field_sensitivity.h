@@ -9,15 +9,50 @@ Author: Michael Tautschnig
 #ifndef CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
-#include <cstddef>
-
 #include <util/nodiscard.h>
+#include <util/ssa_expr.h>
 
-class exprt;
-class ssa_exprt;
 class namespacet;
 class goto_symex_statet;
 class symex_targett;
+
+class field_sensitive_ssa_exprt : public exprt
+{
+public:
+  field_sensitive_ssa_exprt(const ssa_exprt &ssa, exprt::operandst &&fields)
+    : exprt(ID_field_sensitive_ssa, ssa.type(), std::move(fields))
+  {
+    add(ID_expression, ssa);
+  }
+
+  const ssa_exprt &get_object_ssa() const
+  {
+    return static_cast<const ssa_exprt &>(find(ID_expression));
+  }
+};
+
+template <>
+inline bool can_cast_expr<field_sensitive_ssa_exprt>(const exprt &base)
+{
+  return base.id() == ID_field_sensitive_ssa;
+}
+
+inline const field_sensitive_ssa_exprt &
+to_field_sensitive_ssa_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_field_sensitive_ssa);
+  const field_sensitive_ssa_exprt &ret =
+    static_cast<const field_sensitive_ssa_exprt &>(expr);
+  return ret;
+}
+
+inline field_sensitive_ssa_exprt &to_field_sensitive_ssa_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_field_sensitive_ssa);
+  field_sensitive_ssa_exprt &ret =
+    static_cast<field_sensitive_ssa_exprt &>(expr);
+  return ret;
+}
 
 /// Control granularity of object accesses
 ///
@@ -136,10 +171,14 @@ public:
     bool write) const;
 
   /// Compute an expression representing the individual components of a
-  /// field-sensitive SSA representation of \p ssa_expr.
+  /// field-sensitive SSA representation of \p ssa_expr. When
+  /// \p disjoined_fields_only is false, the resulting expression must be
+  /// handled with care as it will have multiple operands but empty `id()`.
   /// \param ns: a namespace to resolve type symbols/tag types
   /// \param [in,out] state: symbolic execution state
   /// \param ssa_expr: the expression to evaluate
+  /// \param disjoined_fields_only: whether to expand unions (`false`) or not
+  ///   (`true`)
   /// \return Expanded expression; for example, for a \p ssa_expr of some struct
   ///   type, a `struct_exprt` with each component now being an SSA expression
   ///   is built.
@@ -147,17 +186,20 @@ public:
   exprt get_fields(
     const namespacet &ns,
     goto_symex_statet &state,
-    const ssa_exprt &ssa_expr) const;
+    const ssa_exprt &ssa_expr,
+    bool disjoined_fields_only) const;
 
   /// Determine whether \p expr would translate to an atomic SSA expression
   /// (returns false) or a composite object made of several SSA expressions as
   /// components (such as a struct with each member becoming an individual SSA
   /// expression, return true in this case).
   /// \param expr: the expression to evaluate
+  /// \param disjoined_fields_only: whether to expand unions (`false`) or not
+  ///   (`true`)
   /// \return False, if and only if, \p expr would be a single field-sensitive
   /// SSA expression.
   NODISCARD
-  bool is_divisible(const ssa_exprt &expr) const;
+  bool is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
 
 private:
   const std::size_t max_field_sensitivity_array_size;

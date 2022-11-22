@@ -205,7 +205,7 @@ void symex_assignt::assign_non_struct_symbol(
     current_assignment_type);
 
   const ssa_exprt &l1_lhs = assignment.lhs;
-  if(state.field_sensitivity.is_divisible(l1_lhs))
+  if(state.field_sensitivity.is_divisible(l1_lhs, false))
   {
     // Split composite symbol lhs into its components
     state.field_sensitivity.field_assignments(
@@ -218,8 +218,11 @@ void symex_assignt::assign_non_struct_symbol(
     // Erase the composite symbol from our working state. Note that we need to
     // have it in the propagation table and the value set while doing the field
     // assignments, thus we cannot skip putting it in there above.
-    state.propagation.erase_if_exists(l1_lhs.get_identifier());
-    state.value_set.erase_symbol(l1_lhs, ns);
+    if(state.field_sensitivity.is_divisible(l1_lhs, true))
+    {
+      state.propagation.erase_if_exists(l1_lhs.get_identifier());
+      state.value_set.erase_symbol(l1_lhs, ns);
+    }
   }
 }
 

@@ -372,7 +372,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivity.is_divisible(expr))
+  if(field_sensitivity.is_divisible(expr, true))
     return false;
 
   const ssa_exprt ssa_l1 = remove_level_2(expr);
@@ -508,7 +508,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivity.is_divisible(expr))
+  if(field_sensitivity.is_divisible(expr, true))
     return write_is_shared_resultt::NOT_SHARED;
 
   if(atomic_section_id != 0)
@@ -836,13 +836,20 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
   }
 
   // L2 renaming
-  const exprt fields = field_sensitivity.get_fields(ns, *this, ssa);
+  exprt fields = field_sensitivity.get_fields(ns, *this, ssa, false);
   fields.visit_pre([this](const exprt &e) {
     if(auto l1_symbol = expr_try_dynamic_cast<symbol_exprt>(e))
     {
       const ssa_exprt &field_ssa = to_ssa_expr(*l1_symbol);
       const std::size_t field_generation = level2.increase_generation(
         l1_symbol->get_identifier(), field_ssa, fresh_l2_name_provider);
+      CHECK_RETURN(field_generation == 1);
+    }
+    else if(auto fs_ssa = expr_try_dynamic_cast<field_sensitive_ssa_exprt>(e))
+    {
+      const ssa_exprt &ssa = fs_ssa->get_object_ssa();
+      const std::size_t field_generation = level2.increase_generation(
+        ssa.get_identifier(), ssa, fresh_l2_name_provider);
       CHECK_RETURN(field_generation == 1);
     }
   });
