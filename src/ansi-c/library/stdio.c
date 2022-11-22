@@ -888,6 +888,28 @@ __CPROVER_HIDE:;
   return result;
 }
 
+/* FUNCTION: __isoc99_scanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __isoc99_scanf(const char *restrict format, ...)
+{
+__CPROVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result = vfscanf(stdin, format, list);
+  va_end(list);
+  return result;
+}
+
 /* FUNCTION: sscanf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -906,6 +928,28 @@ __CPROVER_HIDE:;
   va_list list;
   va_start(list, format);
   int result=vsscanf(s, format, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: __isoc99_sscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __isoc99_sscanf(const char *restrict s, const char *restrict format, ...)
+{
+__CPROVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result = vsscanf(s, format, list);
   va_end(list);
   return result;
 }
@@ -949,6 +993,48 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
   return result;
 }
 
+/* FUNCTION: __isoc99_vfscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int();
+
+int __isoc99_vfscanf(
+  FILE *restrict stream,
+  const char *restrict format,
+  va_list arg)
+{
+__CPROVER_HIDE:;
+  int result = __VERIFIER_nondet_int();
+
+  if(stream != stdin)
+  {
+#if !defined(__linux__) || defined(__GLIBC__)
+    (void)*stream;
+#else
+    (void)*(char *)stream;
+#endif
+  }
+
+  (void)*format;
+  (void)arg;
+
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(
+    __CPROVER_get_must(stream, "open"), "vfscanf file must be open");
+#endif
+
+  return result;
+}
+
 /* FUNCTION: vscanf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -964,6 +1050,24 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 int vscanf(const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
+  return vfscanf(stdin, format, arg);
+}
+
+/* FUNCTION: __isoc99_vscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __isoc99_vscanf(const char *restrict format, va_list arg)
+{
+__CPROVER_HIDE:;
   return vfscanf(stdin, format, arg);
 }
 
@@ -985,6 +1089,33 @@ int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
   int result=__VERIFIER_nondet_int();
+  (void)*s;
+  (void)*format;
+  (void)arg;
+  return result;
+}
+
+/* FUNCTION: __isoc99_vsscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int();
+
+int __isoc99_vsscanf(
+  const char *restrict s,
+  const char *restrict format,
+  va_list arg)
+{
+__CPROVER_HIDE:;
+  int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
   (void)arg;
