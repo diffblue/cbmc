@@ -1035,6 +1035,52 @@ __CPROVER_HIDE:;
   return result;
 }
 
+/* FUNCTION: __stdio_common_vfscanf */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+int __VERIFIER_nondet_int();
+
+int __stdio_common_vfscanf(
+  unsigned __int64 options,
+  FILE *stream,
+  char const *format,
+  _locale_t locale,
+  va_list args)
+{
+  (void)options;
+  (void)locale;
+
+  int result = __VERIFIER_nondet_int();
+
+  if(stream != stdin)
+  {
+    (void)*(char *)stream;
+  }
+
+  (void)*format;
+  (void)args;
+
+#  ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(
+    __CPROVER_get_must(stream, "open"), "vfscanf file must be open");
+#  endif
+
+  return result;
+}
+
+#endif
+
 /* FUNCTION: vscanf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -1121,6 +1167,44 @@ __CPROVER_HIDE:;
   (void)arg;
   return result;
 }
+
+/* FUNCTION: __stdio_common_vsscanf */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+int __VERIFIER_nondet_int();
+
+int __stdio_common_vsscanf(
+  unsigned __int64 options,
+  char const *s,
+  size_t buffer_count,
+  char const *format,
+  _locale_t locale,
+  va_list args)
+{
+  (void)options;
+  (void)locale;
+
+  int result = __VERIFIER_nondet_int();
+
+  (void)*s;
+  (void)*format;
+  (void)args;
+
+  return result;
+}
+
+#endif
 
 /* FUNCTION: printf */
 
