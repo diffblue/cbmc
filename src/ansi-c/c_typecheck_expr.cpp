@@ -1944,7 +1944,7 @@ void c_typecheck_baset::typecheck_typed_target_call(
   }
 
   auto arg0 = expr.arguments().front();
-  typecheck_expr(arg0);
+
   if(!is_assignable(arg0) || !arg0.get_bool(ID_C_lvalue))
   {
     throw invalid_source_file_exceptiont{
@@ -1976,7 +1976,7 @@ void c_typecheck_baset::typecheck_typed_target_call(
     arguments.push_back(false_exprt());
 
   expr.arguments().swap(arguments);
-  typecheck_side_effect_function_call(expr);
+  expr.type() = empty_typet();
 }
 
 void c_typecheck_baset::typecheck_side_effect_function_call(
