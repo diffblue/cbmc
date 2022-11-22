@@ -16,7 +16,11 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_PREDICATE_TRACKING_DOMAIN_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_PREDICATE_TRACKING_DOMAIN_H
 
+#include <util/irep_hash.h>
+
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
+
+#include <unordered_set>
 
 class predicate_tracking_domaint : public variable_sensitivity_domaint
 {
@@ -85,12 +89,21 @@ public:
   /// \return True if no simplification was made
   bool ai_simplify(exprt &condition, const namespacet &ns) const override;
 
+  void make_bottom() override;
+  void make_top() override;
+  bool is_bottom() const override;
+  bool is_top() const override;
+
 protected:
   void assume(exprt expr, namespacet ns) override;
   bool assign(
     const exprt &expr,
     const abstract_object_pointert &value,
     const namespacet &ns) override;
+
+  /// Store the predicates that are known to be true at this point
+  using pred_sett = std::unordered_set<exprt, irep_hash>;
+  pred_sett predicate_set;
 };
 
 class predicate_tracking_domain_factoryt
