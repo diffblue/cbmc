@@ -23,6 +23,9 @@ using:
 
 which will install arm-none-eabi-gcc (amongst other things).
 
+Use `make build_goto_binaries` in the parent directory to run the above for this
+and all other directories containing binaries.
+
 preproc.i is already pre-processed so that it can be linked in without
 needing to invoke a pre-processor from a cross-compile toolchain on your
 local machine. Linking it together with the ARM object file, while
