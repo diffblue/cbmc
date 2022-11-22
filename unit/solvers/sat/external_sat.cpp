@@ -48,19 +48,6 @@ SCENARIO("external_sat", "[core][solvers][sat][external_sat]")
       }
     }
 
-    AND_GIVEN("the output is malformed")
-    {
-      auto result = "c too few assignments\ns SATISFIABLE\nv 1 2 3 4";
-      WHEN("the solver output contains:\n" << result)
-      {
-        THEN("the result is set to error")
-        {
-          satcheck.set_no_variables(100);
-          REQUIRE(satcheck.parse_result(result) == propt::resultt::P_ERROR);
-        }
-      }
-    }
-
     AND_GIVEN("SAT instance is unsatisfiable")
     {
       std::string unsat_result = GENERATE(
