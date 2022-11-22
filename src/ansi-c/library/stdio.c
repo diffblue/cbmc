@@ -983,7 +983,12 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
   }
 
   (void)*format;
-  (void)arg;
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+        __CPROVER_OBJECT_SIZE(arg))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(stream, "open"),
@@ -1025,7 +1030,12 @@ __CPROVER_HIDE:;
   }
 
   (void)*format;
-  (void)arg;
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+        __CPROVER_OBJECT_SIZE(arg))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(
@@ -1069,7 +1079,12 @@ int __stdio_common_vfscanf(
   }
 
   (void)*format;
-  (void)args;
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args) <
+        __CPROVER_OBJECT_SIZE(args))
+  {
+    void *a = va_arg(args, void *);
+    __CPROVER_havoc_object(a);
+  }
 
 #  ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(
@@ -1137,7 +1152,13 @@ int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
   int result=__VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-  (void)arg;
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+        __CPROVER_OBJECT_SIZE(arg))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
+
   return result;
 }
 
@@ -1164,7 +1185,13 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-  (void)arg;
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+        __CPROVER_OBJECT_SIZE(arg))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
+
   return result;
 }
 
@@ -1199,7 +1226,12 @@ int __stdio_common_vsscanf(
 
   (void)*s;
   (void)*format;
-  (void)args;
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args) <
+        __CPROVER_OBJECT_SIZE(args))
+  {
+    void *a = va_arg(args, void *);
+    __CPROVER_havoc_object(a);
+  }
 
   return result;
 }
