@@ -71,11 +71,7 @@ static void get_symbols(
         find_type_and_expr_symbols(a, new_symbols);
       for(const exprt &e : maybe_contract.ensures())
         find_type_and_expr_symbols(e, new_symbols);
-      for(const exprt &e : maybe_contract.ensures_contract())
-        find_type_and_expr_symbols(e, new_symbols);
       for(const exprt &r : maybe_contract.requires())
-        find_type_and_expr_symbols(r, new_symbols);
-      for(const exprt &r : maybe_contract.requires_contract())
         find_type_and_expr_symbols(r, new_symbols);
 
       for(const auto &s : new_symbols)

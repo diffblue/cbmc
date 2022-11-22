@@ -32,7 +32,6 @@ class dfcc_utilst;
 class dfcc_spec_functionst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
-class function_pointer_obeys_contract_exprt;
 
 /// Generates GOTO functions modelling a contract assigns and frees clauses.
 ///

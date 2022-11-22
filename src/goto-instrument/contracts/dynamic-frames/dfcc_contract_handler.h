@@ -32,7 +32,6 @@ class dfcc_instrumentt;
 class dfcc_spec_functionst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
-class function_pointer_obeys_contract_exprt;
 
 /// A contract is represented by a function declaration or definition
 /// with contract clauses attached to its signature:
@@ -40,11 +39,9 @@ class function_pointer_obeys_contract_exprt;
 /// ```
 /// ret_t foo(foo_params)
 /// __CPROVER_requires(R)
-/// __CPROVER_requires_contract(ptr, contract)
 /// __CPROVER_assigns(A)
 /// __CPROVER_frees(F)
 /// __CPROVER_ensures(E)
-/// __CPROVER_ensures_contract(ptr, contract)
 /// { foo_body; } [optional]
 /// ```
 ///
