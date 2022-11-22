@@ -8,12 +8,11 @@
 
 // external dependencies
 extern __CPROVER_size_t __CPROVER_max_malloc_size;
-extern void *__CPROVER_alloca_object;
+extern const void *__CPROVER_alloca_object;
 extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_new_object;
 extern __CPROVER_bool __CPROVER_malloc_is_new_array;
 int __builtin_clzll(unsigned long long);
-char __VERIFIER_nondet_char();
 __CPROVER_bool __VERIFIER_nondet_CPROVER_bool();
 
 /// \brief A conditionally writable range of bytes.
@@ -245,8 +244,8 @@ __CPROVER_HIDE:;
   // symex state from the number of object_bits/offset_bits
   // the number of object bits is determined by counting the number of leading
   // zeroes of the built-in constant __CPROVER_max_malloc_size;
-  __CPROVER_size_t object_bits = __builtin_clzll(__CPROVER_max_malloc_size);
-  __CPROVER_size_t nof_objects = 1UL << object_bits;
+  int object_bits = __builtin_clzll(__CPROVER_max_malloc_size);
+  __CPROVER_size_t nof_objects = 1ULL << object_bits;
   *set = (__CPROVER_contracts_obj_set_t){
     .max_elems = nof_objects,
     .watermark = 0,
@@ -1143,7 +1142,6 @@ void *__CPROVER_contracts_malloc(
   __CPROVER_size_t,
   __CPROVER_contracts_write_set_ptr_t);
 
-__CPROVER_bool __VERIFIER_nondet_bool();
 /// \brief Implementation of the `is_fresh` front-end predicate.
 ///
 /// The behaviour depends on the boolean flags carried by \p set
@@ -1170,7 +1168,7 @@ __CPROVER_bool __CPROVER_contracts_is_fresh(
   __CPROVER_contracts_write_set_ptr_t write_set)
 {
   if(!write_set)
-    return __VERIFIER_nondet_bool();
+    return __VERIFIER_nondet_CPROVER_bool();
 __CPROVER_HIDE:;
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
