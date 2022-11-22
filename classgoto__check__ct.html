@@ -200,6 +200,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ac6fdf8ed79f120ad50f096b2437ab37f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a884eaca58562585b1837913ca1b4121b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a884eaca58562585b1837913ca1b4121b">pointer_overflow_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;)</td></tr>
 <tr class="separator:a884eaca58562585b1837913ca1b4121b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b63d6ead43d0ef4a36a4b91aeea014c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a3b63d6ead43d0ef4a36a4b91aeea014c">memory_leak_check</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
+<tr class="separator:a3b63d6ead43d0ef4a36a4b91aeea014c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#af4ea47ede9713c23b48ee1fceb35ca7e">pointer_validity_check</a> (const <a class="el" href="classdereference__exprt.html">dereference_exprt</a> &amp;expr, const <a class="el" href="classexprt.html">exprt</a> &amp;src_expr, const <a class="el" href="classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2">guardt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates VCCs for the validity of the given dereferencing operation.  <a href="classgoto__check__ct.html#af4ea47ede9713c23b48ee1fceb35ca7e">More...</a><br /></td></tr>
 <tr class="separator:af4ea47ede9713c23b48ee1fceb35ca7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -268,6 +270,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a343f4a2d10b31be5a971a2f1f4605409"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8929ff5bc066637ef12c675b40669ee0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a8929ff5bc066637ef12c675b40669ee0">enable_memory_leak_check</a></td></tr>
 <tr class="separator:a8929ff5bc066637ef12c675b40669ee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa722bd3611af8ed539a22ef75e83f970"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#aa722bd3611af8ed539a22ef75e83f970">enable_memory_cleanup_check</a></td></tr>
+<tr class="separator:aa722bd3611af8ed539a22ef75e83f970"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add5dad5c137b8cabfef0fc1e9d3e00bf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#add5dad5c137b8cabfef0fc1e9d3e00bf">enable_div_by_zero_check</a></td></tr>
 <tr class="separator:add5dad5c137b8cabfef0fc1e9d3e00bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1dfcf968feb8d65a7ca0544edb89ee2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ab1dfcf968feb8d65a7ca0544edb89ee2">enable_enum_range_check</a></td></tr>
@@ -328,7 +332,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00295">295</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00300">300</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -352,7 +356,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00294">294</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00299">299</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +380,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00247">247</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00250">250</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -400,7 +404,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00172">172</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00174">174</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -424,7 +428,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00289">289</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00294">294</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -440,7 +444,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00080">80</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00082">82</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -464,7 +468,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00099">99</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00101">101</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -490,7 +494,7 @@ Protected Attributes</h2></td></tr>
 
 <p>optional (named-check, status) pair </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00318">318</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00323">323</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -522,7 +526,7 @@ Protected Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a4a98afeb77e36684a7d5b2353980e129ad17ec9488c909338294111cdb7a947a3"></a>CHECKED&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00310">310</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00315">315</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -598,7 +602,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds "checked" pragmas for all currently active named checks on the given source location. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02451">2451</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02474">2474</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +632,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds "disable" pragmas for all named checks on the given source location. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02459">2459</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02482">2482</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -703,7 +707,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01698">1698</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01703">1703</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -731,7 +735,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01501">1501</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01506">1506</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -769,7 +773,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01506">1506</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01511">1511</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -807,7 +811,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01676">1676</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01681">1681</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -845,7 +849,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01523">1523</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01528">1528</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -881,7 +885,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01987">1987</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01992">1992</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -928,7 +932,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01897">1897</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01902">1902</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -975,7 +979,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01741">1741</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01746">1746</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1022,7 +1026,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01870">1870</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01875">1875</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1069,7 +1073,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01855">1855</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01860">1860</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1116,7 +1120,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01791">1791</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01796">1796</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1163,7 +1167,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01764">1764</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01769">1769</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1216,7 +1220,7 @@ Protected Attributes</h2></td></tr>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01814">1814</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01819">1819</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1244,7 +1248,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00422">422</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00427">427</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1282,7 +1286,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00665">665</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00670">670</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1320,7 +1324,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00495">495</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00500">500</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1358,7 +1362,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00516">516</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00521">521</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1388,7 +1392,7 @@ Protected Attributes</h2></td></tr>
 
 <p>expand the r_ok, w_ok, rw_ok, pointer_in_range predicates </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01993">1993</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01998">1998</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1426,7 +1430,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01074">1074</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01079">1079</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1464,7 +1468,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01488">1488</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01493">1493</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1502,7 +1506,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02371">2371</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02394">2394</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1540,7 +1544,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02293">2293</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02316">2316</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1570,7 +1574,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02048">2048</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02075">2075</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1608,7 +1612,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00828">828</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00833">833</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1644,7 +1648,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00465">465</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00470">470</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1682,7 +1686,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02392">2392</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02415">2415</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1714,7 +1718,35 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line">(<span class="stringliteral">&quot;enable&quot;</span>|<span class="stringliteral">&quot;disable&quot;</span>|<span class="stringliteral">&quot;checked&quot;</span>) <span class="stringliteral">&quot;:&quot;</span> &lt;named-<a class="code" href="classgoto__check__ct.html#a6c42214b1a5a4a29baeb9f7abf4058eb">check</a>&gt;</div>
 </div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd>a pair (name, status) if the match succeeds and the name is known, nothing otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02467">2467</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02490">2490</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3b63d6ead43d0ef4a36a4b91aeea014c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b63d6ead43d0ef4a36a4b91aeea014c">&#9670;&nbsp;</a></span>memory_leak_check()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void goto_check_ct::memory_leak_check </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02053">2053</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1752,7 +1784,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00611">611</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00616">616</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1792,7 +1824,7 @@ Protected Attributes</h2></td></tr>
 
 <p>check a mod expression for the case INT_MIN % -1 </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00633">633</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00638">638</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1830,7 +1862,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01182">1182</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01187">1187</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1868,7 +1900,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01334">1334</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01339">1339</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1915,7 +1947,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01431">1431</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01436">1436</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -1953,7 +1985,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01290">1290</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01295">1295</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2007,7 +2039,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01390">1390</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01395">1395</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2044,7 +2076,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the given expression is a pointer primitive that requires checking </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01470">1470</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l01475">1475</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2082,7 +2114,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00544">544</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00549">549</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2107,7 +2139,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00296">296</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00301">301</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2131,7 +2163,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00248">248</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00251">251</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2155,7 +2187,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00096">96</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00098">98</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2179,7 +2211,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00270">270</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00274">274</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2203,7 +2235,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00256">256</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00259">259</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2227,7 +2259,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00264">264</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00268">268</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2251,7 +2283,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00259">259</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00263">263</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2275,7 +2307,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00260">260</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00264">264</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2299,7 +2331,31 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00266">266</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00270">270</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa722bd3611af8ed539a22ef75e83f970"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa722bd3611af8ed539a22ef75e83f970">&#9670;&nbsp;</a></span>enable_memory_cleanup_check</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool goto_check_ct::enable_memory_cleanup_check</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00262">262</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2323,7 +2379,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00258">258</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00261">261</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2347,7 +2403,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00268">268</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00272">272</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2371,7 +2427,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00257">257</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00260">260</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2395,7 +2451,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00263">263</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00267">267</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2419,7 +2475,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00271">271</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00275">275</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2443,7 +2499,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00261">261</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00265">265</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2467,7 +2523,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00267">267</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00271">271</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2491,7 +2547,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00265">265</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00269">269</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2515,7 +2571,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00262">262</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00266">266</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2539,7 +2595,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00290">290</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00295">295</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2563,7 +2619,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00100">100</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00102">102</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2587,7 +2643,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00095">95</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00097">97</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2611,7 +2667,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00097">97</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00099">99</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2635,7 +2691,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00298">298</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00303">303</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2662,6 +2718,7 @@ Protected Attributes</h2></td></tr>
 <div class="line">    {<span class="stringliteral">&quot;bounds-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#a9876214b4c3460eedfe5481920f0de12">enable_bounds_check</a>},</div>
 <div class="line">    {<span class="stringliteral">&quot;pointer-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#a343f4a2d10b31be5a971a2f1f4605409">enable_pointer_check</a>},</div>
 <div class="line">    {<span class="stringliteral">&quot;memory-leak-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#a8929ff5bc066637ef12c675b40669ee0">enable_memory_leak_check</a>},</div>
+<div class="line">    {<span class="stringliteral">&quot;memory-cleanup-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#aa722bd3611af8ed539a22ef75e83f970">enable_memory_cleanup_check</a>},</div>
 <div class="line">    {<span class="stringliteral">&quot;div-by-zero-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#add5dad5c137b8cabfef0fc1e9d3e00bf">enable_div_by_zero_check</a>},</div>
 <div class="line">    {<span class="stringliteral">&quot;enum-range-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#ab1dfcf968feb8d65a7ca0544edb89ee2">enable_enum_range_check</a>},</div>
 <div class="line">    {<span class="stringliteral">&quot;signed-overflow-check&quot;</span>, &amp;<a class="code" href="classgoto__check__ct.html#a6a37859afca294ac77b2b029e4f010d0">enable_signed_overflow_check</a>},</div>
@@ -2675,7 +2732,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- fragment -->
 <p>Maps a named-check name to the corresponding boolean flag. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00274">274</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00278">278</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2699,7 +2756,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00246">246</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00249">249</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2723,7 +2780,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00094">94</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00096">96</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2747,7 +2804,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00269">269</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l00273">273</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
 </div>
 </div>
@@ -2756,20 +2813,21 @@ Protected Attributes</h2></td></tr>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassgoto__check__ct_html_a343f4a2d10b31be5a971a2f1f4605409"><div class="ttname"><a href="classgoto__check__ct.html#a343f4a2d10b31be5a971a2f1f4605409">goto_check_ct::enable_pointer_check</a></div><div class="ttdeci">bool enable_pointer_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00257">goto_check_c.cpp:257</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_add5dad5c137b8cabfef0fc1e9d3e00bf"><div class="ttname"><a href="classgoto__check__ct.html#add5dad5c137b8cabfef0fc1e9d3e00bf">goto_check_ct::enable_div_by_zero_check</a></div><div class="ttdeci">bool enable_div_by_zero_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00259">goto_check_c.cpp:259</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a6a37859afca294ac77b2b029e4f010d0"><div class="ttname"><a href="classgoto__check__ct.html#a6a37859afca294ac77b2b029e4f010d0">goto_check_ct::enable_signed_overflow_check</a></div><div class="ttdeci">bool enable_signed_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00261">goto_check_c.cpp:261</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a632a952a66566aa7e47893c0bfc24594"><div class="ttname"><a href="classgoto__check__ct.html#a632a952a66566aa7e47893c0bfc24594">goto_check_ct::enable_float_overflow_check</a></div><div class="ttdeci">bool enable_float_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00266">goto_check_c.cpp:266</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_adcb8214ad7e64cd79236bdfc6e620515"><div class="ttname"><a href="classgoto__check__ct.html#adcb8214ad7e64cd79236bdfc6e620515">goto_check_ct::enable_unsigned_overflow_check</a></div><div class="ttdeci">bool enable_unsigned_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00262">goto_check_c.cpp:262</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a6c42214b1a5a4a29baeb9f7abf4058eb"><div class="ttname"><a href="classgoto__check__ct.html#a6c42214b1a5a4a29baeb9f7abf4058eb">goto_check_ct::check</a></div><div class="ttdeci">void check(const exprt &amp;expr)</div><div class="ttdoc">Initiate the recursively analysis of expr with its ‘guard’ set to TRUE.</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l01987">goto_check_c.cpp:1987</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a4dabe47b5fcb891442b09d1dc0edac53"><div class="ttname"><a href="classgoto__check__ct.html#a4dabe47b5fcb891442b09d1dc0edac53">goto_check_ct::enable_pointer_primitive_check</a></div><div class="ttdeci">bool enable_pointer_primitive_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00271">goto_check_c.cpp:271</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_aab09079ea82127798bdd40e3bd1aff38"><div class="ttname"><a href="classgoto__check__ct.html#aab09079ea82127798bdd40e3bd1aff38">goto_check_ct::enable_undefined_shift_check</a></div><div class="ttdeci">bool enable_undefined_shift_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00265">goto_check_c.cpp:265</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_ab1dfcf968feb8d65a7ca0544edb89ee2"><div class="ttname"><a href="classgoto__check__ct.html#ab1dfcf968feb8d65a7ca0544edb89ee2">goto_check_ct::enable_enum_range_check</a></div><div class="ttdeci">bool enable_enum_range_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00260">goto_check_c.cpp:260</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a8929ff5bc066637ef12c675b40669ee0"><div class="ttname"><a href="classgoto__check__ct.html#a8929ff5bc066637ef12c675b40669ee0">goto_check_ct::enable_memory_leak_check</a></div><div class="ttdeci">bool enable_memory_leak_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00258">goto_check_c.cpp:258</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a9876214b4c3460eedfe5481920f0de12"><div class="ttname"><a href="classgoto__check__ct.html#a9876214b4c3460eedfe5481920f0de12">goto_check_ct::enable_bounds_check</a></div><div class="ttdeci">bool enable_bounds_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00256">goto_check_c.cpp:256</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a634fff033216cc7b457a3ad92a41b068"><div class="ttname"><a href="classgoto__check__ct.html#a634fff033216cc7b457a3ad92a41b068">goto_check_ct::enable_conversion_check</a></div><div class="ttdeci">bool enable_conversion_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00264">goto_check_c.cpp:264</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a684476424cebf34ac241f4f377ae35cb"><div class="ttname"><a href="classgoto__check__ct.html#a684476424cebf34ac241f4f377ae35cb">goto_check_ct::enable_pointer_overflow_check</a></div><div class="ttdeci">bool enable_pointer_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00263">goto_check_c.cpp:263</a></div></div>
-<div class="ttc" id="aclassgoto__check__ct_html_a7f5951547795202ffe307b19b7f77e3c"><div class="ttname"><a href="classgoto__check__ct.html#a7f5951547795202ffe307b19b7f77e3c">goto_check_ct::enable_nan_check</a></div><div class="ttdeci">bool enable_nan_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00268">goto_check_c.cpp:268</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a343f4a2d10b31be5a971a2f1f4605409"><div class="ttname"><a href="classgoto__check__ct.html#a343f4a2d10b31be5a971a2f1f4605409">goto_check_ct::enable_pointer_check</a></div><div class="ttdeci">bool enable_pointer_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00260">goto_check_c.cpp:260</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_add5dad5c137b8cabfef0fc1e9d3e00bf"><div class="ttname"><a href="classgoto__check__ct.html#add5dad5c137b8cabfef0fc1e9d3e00bf">goto_check_ct::enable_div_by_zero_check</a></div><div class="ttdeci">bool enable_div_by_zero_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00263">goto_check_c.cpp:263</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a6a37859afca294ac77b2b029e4f010d0"><div class="ttname"><a href="classgoto__check__ct.html#a6a37859afca294ac77b2b029e4f010d0">goto_check_ct::enable_signed_overflow_check</a></div><div class="ttdeci">bool enable_signed_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00265">goto_check_c.cpp:265</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a632a952a66566aa7e47893c0bfc24594"><div class="ttname"><a href="classgoto__check__ct.html#a632a952a66566aa7e47893c0bfc24594">goto_check_ct::enable_float_overflow_check</a></div><div class="ttdeci">bool enable_float_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00270">goto_check_c.cpp:270</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_adcb8214ad7e64cd79236bdfc6e620515"><div class="ttname"><a href="classgoto__check__ct.html#adcb8214ad7e64cd79236bdfc6e620515">goto_check_ct::enable_unsigned_overflow_check</a></div><div class="ttdeci">bool enable_unsigned_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00266">goto_check_c.cpp:266</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a6c42214b1a5a4a29baeb9f7abf4058eb"><div class="ttname"><a href="classgoto__check__ct.html#a6c42214b1a5a4a29baeb9f7abf4058eb">goto_check_ct::check</a></div><div class="ttdeci">void check(const exprt &amp;expr)</div><div class="ttdoc">Initiate the recursively analysis of expr with its ‘guard’ set to TRUE.</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l01992">goto_check_c.cpp:1992</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a4dabe47b5fcb891442b09d1dc0edac53"><div class="ttname"><a href="classgoto__check__ct.html#a4dabe47b5fcb891442b09d1dc0edac53">goto_check_ct::enable_pointer_primitive_check</a></div><div class="ttdeci">bool enable_pointer_primitive_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00275">goto_check_c.cpp:275</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_aab09079ea82127798bdd40e3bd1aff38"><div class="ttname"><a href="classgoto__check__ct.html#aab09079ea82127798bdd40e3bd1aff38">goto_check_ct::enable_undefined_shift_check</a></div><div class="ttdeci">bool enable_undefined_shift_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00269">goto_check_c.cpp:269</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_ab1dfcf968feb8d65a7ca0544edb89ee2"><div class="ttname"><a href="classgoto__check__ct.html#ab1dfcf968feb8d65a7ca0544edb89ee2">goto_check_ct::enable_enum_range_check</a></div><div class="ttdeci">bool enable_enum_range_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00264">goto_check_c.cpp:264</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a8929ff5bc066637ef12c675b40669ee0"><div class="ttname"><a href="classgoto__check__ct.html#a8929ff5bc066637ef12c675b40669ee0">goto_check_ct::enable_memory_leak_check</a></div><div class="ttdeci">bool enable_memory_leak_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00261">goto_check_c.cpp:261</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a9876214b4c3460eedfe5481920f0de12"><div class="ttname"><a href="classgoto__check__ct.html#a9876214b4c3460eedfe5481920f0de12">goto_check_ct::enable_bounds_check</a></div><div class="ttdeci">bool enable_bounds_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00259">goto_check_c.cpp:259</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a634fff033216cc7b457a3ad92a41b068"><div class="ttname"><a href="classgoto__check__ct.html#a634fff033216cc7b457a3ad92a41b068">goto_check_ct::enable_conversion_check</a></div><div class="ttdeci">bool enable_conversion_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00268">goto_check_c.cpp:268</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a684476424cebf34ac241f4f377ae35cb"><div class="ttname"><a href="classgoto__check__ct.html#a684476424cebf34ac241f4f377ae35cb">goto_check_ct::enable_pointer_overflow_check</a></div><div class="ttdeci">bool enable_pointer_overflow_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00267">goto_check_c.cpp:267</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_aa722bd3611af8ed539a22ef75e83f970"><div class="ttname"><a href="classgoto__check__ct.html#aa722bd3611af8ed539a22ef75e83f970">goto_check_ct::enable_memory_cleanup_check</a></div><div class="ttdeci">bool enable_memory_cleanup_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00262">goto_check_c.cpp:262</a></div></div>
+<div class="ttc" id="aclassgoto__check__ct_html_a7f5951547795202ffe307b19b7f77e3c"><div class="ttname"><a href="classgoto__check__ct.html#a7f5951547795202ffe307b19b7f77e3c">goto_check_ct::enable_nan_check</a></div><div class="ttdeci">bool enable_nan_check</div><div class="ttdef"><b>Definition:</b> <a href="goto__check__c_8cpp_source.html#l00272">goto_check_c.cpp:272</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

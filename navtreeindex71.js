@@ -1,5 +1,7 @@
 var NAVTREEINDEX71 =
 {
+"contracts-assigns.html#autotoc_md61":[1,0,3,0,2],
+"contracts-assigns.html#autotoc_md62":[1,0,3,0,3],
 "contracts-assigns.html#autotoc_md63":[1,0,3,1],
 "contracts-assigns.html#autotoc_md64":[1,0,3,1,0],
 "contracts-assigns.html#autotoc_md65":[1,0,3,1,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX71 =
 "convert__float__literal_8h_source.html":[6,0,2,1,1,3],
 "convert__int__literal_8cpp.html":[6,0,2,25,0,4],
 "convert__int__literal_8cpp.html#a05b33711ac2181f80ff3a197d2b2e40e":[6,0,2,25,0,4,11],
-"convert__int__literal_8cpp.html#a0e8ad9cd668d2d104bf429371dd84ceb":[6,0,2,25,0,4,7],
-"convert__int__literal_8cpp.html#a28058f70322c00eacb48599400efaa2d":[6,0,2,25,0,4,0],
-"convert__int__literal_8cpp.html#a36f8551dca5ec343f64b2346f2475f5c":[6,0,2,25,0,4,13]
+"convert__int__literal_8cpp.html#a0e8ad9cd668d2d104bf429371dd84ceb":[6,0,2,25,0,4,7]
 };

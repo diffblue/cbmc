@@ -1,5 +1,7 @@
 var NAVTREEINDEX43 =
 {
+"classjava__generic__struct__tag__typet.html":[5,0,671],
+"classjava__generic__struct__tag__typet.html#a11785b86c9a7675b3d8724e9fa2646bc":[5,0,671,0],
 "classjava__generic__struct__tag__typet.html#a514aa28f76221114ca357393edd174fb":[5,0,671,1],
 "classjava__generic__struct__tag__typet.html#a537c0b1cb7c06e01f4503d68ef7727d3":[5,0,671,3],
 "classjava__generic__struct__tag__typet.html#a8d6453ce1270b85c3c43c8fbfa3d76f7":[5,0,671,5],
@@ -247,7 +249,5 @@ var NAVTREEINDEX43 =
 "classjsil__declarationt.html#af1b84fb7d03bb45d585b152bd4f797a0":[5,0,694,4],
 "classjsil__declarationt.html#afcbf031599fe517979ec440f63c9852e":[5,0,694,13],
 "classjsil__languaget.html":[5,0,695],
-"classjsil__languaget.html#a098cda038c88aea2e52005adaef40a50":[5,0,695,12],
-"classjsil__languaget.html#a0f15e6db59a5303c4dbe47b20a2e9a60":[5,0,695,17],
-"classjsil__languaget.html#a1c1dcd083ab3fe92b7ad87232138a78f":[5,0,695,4]
+"classjsil__languaget.html#a098cda038c88aea2e52005adaef40a50":[5,0,695,12]
 };
