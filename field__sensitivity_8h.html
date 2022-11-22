@@ -89,19 +89,20 @@ $(document).ready(function(){initNavTree('field__sensitivity_8h.html',''); initR
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">field_sensitivity.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;cstddef&gt;</code><br />
-<code>#include &lt;<a class="el" href="nodiscard_8h_source.html">util/nodiscard.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="nodiscard_8h_source.html">util/nodiscard.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="ssa__expr_8h_source.html">util/ssa_expr.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for field_sensitivity.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="field__sensitivity_8h__incl.svg" width="234" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="field__sensitivity_8h__incl.svg" width="1247" height="664"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -117,10 +118,109 @@ $(document).ready(function(){initNavTree('field__sensitivity_8h.html',''); initR
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitive__ssa__exprt.html">field_sensitive_ssa_exprt</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html">field_sensitivityt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Control granularity of object accesses.  <a href="classfield__sensitivityt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a68171d407895d96b226b86c164e0cec4"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a68171d407895d96b226b86c164e0cec4"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="field__sensitivity_8h.html#a68171d407895d96b226b86c164e0cec4">can_cast_expr&lt; field_sensitive_ssa_exprt &gt;</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;base)</td></tr>
+<tr class="separator:a68171d407895d96b226b86c164e0cec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4833a104f35e436e18db33a1dc8f38c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classfield__sensitive__ssa__exprt.html">field_sensitive_ssa_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="field__sensitivity_8h.html#ae4833a104f35e436e18db33a1dc8f38c">to_field_sensitive_ssa_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:ae4833a104f35e436e18db33a1dc8f38c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae05206b46bef96b314c330ad04684410"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfield__sensitive__ssa__exprt.html">field_sensitive_ssa_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="field__sensitivity_8h.html#ae05206b46bef96b314c330ad04684410">to_field_sensitive_ssa_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:ae05206b46bef96b314c330ad04684410"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a68171d407895d96b226b86c164e0cec4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68171d407895d96b226b86c164e0cec4">&#9670;&nbsp;</a></span>can_cast_expr&lt; field_sensitive_ssa_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classfield__sensitive__ssa__exprt.html">field_sensitive_ssa_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00035">35</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
+
+</div>
+</div>
+<a id="ae4833a104f35e436e18db33a1dc8f38c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4833a104f35e436e18db33a1dc8f38c">&#9670;&nbsp;</a></span>to_field_sensitive_ssa_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classfield__sensitive__ssa__exprt.html">field_sensitive_ssa_exprt</a>&amp; to_field_sensitive_ssa_expr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00041">41</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
+
+</div>
+</div>
+<a id="ae05206b46bef96b314c330ad04684410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae05206b46bef96b314c330ad04684410">&#9670;&nbsp;</a></span>to_field_sensitive_ssa_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfield__sensitive__ssa__exprt.html">field_sensitive_ssa_exprt</a>&amp; to_field_sensitive_ssa_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8h_source.html#l00049">49</a> of file <a class="el" href="field__sensitivity_8h_source.html">field_sensitivity.h</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

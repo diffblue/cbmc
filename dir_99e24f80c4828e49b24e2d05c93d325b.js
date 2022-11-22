@@ -16,9 +16,7 @@ var dir_99e24f80c4828e49b24e2d05c93d325b =
       [ "expr_skeletont", "classexpr__skeletont.html", "classexpr__skeletont" ]
     ] ],
     [ "field_sensitivity.cpp", "field__sensitivity_8cpp.html", "field__sensitivity_8cpp" ],
-    [ "field_sensitivity.h", "field__sensitivity_8h.html", [
-      [ "field_sensitivityt", "classfield__sensitivityt.html", "classfield__sensitivityt" ]
-    ] ],
+    [ "field_sensitivity.h", "field__sensitivity_8h.html", "field__sensitivity_8h" ],
     [ "frame.h", "frame_8h.html", [
       [ "framet", "classframet.html", "classframet" ],
       [ "loop_infot", "structframet_1_1loop__infot.html", "structframet_1_1loop__infot" ],

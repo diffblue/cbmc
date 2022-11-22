@@ -450,6 +450,7 @@ var annotated_dup =
     [ "fault_localization_providert", "classfault__localization__providert.html", "classfault__localization__providert" ],
     [ "fault_location_infot", "structfault__location__infot.html", "structfault__location__infot" ],
     [ "field_address_exprt", "classfield__address__exprt.html", "classfield__address__exprt" ],
+    [ "field_sensitive_ssa_exprt", "classfield__sensitive__ssa__exprt.html", "classfield__sensitive__ssa__exprt" ],
     [ "field_sensitivityt", "classfield__sensitivityt.html", "classfield__sensitivityt" ],
     [ "fieldref_exprt", "classfieldref__exprt.html", "classfieldref__exprt" ],
     [ "file_filtert", "classfile__filtert.html", "classfile__filtert" ],
