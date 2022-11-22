@@ -52,6 +52,15 @@ ifneq ($(BUILD_ENV_),MSVC)
 	@../test.pl -e -p -c "$(exe) -xc++ -D_Bool=bool" -I test-c++-front-end -s c++-front-end $(excluded_tests)
 endif
 
+build_goto_binaries:
+	uname -m | grep x86_64
+	cd arch_flags_mcpu_bad ; $(exe) -c source.c -o object.intel
+	cd arch_flags_mcpu_good ; \
+		$(exe) -o object.arm --native-compiler=arm-none-eabi-gcc -mcpu=cortex-a15 -c source.c
+	cd arch_flags_mthumb_bad ; $(exe) -c source.c -o object.intel
+	cd arch_flags_mthumb_good ; \
+		$(exe) -o object.arm --native-compiler=arm-none-eabi-gcc -mthumb -c source.c
+
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;
