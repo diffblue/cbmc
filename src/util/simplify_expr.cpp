@@ -1680,15 +1680,19 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     {
       return op_byte_update.value();
     }
-    else if(
-      el_size.has_value() &&
-      *el_size <= pointer_offset_bits(op_byte_update.value().type(), ns))
+    else if(el_size.has_value())
     {
-      auto tmp = expr;
-      tmp.op() = op_byte_update.value();
-      tmp.offset() = from_integer(0, expr.offset().type());
+      const auto update_bits_opt =
+        pointer_offset_bits(op_byte_update.value().type(), ns);
 
-      return changed(simplify_byte_extract(tmp)); // recursive call
+      if(update_bits_opt.has_value() && *el_size <= *update_bits_opt)
+      {
+        auto tmp = expr;
+        tmp.op() = op_byte_update.value();
+        tmp.offset() = from_integer(0, expr.offset().type());
+
+        return changed(simplify_byte_extract(tmp)); // recursive call
+      }
     }
   }
 
@@ -1706,7 +1710,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   {
     const byte_update_exprt &bu = to_byte_update_expr(expr.op());
     const auto update_offset = numeric_cast<mp_integer>(bu.offset());
-    if(update_offset.has_value())
+    if(el_size.has_value() && update_offset.has_value())
     {
       if(
         *offset * expr.get_bits_per_byte() + *el_size <=
