@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
@@ -721,6 +722,97 @@ void goto_convertt::do_havoc_slice(
   dest.add(goto_programt::make_other(array_replace, source_location));
 }
 
+/// alloca allocates memory that is freed when leaving the function (and not the
+/// block, as regular destructors would do).
+void goto_convertt::do_alloca(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  const source_locationt &source_location = function.source_location();
+  exprt new_lhs = lhs;
+
+  // make sure we have a left-hand side to track the allocation even when the
+  // original program did not
+  if(lhs.is_nil())
+  {
+    new_lhs = new_tmp_symbol(
+                to_code_type(function.type()).return_type(),
+                "alloca",
+                dest,
+                source_location,
+                mode)
+                .symbol_expr();
+  }
+
+  // do the actual function call
+  code_function_callt function_call(new_lhs, function, arguments);
+  function_call.add_source_location() = source_location;
+  copy(function_call, FUNCTION_CALL, dest);
+
+  // Don't add instrumentation when we're in alloca (which might in turn call
+  // __builtin_alloca) -- the instrumentation will be done for the call of
+  // alloca. Also, we can only add instrumentation when we're in a function
+  // context.
+  if(
+    function.source_location().get_function() == "alloca" || !targets.prefix ||
+    !targets.suffix)
+  {
+    return;
+  }
+
+  // create a symbol to eventually (and non-deterministically) mark the
+  // allocation as dead; this symbol has function scope and is initialised to
+  // NULL
+  symbol_exprt this_alloca_ptr =
+    get_fresh_aux_symbol(
+      to_code_type(function.type()).return_type(),
+      id2string(function.source_location().get_function()),
+      "tmp_alloca",
+      source_location,
+      mode,
+      symbol_table)
+      .symbol_expr();
+  goto_programt decl_prg;
+  decl_prg.add(goto_programt::make_decl(this_alloca_ptr, source_location));
+  decl_prg.add(goto_programt::make_assignment(
+    this_alloca_ptr,
+    null_pointer_exprt{to_pointer_type(this_alloca_ptr.type())},
+    source_location));
+  targets.prefix->destructive_insert(
+    targets.prefix->instructions.begin(), decl_prg);
+
+  // non-deterministically update this_alloca_ptr
+  if_exprt rhs{
+    side_effect_expr_nondett{bool_typet(), source_location},
+    new_lhs,
+    this_alloca_ptr};
+  dest.add(goto_programt::make_assignment(
+    this_alloca_ptr, std::move(rhs), source_location));
+
+  // mark pointer to alloca result as dead, unless the alloca result (in
+  // this_alloca_ptr)  is still NULL
+  symbol_exprt dead_object_sym =
+    ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+  exprt alloca_result =
+    typecast_exprt::conditional_cast(this_alloca_ptr, dead_object_sym.type());
+  if_exprt not_null{
+    equal_exprt{
+      this_alloca_ptr,
+      null_pointer_exprt{to_pointer_type(this_alloca_ptr.type())}},
+    dead_object_sym,
+    std::move(alloca_result)};
+  auto assign = goto_programt::make_assignment(
+    std::move(dead_object_sym), std::move(not_null), source_location);
+  targets.suffix->insert_before_swap(
+    targets.suffix->instructions.begin(), assign);
+  targets.suffix->insert_after(
+    targets.suffix->instructions.begin(),
+    goto_programt::make_dead(this_alloca_ptr, source_location));
+}
+
 /// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
@@ -1398,45 +1490,9 @@ void goto_convertt::do_function_call_symbol(
 
     copy(function_call, FUNCTION_CALL, dest);
   }
-  else if(
-    (identifier == "alloca" || identifier == "__builtin_alloca") &&
-    function.source_location().get_function() != "alloca")
+  else if(identifier == "alloca" || identifier == "__builtin_alloca")
   {
-    const source_locationt &source_location = function.source_location();
-    exprt new_lhs = lhs;
-
-    if(lhs.is_nil())
-    {
-      new_lhs = new_tmp_symbol(
-                  to_code_type(function.type()).return_type(),
-                  "alloca",
-                  dest,
-                  source_location,
-                  mode)
-                  .symbol_expr();
-    }
-
-    code_function_callt function_call(new_lhs, function, arguments);
-    function_call.add_source_location() = source_location;
-    copy(function_call, FUNCTION_CALL, dest);
-
-    // create a backup copy to ensure that no assignments to the pointer affect
-    // the destructor code that will execute eventually
-    if(!lhs.is_nil())
-      make_temp_symbol(new_lhs, "alloca", dest, mode);
-
-    // mark pointer to alloca result as dead
-    symbol_exprt dead_object_sym =
-      ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-    exprt alloca_result =
-      typecast_exprt::conditional_cast(new_lhs, dead_object_sym.type());
-    if_exprt rhs{
-      side_effect_expr_nondett{bool_typet(), source_location},
-      std::move(alloca_result),
-      dead_object_sym};
-    code_assignt assign{
-      std::move(dead_object_sym), std::move(rhs), source_location};
-    targets.destructor_stack.add(assign);
+    do_alloca(lhs, function, arguments, dest, mode);
   }
   else
   {
