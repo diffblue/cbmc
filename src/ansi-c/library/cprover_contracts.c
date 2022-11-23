@@ -1286,6 +1286,10 @@ void *__CPROVER_contracts_write_set_havoc_get_assignable_target(
   __CPROVER_size_t idx)
 {
 __CPROVER_HIDE:;
+#ifdef DFCC_DEBUG
+  __CPROVER_assert(write_set != 0, "write_set not NULL");
+#endif
+
   __CPROVER_contracts_car_t car = set->contract_assigns.elems[idx];
   if(car.is_writable)
     return car.lb;
