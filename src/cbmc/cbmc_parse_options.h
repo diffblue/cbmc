@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+// This is a pointless change
+
 /// \file
 /// CBMC Command Line Option Processing
 
