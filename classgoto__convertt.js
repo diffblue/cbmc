@@ -58,6 +58,7 @@ var classgoto__convertt =
     [ "convert_while", "classgoto__convertt.html#a0effc3273dec39d5ea51f5e3c5060a14", null ],
     [ "copy", "classgoto__convertt.html#a2298f86b3243068d233b7d8b4c327cc0", null ],
     [ "cpp_new_initializer", "classgoto__convertt.html#a9e579178386be1f335bf2c0431c01d8c", null ],
+    [ "do_alloca", "classgoto__convertt.html#abbc0deeb9cb9b4badf671bc16cc594cb", null ],
     [ "do_array_equal", "classgoto__convertt.html#ad6d6262dc35607b11476b31686850c2f", null ],
     [ "do_array_op", "classgoto__convertt.html#a0c5a85238acd3d2409aaf5007c0bb4af", null ],
     [ "do_atomic_begin", "classgoto__convertt.html#ad45545f672b3863525644b415f52ec37", null ],

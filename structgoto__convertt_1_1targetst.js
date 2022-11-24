@@ -25,8 +25,10 @@ var structgoto__convertt_1_1targetst =
     [ "leave_set", "structgoto__convertt_1_1targetst.html#a93ca08e45f7f43afad5356eb6a561ec9", null ],
     [ "leave_stack_node", "structgoto__convertt_1_1targetst.html#a3688ba95d21a299155f95dd1b0019136", null ],
     [ "leave_target", "structgoto__convertt_1_1targetst.html#aac84a4919f37c16223cb13fae624a343", null ],
+    [ "prefix", "structgoto__convertt_1_1targetst.html#aa0def21838b87f45f7cafb4616ebc8e6", null ],
     [ "return_set", "structgoto__convertt_1_1targetst.html#a1e2410bef01d8d75a5861ddf84164b5e", null ],
     [ "return_target", "structgoto__convertt_1_1targetst.html#aa9cedbc8d90ab03b88ce69a6c7982f6a", null ],
+    [ "suffix", "structgoto__convertt_1_1targetst.html#ad1e601794572070a06e006fb59e7580a", null ],
     [ "throw_set", "structgoto__convertt_1_1targetst.html#a2fabbbebe9ec46ffc4c2b82ac7fef5e2", null ],
     [ "throw_stack_node", "structgoto__convertt_1_1targetst.html#a4f1afd71c26989e6b83e7c6ef06ecafd", null ],
     [ "throw_target", "structgoto__convertt_1_1targetst.html#aeb8471360a77976b35006b8d704de770", null ]

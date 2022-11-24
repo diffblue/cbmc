@@ -1,5 +1,6 @@
 var NAVTREEINDEX105 =
 {
+"load__java__class_8cpp.html#a9e42fc74c871b07c0498fa2aafa35315":[6,0,1,1,0,0,4],
 "load__java__class_8cpp.html#aca68aa47defcaab32929d910d9e8bc0c":[6,0,1,1,0,0,1],
 "load__java__class_8cpp.html#af169356b18d8fec1766c92c07074c8a6":[6,0,1,1,0,0,2],
 "load__java__class_8cpp_source.html":[6,0,1,1,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX105 =
 "merge__irep_8cpp.html":[6,0,2,27,133],
 "merge__irep_8cpp_source.html":[6,0,2,27,133],
 "merge__irep_8h.html":[6,0,2,27,134],
-"merge__irep_8h_source.html":[6,0,2,27,134],
-"merged__type_8h.html":[6,0,2,1,82]
+"merge__irep_8h_source.html":[6,0,2,27,134]
 };

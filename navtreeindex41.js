@@ -1,5 +1,6 @@
 var NAVTREEINDEX41 =
 {
+"classis__compile__time__constantt.html#a651a2db85be68bea43d22f894eea7fe3":[5,0,636,0],
 "classis__constantt.html":[5,0,637],
 "classis__constantt.html#a8f871f36b00b7face9f92e6add19ac8b":[5,0,637,2],
 "classis__constantt.html#ac9875c9cabc3a6a0cb9e8b2871624247":[5,0,637,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX41 =
 "classjava__bytecode__instrumentt.html#a06bb79637966362a48834abf9a6890a0":[5,0,658,3],
 "classjava__bytecode__instrumentt.html#a1ae589afb778e263d9b9caa8d5615fc8":[5,0,658,9],
 "classjava__bytecode__instrumentt.html#a2d12795a82444b935a85f758cfdab6aa":[5,0,658,10],
-"classjava__bytecode__instrumentt.html#a4c7b6cb6823a3537f85286d2566bef98":[5,0,658,1],
-"classjava__bytecode__instrumentt.html#a4d4e4a3a621f2bd496a93896d674f9c8":[5,0,658,2]
+"classjava__bytecode__instrumentt.html#a4c7b6cb6823a3537f85286d2566bef98":[5,0,658,1]
 };
