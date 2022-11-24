@@ -1,0 +1,19 @@
+CORE
+byte_extract.c
+--trace
+Running incremental SMT2 solving via
+Building error trace
+\[main\.assertion\.\d+\] line \d+ assertion \*ptr != 42: FAILURE
+\[main\.assertion\.\d+\] line \d+ assertion input != original: SUCCESS
+  input=42ul? \(00000000 00000000 00000000 00101010\)
+  original=42ul? \(00000000 00000000 00000000 00101010\)
+Violated property:
+  file byte_extract.c function main line \d+ thread \d+
+  assertion \*ptr != 42
+^EXIT=10$
+^SIGNAL=0$
+--
+Reached unimplemented Generation of SMT formula for byte extract expression: byte_extract_little_endian
+--
+This test is here to document our lack of support for byte_extract_little_endian
+in the pointers support for the new SMT backend.

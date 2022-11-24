@@ -1,0 +1,23 @@
+CORE
+byte_update.c
+--trace
+Running incremental SMT2 solving via
+Building error trace
+\[main\.assertion\.\d+\] line \d+ assertion x != 256u: FAILURE
+State \d+ file byte_update\.c function main line \d+ thread \d
+  offset=1ul? \(00000000 00000000 00000000 00000001\)
+Assumption:
+  file byte_update\.c line \d+ function main
+  offset >= 0u && offset < 4u
+State \d+ file byte_update\.c function main line \d+ thread \d+
+  byte_extract_little_endian\(x, \(signed long( long)? int\)offset, uint8_t\)=1 \(00000001\)
+Violated property:
+  file byte_update.c function main line \d+ thread \d+
+  assertion x != 256u
+^EXIT=10$
+^SIGNAL=0$
+--
+Reached unimplemented Generation of SMT formula for byte extract expression: byte_update_little_endian
+--
+This test is here to document our lack of support for byte_update_little_endian
+in the pointers support for the new SMT backend.
