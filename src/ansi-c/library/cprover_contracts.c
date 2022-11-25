@@ -1167,9 +1167,13 @@ __CPROVER_bool __CPROVER_contracts_is_fresh(
   __CPROVER_size_t size,
   __CPROVER_contracts_write_set_ptr_t write_set)
 {
-  if(!write_set)
-    return __VERIFIER_nondet_CPROVER_bool();
 __CPROVER_HIDE:;
+  __CPROVER_assert(
+    (write_set != 0) & ((write_set->assume_requires_ctx == 1) |
+                        (write_set->assert_requires_ctx == 1) |
+                        (write_set->assume_ensures_ctx == 1) |
+                        (write_set->assert_ensures_ctx == 1)),
+    "__CPROVER_is_fresh is used only in requires or ensures clauses");
 #ifdef DFCC_DEBUG
   __CPROVER_assert(
     __CPROVER_rw_ok(write_set, sizeof(__CPROVER_contracts_write_set_t)),
@@ -1416,4 +1420,48 @@ __CPROVER_HIDE:;
 #endif
   }
 }
-#endif
+
+/// \brief Implementation of the `obeys_contract` front-end predicate.
+/// \return True iff a function pointer points to the specified contract.
+///
+/// \details If called in an assumption context, translates to an assignment
+/// `function_pointer = contract`. If called in an assertion context, translates
+/// to an `function_pointer == contract`.
+/// The function pointer is taken by reference to be able to update it using a
+/// side-effect in assumption contexts.
+__CPROVER_bool __CPROVER_contracts_obeys_contract(
+  void (**function_pointer)(void),
+  void (*contract)(void),
+  __CPROVER_contracts_write_set_ptr_t set)
+{
+__CPROVER_HIDE:;
+  __CPROVER_assert(
+    (set != 0) &
+      ((set->assume_requires_ctx == 1) | (set->assert_requires_ctx == 1) |
+       (set->assume_ensures_ctx == 1) | (set->assert_ensures_ctx == 1)),
+    "__CPROVER_obeys_contract is used only in requires or ensures clauses");
+  if((set->assume_requires_ctx == 1) | (set->assume_ensures_ctx == 1))
+  {
+    // In assumption contexts, flip a coin to decide wehter the predicate
+    // shall hold or not
+    if(__VERIFIER_nondet_CPROVER_bool())
+    {
+      // if it must hold, assign the function pointer to the contract function
+      *function_pointer = contract;
+      return 1;
+    }
+    else
+    {
+      // if it must not hold do not modify the pointer value
+      // function_pointer will keep whatever bit pattern and value set it had
+      // before evaluating the predicate
+      return 0;
+    }
+  }
+  else
+  {
+    // in assumption contexts, the pointer gets checked for equality
+    return *function_pointer == contract;
+  }
+}
+#endif // __CPROVER_contracts_library_defined

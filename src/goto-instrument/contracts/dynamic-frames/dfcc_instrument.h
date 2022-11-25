@@ -74,7 +74,13 @@ public:
   /// This will trigger cascading checks in all functions called from the
   /// checked function thanks to the propagation of the write set through
   /// function calls and function pointer calls.
-  void instrument_harness_function(const irep_idt &function_id);
+  ///
+  /// \param function_id function to instrument
+  /// \param function_pointer_contracts contracts discovered in calls to
+  /// the obeys_contract predicate are added to this set.
+  void instrument_harness_function(
+    const irep_idt &function_id,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments a GOTO function by adding an extra write set parameter
   /// and inserting frame condition checks in its GOTO program, as well as
@@ -87,7 +93,11 @@ public:
   /// \param function_id The name of the function, used to retrieve the function
   /// to instrument and used as prefix when generating new symbols during
   /// instrumentation.
-  void instrument_function(const irep_idt &function_id);
+  /// \param function_pointer_contracts contracts discovered in calls to
+  /// the obeys_contract predicate are added to this set.
+  void instrument_function(
+    const irep_idt &function_id,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments a GOTO function by adding an extra write set parameter
   /// and inserting frame condition checks in its GOTO program, as well as
@@ -104,9 +114,12 @@ public:
   /// \param initial_function_id The initial name of the function,
   /// before mangling. This is the name used to identify statics symbols in the
   /// symbol table that were locally declared in the function.
+  /// \param function_pointer_contracts contracts discovered in calls to
+  /// the obeys_contract predicate are added to this set.
   void instrument_wrapped_function(
     const irep_idt &wrapped_function_id,
-    const irep_idt &initial_function_id);
+    const irep_idt &initial_function_id,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments a GOTO program against a given write set variable.
   ///
@@ -123,10 +136,12 @@ public:
   /// instrumentation.
   /// \param goto_program Goto program to instrument.
   /// \param write_set Write set variable to use for instrumentation.
+  /// \param function_pointer_contracts Discovered function pointer contracts
   void instrument_goto_program(
     const irep_idt &function_id,
     goto_programt &goto_program,
-    const exprt &write_set);
+    const exprt &write_set,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// Adds the names of instrumented functions to \p dest.
   /// The names are kept track of in the \ref function_cache field.
@@ -201,7 +216,8 @@ protected:
   /// and automatically to add/remove to the write set.
   void instrument_function(
     const irep_idt &function_id,
-    const irep_idt &function_id_for_local_static_search);
+    const irep_idt &function_id_for_local_static_search,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// Instruments the body of a GOTO function against a given write set.
   /// Adds the given local statics to the write set in pre and removes them
@@ -210,7 +226,8 @@ protected:
     const irep_idt &function_id,
     const exprt &write_set,
     cfg_infot &cfg_info,
-    const std::set<symbol_exprt> &local_statics);
+    const std::set<symbol_exprt> &local_statics,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments the instructions found between \p first_instruction and
   /// \p last_instruction in the instructions of \p goto_program against the
@@ -226,6 +243,8 @@ protected:
   /// \param pred filter predicate for instructions. If \p pred is not provided,
   /// all instructions are instrumented. If \p pred is provided, only
   /// instructions satisfying \p pred are instrumented.
+  /// \param function_pointer_contracts contracts discovered in calls to
+  /// the obeys_contract predicate are added to this set.
   void instrument_instructions(
     const irep_idt &function_id,
     const exprt &write_set,
@@ -233,7 +252,8 @@ protected:
     goto_programt::targett first_instruction,
     const goto_programt::targett &last_instruction, // excluding the last
     cfg_infot &cfg_info,
-    const std::function<bool(const goto_programt::targett &)> &pred);
+    const std::function<bool(const goto_programt::targett &)> &pred,
+    std::set<irep_idt> &function_pointer_contracts);
 
   /// Returns `true` if the symbol `x` in `DECL x` or `DEAD x` must be added
   /// explicitly to the write set. Returns `false` when assignments to `x` must

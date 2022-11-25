@@ -270,7 +270,8 @@ void dfcc_swap_and_wrapt::check_contract(
   utils.set_hide(wrapper_id, true);
 
   // instrument the wrapped function
-  instrument.instrument_wrapped_function(wrapped_id, wrapper_id);
+  instrument.instrument_wrapped_function(
+    wrapped_id, wrapper_id, function_pointer_contracts);
 
   goto_model.goto_functions.update();
 }

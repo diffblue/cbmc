@@ -1979,6 +1979,72 @@ void c_typecheck_baset::typecheck_typed_target_call(
   expr.type() = empty_typet();
 }
 
+void c_typecheck_baset::typecheck_obeys_contract_call(
+  side_effect_expr_function_callt &expr)
+{
+  INVARIANT(
+    expr.function().id() == ID_symbol &&
+      to_symbol_expr(expr.function()).get_identifier() == CPROVER_PREFIX
+        "obeys_contract",
+    "expression must be a " CPROVER_PREFIX "obeys_contract function call");
+
+  if(expr.arguments().size() != 2)
+  {
+    throw invalid_source_file_exceptiont{
+      "expected 2 arguments for " CPROVER_PREFIX "obeys_contract, found " +
+        std::to_string(expr.arguments().size()),
+      expr.source_location()};
+  }
+
+  // the first parameter must be a function pointer typed assignable path
+  // expression, without side effects or ternary operator
+  auto &function_pointer = expr.arguments()[0];
+
+  if(
+    function_pointer.type().id() != ID_pointer ||
+    to_pointer_type(function_pointer.type()).base_type().id() != ID_code ||
+    !function_pointer.get_bool(ID_C_lvalue))
+  {
+    throw invalid_source_file_exceptiont(
+      "the first argument of " CPROVER_PREFIX
+      "obeys_contract must be a function pointer lvalue expression",
+      function_pointer.source_location());
+  }
+
+  if(has_subexpr(function_pointer, ID_if))
+  {
+    throw invalid_source_file_exceptiont(
+      "the first argument of " CPROVER_PREFIX
+      "obeys_contract must have no ternary operator",
+      function_pointer.source_location());
+  }
+
+  // second parameter must be the address of a function symbol
+  auto &address_of_contract = expr.arguments()[1];
+
+  if(
+    address_of_contract.id() != ID_address_of ||
+    to_address_of_expr(address_of_contract).object().id() != ID_symbol ||
+    address_of_contract.type().id() != ID_pointer ||
+    to_pointer_type(address_of_contract.type()).base_type().id() != ID_code)
+  {
+    throw invalid_source_file_exceptiont(
+      "the second argument of " CPROVER_PREFIX
+      "obeys_contract must must be a function symbol",
+      address_of_contract.source_location());
+  }
+
+  if(function_pointer.type() != address_of_contract.type())
+  {
+    throw invalid_source_file_exceptiont(
+      "the first and second arguments of " CPROVER_PREFIX
+      "obeys_contract must have the same function pointer type",
+      expr.source_location());
+  }
+
+  expr.type() = bool_typet();
+}
+
 void c_typecheck_baset::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -2268,6 +2334,12 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
     typecheck_function_call_arguments(expr);
+    return nil_exprt();
+  }
+  else if(identifier == CPROVER_PREFIX "obeys_contract")
+  {
+    typecheck_obeys_contract_call(expr);
+    // returning nil leaves the call expression in place
     return nil_exprt();
   }
   else if(identifier == CPROVER_PREFIX "same_object")

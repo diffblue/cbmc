@@ -187,5 +187,6 @@ then the weakest possible invariant (i.e, `true`) is used to model an arbitrary 
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-memory-predicates
+- @ref contracts-function-pointer-predicates
 - @ref contracts-history-variables
 - @ref contracts-quantifiers

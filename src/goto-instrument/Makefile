@@ -21,6 +21,7 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_library.cpp \
       contracts/dynamic-frames/dfcc_is_fresh.cpp \
       contracts/dynamic-frames/dfcc_is_freeable.cpp \
+      contracts/dynamic-frames/dfcc_obeys_contract.cpp \
       contracts/dynamic-frames/dfcc_instrument.cpp \
       contracts/dynamic-frames/dfcc_spec_functions.cpp \
       contracts/dynamic-frames/dfcc_contract_functions.cpp \

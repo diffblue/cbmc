@@ -262,7 +262,9 @@ void dfcct::instrument_harness_function()
   // load the cprover library to make sure the model is complete
   log.status() << "Instrumenting harness function '" << harness_id << "'"
                << messaget::eom;
-  instrument.instrument_harness_function(harness_id);
+
+  instrument.instrument_harness_function(
+    harness_id, function_pointer_contracts);
 
   other_symbols.erase(harness_id);
 }
@@ -314,62 +316,71 @@ void dfcct::wrap_replaced_functions()
 
 void dfcct::wrap_discovered_function_pointer_contracts()
 {
-  // swap-and-wrap function pointer contracts with themselves
-  for(const auto &fp_contract : function_pointer_contracts)
+  std::set<irep_idt> swapped;
+  while(!function_pointer_contracts.empty())
   {
-    log.status() << "Discovered function pointer contract '" << fp_contract
-                 << "'" << messaget::eom;
-
-    // contracts for function pointers must be replaced with themselves
-    // so we need to check that:
-    // - the symbol exists as a function symbol
-    // - the symbol exists as a pure contract symbol
-    // - the function symbol is not already swapped for contract checking
-    // - the function symbol is not already swapped with another contract for
-    // replacement
-
-    const auto str = id2string(fp_contract);
-
-    // Is it already swapped with another function for contract checking ?
-    PRECONDITION_WITH_DIAGNOSTICS(
-      !to_check.has_value() || to_check.value().first != str,
-      "Function '" + str +
-        "' used as contract for function pointer cannot be itself the object "
-        "of a contract check.");
-
-    // Is it already swapped with another function for contract checking ?
-    auto found = to_replace.find(str);
-    if(found != to_replace.end())
+    std::set<irep_idt> new_contracts;
+    // swap-and-wrap function pointer contracts with themselves
+    for(const auto &fp_contract : function_pointer_contracts)
     {
+      if(swapped.find(fp_contract) != swapped.end())
+        continue;
+
+      // contracts for function pointers must be replaced with themselves
+      // so we need to check that:
+      // - the symbol exists as a function symbol
+      // - the symbol exists as a pure contract symbol
+      // - the function symbol is not already swapped for contract checking
+      // - the function symbol is not already swapped with another contract for
+      // replacement
+
+      const auto str = id2string(fp_contract);
+
+      // Is it already swapped with another function for contract checking ?
       PRECONDITION_WITH_DIAGNOSTICS(
-        found->first == found->second,
+        !to_check.has_value() || to_check.value().first != str,
         "Function '" + str +
-          "' used as contract for function pointer already the object of a "
-          "contract replacement with '" +
-          id2string(found->second) + "'");
-      log.status() << "Function pointer contract '" << fp_contract
-                   << "' already wrapped with itself in REPLACE mode"
-                   << messaget::eom;
+          "' used as contract for function pointer cannot be itself the object "
+          "of a contract check.");
+
+      // Is it already swapped with another function for contract checking ?
+      auto found = to_replace.find(str);
+      if(found != to_replace.end())
+      {
+        PRECONDITION_WITH_DIAGNOSTICS(
+          found->first == found->second,
+          "Function '" + str +
+            "' used as contract for function pointer already the object of a "
+            "contract replacement with '" +
+            id2string(found->second) + "'");
+        log.status() << "Function pointer contract '" << fp_contract
+                     << "' already wrapped with itself in REPLACE mode"
+                     << messaget::eom;
+      }
+      else
+      {
+        // we need to swap it with itself
+        PRECONDITION_WITH_DIAGNOSTICS(
+          utils.function_symbol_exists(str),
+          "Function pointer contract '" + str + "' not found.");
+
+        // triggers signature compatibility checking
+        contract_handler.get_pure_contract_symbol(str);
+
+        log.status() << "Wrapping function pointer contract '" << fp_contract
+                     << "' with itself in REPLACE mode" << messaget::eom;
+
+        swap_and_wrap.swap_and_wrap_replace(
+          fp_contract, fp_contract, new_contracts);
+        swapped.insert(fp_contract);
+
+        // remove it from the set of symbols to process
+        if(other_symbols.find(fp_contract) != other_symbols.end())
+          other_symbols.erase(fp_contract);
+      }
     }
-    else
-    {
-      // we need to swap it with itself
-      PRECONDITION_WITH_DIAGNOSTICS(
-        utils.function_symbol_exists(str),
-        "Function pointer contract '" + str + "' not found.");
-
-      // triggers signature compatibility checking
-      contract_handler.get_pure_contract_symbol(str);
-
-      log.status() << "Wrapping function pointer contract '" << fp_contract
-                   << "' with itself in REPLACE mode" << messaget::eom;
-
-      swap_and_wrap.swap_and_wrap_replace(
-        fp_contract, fp_contract, function_pointer_contracts);
-      // remove it from the set of symbols to process
-      if(other_symbols.find(fp_contract) != other_symbols.end())
-        other_symbols.erase(fp_contract);
-    }
+    // process newly discovered contracts
+    function_pointer_contracts = new_contracts;
   }
 }
 
@@ -386,7 +397,7 @@ void dfcct::instrument_other_functions()
 
     log.status() << "Instrumenting '" << function_id << "'" << messaget::eom;
 
-    instrument.instrument_function(function_id);
+    instrument.instrument_function(function_id, function_pointer_contracts);
   }
 
   goto_model.goto_functions.update();

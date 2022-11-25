@@ -27,11 +27,13 @@ __CPROVER_frees(F)
 
 - A `__CPROVER_requires` clause (@ref contracts-requires-ensures) specifies a
   precondition as boolean expression R that may only depend on program globals,
-  function parameters, [memory predicates](@ref contracts-memory-predicates) and
+  function parameters, [memory predicates](@ref contracts-memory-predicates),
+  [function pointer predicates](@ref contracts-function-pointer-predicates) and
   deterministic, side effect-free function calls;
 - A `__CPROVER_ensures` clause (@ref contracts-requires-ensures) specifies a
   postcondition as boolean expression E that may only depend on program globals,
   function parameters, [memory predicates](@ref contracts-memory-predicates),
+  [function pointer predicates](@ref contracts-function-pointer-predicates),
   deterministic, side effect-free function calls,
   [history variables](@ref contracts-history-variables), and the special
   variable `__CPROVER_return_value`;

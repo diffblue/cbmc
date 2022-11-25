@@ -30,6 +30,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc_is_freeable.h"
 #include "dfcc_is_fresh.h"
 #include "dfcc_library.h"
+#include "dfcc_obeys_contract.h"
 #include "dfcc_utils.h"
 
 std::set<irep_idt> dfcc_instrumentt::function_cache;
@@ -220,7 +221,9 @@ bool dfcc_instrumentt::do_not_instrument(const irep_idt &id) const
          (is_cprover_symbol(id) || is_internal_symbol(id));
 }
 
-void dfcc_instrumentt::instrument_harness_function(const irep_idt &function_id)
+void dfcc_instrumentt::instrument_harness_function(
+  const irep_idt &function_id,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   bool inserted = dfcc_instrumentt::function_cache.insert(function_id).second;
   if(!inserted)
@@ -239,6 +242,10 @@ void dfcc_instrumentt::instrument_harness_function(const irep_idt &function_id)
   // rewrite is_freeable/was_freed calls
   dfcc_is_freeablet is_freeable(library, message_handler);
   is_freeable.rewrite_calls(body, null_expr);
+
+  // rewrite obeys_contract calls
+  dfcc_obeys_contractt obeys_contract(library, message_handler);
+  obeys_contract.rewrite_calls(body, null_expr, function_pointer_contracts);
 
   // rewrite calls
   Forall_goto_program_instructions(it, body)
@@ -269,23 +276,28 @@ dfcc_instrumentt::get_local_statics(const irep_idt &function_id)
   return local_statics;
 }
 
-void dfcc_instrumentt::instrument_function(const irep_idt &function_id)
+void dfcc_instrumentt::instrument_function(
+  const irep_idt &function_id,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   // use same name for local static search
-  instrument_function(function_id, function_id);
+  instrument_function(function_id, function_id, function_pointer_contracts);
 }
 
 void dfcc_instrumentt::instrument_wrapped_function(
   const irep_idt &wrapped_function_id,
-  const irep_idt &initial_function_id)
+  const irep_idt &initial_function_id,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   // use the initial name name for local static search
-  instrument_function(wrapped_function_id, initial_function_id);
+  instrument_function(
+    wrapped_function_id, initial_function_id, function_pointer_contracts);
 }
 
 void dfcc_instrumentt::instrument_function(
   const irep_idt &function_id,
-  const irep_idt &function_id_for_local_static_search)
+  const irep_idt &function_id_for_local_static_search,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   // never instrument a function twice
   bool inserted = dfcc_instrumentt::function_cache.insert(function_id).second;
@@ -310,14 +322,19 @@ void dfcc_instrumentt::instrument_function(
     get_local_statics(function_id_for_local_static_search);
 
   instrument_function_body(
-    function_id, write_set.symbol_expr(), cfg_info, local_statics);
+    function_id,
+    write_set.symbol_expr(),
+    cfg_info,
+    local_statics,
+    function_pointer_contracts);
 }
 
 void dfcc_instrumentt::instrument_function_body(
   const irep_idt &function_id,
   const exprt &write_set,
   cfg_infot &cfg_info,
-  const std::set<symbol_exprt> &local_statics)
+  const std::set<symbol_exprt> &local_statics,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
 
@@ -341,7 +358,8 @@ void dfcc_instrumentt::instrument_function_body(
     body.instructions.end(),
     cfg_info,
     // don't skip any instructions
-    {});
+    {},
+    function_pointer_contracts);
 
   // insert add/remove instructions for local statics
   auto begin = body.instructions.begin();
@@ -370,7 +388,8 @@ void dfcc_instrumentt::instrument_function_body(
 void dfcc_instrumentt::instrument_goto_program(
   const irep_idt &function_id,
   goto_programt &goto_program,
-  const exprt &write_set)
+  const exprt &write_set,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   goto_program_cfg_infot cfg_info(goto_program);
 
@@ -382,7 +401,8 @@ void dfcc_instrumentt::instrument_goto_program(
     goto_program.instructions.end(),
     cfg_info,
     // no pred, don't skip any instructions
-    {});
+    {},
+    function_pointer_contracts);
 
   // cleanup
   remove_skip(goto_program);
@@ -395,7 +415,8 @@ void dfcc_instrumentt::instrument_instructions(
   goto_programt::targett first_instruction,
   const goto_programt::targett &last_instruction,
   cfg_infot &cfg_info,
-  const std::function<bool(const goto_programt::targett &)> &pred)
+  const std::function<bool(const goto_programt::targett &)> &pred,
+  std::set<irep_idt> &function_pointer_contracts)
 {
   // rewrite is_fresh calls
   dfcc_is_fresht is_fresh(library, message_handler);
@@ -406,6 +427,15 @@ void dfcc_instrumentt::instrument_instructions(
   dfcc_is_freeablet is_freeable(library, message_handler);
   is_freeable.rewrite_calls(
     goto_program, first_instruction, last_instruction, write_set);
+
+  // rewrite obeys_contract calls
+  dfcc_obeys_contractt obeys_contract(library, message_handler);
+  obeys_contract.rewrite_calls(
+    goto_program,
+    first_instruction,
+    last_instruction,
+    write_set,
+    function_pointer_contracts);
 
   const namespacet ns(goto_model.symbol_table);
   auto &target = first_instruction;
