@@ -4001,7 +4001,6 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_gcc_builtin_va_arg, "gcc_builtin_va_arg"},
     {ID_get_may, CPROVER_PREFIX "get_may"},
     {ID_get_must, CPROVER_PREFIX "get_must"},
-    {ID_good_pointer, "GOOD_POINTER"},
     {ID_ieee_float_equal, "IEEE_FLOAT_EQUAL"},
     {ID_ieee_float_notequal, "IEEE_FLOAT_NOTEQUAL"},
     {ID_infinity, "INFINITY"},

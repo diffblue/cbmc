@@ -2734,10 +2734,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   {
     r = simplify_object_size(*object_size);
   }
-  else if(expr.id()==ID_good_pointer)
-  {
-    r = simplify_good_pointer(to_unary_expr(expr));
-  }
   else if(expr.id()==ID_div)
   {
     r = simplify_div(to_div_expr(expr));

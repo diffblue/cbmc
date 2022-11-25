@@ -62,8 +62,8 @@ public:
 ///
 /// This function generates a formula:
 ///
-///   good_pointer_def(pexpr_1, ns) &&
-///   good_pointer_def(pexpr_2, n2) &&
+///   r_ok_exprt(pexpr_1, sizeof(*pexpr_1)) &&
+///   r_ok_exprt(pexpr_2, sizeof(*pexpr_1)) &&
 ///   ...
 ///
 /// over all dereferenced pointer expressions *(pexpr_1), *(pexpr_2), ...
