@@ -23,8 +23,7 @@ Date: March 2016
 #include <langapi/language_util.h>
 #include <linking/static_lifetime_init.h>
 
-#include <chrono>
-#include <ctime>
+#include <chrono> // IWYU pragma: keep
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 

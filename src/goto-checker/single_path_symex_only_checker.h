@@ -12,13 +12,12 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_ONLY_CHECKER_H
 #define CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_ONLY_CHECKER_H
 
-#include "incremental_goto_checker.h"
-
+#include <goto-instrument/unwindset.h>
 #include <goto-symex/path_storage.h>
 
-#include <goto-instrument/unwindset.h>
+#include "incremental_goto_checker.h"
 
-#include <chrono>
+#include <chrono> // IWYU pragma: keep
 
 class symex_bmct;
 

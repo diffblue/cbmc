@@ -16,8 +16,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
-#include <chrono>
-
 #include "bmc_util.h"
 
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
