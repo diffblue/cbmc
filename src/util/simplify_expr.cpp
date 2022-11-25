@@ -779,7 +779,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   // (void*)(intX)expr -> (void*)expr
   if(
     expr_type.id() == ID_pointer && expr.op().id() == ID_typecast &&
-    (op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv) &&
+    (op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv ||
+     op_type.id() == ID_bv) &&
     to_bitvector_type(op_type).get_width() >=
       to_bitvector_type(expr_type).get_width())
   {
@@ -1305,7 +1306,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     // where T1 has fewer bits than T2
     if(
       op_type_id == expr_type_id &&
-      (expr_type_id == ID_unsignedbv || expr_type_id == ID_signedbv) &&
+      (expr_type_id == ID_unsignedbv || expr_type_id == ID_signedbv ||
+       expr_type_id == ID_bv) &&
       to_bitvector_type(expr_type).get_width() <=
         to_bitvector_type(operand.type()).get_width())
     {
