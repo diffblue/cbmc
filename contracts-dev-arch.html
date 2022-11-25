@@ -121,20 +121,22 @@ Architecture Overview</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><a class="el" href="classdfcc__is__freeablet.html">dfcc_is_freeablet</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-is-freeable.html">Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates</a>  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><a class="el" href="classdfcc__obeys__contractt.html">dfcc_obeys_contractt</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-obeys-contract.html">Rewriting Calls to the __CPROVER_obeys_contract Predicate</a>  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><a class="el" href="classdfcc__spec__functionst.html">dfcc_spec_functionst</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-spec-rewriting.html">Rewriting Declarative Assign and Frees Specification Functions</a>  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft" rowspan="2"><a class="el" href="classdfcc__wrapper__programt.html">dfcc_wrapper_programt</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-checking.html">Checking a Contract Against a Function</a> for contracts  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-replacement.html">Replacing a Function by a Contract</a> for contracts  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft" rowspan="2"><a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-codegen.html">Generating GOTO Functions From Contract Clauses</a> for contracts  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft">Implements the interface <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a> for contract by delegating operations to <a class="el" href="classdfcc__wrapper__programt.html">dfcc_wrapper_programt</a>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft" rowspan="3"><a class="el" href="classdfcc__swap__and__wrapt.html">dfcc_swap_and_wrapt</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-checking.html">Checking a Contract Against a Function</a> by delegating basic operations to <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-replacement.html">Replacing a Function by a Contract</a> by delegating basic operations to <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a>  </td></tr>
+<td class="markdownTableBodyLeft" rowspan="3"><a class="el" href="classdfcc__swap__and__wrapt.html">dfcc_swap_and_wrapt</a> </td><td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-checking.html">Checking a Contract Against a Function</a> by delegating basic operations to <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a>  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-replacement.html">Replacing a Function by a Contract</a> by delegating basic operations to <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a>  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft">Implements <a class="el" href="contracts-dev-spec-contract-checking-rec.html">Checking a Contract Against a Recursive Function</a> by delegating basic operations to <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a>  </td></tr>
 </table>
 <p>The following classes contain utility methods:</p><ul>

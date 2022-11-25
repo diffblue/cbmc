@@ -142,22 +142,22 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Control granularity of object accesses. </p>
 <p><a class="el" href="classfield__sensitivityt.html">Field sensitivity</a> is a transformation of the instructions goto-program which mainly replaces some expressions by symbols but can also add assignments to the target equations produced by symbolic execution. The main goal of this transformation is to allow more constants to be propagated during symbolic execution. Note that field sensitivity is not applied as a single pass over the whole goto program but instead applied as the symbolic execution unfolds.</p>
 <p>On a high level, field sensitivity replaces member operators, and array accesses with atomic symbols representing a field when possible. In cases where this is not immediately possible, like struct assignments, some things need to be added. The possible cases are described below.</p>
-<h3><a class="anchor" id="autotoc_md113"></a>
+<h3><a class="anchor" id="autotoc_md121"></a>
 Member access</h3>
 <p>A member expression <code>struct_expr.field_name</code> is replaced by the symbol <code>struct_expr..field_name</code>; note the use of <code>..</code> to visually distinguish the symbol from the member expression. This is valid for both lvalues and rvalues. See <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>.</p>
-<h3><a class="anchor" id="autotoc_md114"></a>
+<h3><a class="anchor" id="autotoc_md122"></a>
 Symbols representing structs</h3>
 <p>In an rvalue, a symbol struct_expr which has a struct type with fields field1, field2, etc, will be replaced by <code>{struct_expr..field_name1; struct_expr..field_name2; …}</code>. See <a class="el" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">field_sensitivityt::get_fields</a>.</p>
-<h3><a class="anchor" id="autotoc_md115"></a>
+<h3><a class="anchor" id="autotoc_md123"></a>
 Assignment to a struct</h3>
 <p>When the symbol is on the left-hand-side, for instance for an assignment <code>struct_expr = other_struct</code>, the assignment is replaced by a sequence of assignments: <code>struct_expr..field_name1 = other_struct..field_name1;</code> <code>struct_expr..field_name2 = other_struct..field_name2;</code> etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>.</p>
-<h3><a class="anchor" id="autotoc_md116"></a>
+<h3><a class="anchor" id="autotoc_md124"></a>
 Array access</h3>
 <p>An index expression <code>array[index]</code> when index is constant and array has constant size is replaced by the symbol <code>array[[index]]</code>; note the use of <code>[[</code> and <code>]]</code> to visually distinguish the symbol from the index expression. When <code>index</code> is not a constant, <code>array[index]</code> is replaced by <code>{array[[0]]; array[[1]]; …index]</code>. Note that this process does not apply to arrays whose size is not constant, and arrays whose size exceed the bound <code>max_field_sensitivity_array_size</code>. See <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>.</p>
-<h3><a class="anchor" id="autotoc_md117"></a>
+<h3><a class="anchor" id="autotoc_md125"></a>
 Symbols representing arrays</h3>
 <p>In an rvalue, a symbol <code>array</code> which has array type will be replaced by <code>{array[[0]]; array[[1]]; …}[index]</code>. See <a class="el" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">field_sensitivityt::get_fields</a>.</p>
-<h3><a class="anchor" id="autotoc_md118"></a>
+<h3><a class="anchor" id="autotoc_md126"></a>
 Assignment to an array</h3>
 <p>When the array symbol is on the left-hand-side, for instance for an assignment <code>array = other_array</code>, the assignment is replaced by a sequence of assignments: <code>array[[0]] = other_array[[0]]</code>; <code>array[[1]] = other_array[[1]]</code>; etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>. </p>
 

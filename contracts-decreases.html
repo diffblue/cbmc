@@ -93,9 +93,9 @@ $(document).ready(function(){initNavTree('contracts-decreases.html',''); initRes
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md69">Syntax</a></li>
-<li class="level1"><a href="#autotoc_md70">Semantics</a></li>
-<li class="level1"><a href="#autotoc_md71">Additional Resources</a></li>
+<ul><li class="level1"><a href="#autotoc_md70">Syntax</a></li>
+<li class="level1"><a href="#autotoc_md71">Semantics</a></li>
+<li class="level1"><a href="#autotoc_md72">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('contracts-decreases.html',''); initRes
 <li>strictly decreases at each iteration</li>
 </ol>
 <p>we can prove termination of loops. This is because the measure must eventually hit the lower bound at which point the loop must terminate, since the measure cannot strictly decrease further. This technique for proving termination was proposed by Robert Floyd, and interested readers may refer to his seminal paper "[_Assigning Meaning to Programs_](https://people.eecs.berkeley.edu/~necula/Papers/FloydMeaning.pdf)".</p>
-<h1><a class="anchor" id="autotoc_md69"></a>
+<h1><a class="anchor" id="autotoc_md70"></a>
 Syntax</h1>
 <p>A one-dimensional (1D) decreases clause for a loop is an arithmetic expression <code>e</code> over the variables visible at the same scope as the loop, specified as <code>__CPROVER_decreases(e)</code>.</p>
 <p>Like invariant clauses, decreases clauses may be specified just after the loop guard. An example of a 1D decreases clause is shown below.</p>
@@ -130,7 +130,7 @@ Syntax</h1>
 <div class="line">}</div>
 </div><!-- fragment --><p>We extend the strict arithmetic comparison for 1D decreases clauses to a strict <a href="https://en.wikipedia.org/wiki/Lexicographic_order">lexicographic comparison</a> for multi-dimensional decreases clauses.</p>
 <p><b>Important.</b> Like invariant clauses, decreases clauses must be free of side effects, for example, mutation of local or global variables. Otherwise, CBMC raises an error message during compilation: </p><div class="fragment"><div class="line">Decreases clause is not side-effect free. (at: file main.c line 4 function main) </div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md70"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md71"></a>
 Semantics</h1>
 <p>A decreases clause extends the loop abstraction introduced in the <a class="el" href="contracts-loop-invariants.html">loop invariant clause</a> documentation. In addition to the inductiveness check asserted at the end of a single arbitrary iteration, CBMC would also assert the strict decrement of the measure specified in the decreases clause. At a high level, in addition to the assumptions and assertions introduced by the invariant clause, a decreases clause expands to three key steps:</p><ol type="1">
 <li>At the beginning of the loop body, record the initial value of the measure specified in the decreases clause.</li>
@@ -212,7 +212,7 @@ Semantics</h1>
 <div class="line">}</div>
 </div><!-- fragment --><p>The instrumented code points (5), (6), (8), and (9) are specific to the decreases clause.</p>
 <p><b>Important.</b> Decreases clauses work in conjunction with <a class="el" href="contracts-loop-invariants.html">loop invariant clauses</a>, which model an arbitrary loop iteration at which the decreases clause is checked. If a decreases clause is annotated on a loop without an invariant clause, then the weakest possible invariant (i.e, <code>true</code>) is used to model an arbitrary iteration.</p>
-<h1><a class="anchor" id="autotoc_md71"></a>
+<h1><a class="anchor" id="autotoc_md72"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -229,6 +229,7 @@ Additional Resources</h1>
 </ul>
 </li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a></li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a></li>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a></li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> </li>
 </ul>

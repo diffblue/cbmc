@@ -92,15 +92,15 @@ $(document).ready(function(){initNavTree('group__goto-instrument.html',''); init
 <div class="title">goto-instrument</div>  </div>
 </div><!--header-->
 <div class="contents">
-<h1><a class="anchor" id="autotoc_md108"></a>
+<h1><a class="anchor" id="autotoc_md116"></a>
 Folder goto-instrument</h1>
 <dl class="section author"><dt>Author</dt><dd>Martin Brain</dd></dl>
 <p>The <code>goto-instrument/</code> directory contains a number of tools, one per file, that are built into the <code>goto-instrument</code> program. All of them take in a goto-program (produced by <code>goto-cc</code>) and either modify it or perform some analysis. Examples include <code><a class="el" href="nondet__static_8cpp.html">nondet_static.cpp</a></code> which initialises static variables to a non-deterministic value, <code><a class="el" href="nondet__volatile_8cpp.html">nondet_volatile.cpp</a></code> which assigns a non-deterministic value to any volatile variable before it is read and <code><a class="el" href="weak__memory_8h.html">weak_memory.h</a></code> which performs the necessary transformations to reason about weak memory models. The exception to the “one file for each piece of functionality” rule are the program instrumentation options (mostly those given as “Safety checks” in the <code>goto-instrument</code> help text) which are included in the <code>goto-program/</code> directory. An example of this is <code>goto-program/stack_depth.h</code> and the general rule seems to be that transformations and instrumentation that <code>cbmc</code> uses should be in <code>goto-program/</code>, others should be in <code>goto-instrument</code>.</p>
 <p><code>goto-instrument</code> is a very good template for new analysis tools. New developers are advised to copy the directory, remove all files apart from <code>main.*</code>, <code>parseoptions.*</code> and the <code>Makefile</code> and use these as the skeleton of their application. The <code>doit()</code> method in <code>parseoptions.cpp</code> is the preferred location for the top level control for the program.</p>
-<h3><a class="anchor" id="autotoc_md109"></a>
+<h3><a class="anchor" id="autotoc_md117"></a>
 Main usage</h3>
 <p>For most of the transformations, <code>goto-instrument</code> takes one or two arguments and any number of options. The two file arguments are a goto-binary that it uses as an input for the transformation, and then <em>another goto binary</em> that it uses to write the result of the transformation. This is important because many times, if you don't supply a second filename for the goto-binary to be written to, you get the equivalent of the <code>--help</code> option output, with no indication of what has gone wrong. Some of the options can work with just an input file and not output file. For more specific examples, take a look at the demonstrations below:</p>
-<h3><a class="anchor" id="autotoc_md110"></a>
+<h3><a class="anchor" id="autotoc_md118"></a>
 Function pointer removal</h3>
 <p>As an example of a transformation pass being run, imagine you have a file called <code>function_pointers.c</code> with the following content: </p><pre class="fragment">    int f1(void);
     int f2(void);
@@ -205,7 +205,7 @@ Function pointer removal</h3>
             // 27 file function_pointer.c line 24 function func
             END_FUNCTION
 </pre><p>You can now see that the function pointer (indirect) call (resulting from the array indexing of the array containing the function pointers) has now been substituted by direct, conditional calls.</p>
-<h3><a class="anchor" id="autotoc_md111"></a>
+<h3><a class="anchor" id="autotoc_md119"></a>
 Call Graph</h3>
 <p>This is an example of a command line flag that requires only one argument, specifying the input file.</p>
 <p>You can see the call graph of a particular goto-binary by issuing <code>goto-instrument --call-graph &lt;goto_binary&gt;</code>. This gives a result similar to this: </p><pre class="fragment">    Reading GOTO program from `a.out'

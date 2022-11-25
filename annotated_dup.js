@@ -368,6 +368,7 @@ var annotated_dup =
     [ "dfcc_is_freeablet", "classdfcc__is__freeablet.html", "classdfcc__is__freeablet" ],
     [ "dfcc_is_fresht", "classdfcc__is__fresht.html", "classdfcc__is__fresht" ],
     [ "dfcc_libraryt", "classdfcc__libraryt.html", "classdfcc__libraryt" ],
+    [ "dfcc_obeys_contractt", "classdfcc__obeys__contractt.html", "classdfcc__obeys__contractt" ],
     [ "dfcc_spec_functionst", "classdfcc__spec__functionst.html", "classdfcc__spec__functionst" ],
     [ "dfcc_swap_and_wrapt", "classdfcc__swap__and__wrapt.html", "classdfcc__swap__and__wrapt" ],
     [ "dfcc_utilst", "classdfcc__utilst.html", "classdfcc__utilst" ],

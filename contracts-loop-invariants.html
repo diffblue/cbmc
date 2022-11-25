@@ -93,14 +93,14 @@ $(document).ready(function(){initNavTree('contracts-loop-invariants.html',''); i
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md88">Syntax</a></li>
-<li class="level1"><a href="#autotoc_md89">Semantics</a></li>
-<li class="level1"><a href="#autotoc_md90">Additional Resources</a></li>
+<ul><li class="level1"><a href="#autotoc_md96">Syntax</a></li>
+<li class="level1"><a href="#autotoc_md97">Semantics</a></li>
+<li class="level1"><a href="#autotoc_md98">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
 <p>An <em>invariant</em> clause specifies a property that must be preserved by every iteration of a loop. In general a loop has infinitely many invariants. For instance, <code>true</code> is a trivial invariant that holds before the loop, and after each iteration of the loop (thus, inductive). However, <code>true</code> is rarely useful &ndash; it is an extremely imprecise abstraction of a loop, which is generally not <em>sufficient</em> to prove any subsequent assertions.</p>
-<h1><a class="anchor" id="autotoc_md88"></a>
+<h1><a class="anchor" id="autotoc_md96"></a>
 Syntax</h1>
 <p>An <em>invariant</em> clause accepts a valid Boolean expression over the variables visible at the same scope as the loop. Additionally, [history variables] are also allowed within invariant clauses.</p>
 <div class="fragment"><div class="line">__CPROVER_loop_invariant(<span class="keywordtype">bool</span> cond)</div>
@@ -117,7 +117,7 @@ Syntax</h1>
 <div class="line">__CPROVER_loop_invariant(0 &lt;= i)</div>
 <div class="line">__CPROVER_loop_invariant(i &lt;= n);</div>
 </div><!-- fragment --><p><b>Important.</b> Invariant clauses must be free of <em>side effects</em>, for example, mutation of local or global variables. Otherwise, CBMC raises an error message during compilation: </p><div class="fragment"><div class="line">Loop invariant is not side-effect free. (at: file main.c line 4 function main) </div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md89"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md97"></a>
 Semantics</h1>
 <p>A loop invariant clause expands to several assumptions and assertions:</p><ol type="1">
 <li>The invariant is <em>asserted</em> just before the first iteration.</li>
@@ -189,7 +189,7 @@ Semantics</h1>
 <li>At instrumented code point (2), when we <code>havoc</code> the modified variables, this set of modified variables is automatically computed using alias analysis of l-values appearing in the loop body. However, the analysis is incomplete and may fail to characterize the set for complex loops. In such cases, the user must manually annotate the set of modified variables using an <a class="el" href="contracts-assigns.html">_assigns clause_</a>.</li>
 <li>At instrumented code point (6), when we <em>assume</em> <code>false</code>, observe that this assumption only exists within the <code>lb &lt;= ub</code> conditional. Therefore, only the symbolic execution path <em>inside</em> this conditional block terminates. The code outside of the conditional block continues to be symbolically executed, and subsequent assertions do not become vacuously <code>true</code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md90"></a>
+<h1><a class="anchor" id="autotoc_md98"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -206,6 +206,7 @@ Additional Resources</h1>
 </ul>
 </li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a></li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a></li>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a></li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> </li>
 </ul>

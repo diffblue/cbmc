@@ -199,8 +199,9 @@ Instrumenting CALL Instructions</h2>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
 <div class="line">----</div>
 <div class="line">CALL <a class="code" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(ptr);</div>
-</div><!-- fragment --><p>Calls to __CPROVER_was_freed or __CPROVER_is_freeable are rewritten as described in <a class="el" href="contracts-dev-spec-is-freeable.html">Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates</a></p>
-<p>Calls to __CPROVER_is_fresh are rewritten as described in <a class="el" href="contracts-dev-spec-is-fresh.html">Rewriting Calls to the __CPROVER_is_fresh Predicate</a></p>
+</div><!-- fragment --><p>Calls to <code>__CPROVER_was_freed</code> or <code>__CPROVER_is_freeable</code> are rewritten as described in <a class="el" href="contracts-dev-spec-is-freeable.html">Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates</a></p>
+<p>Calls to <code>__CPROVER_is_fresh</code> are rewritten as described in <a class="el" href="contracts-dev-spec-is-fresh.html">Rewriting Calls to the __CPROVER_is_fresh Predicate</a></p>
+<p>Calls to <code>__CPROVER_obeys_contract</code> are rewritten as described in <a class="el" href="contracts-dev-spec-obeys-contract.html">Rewriting Calls to the __CPROVER_obeys_contract Predicate</a></p>
 <p>For all other function or function pointer calls, we proceed as follows.</p>
 <p>If the function call has an LHS (i.e. its result is assigned to a return value variable), the LHS gets checked like for an assignment, and we pass the write set as an extra parameter to the function (remember that all functions of the goto models are extended with write_set parameters by the transformation).</p>
 <div class="fragment"><div class="line"><span class="comment">// If the LHS exists</span></div>

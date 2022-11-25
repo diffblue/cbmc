@@ -93,12 +93,12 @@ $(document).ready(function(){initNavTree('contracts-functions.html',''); initRes
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md80">Overview</a></li>
-<li class="level1"><a href="#autotoc_md81">Additional Resources</a></li>
+<ul><li class="level1"><a href="#autotoc_md88">Overview</a></li>
+<li class="level1"><a href="#autotoc_md89">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md80"></a>
+<h1><a class="anchor" id="autotoc_md88"></a>
 Overview</h1>
 <p>Take a look at the example below.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
@@ -134,6 +134,7 @@ Overview</h1>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a> allow to refer to past versions of function parameters,</li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> allow to express quantified formulas,</li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a> allow to describe simple heap structures;</li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a> allow to describe function pointer properties;</li>
 </ul>
 <p>In our example, the developer may require from the caller to properly allocate all arguments, thus, pointers must be valid. We can specify the preconditions of a function using <code>__CPROVER_requires</code> (see the <a href="../../contracts/requires-and-ensures/">Requires &amp; Ensures Clauses</a> documentation for details) and we can specify an allocated object using a predicate called <code>__CPROVER_is_fresh</code> (see <a class="el" href="contracts-memory-predicates.html">Memory Predicate</a> for details). Thus, for the <code>sum</code> function, the set of preconditions are</p>
 <div class="fragment"><div class="line"><span class="comment">/* Precondition */</span></div>
@@ -173,7 +174,7 @@ Overview</h1>
 <div class="line">goto-instrument --replace-call-with-contract sum foo.goto foo-using-sum-contract.goto</div>
 <div class="line">cbmc foo-using-sum-contract.goto --function foo</div>
 </div><!-- fragment --><p>The first command just compiles the GOTO program as usual, the second command instruments the code to use the function contract in place of the function implementation wherever is invoked, and the third one runs CBMC to check the program using contracts.</p>
-<h1><a class="anchor" id="autotoc_md81"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -190,6 +191,7 @@ Additional Resources</h1>
 </ul>
 </li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a></li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a></li>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a></li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> </li>
 </ul>

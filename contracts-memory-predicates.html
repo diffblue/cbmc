@@ -93,30 +93,30 @@ $(document).ready(function(){initNavTree('contracts-memory-predicates.html','');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md93">Syntax</a><ul><li class="level2"><a href="#autotoc_md94">Parameters</a></li>
-<li class="level2"><a href="#autotoc_md95">Return Value</a></li>
+<ul><li class="level1"><a href="#autotoc_md101">Syntax</a><ul><li class="level2"><a href="#autotoc_md102">Parameters</a></li>
+<li class="level2"><a href="#autotoc_md103">Return Value</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md96">Semantics</a><ul><li class="level2"><a href="#autotoc_md97">Enforcement</a></li>
-<li class="level2"><a href="#autotoc_md98">Replacement</a></li>
+<li class="level1"><a href="#autotoc_md104">Semantics</a><ul><li class="level2"><a href="#autotoc_md105">Enforcement</a></li>
+<li class="level2"><a href="#autotoc_md106">Replacement</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md99">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md107">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md93"></a>
+<h1><a class="anchor" id="autotoc_md101"></a>
 Syntax</h1>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<span class="keywordtype">void</span> *p, <span class="keywordtype">size_t</span> size);</div>
 </div><!-- fragment --><p>To specify memory footprint we use a special function called <code>__CPROVER_is_fresh</code>. The meaning of <code>__CPROVER_is_fresh</code> is that we are borrowing a pointer from the external environment (in a precondition), or returning it to the calling context (in a postcondition).</p>
-<h2><a class="anchor" id="autotoc_md94"></a>
+<h2><a class="anchor" id="autotoc_md102"></a>
 Parameters</h2>
 <p><code>__CPROVER_is_fresh</code> takes two arguments: a pointer and an allocation size. The first argument is the pointer to be checked for "freshness" (i.e., not previously allocated), and the second is the expected size in bytes for the memory available at the pointer. <br  />
 </p>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md103"></a>
 Return Value</h2>
 <p>It returns a <code>bool</code> value, indicating whether the pointer is fresh.</p>
-<h1><a class="anchor" id="autotoc_md96"></a>
+<h1><a class="anchor" id="autotoc_md104"></a>
 Semantics</h1>
 <p>To illustrate the semantics for <code>__CPROVER_is_fresh</code>, consider the following implementation of <code>sum</code> function.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> *err_signal; <span class="comment">// Global variable</span></div>
@@ -133,7 +133,7 @@ Semantics</h1>
 <div class="line">  *out = (uint32_t) result;</div>
 <div class="line">  *err_signal = SUCCESS;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md97"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md105"></a>
 Enforcement</h2>
 <p>When checking the contract abstracts a function a <code>__CPROVER_is_fresh</code> in a <em>requires</em> clause will cause fresh memory to be allocated. In an <em>ensures</em> clause it will check that memory was freshly allocated.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> *err_signal; <span class="comment">// Global variable</span></div>
@@ -156,7 +156,7 @@ Enforcement</h2>
 <div class="line">  <a class="code" href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a>(<a class="code" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(err_signal, <span class="keyword">sizeof</span>(*err_signal)), <span class="stringliteral">&quot;Check ensures clause&quot;</span>);</div>
 <div class="line">  <span class="keywordflow">return</span> return_value_sum;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md98"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md106"></a>
 Replacement</h2>
 <p>In our example, consider that a function <code>foo</code> may call <code>sum</code>.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> *err_signal; <span class="comment">// Global variable</span></div>
@@ -191,7 +191,7 @@ Replacement</h2>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> *err_signal;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md99"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md107"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -208,6 +208,7 @@ Additional Resources</h1>
 </ul>
 </li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a></li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a></li>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a></li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> </li>
 </ul>

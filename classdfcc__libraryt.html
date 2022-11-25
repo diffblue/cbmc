@@ -232,7 +232,7 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class interface to library types and functions defined in <code>cprover_contracts.c</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00147">147</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00149">149</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abf2a449239d88bc96d09b89d1830019e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abf2a449239d88bc96d09b89d1830019e">&#9670;&nbsp;</a></span>dfcc_libraryt()</h2>
@@ -268,7 +268,7 @@ Private Attributes</h2></td></tr>
 
 <p>Class constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00168">168</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00169">169</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -307,7 +307,7 @@ Private Attributes</h2></td></tr>
 
 <p>Generates instructions to initialize the instrumented function map symbol from the given set of instrumented function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00549">549</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00550">550</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +329,7 @@ Private Attributes</h2></td></tr>
 <p>Adds "checked" pragmas to instructions of all library functions instructions. </p>
 <p>By default checks are not disabled. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00223">223</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00224">224</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +359,7 @@ Private Attributes</h2></td></tr>
 <p>Fixes function calls to malloc and free in library functions. </p>
 <p>Change calls to <code>__CPROVER_contracts_malloc</code> into calls to <code>malloc</code> Change calls to <code>__CPROVER_contracts_free</code> into calls to <code>free</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00457">457</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00458">458</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -381,7 +381,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the dfcc_funt that corresponds to the given id if any. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00360">360</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00361">361</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -403,7 +403,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the name of the given dfcc_funt. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00374">374</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00375">375</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +426,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the library instrumentation hook for the given built-in. </p>
 <p>function_id must be one of <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00203">203</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00204">204</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -450,7 +450,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the instrumentation function to use for a given front-end function.</p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>function_id</code> is a front end built-in as defined by <a class="el" href="classdfcc__libraryt.html#a4344ee9423b3135843a9087094531155">is_front_end_builtin</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00195">195</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00196">196</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -472,7 +472,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the "__dfcc_instrumented_functions" symbol or creates it if it does not exist already. </p>
 <p>This symbol is an unbounded map of booleans indexed by function pointer ID, meant to have value true for instrumented functions and false for non-instrumented functions. Initialisation instructions for this map are generated by <a class="el" href="classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c">add_instrumented_functions_map_init_instructions</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00528">528</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00529">529</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +501,7 @@ Private Attributes</h2></td></tr>
 
 <p>Collects the names of all library functions currently missing from the goto_model into <code>missing</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00235">235</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00236">236</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -522,7 +522,7 @@ Private Attributes</h2></td></tr>
 
 <p>Adds an ASSERT(false) body to all front-end functions __CPROVER_object_whole __CPROVER_object_upto __CPROVER_object_from __CPROVER_assignable __CPROVER_freeable To make sure they cannot be used in a proof unexpectedly without causing verification errors. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00488">488</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00489">489</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +551,7 @@ Private Attributes</h2></td></tr>
 
 <p>Inlines library functions that need to be inlined before use. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00401">401</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00402">402</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +573,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the given id is one of the library symbols. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00369">369</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00370">370</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -596,7 +596,7 @@ Private Attributes</h2></td></tr>
 <p>Returns true iff the given function_id is one of <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code>, <code>__CPROVER_freeable</code> </p>
 <p>Returns the instrumentation function to use for a given front-end function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00189">189</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00190">190</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -619,7 +619,7 @@ Private Attributes</h2></td></tr>
 <p>After calling this function, all library types and functions are present in the the goto_model. </p>
 <p>Any other functions that the DFCC functions rely on and need to be instrumented will be added to <code>to_instrument</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00274">274</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00275">275</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -641,7 +641,7 @@ Private Attributes</h2></td></tr>
 
 <p>Sets the given hide flag on all instructions of all library functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00521">521</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00522">522</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +669,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00423">423</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00424">424</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -696,7 +696,7 @@ Private Attributes</h2></td></tr>
 
 <p>All built-in function names (front-end and instrumentation hooks) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00206">206</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00208">208</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -714,7 +714,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps enum values to the actual function symbols (dynamically loaded) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00213">213</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00215">215</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -740,7 +740,7 @@ Private Attributes</h2></td></tr>
 
 <p>enum to function name mapping </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00194">194</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00196">196</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -766,7 +766,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps built-in function names to enums to use for instrumentation. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00200">200</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00202">202</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -790,7 +790,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00197">197</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00199">199</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -816,7 +816,7 @@ Private Attributes</h2></td></tr>
 
 <p>Swapped dfcc_type_to_name. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00191">191</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00193">193</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -834,7 +834,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps enum values to the actual types (dynamically loaded) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00210">210</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00212">212</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -860,7 +860,7 @@ Private Attributes</h2></td></tr>
 
 <p>Enum to type name mapping. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00188">188</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00190">190</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -884,7 +884,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00169">169</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -910,7 +910,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps front-end functions to library functions giving their havoc semantics. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00203">203</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00205">205</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -936,7 +936,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the library functions are inlined. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00160">160</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00162">162</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -962,7 +962,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the contracts library symbols are loaded. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00157">157</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00159">159</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -986,7 +986,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00174">174</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1013,7 +1013,7 @@ Private Attributes</h2></td></tr>
 <p>True iff the library functions uses of malloc and free are fixed. </p>
 <p>True iff the library functions have already been fixed. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00167">167</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00169">169</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1037,7 +1037,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00173">173</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1063,7 +1063,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the library functions are specialized to a particular contract. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00164">164</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00166">166</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1087,7 +1087,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00170">170</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>

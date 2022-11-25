@@ -136,6 +136,9 @@ $(document).ready(function(){initNavTree('contracts_8cpp.html',''); initResizabl
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:aec8058244e9b9220cb2c76b1297dca0c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8cpp.html#aec8058244e9b9220cb2c76b1297dca0c">throw_on_unsupported</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program)</td></tr>
+<tr class="memdesc:aec8058244e9b9220cb2c76b1297dca0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throws an exception if a contract uses unsupported constructs like:  <a href="contracts_8cpp.html#aec8058244e9b9220cb2c76b1297dca0c">More...</a><br /></td></tr>
+<tr class="separator:aec8058244e9b9220cb2c76b1297dca0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5cfbf27af004419d6d598ab11fea026"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8cpp.html#aa5cfbf27af004419d6d598ab11fea026">generate_contract_constraints</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classgoto__convertt.html">goto_convertt</a> &amp;converter, <a class="el" href="classexprt.html">exprt</a> &amp;instantiated_clause, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, const std::function&lt; void(<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;)&gt; &amp;is_fresh_update, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location)</td></tr>
 <tr class="memdesc:aa5cfbf27af004419d6d598ab11fea026"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function generates instructions for all contract constraint, i.e., assumptions and assertions based on requires and ensures clauses.  <a href="contracts_8cpp.html#aa5cfbf27af004419d6d598ab11fea026">More...</a><br /></td></tr>
 <tr class="separator:aa5cfbf27af004419d6d598ab11fea026"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -213,7 +216,7 @@ Functions</h2></td></tr>
 
 <p>This function generates instructions for all contract constraint, i.e., assumptions and assertions based on requires and ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00489">489</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00507">507</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +254,40 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00520">520</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00539">539</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aec8058244e9b9220cb2c76b1297dca0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec8058244e9b9220cb2c76b1297dca0c">&#9670;&nbsp;</a></span>throw_on_unsupported()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void throw_on_unsupported </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>program</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Throws an exception if a contract uses unsupported constructs like: </p>
+<ul>
+<li>obeys_contract predicates </li>
+</ul>
+
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l00489">489</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>

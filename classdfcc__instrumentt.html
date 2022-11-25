@@ -125,18 +125,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9cab5285f589a99ca88184776f371a83"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a9cab5285f589a99ca88184776f371a83">do_not_instrument</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
 <tr class="memdesc:a9cab5285f589a99ca88184776f371a83"><td class="mdescLeft">&#160;</td><td class="mdescRight">True iff the symbol must not be instrumented because it is an internal symbol or a CPROVER symbol.  <a href="classdfcc__instrumentt.html#a9cab5285f589a99ca88184776f371a83">More...</a><br /></td></tr>
 <tr class="separator:a9cab5285f589a99ca88184776f371a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7171e53303bb631cea302707daf8625e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a7171e53303bb631cea302707daf8625e">instrument_harness_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
-<tr class="memdesc:a7171e53303bb631cea302707daf8625e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a function as a proof harness.  <a href="classdfcc__instrumentt.html#a7171e53303bb631cea302707daf8625e">More...</a><br /></td></tr>
-<tr class="separator:a7171e53303bb631cea302707daf8625e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48a08d93c9c5d61bbe6da6f98bed8e41"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a48a08d93c9c5d61bbe6da6f98bed8e41">instrument_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
-<tr class="memdesc:a48a08d93c9c5d61bbe6da6f98bed8e41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set.  <a href="classdfcc__instrumentt.html#a48a08d93c9c5d61bbe6da6f98bed8e41">More...</a><br /></td></tr>
-<tr class="separator:a48a08d93c9c5d61bbe6da6f98bed8e41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c17fc4237a4624a586c17685885cf42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a8c17fc4237a4624a586c17685885cf42">instrument_wrapped_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;wrapped_function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;initial_function_id)</td></tr>
-<tr class="memdesc:a8c17fc4237a4624a586c17685885cf42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set.  <a href="classdfcc__instrumentt.html#a8c17fc4237a4624a586c17685885cf42">More...</a><br /></td></tr>
-<tr class="separator:a8c17fc4237a4624a586c17685885cf42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84710170d8e15d2a8ad65c743fce0b07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a84710170d8e15d2a8ad65c743fce0b07">instrument_goto_program</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set)</td></tr>
-<tr class="memdesc:a84710170d8e15d2a8ad65c743fce0b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO program against a given write set variable.  <a href="classdfcc__instrumentt.html#a84710170d8e15d2a8ad65c743fce0b07">More...</a><br /></td></tr>
-<tr class="separator:a84710170d8e15d2a8ad65c743fce0b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae792ae4d49f271997805c61e8c496aa6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#ae792ae4d49f271997805c61e8c496aa6">instrument_harness_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:ae792ae4d49f271997805c61e8c496aa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a function as a proof harness.  <a href="classdfcc__instrumentt.html#ae792ae4d49f271997805c61e8c496aa6">More...</a><br /></td></tr>
+<tr class="separator:ae792ae4d49f271997805c61e8c496aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cd742d21d4e84ca81ac78da6cf770af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a0cd742d21d4e84ca81ac78da6cf770af">instrument_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a0cd742d21d4e84ca81ac78da6cf770af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set.  <a href="classdfcc__instrumentt.html#a0cd742d21d4e84ca81ac78da6cf770af">More...</a><br /></td></tr>
+<tr class="separator:a0cd742d21d4e84ca81ac78da6cf770af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6c14e9a383dc14130757264b6adb45b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#ac6c14e9a383dc14130757264b6adb45b">instrument_wrapped_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;wrapped_function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;initial_function_id, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:ac6c14e9a383dc14130757264b6adb45b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set.  <a href="classdfcc__instrumentt.html#ac6c14e9a383dc14130757264b6adb45b">More...</a><br /></td></tr>
+<tr class="separator:ac6c14e9a383dc14130757264b6adb45b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b838afe502ea0ad537327a67c900cb5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a1b838afe502ea0ad537327a67c900cb5">instrument_goto_program</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a1b838afe502ea0ad537327a67c900cb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO program against a given write set variable.  <a href="classdfcc__instrumentt.html#a1b838afe502ea0ad537327a67c900cb5">More...</a><br /></td></tr>
+<tr class="separator:a1b838afe502ea0ad537327a67c900cb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3bff56cbc0bb265762f9e128fac2d660"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a3bff56cbc0bb265762f9e128fac2d660">get_instrumented_functions</a> (std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;dest) const</td></tr>
 <tr class="memdesc:a3bff56cbc0bb265762f9e128fac2d660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the names of instrumented functions to <code>dest</code>.  <a href="classdfcc__instrumentt.html#a3bff56cbc0bb265762f9e128fac2d660">More...</a><br /></td></tr>
 <tr class="separator:a3bff56cbc0bb265762f9e128fac2d660"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,15 +152,15 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ac931dd3f011d2dd6f0fe3bed1f4dc035"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">insert_record_dead_call</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol_expr, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;target, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:ac931dd3f011d2dd6f0fe3bed1f4dc035"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a guarded call to record the death of a local symbol and inserts it in the goto_program at the target, and moves the target forward.  <a href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">More...</a><br /></td></tr>
 <tr class="separator:ac931dd3f011d2dd6f0fe3bed1f4dc035"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d1c54158711e440e7dd210c38d0fc73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a4d1c54158711e440e7dd210c38d0fc73">instrument_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id_for_local_static_search)</td></tr>
-<tr class="memdesc:a4d1c54158711e440e7dd210c38d0fc73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its goto program.  <a href="classdfcc__instrumentt.html#a4d1c54158711e440e7dd210c38d0fc73">More...</a><br /></td></tr>
-<tr class="separator:a4d1c54158711e440e7dd210c38d0fc73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a1b7ee66ac39db7859c39efb344bec4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a9a1b7ee66ac39db7859c39efb344bec4">instrument_function_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, <a class="el" href="classcfg__infot.html">cfg_infot</a> &amp;cfg_info, const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;local_statics)</td></tr>
-<tr class="memdesc:a9a1b7ee66ac39db7859c39efb344bec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the body of a GOTO function against a given write set.  <a href="classdfcc__instrumentt.html#a9a1b7ee66ac39db7859c39efb344bec4">More...</a><br /></td></tr>
-<tr class="separator:a9a1b7ee66ac39db7859c39efb344bec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cc2397ffc91591e42c7d29b70fe6915"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a9cc2397ffc91591e42c7d29b70fe6915">instrument_instructions</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> first_instruction, const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;last_instruction, <a class="el" href="classcfg__infot.html">cfg_infot</a> &amp;cfg_info, const std::function&lt; bool(const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;)&gt; &amp;pred)</td></tr>
-<tr class="memdesc:a9cc2397ffc91591e42c7d29b70fe6915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the instructions found between <code>first_instruction</code> and <code>last_instruction</code> in the instructions of <code>goto_program</code> against the given <code>write_set</code> variable.  <a href="classdfcc__instrumentt.html#a9cc2397ffc91591e42c7d29b70fe6915">More...</a><br /></td></tr>
-<tr class="separator:a9cc2397ffc91591e42c7d29b70fe6915"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a441ceedd8c772eb044b426824e9995cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a441ceedd8c772eb044b426824e9995cf">instrument_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id_for_local_static_search, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a441ceedd8c772eb044b426824e9995cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its goto program.  <a href="classdfcc__instrumentt.html#a441ceedd8c772eb044b426824e9995cf">More...</a><br /></td></tr>
+<tr class="separator:a441ceedd8c772eb044b426824e9995cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f9875f660f40dbaaf3d654650bac608"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a3f9875f660f40dbaaf3d654650bac608">instrument_function_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, <a class="el" href="classcfg__infot.html">cfg_infot</a> &amp;cfg_info, const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;local_statics, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a3f9875f660f40dbaaf3d654650bac608"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the body of a GOTO function against a given write set.  <a href="classdfcc__instrumentt.html#a3f9875f660f40dbaaf3d654650bac608">More...</a><br /></td></tr>
+<tr class="separator:a3f9875f660f40dbaaf3d654650bac608"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2d24d645aa6c005b84c37e8450339c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#af2d24d645aa6c005b84c37e8450339c1">instrument_instructions</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> first_instruction, const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;last_instruction, <a class="el" href="classcfg__infot.html">cfg_infot</a> &amp;cfg_info, const std::function&lt; bool(const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;)&gt; &amp;pred, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:af2d24d645aa6c005b84c37e8450339c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the instructions found between <code>first_instruction</code> and <code>last_instruction</code> in the instructions of <code>goto_program</code> against the given <code>write_set</code> variable.  <a href="classdfcc__instrumentt.html#af2d24d645aa6c005b84c37e8450339c1">More...</a><br /></td></tr>
+<tr class="separator:af2d24d645aa6c005b84c37e8450339c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a041069d9c0a308f1ea86b11c40a3a144"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a041069d9c0a308f1ea86b11c40a3a144">must_track_decl_or_dead</a> (const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;target, const <a class="el" href="classcfg__infot.html">cfg_infot</a> &amp;cfg_info) const</td></tr>
 <tr class="memdesc:a041069d9c0a308f1ea86b11c40a3a144"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>true</code> if the symbol <code>x</code> in <code>DECL x</code> or <code>DEAD x</code> must be added explicitly to the write set.  <a href="classdfcc__instrumentt.html#a041069d9c0a308f1ea86b11c40a3a144">More...</a><br /></td></tr>
 <tr class="separator:a041069d9c0a308f1ea86b11c40a3a144"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -268,7 +268,7 @@ Static Protected Attributes</h2></td></tr>
 <p>These builtins are valist management functions and interpreted natively in <a class="el" href="symex__builtin__functions_8cpp.html">src/goto-symex/symex_builtin_functions.cpp</a> and must not be instrumented</p>
 <p>These builtins get translated to CPROVER equivalents and must not be instrumented</p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00037">37</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00038">38</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +291,7 @@ Static Protected Attributes</h2></td></tr>
 
 <p>True iff the symbol must not be instrumented because it is an internal symbol or a CPROVER symbol. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00217">217</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00218">218</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +314,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Adds the names of instrumented functions to <code>dest</code>. </p>
 <p>The names are kept track of in the <a class="el" href="classdfcc__instrumentt.html#a4d7c4a63de14346d987dfb7366529d40">function_cache</a> field. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00082">82</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00083">83</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -350,7 +350,7 @@ Static Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00254">254</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00261">261</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +421,7 @@ Static Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00466">466</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00496">496</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -492,7 +492,7 @@ Static Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00513">513</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00543">543</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +551,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Instrument the <code>lhs</code> of an <code>ASSIGN lhs := rhs</code> instruction by adding an inclusion check of <code>lhs</code> in <code>write_set</code>. </p>
 <p>If <a class="el" href="classdfcc__instrumentt.html#ad021542da17241ed9c9bd924d0dff581">is_dead_object_update</a> returns a successfull match, the matched pointer expression is removed from <code>write_set</code>. If <code>rhs</code> is a <code>side_effect_expr(ID_allocate)</code>, the allocated pointer gets added to the <code>write_set</code>. </p><dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to an <code>ASSIGN</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00730">730</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00760">760</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -598,7 +598,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Adds the <code>write_set</code> as extra argument to a function of function pointer call instruction. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00870">870</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00900">900</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -660,7 +660,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="line">----</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a> x;</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00545">545</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00575">575</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -713,7 +713,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Inserts deallocation checks and a write set update before a call to the __CPROVER_deallocate function. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL __CPROVER_deallocate</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00898">898</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00928">928</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -775,7 +775,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="line">----</div>
 <div class="line"><a class="code" href="classdfcc__instrumentt.html#a1dfdaa2199bec04caf8454acc1703047">insert_add_allocated_call</a>(...);</div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00496">496</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00526">526</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -822,41 +822,12 @@ Static Protected Attributes</h2></td></tr>
 <p>Before calling a function pointer, performs a dynamic lookup into the map of instrumented function provided by <a class="el" href="classdfcc__libraryt.html#a81eff42e4e9c47cc28a08217c62e467b">dfcc_libraryt::get_instrumented_functions_map_symbol</a>, and passes the write_set parameter to the funciton pointer only if it points to a function known to be instrumented and hence able to accept this parameter. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL</code> instruction where the function expression is not a <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00820">820</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00850">850</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a48a08d93c9c5d61bbe6da6f98bed8e41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48a08d93c9c5d61bbe6da6f98bed8e41">&#9670;&nbsp;</a></span>instrument_function() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dfcc_instrumentt::instrument_function </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>function_id</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set. </p>
-<dl class="section pre"><dt>Precondition</dt><dd>The function must <em>not</em> be one of the checked or replaced functions. For checked/replaced functions <a class="el" href="classdfcc__instrumentt.html#a8c17fc4237a4624a586c17685885cf42">instrument_wrapped_function</a> must be used instead. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">function_id</td><td>The name of the function, used to retrieve the function to instrument and used as prefix when generating new symbols during instrumentation. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00272">272</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a4d1c54158711e440e7dd210c38d0fc73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d1c54158711e440e7dd210c38d0fc73">&#9670;&nbsp;</a></span>instrument_function() <span class="overload">[2/2]</span></h2>
+<a id="a441ceedd8c772eb044b426824e9995cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a441ceedd8c772eb044b426824e9995cf">&#9670;&nbsp;</a></span>instrument_function() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -874,7 +845,13 @@ Static Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>function_id_for_local_static_search</em>&#160;</td>
+          <td class="paramname"><em>function_id_for_local_static_search</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -892,12 +869,52 @@ Static Protected Attributes</h2></td></tr>
 <p>Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its goto program. </p>
 <p>Uses <code>function_id_for_local_static_search</code> to search for local statics and automatically to add/remove to the write set. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00286">286</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00297">297</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a9a1b7ee66ac39db7859c39efb344bec4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a1b7ee66ac39db7859c39efb344bec4">&#9670;&nbsp;</a></span>instrument_function_body()</h2>
+<a id="a0cd742d21d4e84ca81ac78da6cf770af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cd742d21d4e84ca81ac78da6cf770af">&#9670;&nbsp;</a></span>instrument_function() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfcc_instrumentt::instrument_function </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set. </p>
+<dl class="section pre"><dt>Precondition</dt><dd>The function must <em>not</em> be one of the checked or replaced functions. For checked/replaced functions <a class="el" href="classdfcc__instrumentt.html#ac6c14e9a383dc14130757264b6adb45b">instrument_wrapped_function</a> must be used instead. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">function_id</td><td>The name of the function, used to retrieve the function to instrument and used as prefix when generating new symbols during instrumentation. </td></tr>
+    <tr><td class="paramname">function_pointer_contracts</td><td>contracts discovered in calls to the obeys_contract predicate are added to this set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00279">279</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3f9875f660f40dbaaf3d654650bac608"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f9875f660f40dbaaf3d654650bac608">&#9670;&nbsp;</a></span>instrument_function_body()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -927,7 +944,13 @@ Static Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>local_statics</em>&#160;</td>
+          <td class="paramname"><em>local_statics</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -945,7 +968,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Instruments the body of a GOTO function against a given write set. </p>
 <p>Adds the given local statics to the write set in pre and removes them post. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00316">316</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00332">332</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1004,12 +1027,12 @@ Static Protected Attributes</h2></td></tr>
 <p>Instruments a <code>CALL lhs := function(params)</code> instruction by adding an inclusion check of <code>lhs</code> in <code>write_set</code>, and passing <code>write_set</code> as an extra argument to the function call. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00975">975</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01005">1005</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a84710170d8e15d2a8ad65c743fce0b07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a84710170d8e15d2a8ad65c743fce0b07">&#9670;&nbsp;</a></span>instrument_goto_program()</h2>
+<a id="a1b838afe502ea0ad537327a67c900cb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b838afe502ea0ad537327a67c900cb5">&#9670;&nbsp;</a></span>instrument_goto_program()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1030,7 +1053,13 @@ Static Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>write_set</em>&#160;</td>
+          <td class="paramname"><em>write_set</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1051,16 +1080,17 @@ This function is meant to instrument instruction sequences that were generated f
     <tr><td class="paramname">function_id</td><td>Name used as prefix when creating new symbols during instrumentation. </td></tr>
     <tr><td class="paramname">goto_program</td><td>Goto program to instrument. </td></tr>
     <tr><td class="paramname">write_set</td><td>Write set variable to use for instrumentation. </td></tr>
+    <tr><td class="paramname">function_pointer_contracts</td><td>Discovered function pointer contracts </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00370">370</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00388">388</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a7171e53303bb631cea302707daf8625e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7171e53303bb631cea302707daf8625e">&#9670;&nbsp;</a></span>instrument_harness_function()</h2>
+<a id="ae792ae4d49f271997805c61e8c496aa6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae792ae4d49f271997805c61e8c496aa6">&#9670;&nbsp;</a></span>instrument_harness_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1069,8 +1099,18 @@ This function is meant to instrument instruction sequences that were generated f
           <td class="memname">void dfcc_instrumentt::instrument_harness_function </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>function_id</em></td><td>)</td>
+          <td class="paramname"><em>function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1078,14 +1118,21 @@ This function is meant to instrument instruction sequences that were generated f
 <p>Instruments a function as a proof harness. </p>
 <p>Instrumenting a harness function just consists in passing a NULL value for the write_set parameter to all function and function pointer calls it contains.</p>
 <p>This will result in no write_set updates or checks being performed in the harness or in the functions called directly from the harness (and transitively in functions they call).</p>
-<p>One of the functions called directly (or indirectly) by the harness is eventually going to be a wrapper function that checks the contract against the function of interest. This wrapper will ignore the NULL write set it received from the harness and instantiate its own local write set from the contract and pass it to the function under analysis. This will trigger cascading checks in all functions called from the checked function thanks to the propagation of the write set through function calls and function pointer calls. </p>
+<p>One of the functions called directly (or indirectly) by the harness is eventually going to be a wrapper function that checks the contract against the function of interest. This wrapper will ignore the NULL write set it received from the harness and instantiate its own local write set from the contract and pass it to the function under analysis. This will trigger cascading checks in all functions called from the checked function thanks to the propagation of the write set through function calls and function pointer calls.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">function_id</td><td>function to instrument </td></tr>
+    <tr><td class="paramname">function_pointer_contracts</td><td>contracts discovered in calls to the obeys_contract predicate are added to this set. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00223">223</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00224">224</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a9cc2397ffc91591e42c7d29b70fe6915"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9cc2397ffc91591e42c7d29b70fe6915">&#9670;&nbsp;</a></span>instrument_instructions()</h2>
+<a id="af2d24d645aa6c005b84c37e8450339c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2d24d645aa6c005b84c37e8450339c1">&#9670;&nbsp;</a></span>instrument_instructions()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1133,7 +1180,13 @@ This function is meant to instrument instruction sequences that were generated f
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::function&lt; bool(const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;)&gt; &amp;&#160;</td>
-          <td class="paramname"><em>pred</em>&#160;</td>
+          <td class="paramname"><em>pred</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1158,11 +1211,12 @@ This function is meant to instrument instruction sequences that were generated f
     <tr><td class="paramname">last_instruction</td><td>Last instruction to instrument (excluded !!!) </td></tr>
     <tr><td class="paramname">cfg_info</td><td>Computes local and dirty variables to discard some checks </td></tr>
     <tr><td class="paramname">pred</td><td>filter predicate for instructions. If <code>pred</code> is not provided, all instructions are instrumented. If <code>pred</code> is provided, only instructions satisfying <code>pred</code> are instrumented. </td></tr>
+    <tr><td class="paramname">function_pointer_contracts</td><td>contracts discovered in calls to the obeys_contract predicate are added to this set. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00391">391</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00411">411</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1226,7 +1280,7 @@ This function is meant to instrument instruction sequences that were generated f
 
 <p>Instruments the LHS of an assignment instruction instruction by adding an inclusion check of <code>lhs</code> in <code>write_set</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00624">624</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00654">654</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1285,12 +1339,12 @@ This function is meant to instrument instruction sequences that were generated f
 <p>Instruments a <code>OTHER statement;</code> instruction. </p>
 <p>OTHER instructions can be an array_set, array_copy, array_replace or a havoc_object instruction. </p><dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to an <code>OTHER</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01013">1013</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01043">1043</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a8c17fc4237a4624a586c17685885cf42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c17fc4237a4624a586c17685885cf42">&#9670;&nbsp;</a></span>instrument_wrapped_function()</h2>
+<a id="ac6c14e9a383dc14130757264b6adb45b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6c14e9a383dc14130757264b6adb45b">&#9670;&nbsp;</a></span>instrument_wrapped_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1305,7 +1359,13 @@ This function is meant to instrument instruction sequences that were generated f
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>initial_function_id</em>&#160;</td>
+          <td class="paramname"><em>initial_function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>function_pointer_contracts</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1316,16 +1376,17 @@ This function is meant to instrument instruction sequences that were generated f
 </div><div class="memdoc">
 
 <p>Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set. </p>
-<dl class="section pre"><dt>Precondition</dt><dd>The function must be a function wrapped for contract checking or replacemend. For other functions <a class="el" href="classdfcc__instrumentt.html#a48a08d93c9c5d61bbe6da6f98bed8e41">instrument_function</a> must be used instead.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The function must be a function wrapped for contract checking or replacemend. For other functions <a class="el" href="classdfcc__instrumentt.html#a0cd742d21d4e84ca81ac78da6cf770af">instrument_function</a> must be used instead.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wrapped_function_id</td><td>The name of the function, used to retrieve the function to instrument and used as prefix when generating new symbols during instrumentation. </td></tr>
     <tr><td class="paramname">initial_function_id</td><td>The initial name of the function, before mangling. This is the name used to identify statics symbols in the symbol table that were locally declared in the function. </td></tr>
+    <tr><td class="paramname">function_pointer_contracts</td><td>contracts discovered in calls to the obeys_contract predicate are added to this set. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00278">278</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00287">287</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1348,7 +1409,7 @@ This function is meant to instrument instruction sequences that were generated f
 <p>True if id has <code>CPROVER_PREFIX</code> or <code>__VERIFIER</code> or <code>nondet</code> prefix, or an <code>&amp;object</code> </p>
 <p>True if id has <code>CPROVER_PREFIX</code> or <code>__VERIFIER</code> or <code>nondet</code> prefix, or an <code>&amp;object</code> suffix (cf <a class="el" href="system__library__symbols_8cpp.html">system_library_symbols.cpp</a>) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00210">210</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00211">211</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1391,7 +1452,7 @@ This function is meant to instrument instruction sequences that were generated f
 <p>Returns a pointer to the <code>ptr</code> expression if the pattern was matched, returns <code>nullptr</code> otherwise.</p>
 <p>Returns <code>ptr</code> if the pattern was matched, nullptr otherwise. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00711">711</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00741">741</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1414,7 +1475,7 @@ This function is meant to instrument instruction sequences that were generated f
 <p>True iff the symbol an internal symbol. </p>
 <p>True iff the symbol must not be instrumented. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00203">203</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00204">204</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1473,7 +1534,7 @@ This function is meant to instrument instruction sequences that were generated f
 <p>Returns true iff the lhs of a <code>ASSIGN lhs := ...</code> instruction or <code>CALL lhs := ...</code> must be checked against the write set. </p>
 <p>Returns false if the assignment must be implicitly allowed. Works in tandem with <a class="el" href="classdfcc__instrumentt.html#a041069d9c0a308f1ea86b11c40a3a144">must_track_decl_or_dead</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00560">560</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00590">590</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1514,7 +1575,7 @@ This function is meant to instrument instruction sequences that were generated f
 <p>Returns <code>true</code> if the symbol <code>x</code> in <code>DECL x</code> or <code>DEAD x</code> must be added explicitly to the write set. </p>
 <p>Returns <code>false</code> when assignments to <code>x</code> must be implicitly allowed. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00450">450</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00480">480</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1541,7 +1602,7 @@ This function is meant to instrument instruction sequences that were generated f
 
 <p>Keeps track of instrumented functions, so that no function gets instrumented more than once. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00145">145</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00160">160</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1565,7 +1626,7 @@ This function is meant to instrument instruction sequences that were generated f
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00136">136</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00151">151</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1591,7 +1652,7 @@ This function is meant to instrument instruction sequences that were generated f
 
 <p>Set of internal symbols which implementation is generated and inlined into the model at conversion or symex time and must not be instrumented. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00150">150</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00165">165</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1615,7 +1676,7 @@ This function is meant to instrument instruction sequences that were generated f
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00140">140</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00155">155</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1639,7 +1700,7 @@ This function is meant to instrument instruction sequences that were generated f
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00138">138</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00153">153</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1663,7 +1724,7 @@ This function is meant to instrument instruction sequences that were generated f
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00137">137</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00152">152</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1687,7 +1748,7 @@ This function is meant to instrument instruction sequences that were generated f
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00141">141</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00156">156</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1711,7 +1772,7 @@ This function is meant to instrument instruction sequences that were generated f
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00139">139</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00154">154</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1721,9 +1782,9 @@ This function is meant to instrument instruction sequences that were generated f
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassdfcc__instrumentt_html_a1dfdaa2199bec04caf8454acc1703047"><div class="ttname"><a href="classdfcc__instrumentt.html#a1dfdaa2199bec04caf8454acc1703047">dfcc_instrumentt::insert_add_allocated_call</a></div><div class="ttdeci">void insert_add_allocated_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record a locally allocated symbol and inserts it in the goto_program at t...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00466">dfcc_instrument.cpp:466</a></div></div>
+<div class="ttc" id="aclassdfcc__instrumentt_html_a1dfdaa2199bec04caf8454acc1703047"><div class="ttname"><a href="classdfcc__instrumentt.html#a1dfdaa2199bec04caf8454acc1703047">dfcc_instrumentt::insert_add_allocated_call</a></div><div class="ttdeci">void insert_add_allocated_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record a locally allocated symbol and inserts it in the goto_program at t...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00496">dfcc_instrument.cpp:496</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a></div><div class="ttdeci">@ GOTO</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00034">goto_program.h:34</a></div></div>
-<div class="ttc" id="aclassdfcc__instrumentt_html_ac931dd3f011d2dd6f0fe3bed1f4dc035"><div class="ttname"><a href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">dfcc_instrumentt::insert_record_dead_call</a></div><div class="ttdeci">void insert_record_dead_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record the death of a local symbol and inserts it in the goto_program at ...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00513">dfcc_instrument.cpp:513</a></div></div>
+<div class="ttc" id="aclassdfcc__instrumentt_html_ac931dd3f011d2dd6f0fe3bed1f4dc035"><div class="ttname"><a href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">dfcc_instrumentt::insert_record_dead_call</a></div><div class="ttdeci">void insert_record_dead_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record the death of a local symbol and inserts it in the goto_program at ...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00543">dfcc_instrument.cpp:543</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a></div><div class="ttdeci">@ SKIP</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00038">goto_program.h:38</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a></div><div class="ttdeci">@ DECL</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00047">goto_program.h:47</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a></div><div class="ttdeci">@ DEAD</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00048">goto_program.h:48</a></div></div>

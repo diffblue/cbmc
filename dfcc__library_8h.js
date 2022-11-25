@@ -44,7 +44,8 @@ var dfcc__library_8h =
       [ "IS_FRESH", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cacf027dd86cc7b624d490bff9f5d0cd9d", null ],
       [ "IS_FREEABLE", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca0a6f938522ddc6da8229dc6b80359227", null ],
       [ "WAS_FREED", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57caa6004cea15b69066e7618db63f29573a", null ],
-      [ "REPLACE_ENSURES_WAS_FREED_PRECONDITIONS", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac543dc0cf23dc7e8304f3c59c73b6b03", null ]
+      [ "REPLACE_ENSURES_WAS_FREED_PRECONDITIONS", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac543dc0cf23dc7e8304f3c59c73b6b03", null ],
+      [ "OBEYS_CONTRACT", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca687f59c7b0a624c3d6d40636656c99e9", null ]
     ] ],
     [ "dfcc_typet", "dfcc__library_8h.html#afa825bddfe01a78991bfae7f91471a52", [
       [ "CAR", "dfcc__library_8h.html#afa825bddfe01a78991bfae7f91471a52aedc860e2d30b3a5c8823c026e7a79e03", null ],

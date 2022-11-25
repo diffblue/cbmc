@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h" name="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4131,5,4331,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4234,5,4434,61"/>
 <area shape="rect" id="node2" href="$constant__propagator_8cpp.html" title=" " alt="" coords="5,117,212,173"/>
 <area shape="rect" id="node3" href="$custom__bitvector__analysis_8cpp.html" title=" " alt="" coords="236,117,435,173"/>
 <area shape="rect" id="node4" href="$goto__rw_8cpp.html" title=" " alt="" coords="459,117,643,173"/>
@@ -14,28 +14,29 @@
 <area shape="rect" id="node13" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="2449,109,2656,180"/>
 <area shape="rect" id="node14" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="2681,109,2878,180"/>
 <area shape="rect" id="node15" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2902,109,3099,180"/>
-<area shape="rect" id="node16" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="3123,109,3321,180"/>
-<area shape="rect" id="node17" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3345,109,3542,180"/>
-<area shape="rect" id="node18" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="3566,109,3769,180"/>
-<area shape="rect" id="node19" href="$instrument__spec__assigns_8cpp.html" title=" " alt="" coords="3793,109,3992,180"/>
-<area shape="rect" id="node20" href="$utils_8cpp.html" title=" " alt="" coords="4016,117,4209,173"/>
-<area shape="rect" id="node21" href="$cover__instrument__condition_8cpp.html" title=" " alt="" coords="4234,117,4469,173"/>
-<area shape="rect" id="node22" href="$cover__instrument__decision_8cpp.html" title=" " alt="" coords="4493,117,4721,173"/>
-<area shape="rect" id="node23" href="$cover__instrument__mcdc_8cpp.html" title=" " alt="" coords="4745,117,4955,173"/>
-<area shape="rect" id="node24" href="$cover__instrument__other_8cpp.html" title=" " alt="" coords="4979,117,5185,173"/>
-<area shape="rect" id="node25" href="$dot_8cpp.html" title=" " alt="" coords="5209,117,5403,173"/>
-<area shape="rect" id="node26" href="$rw__set_8cpp.html" title=" " alt="" coords="5427,117,5620,173"/>
-<area shape="rect" id="node27" href="$builtin__functions_8cpp.html" title=" " alt="" coords="5645,117,5829,173"/>
-<area shape="rect" id="node28" href="$goto__program_8cpp.html" title=" " alt="" coords="5853,117,6037,173"/>
-<area shape="rect" id="node29" href="$goto__trace_8cpp.html" title=" " alt="" coords="6061,117,6245,173"/>
-<area shape="rect" id="node30" href="$graphml__witness_8cpp.html" title=" " alt="" coords="6269,117,6453,173"/>
-<area shape="rect" id="node31" href="$interpreter__evaluate_8cpp.html" title=" " alt="" coords="6477,117,6663,173"/>
-<area shape="rect" id="node32" href="$json__goto__trace_8cpp.html" title=" " alt="" coords="6687,117,6871,173"/>
-<area shape="rect" id="node33" href="$show__properties_8cpp.html" title=" " alt="" coords="6895,117,7079,173"/>
-<area shape="rect" id="node34" href="$xml__goto__trace_8cpp.html" title=" " alt="" coords="7103,117,7287,173"/>
-<area shape="rect" id="node35" href="$show__program_8cpp.html" title=" " alt="" coords="7312,117,7516,173"/>
-<area shape="rect" id="node36" href="$symex__goto_8cpp.html" title=" " alt="" coords="7540,117,7755,173"/>
-<area shape="rect" id="node37" href="$language__util_8cpp.html" title=" " alt="" coords="7779,117,7979,173"/>
-<area shape="rect" id="node38" href="$linking_8cpp.html" title=" " alt="" coords="8004,124,8211,165"/>
-<area shape="rect" id="node39" href="$value__set__fi_8cpp.html" title=" " alt="" coords="8235,117,8428,173"/>
+<area shape="rect" id="node16" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="3123,109,3321,180"/>
+<area shape="rect" id="node17" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="3345,109,3542,180"/>
+<area shape="rect" id="node18" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3566,109,3763,180"/>
+<area shape="rect" id="node19" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="3787,109,3990,180"/>
+<area shape="rect" id="node20" href="$instrument__spec__assigns_8cpp.html" title=" " alt="" coords="4015,109,4213,180"/>
+<area shape="rect" id="node21" href="$utils_8cpp.html" title=" " alt="" coords="4237,117,4431,173"/>
+<area shape="rect" id="node22" href="$cover__instrument__condition_8cpp.html" title=" " alt="" coords="4455,117,4690,173"/>
+<area shape="rect" id="node23" href="$cover__instrument__decision_8cpp.html" title=" " alt="" coords="4715,117,4943,173"/>
+<area shape="rect" id="node24" href="$cover__instrument__mcdc_8cpp.html" title=" " alt="" coords="4967,117,5176,173"/>
+<area shape="rect" id="node25" href="$cover__instrument__other_8cpp.html" title=" " alt="" coords="5200,117,5407,173"/>
+<area shape="rect" id="node26" href="$dot_8cpp.html" title=" " alt="" coords="5431,117,5624,173"/>
+<area shape="rect" id="node27" href="$rw__set_8cpp.html" title=" " alt="" coords="5648,117,5841,173"/>
+<area shape="rect" id="node28" href="$builtin__functions_8cpp.html" title=" " alt="" coords="5866,117,6050,173"/>
+<area shape="rect" id="node29" href="$goto__program_8cpp.html" title=" " alt="" coords="6074,117,6258,173"/>
+<area shape="rect" id="node30" href="$goto__trace_8cpp.html" title=" " alt="" coords="6282,117,6466,173"/>
+<area shape="rect" id="node31" href="$graphml__witness_8cpp.html" title=" " alt="" coords="6490,117,6674,173"/>
+<area shape="rect" id="node32" href="$interpreter__evaluate_8cpp.html" title=" " alt="" coords="6698,117,6885,173"/>
+<area shape="rect" id="node33" href="$json__goto__trace_8cpp.html" title=" " alt="" coords="6909,117,7093,173"/>
+<area shape="rect" id="node34" href="$show__properties_8cpp.html" title=" " alt="" coords="7117,117,7301,173"/>
+<area shape="rect" id="node35" href="$xml__goto__trace_8cpp.html" title=" " alt="" coords="7325,117,7509,173"/>
+<area shape="rect" id="node36" href="$show__program_8cpp.html" title=" " alt="" coords="7533,117,7737,173"/>
+<area shape="rect" id="node37" href="$symex__goto_8cpp.html" title=" " alt="" coords="7761,117,7976,173"/>
+<area shape="rect" id="node38" href="$language__util_8cpp.html" title=" " alt="" coords="8001,117,8201,173"/>
+<area shape="rect" id="node39" href="$linking_8cpp.html" title=" " alt="" coords="8225,124,8432,165"/>
+<area shape="rect" id="node40" href="$value__set__fi_8cpp.html" title=" " alt="" coords="8456,117,8649,173"/>
 </map>

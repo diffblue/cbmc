@@ -93,21 +93,21 @@ $(document).ready(function(){initNavTree('contracts-assigns.html',''); initResiz
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md56">Syntax</a><ul><li class="level2"><a href="#autotoc_md57">Lvalue targets</a></li>
-<li class="level2"><a href="#autotoc_md58">Object slice targets</a></li>
-<li class="level2"><a href="#autotoc_md61">Function parameters</a></li>
-<li class="level2"><a href="#autotoc_md62">Inductive data structures</a></li>
+<ul><li class="level1"><a href="#autotoc_md57">Syntax</a><ul><li class="level2"><a href="#autotoc_md58">Lvalue targets</a></li>
+<li class="level2"><a href="#autotoc_md59">Object slice targets</a></li>
+<li class="level2"><a href="#autotoc_md62">Function parameters</a></li>
+<li class="level2"><a href="#autotoc_md63">Inductive data structures</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md63">Semantics</a><ul><li class="level2"><a href="#autotoc_md64">Contract Enforcement</a></li>
-<li class="level2"><a href="#autotoc_md65">Contract Replacement</a></li>
+<li class="level1"><a href="#autotoc_md64">Semantics</a><ul><li class="level2"><a href="#autotoc_md65">Contract Enforcement</a></li>
+<li class="level2"><a href="#autotoc_md66">Contract Replacement</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md66">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md67">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md56"></a>
+<h1><a class="anchor" id="autotoc_md57"></a>
 Syntax</h1>
 <p>An <em>assigns</em> clause allows the user to specify a set of locations that may be assigned to by a function or the body of a loop:</p>
 <div class="fragment"><div class="line">__CPROVER_assigns(targets)</div>
@@ -122,7 +122,7 @@ Syntax</h1>
 </div><!-- fragment --><p>The set of locations writable by a function is the union of the sets of locations specified by its assigns clauses, or the empty set if no <em>assigns</em> clause is specified. While, in general, an <em>assigns</em> clause could be interpreted with either <em>writes</em> or <em>modifies</em> semantics, this design is based on the former. This means that memory not captured by an <em>assigns</em> clause must not be assigned to by the given function, even if the value(s) therein are not modified.</p>
 <p>For function contracts, the condition and target expressions in the assigns clause may only involve function parameters, global variables or type identifiers (in <code>sizeof</code> or cast expressions). The target expression must be free of function calls and side-effects. The condition expression may contain calls to side-effect-free functions.</p>
 <p>For a loop contract, the condition and target expressions in the assigns clause may involve any identifier that is in scope at loop entry (parameters of the surrounding function, local variables, global variables, type identifiers in <code>sizeof</code> or cast expressions, etc.). The target expression must be free of function calls and side-effects. The condition expression may contain calls to side-effect-free functions.</p>
-<h2><a class="anchor" id="autotoc_md57"></a>
+<h2><a class="anchor" id="autotoc_md58"></a>
 Lvalue targets</h2>
 <p>Roughly speaking, <em>lvalues</em> are expressions that are associated with a memory location, the address of which can be computed using the address-of operator <code>&amp;</code>.</p>
 <p>Examples of lvalues are: <code>x</code> if <code>x</code> is either a global or local variable identifier, <code>*ptr</code> if <code>ptr</code> is a pointer expression, <code>ptr[i]</code> or <code>ptr + i</code> if <code>ptr</code> is pointer variable or an array and <code>i</code> is an integer expression, etc.</p>
@@ -149,7 +149,7 @@ Lvalue targets</h2>
 <div class="line">  <span class="keywordflow">else</span></div>
 <div class="line">    buf-&gt;current += 1;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md58"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md59"></a>
 Object slice targets</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="cprover__builtin__headers_8h.html#a2be80782db5f3cfb2a75f18530b2c992">__CPROVER_object_upto</a>(<span class="keywordtype">void</span> *ptr, __CPROVER_size_t size);</div>
 </div><!-- fragment --><p>Given a pointer <code>ptr</code> pointing into some object (possibly at some non-zero offset), <code>__CPROVER_object_upto(ptr, size)</code> specifies that the range of <code>size</code> bytes starting at <code>ptr</code> is assignable.</p>
@@ -307,14 +307,14 @@ Object slice targets</h2>
 <div class="line">  <span class="keyword">struct </span>vec_t *vec = vec_alloc(size);</div>
 <div class="line">  vec_clear(vec);</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md61"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md62"></a>
 Function parameters</h2>
 <p>For a function contract, the memory locations storing function parameters are considered as being local to the function and are hence always assignable.</p>
 <p>For a loop contract, the parameters of the enclosing function are not considered local to the loop and must be explicitly added to the loop to become assignable. </p>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<h2><a class="anchor" id="autotoc_md63"></a>
 Inductive data structures</h2>
 <p>Inductive data structures are not supported yet in assigns clauses.</p>
-<h1><a class="anchor" id="autotoc_md63"></a>
+<h1><a class="anchor" id="autotoc_md64"></a>
 Semantics</h1>
 <p>Each target listed in an assigns clause defines a <em>conditionally assignable range</em> of bytes represented by the following triple:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>{</div>
@@ -329,7 +329,7 @@ Semantics</h1>
 </ul>
 <p>For contract enforcement, assigns clause targets are turned into checks, to verify that the function only assigns locations allowed by the assigns clause.</p>
 <p>For contract replacement, assigns clause targets are turned into havoc statements, to model the non-deterministic behaviour specified by the contract. </p>
-<h2><a class="anchor" id="autotoc_md64"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 Contract Enforcement</h2>
 <p>In order to determine whether a function (or loop) complies with the <em>assigns</em> clause of the contract, the body of the function (or loop) is instrumented with assertion statements before each statement which may write to memory (e.g., an assignment). These assertions check that the location about to be assigned to is among the targets specified by the <em>assigns</em> clauses.</p>
 <p>For example, consider the following implementation of <code>sum</code> function.</p>
@@ -369,7 +369,7 @@ Contract Enforcement</h2>
 <div class="line">  <span class="keywordtype">int</span> return_value_sum = __CPROVER_contracts_original_sum(a, b, out);</div>
 <div class="line">  <span class="keywordflow">return</span> return_value_sum;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md65"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md66"></a>
 Contract Replacement</h2>
 <p>Assuming the <em>assigns</em> clause of the contract correctly captures the set of locations assigned to by a function (checked during <em>contract enforcement</em>), CBMC will use the contract's <a href="../../contracts/requires-and-ensures/#replacement">Requires &amp; Ensures Clauses</a>, and its <em>assigns clause</em> to generate a sound abstraction of the function behaviour from the contract.</p>
 <p>Given the contract:</p>
@@ -440,7 +440,7 @@ Contract Replacement</h2>
 <div class="line">    <span class="keywordflow">return</span> out;</div>
 <div class="line">  <span class="keywordflow">return</span> rval;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md66"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md67"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -457,6 +457,7 @@ Additional Resources</h1>
 </ul>
 </li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a></li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a></li>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a></li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> </li>
 </ul>

@@ -92,10 +92,10 @@ $(document).ready(function(){initNavTree('contracts-frees.html',''); initResizab
 <div class="title">Frees Clauses </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md72"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md73"></a>
 Frees Clauses</h1>
 <p>A <em>frees clause</em> allows the user to specify a set of pointers that may be freed by a function or by the function it calls, transitively. A function contract may have zero or more frees clauses. When no clause is provided the empty set is used as default. Contracts can also have an empty frees clause. When more than one frees clause is given, the sets of pointers they contain are unioned together to yield a single set of pointers.</p>
-<h2><a class="anchor" id="autotoc_md73"></a>
+<h2><a class="anchor" id="autotoc_md74"></a>
 Syntax</h2>
 <p>The clause has the following syntax (square brackets denote optional expressions <code>[</code> <code>]</code> ): </p><div class="fragment"><div class="line">__CPROVER_frees([targets])</div>
 </div><!-- fragment --><p>Where <code>targets</code> has the following syntax: </p><div class="fragment"><div class="line">          targets ::= cond-target-group (&#39;;&#39; cond-target-group)* &#39;;&#39;?</div>
@@ -107,7 +107,7 @@ Syntax</h2>
 <li>a call to the built-in function <code>__CPROVER_freeable</code></li>
 <li>a call to a user-defined side effect free and deterministic function returning the type <code>void</code> (itself containing direct or indirect calls to <code>__CPROVER_freeable</code> or to functions that call <code>__CPROVER_freeable</code>);</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md74"></a>
+<h3><a class="anchor" id="autotoc_md75"></a>
 Example</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> foo(<span class="keywordtype">char</span> *arr1, <span class="keywordtype">char</span> *arr2, <span class="keywordtype">size_t</span> size)</div>
 <div class="line">__CPROVER_frees(</div>
@@ -123,16 +123,16 @@ Example</h3>
 <div class="line">  free(arr2);</div>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md75"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md76"></a>
 Semantics</h2>
 <p>The set of pointers specified by the frees clause of the contract is interpreted at the function call-site where the contract is being checked or used to abstract a function call.</p>
-<h3><a class="anchor" id="autotoc_md76"></a>
+<h3><a class="anchor" id="autotoc_md77"></a>
 For contract checking</h3>
 <p>When checking a contract against a function, each pointer that the function attempts to free gets checked for membership in the set of pointers specified by the <em>frees clause</em>.</p>
-<h3><a class="anchor" id="autotoc_md77"></a>
+<h3><a class="anchor" id="autotoc_md78"></a>
 For replacement of function calls by contracts</h3>
 <p>When replacing a function call by a contract, each pointer of the <em>frees clause</em> gets non-deterministically freed between the evaluation of preconditions and before the evaluation of post-conditions.</p>
-<h2><a class="anchor" id="autotoc_md78"></a>
+<h2><a class="anchor" id="autotoc_md79"></a>
 Specifying parametric sets of freeable pointers using C functions</h2>
 <p>Users can define parametric sets of freeable pointers by writing functions that return the <code>void</code> type and call (directly or indirectly) the built-in function <code>__CPROVER_freeable</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> my_freeable_set(<span class="keywordtype">char</span> **arr, <span class="keywordtype">size_t</span> size)</div>
@@ -155,7 +155,7 @@ Specifying parametric sets of freeable pointers using C functions</h2>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// body ...</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md79"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md80"></a>
 Frees clause related predicates</h2>
 <p>The predicate: </p><div class="fragment"><div class="line">__CPROVER_bool <a class="code" href="cprover__builtin__headers_8h.html#ab32db8895952dbd7e472a9fd51c5e04e">__CPROVER_is_freeable</a>(<span class="keywordtype">void</span> *ptr);</div>
 </div><!-- fragment --><p>can only be used in pre and post conditions, in contract checking or replacement modes. It returns <code>true</code> if and only if the pointer satisfies the preconditions of the <code>free</code> function from <code>stdlib.h</code> (<a href="https://github.com/diffblue/cbmc/blob/cf00a53bbcc388748be9668f393276f6d84b1a60/src/ansi-c/library/stdlib.c#L269">see here</a>), that is if and only if the pointer points to a valid dynamically allocated object and has offset zero.</p>

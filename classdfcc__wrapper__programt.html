@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('classdfcc__wrapper__programt.html','')
 </div><!--header-->
 <div class="contents">
 
-<p>Generates the body of a wrapper function from a contract specified using requires, requires_contract, assigns, frees, ensures, ensures_contract clauses attached to a function symbol.  
+<p>Generates the body of a wrapper function from a contract specified using requires, assigns, frees, ensures, clauses attached to a function symbol.  
  <a href="classdfcc__wrapper__programt.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>&gt;</code></p>
@@ -242,7 +242,7 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a8ee883c7b21fd9a489c2f2fbc7d178a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Generates the body of a wrapper function from a contract specified using requires, requires_contract, assigns, frees, ensures, ensures_contract clauses attached to a function symbol. </p>
+<div class="textblock"><p>Generates the body of a wrapper function from a contract specified using requires, assigns, frees, ensures, clauses attached to a function symbol. </p>
 <p>The desired mode CHECK or REPLACE is given to the constructor of the class.</p>
 <p>The body of the wrapper is divided into a number of sections represented as separate goto_programs:</p><ul>
 <li><a class="el" href="classdfcc__wrapper__programt.html#a17be45696c707c99abf84fa1bb60662f">preamble</a><ul>
@@ -291,7 +291,7 @@ Protected Attributes</h2></td></tr>
 <p>There a private method per type of contract clause, which adds contents encoding the semantics of the clause to the appropriate section when called.</p>
 <p>The public method <a class="el" href="classdfcc__wrapper__programt.html#aa0f4800b4d90ddf2bc6b12b6adb0005b">add_to_dest</a> calls the private methods to populate the sections, and then adds the contents of these sections in order to the given destination program. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00097">97</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00096">96</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a1a750019d51aec0b1c72de4121128d8c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1a750019d51aec0b1c72de4121128d8c">&#9670;&nbsp;</a></span>dfcc_wrapper_programt()</h2>
@@ -382,7 +382,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00178">178</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00176">176</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -413,7 +413,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds the whole generated program to <code>dest</code>, which is meant to be a part of the body of the <code>wrapper_symbol</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00266">266</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00264">264</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -445,7 +445,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Adds the whole program to <code>dest</code> and the discovered function pointer contracts <code>dest_fp_contracts</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00257">257</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00255">255</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +474,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Creates a checked function call to the wrapped function, passing it the contract-derived write set as parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00807">807</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00791">791</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +509,7 @@ Protected Attributes</h2></td></tr>
 <li>Adds release function call in <a class="el" href="classdfcc__wrapper__programt.html#a8ee883c7b21fd9a489c2f2fbc7d178a7">postamble</a> </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00512">512</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00510">510</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -538,7 +538,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Encodes postconditions, instruments them to check for side effects. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00722">722</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00714">714</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +573,7 @@ Protected Attributes</h2></td></tr>
 <li>Adds release function call in <a class="el" href="classdfcc__wrapper__programt.html#a8ee883c7b21fd9a489c2f2fbc7d178a7">postamble</a> </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00389">389</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00387">387</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -602,7 +602,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Encodes the function call section of the wrapper program. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00799">799</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00783">783</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -631,7 +631,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Creates instructions that havoc the contract write set, create a nondet return value, nondeterministically free the freeable part of the write set. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00843">843</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00827">827</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -665,7 +665,7 @@ Protected Attributes</h2></td></tr>
 <li>Adds release function call in <a class="el" href="classdfcc__wrapper__programt.html#a8ee883c7b21fd9a489c2f2fbc7d178a7">postamble</a> </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00626">626</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00624">624</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -694,7 +694,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Encodes preconditions, instruments them to check for side effects. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00669">669</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00667">667</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -729,7 +729,7 @@ Protected Attributes</h2></td></tr>
 <li>Adds release function call in <a class="el" href="classdfcc__wrapper__programt.html#a8ee883c7b21fd9a489c2f2fbc7d178a7">postamble</a> </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00281">281</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00279">279</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -756,7 +756,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the pointer to the write set object derived from the contract. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00147">147</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00146">146</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -782,7 +782,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the pointer to the write set used to check ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00159">159</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00158">158</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -808,7 +808,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the pointer to the is_fresh object set. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00165">165</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00164">164</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -834,7 +834,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the pointer to the write set used to check requires clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00153">153</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00152">152</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -858,7 +858,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00135">135</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00134">134</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -882,7 +882,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00134">134</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00133">133</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -906,7 +906,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00132">132</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00131">131</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -932,7 +932,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Vector of arguments to use to instantiate the lambdas wrapping the contract clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00182">182</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00181">181</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -956,7 +956,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00129">129</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00128">128</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -980,7 +980,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00133">133</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00132">132</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1006,7 +1006,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the write set object derived from the contract. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00144">144</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00143">143</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1030,7 +1030,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00178">178</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00177">177</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1056,7 +1056,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the write set used to check ensures clauses for side effects. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00156">156</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00155">155</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1080,7 +1080,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00194">194</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00193">193</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1106,7 +1106,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Set of required or ensured contracts for function pointers discovered when processing the contract of interest. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00169">169</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00168">168</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1130,7 +1130,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00170">170</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1154,7 +1154,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00192">192</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00191">191</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1178,7 +1178,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00176">176</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00175">175</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1204,7 +1204,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the object set used to evaluate is_fresh predicates. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00162">162</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00161">161</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1228,7 +1228,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00175">175</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00174">174</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1252,7 +1252,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00195">195</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00194">194</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1276,7 +1276,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00196">196</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00195">195</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1300,7 +1300,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00190">190</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00189">189</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1324,7 +1324,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00173">173</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1348,7 +1348,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1372,7 +1372,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00177">177</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00176">176</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1396,7 +1396,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00198">198</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00197">197</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1420,7 +1420,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00197">197</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00196">196</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1444,7 +1444,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00189">189</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00188">188</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1468,7 +1468,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00191">191</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00190">190</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1494,7 +1494,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the write set used to check requires clauses for side effects. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00150">150</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00149">149</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1520,7 +1520,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Symbol for the return value of the wrapped function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00141">141</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00140">140</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1544,7 +1544,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00174">174</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00173">173</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1568,7 +1568,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00131">131</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00130">130</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1594,7 +1594,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Source location with wrapper function name as function name. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00138">138</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00137">137</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1618,7 +1618,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00130">130</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00129">129</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1642,7 +1642,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00193">193</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8h_source.html#l00192">192</a> of file <a class="el" href="dfcc__wrapper__program_8h_source.html">dfcc_wrapper_program.h</a>.</p>
 
 </div>
 </div>
@@ -1653,9 +1653,9 @@ Protected Attributes</h2></td></tr>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beba52a9b031766fa116251f70e65a84c01a"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba52a9b031766fa116251f70e65a84c01a">ASSIGN</a></div><div class="ttdeci">@ ASSIGN</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00046">goto_program.h:46</a></div></div>
-<div class="ttc" id="aclassdfcc__wrapper__programt_html_a196003fdef895074b0001213ab1cd45d"><div class="ttname"><a href="classdfcc__wrapper__programt.html#a196003fdef895074b0001213ab1cd45d">dfcc_wrapper_programt::caller_write_set</a></div><div class="ttdeci">const symbol_exprt caller_write_set</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__wrapper__program_8h_source.html#l00135">dfcc_wrapper_program.h:135</a></div></div>
-<div class="ttc" id="aclassdfcc__wrapper__programt_html_a0d4bef3e127f7649edf689674deb6294"><div class="ttname"><a href="classdfcc__wrapper__programt.html#a0d4bef3e127f7649edf689674deb6294">dfcc_wrapper_programt::contract_write_set</a></div><div class="ttdeci">const symbol_exprt contract_write_set</div><div class="ttdoc">Symbol for the write set object derived from the contract.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__wrapper__program_8h_source.html#l00144">dfcc_wrapper_program.h:144</a></div></div>
-<div class="ttc" id="aclassdfcc__wrapper__programt_html_ad84f21e39ba7a1748896350cb5fe2aa9"><div class="ttname"><a href="classdfcc__wrapper__programt.html#ad84f21e39ba7a1748896350cb5fe2aa9">dfcc_wrapper_programt::ensures_write_set</a></div><div class="ttdeci">const symbol_exprt ensures_write_set</div><div class="ttdoc">Symbol for the write set used to check ensures clauses for side effects.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__wrapper__program_8h_source.html#l00156">dfcc_wrapper_program.h:156</a></div></div>
+<div class="ttc" id="aclassdfcc__wrapper__programt_html_a196003fdef895074b0001213ab1cd45d"><div class="ttname"><a href="classdfcc__wrapper__programt.html#a196003fdef895074b0001213ab1cd45d">dfcc_wrapper_programt::caller_write_set</a></div><div class="ttdeci">const symbol_exprt caller_write_set</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__wrapper__program_8h_source.html#l00134">dfcc_wrapper_program.h:134</a></div></div>
+<div class="ttc" id="aclassdfcc__wrapper__programt_html_a0d4bef3e127f7649edf689674deb6294"><div class="ttname"><a href="classdfcc__wrapper__programt.html#a0d4bef3e127f7649edf689674deb6294">dfcc_wrapper_programt::contract_write_set</a></div><div class="ttdeci">const symbol_exprt contract_write_set</div><div class="ttdoc">Symbol for the write set object derived from the contract.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__wrapper__program_8h_source.html#l00143">dfcc_wrapper_program.h:143</a></div></div>
+<div class="ttc" id="aclassdfcc__wrapper__programt_html_ad84f21e39ba7a1748896350cb5fe2aa9"><div class="ttname"><a href="classdfcc__wrapper__programt.html#ad84f21e39ba7a1748896350cb5fe2aa9">dfcc_wrapper_programt::ensures_write_set</a></div><div class="ttdeci">const symbol_exprt ensures_write_set</div><div class="ttdoc">Symbol for the write set used to check ensures clauses for side effects.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__wrapper__program_8h_source.html#l00155">dfcc_wrapper_program.h:155</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

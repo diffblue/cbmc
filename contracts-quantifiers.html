@@ -93,13 +93,13 @@ $(document).ready(function(){initNavTree('contracts-quantifiers.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md100">Syntax</a></li>
-<li class="level1"><a href="#autotoc_md101">Semantics</a></li>
-<li class="level1"><a href="#autotoc_md102">Additional Resources</a></li>
+<ul><li class="level1"><a href="#autotoc_md108">Syntax</a></li>
+<li class="level1"><a href="#autotoc_md109">Semantics</a></li>
+<li class="level1"><a href="#autotoc_md110">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md100"></a>
+<h1><a class="anchor" id="autotoc_md108"></a>
 Syntax</h1>
 <div class="fragment"><div class="line">__CPROVER_forall { *type* *identifier*; *<span class="keywordtype">boolean</span> expression* }</div>
 <div class="line">__CPROVER_exists { *type* *identifier*; *<span class="keywordtype">boolean</span> expression* }</div>
@@ -110,7 +110,7 @@ Syntax</h1>
 </div><!-- fragment --><p>where <code>*range*</code> is an expression of the form</p>
 <div class="fragment"><div class="line">*lower bound* &lt;= *id* &amp;&amp; *id* &lt; *upper bound*</div>
 </div><!-- fragment --><p>where <code>*lower bound*</code>and <code>*upper bound*</code> are constants. The bound predicates could be strict (e.g., <code>*lower bound* &lt; *id*</code>), or non-strict (e.g., <code>*upper bound* &lt;= *id*</code>), but both the bounds <b>must</b> be constants.</p>
-<h1><a class="anchor" id="autotoc_md101"></a>
+<h1><a class="anchor" id="autotoc_md109"></a>
 Semantics</h1>
 <p>For <code>__CPROVER_forall</code> all <code>*type*</code> values for <code>*identifier*</code> must satisfy <code>*boolean expression*</code>.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> foo(<span class="keywordtype">int</span> *arr, <span class="keywordtype">int</span> len)</div>
@@ -154,7 +154,7 @@ Semantics</h1>
 <div class="line">{</div>
 <div class="line">  <span class="comment">/* at least one element in arr must be set to 1 */</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md102"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md110"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -171,6 +171,7 @@ Additional Resources</h1>
 </ul>
 </li>
 <li><a class="el" href="contracts-memory-predicates.html">Memory Predicates</a></li>
+<li><a class="el" href="contracts-function-pointer-predicates.html">Function Pointer Predicates</a></li>
 <li><a class="el" href="contracts-history-variables.html">History Variables</a></li>
 <li><a class="el" href="contracts-quantifiers.html">Quantifiers</a> </li>
 </ul>
