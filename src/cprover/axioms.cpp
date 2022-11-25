@@ -474,8 +474,8 @@ void axiomst::node(const exprt &src)
 
     {
       // live_object(ς, p) --> p!=0
-      auto instance = replace(implies_exprt(
-        src, not_exprt(null_pointer(live_object_expr.address()))));
+      auto instance = replace(
+        implies_exprt(src, not_exprt(null_object(live_object_expr.address()))));
       if(verbose)
         std::cout << "AXIOMc: " << format(instance) << "\n";
       dest << instance;
@@ -691,7 +691,7 @@ void axiomst::add(const state_ok_exprt &ok_expr)
   {
     // X_ok(ς, p) --> p!=0
     auto instance =
-      replace(implies_exprt(ok_expr, not_exprt(null_pointer(pointer))));
+      replace(implies_exprt(ok_expr, not_exprt(null_object(pointer))));
     if(verbose)
       std::cout << "AXIOMe: " << format(instance) << "\n";
     dest << instance;

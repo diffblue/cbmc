@@ -607,8 +607,8 @@ void instrument_spec_assignst::create_snapshot(
   dest.add(goto_programt::make_assignment(
     car.valid_var(),
     simplify_expr(
-      and_exprt{car.condition(),
-                not_exprt{null_pointer(car.target_start_address())}},
+      and_exprt{
+        car.condition(), not_exprt{null_object(car.target_start_address())}},
       ns),
     source_location));
 
@@ -640,7 +640,7 @@ exprt instrument_spec_assignst::target_validity_expr(
              w_ok_exprt{car.target_start_address(), car.target_size()}};
 
   if(allow_null_target)
-    result.add_to_operands(null_pointer(car.target_start_address()));
+    result.add_to_operands(null_object(car.target_start_address()));
 
   return simplify_expr(result, ns);
 }
@@ -748,7 +748,7 @@ exprt instrument_spec_assignst::inclusion_check_full(
     // we reach this program point, otherwise we should never reach
     // this program point
     if(allow_null_lhs)
-      return null_pointer(car.target_start_address());
+      return null_object(car.target_start_address());
     else
       return false_exprt{};
   }
@@ -798,7 +798,7 @@ exprt instrument_spec_assignst::inclusion_check_full(
 
   if(allow_null_lhs)
     return or_exprt{
-      null_pointer(car.target_start_address()),
+      null_object(car.target_start_address()),
       and_exprt{car.valid_var(), disjunction(disjuncts)}};
   else
     return and_exprt{car.valid_var(), disjunction(disjuncts)};
