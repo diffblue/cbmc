@@ -13,8 +13,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "single_loop_incremental_symex_checker.h"
 
-#include <chrono>
-
 #include <util/structured_data.h>
 
 #include <goto-symex/slice.h>

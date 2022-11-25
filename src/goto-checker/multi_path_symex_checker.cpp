@@ -11,8 +11,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "multi_path_symex_checker.h"
 
-#include <chrono>
-
 #include <util/ui_message.h>
 
 #include <goto-symex/solver_hardness.h>

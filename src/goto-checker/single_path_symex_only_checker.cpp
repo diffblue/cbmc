@@ -11,8 +11,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "single_path_symex_only_checker.h"
 
-#include <chrono>
-
 #include <util/ui_message.h>
 
 #include <goto-symex/path_storage.h>

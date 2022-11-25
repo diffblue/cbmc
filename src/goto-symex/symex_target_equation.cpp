@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_target_equation.h"
 
-#include <chrono>
-
 #include <util/std_expr.h>
 
 #include "solver_hardness.h"
 #include "ssa_step.h"
+
+#include <chrono> // IWYU pragma: keep
 
 static std::function<void(solver_hardnesst &)>
 hardness_register_ssa(std::size_t step_index, const SSA_stept &step)

@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "prop_conv_solver.h"
 
-#include <algorithm>
-#include <chrono>
-
 #include "literal_expr.h"
+
+#include <algorithm>
+#include <chrono> // IWYU pragma: keep
 
 bool prop_conv_solvert::is_in_conflict(const exprt &expr) const
 {
