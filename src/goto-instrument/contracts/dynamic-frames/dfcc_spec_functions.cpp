@@ -200,10 +200,9 @@ void dfcc_spec_functionst::generate_havoc_function(
       // Use same source location as original call
       source_locationt location(ins_it->source_location());
       auto hook = hook_opt.value();
-      auto write_set_var = write_set_symbol.symbol_expr();
       code_function_callt call(
         library.dfcc_fun_symbol.at(hook).symbol_expr(),
-        {write_set_var, from_integer(next_idx, size_type())});
+        {write_set_symbol.symbol_expr(), from_integer(next_idx, size_type())});
 
       if(hook == dfcc_funt::WRITE_SET_HAVOC_GET_ASSIGNABLE_TARGET)
       {
@@ -233,7 +232,8 @@ void dfcc_spec_functionst::generate_havoc_function(
         body.add(goto_programt::make_function_call(call, location));
 
         auto goto_instruction = body.add(goto_programt::make_incomplete_goto(
-          utils.make_null_check_expr(write_set_var)));
+          utils.make_null_check_expr(target_expr), location));
+
         // create nondet assignment to the target
         side_effect_expr_nondett nondet(target_type, location);
         body.add(goto_programt::make_assignment(
