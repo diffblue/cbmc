@@ -4,6 +4,11 @@
 # These owners will be the default owners for everything in the repo.
 *       @kroening @tautschnig @peterschrammel @chris-ryder
 
+# Documentation can be reviewed by people with broad project responsibility
+
+/doc/ @jimgrundy @TGWDB @kroening @tautschnig @peterschrammel
+
+
 # These files should rarely change
 
 /src/big-int/ @kroening
