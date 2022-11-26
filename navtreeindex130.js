@@ -1,7 +1,5 @@
 var NAVTREEINDEX130 =
 {
-"structxml__graph__nodet.html#afd87e1aff7954b26d3ec627a8b686f6f":[6,0,1328,8],
-"structzip__iteratort.html":[6,0,1333],
 "structzip__iteratort.html#a007ee165f1b4ac48a8184f0cb3205b26":[6,0,1333,0],
 "structzip__iteratort.html#a021b12391aa101aebbce954fcfb458a4":[6,0,1333,5],
 "structzip__iteratort.html#a08bdfedd9d784621cf157c2140d1debb":[6,0,1333,16],
@@ -249,5 +247,7 @@ var NAVTREEINDEX130 =
 "timestamper_8h.html#acd4fc618e22f08d60178633e508120e3":[7,0,2,27,251,4],
 "timestamper_8h_source.html":[7,0,2,27,251],
 "trace__automaton_8cpp.html":[7,0,2,13,0,27],
-"trace__automaton_8cpp_source.html":[7,0,2,13,0,27]
+"trace__automaton_8cpp_source.html":[7,0,2,13,0,27],
+"trace__automaton_8h.html":[7,0,2,13,0,28],
+"trace__automaton_8h.html#a082a39f8f14980efcc958b0136d8260b":[7,0,2,13,0,28,2]
 };

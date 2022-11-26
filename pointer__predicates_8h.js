@@ -9,7 +9,6 @@ var pointer__predicates_8h =
     [ "good_pointer_def", "pointer__predicates_8h.html#ae1b6fc8978675f2347cba7917a5ac4c3", null ],
     [ "integer_address", "pointer__predicates_8h.html#a1579332740730bec2ce3fce72fe9f408", null ],
     [ "null_object", "pointer__predicates_8h.html#ae1ecb1413ca75f4c142e1e4d397e3837", null ],
-    [ "null_pointer", "pointer__predicates_8h.html#ae429f267a66e4594a46d28a8861f4b23", null ],
     [ "object_lower_bound", "pointer__predicates_8h.html#afc902b562b2d1954b6efd7ac3b741b95", null ],
     [ "object_size", "pointer__predicates_8h.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc", null ],
     [ "object_upper_bound", "pointer__predicates_8h.html#a62fc3446bf06c94b641130c95e629e11", null ],

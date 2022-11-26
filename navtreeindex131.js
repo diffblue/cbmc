@@ -1,7 +1,5 @@
 var NAVTREEINDEX131 =
 {
-"trace__automaton_8h.html":[7,0,2,13,0,28],
-"trace__automaton_8h.html#a082a39f8f14980efcc958b0136d8260b":[7,0,2,13,0,28,2],
 "trace__automaton_8h.html#abbc5e41d9372bbd1e5712fb137955900":[7,0,2,13,0,28,3],
 "trace__automaton_8h_source.html":[7,0,2,13,0,28],
 "tutorial.html":[0,4,13],
@@ -249,5 +247,7 @@ var NAVTREEINDEX131 =
 "util_8h.html#a22e2242e278f0cecb1afc042ccd6ba37":[7,0,2,13,0,30,0],
 "util_8h.html#aca44eef45f84680c27689f503ea0591f":[7,0,2,13,0,30,2],
 "util_8h_source.html":[7,0,2,13,0,30],
-"utils_8cpp.html":[7,0,2,13,1,13]
+"utils_8cpp.html":[7,0,2,13,1,13],
+"utils_8cpp.html#a0e4c1d1b019f583c464308badc770bb2":[7,0,2,13,1,13,3],
+"utils_8cpp.html#a1c73b0b817e6e049ea409d0c86e7b3e3":[7,0,2,13,1,13,8]
 };
