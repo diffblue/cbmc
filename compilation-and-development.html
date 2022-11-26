@@ -117,6 +117,7 @@ Running tests</h1>
 Regression tests</h2>
 <p>The regression tests are contained in <code>regression/</code> and <code>jbmc/regression/</code>. Inside these folders there is a directory for each of the modules. Each of these contains multiple test directories, with names describing what they test. When there are multiple tests in a test directory then they should all test very similar aspects of the program's behaviour. Each test directory contains input files and one or more test description files, which have the ending <code>.desc</code>. The test description files specify what command to run, what output is expected and so on. The test framework is a Perl script, <a href="https://github.com/diffblue/cbmc/blob/develop/regression/test.pl">test.pl</a>, located in <code>regression/test.pl</code>.</p>
 <p>The <code>--help</code> option to <code>test.pl</code> outlines the format of the test description files. Most importantly, the first word in a test description file is its level, which is one of: <code>CORE</code> (should be run in CI, should succeed), <code>THOROUGH</code> (takes too long to be run in CI, should succeed), <code>FUTURE</code> (will succeed when a planned feature is added) or <code>KNOWNBUG</code> (will succeed when a bug is fixed).</p>
+<p>Test descriptions may also include a number of tags. <code>test.pl -I&lt;tag&gt;</code> will only run tests with a particular <code>&lt;tag&gt;</code>, and <code>test.pl -X&lt;tag&gt;</code> will run all tests except for those with a particular <code>&lt;tag&gt;</code>. See <a href="https://github.com/diffblue/cbmc/blob/develop/regression/README.md">regression/README.md</a> for the current set of tags and their intended use.</p>
 <h3><a class="anchor" id="compilation-and-development-subsubsection-running-regression-tests-with-make"></a>
 Running regression tests with make</h3>
 <p>If you have compiled using <code>make</code> then you can run the regression tests using <code>make test</code>. Run it from <code>regression/</code> to run all the regression tests, or any of its subfolders to just run the tests for that module. The number of tests that are run in parallel can be controlled through the environment variable <code>TESTPL_JOBS</code>.</p>
@@ -181,7 +182,7 @@ Time profiling</h1>
 <p>Run <code>gprof &lt;path-to-binary&gt; &lt;path-to-gmon.out&gt;</code> and redirect the output to a file. This will take a while to run - e.g. 12 minutes for test-gen run on a trivial function.</p>
 <p>The output file will now be a large text file. There are two sections: the "flat
 profile", which ignores context, and just tells you how much time was spent in each function; and the "call graph", which includes context, and tells you how much time was spent within each call stack. For more information see online tutorials, like <a href="https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_chapter/gprof_5.html">https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_chapter/gprof_5.html</a></p>
-<p>Last modified: 2022-11-26 18:46:28 +0000 </p>
+<p>Last modified: 2022-11-26 21:53:30 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
