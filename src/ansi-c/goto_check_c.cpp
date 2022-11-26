@@ -2405,7 +2405,7 @@ goto_check_ct::get_pointer_is_null_condition(
     return {conditiont{
       or_exprt{
         is_in_bounds_of_some_explicit_allocation(address, size),
-        not_exprt(null_pointer(address))},
+        not_exprt(null_object(address))},
       "pointer NULL"}};
   }
 

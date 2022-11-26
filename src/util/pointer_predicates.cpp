@@ -73,7 +73,7 @@ exprt good_pointer_def(
 
   const exprt good_dynamic = not_exprt{deallocated(pointer, ns)};
 
-  const not_exprt not_null(null_pointer(pointer));
+  const not_exprt not_null(null_object(pointer));
 
   const not_exprt not_invalid{is_invalid_pointer_exprt{pointer}};
 
@@ -95,12 +95,6 @@ exprt integer_address(const exprt &pointer)
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return and_exprt(same_object(null_pointer, pointer),
                    notequal_exprt(null_pointer, pointer));
-}
-
-exprt null_pointer(const exprt &pointer)
-{
-  null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
-  return same_object(pointer, null_pointer);
 }
 
 exprt object_upper_bound(
