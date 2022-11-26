@@ -25,6 +25,22 @@ long long int llabs(long long int i)
   return __CPROVER_llabs(i);
 }
 
+/* FUNCTION: imaxabs */
+
+#ifndef __CPROVER_INTTYPES_H_INCLUDED
+#  include <inttypes.h>
+#  define __CPROVER_INTTYPES_H_INCLUDED
+#endif
+
+#undef imaxabs
+
+intmax_t __CPROVER_imaxabs(intmax_t);
+
+intmax_t imaxabs(intmax_t i)
+{
+  return __CPROVER_imaxabs(i);
+}
+
 /* FUNCTION: __builtin_abs */
 
 int __builtin_abs(int i)
