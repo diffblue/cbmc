@@ -30,13 +30,6 @@ This folder contains the CProver regression test-suite.
 
 - `winbug`:
   These tests are currently known to be failing on Windows,
-  but passing on other platforms.
-  The reason for this is not known, and it's currently being investigated.
-  This was discovered during work done to port CI from [Travis]
-  and [AWS CodeBuild] to [GitHub Actions].
-  Worth noting that those tests were not being run on Windows before.
-
-
-[AWS CodeBuild]: https://aws.amazon.com/codebuild/
-[GitHub Actions]: https://github.com/features/actions
-[Travis]: https://travis-ci.com/
+  but passing on other platforms. https://github.com/diffblue/cbmc/pull/5572
+  will address one part thereof; the remaining ones are C++ tests that fail on
+  both Windows and MacOS for our lack of C++-11 support.
