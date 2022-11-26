@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+assert(s) fails with field sensitivity, but passes without
