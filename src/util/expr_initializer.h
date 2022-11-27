@@ -27,4 +27,12 @@ optionalt<exprt> nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns);
 
+optionalt<exprt> expr_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns,
+  const exprt &init_byte_expr);
+
+exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type);
+
 #endif // CPROVER_UTIL_EXPR_INITIALIZER_H

@@ -12,7 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_initializer.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
 #include "c_types.h"
+#include "config.h"
 #include "magic.h"
 #include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
@@ -63,6 +65,8 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
       result = side_effect_expr_nondett(type, source_location);
     else if(init_expr.is_zero())
       result = from_integer(0, type);
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -75,6 +79,8 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
       result = side_effect_expr_nondett(type, source_location);
     else if(init_expr.is_zero())
       result = constant_exprt(ID_0, type);
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -92,6 +98,8 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
 
       result = constant_exprt(value, type);
     }
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -110,6 +118,8 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
 
       result = complex_exprt(*sub_zero, *sub_zero, to_complex_type(type));
     }
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -276,6 +286,8 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
       result = side_effect_expr_nondett(type, source_location);
     else if(init_expr.is_zero())
       result = constant_exprt(irep_idt(), type);
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -312,4 +324,68 @@ optionalt<exprt> nondet_initializer(
   const namespacet &ns)
 {
   return expr_initializert(ns)(type, source_location, exprt(ID_nondet));
+}
+
+/// Create a value for type `type`, with all subtype bytes
+/// initialized to the given value.
+/// \param type: Type of the target expression.
+/// \param source_location: Location to record in all created sub-expressions.
+/// \param ns: Namespace to perform type symbol/tag lookups.
+/// \param init_byte_expr: Value to be used for initialization.
+/// \return An expression if a byte-initialized expression of the input type
+///   can be built.
+optionalt<exprt> expr_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns,
+  const exprt &init_byte_expr)
+{
+  return expr_initializert(ns)(type, source_location, init_byte_expr);
+}
+
+/// Builds an expression of the given output type with each of its bytes
+/// initialized to the given initialization expression.
+/// Integer bitvector types are currently supported.
+/// For unsupported types the initialization expression is casted to the
+/// output type.
+/// \param init_byte_expr The initialization expression
+/// \param output_type The output type
+/// \return The built expression
+exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
+{
+  if(output_type.id() == ID_unsignedbv || output_type.id() == ID_signedbv)
+  {
+    const size_t size =
+      to_bitvector_type(output_type).get_width() / config.ansi_c.char_width;
+
+    // We've got a constant. So, precompute the value of the constant.
+    if(init_byte_expr.is_constant())
+    {
+      const mp_integer value =
+        numeric_cast_v<mp_integer>(to_constant_expr(init_byte_expr));
+      mp_integer duplicated_value = value;
+      for(size_t i = 1; i < size; ++i)
+      {
+        duplicated_value =
+          bitwise_or(duplicated_value << config.ansi_c.char_width, value);
+      }
+      return from_integer(duplicated_value, output_type);
+    }
+
+    // We haven't got a constant. So, build the expression using shift-and-or.
+    exprt::operandst values;
+    values.push_back(init_byte_expr);
+    for(size_t i = 1; i < size; ++i)
+    {
+      values.push_back(shl_exprt(
+        init_byte_expr,
+        from_integer(config.ansi_c.char_width * i, size_type())));
+    }
+    if(values.size() == 1)
+      return values[0];
+    return multi_ary_exprt(ID_bitor, values, output_type);
+  }
+
+  // Anything else. We don't know what to do with it. So, just cast.
+  return typecast_exprt::conditional_cast(init_byte_expr, output_type);
 }
