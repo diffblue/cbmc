@@ -724,7 +724,7 @@ void goto_symext::merge_goto(
 /// \param ns: namespace
 /// \param diff_guard: difference between the guards of the two states
 /// \param [out] log: logger for debug messages
-/// \param do_simplify: should the right-hand-side of the assignment that is
+/// \param do_simplify_phi: should the right-hand-side of the assignment that is
 ///   added to the target be simplified
 /// \param [out] target: equation that will receive the resulting assignment
 /// \param dirty: dirty-object analysis
@@ -738,7 +738,7 @@ static void merge_names(
   const namespacet &ns,
   const guardt &diff_guard,
   messaget &log,
-  const bool do_simplify,
+  const bool do_simplify_phi,
   symex_target_equationt &target,
   const incremental_dirtyt &dirty,
   const ssa_exprt &ssa,
@@ -830,7 +830,7 @@ static void merge_names(
   else
   {
     rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-    if(do_simplify)
+    if(do_simplify_phi)
       simplify(rhs, ns);
   }
 
@@ -887,7 +887,7 @@ void goto_symext::phi_function(
       ns,
       diff_guard,
       log,
-      symex_config.simplify_opt,
+      symex_config.simplify_phi,
       target,
       path_storage.dirty,
       ssa,
@@ -914,7 +914,7 @@ void goto_symext::phi_function(
       ns,
       diff_guard,
       log,
-      symex_config.simplify_opt,
+      symex_config.simplify_phi,
       target,
       path_storage.dirty,
       ssa,

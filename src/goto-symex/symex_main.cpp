@@ -37,6 +37,7 @@ symex_configt::symex_configt(const optionst &options)
     self_loops_to_assumptions(
       options.get_bool_option("self-loops-to-assumptions")),
     simplify_opt(options.get_bool_option("simplify")),
+    simplify_phi(options.get_bool_option("simplify-phi")),
     unwinding_assertions(options.get_bool_option("unwinding-assertions")),
     partial_loops(options.get_bool_option("partial-loops")),
     havoc_undefined_functions(

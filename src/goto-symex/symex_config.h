@@ -32,6 +32,8 @@ struct symex_configt final
 
   bool simplify_opt;
 
+  bool simplify_phi;
+
   bool unwinding_assertions;
 
   bool partial_loops;
