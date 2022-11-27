@@ -36,10 +36,9 @@ class optionst;
   OPT_BMC \
   "(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
-  "(no-simplify)(full-slice)" \
+  "(full-slice)" \
   OPT_REACHABILITY_SLICER \
   "(no-propagation)" \
-  "(no-simplify-phi)" \
   "(document-subgoals)(test-preprocessor)" \
   "(show-array-constraints)"  \
   OPT_CONFIG_C_CPP \

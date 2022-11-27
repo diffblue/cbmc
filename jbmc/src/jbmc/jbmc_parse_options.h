@@ -42,7 +42,7 @@ class optionst;
   OPT_BMC \
   "(preprocess)" \
   OPT_FUNCTIONS \
-  "(no-simplify)(full-slice)" \
+  "(full-slice)" \
   OPT_REACHABILITY_SLICER \
   "(no-propagation)" \
   "(document-subgoals)" \
