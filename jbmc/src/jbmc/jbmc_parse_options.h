@@ -44,7 +44,7 @@ class optionst;
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \
-  "(no-propagation)(no-simplify-if)" \
+  "(no-propagation)" \
   "(document-subgoals)" \
   "(object-bits):" \
   "(classpath):(cp):" \

@@ -70,7 +70,7 @@ for t in  \
       for undoc in \
         -all-claims -all-properties -claim -show-claims \
         -document-subgoals \
-        -no-propagation -no-simplify -no-simplify-if \
+        -no-propagation -no-simplify \
         -floatbv -no-unwinding-assertions \
         -slice-by-trace ; do
         echo "$undoc" >> help_string
@@ -102,7 +102,7 @@ for t in  \
       # -jar, -gb are documented, but in a different format
       for undoc in \
         -document-subgoals \
-        -no-propagation -no-simplify -no-simplify-if \
+        -no-propagation -no-simplify \
         -no-unwinding-assertions \
         -jar -gb ; do
         echo "$undoc" >> help_string
