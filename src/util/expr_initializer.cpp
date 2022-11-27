@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
 
-template <bool nondet>
 class expr_initializert
 {
 public:
@@ -25,10 +24,12 @@ public:
   {
   }
 
-  optionalt<exprt>
-  operator()(const typet &type, const source_locationt &source_location)
+  optionalt<exprt> operator()(
+    const typet &type,
+    const source_locationt &source_location,
+    const exprt &init_expr)
   {
-    return expr_initializer_rec(type, source_location);
+    return expr_initializer_rec(type, source_location, init_expr);
   }
 
 protected:
@@ -36,13 +37,14 @@ protected:
 
   optionalt<exprt> expr_initializer_rec(
     const typet &type,
-    const source_locationt &source_location);
+    const source_locationt &source_location,
+    const exprt &init_expr);
 };
 
-template <bool nondet>
-optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
+optionalt<exprt> expr_initializert::expr_initializer_rec(
   const typet &type,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  const exprt &init_expr)
 {
   const irep_idt &type_id=type.id();
 
@@ -57,9 +59,9 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
      type_id==ID_fixedbv)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = from_integer(0, type);
 
     result.add_source_location()=source_location;
@@ -69,9 +71,9 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
           type_id==ID_real)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = constant_exprt(ID_0, type);
 
     result.add_source_location()=source_location;
@@ -81,9 +83,9 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
           type_id==ID_verilog_unsignedbv)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
     {
       const std::size_t width = to_bitvector_type(type).get_width();
       std::string value(width, '0');
@@ -97,12 +99,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_complex)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
     {
-      auto sub_zero =
-        expr_initializer_rec(to_complex_type(type).subtype(), source_location);
+      auto sub_zero = expr_initializer_rec(
+        to_complex_type(type).subtype(), source_location, init_expr);
       if(!sub_zero.has_value())
         return {};
 
@@ -127,8 +129,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     }
     else
     {
-      auto tmpval =
-        expr_initializer_rec(array_type.element_type(), source_location);
+      auto tmpval = expr_initializer_rec(
+        array_type.element_type(), source_location, init_expr);
       if(!tmpval.has_value())
         return {};
 
@@ -137,7 +139,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
         array_type.size().id() == ID_infinity || !array_size.has_value() ||
         *array_size > MAX_FLATTENED_ARRAY_SIZE)
       {
-        if(nondet)
+        if(init_expr.id() == ID_nondet)
           return side_effect_expr_nondett(type, source_location);
 
         array_of_exprt value(*tmpval, array_type);
@@ -159,8 +161,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    auto tmpval =
-      expr_initializer_rec(vector_type.element_type(), source_location);
+    auto tmpval = expr_initializer_rec(
+      vector_type.element_type(), source_location, init_expr);
     if(!tmpval.has_value())
       return {};
 
@@ -190,7 +192,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       DATA_INVARIANT(
         c.type().id() != ID_code, "struct member must not be of code type");
 
-      const auto member = expr_initializer_rec(c.type(), source_location);
+      const auto member =
+        expr_initializer_rec(c.type(), source_location, init_expr);
       if(!member.has_value())
         return {};
 
@@ -216,8 +219,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     if(!widest_member.has_value())
       return {};
 
-    auto component_value =
-      expr_initializer_rec(widest_member->first.type(), source_location);
+    auto component_value = expr_initializer_rec(
+      widest_member->first.type(), source_location, init_expr);
 
     if(!component_value.has_value())
       return {};
@@ -230,7 +233,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_c_enum_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_c_enum_tag_type(type)), source_location);
+      ns.follow_tag(to_c_enum_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -243,7 +246,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_struct_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_struct_tag_type(type)), source_location);
+      ns.follow_tag(to_struct_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -256,7 +259,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_union_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_union_tag_type(type)), source_location);
+      ns.follow_tag(to_union_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -269,9 +272,9 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_string)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = constant_exprt(irep_idt(), type);
 
     result.add_source_location()=source_location;
@@ -292,7 +295,8 @@ optionalt<exprt> zero_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert<false>(ns)(type, source_location);
+  return expr_initializert(ns)(
+    type, source_location, constant_exprt(ID_0, char_type()));
 }
 
 /// Create a non-deterministic value for type `type`, with all subtypes
@@ -307,5 +311,5 @@ optionalt<exprt> nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert<true>(ns)(type, source_location);
+  return expr_initializert(ns)(type, source_location, exprt(ID_nondet));
 }
