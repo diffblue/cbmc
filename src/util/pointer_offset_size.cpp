@@ -633,17 +633,22 @@ optionalt<exprt> get_subexpression_at_offset(
 
     // no arrays of non-byte-aligned, zero-, or unknown-sized objects
     if(
-      elem_size_bits.has_value() && *elem_size_bits > 0 &&
-      *elem_size_bits % config.ansi_c.char_width == 0 &&
+      array_type.size().is_constant() && elem_size_bits.has_value() &&
+      *elem_size_bits > 0 && *elem_size_bits % config.ansi_c.char_width == 0 &&
       *target_size_bits <= *elem_size_bits)
     {
+      const mp_integer array_size =
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
       const mp_integer elem_size_bytes =
         *elem_size_bits / config.ansi_c.char_width;
+      const mp_integer index = offset_bytes / elem_size_bytes;
       const auto offset_inside_elem = offset_bytes % elem_size_bytes;
       const auto target_size_bytes =
         *target_size_bits / config.ansi_c.char_width;
       // only recurse if the cell completely contains the target
-      if(offset_inside_elem + target_size_bytes <= elem_size_bytes)
+      if(
+        index < array_size &&
+        offset_inside_elem + target_size_bytes <= elem_size_bytes)
       {
         return get_subexpression_at_offset(
           index_exprt(
