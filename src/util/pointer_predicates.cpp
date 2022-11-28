@@ -56,34 +56,6 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
-exprt good_pointer(const exprt &pointer)
-{
-  return unary_exprt(ID_good_pointer, pointer, bool_typet());
-}
-
-exprt good_pointer_def(
-  const exprt &pointer,
-  const namespacet &ns)
-{
-  const pointer_typet &pointer_type = to_pointer_type(pointer.type());
-  const typet &dereference_type = pointer_type.base_type();
-
-  const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
-  CHECK_RETURN(size_of_expr_opt.has_value());
-
-  const exprt good_dynamic = not_exprt{deallocated(pointer, ns)};
-
-  const not_exprt not_null(null_object(pointer));
-
-  const not_exprt not_invalid{is_invalid_pointer_exprt{pointer}};
-
-  const and_exprt good_bounds{
-    not_exprt{object_lower_bound(pointer, nil_exprt())},
-    not_exprt{object_upper_bound(pointer, size_of_expr_opt.value())}};
-
-  return and_exprt(not_null, not_invalid, good_dynamic, good_bounds);
-}
-
 exprt null_object(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));

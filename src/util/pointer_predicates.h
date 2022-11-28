@@ -22,8 +22,6 @@ exprt dead_object(const exprt &pointer, const namespacet &);
 exprt pointer_offset(const exprt &pointer);
 exprt pointer_object(const exprt &pointer);
 exprt object_size(const exprt &pointer);
-exprt good_pointer(const exprt &pointer);
-exprt good_pointer_def(const exprt &pointer, const namespacet &);
 exprt null_object(const exprt &pointer);
 
 exprt integer_address(const exprt &pointer);

@@ -692,13 +692,3 @@ simplify_exprt::simplify_object_size(const object_size_exprt &expr)
   else
     return std::move(new_expr);
 }
-
-simplify_exprt::resultt<>
-simplify_exprt::simplify_good_pointer(const unary_exprt &expr)
-{
-  // we expand the definition
-  exprt def = good_pointer_def(expr.op(), ns);
-
-  // recursive call
-  return changed(simplify_rec(def));
-}
