@@ -285,18 +285,7 @@ static void check_rhs_assumptions(
   // check byte extract rhs structure
   else if(const auto byte = expr_try_dynamic_cast<byte_extract_exprt>(rhs))
   {
-    DATA_CHECK_WITH_DIAGNOSTICS(
-      vm,
-      byte->operands().size() == 2,
-      "RHS",
-      rhs.pretty(),
-      "Expecting a byte extract with two operands.");
-    DATA_CHECK_WITH_DIAGNOSTICS(
-      vm,
-      can_cast_expr<constant_exprt>(simplify_expr(byte->op(), ns)),
-      "RHS",
-      rhs.pretty(),
-      "Expecting a byte extract with constant value.");
+    check_rhs_assumptions(simplify_expr(byte->op(), ns), ns, vm);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       can_cast_expr<constant_exprt>(simplify_expr(byte->offset(), ns)),
