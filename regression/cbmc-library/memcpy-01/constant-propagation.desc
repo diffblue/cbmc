@@ -1,7 +1,7 @@
 CORE
 main.c
 --show-vcc
-main::1::m!0@1#1 = .*byte_extract_(big|little)_endian\(cast\(44, signedbv\[\d+\]\*\), 0, signedbv\[\d+\]\).*
+main::1::m!0@1#2 = .*byte_extract_(big|little)_endian\(cast\(44, signedbv\[\d+\]\*\), 0, signedbv\[\d+\]\).*
 ^EXIT=0$
 ^SIGNAL=0$
 --
