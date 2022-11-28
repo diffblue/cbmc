@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('utils_8cpp.html',''); initResizable();
 <code>#include &lt;<a class="el" href="mathematical__expr_8h_source.html">util/mathematical_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="symbol_8h_source.html">util/symbol.h</a>&gt;</code><br />
@@ -113,7 +114,7 @@ $(document).ready(function(){initNavTree('utils_8cpp.html',''); initResizable();
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8cpp__incl.svg" width="2910" height="1142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8cpp__incl.svg" width="2888" height="1096"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -202,7 +203,7 @@ Variables</h2></td></tr>
 <p>This function recursively searches <code>expression</code> to find nested or non-nested quantified expressions. </p>
 <p>When a quantified expression is found, a fresh quantified variable is added to the symbol table and <code>expression</code> is updated to use this fresh variable. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00276">276</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00281">281</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -234,7 +235,7 @@ Variables</h2></td></tr>
 
 <p>Generate a validity check over all dereferences in an expression. </p>
 <p>This function generates a formula:</p>
-<p>good_pointer_def(pexpr_1, ns) &amp;&amp; good_pointer_def(pexpr_2, n2) &amp;&amp; ...</p>
+<p><a class="el" href="classr__ok__exprt.html" title="A predicate that indicates that an address range is ok to read.">r_ok_exprt(pexpr_1, sizeof(*pexpr_1))</a> &amp;&amp; <a class="el" href="classr__ok__exprt.html" title="A predicate that indicates that an address range is ok to read.">r_ok_exprt(pexpr_2, sizeof(*pexpr_1))</a> &amp;&amp; ...</p>
 <p>over all dereferenced pointer expressions *(pexpr_1), *(pexpr_2), ... found in the AST of <code>expr</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -245,7 +246,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A conjunctive expression that checks validity of all pointers that are dereferenced within <code>expr</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00084">84</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00085">85</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -301,7 +302,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00028">28</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00029">29</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +346,7 @@ Variables</h2></td></tr>
 
 <p>This function generates all the instructions required to initialize history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00425">425</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00430">430</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +387,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A lexicographic less-than comparison expression: LHS &lt; RHS. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00098">98</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00103">103</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -433,7 +434,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00142">142</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00147">147</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -455,7 +456,7 @@ Variables</h2></td></tr>
 
 <p>Returns true if the given comment matches the type of comments created by <a class="el" href="utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3">make_assigns_clause_replacement_tracking_comment</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00244">244</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00249">249</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -494,7 +495,7 @@ Variables</h2></td></tr>
 <p>Returns true iff the given program is loop-free, i.e. </p>
 <p>if each SCC of its CFG contains a single element. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00177">177</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00182">182</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -532,7 +533,7 @@ Variables</h2></td></tr>
 
 <p>Returns an <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> that essentially says that <code>target</code> was assigned by the contract of <code>function_id</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00235">235</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00240">240</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -600,7 +601,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The new symbolt object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00152">152</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00157">157</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -662,7 +663,7 @@ Variables</h2></td></tr>
 
 <p>This function recursively identifies the "old" expressions within expr and replaces them with correspoding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00348">348</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00353">353</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -694,7 +695,7 @@ Variables</h2></td></tr>
 
 <p>Turns goto instructions <code>IF cond GOTO label</code> where the condition statically simplifies to <code>false</code> into SKIP instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00166">166</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00171">171</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -727,7 +728,7 @@ Variables</h2></td></tr>
 <p>Widen expressions in <code>assigns</code> with the following strategy. </p>
 <p>If an expression is an array index or object dereference expression, with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant <code>i</code>, then replace it by the entire underlying object. Otherwise, e.g. for a[i] or *(b+i) when <code>i</code> is a known constant, keep the expression in the result. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00250">250</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00255">255</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -756,7 +757,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>Prefix for comments added to track assigns clause replacement. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00232">232</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00237">237</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>

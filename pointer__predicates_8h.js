@@ -5,8 +5,6 @@ var pointer__predicates_8h =
     [ "can_cast_expr< is_invalid_pointer_exprt >", "pointer__predicates_8h.html#ad41018ba06e1a46d314fbfc187fe1edf", null ],
     [ "dead_object", "pointer__predicates_8h.html#a517bf9699d30f655a00cb661c1ca8035", null ],
     [ "deallocated", "pointer__predicates_8h.html#aaf1fa877319db26b9320cb3a0122c81c", null ],
-    [ "good_pointer", "pointer__predicates_8h.html#a9a5e9fac06ef8279cf0827099bc60ce9", null ],
-    [ "good_pointer_def", "pointer__predicates_8h.html#ae1b6fc8978675f2347cba7917a5ac4c3", null ],
     [ "integer_address", "pointer__predicates_8h.html#a1579332740730bec2ce3fce72fe9f408", null ],
     [ "null_object", "pointer__predicates_8h.html#ae1ecb1413ca75f4c142e1e4d397e3837", null ],
     [ "object_lower_bound", "pointer__predicates_8h.html#afc902b562b2d1954b6efd7ac3b741b95", null ],

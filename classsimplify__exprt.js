@@ -28,7 +28,6 @@ var classsimplify__exprt =
     [ "simplify_floatbv_op", "classsimplify__exprt.html#af3eeb6bbc690359c5b56c76da1bf7cc2", null ],
     [ "simplify_floatbv_typecast", "classsimplify__exprt.html#a945fa0fe27a5a64d0a0e6ee5a62dfba1", null ],
     [ "simplify_function_application", "classsimplify__exprt.html#aae5ce5667107791421e4d24d3e7ac1af", null ],
-    [ "simplify_good_pointer", "classsimplify__exprt.html#a38e254aed12acf9035faf6ce60bf440c", null ],
     [ "simplify_ieee_float_relation", "classsimplify__exprt.html#af6f07602312c923c244e32a8010a9cff", null ],
     [ "simplify_if", "classsimplify__exprt.html#a4d16933a9b35d843f314cc51a76656ae", null ],
     [ "simplify_if_branch", "classsimplify__exprt.html#a97b9659e5ade01dd2268a332ebc884c7", null ],

@@ -1,6 +1,5 @@
 var NAVTREEINDEX99 =
 {
-"group__solvers.html":[4,22],
 "group__util.html":[4,23],
 "group__xmllang.html":[4,24],
 "guard_8h.html":[7,0,2,0,33],
@@ -249,5 +248,6 @@ var NAVTREEINDEX99 =
 "interval_8h_source.html":[7,0,2,27,90],
 "interval__abstract__value_8cpp.html":[7,0,2,0,0,24],
 "interval__abstract__value_8cpp.html#a0e9a54d2d318bde57814a86c9402d8de":[7,0,2,0,0,24,12],
-"interval__abstract__value_8cpp.html#a121625646eed458509dec3519bb51167":[7,0,2,0,0,24,4]
+"interval__abstract__value_8cpp.html#a121625646eed458509dec3519bb51167":[7,0,2,0,0,24,4],
+"interval__abstract__value_8cpp.html#a1e10d2d1792f8391665c6613e5fd1dfb":[7,0,2,0,0,24,13]
 };
