@@ -213,7 +213,7 @@ void code_contractst::check_apply_loop_contracts(
 
       // If the set contains pairs (i, a[i]),
       // we widen them to (i, __CPROVER_POINTER_OBJECT(a))
-      widen_assigns(to_havoc);
+      widen_assigns(to_havoc, ns);
 
       log.debug() << "No loop assigns clause provided. Inferred targets: {";
       // Add inferred targets to the loop assigns clause.

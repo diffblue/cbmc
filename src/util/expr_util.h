@@ -88,6 +88,10 @@ const exprt &skip_typecast(const exprt &expr);
 class is_constantt
 {
 public:
+  explicit is_constantt(const namespacet &ns) : ns(ns)
+  {
+  }
+
   /// returns true iff the expression can be considered constant
   bool operator()(const exprt &e) const
   {
@@ -95,6 +99,8 @@ public:
   }
 
 protected:
+  const namespacet &ns;
+
   virtual bool is_constant(const exprt &) const;
   virtual bool is_constant_address_of(const exprt &) const;
 };

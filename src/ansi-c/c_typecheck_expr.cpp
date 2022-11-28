@@ -4467,13 +4467,11 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 class is_compile_time_constantt : public is_constantt
 {
 public:
-  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
+  explicit is_compile_time_constantt(const namespacet &ns) : is_constantt(ns)
   {
   }
 
 protected:
-  const namespacet &ns;
-
   bool is_constant(const exprt &e) const override
   {
     if(e.id() == ID_infinity)
