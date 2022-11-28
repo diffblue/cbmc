@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --verbosity 10
 ^EXIT=0$
@@ -6,5 +6,3 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
---
-assert(s) fails with field sensitivity, but passes without
