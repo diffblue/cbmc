@@ -91,6 +91,7 @@ $(document).ready(function(){initNavTree('classis__constantt.html',''); initResi
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classis__constantt-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">is_constantt Class Reference</div>  </div>
@@ -109,9 +110,19 @@ $(document).ready(function(){initNavTree('classis__constantt.html',''); initResi
 <div class="center"><iframe scrolling="no" frameborder="0" src="classis__constantt__inherit__graph.svg" width="358" height="206"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Collaboration diagram for is_constantt:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classis__constantt__coll__graph.svg" width="419" height="439"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a59933ec38e7b9511700d502ac3b58bb4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__constantt.html#a59933ec38e7b9511700d502ac3b58bb4">is_constantt</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;<a class="el" href="classis__constantt.html#ac1c0324618f3a5fb8e0b664ddbc48d05">ns</a>)</td></tr>
+<tr class="separator:a59933ec38e7b9511700d502ac3b58bb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f871f36b00b7face9f92e6add19ac8b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__constantt.html#a8f871f36b00b7face9f92e6add19ac8b">operator()</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;e) const</td></tr>
 <tr class="memdesc:a8f871f36b00b7face9f92e6add19ac8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff the expression can be considered constant  <a href="classis__constantt.html#a8f871f36b00b7face9f92e6add19ac8b">More...</a><br /></td></tr>
 <tr class="separator:a8f871f36b00b7face9f92e6add19ac8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,13 +135,47 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae6401a967e33c5f05fb796fb1ce9f650"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__constantt.html#ae6401a967e33c5f05fb796fb1ce9f650">is_constant_address_of</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;) const</td></tr>
 <tr class="memdesc:ae6401a967e33c5f05fb796fb1ce9f650"><td class="mdescLeft">&#160;</td><td class="mdescRight">this function determines which reference-typed expressions are constant  <a href="classis__constantt.html#ae6401a967e33c5f05fb796fb1ce9f650">More...</a><br /></td></tr>
 <tr class="separator:ae6401a967e33c5f05fb796fb1ce9f650"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:ac1c0324618f3a5fb8e0b664ddbc48d05"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__constantt.html#ac1c0324618f3a5fb8e0b664ddbc48d05">ns</a></td></tr>
+<tr class="separator:ac1c0324618f3a5fb8e0b664ddbc48d05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Determine whether an expression is constant. </p>
 <p>A literal constant is constant, but so are, e.g., sums over constants or addresses of objects. An implementation derive from this class to refine what it considers constant in a particular context by overriding is_constant and/or is_constant_address_of. </p>
 
 <p class="definition">Definition at line <a class="el" href="expr__util_8h_source.html#l00088">88</a> of file <a class="el" href="expr__util_8h_source.html">expr_util.h</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a59933ec38e7b9511700d502ac3b58bb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59933ec38e7b9511700d502ac3b58bb4">&#9670;&nbsp;</a></span>is_constantt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">is_constantt::is_constantt </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="expr__util_8h_source.html#l00091">91</a> of file <a class="el" href="expr__util_8h_source.html">expr_util.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ac9875c9cabc3a6a0cb9e8b2871624247"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac9875c9cabc3a6a0cb9e8b2871624247">&#9670;&nbsp;</a></span>is_constant()</h2>
 
@@ -159,7 +204,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classconstant__propagator__is__constantt.html#aea3fb18a611daf12994de9521f7b0d9f">constant_propagator_is_constantt</a>, <a class="el" href="classhavoc__utils__is__constantt.html#a498579d9535c0620b1b05a0d03583c1c">havoc_utils_is_constantt</a>, <a class="el" href="classgoto__symex__is__constantt.html#addfcb31b85b60f2d410591ae6070ac15">goto_symex_is_constantt</a>, and <a class="el" href="classis__compile__time__constantt.html#a0d12790551acad8f0c6eecf0c0162d49">is_compile_time_constantt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00227">227</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00229">229</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -191,7 +236,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classis__compile__time__constantt.html#a2f022c8baa2acad0087e06ee00895ad6">is_compile_time_constantt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00255">255</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00296">296</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +266,32 @@ Protected Member Functions</h2></td></tr>
 
 <p>returns true iff the expression can be considered constant </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8h_source.html#l00092">92</a> of file <a class="el" href="expr__util_8h_source.html">expr_util.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8h_source.html#l00096">96</a> of file <a class="el" href="expr__util_8h_source.html">expr_util.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ac1c0324618f3a5fb8e0b664ddbc48d05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1c0324618f3a5fb8e0b664ddbc48d05">&#9670;&nbsp;</a></span>ns</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classnamespacet.html">namespacet</a>&amp; is_constantt::ns</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="expr__util_8h_source.html#l00102">102</a> of file <a class="el" href="expr__util_8h_source.html">expr_util.h</a>.</p>
 
 </div>
 </div>

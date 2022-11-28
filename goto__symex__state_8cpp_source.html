@@ -202,7 +202,7 @@ $(document).ready(function(){initNavTree('goto__symex__state_8cpp_source.html','
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      <span class="stringliteral">&quot;pointer handling for concurrency is unsound&quot;</span>);</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="comment">// Update constant propagation map -- the RHS is L2</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a> &amp;&amp; record_value &amp;&amp; <a class="code" href="classgoto__symex__is__constantt.html">goto_symex_is_constantt</a>()(rhs))</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="race__check_8cpp.html#aa8f3639e5e1d6a3b6dfb166df5709113">is_shared</a> &amp;&amp; record_value &amp;&amp; <a class="code" href="classgoto__symex__is__constantt.html">goto_symex_is_constantt</a>(ns)(rhs))</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  {</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> propagation_entry = <a class="code" href="classgoto__statet.html#ab9868657d4cf7de2042d5a5fe9c41146">propagation</a>.find(l1_identifier);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">if</span>(!propagation_entry.has_value())</div>

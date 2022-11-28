@@ -130,10 +130,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9802005d5f601ab8931792b0056559e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a765909ed7881c0ce4a3d499509af7871"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#a765909ed7881c0ce4a3d499509af7871">set_dirty_to_top</a> (const <a class="el" href="classdirtyt.html">dirtyt</a> &amp;dirty, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="separator:a765909ed7881c0ce4a3d499509af7871"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c2cface0f1e9d0c3e1dccda62c3fc42"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#a0c2cface0f1e9d0c3e1dccda62c3fc42">is_constant</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr) const</td></tr>
-<tr class="separator:a0c2cface0f1e9d0c3e1dccda62c3fc42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9e15e8a9f68f93eb38f4b725a213a71"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#aa9e15e8a9f68f93eb38f4b725a213a71">is_constant</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
-<tr class="separator:aa9e15e8a9f68f93eb38f4b725a213a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a256e3b0d337d3f82d727f32df120205e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#a256e3b0d337d3f82d727f32df120205e">is_constant</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
+<tr class="separator:a256e3b0d337d3f82d727f32df120205e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e7baa52fb5da94e61e3284083fcb663"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#a3e7baa52fb5da94e61e3284083fcb663">is_constant</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
+<tr class="separator:a3e7baa52fb5da94e61e3284083fcb663"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13011ba0dc34a06559721edddb373e66"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#a13011ba0dc34a06559721edddb373e66">is_empty</a> () const</td></tr>
 <tr class="separator:a13011ba0dc34a06559721edddb373e66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a596bc23ffcd7194f3ef8ef36b971007c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconstant__propagator__domaint_1_1valuest.html#a596bc23ffcd7194f3ef8ef36b971007c">output</a> (std::ostream &amp;out, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
@@ -177,8 +177,8 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0c2cface0f1e9d0c3e1dccda62c3fc42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c2cface0f1e9d0c3e1dccda62c3fc42">&#9670;&nbsp;</a></span>is_constant() <span class="overload">[1/2]</span></h2>
+<a id="a256e3b0d337d3f82d727f32df120205e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a256e3b0d337d3f82d727f32df120205e">&#9670;&nbsp;</a></span>is_constant() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -187,18 +187,28 @@ Public Attributes</h2></td></tr>
           <td class="memname">bool constant_propagator_domaint::valuest::is_constant </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expr</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00445">445</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00446">446</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aa9e15e8a9f68f93eb38f4b725a213a71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9e15e8a9f68f93eb38f4b725a213a71">&#9670;&nbsp;</a></span>is_constant() <span class="overload">[2/2]</span></h2>
+<a id="a3e7baa52fb5da94e61e3284083fcb663"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e7baa52fb5da94e61e3284083fcb663">&#9670;&nbsp;</a></span>is_constant() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,13 +217,23 @@ Public Attributes</h2></td></tr>
           <td class="memname">bool constant_propagator_domaint::valuest::is_constant </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>id</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00450">450</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00453">453</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>
@@ -300,7 +320,7 @@ Public Attributes</h2></td></tr>
 <p>meet </p>
 <dl class="section return"><dt>Returns</dt><dd>Return true if "this" has changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00600">600</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00605">605</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +343,7 @@ Public Attributes</h2></td></tr>
 <p>join </p>
 <dl class="section return"><dt>Returns</dt><dd>Return true if "this" has changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00529">529</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00534">534</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>
@@ -353,7 +373,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00492">492</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00497">497</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>
@@ -383,7 +403,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00467">467</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00472">472</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>
@@ -497,7 +517,7 @@ Public Attributes</h2></td></tr>
 
 <p>Do not call this when iterating over replace_const.expr_map! </p>
 
-<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00456">456</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constant__propagator_8cpp_source.html#l00461">461</a> of file <a class="el" href="constant__propagator_8cpp_source.html">constant_propagator.cpp</a>.</p>
 
 </div>
 </div>

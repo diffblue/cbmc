@@ -12,6 +12,6 @@ var utils_8cpp =
     [ "new_tmp_symbol", "utils_8cpp.html#a5cf09fde997eeb78602693d324d9d34b", null ],
     [ "replace_history_parameter", "utils_8cpp.html#a3c151c3ed976293e7799df9faeb14154", null ],
     [ "simplify_gotos", "utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024", null ],
-    [ "widen_assigns", "utils_8cpp.html#a5e4658887550eb3d68278da75cfe5b6b", null ],
+    [ "widen_assigns", "utils_8cpp.html#a8ec8b1b695a472d1ee3ffc455fb07995", null ],
     [ "ASSIGNS_CLAUSE_REPLACEMENT_TRACKING", "utils_8cpp.html#abe4637b56094bf90d6b488cbf4b6de92", null ]
 ];

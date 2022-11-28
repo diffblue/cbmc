@@ -14,5 +14,5 @@ var utils_8h =
     [ "new_tmp_symbol", "utils_8h.html#a5aa22ab7a0301e7955023b63a6868c15", null ],
     [ "replace_history_parameter", "utils_8h.html#a3c151c3ed976293e7799df9faeb14154", null ],
     [ "simplify_gotos", "utils_8h.html#aba81cb53e8d0082cbe68db4136188024", null ],
-    [ "widen_assigns", "utils_8h.html#a5e4658887550eb3d68278da75cfe5b6b", null ]
+    [ "widen_assigns", "utils_8h.html#a8ec8b1b695a472d1ee3ffc455fb07995", null ]
 ];
