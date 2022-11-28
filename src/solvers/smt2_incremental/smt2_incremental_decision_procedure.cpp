@@ -451,20 +451,29 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
     }
     else
     {
-      const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
-      INVARIANT(
-        symbol_expr, "Unhandled expressions are expected to be symbols");
-      // Note this case is currently expected to be encountered during trace
-      // generation for -
-      //  * Steps which were removed via --slice-formula.
-      //  * Getting concurrency clock values.
-      // The below implementation which returns the given expression was chosen
-      // based on the implementation of `smt2_convt::get` in the non-incremental
-      // smt2 decision procedure.
-      log.warning()
-        << "`get` attempted for unknown symbol, with identifier - \n"
-        << symbol_expr->get_identifier() << messaget::eom;
-      return expr;
+      if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr))
+      {
+        // Note this case is currently expected to be encountered during trace
+        // generation for -
+        //  * Steps which were removed via --slice-formula.
+        //  * Getting concurrency clock values.
+        // The below implementation which returns the given expression was chosen
+        // based on the implementation of `smt2_convt::get` in the non-incremental
+        // smt2 decision procedure.
+        log.warning()
+          << "`get` attempted for unknown symbol, with identifier - \n"
+          << symbol_expr->get_identifier() << messaget::eom;
+        return expr;
+      }
+      exprt copy = expr;
+      for(auto &op : copy.operands())
+      {
+        exprt eval_op = get(op);
+        if(eval_op.is_nil())
+          return nil_exprt{};
+        op = std::move(eval_op);
+      }
+      return copy;
     }
   }
   if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
