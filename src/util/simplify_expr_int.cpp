@@ -1617,6 +1617,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
       new_expr.rhs() = simplify_node(new_expr.rhs());
       return changed(simplify_inequality(new_expr)); // recursive call
     }
+    else if(expr.op0().type().id() == ID_pointer)
+    {
+      exprt ptr_op0 = simplify_object(expr.op0()).expr;
+      exprt ptr_op1 = simplify_object(expr.op1()).expr;
+
+      if(ptr_op0 == ptr_op1)
+      {
+        pointer_offset_exprt offset_op0{expr.op0(), size_type()};
+        pointer_offset_exprt offset_op1{expr.op1(), size_type()};
+
+        return changed(simplify_rec(equal_exprt{offset_op0, offset_op1}));
+      }
+    }
   }
 
   return unchanged(expr);
@@ -1713,17 +1726,26 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
       }
       else if(expr.op0().id() == ID_plus)
       {
-        // NULL + 1 == NULL is false
-        const plus_exprt &plus = to_plus_expr(expr.op0());
-        if(
-          plus.operands().size() == 2 && plus.op0().is_constant() &&
-          plus.op1().is_constant() &&
-          ((is_null_pointer(to_constant_expr(plus.op0())) &&
-            !plus.op1().is_zero()) ||
-           (is_null_pointer(to_constant_expr(plus.op1())) &&
-            !plus.op0().is_zero())))
+        exprt offset =
+          simplify_rec(pointer_offset_exprt{expr.op0(), size_type()}).expr;
+        if(!offset.is_constant())
+          return unchanged(expr);
+
+        exprt ptr = simplify_object(expr.op0()).expr;
+        // NULL + N == NULL is N == 0
+        if(ptr.is_constant() && is_null_pointer(to_constant_expr(ptr)))
+          return make_boolean_expr(offset.is_zero());
+        // &x + N == NULL is false when the offset is in bounds
+        else if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(ptr))
         {
-          return false_exprt();
+          const auto object_size =
+            pointer_offset_size(address_of->object().type(), ns);
+          if(
+            object_size.has_value() &&
+            numeric_cast_v<mp_integer>(to_constant_expr(offset)) < *object_size)
+          {
+            return false_exprt();
+          }
         }
       }
     }
