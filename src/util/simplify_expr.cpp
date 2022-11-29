@@ -1976,10 +1976,13 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   // try to refine it down to extracting from a member or an index in an array
   auto subexpr =
     get_subexpression_at_offset(expr.op(), *offset, expr.type(), ns);
-  if(!subexpr.has_value() || subexpr.value() == expr)
-    return unchanged(expr);
+  if(subexpr.has_value() && subexpr.value() != expr)
+    return changed(simplify_rec(subexpr.value())); // recursive call
 
-  return changed(simplify_rec(subexpr.value())); // recursive call
+  if(is_constantt(ns)(expr))
+    return changed(simplify_rec(lower_byte_extract(expr, ns)));
+
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>

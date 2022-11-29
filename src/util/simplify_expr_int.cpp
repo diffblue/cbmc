@@ -906,7 +906,14 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
             .set_width(
               to_bitvector_type(eb_i.type()).get_width() +
               to_bitvector_type(eb_n.type()).get_width());
-          opi = eb_merged;
+          if(expr.type().id() != eb_merged.type().id())
+          {
+            bitvector_typet bt = to_bitvector_type(expr.type());
+            bt.set_width(to_bitvector_type(eb_merged.type()).get_width());
+            opi = simplify_typecast(typecast_exprt{eb_merged, bt});
+          }
+          else
+            opi = eb_merged;
           // erase opn
           new_expr.operands().erase(new_expr.operands().begin() + i + 1);
           no_change = false;
