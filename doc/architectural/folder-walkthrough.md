@@ -4,7 +4,7 @@
 
 \author Martin Brain, Peter Schrammel
 
-## `src/` ##
+## `src/`
 
 The source code is divided into a number of sub-directories, each
 containing the code for a different part of the system.
@@ -55,7 +55,7 @@ containing the code for a different part of the system.
 
 In the top level of `src` there are only a few files:
 
-* `config.inc`:   The user-editable configuration parameters for the
+* `config.inc`: The user-editable configuration parameters for the
   build process. The main use of this file is setting the paths for the
   various external SAT solvers that are used. As such, anyone building
   from source will likely need to edit this.
@@ -69,24 +69,24 @@ In the top level of `src` there are only a few files:
 
 * `doxygen.cfg`:   The config file for doxygen.cfg
 
-## `doc/` ##
+## `doc/`
 
 Contains the CBMC man page. Doxygen HTML pages are generated
 into the `doc/html` directory when running `doxygen` from `src`.
 
-## `regression/` ##
+## `regression/`
 
 The `regression/` directory contains the regression test suites. See
 \ref compilation-and-development for information on how to run and
 develop regression tests.
 
-## `unit/` ##
+## `unit/`
 
 The `unit/` directory contains the unit test suites. See
 \ref compilation-and-development for information on how to run and
 develop unit tests.
 
-## Directory dependencies ##
+## Directory dependencies
 
 This diagram shows *intended* directory dependencies.  Arrows should
 be read transitively - dependencies of dependencies are often used
