@@ -23,7 +23,9 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <goto-programs/goto_model.h>
 
 #include <ansi-c/c_expr.h>
+#include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
+#include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/unwind.h>
 #include <goto-instrument/unwindset.h>
 #include <linking/static_lifetime_init.h>
@@ -488,32 +490,21 @@ void dfcc_libraryt::fix_malloc_free_calls()
 
 void dfcc_libraryt::inhibit_front_end_builtins()
 {
+  // not using assume-false in order not to hinder coverage
+  std::string options = "assert-false";
+  c_object_factory_parameterst object_factory_params;
+  auto generate_function_bodies = generate_function_bodies_factory(
+    options, object_factory_params, goto_model.symbol_table, message_handler);
   for(const auto &it : dfcc_hook)
   {
-    const auto &fid = it.first;
-    if(goto_model.symbol_table.has_symbol(fid))
+    const auto &function_id = it.first;
+    if(goto_model.symbol_table.has_symbol(function_id))
     {
-      // make sure parameter symbols exist
-      utils.fix_parameters_symbols(fid);
+      auto &goto_function =
+        goto_model.goto_functions.function_map.at(function_id);
 
-      // create fatal assertion code block as body
-      source_locationt sl;
-      sl.set_function(fid);
-      sl.set_file("<built-in-additions>");
-      sl.set_property_class("sanity_check");
-      sl.set_comment(
-        "Built-in " + id2string(fid) +
-        " should not be called after contracts transformation");
-      auto block = create_fatal_assertion(false_exprt(), sl);
-      auto &symbol = goto_model.symbol_table.get_writeable_ref(fid);
-      symbol.value = block;
-
-      // convert the function
-      goto_convert(
-        fid,
-        goto_model.symbol_table,
-        goto_model.goto_functions,
-        message_handler);
+      generate_function_bodies->generate_function_body(
+        goto_function, goto_model.symbol_table, function_id);
     }
   }
 }
