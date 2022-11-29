@@ -614,10 +614,35 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
       if(
         offset_op0.is_constant() && offset_op1.is_constant() &&
         object_size.has_value() && element_size.has_value() &&
+        element_size->is_constant() && !element_size->is_zero() &&
         numeric_cast_v<mp_integer>(to_constant_expr(offset_op0)) <=
           *object_size &&
         numeric_cast_v<mp_integer>(to_constant_expr(offset_op1)) <=
           *object_size)
+      {
+        return changed(simplify_rec(div_exprt{
+          minus_exprt{offset_op0, offset_op1},
+          typecast_exprt{*element_size, minus_expr.type()}}));
+      }
+    }
+
+    const exprt &ptr_op0_skipped_tc = skip_typecast(ptr_op0);
+    const exprt &ptr_op1_skipped_tc = skip_typecast(ptr_op1);
+    if(
+      is_number(ptr_op0_skipped_tc.type()) &&
+      is_number(ptr_op1_skipped_tc.type()))
+    {
+      exprt offset_op0 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[0], minus_expr.type()});
+      exprt offset_op1 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[1], minus_expr.type()});
+
+      auto element_size =
+        size_of_expr(to_pointer_type(operands[0].type()).base_type(), ns);
+
+      if(
+        element_size.has_value() && element_size->is_constant() &&
+        !element_size->is_zero())
       {
         return changed(simplify_rec(div_exprt{
           minus_exprt{offset_op0, offset_op1},
