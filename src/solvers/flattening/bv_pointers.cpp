@@ -669,8 +669,20 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
           prop.lor(in_bounds, prop.land(lhs_in_bounds, rhs_in_bounds));
       }
 
-      prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_lit, in_bounds), bv_utils.equal(difference, bv)));
+      if(prop.cnf_handled_well())
+      {
+        for(std::size_t i = 0; i < width; ++i)
+        {
+          prop.lcnf({!same_object_lit, !in_bounds, !difference[i], bv[i]});
+          prop.lcnf({!same_object_lit, !in_bounds, difference[i], !bv[i]});
+        }
+      }
+      else
+      {
+        prop.l_set_to_true(prop.limplies(
+          prop.land(same_object_lit, in_bounds),
+          bv_utils.equal(difference, bv)));
+      }
     }
 
     return bv;
@@ -929,7 +941,10 @@ void bv_pointerst::do_postponed(
       if(!is_dynamic)
         l2=!l2;
 
-      prop.l_set_to_true(prop.limplies(l1, l2));
+      if(prop.cnf_handled_well())
+        prop.lcnf({!l1, l2});
+      else
+        prop.l_set_to_true(prop.limplies(l1, l2));
     }
   }
   else if(
@@ -980,7 +995,10 @@ void bv_pointerst::do_postponed(
 #ifndef COMPACT_OBJECT_SIZE_EQ
       literalt l2=bv_utils.equal(postponed.bv, size_bv);
 
-      prop.l_set_to_true(prop.limplies(l1, l2));
+      if(prop.cnf_handled_well())
+        prop.lcnf({!l1, l2});
+      else
+        prop.l_set_to_true(prop.limplies(l1, l2));
 #else
       for(std::size_t i = 0; i < postponed.bv.size(); ++i)
       {

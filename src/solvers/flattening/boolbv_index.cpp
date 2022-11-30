@@ -186,9 +186,18 @@ bvt boolbvt::convert_index(const index_exprt &expr)
           "past the array's end");
 
         // Cache comparisons and equalities
-        prop.l_set_to_true(convert(implies_exprt(
-          equal_exprt(index, from_integer(i, index.type())),
-          equal_exprt(result, *it++))));
+        if(prop.cnf_handled_well())
+        {
+          prop.lcnf(
+            {!convert(equal_exprt(index, from_integer(i, index.type()))),
+             convert(equal_exprt(result, *it++))});
+        }
+        else
+        {
+          prop.l_set_to_true(convert(implies_exprt(
+            equal_exprt(index, from_integer(i, index.type())),
+            equal_exprt(result, *it++))));
+        }
       }
 
       return bv;
@@ -229,13 +238,33 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       {
         mp_integer offset=i*width;
 
-        for(std::size_t j=0; j<width; j++)
-          equal_bv[j] = prop.lequal(
-            bv[j], array_bv[numeric_cast_v<std::size_t>(offset + j)]);
+        if(prop.cnf_handled_well())
+        {
+          literalt index_eq =
+            convert(equal_exprt(index, from_integer(i, index.type())));
 
-        prop.l_set_to_true(prop.limplies(
-          convert(equal_exprt(index, from_integer(i, index.type()))),
-          prop.land(equal_bv)));
+          for(std::size_t j = 0; j < width; j++)
+          {
+            prop.lcnf(
+              {!index_eq,
+               !bv[j],
+               array_bv[numeric_cast_v<std::size_t>(offset + j)]});
+            prop.lcnf(
+              {!index_eq,
+               bv[j],
+               !array_bv[numeric_cast_v<std::size_t>(offset + j)]});
+          }
+        }
+        else
+        {
+          for(std::size_t j = 0; j < width; j++)
+            equal_bv[j] = prop.lequal(
+              bv[j], array_bv[numeric_cast_v<std::size_t>(offset + j)]);
+
+          prop.l_set_to_true(prop.limplies(
+            convert(equal_exprt(index, from_integer(i, index.type()))),
+            prop.land(equal_bv)));
+        }
       }
     }
     else

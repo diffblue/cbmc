@@ -142,9 +142,32 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
           else
             equal_bv[j]=const_literal(true);
 
-        prop.l_set_to_true(prop.limplies(
-          convert(equal_exprt(expr.offset(), from_integer(i, constant_type))),
-          prop.land(equal_bv)));
+        if(prop.cnf_handled_well())
+        {
+          literalt index_eq =
+            convert(equal_exprt(expr.offset(), from_integer(i, constant_type)));
+
+          for(std::size_t j = 0; j < width; j++)
+          {
+            if(offset + j >= op_bv.size())
+              break;
+
+            prop.lcnf({!index_eq, !bv[j], op_bv[offset + j]});
+            prop.lcnf({!index_eq, bv[j], !op_bv[offset + j]});
+          }
+        }
+        else
+        {
+          for(std::size_t j = 0; j < width; j++)
+            if(offset + j < op_bv.size())
+              equal_bv[j] = prop.lequal(bv[j], op_bv[offset + j]);
+            else
+              equal_bv[j] = const_literal(true);
+
+          prop.l_set_to_true(prop.limplies(
+            convert(equal_exprt(expr.offset(), from_integer(i, constant_type))),
+            prop.land(equal_bv)));
+        }
       }
     }
     else
