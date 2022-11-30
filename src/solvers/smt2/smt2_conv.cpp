@@ -638,7 +638,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
     type.id() == ID_integer || type.id() == ID_rational ||
     type.id() == ID_real || type.id() == ID_c_enum ||
     type.id() == ID_c_enum_tag || type.id() == ID_fixedbv ||
-    type.id() == ID_floatbv)
+    type.id() == ID_floatbv || type.id() == ID_c_bool)
   {
     return parse_literal(src, type);
   }
