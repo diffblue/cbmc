@@ -73,10 +73,20 @@ literalt boolbvt::convert_bv_rel(const binary_relation_exprt &expr)
         {
           literalt equal_lit = equality(lhs, rhs);
 
-          if(or_equal)
-            prop.l_set_to_true(prop.limplies(equal_lit, literal));
+          if(prop.cnf_handled_well())
+          {
+            if(or_equal)
+              prop.lcnf(!equal_lit, literal);
+            else
+              prop.lcnf(!equal_lit, !literal);
+          }
           else
-            prop.l_set_to_true(prop.limplies(equal_lit, !literal));
+          {
+            if(or_equal)
+              prop.l_set_to_true(prop.limplies(equal_lit, literal));
+            else
+              prop.l_set_to_true(prop.limplies(equal_lit, !literal));
+          }
         }
       }
 
