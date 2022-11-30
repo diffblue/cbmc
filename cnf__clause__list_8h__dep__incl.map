@@ -1,36 +1,36 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/sat/cnf_clause_list.h" name="/home/runner/work/cbmc/cbmc/src/solvers/sat/cnf_clause_list.h">
-<area shape="rect" id="node1" title=" " alt="" coords="743,5,927,61"/>
-<area shape="rect" id="node2" href="$dimacs__cnf_8h.html" title=" " alt="" coords="639,109,823,165"/>
-<area shape="rect" id="node31" href="$external__sat_8h.html" title=" " alt="" coords="213,109,397,165"/>
-<area shape="rect" id="node32" href="$cnf__clause__list_8cpp.html" title=" " alt="" coords="847,109,1031,165"/>
-<area shape="rect" id="node33" href="$satcheck__zchaff_8h.html" title=" " alt="" coords="1267,109,1451,165"/>
-<area shape="rect" id="node3" href="$solver__factory_8cpp.html" title=" " alt="" coords="5,213,189,269"/>
-<area shape="rect" id="node4" href="$bv__dimacs_8cpp.html" title=" " alt="" coords="630,213,831,269"/>
-<area shape="rect" id="node5" href="$qdimacs__cnf_8h.html" title=" " alt="" coords="856,213,1040,269"/>
-<area shape="rect" id="node25" href="$dimacs__cnf_8cpp.html" title=" " alt="" coords="1064,213,1248,269"/>
-<area shape="rect" id="node26" href="$external__sat_8cpp.html" title=" " alt="" coords="213,213,397,269"/>
-<area shape="rect" id="node27" href="$pbs__dimacs__cnf_8h.html" title=" " alt="" coords="1272,213,1456,269"/>
-<area shape="rect" id="node29" href="$satcheck__zcore_8h.html" title=" " alt="" coords="421,213,605,269"/>
-<area shape="rect" id="node6" href="$qdimacs__core_8h.html" title=" " alt="" coords="752,317,936,373"/>
-<area shape="rect" id="node16" href="$qbf__quantor_8h.html" title=" " alt="" coords="960,317,1144,373"/>
-<area shape="rect" id="node18" href="$qbf__qube_8h.html" title=" " alt="" coords="1168,317,1352,373"/>
-<area shape="rect" id="node20" href="$qbf__skizzo_8h.html" title=" " alt="" coords="1376,317,1560,373"/>
-<area shape="rect" id="node22" href="$qbf__squolem_8h.html" title=" " alt="" coords="336,317,520,373"/>
-<area shape="rect" id="node24" href="$qdimacs__cnf_8cpp.html" title=" " alt="" coords="544,317,728,373"/>
-<area shape="rect" id="node7" href="$qbf__bdd__core_8h.html" title=" " alt="" coords="648,421,832,477"/>
-<area shape="rect" id="node11" href="$qbf__qube__core_8h.html" title=" " alt="" coords="856,421,1040,477"/>
-<area shape="rect" id="node13" href="$qbf__squolem__core_8h.html" title=" " alt="" coords="232,421,416,477"/>
-<area shape="rect" id="node15" href="$qdimacs__core_8cpp.html" title=" " alt="" coords="440,421,624,477"/>
-<area shape="rect" id="node8" href="$qbf__bdd__core_8cpp.html" title=" " alt="" coords="440,525,624,581"/>
-<area shape="rect" id="node9" href="$qbf__skizzo__core_8h.html" title=" " alt="" coords="648,525,832,581"/>
-<area shape="rect" id="node10" href="$qbf__skizzo__core_8cpp.html" title=" " alt="" coords="648,629,832,685"/>
-<area shape="rect" id="node12" href="$qbf__qube__core_8cpp.html" title=" " alt="" coords="856,525,1040,581"/>
-<area shape="rect" id="node14" href="$qbf__squolem__core_8cpp.html" title=" " alt="" coords="232,525,416,581"/>
-<area shape="rect" id="node17" href="$qbf__quantor_8cpp.html" title=" " alt="" coords="1064,421,1248,477"/>
-<area shape="rect" id="node19" href="$qbf__qube_8cpp.html" title=" " alt="" coords="1272,421,1456,477"/>
-<area shape="rect" id="node21" href="$qbf__skizzo_8cpp.html" title=" " alt="" coords="1480,421,1664,477"/>
-<area shape="rect" id="node23" href="$qbf__squolem_8cpp.html" title=" " alt="" coords="24,421,208,477"/>
-<area shape="rect" id="node28" href="$pbs__dimacs__cnf_8cpp.html" title=" " alt="" coords="1584,317,1768,373"/>
-<area shape="rect" id="node30" href="$satcheck__zcore_8cpp.html" title=" " alt="" coords="128,317,312,373"/>
-<area shape="rect" id="node34" href="$satcheck__zchaff_8cpp.html" title=" " alt="" coords="1480,213,1664,269"/>
+<area shape="rect" id="node1" title="CNF Generation." alt="" coords="719,5,903,61"/>
+<area shape="rect" id="node2" href="$cnf__clause__list_8cpp.html" title="CNF Generation." alt="" coords="353,109,537,165"/>
+<area shape="rect" id="node3" href="$dimacs__cnf_8h.html" title=" " alt="" coords="877,109,1061,165"/>
+<area shape="rect" id="node32" href="$external__sat_8h.html" title="Allows calling an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="561,109,745,165"/>
+<area shape="rect" id="node33" href="$satcheck__zchaff_8h.html" title=" " alt="" coords="1456,109,1640,165"/>
+<area shape="rect" id="node4" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="299,213,483,269"/>
+<area shape="rect" id="node5" href="$bv__dimacs_8cpp.html" title="Writing DIMACS Files." alt="" coords="923,213,1125,269"/>
+<area shape="rect" id="node6" href="$qdimacs__cnf_8h.html" title=" " alt="" coords="1149,213,1333,269"/>
+<area shape="rect" id="node26" href="$dimacs__cnf_8cpp.html" title=" " alt="" coords="1357,213,1541,269"/>
+<area shape="rect" id="node27" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="507,213,691,269"/>
+<area shape="rect" id="node28" href="$pbs__dimacs__cnf_8h.html" title=" " alt="" coords="1565,213,1749,269"/>
+<area shape="rect" id="node30" href="$satcheck__zcore_8h.html" title=" " alt="" coords="715,213,899,269"/>
+<area shape="rect" id="node7" href="$qbf__quantor_8h.html" title=" " alt="" coords="1045,317,1229,373"/>
+<area shape="rect" id="node9" href="$qbf__qube_8h.html" title=" " alt="" coords="1253,317,1437,373"/>
+<area shape="rect" id="node11" href="$qbf__skizzo_8h.html" title=" " alt="" coords="1461,317,1645,373"/>
+<area shape="rect" id="node13" href="$qbf__squolem_8h.html" title="Squolem Backend." alt="" coords="1669,317,1853,373"/>
+<area shape="rect" id="node15" href="$qdimacs__cnf_8cpp.html" title=" " alt="" coords="629,317,813,373"/>
+<area shape="rect" id="node16" href="$qdimacs__core_8h.html" title=" " alt="" coords="837,317,1021,373"/>
+<area shape="rect" id="node8" href="$qbf__quantor_8cpp.html" title=" " alt="" coords="1045,421,1229,477"/>
+<area shape="rect" id="node10" href="$qbf__qube_8cpp.html" title=" " alt="" coords="1253,421,1437,477"/>
+<area shape="rect" id="node12" href="$qbf__skizzo_8cpp.html" title=" " alt="" coords="1461,421,1645,477"/>
+<area shape="rect" id="node14" href="$qbf__squolem_8cpp.html" title="Squolem Backend." alt="" coords="1669,421,1853,477"/>
+<area shape="rect" id="node17" href="$qbf__bdd__core_8h.html" title=" " alt="" coords="213,421,397,477"/>
+<area shape="rect" id="node21" href="$qbf__qube__core_8h.html" title=" " alt="" coords="421,421,605,477"/>
+<area shape="rect" id="node23" href="$qbf__squolem__core_8h.html" title="Squolem Backend (with Proofs)" alt="" coords="629,421,813,477"/>
+<area shape="rect" id="node25" href="$qdimacs__core_8cpp.html" title=" " alt="" coords="837,421,1021,477"/>
+<area shape="rect" id="node18" href="$qbf__bdd__core_8cpp.html" title=" " alt="" coords="213,525,397,581"/>
+<area shape="rect" id="node19" href="$qbf__skizzo__core_8h.html" title=" " alt="" coords="5,525,189,581"/>
+<area shape="rect" id="node20" href="$qbf__skizzo__core_8cpp.html" title=" " alt="" coords="5,629,189,685"/>
+<area shape="rect" id="node22" href="$qbf__qube__core_8cpp.html" title=" " alt="" coords="421,525,605,581"/>
+<area shape="rect" id="node24" href="$qbf__squolem__core_8cpp.html" title="Squolem Backend (with proofs)" alt="" coords="629,525,813,581"/>
+<area shape="rect" id="node29" href="$pbs__dimacs__cnf_8cpp.html" title=" " alt="" coords="1877,317,2061,373"/>
+<area shape="rect" id="node31" href="$satcheck__zcore_8cpp.html" title=" " alt="" coords="421,317,605,373"/>
+<area shape="rect" id="node34" href="$satcheck__zchaff_8cpp.html" title=" " alt="" coords="1773,213,1957,269"/>
 </map>

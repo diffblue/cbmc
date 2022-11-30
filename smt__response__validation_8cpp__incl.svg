@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Validation of smt response parse trees to produce either a strongly typed smt_responset representatio...">
 <polygon fill="#bfbfbf" stroke="black" points="1391.52,-716.5 1391.52,-768.5 1543.52,-768.5 1543.52,-716.5 1391.52,-716.5"/>
 <text text-anchor="start" x="1399.52" y="-756.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1399.52" y="-745.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
@@ -68,7 +68,7 @@
 <!-- Node56 -->
 <g id="node50" class="node">
 <title>Node56</title>
-<g id="a_node50"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="786.52,-358.5 786.52,-377.5 858.52,-377.5 858.52,-358.5 786.52,-358.5"/>
 <text text-anchor="middle" x="822.52" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/range.h</text>
 </a>
@@ -99,7 +99,7 @@
 <!-- Node60 -->
 <g id="node54" class="node">
 <title>Node60</title>
-<g id="a_node54"><a xlink:href="smt__to__smt2__string_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="smt__to__smt2__string_8h.html" target="_top" xlink:title="Streaming SMT data structures to a string based output stream.">
 <polygon fill="none" stroke="black" points="1791.52,-112.5 1791.52,-131.5 1913.52,-131.5 1913.52,-112.5 1791.52,-112.5"/>
 <text text-anchor="middle" x="1852.52" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">smt_to_smt2_string.h</text>
 </a>
@@ -251,7 +251,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="781.52,-174 781.52,-193 845.52,-193 845.52,-174 781.52,-174"/>
 <text text-anchor="middle" x="813.52" y="-181" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -332,7 +332,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="1374.02,-112.5 1374.02,-131.5 1433.02,-131.5 1433.02,-112.5 1374.02,-112.5"/>
 <text text-anchor="middle" x="1403.52" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -398,7 +398,7 @@
 <!-- Node17 -->
 <g id="node16" class="node">
 <title>Node17</title>
-<g id="a_node16"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="1291.52,-56.5 1291.52,-75.5 1395.52,-75.5 1395.52,-56.5 1291.52,-56.5"/>
 <text text-anchor="middle" x="1343.52" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -518,7 +518,7 @@
 <!-- Node32 -->
 <g id="node28" class="node">
 <title>Node32</title>
-<g id="a_node28"><a xlink:href="type__traits_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="type__traits_8h.html" target="_top" xlink:title="Back ports of utilities available in the &lt;type_traits&gt; library for C++14 or C++17 to C++11.">
 <polygon fill="none" stroke="black" points="2.02,-168.5 2.02,-198.5 145.02,-198.5 145.02,-168.5 2.02,-168.5"/>
 <text text-anchor="start" x="10.02" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="73.52" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">/type_traits.h</text>
@@ -549,7 +549,7 @@
 <!-- Node34 -->
 <g id="node30" class="node">
 <title>Node34</title>
-<g id="a_node30"><a xlink:href="smt__sorts_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="smt__sorts_8h.html" target="_top" xlink:title="Data structure for smt sorts.">
 <polygon fill="none" stroke="black" points="189.52,-297 189.52,-316 263.52,-316 263.52,-297 189.52,-297"/>
 <text text-anchor="middle" x="226.52" y="-304" font-family="Helvetica,sans-Serif" font-size="10.00">smt_sorts.h</text>
 </a>
@@ -720,7 +720,7 @@
 <!-- Node42 -->
 <g id="node38" class="node">
 <title>Node42</title>
-<g id="a_node38"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1434.02,-604.5 1434.02,-623.5 1501.02,-623.5 1501.02,-604.5 1434.02,-604.5"/>
 <text text-anchor="middle" x="1467.52" y="-611.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -798,7 +798,7 @@
 <!-- Node54 -->
 <g id="node48" class="node">
 <title>Node54</title>
-<g id="a_node48"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1398.02,-543 1398.02,-562 1471.02,-562 1471.02,-543 1398.02,-543"/>
 <text text-anchor="middle" x="1434.52" y="-550" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -873,7 +873,7 @@
 <!-- Node46 -->
 <g id="node42" class="node">
 <title>Node46</title>
-<g id="a_node42"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1163.02,-358.5 1163.02,-377.5 1210.02,-377.5 1210.02,-358.5 1163.02,-358.5"/>
 <text text-anchor="middle" x="1186.52" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

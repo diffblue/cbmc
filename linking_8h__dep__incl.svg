@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="ANSI&#45;C Linking.">
 <polygon fill="#bfbfbf" stroke="black" points="559,-78.5 559,-108.5 703,-108.5 703,-78.5 559,-78.5"/>
 <text text-anchor="start" x="567" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="631" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/linking/linking.h</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title="C++ Language Module.">
 <polygon fill="none" stroke="black" points="156,-6 156,-36 330,-36 330,-6 156,-6"/>
 <text text-anchor="start" x="164" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="243" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_language.cpp</text>
@@ -54,7 +54,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="compile_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="compile_8cpp.html" target="_top" xlink:title="Compile and link source and object files.">
 <polygon fill="none" stroke="black" points="348,-6 348,-36 512,-36 512,-6 348,-6"/>
 <text text-anchor="start" x="356" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="430" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/compile.cpp</text>
@@ -87,7 +87,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="linking_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="linking_8cpp.html" target="_top" xlink:title="ANSI&#45;C Linking.">
 <polygon fill="none" stroke="black" points="749.5,-6 749.5,-36 904.5,-36 904.5,-6 749.5,-6"/>
 <text text-anchor="start" x="757.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="827" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/linking/linking.cpp</text>
@@ -103,7 +103,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="statement__list__language_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="statement__list__language_8cpp.html" target="_top" xlink:title="Statement List Language Interface.">
 <polygon fill="none" stroke="black" points="922.5,-0.5 922.5,-41.5 1083.5,-41.5 1083.5,-0.5 922.5,-0.5"/>
 <text text-anchor="start" x="930.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="930.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/statement&#45;list</text>

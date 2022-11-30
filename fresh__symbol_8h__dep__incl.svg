@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Fresh auxiliary symbol creation.">
 <polygon fill="#bfbfbf" stroke="black" points="2844.5,-89.5 2844.5,-119.5 3004.5,-119.5 3004.5,-89.5 2844.5,-89.5"/>
 <text text-anchor="start" x="2852.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="2924.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/fresh_symbol.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="c__nondet__symbol__factory_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="c__nondet__symbol__factory_8cpp.html" target="_top" xlink:title="C Nondet Symbol Factory.">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 143,-47 143,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_nondet</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="c__typecheck__type_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="c__typecheck__type_8cpp.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="161,-6 161,-47 320,-47 320,-6 161,-6"/>
 <text text-anchor="start" x="169" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="169" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -90,7 +90,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title="Verify and use annotated loop and function contracts.">
 <polygon fill="none" stroke="black" points="680,-6 680,-47 825,-47 825,-6 680,-6"/>
 <text text-anchor="start" x="688" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="688" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -267,7 +267,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="nondet__volatile_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="nondet__volatile_8cpp.html" target="_top" xlink:title="Volatile Variables.">
 <polygon fill="none" stroke="black" points="2366,-6 2366,-47 2511,-47 2511,-6 2366,-6"/>
 <text text-anchor="start" x="2374" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2374" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -301,7 +301,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="weak__memory_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="weak__memory_8cpp.html" target="_top" xlink:title="Weak Memory Instrumentation for Threaded Goto Programs.">
 <polygon fill="none" stroke="black" points="2692,-6 2692,-47 2837,-47 2837,-6 2692,-6"/>
 <text text-anchor="start" x="2700" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2700" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -335,7 +335,7 @@
 <!-- Node20 -->
 <g id="node20" class="node">
 <title>Node20</title>
-<g id="a_node20"><a xlink:href="builtin__functions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="builtin__functions_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="3011.5,-6 3011.5,-47 3149.5,-47 3149.5,-6 3011.5,-6"/>
 <text text-anchor="start" x="3019.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3019.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -352,7 +352,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="goto__clean__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="goto__clean__expr_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="3167.5,-6 3167.5,-47 3305.5,-47 3305.5,-6 3167.5,-6"/>
 <text text-anchor="start" x="3175.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3175.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -369,7 +369,7 @@
 <!-- Node22 -->
 <g id="node22" class="node">
 <title>Node22</title>
-<g id="a_node22"><a xlink:href="goto__convert_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="goto__convert_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="3323.5,-6 3323.5,-47 3461.5,-47 3461.5,-6 3323.5,-6"/>
 <text text-anchor="start" x="3331.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3331.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -386,7 +386,7 @@
 <!-- Node23 -->
 <g id="node23" class="node">
 <title>Node23</title>
-<g id="a_node23"><a xlink:href="goto__convert__side__effect_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="goto__convert__side__effect_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="3479.5,-6 3479.5,-47 3641.5,-47 3641.5,-6 3479.5,-6"/>
 <text text-anchor="start" x="3487.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3487.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -403,7 +403,7 @@
 <!-- Node24 -->
 <g id="node24" class="node">
 <title>Node24</title>
-<g id="a_node24"><a xlink:href="mm__io_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="mm__io_8cpp.html" target="_top" xlink:title="Perform Memory&#45;mapped I/O instrumentation.">
 <polygon fill="none" stroke="black" points="3659.5,-6 3659.5,-47 3797.5,-47 3797.5,-6 3659.5,-6"/>
 <text text-anchor="start" x="3667.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3667.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -420,7 +420,7 @@
 <!-- Node25 -->
 <g id="node25" class="node">
 <title>Node25</title>
-<g id="a_node25"><a xlink:href="remove__function__pointers_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="remove__function__pointers_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="3816,-6 3816,-47 3983,-47 3983,-6 3816,-6"/>
 <text text-anchor="start" x="3824" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3824" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -437,7 +437,7 @@
 <!-- Node26 -->
 <g id="node26" class="node">
 <title>Node26</title>
-<g id="a_node26"><a xlink:href="remove__virtual__functions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="remove__virtual__functions_8cpp.html" target="_top" xlink:title="Remove Virtual Function (Method) Calls.">
 <polygon fill="none" stroke="black" points="4001.5,-6 4001.5,-47 4165.5,-47 4165.5,-6 4001.5,-6"/>
 <text text-anchor="start" x="4009.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="4009.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -454,7 +454,7 @@
 <!-- Node27 -->
 <g id="node27" class="node">
 <title>Node27</title>
-<g id="a_node27"><a xlink:href="string__abstraction_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="string__abstraction_8cpp.html" target="_top" xlink:title="String Abstraction.">
 <polygon fill="none" stroke="black" points="4183.5,-6 4183.5,-47 4321.5,-47 4321.5,-6 4183.5,-6"/>
 <text text-anchor="start" x="4191.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="4191.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -471,7 +471,7 @@
 <!-- Node28 -->
 <g id="node28" class="node">
 <title>Node28</title>
-<g id="a_node28"><a xlink:href="goto__symex_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="goto__symex_8cpp.html" target="_top" xlink:title="Symbolic Execution.">
 <polygon fill="none" stroke="black" points="4340,-6 4340,-47 4489,-47 4489,-6 4340,-6"/>
 <text text-anchor="start" x="4348" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="4348" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/goto</text>
@@ -488,7 +488,7 @@
 <!-- Node29 -->
 <g id="node29" class="node">
 <title>Node29</title>
-<g id="a_node29"><a xlink:href="symex__builtin__functions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="symex__builtin__functions_8cpp.html" target="_top" xlink:title="Symbolic Execution of ANSI&#45;C.">
 <polygon fill="none" stroke="black" points="4507,-6 4507,-47 4668,-47 4668,-6 4507,-6"/>
 <text text-anchor="start" x="4515" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="4515" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/symex</text>
@@ -505,7 +505,7 @@
 <!-- Node30 -->
 <g id="node30" class="node">
 <title>Node30</title>
-<g id="a_node30"><a xlink:href="symex__dereference_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="symex__dereference_8cpp.html" target="_top" xlink:title="Symbolic Execution of ANSI&#45;C.">
 <polygon fill="none" stroke="black" points="4686,-6 4686,-47 4847,-47 4847,-6 4686,-6"/>
 <text text-anchor="start" x="4694" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="4694" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/symex</text>
@@ -522,7 +522,7 @@
 <!-- Node31 -->
 <g id="node31" class="node">
 <title>Node31</title>
-<g id="a_node31"><a xlink:href="symex__function__call_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="symex__function__call_8cpp.html" target="_top" xlink:title="Symbolic Execution of ANSI&#45;C.">
 <polygon fill="none" stroke="black" points="4865,-6 4865,-47 5026,-47 5026,-6 4865,-6"/>
 <text text-anchor="start" x="4873" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="4873" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/symex</text>
@@ -539,7 +539,7 @@
 <!-- Node32 -->
 <g id="node32" class="node">
 <title>Node32</title>
-<g id="a_node32"><a xlink:href="value__set__dereference_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="value__set__dereference_8cpp.html" target="_top" xlink:title="Symbolic Execution of ANSI&#45;C.">
 <polygon fill="none" stroke="black" points="5044,-6 5044,-47 5195,-47 5195,-6 5044,-6"/>
 <text text-anchor="start" x="5052" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="5052" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/pointer&#45;analysis</text>
@@ -556,7 +556,7 @@
 <!-- Node33 -->
 <g id="node33" class="node">
 <title>Node33</title>
-<g id="a_node33"><a xlink:href="fresh__symbol_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="fresh__symbol_8cpp.html" target="_top" xlink:title="Fresh auxiliary symbol creation.">
 <polygon fill="none" stroke="black" points="5213,-11.5 5213,-41.5 5384,-41.5 5384,-11.5 5213,-11.5"/>
 <text text-anchor="start" x="5221" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="5298.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/fresh_symbol.cpp</text>
@@ -572,7 +572,7 @@
 <!-- Node34 -->
 <g id="node34" class="node">
 <title>Node34</title>
-<g id="a_node34"><a xlink:href="create__array__with__type__intrinsic_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="create__array__with__type__intrinsic_8cpp.html" target="_top" xlink:title="Implementation of CProver.createArrayWithType intrinsic.">
 <polygon fill="none" stroke="black" points="5402,-6 5402,-47 5601,-47 5601,-6 5402,-6"/>
 <text text-anchor="start" x="5410" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="5410" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>

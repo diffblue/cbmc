@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Goto Verifier for Verifying all Properties.">
 <polygon fill="#bfbfbf" stroke="black" points="91,-78.5 91,-119.5 229,-119.5 229,-78.5 91,-78.5"/>
 <text text-anchor="start" x="99" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="99" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 154,-41.5 154,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="172,-0.5 172,-41.5 316,-41.5 316,-0.5 172,-0.5"/>
 <text text-anchor="start" x="180" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="180" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>

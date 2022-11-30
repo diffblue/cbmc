@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="as__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="as__mode_8cpp.html" target="_top" xlink:title="Assembler Mode.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 170,-36 170,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="85" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/as_mode.cpp</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="compile_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="compile_8cpp.html" target="_top" xlink:title="Compile and link source and object files.">
 <polygon fill="none" stroke="black" points="188,-6 188,-36 352,-36 352,-6 188,-6"/>
 <text text-anchor="start" x="196" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="270" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/compile.cpp</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="gcc__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="gcc__mode_8cpp.html" target="_top" xlink:title="GCC Mode.">
 <polygon fill="none" stroke="black" points="370,-0.5 370,-41.5 508,-41.5 508,-0.5 370,-0.5"/>
 <text text-anchor="start" x="378" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="378" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/gcc</text>

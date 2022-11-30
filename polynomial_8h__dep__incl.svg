@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Loop Acceleration.">
 <polygon fill="#bfbfbf" stroke="black" points="395.5,-356.5 395.5,-397.5 540.5,-397.5 540.5,-356.5 395.5,-356.5"/>
 <text text-anchor="start" x="403.5" y="-385.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="403.5" y="-374.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="acceleration__utils_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="acceleration__utils_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="395.5,-267.5 395.5,-319.5 540.5,-319.5 540.5,-267.5 395.5,-267.5"/>
 <text text-anchor="start" x="403.5" y="-307.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="403.5" y="-296.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -37,10 +37,10 @@
 <path fill="none" stroke="midnightblue" d="M468,-346.12C468,-337.41 468,-327.99 468,-319.61"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="464.5,-346.27 468,-356.27 471.5,-346.27 464.5,-346.27"/>
 </g>
-<!-- Node6 -->
-<g id="node6" class="node">
-<title>Node6</title>
-<g id="a_node6"><a xlink:href="polynomial__accelerator_8h.html" target="_top" xlink:title=" ">
+<!-- Node9 -->
+<g id="node9" class="node">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="polynomial__accelerator_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="57.5,-184 57.5,-225 254.5,-225 254.5,-184 57.5,-184"/>
 <text text-anchor="start" x="65.5" y="-213" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="65.5" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -48,16 +48,16 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node6 -->
-<g id="edge17" class="edge">
-<title>Node1&#45;&gt;Node6</title>
+<!-- Node1&#45;&gt;Node9 -->
+<g id="edge18" class="edge">
+<title>Node1&#45;&gt;Node9</title>
 <path fill="none" stroke="midnightblue" d="M423.38,-351.62C361.04,-317.55 249.1,-256.38 191.85,-225.09"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="421.76,-354.72 432.21,-356.44 425.11,-348.57 421.76,-354.72"/>
 </g>
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="polynomial_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="polynomial_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="558.5,-273 558.5,-314 707.5,-314 707.5,-273 558.5,-273"/>
 <text text-anchor="start" x="566.5" y="-302" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="566.5" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -66,7 +66,7 @@
 </g>
 </g>
 <!-- Node1&#45;&gt;Node15 -->
-<g id="edge18" class="edge">
+<g id="edge17" class="edge">
 <title>Node1&#45;&gt;Node15</title>
 <path fill="none" stroke="midnightblue" d="M516.65,-351.97C541.14,-339.87 570.44,-325.4 593.52,-314"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="514.94,-348.91 507.52,-356.48 518.04,-355.19 514.94,-348.91"/>
@@ -74,7 +74,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="accelerate_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="accelerate_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="844.5,-184 844.5,-225 989.5,-225 989.5,-184 844.5,-184"/>
 <text text-anchor="start" x="852.5" y="-213" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="852.5" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -88,33 +88,10 @@
 <path fill="none" stroke="midnightblue" d="M550.76,-267.02C677.08,-240.78 714.02,-257.65 836,-231 843.63,-229.33 851.58,-227.26 859.38,-225.03"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="549.75,-263.66 540.7,-269.16 551.21,-270.5 549.75,-263.66"/>
 </g>
-<!-- Node2&#45;&gt;Node6 -->
-<g id="edge5" class="edge">
-<title>Node2&#45;&gt;Node6</title>
-<path fill="none" stroke="midnightblue" d="M385.5,-269.5C335.89,-255.66 273.42,-238.24 226.19,-225.07"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="384.67,-272.9 395.24,-272.21 386.55,-266.15 384.67,-272.9"/>
-</g>
-<!-- Node11 -->
-<g id="node11" class="node">
-<title>Node11</title>
-<g id="a_node11"><a xlink:href="sat__path__enumerator_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="477,-184 477,-225 663,-225 663,-184 477,-184"/>
-<text text-anchor="start" x="485" y="-213" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="485" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
-<text text-anchor="middle" x="570" y="-191" font-family="Helvetica,sans-Serif" font-size="10.00">/accelerate/sat_path_enumerator.h</text>
-</a>
-</g>
-</g>
-<!-- Node2&#45;&gt;Node11 -->
-<g id="edge11" class="edge">
-<title>Node2&#45;&gt;Node11</title>
-<path fill="none" stroke="midnightblue" d="M505.5,-260.51C519.43,-248.64 534.8,-235.53 547.04,-225.08"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="502.84,-258.18 497.5,-267.34 507.38,-263.51 502.84,-258.18"/>
-</g>
-<!-- Node13 -->
-<g id="node13" class="node">
-<title>Node13</title>
-<g id="a_node13"><a xlink:href="acceleration__utils_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node6 -->
+<g id="node6" class="node">
+<title>Node6</title>
+<g id="a_node6"><a xlink:href="acceleration__utils_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="681.5,-178.5 681.5,-230.5 826.5,-230.5 826.5,-178.5 681.5,-178.5"/>
 <text text-anchor="start" x="689.5" y="-218.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="689.5" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -123,16 +100,16 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node13 -->
-<g id="edge14" class="edge">
-<title>Node2&#45;&gt;Node13</title>
+<!-- Node2&#45;&gt;Node6 -->
+<g id="edge5" class="edge">
+<title>Node2&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M550.47,-266.88C605.67,-250.23 620.75,-246.53 672,-231 675,-230.09 678.05,-229.16 681.14,-228.22"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="549.42,-263.54 540.86,-269.78 551.45,-270.24 549.42,-263.54"/>
 </g>
-<!-- Node14 -->
-<g id="node14" class="node">
-<title>Node14</title>
-<g id="a_node14"><a xlink:href="disjunctive__polynomial__acceleration_8h.html" target="_top" xlink:title=" ">
+<!-- Node7 -->
+<g id="node7" class="node">
+<title>Node7</title>
+<g id="a_node7"><a xlink:href="disjunctive__polynomial__acceleration_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="272.5,-178.5 272.5,-230.5 459.5,-230.5 459.5,-178.5 272.5,-178.5"/>
 <text text-anchor="start" x="280.5" y="-218.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="280.5" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -141,16 +118,39 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node14 -->
-<g id="edge15" class="edge">
-<title>Node2&#45;&gt;Node14</title>
+<!-- Node2&#45;&gt;Node7 -->
+<g id="edge6" class="edge">
+<title>Node2&#45;&gt;Node7</title>
 <path fill="none" stroke="midnightblue" d="M430.66,-260.65C419.05,-250.75 406.42,-239.98 395.44,-230.61"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="428.62,-263.51 438.5,-267.34 433.16,-258.18 428.62,-263.51"/>
+</g>
+<!-- Node2&#45;&gt;Node9 -->
+<g id="edge8" class="edge">
+<title>Node2&#45;&gt;Node9</title>
+<path fill="none" stroke="midnightblue" d="M385.5,-269.5C335.89,-255.66 273.42,-238.24 226.19,-225.07"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="384.67,-272.9 395.24,-272.21 386.55,-266.15 384.67,-272.9"/>
+</g>
+<!-- Node13 -->
+<g id="node13" class="node">
+<title>Node13</title>
+<g id="a_node13"><a xlink:href="sat__path__enumerator_8h.html" target="_top" xlink:title="Loop Acceleration.">
+<polygon fill="none" stroke="black" points="477,-184 477,-225 663,-225 663,-184 477,-184"/>
+<text text-anchor="start" x="485" y="-213" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="485" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
+<text text-anchor="middle" x="570" y="-191" font-family="Helvetica,sans-Serif" font-size="10.00">/accelerate/sat_path_enumerator.h</text>
+</a>
+</g>
+</g>
+<!-- Node2&#45;&gt;Node13 -->
+<g id="edge14" class="edge">
+<title>Node2&#45;&gt;Node13</title>
+<path fill="none" stroke="midnightblue" d="M505.5,-260.51C519.43,-248.64 534.8,-235.53 547.04,-225.08"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="502.84,-258.18 497.5,-267.34 507.38,-263.51 502.84,-258.18"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="accelerate_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="accelerate_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="688.5,-6 688.5,-47 833.5,-47 833.5,-6 688.5,-6"/>
 <text text-anchor="start" x="696.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="696.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -167,7 +167,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="866,-95 866,-136 1060,-136 1060,-95 866,-95"/>
 <text text-anchor="start" x="874" y="-124" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="874" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -181,28 +181,10 @@
 <path fill="none" stroke="midnightblue" d="M932.3,-174.56C938.97,-161.95 946.61,-147.5 952.6,-136.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="929.02,-173.28 927.44,-183.76 935.21,-176.55 929.02,-173.28"/>
 </g>
-<!-- Node7 -->
-<g id="node7" class="node">
-<title>Node7</title>
-<g id="a_node7"><a xlink:href="enumerating__loop__acceleration_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="432,-89.5 432,-141.5 594,-141.5 594,-89.5 432,-89.5"/>
-<text text-anchor="start" x="440" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="440" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
-<text text-anchor="start" x="440" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/accelerate/enumerating_loop</text>
-<text text-anchor="middle" x="513" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">_acceleration.h</text>
-</a>
-</g>
-</g>
-<!-- Node6&#45;&gt;Node7 -->
-<g id="edge6" class="edge">
-<title>Node6&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M247.56,-181.61C252.78,-180.38 257.96,-179.17 263,-178 333.58,-161.6 351.76,-159.78 422,-142 425.18,-141.19 428.42,-140.36 431.69,-139.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="246.41,-178.28 237.47,-183.98 248.01,-185.1 246.41,-178.28"/>
-</g>
-<!-- Node9 -->
-<g id="node9" class="node">
-<title>Node9</title>
-<g id="a_node9"><a xlink:href="disjunctive__polynomial__acceleration_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node8 -->
+<g id="node8" class="node">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="disjunctive__polynomial__acceleration_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="226.5,-89.5 226.5,-141.5 413.5,-141.5 413.5,-89.5 226.5,-89.5"/>
 <text text-anchor="start" x="234.5" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="234.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -211,16 +193,40 @@
 </a>
 </g>
 </g>
-<!-- Node6&#45;&gt;Node9 -->
+<!-- Node7&#45;&gt;Node8 -->
+<g id="edge7" class="edge">
+<title>Node7&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M347.94,-169.35C343.05,-160.1 337.85,-150.26 333.28,-141.61"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="344.93,-171.13 352.69,-178.34 351.11,-167.86 344.93,-171.13"/>
+</g>
+<!-- Node9&#45;&gt;Node8 -->
 <g id="edge9" class="edge">
-<title>Node6&#45;&gt;Node9</title>
+<title>Node9&#45;&gt;Node8</title>
 <path fill="none" stroke="midnightblue" d="M201.68,-179.27C223.81,-167.53 250.37,-153.44 272.71,-141.58"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="200,-176.2 192.8,-183.98 203.28,-182.38 200,-176.2"/>
 </g>
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="polynomial__accelerator_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="enumerating__loop__acceleration_8h.html" target="_top" xlink:title="Loop Acceleration.">
+<polygon fill="none" stroke="black" points="432,-89.5 432,-141.5 594,-141.5 594,-89.5 432,-89.5"/>
+<text text-anchor="start" x="440" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="440" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
+<text text-anchor="start" x="440" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/accelerate/enumerating_loop</text>
+<text text-anchor="middle" x="513" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">_acceleration.h</text>
+</a>
+</g>
+</g>
+<!-- Node9&#45;&gt;Node10 -->
+<g id="edge10" class="edge">
+<title>Node9&#45;&gt;Node10</title>
+<path fill="none" stroke="midnightblue" d="M247.56,-181.61C252.78,-180.38 257.96,-179.17 263,-178 333.58,-161.6 351.76,-159.78 422,-142 425.18,-141.19 428.42,-140.36 431.69,-139.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="246.41,-178.28 237.47,-183.98 248.01,-185.1 246.41,-178.28"/>
+</g>
+<!-- Node12 -->
+<g id="node12" class="node">
+<title>Node12</title>
+<g id="a_node12"><a xlink:href="polynomial__accelerator_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="0,-95 0,-136 208,-136 208,-95 0,-95"/>
 <text text-anchor="start" x="8" y="-124" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -228,22 +234,22 @@
 </a>
 </g>
 </g>
-<!-- Node6&#45;&gt;Node10 -->
-<g id="edge10" class="edge">
-<title>Node6&#45;&gt;Node10</title>
+<!-- Node9&#45;&gt;Node12 -->
+<g id="edge13" class="edge">
+<title>Node9&#45;&gt;Node12</title>
 <path fill="none" stroke="midnightblue" d="M138.92,-174.93C131.33,-162.23 122.59,-147.61 115.75,-136.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="136.07,-176.97 144.2,-183.76 142.07,-173.38 136.07,-176.97"/>
 </g>
-<!-- Node7&#45;&gt;Node4 -->
-<g id="edge7" class="edge">
-<title>Node7&#45;&gt;Node4</title>
+<!-- Node10&#45;&gt;Node4 -->
+<g id="edge11" class="edge">
+<title>Node10&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M593.99,-86.09C630.32,-73.34 672.27,-58.63 705.03,-47.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="592.68,-82.84 584.4,-89.45 594.99,-89.45 592.68,-82.84"/>
 </g>
-<!-- Node8 -->
-<g id="node8" class="node">
-<title>Node8</title>
-<g id="a_node8"><a xlink:href="enumerating__loop__acceleration_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node11 -->
+<g id="node11" class="node">
+<title>Node11</title>
+<g id="a_node11"><a xlink:href="enumerating__loop__acceleration_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="432,-0.5 432,-52.5 594,-52.5 594,-0.5 432,-0.5"/>
 <text text-anchor="start" x="440" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="440" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -252,22 +258,22 @@
 </a>
 </g>
 </g>
-<!-- Node7&#45;&gt;Node8 -->
-<g id="edge8" class="edge">
-<title>Node7&#45;&gt;Node8</title>
+<!-- Node10&#45;&gt;Node11 -->
+<g id="edge12" class="edge">
+<title>Node10&#45;&gt;Node11</title>
 <path fill="none" stroke="midnightblue" d="M513,-79.19C513,-70.28 513,-60.9 513,-52.61"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="509.5,-79.34 513,-89.34 516.5,-79.34 509.5,-79.34"/>
 </g>
-<!-- Node11&#45;&gt;Node7 -->
-<g id="edge12" class="edge">
-<title>Node11&#45;&gt;Node7</title>
+<!-- Node13&#45;&gt;Node10 -->
+<g id="edge15" class="edge">
+<title>Node13&#45;&gt;Node10</title>
 <path fill="none" stroke="midnightblue" d="M551.41,-175.13C544.37,-164.39 536.41,-152.23 529.57,-141.79"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="548.66,-177.31 557.07,-183.76 554.51,-173.48 548.66,-177.31"/>
 </g>
-<!-- Node12 -->
-<g id="node12" class="node">
-<title>Node12</title>
-<g id="a_node12"><a xlink:href="sat__path__enumerator_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node14 -->
+<g id="node14" class="node">
+<title>Node14</title>
+<g id="a_node14"><a xlink:href="sat__path__enumerator_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="612.5,-95 612.5,-136 809.5,-136 809.5,-95 612.5,-95"/>
 <text text-anchor="start" x="620.5" y="-124" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="620.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -275,17 +281,11 @@
 </a>
 </g>
 </g>
-<!-- Node11&#45;&gt;Node12 -->
-<g id="edge13" class="edge">
-<title>Node11&#45;&gt;Node12</title>
+<!-- Node13&#45;&gt;Node14 -->
+<g id="edge16" class="edge">
+<title>Node13&#45;&gt;Node14</title>
 <path fill="none" stroke="midnightblue" d="M610.35,-178.61C632.12,-165.17 658.63,-148.81 678.97,-136.26"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="608.32,-175.75 601.64,-183.98 611.99,-181.7 608.32,-175.75"/>
-</g>
-<!-- Node14&#45;&gt;Node9 -->
-<g id="edge16" class="edge">
-<title>Node14&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M347.94,-169.35C343.05,-160.1 337.85,-150.26 333.28,-141.61"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="344.93,-171.13 352.69,-178.34 351.11,-167.86 344.93,-171.13"/>
 </g>
 </g>
 </svg>

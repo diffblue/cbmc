@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Minimize some target function incrementally.">
 <polygon fill="#bfbfbf" stroke="black" points="632,-683.5 632,-724.5 770,-724.5 770,-683.5 632,-683.5"/>
 <text text-anchor="start" x="640" y="-712.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="640" y="-701.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/prop</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="prop__minimize_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="prop__minimize_8h.html" target="_top" xlink:title="SAT Minimizer.">
 <polygon fill="none" stroke="black" points="430,-403.5 430,-422.5 528,-422.5 528,-403.5 430,-403.5"/>
 <text text-anchor="middle" x="479" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">prop_minimize.h</text>
 </a>
@@ -343,7 +343,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="426,-168.5 426,-187.5 490,-187.5 490,-168.5 426,-168.5"/>
 <text text-anchor="middle" x="458" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -373,7 +373,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="318.5,-112.5 318.5,-131.5 377.5,-131.5 377.5,-112.5 318.5,-112.5"/>
 <text text-anchor="middle" x="348" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -532,7 +532,7 @@
 <!-- Node36 -->
 <g id="node29" class="node">
 <title>Node36</title>
-<g id="a_node29"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="692,-571.5 692,-590.5 778,-590.5 778,-571.5 692,-571.5"/>
 <text text-anchor="middle" x="735" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -568,7 +568,7 @@
 <!-- Node46 -->
 <g id="node38" class="node">
 <title>Node46</title>
-<g id="a_node38"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="834.5,-515.5 834.5,-534.5 907.5,-534.5 907.5,-515.5 834.5,-515.5"/>
 <text text-anchor="middle" x="871" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -643,7 +643,7 @@
 <!-- Node40 -->
 <g id="node33" class="node">
 <title>Node40</title>
-<g id="a_node33"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1133.5,-347.5 1133.5,-366.5 1180.5,-366.5 1180.5,-347.5 1133.5,-347.5"/>
 <text text-anchor="middle" x="1157" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -829,7 +829,7 @@
 <!-- Node50 -->
 <g id="node43" class="node">
 <title>Node50</title>
-<g id="a_node43"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title="Decision procedure with incremental solving with contexts and assumptions.">
 <polygon fill="none" stroke="black" points="1082.5,-224.5 1082.5,-254.5 1209.5,-254.5 1209.5,-224.5 1082.5,-224.5"/>
 <text text-anchor="start" x="1090.5" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/stack_decision</text>
 <text text-anchor="middle" x="1146" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">_procedure.h</text>
@@ -851,7 +851,7 @@
 <!-- Node51 -->
 <g id="node44" class="node">
 <title>Node51</title>
-<g id="a_node44"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node44"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title="Decision Procedure Interface.">
 <polygon fill="none" stroke="black" points="978,-112.5 978,-131.5 1098,-131.5 1098,-112.5 978,-112.5"/>
 <text text-anchor="middle" x="1038" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">decision_procedure.h</text>
 </a>

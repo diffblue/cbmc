@@ -1,6 +1,6 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;cc/as_mode.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;cc/as_mode.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="517,5,744,47"/>
-<area shape="rect" id="node2" href="$as__mode_8h.html" title=" " alt="" coords="844,319,937,345"/>
+<area shape="rect" id="node1" title="Assembler Mode." alt="" coords="517,5,744,47"/>
+<area shape="rect" id="node2" href="$as__mode_8h.html" title="Assembler Mode." alt="" coords="844,319,937,345"/>
 <area shape="rect" id="node19" title=" " alt="" coords="160,95,248,121"/>
 <area shape="rect" id="node20" href="$cmdline_8h.html" title=" " alt="" coords="342,543,453,569"/>
 <area shape="rect" id="node23" href="$config_8h.html" title=" " alt="" coords="480,543,579,569"/>
@@ -9,13 +9,13 @@
 <area shape="rect" id="node30" href="$run_8h.html" title=" " alt="" coords="549,692,629,719"/>
 <area shape="rect" id="node31" href="$tempdir_8h.html" title=" " alt="" coords="744,244,853,271"/>
 <area shape="rect" id="node32" href="$version_8h.html" title=" " alt="" coords="693,95,800,121"/>
-<area shape="rect" id="node33" href="$compile_8h.html" title=" " alt="" coords="929,95,1015,121"/>
-<area shape="rect" id="node48" href="$goto__cc__cmdline_8h.html" title=" " alt="" coords="374,169,517,196"/>
-<area shape="rect" id="node49" href="$hybrid__binary_8h.html" title=" " alt="" coords="643,319,765,345"/>
+<area shape="rect" id="node33" href="$compile_8h.html" title="Compile and link source and object files." alt="" coords="929,95,1015,121"/>
+<area shape="rect" id="node48" href="$goto__cc__cmdline_8h.html" title="Command line interpretation for goto&#45;cc." alt="" coords="374,169,517,196"/>
+<area shape="rect" id="node49" href="$hybrid__binary_8h.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="643,319,765,345"/>
 <area shape="rect" id="node50" title=" " alt="" coords="1039,95,1113,121"/>
 <area shape="rect" id="node51" title=" " alt="" coords="1137,95,1217,121"/>
 <area shape="rect" id="node3" href="$gcc__message__handler_8h.html" title=" " alt="" coords="877,393,1054,420"/>
-<area shape="rect" id="node18" href="$goto__cc__mode_8h.html" title=" " alt="" coords="755,468,883,495"/>
+<area shape="rect" id="node18" href="$goto__cc__mode_8h.html" title="Command line interpretation for goto&#45;cc." alt="" coords="755,468,883,495"/>
 <area shape="rect" id="node4" href="$cout__message_8h.html" title=" " alt="" coords="907,468,1061,495"/>
 <area shape="rect" id="node5" href="$src_2util_2message_8h.html" title=" " alt="" coords="1300,543,1393,569"/>
 <area shape="rect" id="node6" title=" " alt="" coords="1958,617,2045,644"/>
@@ -36,7 +36,7 @@
 <area shape="rect" id="node25" href="$mp__arith_8h.html" title=" " alt="" coords="1097,692,1189,719"/>
 <area shape="rect" id="node27" href="$format__spec_8h.html" title=" " alt="" coords="805,692,920,719"/>
 <area shape="rect" id="node26" title=" " alt="" coords="1013,767,1139,793"/>
-<area shape="rect" id="node34" href="$std__types_8h.html" title=" " alt="" coords="1339,169,1461,196"/>
+<area shape="rect" id="node34" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1339,169,1461,196"/>
 <area shape="rect" id="node46" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1056,244,1163,271"/>
 <area shape="rect" id="node47" title=" " alt="" coords="931,169,981,196"/>
 <area shape="rect" id="node35" href="$expr_8h.html" title=" " alt="" coords="1555,319,1618,345"/>
@@ -44,7 +44,7 @@
 <area shape="rect" id="node43" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1994,244,2091,271"/>
 <area shape="rect" id="node45" title=" " alt="" coords="1238,244,1362,271"/>
 <area shape="rect" id="node36" href="$as__const_8h.html" title=" " alt="" coords="1624,393,1715,420"/>
-<area shape="rect" id="node37" href="$type_8h.html" title=" " alt="" coords="1486,393,1549,420"/>
+<area shape="rect" id="node37" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="1486,393,1549,420"/>
 <area shape="rect" id="node40" href="$validation__mode_8h.html" title=" " alt="" coords="1582,543,1725,569"/>
 <area shape="rect" id="node41" href="$validate__types_8h.html" title=" " alt="" coords="1435,468,1565,495"/>
 <area shape="rect" id="node42" href="$validate__expressions_8h.html" title=" " alt="" coords="1739,393,1911,420"/>

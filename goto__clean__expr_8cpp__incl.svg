@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Program Transformation.">
 <polygon fill="#bfbfbf" stroke="black" points="1089,-896.5 1089,-937.5 1227,-937.5 1227,-896.5 1089,-896.5"/>
 <text text-anchor="start" x="1097" y="-925.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1097" y="-914.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="360.5,-840.5 360.5,-859.5 479.5,-859.5 479.5,-840.5 360.5,-840.5"/>
 <text text-anchor="middle" x="420" y="-847.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_convert_class.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node49 -->
 <g id="node44" class="node">
 <title>Node49</title>
-<g id="a_node44"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node44"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="841.5,-672.5 841.5,-691.5 908.5,-691.5 908.5,-672.5 841.5,-672.5"/>
 <text text-anchor="middle" x="875" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node61 -->
 <g id="node56" class="node">
 <title>Node61</title>
-<g id="a_node56"><a xlink:href="fresh__symbol_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="fresh__symbol_8h.html" target="_top" xlink:title="Fresh auxiliary symbol creation.">
 <polygon fill="none" stroke="black" points="1593,-280.5 1593,-299.5 1703,-299.5 1703,-280.5 1593,-280.5"/>
 <text text-anchor="middle" x="1648" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/fresh_symbol.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node62 -->
 <g id="node57" class="node">
 <title>Node62</title>
-<g id="a_node57"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="929.5,-728.5 929.5,-747.5 1034.5,-747.5 1034.5,-728.5 929.5,-728.5"/>
 <text text-anchor="middle" x="982" y="-735.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/pointer_expr.h</text>
 </a>
@@ -247,7 +247,7 @@
 <!-- Node56 -->
 <g id="node51" class="node">
 <title>Node56</title>
-<g id="a_node51"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="633,-784.5 633,-803.5 727,-803.5 727,-784.5 633,-784.5"/>
 <text text-anchor="middle" x="680" y="-791.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -469,7 +469,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="1560,-168.5 1560,-187.5 1624,-187.5 1624,-168.5 1560,-168.5"/>
 <text text-anchor="middle" x="1592" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -499,7 +499,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="1647.5,-112.5 1647.5,-131.5 1706.5,-131.5 1706.5,-112.5 1647.5,-112.5"/>
 <text text-anchor="middle" x="1677" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -682,7 +682,7 @@
 <!-- Node36 -->
 <g id="node30" class="node">
 <title>Node36</title>
-<g id="a_node30"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1113.5,-448.5 1113.5,-467.5 1160.5,-467.5 1160.5,-448.5 1113.5,-448.5"/>
 <text text-anchor="middle" x="1137" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -874,7 +874,7 @@
 <!-- Node46 -->
 <g id="node41" class="node">
 <title>Node46</title>
-<g id="a_node41"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="945.5,-616.5 945.5,-635.5 1018.5,-635.5 1018.5,-616.5 945.5,-616.5"/>
 <text text-anchor="middle" x="982" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -1036,7 +1036,7 @@
 <!-- Node52 -->
 <g id="node47" class="node">
 <title>Node52</title>
-<g id="a_node47"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node47"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="black" points="155,-336.5 155,-355.5 227,-355.5 227,-336.5 155,-336.5"/>
 <text text-anchor="middle" x="191" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -1255,7 +1255,7 @@
 <!-- Node63 -->
 <g id="node58" class="node">
 <title>Node63</title>
-<g id="a_node58"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node58"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="931.5,-672.5 931.5,-691.5 1032.5,-691.5 1032.5,-672.5 931.5,-672.5"/>
 <text text-anchor="middle" x="982" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>

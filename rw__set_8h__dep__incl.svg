@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Race Detection for Threaded Goto Programs.">
 <polygon fill="#bfbfbf" stroke="black" points="619.5,-78.5 619.5,-119.5 764.5,-119.5 764.5,-78.5 619.5,-78.5"/>
 <text text-anchor="start" x="627.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="627.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 194,-41.5 194,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="interrupt_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="interrupt_8cpp.html" target="_top" xlink:title="Interrupt Instrumentation.">
 <polygon fill="none" stroke="black" points="212.5,-0.5 212.5,-41.5 357.5,-41.5 357.5,-0.5 212.5,-0.5"/>
 <text text-anchor="start" x="220.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="220.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="mmio_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="mmio_8cpp.html" target="_top" xlink:title="Memory&#45;mapped I/O Instrumentation for Goto Programs.">
 <polygon fill="none" stroke="black" points="375.5,-0.5 375.5,-41.5 520.5,-41.5 520.5,-0.5 375.5,-0.5"/>
 <text text-anchor="start" x="383.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="383.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="race__check_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="race__check_8cpp.html" target="_top" xlink:title="Race Detection for Threaded Goto Programs.">
 <polygon fill="none" stroke="black" points="538.5,-0.5 538.5,-41.5 683.5,-41.5 683.5,-0.5 538.5,-0.5"/>
 <text text-anchor="start" x="546.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="546.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -90,7 +90,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="rw__set_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="rw__set_8cpp.html" target="_top" xlink:title="Race Detection for Threaded Goto Programs.">
 <polygon fill="none" stroke="black" points="701.5,-0.5 701.5,-41.5 846.5,-41.5 846.5,-0.5 701.5,-0.5"/>
 <text text-anchor="start" x="709.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="709.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -107,7 +107,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="goto2graph_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="goto2graph_8cpp.html" target="_top" xlink:title="Turns a goto&#45;program into an abstract event graph.">
 <polygon fill="none" stroke="black" points="864.5,-0.5 864.5,-41.5 1009.5,-41.5 1009.5,-0.5 864.5,-0.5"/>
 <text text-anchor="start" x="872.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="872.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -141,7 +141,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="weak__memory_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="weak__memory_8cpp.html" target="_top" xlink:title="Weak Memory Instrumentation for Threaded Goto Programs.">
 <polygon fill="none" stroke="black" points="1190.5,-0.5 1190.5,-41.5 1335.5,-41.5 1335.5,-0.5 1190.5,-0.5"/>
 <text text-anchor="start" x="1198.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1198.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

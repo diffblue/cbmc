@@ -1,9 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_tso.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_tso.h">
-<area shape="rect" id="node1" title=" " alt="" coords="530,5,755,61"/>
-<area shape="rect" id="node2" href="$memory__model__sc_8h.html" title=" " alt="" coords="563,109,722,136"/>
-<area shape="rect" id="node3" href="$memory__model_8h.html" title=" " alt="" coords="574,184,711,211"/>
-<area shape="rect" id="node4" href="$partial__order__concurrency_8h.html" title=" " alt="" coords="542,259,743,285"/>
-<area shape="rect" id="node5" href="$symex__target__equation_8h.html" title=" " alt="" coords="549,333,737,360"/>
+<area shape="rect" id="node1" title="Memory models for partial order concurrency." alt="" coords="530,5,755,61"/>
+<area shape="rect" id="node2" href="$memory__model__sc_8h.html" title="Memory models for partial order concurrency." alt="" coords="563,109,722,136"/>
+<area shape="rect" id="node3" href="$memory__model_8h.html" title="Memory models for partial order concurrency." alt="" coords="574,184,711,211"/>
+<area shape="rect" id="node4" href="$partial__order__concurrency_8h.html" title="Add constraints to equation encoding partial orders on events." alt="" coords="542,259,743,285"/>
+<area shape="rect" id="node5" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="549,333,737,360"/>
 <area shape="rect" id="node6" title=" " alt="" coords="5,408,91,435"/>
 <area shape="rect" id="node7" title=" " alt="" coords="209,647,273,673"/>
 <area shape="rect" id="node8" title=" " alt="" coords="996,408,1039,435"/>
@@ -12,7 +12,7 @@
 <area shape="rect" id="node17" href="$src_2util_2message_8h.html" title=" " alt="" coords="474,572,593,599"/>
 <area shape="rect" id="node21" href="$narrow_8h.html" title=" " alt="" coords="946,721,1025,748"/>
 <area shape="rect" id="node22" href="$ssa__step_8h.html" title=" " alt="" coords="408,408,499,435"/>
-<area shape="rect" id="node25" href="$symex__target_8h.html" title=" " alt="" coords="481,490,605,517"/>
+<area shape="rect" id="node25" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="481,490,605,517"/>
 <area shape="rect" id="node10" title=" " alt="" coords="730,871,795,897"/>
 <area shape="rect" id="node11" title=" " alt="" coords="820,871,895,897"/>
 <area shape="rect" id="node12" title=" " alt="" coords="612,871,671,897"/>
@@ -23,5 +23,5 @@
 <area shape="rect" id="node19" href="$deprecate_8h.html" title=" " alt="" coords="480,721,579,748"/>
 <area shape="rect" id="node20" href="$source__location_8h.html" title=" " alt="" coords="571,647,707,673"/>
 <area shape="rect" id="node23" href="$ssa__expr_8h.html" title=" " alt="" coords="341,490,457,517"/>
-<area shape="rect" id="node24" href="$goto__trace_8h.html" title=" " alt="" coords="166,483,317,524"/>
+<area shape="rect" id="node24" href="$goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="166,483,317,524"/>
 </map>

@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:title="STL class.">
+<g id="a_node3"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="20,-168.5 20,-187.5 85,-187.5 85,-168.5 20,-168.5"/>
 <text text-anchor="middle" x="52.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
@@ -46,19 +46,19 @@
 <title>Node3&#45;&gt;Node2</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M52.5,-158.19C52.5,-134.28 52.5,-93.99 52.5,-76.51"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="49,-158.45 52.5,-168.45 56,-158.45 49,-158.45"/>
-<text text-anchor="middle" x="77" y="-142" font-family="Helvetica,sans-Serif" font-size="10.00"> reason</text>
-<text text-anchor="middle" x="77" y="-131" font-family="Helvetica,sans-Serif" font-size="10.00">function</text>
-<text text-anchor="middle" x="77" y="-120" font-family="Helvetica,sans-Serif" font-size="10.00">backtrace</text>
-<text text-anchor="middle" x="77" y="-109" font-family="Helvetica,sans-Serif" font-size="10.00">file</text>
-<text text-anchor="middle" x="77" y="-98" font-family="Helvetica,sans-Serif" font-size="10.00">condition</text>
+<text text-anchor="middle" x="78.5" y="-142" font-family="Helvetica,sans-Serif" font-size="10.00"> backtrace</text>
+<text text-anchor="middle" x="78.5" y="-131" font-family="Helvetica,sans-Serif" font-size="10.00">condition</text>
+<text text-anchor="middle" x="78.5" y="-120" font-family="Helvetica,sans-Serif" font-size="10.00">file</text>
+<text text-anchor="middle" x="78.5" y="-109" font-family="Helvetica,sans-Serif" font-size="10.00">function</text>
+<text text-anchor="middle" x="78.5" y="-98" font-family="Helvetica,sans-Serif" font-size="10.00">reason</text>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="0.5,-225.5 0.5,-255.5 104.5,-255.5 104.5,-225.5 0.5,-225.5"/>
 <text text-anchor="start" x="8.5" y="-243.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
-<text text-anchor="middle" x="52.5" y="-232.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
+<text text-anchor="middle" x="52.5" y="-232.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Char &gt;</text>
 </a>
 </g>
 </g>

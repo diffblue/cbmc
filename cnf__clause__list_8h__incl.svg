@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="CNF Generation.">
 <polygon fill="#bfbfbf" stroke="black" points="94.69,-504.5 94.69,-545.5 232.69,-545.5 232.69,-504.5 94.69,-504.5"/>
 <text text-anchor="start" x="102.69" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="102.69" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/sat</text>
@@ -52,7 +52,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="cnf_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="cnf_8h.html" target="_top" xlink:title="CNF Generation, via Tseitin.">
 <polygon fill="none" stroke="black" points="208.69,-448.5 208.69,-467.5 248.69,-467.5 248.69,-448.5 208.69,-448.5"/>
 <text text-anchor="middle" x="228.69" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf.h</text>
 </a>
@@ -340,7 +340,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="364.69,-168.5 364.69,-187.5 428.69,-187.5 428.69,-168.5 364.69,-168.5"/>
 <text text-anchor="middle" x="396.69" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>

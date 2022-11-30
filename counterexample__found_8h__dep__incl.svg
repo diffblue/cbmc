@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Counterexample Found.">
 <polygon fill="#bfbfbf" stroke="black" points="103,-78.5 103,-119.5 288,-119.5 288,-78.5 103,-78.5"/>
 <text text-anchor="start" x="111" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="111" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/counterexample</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="counterexample__found_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="counterexample__found_8cpp.html" target="_top" xlink:title="Counterexample Found.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 185,-41.5 185,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/counterexample</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="inductiveness_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="inductiveness_8cpp.html" target="_top" xlink:title="Inductiveness.">
 <polygon fill="none" stroke="black" points="202.5,-6 202.5,-36 396.5,-36 396.5,-6 202.5,-6"/>
 <text text-anchor="start" x="210.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="299.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/inductiveness.cpp</text>

@@ -12,8 +12,8 @@
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="19.5,-0.5 19.5,-19.5 118.5,-19.5 118.5,-0.5 19.5,-0.5"/>
-<text text-anchor="middle" x="69" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">rename_symbolt</text>
+<polygon fill="#bfbfbf" stroke="black" points="20.5,-0.5 20.5,-19.5 119.5,-19.5 119.5,-0.5 20.5,-0.5"/>
+<text text-anchor="middle" x="70" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">rename_symbolt</text>
 </a>
 </g>
 </g>
@@ -21,19 +21,19 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="9.5,-78.5 9.5,-108.5 128.5,-108.5 128.5,-78.5 9.5,-78.5"/>
-<text text-anchor="start" x="17.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
-<text text-anchor="middle" x="69" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; irep_idt, irep_idt &gt;</text>
+<polygon fill="none" stroke="#bfbfbf" points="10.5,-78.5 10.5,-108.5 129.5,-108.5 129.5,-78.5 10.5,-78.5"/>
+<text text-anchor="start" x="18.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
+<text text-anchor="middle" x="70" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; irep_idt, irep_idt &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
 <title>Node2&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M69,-68.25C69,-51.78 69,-30.99 69,-19.54"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="65.5,-68.3 69,-78.3 72.5,-68.3 65.5,-68.3"/>
-<text text-anchor="middle" x="95" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00"> expr_map</text>
-<text text-anchor="middle" x="95" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">type_map</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M70,-68.25C70,-51.78 70,-30.99 70,-19.54"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="66.5,-68.3 70,-78.3 73.5,-68.3 66.5,-68.3"/>
+<text text-anchor="middle" x="96" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00"> expr_map</text>
+<text text-anchor="middle" x="96" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">type_map</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -47,15 +47,15 @@
 <!-- Node3&#45;&gt;Node2 -->
 <g id="edge2" class="edge">
 <title>Node3&#45;&gt;Node2</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M31.14,-162.61C33.93,-151.81 38.17,-138.23 44,-127 47.35,-120.56 52,-114.09 56.38,-108.64"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="27.66,-162.1 28.75,-172.63 34.47,-163.72 27.66,-162.1"/>
-<text text-anchor="middle" x="67" y="-141" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
-<text text-anchor="middle" x="67" y="-130" font-family="Helvetica,sans-Serif" font-size="10.00">elements</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M30.48,-162.89C33,-152.01 37.01,-138.24 43,-127 46.45,-120.53 51.32,-114.15 55.98,-108.78"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="27,-162.47 28.39,-172.97 33.85,-163.89 27,-162.47"/>
+<text text-anchor="middle" x="67.5" y="-141" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
+<text text-anchor="middle" x="67.5" y="-130" font-family="Helvetica,sans-Serif" font-size="10.00">keys</text>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="72,-167.5 72,-197.5 186,-197.5 186,-167.5 72,-167.5"/>
 <text text-anchor="start" x="80" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
 <text text-anchor="middle" x="129" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; K, T &gt;</text>
@@ -65,8 +65,8 @@
 <!-- Node4&#45;&gt;Node2 -->
 <g id="edge3" class="edge">
 <title>Node4&#45;&gt;Node2</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M113.4,-158.88C102.43,-142.97 88.1,-122.19 78.72,-108.6"/>
-<polygon fill="orange" stroke="orange" points="110.53,-160.89 119.09,-167.13 116.3,-156.91 110.53,-160.89"/>
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M113.36,-158.43C102.61,-142.59 88.69,-122.06 79.56,-108.6"/>
+<polygon fill="orange" stroke="orange" points="110.75,-160.82 119.26,-167.13 116.54,-156.89 110.75,-160.82"/>
 <text text-anchor="middle" x="159" y="-135.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, irep_idt &gt;</text>
 </g>
 <!-- Node5 -->

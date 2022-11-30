@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Enumerative Loop Invariant Synthesizer.">
 <polygon fill="#bfbfbf" stroke="black" points="343.49,-716.5 343.49,-768.5 504.49,-768.5 504.49,-716.5 343.49,-716.5"/>
 <text text-anchor="start" x="351.49" y="-756.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="351.49" y="-745.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="loop__invariant__synthesizer__base_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="loop__invariant__synthesizer__base_8h.html" target="_top" xlink:title="Loop Invariant Synthesizer Interface.">
 <polygon fill="none" stroke="black" points="349.99,-649.5 349.99,-679.5 497.99,-679.5 497.99,-649.5 349.99,-649.5"/>
 <text text-anchor="start" x="357.99" y="-667.5" font-family="Helvetica,sans-Serif" font-size="10.00">loop_invariant_synthesizer</text>
 <text text-anchor="middle" x="423.99" y="-656.5" font-family="Helvetica,sans-Serif" font-size="10.00">_base.h</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__model_8h.html" target="_top" xlink:title="Symbol Table + CFG.">
 <polygon fill="none" stroke="black" points="325.49,-582.5 325.49,-612.5 438.49,-612.5 438.49,-582.5 325.49,-582.5"/>
 <text text-anchor="start" x="333.49" y="-600.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="381.99" y="-589.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model.h</text>
@@ -116,7 +116,7 @@
 <!-- Node47 -->
 <g id="node32" class="node">
 <title>Node47</title>
-<g id="a_node32"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title="Abstract interface to eager or lazy GOTO models.">
 <polygon fill="none" stroke="black" points="97.99,-521 97.99,-540 225.99,-540 225.99,-521 97.99,-521"/>
 <text text-anchor="middle" x="161.99" y="-528" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_goto_model.h</text>
 </a>
@@ -131,7 +131,7 @@
 <!-- Node48 -->
 <g id="node33" class="node">
 <title>Node48</title>
-<g id="a_node33"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="301.99,-454 301.99,-473 399.99,-473 399.99,-454 301.99,-454"/>
 <text text-anchor="middle" x="350.99" y="-461" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -266,7 +266,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="811.99,-168.5 811.99,-187.5 875.99,-187.5 875.99,-168.5 811.99,-168.5"/>
 <text text-anchor="middle" x="843.99" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -347,7 +347,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="872.49,-112.5 872.49,-131.5 931.49,-131.5 931.49,-112.5 872.49,-112.5"/>
 <text text-anchor="middle" x="901.99" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -614,7 +614,7 @@
 <!-- Node49 -->
 <g id="node34" class="node">
 <title>Node49</title>
-<g id="a_node34"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="383.99,-392.5 383.99,-411.5 475.99,-411.5 475.99,-392.5 383.99,-392.5"/>
 <text text-anchor="middle" x="429.99" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -644,7 +644,7 @@
 <!-- Node50 -->
 <g id="node35" class="node">
 <title>Node50</title>
-<g id="a_node35"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="red" points="102.99,-336.5 102.99,-355.5 194.99,-355.5 194.99,-336.5 102.99,-336.5"/>
 <text text-anchor="middle" x="148.99" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -659,7 +659,7 @@
 <!-- Node55 -->
 <g id="node36" class="node">
 <title>Node55</title>
-<g id="a_node36"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="668.99,-336.5 668.99,-355.5 762.99,-355.5 762.99,-336.5 668.99,-336.5"/>
 <text text-anchor="middle" x="715.99" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -776,7 +776,7 @@
 <!-- Node64 -->
 <g id="node42" class="node">
 <title>Node64</title>
-<g id="a_node42"><a xlink:href="loop__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="loop__ids_8h.html" target="_top" xlink:title="Loop IDs.">
 <polygon fill="none" stroke="black" points="866.49,-448.5 866.49,-478.5 979.49,-478.5 979.49,-448.5 866.49,-448.5"/>
 <text text-anchor="start" x="874.49" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/loop</text>
 <text text-anchor="middle" x="922.99" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">_ids.h</text>

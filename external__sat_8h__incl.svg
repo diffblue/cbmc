@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Allows calling an external SAT solver to allow faster integration of newer SAT solvers.">
 <polygon fill="#bfbfbf" stroke="black" points="11.5,-448.5 11.5,-489.5 149.5,-489.5 149.5,-448.5 11.5,-448.5"/>
 <text text-anchor="start" x="19.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="19.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/sat</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title="CNF Generation.">
 <polygon fill="none" stroke="black" points="31.5,-392.5 31.5,-411.5 129.5,-411.5 129.5,-392.5 31.5,-392.5"/>
 <text text-anchor="middle" x="80.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf_clause_list.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="cnf_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="cnf_8h.html" target="_top" xlink:title="CNF Generation, via Tseitin.">
 <polygon fill="none" stroke="black" points="125.5,-336.5 125.5,-355.5 165.5,-355.5 165.5,-336.5 125.5,-336.5"/>
 <text text-anchor="middle" x="145.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf.h</text>
 </a>

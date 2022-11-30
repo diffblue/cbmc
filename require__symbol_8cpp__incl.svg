@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="require__symbol_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="require__symbol_8h.html" target="_top" xlink:title="Helper functions for getting symbols from the symbol table during unit tests.">
 <polygon fill="none" stroke="black" points="268,-571.5 268,-590.5 369,-590.5 369,-571.5 268,-571.5"/>
 <text text-anchor="middle" x="318.5" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">require_symbol.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="371.5,-235.5 371.5,-254.5 435.5,-254.5 435.5,-235.5 371.5,-235.5"/>
 <text text-anchor="middle" x="403.5" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -208,7 +208,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="289,-174 289,-193 348,-193 348,-174 289,-174"/>
 <text text-anchor="middle" x="318.5" y="-181" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -274,7 +274,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="275.5,-112.5 275.5,-131.5 379.5,-131.5 379.5,-112.5 275.5,-112.5"/>
 <text text-anchor="middle" x="327.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -355,7 +355,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="string__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="string__hash_8h.html" target="_top" xlink:title="string hashing">
 <polygon fill="none" stroke="black" points="313.5,-56.5 313.5,-75.5 395.5,-75.5 395.5,-56.5 313.5,-56.5"/>
 <text text-anchor="middle" x="354.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_hash.h</text>
 </a>
@@ -544,7 +544,7 @@
 <!-- Node30 -->
 <g id="node30" class="node">
 <title>Node30</title>
-<g id="a_node30"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1158,-403.5 1158,-422.5 1205,-422.5 1205,-403.5 1158,-403.5"/>
 <text text-anchor="middle" x="1181.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -700,7 +700,7 @@
 <!-- Node44 -->
 <g id="node40" class="node">
 <title>Node44</title>
-<g id="a_node40"><a xlink:href="smt__to__smt2__string_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="smt__to__smt2__string_8h.html" target="_top" xlink:title="Streaming SMT data structures to a string based output stream.">
 <polygon fill="none" stroke="black" points="1063,-168.5 1063,-198.5 1206,-198.5 1206,-168.5 1063,-168.5"/>
 <text text-anchor="start" x="1071" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="1134.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">/smt_to_smt2_string.h</text>

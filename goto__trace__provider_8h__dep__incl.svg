@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Interface for returning Goto Traces from Goto Checkers.">
 <polygon fill="#bfbfbf" stroke="black" points="448.5,-256.5 448.5,-297.5 586.5,-297.5 586.5,-256.5 448.5,-256.5"/>
 <text text-anchor="start" x="456.5" y="-285.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="456.5" y="-274.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="multi__path__symex__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="multi__path__symex__checker_8h.html" target="_top" xlink:title="Goto Checker using Multi&#45;Path Symbolic Execution.">
 <polygon fill="none" stroke="black" points="259,-173 259,-214 420,-214 420,-173 259,-173"/>
 <text text-anchor="start" x="267" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="267" y="-191" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -39,7 +39,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="single__loop__incremental__symex__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="single__loop__incremental__symex__checker_8h.html" target="_top" xlink:title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop.">
 <polygon fill="none" stroke="black" points="448,-167.5 448,-219.5 587,-219.5 587,-167.5 448,-167.5"/>
 <text text-anchor="start" x="456" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="456" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -57,7 +57,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="single__path__symex__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="single__path__symex__checker_8h.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution.">
 <polygon fill="none" stroke="black" points="690,-173 690,-214 855,-214 855,-173 690,-173"/>
 <text text-anchor="start" x="698" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="698" y="-191" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -74,7 +74,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="397.5,-84 397.5,-125 551.5,-125 551.5,-84 397.5,-84"/>
 <text text-anchor="start" x="405.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="405.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -91,7 +91,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="multi__path__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="multi__path__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using Bounded Model Checking.">
 <polygon fill="none" stroke="black" points="0,-84 0,-125 173,-125 173,-84 0,-84"/>
 <text text-anchor="start" x="8" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -108,7 +108,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="java__multi__path__symex__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="java__multi__path__symex__checker_8h.html" target="_top" xlink:title="Goto Checker using Bounded Model Checking for Java.">
 <polygon fill="none" stroke="black" points="191.5,-84 191.5,-125 379.5,-125 379.5,-84 191.5,-84"/>
 <text text-anchor="start" x="199.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="199.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -142,7 +142,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="578.5,-0.5 578.5,-41.5 722.5,-41.5 722.5,-0.5 578.5,-0.5"/>
 <text text-anchor="start" x="586.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="586.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -165,7 +165,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="single__loop__incremental__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="single__loop__incremental__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop.">
 <polygon fill="none" stroke="black" points="570,-78.5 570,-130.5 709,-130.5 709,-78.5 570,-78.5"/>
 <text text-anchor="start" x="578" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="578" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -189,7 +189,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="single__path__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="single__path__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution.">
 <polygon fill="none" stroke="black" points="727.5,-84 727.5,-125 903.5,-125 903.5,-84 727.5,-84"/>
 <text text-anchor="start" x="735.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="735.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -206,7 +206,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="java__single__path__symex__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="java__single__path__symex__checker_8h.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution for Java.">
 <polygon fill="none" stroke="black" points="922,-84 922,-125 1113,-125 1113,-84 922,-84"/>
 <text text-anchor="start" x="930" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="930" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>

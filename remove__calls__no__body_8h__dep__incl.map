@@ -1,9 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_calls_no_body.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_calls_no_body.h">
-<area shape="rect" id="node1" title=" " alt="" coords="567,5,753,61"/>
-<area shape="rect" id="node2" href="$goto__instrument__parse__options_8h.html" title=" " alt="" coords="289,109,532,165"/>
-<area shape="rect" id="node5" href="$goto__instrument__parse__options_8cpp.html" title=" " alt="" coords="488,213,747,269"/>
-<area shape="rect" id="node6" href="$reachability__slicer_8cpp.html" title=" " alt="" coords="631,109,825,165"/>
-<area shape="rect" id="node7" href="$remove__calls__no__body_8cpp.html" title=" " alt="" coords="849,109,1049,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__languages_8cpp.html" title=" " alt="" coords="5,213,240,269"/>
-<area shape="rect" id="node4" href="$goto__instrument__main_8cpp.html" title=" " alt="" coords="264,213,464,269"/>
+<area shape="rect" id="node1" title="Remove calls to functions without a body." alt="" coords="406,5,591,61"/>
+<area shape="rect" id="node2" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,213,264,269"/>
+<area shape="rect" id="node3" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="256,109,499,165"/>
+<area shape="rect" id="node6" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="523,109,717,165"/>
+<area shape="rect" id="node7" href="$remove__calls__no__body_8cpp.html" title="Remove calls to functions without a body." alt="" coords="741,109,941,165"/>
+<area shape="rect" id="node4" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="288,213,523,269"/>
+<area shape="rect" id="node5" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="547,213,747,269"/>
 </map>

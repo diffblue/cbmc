@@ -1,6 +1,7 @@
 var classcharacter__refine__preprocesst =
 [
     [ "conversion_functiont", "classcharacter__refine__preprocesst.html#aa5b827fca5e0bf3bdba512a261e1ea68", null ],
+    [ "conversion_inputt", "classcharacter__refine__preprocesst.html#a14d7d09c8edcf19d6293599f0f9537bd", null ],
     [ "convert_char_count", "classcharacter__refine__preprocesst.html#a4109e2ac5fd11d1c52f449caba5690a7", null ],
     [ "convert_char_function", "classcharacter__refine__preprocesst.html#a103d5d355edeaed82aab4009d1b33685", null ],
     [ "convert_char_value", "classcharacter__refine__preprocesst.html#a901377f0a5f04a21adcb36e8b386ce4b", null ],
@@ -102,6 +103,5 @@ var classcharacter__refine__preprocesst =
     [ "in_list_expr", "classcharacter__refine__preprocesst.html#aaf9590b8567125443f23545a94da8e7f", null ],
     [ "initialize_conversion_table", "classcharacter__refine__preprocesst.html#a4838eb24d093dee0ab635a773ca779bb", null ],
     [ "replace_character_call", "classcharacter__refine__preprocesst.html#a5f4b941c19f4db8ed8c2a18e0fc37d8b", null ],
-    [ "conversion_inputt", "classcharacter__refine__preprocesst.html#a8b3e01fe05240afd0a691335b8926b17", null ],
     [ "conversion_table", "classcharacter__refine__preprocesst.html#a311f6cd833f83d0b9188f91e6ebabb8b", null ]
 ];

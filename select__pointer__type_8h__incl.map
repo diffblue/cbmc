@@ -1,10 +1,10 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/select_pointer_type.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/select_pointer_type.h">
-<area shape="rect" id="node1" title=" " alt="" coords="109,5,327,61"/>
+<area shape="rect" id="node1" title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)..." alt="" coords="109,5,327,61"/>
 <area shape="rect" id="node2" title=" " alt="" coords="139,109,182,136"/>
-<area shape="rect" id="node3" href="$pointer__expr_8h.html" title=" " alt="" coords="207,109,347,136"/>
-<area shape="rect" id="node4" href="$bitvector__types_8h.html" title=" " alt="" coords="277,184,412,211"/>
-<area shape="rect" id="node24" href="$std__expr_8h.html" title=" " alt="" coords="164,184,253,211"/>
-<area shape="rect" id="node5" href="$std__types_8h.html" title=" " alt="" coords="292,259,389,285"/>
+<area shape="rect" id="node3" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="207,109,347,136"/>
+<area shape="rect" id="node4" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="277,184,412,211"/>
+<area shape="rect" id="node24" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="164,184,253,211"/>
+<area shape="rect" id="node5" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="292,259,389,285"/>
 <area shape="rect" id="node6" href="$expr_8h.html" title=" " alt="" coords="376,408,439,435"/>
 <area shape="rect" id="node11" href="$validate_8h.html" title=" " alt="" coords="233,557,320,584"/>
 <area shape="rect" id="node17" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="163,333,260,360"/>
@@ -12,7 +12,7 @@
 <area shape="rect" id="node20" href="$mp__arith_8h.html" title=" " alt="" coords="480,333,572,360"/>
 <area shape="rect" id="node23" title=" " alt="" coords="596,333,720,360"/>
 <area shape="rect" id="node7" href="$as__const_8h.html" title=" " alt="" coords="395,483,486,509"/>
-<area shape="rect" id="node8" href="$type_8h.html" title=" " alt="" coords="707,483,769,509"/>
+<area shape="rect" id="node8" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="707,483,769,509"/>
 <area shape="rect" id="node13" href="$validation__mode_8h.html" title=" " alt="" coords="287,632,429,659"/>
 <area shape="rect" id="node14" href="$validate__types_8h.html" title=" " alt="" coords="690,557,821,584"/>
 <area shape="rect" id="node15" href="$validate__expressions_8h.html" title=" " alt="" coords="511,483,683,509"/>

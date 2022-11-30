@@ -127,7 +127,7 @@
 <!-- Node33 -->
 <g id="node27" class="node">
 <title>Node33</title>
-<g id="a_node27"><a xlink:href="goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="goto__model_8h.html" target="_top" xlink:title="Symbol Table + CFG.">
 <polygon fill="none" stroke="black" points="820.5,-571.5 820.5,-590.5 903.5,-590.5 903.5,-571.5 820.5,-571.5"/>
 <text text-anchor="middle" x="862" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_model.h</text>
 </a>
@@ -355,7 +355,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="531,-168.5 531,-187.5 595,-187.5 595,-168.5 531,-168.5"/>
 <text text-anchor="middle" x="563" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -385,7 +385,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="372.5,-112.5 372.5,-131.5 431.5,-131.5 431.5,-112.5 372.5,-112.5"/>
 <text text-anchor="middle" x="402" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -581,7 +581,7 @@
 <!-- Node49 -->
 <g id="node38" class="node">
 <title>Node49</title>
-<g id="a_node38"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title="Abstract interface to eager or lazy GOTO models.">
 <polygon fill="none" stroke="black" points="665,-515.5 665,-534.5 793,-534.5 793,-515.5 665,-515.5"/>
 <text text-anchor="middle" x="729" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_goto_model.h</text>
 </a>
@@ -596,7 +596,7 @@
 <!-- Node50 -->
 <g id="node39" class="node">
 <title>Node50</title>
-<g id="a_node39"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="700,-454 700,-473 798,-473 798,-454 700,-454"/>
 <text text-anchor="middle" x="749" y="-461" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -803,7 +803,7 @@
 <!-- Node51 -->
 <g id="node40" class="node">
 <title>Node51</title>
-<g id="a_node40"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="566,-392.5 566,-411.5 658,-411.5 658,-392.5 566,-392.5"/>
 <text text-anchor="middle" x="612" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -833,7 +833,7 @@
 <!-- Node52 -->
 <g id="node41" class="node">
 <title>Node52</title>
-<g id="a_node41"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="red" points="746,-336.5 746,-355.5 838,-355.5 838,-336.5 746,-336.5"/>
 <text text-anchor="middle" x="792" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -848,7 +848,7 @@
 <!-- Node57 -->
 <g id="node42" class="node">
 <title>Node57</title>
-<g id="a_node42"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="377,-336.5 377,-355.5 471,-355.5 471,-336.5 377,-336.5"/>
 <text text-anchor="middle" x="424" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>

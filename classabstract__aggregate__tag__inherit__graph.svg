@@ -12,8 +12,8 @@
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="0,-163 0,-182 132,-182 132,-163 0,-163"/>
-<text text-anchor="middle" x="66" y="-170" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate_tag</text>
+<polygon fill="#bfbfbf" stroke="black" points="0,-147 0,-166 132,-166 132,-147 0,-147"/>
+<text text-anchor="middle" x="66" y="-154" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate_tag</text>
 </a>
 </g>
 </g>
@@ -21,59 +21,42 @@
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="169,-177 169,-218 318,-218 318,-177 169,-177"/>
-<text text-anchor="start" x="177" y="-206" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
-<text text-anchor="start" x="177" y="-195" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; aggregate</text>
-<text text-anchor="middle" x="243.5" y="-184" font-family="Helvetica,sans-Serif" font-size="10.00">_typet, aggregate_traitst &gt;</text>
+<polygon fill="none" stroke="black" points="496,-257.5 496,-309.5 640,-309.5 640,-257.5 496,-257.5"/>
+<text text-anchor="start" x="504" y="-297.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
+<text text-anchor="start" x="504" y="-286.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; two_value</text>
+<text text-anchor="start" x="504" y="-275.5" font-family="Helvetica,sans-Serif" font-size="10.00">_struct_abstract_objectt,</text>
+<text text-anchor="middle" x="568" y="-264.5" font-family="Helvetica,sans-Serif" font-size="10.00"> struct_aggregate_typet &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M142.5,-183.25C151.23,-184.5 160.12,-185.77 168.83,-187.01"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="142.74,-179.75 132.35,-181.81 141.76,-186.68 142.74,-179.75"/>
+<path fill="none" stroke="midnightblue" d="M81.73,-173.89C119,-216.38 222.22,-324.79 336,-363.5 395.75,-383.83 419.07,-386.09 478,-363.5 481.78,-362.05 514,-332.66 538.6,-309.92"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="84.17,-171.37 74.98,-166.09 78.88,-175.95 84.17,-171.37"/>
 </g>
-<!-- Node3 -->
-<g id="node3" class="node">
-<title>Node3</title>
-<g id="a_node3"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="501,-257.5 501,-309.5 635,-309.5 635,-257.5 501,-257.5"/>
-<text text-anchor="start" x="509" y="-297.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
-<text text-anchor="start" x="509" y="-286.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; full_struct</text>
-<text text-anchor="start" x="509" y="-275.5" font-family="Helvetica,sans-Serif" font-size="10.00">_abstract_objectt, struct</text>
-<text text-anchor="middle" x="568" y="-264.5" font-family="Helvetica,sans-Serif" font-size="10.00">_aggregate_typet &gt;</text>
+<!-- Node4 -->
+<g id="node4" class="node">
+<title>Node4</title>
+<g id="a_node4"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="501,-358.5 501,-410.5 635,-410.5 635,-358.5 501,-358.5"/>
+<text text-anchor="start" x="509" y="-398.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
+<text text-anchor="start" x="509" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; full_struct</text>
+<text text-anchor="start" x="509" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">_abstract_objectt, struct</text>
+<text text-anchor="middle" x="568" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">_aggregate_typet &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node3 -->
-<g id="edge13" class="edge">
-<title>Node1&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M83.1,-189.67C121.93,-229.67 225.73,-328.33 336,-363.5 396.13,-382.68 419.07,-386.09 478,-363.5 481.78,-362.05 514,-332.66 538.6,-309.92"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="85.46,-187.08 76.02,-182.28 80.41,-191.92 85.46,-187.08"/>
+<!-- Node1&#45;&gt;Node4 -->
+<g id="edge3" class="edge">
+<title>Node1&#45;&gt;Node4</title>
+<path fill="none" stroke="midnightblue" d="M74.07,-176.03C87.43,-210.34 119.58,-281.69 169,-322.5 263.23,-400.31 414.27,-400.78 500.65,-393.24"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="77.19,-174.39 70.39,-166.27 70.64,-176.86 77.19,-174.39"/>
 </g>
-<!-- Node5 -->
-<g id="node5" class="node">
-<title>Node5</title>
-<g id="a_node5"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="496,-358.5 496,-410.5 640,-410.5 640,-358.5 496,-358.5"/>
-<text text-anchor="start" x="504" y="-398.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
-<text text-anchor="start" x="504" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; two_value</text>
-<text text-anchor="start" x="504" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">_struct_abstract_objectt,</text>
-<text text-anchor="middle" x="568" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00"> struct_aggregate_typet &gt;</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node5 -->
-<g id="edge15" class="edge">
-<title>Node1&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M74.74,-191.62C88.77,-223.97 121.43,-289.58 169,-326.5 263.33,-399.71 409.22,-401 495.7,-393.78"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="77.8,-189.87 70.7,-182.01 71.35,-192.59 77.8,-189.87"/>
-</g>
-<!-- Node7 -->
-<g id="node7" class="node">
-<title>Node7</title>
-<g id="a_node7"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
+<!-- Node6 -->
+<g id="node6" class="node">
+<title>Node6</title>
+<g id="a_node6"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="497,-96.5 497,-148.5 639,-148.5 639,-96.5 497,-96.5"/>
 <text text-anchor="start" x="505" y="-136.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
 <text text-anchor="start" x="505" y="-125.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; two_value</text>
@@ -82,172 +65,189 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node7 -->
-<g id="edge14" class="edge">
-<title>Node1&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M90.63,-157.54C110.87,-145.15 141.1,-127.66 169,-115.5 240.5,-84.32 258.95,-73.65 336,-61.5 398.34,-51.67 417.72,-42.82 478,-61.5 500.37,-68.43 522.11,-83.14 538.51,-96.37"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="88.73,-154.59 82.07,-162.83 92.41,-160.55 88.73,-154.59"/>
-</g>
-<!-- Node9 -->
-<g id="node9" class="node">
-<title>Node9</title>
-<g id="a_node9"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="502,-0.5 502,-52.5 634,-52.5 634,-0.5 502,-0.5"/>
-<text text-anchor="start" x="510" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
-<text text-anchor="start" x="510" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; full_array</text>
-<text text-anchor="start" x="510" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">_abstract_objectt, array</text>
-<text text-anchor="middle" x="568" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_aggregate_typet &gt;</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node9 -->
-<g id="edge12" class="edge">
-<title>Node1&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M77.69,-154.08C93.81,-128.28 126.95,-82.21 169,-61.5 276.34,-8.63 419.73,-11.12 501.85,-18.37"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="74.55,-152.52 72.37,-162.89 80.54,-156.14 74.55,-152.52"/>
-</g>
-<!-- Node11 -->
-<g id="node11" class="node">
-<title>Node11</title>
-<g id="a_node11"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="496.5,-180.5 496.5,-232.5 639.5,-232.5 639.5,-180.5 496.5,-180.5"/>
-<text text-anchor="start" x="504.5" y="-220.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
-<text text-anchor="start" x="504.5" y="-209.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; two_value</text>
-<text text-anchor="start" x="504.5" y="-198.5" font-family="Helvetica,sans-Serif" font-size="10.00">_union_abstract_objectt,</text>
-<text text-anchor="middle" x="568" y="-187.5" font-family="Helvetica,sans-Serif" font-size="10.00"> union_aggregate_typet &gt;</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node11 -->
-<g id="edge16" class="edge">
-<title>Node1&#45;&gt;Node11</title>
-<path fill="none" stroke="midnightblue" d="M103.86,-159.7C177.67,-136.21 347.71,-92.96 478,-142.5 488,-146.3 487.55,-151.93 496,-158.5 505.63,-165.99 516.38,-173.6 526.54,-180.49"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="102.53,-156.45 94.1,-162.87 104.69,-163.11 102.53,-156.45"/>
-</g>
-<!-- Node2&#45;&gt;Node3 -->
-<g id="edge2" class="edge">
-<title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M292.12,-222.69C305.98,-229.24 321.34,-235.78 336,-240.5 390.26,-257.98 454.12,-269.19 500.93,-275.77"/>
-<polygon fill="orange" stroke="orange" points="293.32,-219.38 282.79,-218.17 290.27,-225.68 293.32,-219.38"/>
-<text text-anchor="start" x="343" y="-296.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; full_struct_abstract</text>
-<text text-anchor="start" x="343" y="-285.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, struct_aggregate</text>
-<text text-anchor="middle" x="407" y="-274.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
-</g>
-<!-- Node2&#45;&gt;Node5 -->
-<g id="edge4" class="edge">
-<title>Node2&#45;&gt;Node5</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M262.29,-226.96C278.62,-251.69 304.95,-286.28 336,-307.5 384.26,-340.47 447.76,-360.28 495.97,-371.54"/>
-<polygon fill="orange" stroke="orange" points="265.09,-224.85 256.74,-218.34 259.21,-228.64 265.09,-224.85"/>
-<text text-anchor="start" x="348" y="-390.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; two_value_struct</text>
-<text text-anchor="start" x="348" y="-379.5" font-family="Helvetica,sans-Serif" font-size="10.00">_abstract_objectt, struct</text>
-<text text-anchor="middle" x="407" y="-368.5" font-family="Helvetica,sans-Serif" font-size="10.00">_aggregate_typet &gt;</text>
-</g>
-<!-- Node2&#45;&gt;Node7 -->
-<g id="edge6" class="edge">
-<title>Node2&#45;&gt;Node7</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M302.75,-173.29C313.68,-169.3 325.09,-165.5 336,-162.5 389.18,-147.87 450.78,-137.53 496.98,-131.02"/>
-<polygon fill="orange" stroke="orange" points="301.44,-170.04 293.3,-176.83 303.89,-176.6 301.44,-170.04"/>
-<text text-anchor="start" x="336.5" y="-187.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; two_value_array_abstract</text>
-<text text-anchor="start" x="336.5" y="-176.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, array_aggregate</text>
-<text text-anchor="middle" x="407" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
-</g>
-<!-- Node2&#45;&gt;Node9 -->
-<g id="edge8" class="edge">
-<title>Node2&#45;&gt;Node9</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M264.17,-168.7C280.87,-146.3 306.73,-116.02 336,-97.5 386.88,-65.32 453.3,-46.9 501.86,-36.94"/>
-<polygon fill="orange" stroke="orange" points="261.29,-166.71 258.23,-176.85 266.95,-170.83 261.29,-166.71"/>
-<text text-anchor="start" x="344" y="-122.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; full_array_abstract</text>
-<text text-anchor="start" x="344" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, array_aggregate</text>
-<text text-anchor="middle" x="407" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
-</g>
-<!-- Node2&#45;&gt;Node11 -->
-<g id="edge10" class="edge">
-<title>Node2&#45;&gt;Node11</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M328.31,-199.84C380.44,-201.29 446.74,-203.14 496.22,-204.52"/>
-<polygon fill="orange" stroke="orange" points="328.18,-196.33 318.08,-199.55 327.98,-203.33 328.18,-196.33"/>
-<text text-anchor="start" x="336" y="-228.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; two_value_union_abstract</text>
-<text text-anchor="start" x="336" y="-217.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, union_aggregate</text>
-<text text-anchor="middle" x="407" y="-206.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
-</g>
-<!-- Node4 -->
-<g id="node4" class="node">
-<title>Node4</title>
-<g id="a_node4"><a xlink:href="classfull__struct__abstract__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="694.5,-268.5 694.5,-298.5 804.5,-298.5 804.5,-268.5 694.5,-268.5"/>
-<text text-anchor="start" x="702.5" y="-286.5" font-family="Helvetica,sans-Serif" font-size="10.00">full_struct_abstract</text>
-<text text-anchor="middle" x="749.5" y="-275.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
-</a>
-</g>
-</g>
-<!-- Node3&#45;&gt;Node4 -->
-<g id="edge3" class="edge">
-<title>Node3&#45;&gt;Node4</title>
-<path fill="none" stroke="midnightblue" d="M645.25,-283.5C661.75,-283.5 678.87,-283.5 694.32,-283.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="645.07,-280 635.07,-283.5 645.07,-287 645.07,-280"/>
-</g>
-<!-- Node6 -->
-<g id="node6" class="node">
-<title>Node6</title>
-<g id="a_node6"><a xlink:href="classtwo__value__struct__abstract__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="677,-369.5 677,-399.5 822,-399.5 822,-369.5 677,-369.5"/>
-<text text-anchor="start" x="685" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">two_value_struct_abstract</text>
-<text text-anchor="middle" x="749.5" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
-</a>
-</g>
-</g>
-<!-- Node5&#45;&gt;Node6 -->
+<!-- Node1&#45;&gt;Node6 -->
 <g id="edge5" class="edge">
-<title>Node5&#45;&gt;Node6</title>
-<path fill="none" stroke="midnightblue" d="M650.45,-384.5C659.24,-384.5 668.14,-384.5 676.8,-384.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="650.2,-381 640.2,-384.5 650.2,-388 650.2,-381"/>
+<title>Node1&#45;&gt;Node6</title>
+<path fill="none" stroke="midnightblue" d="M92.55,-141.97C108.68,-133.21 130.14,-122.27 150,-114.5 230.05,-83.17 250.87,-73.39 336,-61.5 398.5,-52.77 417.72,-42.82 478,-61.5 500.37,-68.43 522.11,-83.14 538.51,-96.37"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="90.8,-138.94 83.73,-146.84 94.18,-145.07 90.8,-138.94"/>
 </g>
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="classtwo__value__array__abstract__objectt.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="496.5,-0.5 496.5,-52.5 639.5,-52.5 639.5,-0.5 496.5,-0.5"/>
+<text text-anchor="start" x="504.5" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
+<text text-anchor="start" x="504.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; two_value</text>
+<text text-anchor="start" x="504.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">_union_abstract_objectt,</text>
+<text text-anchor="middle" x="568" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00"> union_aggregate_typet &gt;</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node8 -->
+<g id="edge7" class="edge">
+<title>Node1&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M79.56,-138.88C96.82,-116.26 130.19,-77.84 169,-60.5 275.53,-12.91 413.95,-13.19 496.32,-18.97"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="76.71,-136.86 73.56,-146.97 82.33,-141.03 76.71,-136.86"/>
+</g>
+<!-- Node10 -->
+<g id="node10" class="node">
+<title>Node10</title>
+<g id="a_node10"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="502,-180.5 502,-232.5 634,-232.5 634,-180.5 502,-180.5"/>
+<text text-anchor="start" x="510" y="-220.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
+<text text-anchor="start" x="510" y="-209.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; full_array</text>
+<text text-anchor="start" x="510" y="-198.5" font-family="Helvetica,sans-Serif" font-size="10.00">_abstract_objectt, array</text>
+<text text-anchor="middle" x="568" y="-187.5" font-family="Helvetica,sans-Serif" font-size="10.00">_aggregate_typet &gt;</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node10 -->
+<g id="edge9" class="edge">
+<title>Node1&#45;&gt;Node10</title>
+<path fill="none" stroke="midnightblue" d="M110.2,-144.42C187.11,-125.19 351.54,-94.42 478,-142.5 488,-146.3 487.55,-151.93 496,-158.5 505.63,-165.99 516.38,-173.6 526.54,-180.49"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="109.2,-141.06 100.38,-146.93 110.94,-147.85 109.2,-141.06"/>
+</g>
+<!-- Node12 -->
+<g id="node12" class="node">
+<title>Node12</title>
+<g id="a_node12"><a xlink:href="classabstract__aggregate__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="169,-183 169,-224 318,-224 318,-183 169,-183"/>
+<text text-anchor="start" x="177" y="-212" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_aggregate</text>
+<text text-anchor="start" x="177" y="-201" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt&lt; aggregate</text>
+<text text-anchor="middle" x="243.5" y="-190" font-family="Helvetica,sans-Serif" font-size="10.00">_typet, aggregate_traitst &gt;</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node12 -->
+<g id="edge11" class="edge">
+<title>Node1&#45;&gt;Node12</title>
+<path fill="none" stroke="midnightblue" d="M112.32,-168.64C129.6,-173.26 149.76,-178.66 168.98,-183.81"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="113.08,-165.22 102.52,-166.01 111.27,-171.98 113.08,-165.22"/>
+</g>
+<!-- Node3 -->
+<g id="node3" class="node">
+<title>Node3</title>
+<g id="a_node3"><a xlink:href="classtwo__value__struct__abstract__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="677,-268.5 677,-298.5 822,-298.5 822,-268.5 677,-268.5"/>
+<text text-anchor="start" x="685" y="-286.5" font-family="Helvetica,sans-Serif" font-size="10.00">two_value_struct_abstract</text>
+<text text-anchor="middle" x="749.5" y="-275.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
+</a>
+</g>
+</g>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge">
+<title>Node2&#45;&gt;Node3</title>
+<path fill="none" stroke="midnightblue" d="M650.45,-283.5C659.24,-283.5 668.14,-283.5 676.8,-283.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="650.2,-280 640.2,-283.5 650.2,-287 650.2,-280"/>
+</g>
+<!-- Node5 -->
+<g id="node5" class="node">
+<title>Node5</title>
+<g id="a_node5"><a xlink:href="classfull__struct__abstract__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="694.5,-369.5 694.5,-399.5 804.5,-399.5 804.5,-369.5 694.5,-369.5"/>
+<text text-anchor="start" x="702.5" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">full_struct_abstract</text>
+<text text-anchor="middle" x="749.5" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
+</a>
+</g>
+</g>
+<!-- Node4&#45;&gt;Node5 -->
+<g id="edge4" class="edge">
+<title>Node4&#45;&gt;Node5</title>
+<path fill="none" stroke="midnightblue" d="M645.25,-384.5C661.75,-384.5 678.87,-384.5 694.32,-384.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="645.07,-381 635.07,-384.5 645.07,-388 645.07,-381"/>
+</g>
+<!-- Node7 -->
+<g id="node7" class="node">
+<title>Node7</title>
+<g id="a_node7"><a xlink:href="classtwo__value__array__abstract__objectt.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="678,-107.5 678,-137.5 821,-137.5 821,-107.5 678,-107.5"/>
 <text text-anchor="start" x="686" y="-125.5" font-family="Helvetica,sans-Serif" font-size="10.00">two_value_array_abstract</text>
 <text text-anchor="middle" x="749.5" y="-114.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
 </a>
 </g>
 </g>
-<!-- Node7&#45;&gt;Node8 -->
-<g id="edge7" class="edge">
-<title>Node7&#45;&gt;Node8</title>
+<!-- Node6&#45;&gt;Node7 -->
+<g id="edge6" class="edge">
+<title>Node6&#45;&gt;Node7</title>
 <path fill="none" stroke="midnightblue" d="M649.37,-122.5C658.85,-122.5 668.46,-122.5 677.79,-122.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="649.17,-119 639.17,-122.5 649.17,-126 649.17,-119"/>
 </g>
-<!-- Node10 -->
-<g id="node10" class="node">
-<title>Node10</title>
-<g id="a_node10"><a xlink:href="classfull__array__abstract__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="695.5,-11.5 695.5,-41.5 803.5,-41.5 803.5,-11.5 695.5,-11.5"/>
-<text text-anchor="start" x="703.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">full_array_abstract</text>
+<!-- Node9 -->
+<g id="node9" class="node">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="classtwo__value__union__abstract__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="677.5,-11.5 677.5,-41.5 821.5,-41.5 821.5,-11.5 677.5,-11.5"/>
+<text text-anchor="start" x="685.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">two_value_union_abstract</text>
 <text text-anchor="middle" x="749.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
 </a>
 </g>
 </g>
-<!-- Node9&#45;&gt;Node10 -->
-<g id="edge9" class="edge">
-<title>Node9&#45;&gt;Node10</title>
-<path fill="none" stroke="midnightblue" d="M644.11,-26.5C661.36,-26.5 679.35,-26.5 695.44,-26.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="644.06,-23 634.06,-26.5 644.06,-30 644.06,-23"/>
+<!-- Node8&#45;&gt;Node9 -->
+<g id="edge8" class="edge">
+<title>Node8&#45;&gt;Node9</title>
+<path fill="none" stroke="midnightblue" d="M649.92,-26.5C659.05,-26.5 668.3,-26.5 677.29,-26.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="649.69,-23 639.69,-26.5 649.69,-30 649.69,-23"/>
 </g>
-<!-- Node12 -->
-<g id="node12" class="node">
-<title>Node12</title>
-<g id="a_node12"><a xlink:href="classtwo__value__union__abstract__objectt.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="677.5,-191.5 677.5,-221.5 821.5,-221.5 821.5,-191.5 677.5,-191.5"/>
-<text text-anchor="start" x="685.5" y="-209.5" font-family="Helvetica,sans-Serif" font-size="10.00">two_value_union_abstract</text>
+<!-- Node11 -->
+<g id="node11" class="node">
+<title>Node11</title>
+<g id="a_node11"><a xlink:href="classfull__array__abstract__objectt.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="695.5,-191.5 695.5,-221.5 803.5,-221.5 803.5,-191.5 695.5,-191.5"/>
+<text text-anchor="start" x="703.5" y="-209.5" font-family="Helvetica,sans-Serif" font-size="10.00">full_array_abstract</text>
 <text text-anchor="middle" x="749.5" y="-198.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt</text>
 </a>
 </g>
 </g>
-<!-- Node11&#45;&gt;Node12 -->
-<g id="edge11" class="edge">
-<title>Node11&#45;&gt;Node12</title>
-<path fill="none" stroke="midnightblue" d="M649.92,-206.5C659.05,-206.5 668.3,-206.5 677.29,-206.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="649.69,-203 639.69,-206.5 649.69,-210 649.69,-203"/>
+<!-- Node10&#45;&gt;Node11 -->
+<g id="edge10" class="edge">
+<title>Node10&#45;&gt;Node11</title>
+<path fill="none" stroke="midnightblue" d="M644.11,-206.5C661.36,-206.5 679.35,-206.5 695.44,-206.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="644.06,-203 634.06,-206.5 644.06,-210 644.06,-203"/>
+</g>
+<!-- Node12&#45;&gt;Node2 -->
+<g id="edge12" class="edge">
+<title>Node12&#45;&gt;Node2</title>
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M296.54,-228.09C309.24,-233.42 322.94,-238.61 336,-242.5 388.51,-258.13 449.6,-268.65 495.77,-275.12"/>
+<polygon fill="orange" stroke="orange" points="297.61,-224.74 287.04,-224.01 294.85,-231.17 297.61,-224.74"/>
+<text text-anchor="start" x="348" y="-297.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; two_value_struct</text>
+<text text-anchor="start" x="348" y="-286.5" font-family="Helvetica,sans-Serif" font-size="10.00">_abstract_objectt, struct</text>
+<text text-anchor="middle" x="407" y="-275.5" font-family="Helvetica,sans-Serif" font-size="10.00">_aggregate_typet &gt;</text>
+</g>
+<!-- Node12&#45;&gt;Node4 -->
+<g id="edge13" class="edge">
+<title>Node12&#45;&gt;Node4</title>
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M263.45,-232.45C280.05,-255.73 306.14,-287.7 336,-307.5 386.29,-340.85 452.32,-360.95 500.9,-372.2"/>
+<polygon fill="orange" stroke="orange" points="266.15,-230.21 257.57,-224 260.41,-234.21 266.15,-230.21"/>
+<text text-anchor="start" x="343" y="-389.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; full_struct_abstract</text>
+<text text-anchor="start" x="343" y="-378.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, struct_aggregate</text>
+<text text-anchor="middle" x="407" y="-367.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
+</g>
+<!-- Node12&#45;&gt;Node6 -->
+<g id="edge14" class="edge">
+<title>Node12&#45;&gt;Node6</title>
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M299.73,-179.15C311.54,-174.51 324.07,-170.01 336,-166.5 389.07,-150.88 450.67,-139.47 496.91,-132.19"/>
+<polygon fill="orange" stroke="orange" points="298.4,-175.91 290.42,-182.88 301.01,-182.4 298.4,-175.91"/>
+<text text-anchor="start" x="336.5" y="-191.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; two_value_array_abstract</text>
+<text text-anchor="start" x="336.5" y="-180.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, array_aggregate</text>
+<text text-anchor="middle" x="407" y="-169.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
+</g>
+<!-- Node12&#45;&gt;Node8 -->
+<g id="edge15" class="edge">
+<title>Node12&#45;&gt;Node8</title>
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M263.29,-174.11C279.79,-150.51 305.83,-118.18 336,-98.5 384.73,-66.71 448.34,-48.24 496.48,-37.99"/>
+<polygon fill="orange" stroke="orange" points="260.19,-172.44 257.44,-182.68 265.97,-176.39 260.19,-172.44"/>
+<text text-anchor="start" x="336" y="-123.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; two_value_union_abstract</text>
+<text text-anchor="start" x="336" y="-112.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, union_aggregate</text>
+<text text-anchor="middle" x="407" y="-101.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
+</g>
+<!-- Node12&#45;&gt;Node10 -->
+<g id="edge16" class="edge">
+<title>Node12&#45;&gt;Node10</title>
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M328.36,-204.28C382.51,-204.78 451.94,-205.43 501.93,-205.89"/>
+<polygon fill="orange" stroke="orange" points="328.12,-200.78 318.08,-204.18 328.05,-207.78 328.12,-200.78"/>
+<text text-anchor="start" x="344" y="-230.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; full_array_abstract</text>
+<text text-anchor="start" x="344" y="-219.5" font-family="Helvetica,sans-Serif" font-size="10.00">_objectt, array_aggregate</text>
+<text text-anchor="middle" x="407" y="-208.5" font-family="Helvetica,sans-Serif" font-size="10.00">_typet &gt;</text>
 </g>
 </g>
 </svg>

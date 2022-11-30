@@ -1,16 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover.h">
-<area shape="rect" id="node1" title=" " alt="" coords="755,5,948,61"/>
-<area shape="rect" id="node2" href="$cover__filter_8h.html" title=" " alt="" coords="647,109,754,136"/>
-<area shape="rect" id="node36" href="$cover__instrument_8h.html" title=" " alt="" coords="949,109,1097,136"/>
+<area shape="rect" id="node1" title="Coverage Instrumentation." alt="" coords="755,5,948,61"/>
+<area shape="rect" id="node2" href="$cover__filter_8h.html" title="Filters for the Coverage Instrumentation." alt="" coords="647,109,754,136"/>
+<area shape="rect" id="node36" href="$cover__instrument_8h.html" title="Coverage Instrumentation." alt="" coords="949,109,1097,136"/>
 <area shape="rect" id="node38" href="$make__unique_8h.html" title=" " alt="" coords="778,109,925,136"/>
 <area shape="rect" id="node3" title=" " alt="" coords="549,191,607,218"/>
 <area shape="rect" id="node4" title=" " alt="" coords="813,191,890,218"/>
-<area shape="rect" id="node5" href="$goto__functions_8h.html" title=" " alt="" coords="632,184,783,225"/>
-<area shape="rect" id="node6" href="$goto__function_8h.html" title=" " alt="" coords="807,273,930,300"/>
+<area shape="rect" id="node5" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="632,184,783,225"/>
+<area shape="rect" id="node6" href="$goto__function_8h.html" title="Goto Function." alt="" coords="807,273,930,300"/>
 <area shape="rect" id="node34" href="$cprover__prefix_8h.html" title=" " alt="" coords="631,273,783,300"/>
 <area shape="rect" id="node35" title=" " alt="" coords="557,273,607,300"/>
-<area shape="rect" id="node7" href="$std__types_8h.html" title=" " alt="" coords="559,572,682,599"/>
-<area shape="rect" id="node28" href="$goto__program_8h.html" title=" " alt="" coords="1278,348,1403,375"/>
+<area shape="rect" id="node7" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="559,572,682,599"/>
+<area shape="rect" id="node28" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1278,348,1403,375"/>
 <area shape="rect" id="node8" href="$expr_8h.html" title=" " alt="" coords="457,721,520,748"/>
 <area shape="rect" id="node15" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="899,1020,991,1047"/>
 <area shape="rect" id="node17" href="$validate_8h.html" title=" " alt="" coords="5,871,92,897"/>
@@ -18,7 +18,7 @@
 <area shape="rect" id="node24" href="$mp__arith_8h.html" title=" " alt="" coords="1092,647,1184,673"/>
 <area shape="rect" id="node27" title=" " alt="" coords="539,647,663,673"/>
 <area shape="rect" id="node9" href="$as__const_8h.html" title=" " alt="" coords="357,796,447,823"/>
-<area shape="rect" id="node10" href="$type_8h.html" title=" " alt="" coords="269,796,332,823"/>
+<area shape="rect" id="node10" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="269,796,332,823"/>
 <area shape="rect" id="node18" href="$validation__mode_8h.html" title=" " alt="" coords="219,945,361,972"/>
 <area shape="rect" id="node19" href="$validate__types_8h.html" title=" " alt="" coords="379,871,510,897"/>
 <area shape="rect" id="node20" href="$validate__expressions_8h.html" title=" " alt="" coords="523,796,695,823"/>
@@ -35,6 +35,6 @@
 <area shape="rect" id="node32" title=" " alt="" coords="1403,423,1446,449"/>
 <area shape="rect" id="node33" title=" " alt="" coords="1470,423,1529,449"/>
 <area shape="rect" id="node30" href="$std__code__base_8h.html" title=" " alt="" coords="658,497,813,524"/>
-<area shape="rect" id="node31" href="$std__expr_8h.html" title=" " alt="" coords="837,497,951,524"/>
+<area shape="rect" id="node31" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="837,497,951,524"/>
 <area shape="rect" id="node37" href="$namespace_8h.html" title=" " alt="" coords="983,871,1117,897"/>
 </map>

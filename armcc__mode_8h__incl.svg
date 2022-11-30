@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Base class for command line interpretation for CL.">
 <polygon fill="#bfbfbf" stroke="black" points="114,-392.5 114,-433.5 252,-433.5 252,-392.5 114,-392.5"/>
 <text text-anchor="start" x="122" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="122" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/armcc</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="armcc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="armcc__cmdline_8h.html" target="_top" xlink:title="A special command line object to mimic ARM&#39;s armcc.">
 <polygon fill="none" stroke="black" points="133,-336.5 133,-355.5 233,-355.5 233,-336.5 133,-336.5"/>
 <text text-anchor="middle" x="183" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">armcc_cmdline.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node37 -->
 <g id="node25" class="node">
 <title>Node37</title>
-<g id="a_node25"><a xlink:href="goto__cc__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="goto__cc__mode_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="0,-336.5 0,-355.5 96,-355.5 96,-336.5 0,-336.5"/>
 <text text-anchor="middle" x="48" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_mode.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="129.5,-280.5 129.5,-299.5 236.5,-299.5 236.5,-280.5 129.5,-280.5"/>
 <text text-anchor="middle" x="183" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_cmdline.h</text>
 </a>
@@ -406,7 +406,7 @@
 <!-- Node23 -->
 <g id="node23" class="node">
 <title>Node23</title>
-<g id="a_node23"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="321,-56.5 321,-75.5 385,-75.5 385,-56.5 321,-56.5"/>
 <text text-anchor="middle" x="353" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>

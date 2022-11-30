@@ -1,39 +1,37 @@
 <map id="goto_program_dereferencet" name="goto_program_dereferencet">
-<area shape="rect" id="node1" title="Wrapper for functions removing dereferences in expressions contained in a goto program." alt="" coords="2243,165,2445,192"/>
-<area shape="rect" id="node2" href="$classdereference__callbackt.html" title="Base class for pointer value set analysis." alt="" coords="1575,84,1741,111"/>
-<area shape="rect" id="node12" href="$classvalue__set__dereferencet.html" title="Wrapper for a function dereferencing pointer expressions using a value set." alt="" coords="1937,227,2112,253"/>
-<area shape="rect" id="node3" href="$classoptionst.html" title=" " alt="" coords="1621,329,1695,356"/>
-<area shape="rect" id="node4" title="STL class." alt="" coords="883,347,991,373"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1230,265,1393,306"/>
-<area shape="rect" id="node33" title=" " alt="" coords="1571,409,1745,436"/>
-<area shape="rect" id="node5" title=" " alt="" coords="331,217,370,244"/>
-<area shape="rect" id="node9" title="STL class." alt="" coords="870,212,1005,239"/>
-<area shape="rect" id="node16" title="STL class." alt="" coords="561,480,690,507"/>
-<area shape="rect" id="node27" title="STL class." alt="" coords="853,19,1021,45"/>
-<area shape="rect" id="node28" title="STL class." alt="" coords="861,70,1013,111"/>
-<area shape="rect" id="node7" title="STL class." alt="" coords="894,275,981,301"/>
-<area shape="rect" id="node8" title="STL class." alt="" coords="556,279,695,321"/>
-<area shape="rect" id="node10" title=" " alt="" coords="606,65,645,92"/>
-<area shape="rect" id="node11" href="$classvalue__setst.html" title=" " alt="" coords="1976,113,2073,140"/>
-<area shape="rect" id="node13" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1615,683,1701,709"/>
-<area shape="rect" id="node18" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1945,756,2104,783"/>
-<area shape="rect" id="node14" href="$classmessage__handlert.html" title=" " alt="" coords="1240,537,1383,564"/>
-<area shape="rect" id="node15" title=" " alt="" coords="844,535,1031,561"/>
-<area shape="rect" id="node35" title=" " alt="" coords="859,480,1016,507"/>
-<area shape="rect" id="node17" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1229,676,1393,703"/>
-<area shape="rect" id="node19" title="STL class." alt="" coords="1587,779,1729,805"/>
-<area shape="rect" id="node20" title="STL class." alt="" coords="1220,778,1403,819"/>
-<area shape="rect" id="node21" title="STL class." alt="" coords="865,778,1010,819"/>
-<area shape="rect" id="node22" href="$classsource__locationt.html" title=" " alt="" coords="403,841,532,868"/>
-<area shape="rect" id="node23" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="221,713,273,740"/>
-<area shape="rect" id="node37" href="$classexprt.html" title="Base class for all expressions." alt="" coords="323,667,379,693"/>
-<area shape="rect" id="node24" href="$classsharing__treet.html" title=" " alt="" coords="5,699,172,755"/>
-<area shape="rect" id="node25" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1247,727,1375,753"/>
-<area shape="rect" id="node26" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1235,76,1388,103"/>
-<area shape="rect" id="node29" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1607,24,1709,51"/>
-<area shape="rect" id="node30" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1241,24,1381,51"/>
-<area shape="rect" id="node31" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1622,180,1694,207"/>
-<area shape="rect" id="node32" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="1965,387,2084,413"/>
-<area shape="rect" id="node34" href="$structstatement__list__parse__treet_1_1instructiont.html" title="Represents a regular Statement List instruction which consists out of one or more codet tokens." alt="" coords="1232,471,1391,513"/>
-<area shape="rect" id="node36" href="$classcodet.html" title="Data structure for representing an arbitrary statement in a program." alt="" coords="596,605,655,632"/>
+<area shape="rect" id="node1" title="Wrapper for functions removing dereferences in expressions contained in a goto program." alt="" coords="2005,545,2208,572"/>
+<area shape="rect" id="node2" href="$classdereference__callbackt.html" title="Base class for pointer value set analysis." alt="" coords="1341,485,1508,512"/>
+<area shape="rect" id="node13" href="$classvalue__set__dereferencet.html" title="Wrapper for a function dereferencing pointer expressions using a value set." alt="" coords="1700,545,1875,572"/>
+<area shape="rect" id="node3" href="$classoptionst.html" title=" " alt="" coords="1387,124,1462,151"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1001,50,1163,91"/>
+<area shape="rect" id="node5" title=" " alt="" coords="298,19,385,45"/>
+<area shape="rect" id="node7" title=" " alt="" coords="625,117,791,144"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,11,144,53"/>
+<area shape="rect" id="node8" title=" " alt="" coords="287,188,395,215"/>
+<area shape="rect" id="node35" title=" " alt="" coords="621,188,795,215"/>
+<area shape="rect" id="node9" title=" " alt="" coords="55,299,94,325"/>
+<area shape="rect" id="node10" title=" " alt="" coords="274,117,409,144"/>
+<area shape="rect" id="node17" title=" " alt="" coords="277,296,406,323"/>
+<area shape="rect" id="node30" title=" " alt="" coords="257,347,425,373"/>
+<area shape="rect" id="node31" title=" " alt="" coords="265,427,417,469"/>
+<area shape="rect" id="node11" title=" " alt="" coords="55,208,94,235"/>
+<area shape="rect" id="node12" href="$classvalue__setst.html" title=" " alt="" coords="1739,784,1836,811"/>
+<area shape="rect" id="node14" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1381,427,1468,453"/>
+<area shape="rect" id="node19" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1708,309,1867,336"/>
+<area shape="rect" id="node15" href="$classmessage__handlert.html" title=" " alt="" coords="1011,507,1153,533"/>
+<area shape="rect" id="node16" title=" " alt="" coords="615,411,801,437"/>
+<area shape="rect" id="node18" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1000,405,1164,432"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1354,236,1495,263"/>
+<area shape="rect" id="node21" title=" " alt="" coords="991,239,1173,281"/>
+<area shape="rect" id="node22" title=" " alt="" coords="635,239,781,281"/>
+<area shape="rect" id="node23" href="$classsource__locationt.html" title=" " alt="" coords="1360,287,1489,313"/>
+<area shape="rect" id="node24" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1056,313,1108,340"/>
+<area shape="rect" id="node25" href="$classsharing__treet.html" title=" " alt="" coords="625,305,791,361"/>
+<area shape="rect" id="node26" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1018,456,1146,483"/>
+<area shape="rect" id="node27" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1005,557,1159,584"/>
+<area shape="rect" id="node32" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1373,611,1476,637"/>
+<area shape="rect" id="node28" title=" " alt="" coords="631,490,785,531"/>
+<area shape="rect" id="node29" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="305,672,377,699"/>
+<area shape="rect" id="node33" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1012,620,1152,647"/>
+<area shape="rect" id="node34" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="1198,163,1317,189"/>
 </map>

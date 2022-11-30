@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="The base of all pointer abstractions.">
 <polygon fill="#bfbfbf" stroke="black" points="266,-178.5 266,-230.5 420,-230.5 420,-178.5 266,-178.5"/>
 <text text-anchor="start" x="274" y="-218.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="274" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -41,7 +41,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="constant__pointer__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="constant__pointer__abstract__object_8h.html" target="_top" xlink:title="An abstraction of a pointer that tracks a single pointer.">
 <polygon fill="none" stroke="black" points="177,-89.5 177,-141.5 333,-141.5 333,-89.5 177,-89.5"/>
 <text text-anchor="start" x="185" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="185" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -77,7 +77,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="value__set__pointer__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="value__set__pointer__abstract__object_8h.html" target="_top" xlink:title="Value Set of Pointer Abstract Object.">
 <polygon fill="none" stroke="black" points="351.5,-89.5 351.5,-141.5 512.5,-141.5 512.5,-89.5 351.5,-89.5"/>
 <text text-anchor="start" x="359.5" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="359.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -113,7 +113,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="value__set__pointer__abstract__object_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="value__set__pointer__abstract__object_8cpp.html" target="_top" xlink:title="Value Set of Pointer Abstract Object.">
 <polygon fill="none" stroke="black" points="174.5,-0.5 174.5,-52.5 335.5,-52.5 335.5,-0.5 174.5,-0.5"/>
 <text text-anchor="start" x="182.5" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="182.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="C++ Parser.">
 <polygon fill="#bfbfbf" stroke="black" points="198,-67.5 198,-97.5 346,-97.5 346,-67.5 198,-67.5"/>
 <text text-anchor="start" x="206" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="272" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_parser.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title="C++ Language Module.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 174,-30.5 174,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="87" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_language.cpp</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cpp__parser_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cpp__parser_8cpp.html" target="_top" xlink:title="C++ Parser.">
 <polygon fill="none" stroke="black" points="192.5,-0.5 192.5,-30.5 351.5,-30.5 351.5,-0.5 192.5,-0.5"/>
 <text text-anchor="start" x="200.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="272" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_parser.cpp</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="parse_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="parse_8cpp.html" target="_top" xlink:title="C++ Language Parsing.">
 <polygon fill="none" stroke="black" points="370,-0.5 370,-30.5 508,-30.5 508,-0.5 370,-0.5"/>
 <text text-anchor="start" x="378" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="439" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/parse.cpp</text>

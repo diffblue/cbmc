@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions.">
 <polygon fill="#bfbfbf" stroke="black" points="342.5,-78.5 342.5,-108.5 535.5,-108.5 535.5,-78.5 342.5,-78.5"/>
 <text text-anchor="start" x="350.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="439" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/assembler/remove_asm.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="remove__asm_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="remove__asm_8cpp.html" target="_top" xlink:title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 158,-41.5 158,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/assembler/remove</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="176,-0.5 176,-41.5 330,-41.5 330,-0.5 176,-0.5"/>
 <text text-anchor="start" x="184" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="184" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Goto&#45;Analyser Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="348,-0.5 348,-41.5 530,-41.5 530,-0.5 348,-0.5"/>
 <text text-anchor="start" x="356" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="356" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -72,7 +72,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__diff__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__diff__parse__options_8cpp.html" target="_top" xlink:title="GOTO&#45;DIFF Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="548,-0.5 548,-41.5 686,-41.5 686,-0.5 548,-0.5"/>
 <text text-anchor="start" x="556" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="556" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;diff/goto</text>
@@ -89,7 +89,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="704,-0.5 704,-41.5 898,-41.5 898,-0.5 704,-0.5"/>
 <text text-anchor="start" x="712" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="712" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

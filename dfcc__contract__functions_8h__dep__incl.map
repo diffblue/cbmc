@@ -1,16 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_functions.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_functions.h">
-<area shape="rect" id="node1" title=" " alt="" coords="547,5,744,76"/>
-<area shape="rect" id="node2" href="$dfcc__contract__handler_8h.html" title=" " alt="" coords="207,124,404,195"/>
-<area shape="rect" id="node12" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="429,124,635,195"/>
-<area shape="rect" id="node13" href="$dfcc__wrapper__program_8h.html" title=" " alt="" coords="660,124,857,195"/>
-<area shape="rect" id="node14" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="775,243,977,313"/>
-<area shape="rect" id="node3" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,369,361,425"/>
-<area shape="rect" id="node9" href="$dfcc__swap__and__wrap_8h.html" title=" " alt="" coords="279,243,476,313"/>
-<area shape="rect" id="node11" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="536,243,733,313"/>
-<area shape="rect" id="node4" href="$dfcc_8cpp.html" title=" " alt="" coords="21,480,219,551"/>
-<area shape="rect" id="node5" href="$goto__instrument__parse__options_8h.html" title=" " alt="" coords="243,487,485,543"/>
-<area shape="rect" id="node6" href="$goto__instrument__languages_8cpp.html" title=" " alt="" coords="5,599,240,655"/>
-<area shape="rect" id="node7" href="$goto__instrument__main_8cpp.html" title=" " alt="" coords="264,599,464,655"/>
-<area shape="rect" id="node8" href="$goto__instrument__parse__options_8cpp.html" title=" " alt="" coords="488,599,747,655"/>
-<area shape="rect" id="node10" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="385,361,583,432"/>
+<area shape="rect" id="node1" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="412,5,609,76"/>
+<area shape="rect" id="node2" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="70,124,277,195"/>
+<area shape="rect" id="node3" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="301,124,499,195"/>
+<area shape="rect" id="node13" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="721,243,924,313"/>
+<area shape="rect" id="node14" href="$dfcc__wrapper__program_8h.html" title="Generates the body of a wrapper function from a contract for contract checking or contract replacemen..." alt="" coords="523,124,720,195"/>
+<area shape="rect" id="node4" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,369,361,425"/>
+<area shape="rect" id="node10" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="500,243,697,313"/>
+<area shape="rect" id="node11" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="279,243,476,313"/>
+<area shape="rect" id="node5" href="$dfcc_8cpp.html" title=" " alt="" coords="21,480,219,551"/>
+<area shape="rect" id="node6" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,487,485,543"/>
+<area shape="rect" id="node7" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,599,240,655"/>
+<area shape="rect" id="node8" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,599,464,655"/>
+<area shape="rect" id="node9" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,599,747,655"/>
+<area shape="rect" id="node12" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="385,361,583,432"/>
 </map>

@@ -32,8 +32,8 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M134.45,-80.95C123.45,-66.01 107.67,-44.58 97.38,-30.6"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="131.83,-83.3 140.58,-89.28 137.47,-79.15 131.83,-83.3"/>
-<text text-anchor="middle" x="141.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> value</text>
-<text text-anchor="middle" x="141.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">index</text>
+<text text-anchor="middle" x="141.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> index</text>
+<text text-anchor="middle" x="141.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">value</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -123,25 +123,25 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="86.15,-425.65 81.63,-435.23 91.14,-430.56 86.15,-425.65"/>
 <text text-anchor="middle" x="118.5" y="-409" font-family="Helvetica,sans-Serif" font-size="10.00"> var</text>
 </g>
-<!-- Node13 -->
+<!-- Node14 -->
 <g id="node8" class="node">
-<title>Node13</title>
-<g id="a_node8"><a xlink:title="STL class.">
+<title>Node14</title>
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="223.5,-368.5 223.5,-387.5 320.5,-387.5 320.5,-368.5 223.5,-368.5"/>
 <text text-anchor="middle" x="272" y="-375.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node13&#45;&gt;Node3 -->
+<!-- Node14&#45;&gt;Node3 -->
 <g id="edge8" class="edge">
-<title>Node13&#45;&gt;Node3</title>
+<title>Node14&#45;&gt;Node3</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M290.86,-361.27C293.77,-357.88 296.36,-354.07 298,-350 299.83,-345.47 299.14,-343.75 298,-339 281.09,-268.65 275.18,-245.14 224,-194 216.04,-186.04 205.25,-179.97 195.48,-175.61"/>
 <polygon fill="orange" stroke="orange" points="288.35,-358.83 283.74,-368.37 293.3,-363.78 288.35,-358.83"/>
 <text text-anchor="middle" x="317.5" y="-264" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; monomialt &gt;</text>
 </g>
-<!-- Node13&#45;&gt;Node5 -->
+<!-- Node14&#45;&gt;Node5 -->
 <g id="edge7" class="edge">
-<title>Node13&#45;&gt;Node5</title>
+<title>Node14&#45;&gt;Node5</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M213.41,-366.74C203.33,-362.83 193.65,-357.44 186,-350 178.1,-342.31 174.36,-330.27 172.59,-320.81"/>
 <polygon fill="orange" stroke="orange" points="212.56,-370.15 223.15,-370.05 214.81,-363.52 212.56,-370.15"/>
 <text text-anchor="middle" x="242" y="-342" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; monomialt::termt &gt;</text>

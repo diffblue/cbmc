@@ -31,8 +31,8 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M65.5,-68.22C65.5,-52.7 65.5,-31.36 65.5,-19.62"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="62,-68.28 65.5,-78.28 69,-68.28 62,-68.28"/>
-<text text-anchor="middle" x="85.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00"> parents</text>
-<text text-anchor="middle" x="85.5" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">children</text>
+<text text-anchor="middle" x="87" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00"> children</text>
+<text text-anchor="middle" x="87" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">parents</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="75,-145.5 75,-164.5 172,-164.5 172,-145.5 75,-145.5"/>
 <text text-anchor="middle" x="123.5" y="-152.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>

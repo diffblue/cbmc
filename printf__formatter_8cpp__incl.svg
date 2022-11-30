@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="printf Formatting">
 <polygon fill="#bfbfbf" stroke="black" points="554,-728.5 554,-769.5 692,-769.5 692,-728.5 554,-728.5"/>
 <text text-anchor="start" x="562" y="-757.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="562" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="printf__formatter_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="printf__formatter_8h.html" target="_top" xlink:title="printf Formatting">
 <polygon fill="none" stroke="black" points="251.5,-672.5 251.5,-691.5 354.5,-691.5 354.5,-672.5 251.5,-672.5"/>
 <text text-anchor="middle" x="303" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">printf_formatter.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node39 -->
 <g id="node26" class="node">
 <title>Node39</title>
-<g id="a_node26"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="560,-616.5 560,-635.5 646,-635.5 646,-616.5 560,-616.5"/>
 <text text-anchor="middle" x="603" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node46 -->
 <g id="node35" class="node">
 <title>Node46</title>
-<g id="a_node35"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="663.5,-560.5 663.5,-579.5 730.5,-579.5 730.5,-560.5 663.5,-560.5"/>
 <text text-anchor="middle" x="697" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -172,7 +172,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="333.5,-336.5 333.5,-355.5 380.5,-355.5 380.5,-336.5 333.5,-336.5"/>
 <text text-anchor="middle" x="357" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -385,7 +385,7 @@
 <!-- Node15 -->
 <g id="node14" class="node">
 <title>Node15</title>
-<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="326,-56.5 326,-75.5 390,-75.5 390,-56.5 326,-56.5"/>
 <text text-anchor="middle" x="358" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -520,7 +520,7 @@
 <!-- Node40 -->
 <g id="node27" class="node">
 <title>Node40</title>
-<g id="a_node27"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="544.5,-560.5 544.5,-579.5 645.5,-579.5 645.5,-560.5 544.5,-560.5"/>
 <text text-anchor="middle" x="595" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -541,7 +541,7 @@
 <!-- Node41 -->
 <g id="node28" class="node">
 <title>Node41</title>
-<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="558.5,-504.5 558.5,-523.5 631.5,-523.5 631.5,-504.5 558.5,-504.5"/>
 <text text-anchor="middle" x="595" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

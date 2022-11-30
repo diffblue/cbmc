@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Value Set Abstract Object.">
 <polygon fill="#bfbfbf" stroke="black" points="912.6,-503.5 912.6,-555.5 1079.6,-555.5 1079.6,-503.5 912.6,-503.5"/>
 <text text-anchor="start" x="920.6" y="-543.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="920.6" y="-532.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="abstract__object__set_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="abstract__object__set_8h.html" target="_top" xlink:title="an unordered set of value objects">
 <polygon fill="none" stroke="black" points="971.1,-436.5 971.1,-466.5 1129.1,-466.5 1129.1,-436.5 971.1,-436.5"/>
 <text text-anchor="start" x="979.1" y="-454.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="1050.1" y="-443.5" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_object_set.h</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="abstract__value__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="abstract__value__object_8h.html" target="_top" xlink:title="Common behaviour for abstract objects modelling values &#45; constants, intervals, etc.">
 <polygon fill="none" stroke="black" points="864.1,-369.5 864.1,-399.5 1022.1,-399.5 1022.1,-369.5 864.1,-369.5"/>
 <text text-anchor="start" x="872.1" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="943.1" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_value_object.h</text>
@@ -76,7 +76,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari...">
 <polygon fill="none" stroke="black" points="864.1,-302.5 864.1,-332.5 1022.1,-332.5 1022.1,-302.5 864.1,-302.5"/>
 <text text-anchor="start" x="872.1" y="-320.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="943.1" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_object.h</text>
@@ -137,7 +137,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="478.6,-235.5 478.6,-265.5 591.6,-265.5 591.6,-235.5 478.6,-235.5"/>
 <text text-anchor="start" x="486.6" y="-253.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="535.1" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -153,7 +153,7 @@
 <!-- Node53 -->
 <g id="node22" class="node">
 <title>Node53</title>
-<g id="a_node22"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title="Sharing map.">
 <polygon fill="none" stroke="black" points="889.6,-241 889.6,-260 996.6,-260 996.6,-241 889.6,-241"/>
 <text text-anchor="middle" x="943.1" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">util/sharing_map.h</text>
 </a>
@@ -294,7 +294,7 @@
 <!-- Node51 -->
 <g id="node14" class="node">
 <title>Node51</title>
-<g id="a_node14"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="287.1,-118 287.1,-137 373.1,-137 373.1,-118 287.1,-118"/>
 <text text-anchor="middle" x="330.1" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -534,7 +534,7 @@
 <!-- Node57 -->
 <g id="node28" class="node">
 <title>Node57</title>
-<g id="a_node28"><a xlink:href="sharing__node_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="sharing__node_8h.html" target="_top" xlink:title="Sharing node.">
 <polygon fill="none" stroke="black" points="971.6,-179.5 971.6,-198.5 1062.6,-198.5 1062.6,-179.5 971.6,-179.5"/>
 <text text-anchor="middle" x="1017.1" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">sharing_node.h</text>
 </a>
@@ -597,7 +597,7 @@
 <!-- Node58 -->
 <g id="node30" class="node">
 <title>Node58</title>
-<g id="a_node30"><a xlink:href="small__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="small__map_8h.html" target="_top" xlink:title="Small map.">
 <polygon fill="none" stroke="red" points="1188.1,-118 1188.1,-137 1268.1,-137 1268.1,-118 1188.1,-118"/>
 <text text-anchor="middle" x="1228.1" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">small_map.h</text>
 </a>

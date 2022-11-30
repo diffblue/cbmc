@@ -1,14 +1,14 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_instrument.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_instrument.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1337,5,1534,76"/>
+<area shape="rect" id="node1" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="1337,5,1534,76"/>
 <area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="1130,213,1258,240"/>
-<area shape="rect" id="node13" href="$std__expr_8h.html" title=" " alt="" coords="904,288,993,315"/>
-<area shape="rect" id="node27" href="$std__types_8h.html" title=" " alt="" coords="589,363,687,389"/>
+<area shape="rect" id="node13" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="904,288,993,315"/>
+<area shape="rect" id="node27" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="589,363,687,389"/>
 <area shape="rect" id="node30" href="$c__types_8h.html" title=" " alt="" coords="1233,131,1342,158"/>
 <area shape="rect" id="node33" href="$src_2util_2message_8h.html" title=" " alt="" coords="1593,512,1712,539"/>
 <area shape="rect" id="node34" href="$namespace_8h.html" title=" " alt="" coords="1033,661,1168,688"/>
-<area shape="rect" id="node35" href="$goto__program_8h.html" title=" " alt="" coords="1417,124,1568,165"/>
+<area shape="rect" id="node35" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1417,124,1568,165"/>
 <area shape="rect" id="node38" title=" " alt="" coords="1659,213,1702,240"/>
-<area shape="rect" id="node39" href="$dfcc__contract__mode_8h.html" title=" " alt="" coords="1777,131,1942,158"/>
+<area shape="rect" id="node39" href="$dfcc__contract__mode_8h.html" title="Enum type representing the contract checking and replacement modes." alt="" coords="1777,131,1942,158"/>
 <area shape="rect" id="node40" title=" " alt="" coords="1966,131,2017,158"/>
 <area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="976,811,1068,837"/>
 <area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="1136,512,1228,539"/>
@@ -26,7 +26,7 @@
 <area shape="rect" id="node16" title=" " alt="" coords="719,587,805,613"/>
 <area shape="rect" id="node17" href="$expr_8h.html" title=" " alt="" coords="540,512,603,539"/>
 <area shape="rect" id="node18" href="$as__const_8h.html" title=" " alt="" coords="167,587,258,613"/>
-<area shape="rect" id="node19" href="$type_8h.html" title=" " alt="" coords="479,587,541,613"/>
+<area shape="rect" id="node19" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="479,587,541,613"/>
 <area shape="rect" id="node24" href="$validation__mode_8h.html" title=" " alt="" coords="353,736,496,763"/>
 <area shape="rect" id="node25" href="$validate__types_8h.html" title=" " alt="" coords="462,661,593,688"/>
 <area shape="rect" id="node26" href="$validate__expressions_8h.html" title=" " alt="" coords="283,587,455,613"/>
@@ -35,8 +35,8 @@
 <area shape="rect" id="node21" href="$deprecate_8h.html" title=" " alt="" coords="1603,736,1702,763"/>
 <area shape="rect" id="node22" href="$irep_8h.html" title=" " alt="" coords="1243,736,1302,763"/>
 <area shape="rect" id="node28" title=" " alt="" coords="428,437,552,464"/>
-<area shape="rect" id="node31" href="$pointer__expr_8h.html" title=" " alt="" coords="641,213,755,240"/>
-<area shape="rect" id="node32" href="$bitvector__types_8h.html" title=" " alt="" coords="565,288,700,315"/>
+<area shape="rect" id="node31" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="641,213,755,240"/>
+<area shape="rect" id="node32" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="565,288,700,315"/>
 <area shape="rect" id="node36" href="$goto__instruction__code_8h.html" title=" " alt="" coords="780,213,957,240"/>
 <area shape="rect" id="node37" href="$std__code__base_8h.html" title=" " alt="" coords="725,288,879,315"/>
 </map>

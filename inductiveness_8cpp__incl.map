@@ -1,27 +1,27 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cprover/inductiveness.cpp" name="/home/runner/work/cbmc/cbmc/src/cprover/inductiveness.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1602,5,1861,47"/>
-<area shape="rect" id="node2" href="$inductiveness_8h.html" title=" " alt="" coords="1720,95,1844,121"/>
-<area shape="rect" id="node28" href="$console_8h.html" title=" " alt="" coords="146,95,255,121"/>
+<area shape="rect" id="node1" title="Inductiveness." alt="" coords="1602,5,1861,47"/>
+<area shape="rect" id="node2" href="$inductiveness_8h.html" title="Inductiveness." alt="" coords="1720,95,1844,121"/>
+<area shape="rect" id="node28" href="$console_8h.html" title="Console." alt="" coords="146,95,255,121"/>
 <area shape="rect" id="node30" href="$cout__message_8h.html" title=" " alt="" coords="5,490,159,517"/>
 <area shape="rect" id="node32" href="$format__expr_8h.html" title=" " alt="" coords="125,572,263,599"/>
 <area shape="rect" id="node34" href="$satcheck_8h.html" title=" " alt="" coords="1477,95,1644,121"/>
-<area shape="rect" id="node35" href="$axioms_8h.html" title=" " alt="" coords="1641,177,1723,203"/>
+<area shape="rect" id="node35" href="$axioms_8h.html" title="Axioms." alt="" coords="1641,177,1723,203"/>
 <area shape="rect" id="node42" href="$bv__pointers__wide_8h.html" title=" " alt="" coords="764,95,912,121"/>
-<area shape="rect" id="node56" href="$counterexample__found_8h.html" title=" " alt="" coords="1953,177,2137,203"/>
-<area shape="rect" id="node57" href="$propagate_8h.html" title=" " alt="" coords="1828,177,1928,203"/>
-<area shape="rect" id="node58" href="$solver_8h.html" title=" " alt="" coords="2035,408,2108,435"/>
+<area shape="rect" id="node56" href="$counterexample__found_8h.html" title="Counterexample Found." alt="" coords="1953,177,2137,203"/>
+<area shape="rect" id="node57" href="$propagate_8h.html" title="Propagate." alt="" coords="1828,177,1928,203"/>
+<area shape="rect" id="node58" href="$solver_8h.html" title="Equality Propagation." alt="" coords="2035,408,2108,435"/>
 <area shape="rect" id="node59" title=" " alt="" coords="2211,95,2286,121"/>
 <area shape="rect" id="node60" title=" " alt="" coords="2310,95,2390,121"/>
-<area shape="rect" id="node3" href="$solver__types_8h.html" title=" " alt="" coords="1867,259,1985,285"/>
-<area shape="rect" id="node4" href="$mathematical__expr_8h.html" title=" " alt="" coords="1136,333,1321,360"/>
-<area shape="rect" id="node21" href="$std__expr_8h.html" title=" " alt="" coords="1404,408,1493,435"/>
+<area shape="rect" id="node3" href="$solver__types_8h.html" title="Solver." alt="" coords="1867,259,1985,285"/>
+<area shape="rect" id="node4" href="$mathematical__expr_8h.html" title="API to expression classes for &#39;mathematical&#39; expressions." alt="" coords="1136,333,1321,360"/>
+<area shape="rect" id="node21" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1404,408,1493,435"/>
 <area shape="rect" id="node25" title=" " alt="" coords="1727,647,1851,673"/>
 <area shape="rect" id="node26" title=" " alt="" coords="1931,333,1998,360"/>
 <area shape="rect" id="node27" title=" " alt="" coords="2022,333,2137,360"/>
-<area shape="rect" id="node5" href="$mathematical__types_8h.html" title=" " alt="" coords="1014,490,1182,517"/>
+<area shape="rect" id="node5" href="$mathematical__types_8h.html" title="Mathematical types." alt="" coords="1014,490,1182,517"/>
 <area shape="rect" id="node6" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1165,572,1263,599"/>
 <area shape="rect" id="node10" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1056,945,1148,972"/>
-<area shape="rect" id="node14" href="$type_8h.html" title=" " alt="" coords="884,721,947,748"/>
+<area shape="rect" id="node14" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="884,721,947,748"/>
 <area shape="rect" id="node7" title=" " alt="" coords="1165,647,1241,673"/>
 <area shape="rect" id="node8" title=" " alt="" coords="1264,1020,1356,1047"/>
 <area shape="rect" id="node9" title=" " alt="" coords="661,721,748,748"/>
@@ -34,7 +34,7 @@
 <area shape="rect" id="node17" href="$irep_8h.html" title=" " alt="" coords="478,871,537,897"/>
 <area shape="rect" id="node19" href="$optional_8h.html" title=" " alt="" coords="561,871,648,897"/>
 <area shape="rect" id="node18" title=" " alt="" coords="1637,945,1700,972"/>
-<area shape="rect" id="node22" href="$std__types_8h.html" title=" " alt="" coords="1276,490,1373,517"/>
+<area shape="rect" id="node22" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1276,490,1373,517"/>
 <area shape="rect" id="node23" href="$mp__arith_8h.html" title=" " alt="" coords="668,572,760,599"/>
 <area shape="rect" id="node24" title=" " alt="" coords="457,721,521,748"/>
 <area shape="rect" id="node29" title=" " alt="" coords="184,177,255,203"/>
@@ -44,15 +44,15 @@
 <area shape="rect" id="node37" href="$state_8h.html" title=" " alt="" coords="1355,259,1422,285"/>
 <area shape="rect" id="node40" title=" " alt="" coords="1010,333,1061,360"/>
 <area shape="rect" id="node41" title=" " alt="" coords="943,333,986,360"/>
-<area shape="rect" id="node38" href="$pointer__expr_8h.html" title=" " alt="" coords="1345,333,1485,360"/>
-<area shape="rect" id="node39" href="$bitvector__types_8h.html" title=" " alt="" coords="1245,408,1380,435"/>
+<area shape="rect" id="node38" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1345,333,1485,360"/>
+<area shape="rect" id="node39" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="1245,408,1380,435"/>
 <area shape="rect" id="node43" href="$nodiscard_8h.html" title=" " alt="" coords="746,333,869,360"/>
 <area shape="rect" id="node44" href="$boolbv_8h.html" title=" " alt="" coords="693,169,828,211"/>
-<area shape="rect" id="node54" href="$pointer__logic_8h.html" title=" " alt="" coords="715,483,849,524"/>
+<area shape="rect" id="node54" href="$pointer__logic_8h.html" title="Pointer Logic." alt="" coords="715,483,849,524"/>
 <area shape="rect" id="node55" href="$endianness__map__wide_8h.html" title=" " alt="" coords="235,408,417,435"/>
 <area shape="rect" id="node45" href="$endianness__map_8h.html" title=" " alt="" coords="339,647,508,673"/>
-<area shape="rect" id="node46" href="$functions_8h.html" title=" " alt="" coords="1002,259,1207,285"/>
-<area shape="rect" id="node47" href="$arrays_8h.html" title=" " alt="" coords="1446,259,1521,285"/>
+<area shape="rect" id="node46" href="$functions_8h.html" title="Uninterpreted Functions." alt="" coords="1002,259,1207,285"/>
+<area shape="rect" id="node47" href="$arrays_8h.html" title="Theory of Arrays with Extensionality." alt="" coords="1446,259,1521,285"/>
 <area shape="rect" id="node51" href="$boolbv__map_8h.html" title=" " alt="" coords="634,647,749,673"/>
 <area shape="rect" id="node52" href="$boolbv__width_8h.html" title=" " alt="" coords="880,408,1001,435"/>
 <area shape="rect" id="node53" href="$bv__utils_8h.html" title=" " alt="" coords="718,259,803,285"/>

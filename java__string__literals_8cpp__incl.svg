@@ -52,7 +52,7 @@
 <!-- Node45 -->
 <g id="node30" class="node">
 <title>Node45</title>
-<g id="a_node30"><a xlink:href="java__string__literal__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="java__string__literal__expr_8h.html" target="_top" xlink:title="Representation of a constant Java string.">
 <polygon fill="none" stroke="black" points="57.5,-403.5 57.5,-433.5 161.5,-433.5 161.5,-403.5 57.5,-403.5"/>
 <text text-anchor="start" x="65.5" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">java_string_literal</text>
 <text text-anchor="middle" x="109.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_expr.h</text>
@@ -129,7 +129,7 @@
 <!-- Node59 -->
 <g id="node46" class="node">
 <title>Node59</title>
-<g id="a_node46"><a xlink:href="expr__initializer_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="expr__initializer_8h.html" target="_top" xlink:title="Expression Initialization.">
 <polygon fill="none" stroke="black" points="1274.5,-409 1274.5,-428 1390.5,-428 1390.5,-409 1274.5,-409"/>
 <text text-anchor="middle" x="1332.5" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">util/expr_initializer.h</text>
 </a>
@@ -204,7 +204,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="580.5,-470.5 580.5,-489.5 666.5,-489.5 666.5,-470.5 580.5,-470.5"/>
 <text text-anchor="middle" x="623.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -249,7 +249,7 @@
 <!-- Node41 -->
 <g id="node24" class="node">
 <title>Node41</title>
-<g id="a_node24"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="501,-409 501,-428 574,-428 574,-409 501,-409"/>
 <text text-anchor="middle" x="537.5" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -402,7 +402,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="268,-224.5 268,-243.5 315,-243.5 315,-224.5 268,-224.5"/>
 <text text-anchor="middle" x="291.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -780,7 +780,7 @@
 <!-- Node49 -->
 <g id="node35" class="node">
 <title>Node49</title>
-<g id="a_node35"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="468.5,-526.5 468.5,-545.5 554.5,-545.5 554.5,-526.5 468.5,-526.5"/>
 <text text-anchor="middle" x="511.5" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -801,7 +801,7 @@
 <!-- Node50 -->
 <g id="node36" class="node">
 <title>Node50</title>
-<g id="a_node36"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="461,-470.5 461,-489.5 562,-489.5 562,-470.5 461,-470.5"/>
 <text text-anchor="middle" x="511.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -870,7 +870,7 @@
 <!-- Node54 -->
 <g id="node41" class="node">
 <title>Node54</title>
-<g id="a_node41"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title="Given a class and a component (either field or method), find the closest parent that defines that com...">
 <polygon fill="none" stroke="black" points="1132.5,-280.5 1132.5,-310.5 1266.5,-310.5 1266.5,-280.5 1132.5,-280.5"/>
 <text text-anchor="start" x="1140.5" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/resolve</text>
 <text text-anchor="middle" x="1199.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">_inherited_component.h</text>

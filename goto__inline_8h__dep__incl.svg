@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Function Inlining This gives a number of different interfaces to the function inlining functionality ...">
 <polygon fill="#bfbfbf" stroke="black" points="578.5,-89.5 578.5,-130.5 716.5,-130.5 716.5,-89.5 578.5,-89.5"/>
 <text text-anchor="start" x="586.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="586.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title="cprover Command Line Options Processing">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 143,-47 143,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/cprover</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title="Verify and use annotated loop and function contracts.">
 <polygon fill="none" stroke="black" points="161,-6 161,-47 306,-47 306,-6 161,-6"/>
 <text text-anchor="start" x="169" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="169" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -110,7 +110,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="822.5,-6 822.5,-47 1016.5,-47 1016.5,-6 822.5,-6"/>
 <text text-anchor="start" x="830.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="830.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -127,7 +127,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="goto__inline_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__inline_8cpp.html" target="_top" xlink:title="Function Inlining.">
 <polygon fill="none" stroke="black" points="1034.5,-6 1034.5,-47 1172.5,-47 1172.5,-6 1034.5,-6"/>
 <text text-anchor="start" x="1042.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1042.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -144,7 +144,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="process__goto__program_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="process__goto__program_8cpp.html" target="_top" xlink:title="Get a Goto Program.">
 <polygon fill="none" stroke="black" points="1191,-6 1191,-47 1342,-47 1342,-6 1191,-6"/>
 <text text-anchor="start" x="1199" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1199" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>

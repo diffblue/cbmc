@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Goto Verifier Interface.">
 <polygon fill="#bfbfbf" stroke="black" points="476,-167.5 476,-208.5 614,-208.5 614,-167.5 476,-167.5"/>
 <text text-anchor="start" x="484" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="484" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="all__properties__verifier_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="all__properties__verifier_8h.html" target="_top" xlink:title="Goto Verifier for Verifying all Properties.">
 <polygon fill="none" stroke="black" points="634,-84 634,-125 772,-125 772,-84 634,-84"/>
 <text text-anchor="start" x="642" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="642" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -39,7 +39,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="all__properties__verifier__with__fault__localization_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="all__properties__verifier__with__fault__localization_8h.html" target="_top" xlink:title="Goto verifier for verifying all properties that stores traces and localizes faults.">
 <polygon fill="none" stroke="black" points="790.5,-78.5 790.5,-130.5 931.5,-130.5 931.5,-78.5 790.5,-78.5"/>
 <text text-anchor="start" x="798.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="798.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -57,7 +57,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="all__properties__verifier__with__trace__storage_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="all__properties__verifier__with__trace__storage_8h.html" target="_top" xlink:title="Goto verifier for verifying all properties that stores traces.">
 <polygon fill="none" stroke="black" points="162,-78.5 162,-130.5 300,-130.5 300,-78.5 162,-78.5"/>
 <text text-anchor="start" x="170" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="170" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -75,7 +75,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="cover__goals__verifier__with__trace__storage_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="cover__goals__verifier__with__trace__storage_8h.html" target="_top" xlink:title="Goto verifier for covering goals that stores traces.">
 <polygon fill="none" stroke="black" points="0,-78.5 0,-130.5 144,-130.5 144,-78.5 0,-78.5"/>
 <text text-anchor="start" x="8" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -93,7 +93,24 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="stop__on__fail__verifier_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__verifier_8cpp.html" target="_top" xlink:title="Goto Verifier Interface.">
+<polygon fill="none" stroke="black" points="950,-84 950,-125 1088,-125 1088,-84 950,-84"/>
+<text text-anchor="start" x="958" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="958" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
+<text text-anchor="middle" x="1019" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/goto_verifier.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node8 -->
+<g id="edge12" class="edge">
+<title>Node1&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M624.42,-179.91C704.91,-171.76 832.68,-156.16 941,-131 948.22,-129.32 955.72,-127.28 963.09,-125.08"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="623.96,-176.44 614.35,-180.91 624.65,-183.4 623.96,-176.44"/>
+</g>
+<!-- Node9 -->
+<g id="node9" class="node">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="stop__on__fail__verifier_8h.html" target="_top" xlink:title="Goto Verifier for stopping at the first failing property.">
 <polygon fill="none" stroke="black" points="318,-84 318,-125 456,-125 456,-84 318,-84"/>
 <text text-anchor="start" x="326" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="326" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -101,16 +118,16 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node8 -->
-<g id="edge12" class="edge">
-<title>Node1&#45;&gt;Node8</title>
+<!-- Node1&#45;&gt;Node9 -->
+<g id="edge13" class="edge">
+<title>Node1&#45;&gt;Node9</title>
 <path fill="none" stroke="midnightblue" d="M498.1,-162.81C474.72,-150.75 446.81,-136.35 424.81,-125"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="496.66,-166 507.16,-167.48 499.87,-159.78 496.66,-166"/>
 </g>
-<!-- Node9 -->
-<g id="node9" class="node">
-<title>Node9</title>
-<g id="a_node9"><a xlink:href="stop__on__fail__verifier__with__fault__localization_8h.html" target="_top" xlink:title=" ">
+<!-- Node10 -->
+<g id="node10" class="node">
+<title>Node10</title>
+<g id="a_node10"><a xlink:href="stop__on__fail__verifier__with__fault__localization_8h.html" target="_top" xlink:title="Goto Verifier for stopping at the first failing property and localizing the fault.">
 <polygon fill="none" stroke="black" points="474.5,-78.5 474.5,-130.5 615.5,-130.5 615.5,-78.5 474.5,-78.5"/>
 <text text-anchor="start" x="482.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="482.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -119,33 +136,16 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node9 -->
-<g id="edge15" class="edge">
-<title>Node1&#45;&gt;Node9</title>
+<!-- Node1&#45;&gt;Node10 -->
+<g id="edge16" class="edge">
+<title>Node1&#45;&gt;Node10</title>
 <path fill="none" stroke="midnightblue" d="M545,-157.12C545,-148.41 545,-138.99 545,-130.61"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="541.5,-157.27 545,-167.27 548.5,-157.27 541.5,-157.27"/>
-</g>
-<!-- Node10 -->
-<g id="node10" class="node">
-<title>Node10</title>
-<g id="a_node10"><a xlink:href="goto__verifier_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="950,-84 950,-125 1088,-125 1088,-84 950,-84"/>
-<text text-anchor="start" x="958" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="958" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
-<text text-anchor="middle" x="1019" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/goto_verifier.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node10 -->
-<g id="edge18" class="edge">
-<title>Node1&#45;&gt;Node10</title>
-<path fill="none" stroke="midnightblue" d="M624.42,-179.91C704.91,-171.76 832.68,-156.16 941,-131 948.22,-129.32 955.72,-127.28 963.09,-125.08"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="623.96,-176.44 614.35,-180.91 624.65,-183.4 623.96,-176.44"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="310,-0.5 310,-41.5 464,-41.5 464,-0.5 310,-0.5"/>
 <text text-anchor="start" x="318" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="318" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -162,7 +162,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="482,-0.5 482,-41.5 626,-41.5 626,-0.5 482,-0.5"/>
 <text text-anchor="start" x="490" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="490" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -206,27 +206,27 @@
 <path fill="none" stroke="midnightblue" d="M154.29,-77.71C211.46,-62.07 266.68,-48.9 309.98,-39"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="153.06,-74.42 144.35,-80.45 154.92,-81.16 153.06,-74.42"/>
 </g>
-<!-- Node8&#45;&gt;Node3 -->
-<g id="edge13" class="edge">
-<title>Node8&#45;&gt;Node3</title>
+<!-- Node9&#45;&gt;Node3 -->
+<g id="edge14" class="edge">
+<title>Node9&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M387,-73.56C387,-62.88 387,-51.13 387,-41.55"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="383.5,-73.77 387,-83.77 390.5,-73.77 383.5,-73.77"/>
 </g>
-<!-- Node8&#45;&gt;Node4 -->
-<g id="edge14" class="edge">
-<title>Node8&#45;&gt;Node4</title>
+<!-- Node9&#45;&gt;Node4 -->
+<g id="edge15" class="edge">
+<title>Node9&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M436.24,-79.47C461.02,-67.37 490.68,-52.9 514.04,-41.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="434.45,-76.45 427,-83.98 437.52,-82.74 434.45,-76.45"/>
 </g>
-<!-- Node9&#45;&gt;Node3 -->
-<g id="edge16" class="edge">
-<title>Node9&#45;&gt;Node3</title>
+<!-- Node10&#45;&gt;Node3 -->
+<g id="edge17" class="edge">
+<title>Node10&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M487.25,-73.71C466.51,-63.01 443.65,-51.22 425,-41.6"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="485.81,-76.91 496.31,-78.38 489.02,-70.69 485.81,-76.91"/>
 </g>
-<!-- Node9&#45;&gt;Node4 -->
-<g id="edge17" class="edge">
-<title>Node9&#45;&gt;Node4</title>
+<!-- Node10&#45;&gt;Node4 -->
+<g id="edge18" class="edge">
+<title>Node10&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M548.9,-68.15C549.91,-59.05 550.95,-49.6 551.83,-41.63"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="545.42,-67.84 547.8,-78.16 552.37,-68.6 545.42,-67.84"/>
 </g>

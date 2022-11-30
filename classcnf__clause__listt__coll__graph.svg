@@ -114,7 +114,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:title="STL class.">
+<g id="a_node7"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="430.5,-503.5 430.5,-522.5 527.5,-522.5 527.5,-503.5 430.5,-503.5"/>
 <text text-anchor="middle" x="479" y="-510.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
@@ -178,7 +178,7 @@
 <!-- Node28 -->
 <g id="node19" class="node">
 <title>Node28</title>
-<g id="a_node19"><a xlink:title="STL class.">
+<g id="a_node19"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="324.5,-503.5 324.5,-522.5 405.5,-522.5 405.5,-503.5 324.5,-503.5"/>
 <text text-anchor="middle" x="365" y="-510.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::list&lt; T &gt;</text>
 </a>
@@ -205,16 +205,16 @@
 <title>Node9&#45;&gt;Node4</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M338.95,-353.86C343.63,-324.89 353.34,-267.34 364,-219 365.33,-212.95 367.08,-206.2 368.5,-200.96"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="335.48,-353.37 337.36,-363.8 342.39,-354.48 335.48,-353.37"/>
-<text text-anchor="middle" x="403" y="-332" font-family="Helvetica,sans-Serif" font-size="10.00"> cyan</text>
-<text text-anchor="middle" x="403" y="-321" font-family="Helvetica,sans-Serif" font-size="10.00">bright_yellow</text>
-<text text-anchor="middle" x="403" y="-310" font-family="Helvetica,sans-Serif" font-size="10.00">bold</text>
-<text text-anchor="middle" x="403" y="-299" font-family="Helvetica,sans-Serif" font-size="10.00">yellow</text>
-<text text-anchor="middle" x="403" y="-288" font-family="Helvetica,sans-Serif" font-size="10.00">bright_blue</text>
-<text text-anchor="middle" x="403" y="-277" font-family="Helvetica,sans-Serif" font-size="10.00">magenta</text>
-<text text-anchor="middle" x="403" y="-266" font-family="Helvetica,sans-Serif" font-size="10.00">reset</text>
-<text text-anchor="middle" x="403" y="-255" font-family="Helvetica,sans-Serif" font-size="10.00">bright_magenta</text>
-<text text-anchor="middle" x="403" y="-244" font-family="Helvetica,sans-Serif" font-size="10.00">underline</text>
-<text text-anchor="middle" x="403" y="-233" font-family="Helvetica,sans-Serif" font-size="10.00">blue</text>
+<text text-anchor="middle" x="403" y="-332" font-family="Helvetica,sans-Serif" font-size="10.00"> blue</text>
+<text text-anchor="middle" x="403" y="-321" font-family="Helvetica,sans-Serif" font-size="10.00">bold</text>
+<text text-anchor="middle" x="403" y="-310" font-family="Helvetica,sans-Serif" font-size="10.00">bright_blue</text>
+<text text-anchor="middle" x="403" y="-299" font-family="Helvetica,sans-Serif" font-size="10.00">bright_cyan</text>
+<text text-anchor="middle" x="403" y="-288" font-family="Helvetica,sans-Serif" font-size="10.00">bright_green</text>
+<text text-anchor="middle" x="403" y="-277" font-family="Helvetica,sans-Serif" font-size="10.00">bright_magenta</text>
+<text text-anchor="middle" x="403" y="-266" font-family="Helvetica,sans-Serif" font-size="10.00">bright_red</text>
+<text text-anchor="middle" x="403" y="-255" font-family="Helvetica,sans-Serif" font-size="10.00">bright_yellow</text>
+<text text-anchor="middle" x="403" y="-244" font-family="Helvetica,sans-Serif" font-size="10.00">cyan</text>
+<text text-anchor="middle" x="403" y="-233" font-family="Helvetica,sans-Serif" font-size="10.00">faint</text>
 <text text-anchor="middle" x="403" y="-222" font-family="Helvetica,sans-Serif" font-size="10.00">...</text>
 </g>
 <!-- Node10&#45;&gt;Node4 -->
@@ -227,7 +227,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:title="STL class.">
+<g id="a_node11"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="178,-181.5 178,-200.5 284,-200.5 284,-181.5 178,-181.5"/>
 <text text-anchor="middle" x="231" y="-188.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::ostringstream</text>
 </a>
@@ -242,10 +242,10 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:title="STL class.">
+<g id="a_node12"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="119.5,-358.5 119.5,-388.5 256.5,-388.5 256.5,-358.5 119.5,-358.5"/>
 <text text-anchor="start" x="127.5" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_ostringstream</text>
-<text text-anchor="middle" x="188" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; char &gt;</text>
+<text text-anchor="middle" x="188" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; Char &gt;</text>
 </a>
 </g>
 </g>

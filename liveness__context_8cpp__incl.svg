@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="liveness__context_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="liveness__context_8h.html" target="_top" xlink:title="Maintain a context in the variable sensitvity domain that records the liveness region for a given abs...">
 <polygon fill="none" stroke="black" points="1192.65,-492.5 1192.65,-511.5 1300.65,-511.5 1300.65,-492.5 1192.65,-492.5"/>
 <text text-anchor="middle" x="1246.65" y="-499.5" font-family="Helvetica,sans-Serif" font-size="10.00">liveness_context.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="write__location__context_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="write__location__context_8h.html" target="_top" xlink:title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac...">
 <polygon fill="none" stroke="black" points="1060.65,-425.5 1060.65,-455.5 1218.65,-455.5 1218.65,-425.5 1060.65,-425.5"/>
 <text text-anchor="start" x="1068.65" y="-443.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="1139.65" y="-432.5" font-family="Helvetica,sans-Serif" font-size="10.00">/write_location_context.h</text>
@@ -83,7 +83,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="context__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="context__abstract__object_8h.html" target="_top" xlink:title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co...">
 <polygon fill="none" stroke="black" points="848.65,-358.5 848.65,-388.5 1006.65,-388.5 1006.65,-358.5 848.65,-358.5"/>
 <text text-anchor="start" x="856.65" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="927.65" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">/context_abstract_object.h</text>
@@ -111,7 +111,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari...">
 <polygon fill="none" stroke="black" points="641.65,-291.5 641.65,-321.5 799.65,-321.5 799.65,-291.5 641.65,-291.5"/>
 <text text-anchor="start" x="649.65" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="720.65" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_object.h</text>
@@ -163,7 +163,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="230.15,-224.5 230.15,-254.5 343.15,-254.5 343.15,-224.5 230.15,-224.5"/>
 <text text-anchor="start" x="238.15" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="286.65" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -179,7 +179,7 @@
 <!-- Node54 -->
 <g id="node21" class="node">
 <title>Node54</title>
-<g id="a_node21"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title="Sharing map.">
 <polygon fill="none" stroke="black" points="785.15,-230 785.15,-249 892.15,-249 892.15,-230 785.15,-230"/>
 <text text-anchor="middle" x="838.65" y="-237" font-family="Helvetica,sans-Serif" font-size="10.00">util/sharing_map.h</text>
 </a>
@@ -518,7 +518,7 @@
 <!-- Node58 -->
 <g id="node27" class="node">
 <title>Node58</title>
-<g id="a_node27"><a xlink:href="sharing__node_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="sharing__node_8h.html" target="_top" xlink:title="Sharing node.">
 <polygon fill="none" stroke="red" points="756.15,-168.5 756.15,-187.5 847.15,-187.5 847.15,-168.5 756.15,-168.5"/>
 <text text-anchor="middle" x="801.65" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">sharing_node.h</text>
 </a>

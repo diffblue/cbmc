@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Show the symbol table.">
 <polygon fill="#bfbfbf" stroke="black" points="584,-78.5 584,-119.5 722,-119.5 722,-78.5 584,-78.5"/>
 <text text-anchor="start" x="592" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="592" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 154,-41.5 154,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Goto&#45;Analyser Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="172,-0.5 172,-41.5 354,-41.5 354,-0.5 172,-0.5"/>
 <text text-anchor="start" x="180" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="180" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="372,-0.5 372,-41.5 566,-41.5 566,-0.5 372,-0.5"/>
 <text text-anchor="start" x="380" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="380" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="show__symbol__table_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="show__symbol__table_8cpp.html" target="_top" xlink:title="Show the symbol table.">
 <polygon fill="none" stroke="black" points="584,-0.5 584,-41.5 722,-41.5 722,-0.5 584,-0.5"/>
 <text text-anchor="start" x="592" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="592" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -90,7 +90,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="memory__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="memory__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Commandline parser for the memory analyzer executing main work.">
 <polygon fill="none" stroke="black" points="740,-0.5 740,-41.5 942,-41.5 942,-0.5 740,-0.5"/>
 <text text-anchor="start" x="748" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="748" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/memory&#45;analyzer</text>
@@ -107,7 +107,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title="JANALYZER Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="960,-0.5 960,-41.5 1118,-41.5 1118,-0.5 960,-0.5"/>
 <text text-anchor="start" x="968" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="968" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/janalyzer</text>
@@ -124,7 +124,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="1136,-0.5 1136,-41.5 1280,-41.5 1280,-0.5 1136,-0.5"/>
 <text text-anchor="start" x="1144" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1144" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>

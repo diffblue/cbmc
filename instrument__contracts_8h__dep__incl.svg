@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Instrument Given Invariants.">
 <polygon fill="#bfbfbf" stroke="black" points="161,-78.5 161,-119.5 320,-119.5 320,-78.5 161,-78.5"/>
 <text text-anchor="start" x="169" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="169" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title="cprover Command Line Options Processing">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 143,-41.5 143,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/cprover</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="instrument__contracts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="instrument__contracts_8cpp.html" target="_top" xlink:title="Instrument Contracts.">
 <polygon fill="none" stroke="black" points="161,-0.5 161,-41.5 320,-41.5 320,-0.5 161,-0.5"/>
 <text text-anchor="start" x="169" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="169" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/instrument</text>

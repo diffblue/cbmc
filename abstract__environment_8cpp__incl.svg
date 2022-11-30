@@ -127,7 +127,7 @@
 <!-- Node45 -->
 <g id="node38" class="node">
 <title>Node45</title>
-<g id="a_node38"><a xlink:href="abstract__environment_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="abstract__environment_8h.html" target="_top" xlink:title="An abstract version of a program environment.">
 <polygon fill="none" stroke="black" points="975,-537.5 975,-567.5 1133,-567.5 1133,-537.5 975,-537.5"/>
 <text text-anchor="start" x="983" y="-555.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="1054" y="-544.5" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_environment.h</text>
@@ -158,7 +158,7 @@
 <!-- Node74 -->
 <g id="node50" class="node">
 <title>Node74</title>
-<g id="a_node50"><a xlink:href="variable__sensitivity__object__factory_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="variable__sensitivity__object__factory_8h.html" target="_top" xlink:title="Tracks the user&#45;supplied configuration for VSD and build the correct type of abstract object when nee...">
 <polygon fill="none" stroke="black" points="954,-459.5 954,-500.5 1112,-500.5 1112,-459.5 954,-459.5"/>
 <text text-anchor="start" x="962" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="start" x="962" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/variable_sensitivity_object</text>
@@ -190,7 +190,7 @@
 <!-- Node77 -->
 <g id="node53" class="node">
 <title>Node77</title>
-<g id="a_node53"><a xlink:href="abstract__object__statistics_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="abstract__object__statistics_8h.html" target="_top" xlink:title="Statistics gathering for the variable senstivity domain.">
 <polygon fill="none" stroke="black" points="1979,-604.5 1979,-623.5 2129,-623.5 2129,-604.5 1979,-604.5"/>
 <text text-anchor="middle" x="2054" y="-611.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_object_statistics.h</text>
 </a>
@@ -205,7 +205,7 @@
 <!-- Node78 -->
 <g id="node56" class="node">
 <title>Node78</title>
-<g id="a_node56"><a xlink:href="context__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="context__abstract__object_8h.html" target="_top" xlink:title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co...">
 <polygon fill="none" stroke="black" points="1183.5,-543 1183.5,-562 1326.5,-562 1326.5,-543 1183.5,-543"/>
 <text text-anchor="middle" x="1255" y="-550" font-family="Helvetica,sans-Serif" font-size="10.00">context_abstract_object.h</text>
 </a>
@@ -220,7 +220,7 @@
 <!-- Node79 -->
 <g id="node57" class="node">
 <title>Node79</title>
-<g id="a_node57"><a xlink:href="interval__abstract__value_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="interval__abstract__value_8h.html" target="_top" xlink:title="An interval to represent a set of possible values.">
 <polygon fill="none" stroke="black" points="1780,-543 1780,-562 1920,-562 1920,-543 1780,-543"/>
 <text text-anchor="middle" x="1850" y="-550" font-family="Helvetica,sans-Serif" font-size="10.00">interval_abstract_value.h</text>
 </a>
@@ -310,7 +310,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="649,-168.5 649,-187.5 713,-187.5 713,-168.5 649,-168.5"/>
 <text text-anchor="middle" x="681" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -391,7 +391,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="927.5,-112.5 927.5,-131.5 986.5,-131.5 986.5,-112.5 927.5,-112.5"/>
 <text text-anchor="middle" x="957" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -565,7 +565,7 @@
 <!-- Node31 -->
 <g id="node24" class="node">
 <title>Node31</title>
-<g id="a_node24"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="305.5,-342 305.5,-361 352.5,-361 352.5,-342 305.5,-342"/>
 <text text-anchor="middle" x="329" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -796,7 +796,7 @@
 <!-- Node46 -->
 <g id="node39" class="node">
 <title>Node46</title>
-<g id="a_node39"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari...">
 <polygon fill="none" stroke="black" points="1281.5,-403.5 1281.5,-422.5 1382.5,-422.5 1382.5,-403.5 1281.5,-403.5"/>
 <text text-anchor="middle" x="1332" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_object.h</text>
 </a>
@@ -847,7 +847,7 @@
 <!-- Node50 -->
 <g id="node43" class="node">
 <title>Node50</title>
-<g id="a_node43"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="1085.5,-336.5 1085.5,-366.5 1198.5,-366.5 1198.5,-336.5 1085.5,-336.5"/>
 <text text-anchor="start" x="1093.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1142" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -863,7 +863,7 @@
 <!-- Node60 -->
 <g id="node47" class="node">
 <title>Node60</title>
-<g id="a_node47"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node47"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title="Sharing map.">
 <polygon fill="none" stroke="red" points="1400.5,-342 1400.5,-361 1507.5,-361 1507.5,-342 1400.5,-342"/>
 <text text-anchor="middle" x="1454" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">util/sharing_map.h</text>
 </a>
@@ -944,7 +944,7 @@
 <!-- Node58 -->
 <g id="node45" class="node">
 <title>Node58</title>
-<g id="a_node45"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="1174,-224.5 1174,-243.5 1260,-243.5 1260,-224.5 1174,-224.5"/>
 <text text-anchor="middle" x="1217" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -1073,7 +1073,7 @@
 <!-- Node75 -->
 <g id="node51" class="node">
 <title>Node75</title>
-<g id="a_node51"><a xlink:href="variable__sensitivity__configuration_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="variable__sensitivity__configuration_8h.html" target="_top" xlink:title="Captures the user&#45;supplied configuration for VSD, determining which domain abstractions are used,...">
 <polygon fill="none" stroke="black" points="954.5,-336.5 954.5,-366.5 1067.5,-366.5 1067.5,-336.5 954.5,-336.5"/>
 <text text-anchor="start" x="962.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">variable_sensitivity</text>
 <text text-anchor="middle" x="1011" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_configuration.h</text>
@@ -1170,7 +1170,7 @@
 <!-- Node82 -->
 <g id="node60" class="node">
 <title>Node82</title>
-<g id="a_node60"><a xlink:href="abstract__value__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="abstract__value__object_8h.html" target="_top" xlink:title="Common behaviour for abstract objects modelling values &#45; constants, intervals, etc.">
 <polygon fill="none" stroke="black" points="1679,-465 1679,-495 1837,-495 1837,-465 1679,-465"/>
 <text text-anchor="start" x="1687" y="-483" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="1758" y="-472" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_value_object.h</text>

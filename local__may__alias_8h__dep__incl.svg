@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis.">
 <polygon fill="#bfbfbf" stroke="black" points="852.5,-156.5 852.5,-197.5 990.5,-197.5 990.5,-156.5 852.5,-156.5"/>
 <text text-anchor="start" x="860.5" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="860.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/local</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="custom__bitvector__analysis_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="custom__bitvector__analysis_8h.html" target="_top" xlink:title="Field&#45;insensitive, location&#45;sensitive bitvector analysis.">
 <polygon fill="none" stroke="black" points="162,-78.5 162,-119.5 311,-119.5 311,-78.5 162,-78.5"/>
 <text text-anchor="start" x="170" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="170" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/custom</text>
@@ -39,7 +39,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="local__may__alias_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="local__may__alias_8cpp.html" target="_top" xlink:title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis.">
 <polygon fill="none" stroke="black" points="329.5,-78.5 329.5,-119.5 467.5,-119.5 467.5,-78.5 329.5,-78.5"/>
 <text text-anchor="start" x="337.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="337.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/local</text>
@@ -56,7 +56,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Goto&#45;Analyser Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="485.5,-78.5 485.5,-119.5 667.5,-119.5 667.5,-78.5 485.5,-78.5"/>
 <text text-anchor="start" x="493.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="493.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -73,7 +73,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title="Verify and use annotated loop and function contracts.">
 <polygon fill="none" stroke="black" points="686,-78.5 686,-119.5 831,-119.5 831,-78.5 686,-78.5"/>
 <text text-anchor="start" x="694" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="694" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -90,7 +90,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="function__assigns_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="function__assigns_8cpp.html" target="_top" xlink:title="Compute objects assigned to in a function.">
 <polygon fill="none" stroke="black" points="849,-78.5 849,-119.5 994,-119.5 994,-78.5 849,-78.5"/>
 <text text-anchor="start" x="857" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="857" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -107,7 +107,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="havoc__loops_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="havoc__loops_8cpp.html" target="_top" xlink:title="Havoc Loops.">
 <polygon fill="none" stroke="black" points="1012,-78.5 1012,-119.5 1157,-119.5 1157,-78.5 1012,-78.5"/>
 <text text-anchor="start" x="1020" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1020" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -124,7 +124,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="k__induction_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="k__induction_8cpp.html" target="_top" xlink:title="k&#45;induction">
 <polygon fill="none" stroke="black" points="1175,-78.5 1175,-119.5 1320,-119.5 1320,-78.5 1175,-78.5"/>
 <text text-anchor="start" x="1183" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1183" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -141,7 +141,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="loop__utils_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="loop__utils_8cpp.html" target="_top" xlink:title="Helper functions for k&#45;induction and loop invariants.">
 <polygon fill="none" stroke="black" points="1338,-78.5 1338,-119.5 1483,-119.5 1483,-78.5 1338,-78.5"/>
 <text text-anchor="start" x="1346" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1346" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -158,7 +158,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title="JANALYZER Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="1501.5,-78.5 1501.5,-119.5 1659.5,-119.5 1659.5,-78.5 1501.5,-78.5"/>
 <text text-anchor="start" x="1509.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1509.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/janalyzer</text>
@@ -175,7 +175,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="custom__bitvector__analysis_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="custom__bitvector__analysis_8cpp.html" target="_top" xlink:title="Field&#45;insensitive, location&#45;sensitive bitvector analysis.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 149,-41.5 149,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/custom</text>
@@ -192,7 +192,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="taint__analysis_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="taint__analysis_8cpp.html" target="_top" xlink:title="Taint Analysis.">
 <polygon fill="none" stroke="black" points="167.5,-0.5 167.5,-41.5 305.5,-41.5 305.5,-0.5 167.5,-0.5"/>
 <text text-anchor="start" x="175.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="175.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -209,7 +209,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="323.5,-0.5 323.5,-41.5 517.5,-41.5 517.5,-0.5 323.5,-0.5"/>
 <text text-anchor="start" x="331.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="331.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Constant propagation.">
 <polygon fill="#bfbfbf" stroke="black" points="257,-78.5 257,-119.5 412,-119.5 412,-78.5 257,-78.5"/>
 <text text-anchor="start" x="265" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="265" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/constant</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="constant__propagator_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="constant__propagator_8cpp.html" target="_top" xlink:title="Constant Propagation.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 155,-41.5 155,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/constant</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="329.5,-0.5 329.5,-41.5 523.5,-41.5 523.5,-0.5 329.5,-0.5"/>
 <text text-anchor="start" x="337.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="337.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title="JANALYZER Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="541.5,-0.5 541.5,-41.5 699.5,-41.5 699.5,-0.5 541.5,-0.5"/>
 <text text-anchor="start" x="549.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="549.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/janalyzer</text>

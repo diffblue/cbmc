@@ -1,60 +1,60 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/ai_history.h" name="/home/runner/work/cbmc/cbmc/src/analyses/ai_history.h">
-<area shape="rect" id="node1" title=" " alt="" coords="3186,5,3370,61"/>
-<area shape="rect" id="node2" href="$ai__domain_8h.html" title=" " alt="" coords="2774,109,2958,165"/>
-<area shape="rect" id="node3" href="$ai_8h.html" title=" " alt="" coords="2146,347,2330,388"/>
-<area shape="rect" id="node42" href="$ai__storage_8h.html" title=" " alt="" coords="2386,221,2570,277"/>
-<area shape="rect" id="node53" href="$ai__history_8cpp.html" title=" " alt="" coords="4529,109,4713,165"/>
-<area shape="rect" id="node54" href="$call__stack__history_8h.html" title=" " alt="" coords="4009,109,4193,165"/>
-<area shape="rect" id="node56" href="$local__control__flow__history_8h.html" title=" " alt="" coords="4321,109,4505,165"/>
-<area shape="rect" id="node58" href="$static__verifier_8h.html" title=" " alt="" coords="3186,339,3370,395"/>
-<area shape="rect" id="node43" href="$ai__domain_8cpp.html" title=" " alt="" coords="2594,221,2778,277"/>
-<area shape="rect" id="node44" href="$interval__domain_8h.html" title=" " alt="" coords="2402,577,2602,633"/>
-<area shape="rect" id="node46" href="$invariant__set__domain_8h.html" title=" " alt="" coords="2903,221,3111,277"/>
-<area shape="rect" id="node48" href="$variable__sensitivity__domain_8h.html" title=" " alt="" coords="3706,213,3933,284"/>
-<area shape="rect" id="node4" href="$ai_8cpp.html" title=" " alt="" coords="1623,465,1813,507"/>
-<area shape="rect" id="node5" href="$constant__propagator_8h.html" title=" " alt="" coords="2033,577,2240,633"/>
-<area shape="rect" id="node7" href="$build__analyzer_8cpp.html" title=" " alt="" coords="3467,695,3651,751"/>
-<area shape="rect" id="node10" href="$custom__bitvector__analysis_8h.html" title=" " alt="" coords="1185,458,1384,514"/>
-<area shape="rect" id="node13" href="$dependence__graph_8h.html" title=" " alt="" coords="750,577,979,633"/>
-<area shape="rect" id="node20" href="$reaching__definitions_8h.html" title=" " alt="" coords="927,458,1133,514"/>
-<area shape="rect" id="node22" href="$escape__analysis_8h.html" title=" " alt="" coords="529,458,725,514"/>
-<area shape="rect" id="node24" href="$global__may__alias_8h.html" title=" " alt="" coords="1408,458,1599,514"/>
-<area shape="rect" id="node26" href="$interval__analysis_8cpp.html" title=" " alt="" coords="2334,695,2534,751"/>
-<area shape="rect" id="node27" href="$invariant__propagation_8h.html" title=" " alt="" coords="2903,458,3111,514"/>
-<area shape="rect" id="node29" href="$is__threaded_8cpp.html" title=" " alt="" coords="1938,458,2122,514"/>
-<area shape="rect" id="node30" href="$uninitialized__domain_8h.html" title=" " alt="" coords="223,458,453,514"/>
-<area shape="rect" id="node33" href="$three__way__merge__abstract__interpreter_8h.html" title=" " alt="" coords="3445,451,3661,521"/>
-<area shape="rect" id="node37" href="$goto__analyzer__parse__options_8cpp.html" title=" " alt="" coords="3685,458,3927,514"/>
-<area shape="rect" id="node38" href="$show__on__source_8cpp.html" title=" " alt="" coords="2146,458,2330,514"/>
-<area shape="rect" id="node39" href="$static__simplifier_8cpp.html" title=" " alt="" coords="2354,458,2538,514"/>
-<area shape="rect" id="node40" href="$static__verifier_8cpp.html" title=" " alt="" coords="3135,458,3319,514"/>
-<area shape="rect" id="node41" href="$unreachable__instructions_8cpp.html" title=" " alt="" coords="2562,458,2778,514"/>
-<area shape="rect" id="node6" href="$constant__propagator_8cpp.html" title=" " alt="" coords="1868,695,2075,751"/>
-<area shape="rect" id="node8" href="$goto__instrument__parse__options_8cpp.html" title=" " alt="" coords="1205,695,1463,751"/>
-<area shape="rect" id="node9" href="$janalyzer__parse__options_8cpp.html" title=" " alt="" coords="2099,695,2310,751"/>
-<area shape="rect" id="node11" href="$custom__bitvector__analysis_8cpp.html" title=" " alt="" coords="1336,577,1535,633"/>
-<area shape="rect" id="node12" href="$taint__analysis_8cpp.html" title=" " alt="" coords="1559,577,1743,633"/>
-<area shape="rect" id="node14" href="$dependence__graph_8cpp.html" title=" " alt="" coords="951,695,1181,751"/>
-<area shape="rect" id="node15" href="$static__show__domain_8cpp.html" title=" " alt="" coords="3011,695,3198,751"/>
-<area shape="rect" id="node16" href="$change__impact_8cpp.html" title=" " alt="" coords="514,695,709,751"/>
-<area shape="rect" id="node17" href="$full__slicer__class_8h.html" title=" " alt="" coords="733,695,927,751"/>
-<area shape="rect" id="node18" href="$full__slicer_8cpp.html" title=" " alt="" coords="624,807,817,863"/>
-<area shape="rect" id="node19" href="$reachability__slicer_8cpp.html" title=" " alt="" coords="841,807,1035,863"/>
-<area shape="rect" id="node21" href="$reaching__definitions_8cpp.html" title=" " alt="" coords="1055,577,1261,633"/>
-<area shape="rect" id="node23" href="$escape__analysis_8cpp.html" title=" " alt="" coords="529,577,725,633"/>
-<area shape="rect" id="node25" href="$global__may__alias_8cpp.html" title=" " alt="" coords="1819,577,2009,633"/>
-<area shape="rect" id="node28" href="$invariant__propagation_8cpp.html" title=" " alt="" coords="2903,577,3111,633"/>
-<area shape="rect" id="node31" href="$uninitialized__domain_8cpp.html" title=" " alt="" coords="223,577,453,633"/>
-<area shape="rect" id="node32" href="$uninitialized_8cpp.html" title=" " alt="" coords="5,577,199,633"/>
-<area shape="rect" id="node34" href="$three__way__merge__abstract__interpreter_8cpp.html" title=" " alt="" coords="3346,569,3562,640"/>
-<area shape="rect" id="node35" href="$variable__sensitivity__dependence__graph_8h.html" title=" " alt="" coords="3637,569,3863,640"/>
-<area shape="rect" id="node36" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="3675,688,3902,759"/>
-<area shape="rect" id="node45" href="$interval__domain_8cpp.html" title=" " alt="" coords="2558,695,2758,751"/>
-<area shape="rect" id="node47" href="$invariant__set__domain_8cpp.html" title=" " alt="" coords="2903,339,3111,395"/>
-<area shape="rect" id="node49" href="$variable__sensitivity__domain_8cpp.html" title=" " alt="" coords="3679,332,3906,403"/>
-<area shape="rect" id="node50" href="$goto__analyzer__parse__options_8h.html" title=" " alt="" coords="3931,339,4159,395"/>
-<area shape="rect" id="node51" href="$goto__analyzer__languages_8cpp.html" title=" " alt="" coords="4162,458,4381,514"/>
-<area shape="rect" id="node52" href="$goto__analyzer__main_8cpp.html" title=" " alt="" coords="3952,458,4137,514"/>
-<area shape="rect" id="node55" href="$call__stack__history_8cpp.html" title=" " alt="" coords="4009,221,4193,277"/>
-<area shape="rect" id="node57" href="$local__control__flow__history_8cpp.html" title=" " alt="" coords="4347,221,4532,277"/>
+<area shape="rect" id="node1" title="Abstract Interpretation history." alt="" coords="3268,5,3452,61"/>
+<area shape="rect" id="node2" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="2099,347,2283,388"/>
+<area shape="rect" id="node41" href="$ai__domain_8h.html" title="Abstract Interpretation Domain." alt="" coords="2616,109,2800,165"/>
+<area shape="rect" id="node43" href="$ai__storage_8h.html" title="Abstract Interpretation Storage." alt="" coords="2228,221,2412,277"/>
+<area shape="rect" id="node53" href="$ai__history_8cpp.html" title="Abstract Interpretation history." alt="" coords="4381,109,4565,165"/>
+<area shape="rect" id="node54" href="$call__stack__history_8h.html" title="History for tracking the call stack and performing interprocedural analysis." alt="" coords="4173,109,4357,165"/>
+<area shape="rect" id="node56" href="$local__control__flow__history_8h.html" title="Track function&#45;local control flow for loop unwinding and path senstivity." alt="" coords="3921,109,4105,165"/>
+<area shape="rect" id="node58" href="$static__verifier_8h.html" title=" " alt="" coords="3268,339,3452,395"/>
+<area shape="rect" id="node3" href="$ai_8cpp.html" title="Abstract Interpretation." alt="" coords="987,465,1176,507"/>
+<area shape="rect" id="node4" href="$constant__propagator_8h.html" title="Constant propagation." alt="" coords="1118,577,1325,633"/>
+<area shape="rect" id="node6" href="$build__analyzer_8cpp.html" title=" " alt="" coords="3019,695,3203,751"/>
+<area shape="rect" id="node9" href="$custom__bitvector__analysis_8h.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="1250,458,1449,514"/>
+<area shape="rect" id="node12" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="259,577,488,633"/>
+<area shape="rect" id="node19" href="$escape__analysis_8h.html" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="766,458,962,514"/>
+<area shape="rect" id="node21" href="$global__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="43,458,234,514"/>
+<area shape="rect" id="node23" href="$interval__analysis_8cpp.html" title="Interval Analysis – implements the functionality necessary for performing abstract interpretation ove..." alt="" coords="2360,695,2560,751"/>
+<area shape="rect" id="node24" href="$invariant__propagation_8h.html" title="Invariant Propagation." alt="" coords="2796,458,3004,514"/>
+<area shape="rect" id="node26" href="$is__threaded_8cpp.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="1473,458,1657,514"/>
+<area shape="rect" id="node27" href="$reaching__definitions_8h.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="521,458,727,514"/>
+<area shape="rect" id="node29" href="$uninitialized__domain_8h.html" title="Detection for Uninitialized Local Variables." alt="" coords="1733,458,1963,514"/>
+<area shape="rect" id="node32" href="$three__way__merge__abstract__interpreter_8h.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="3028,451,3244,521"/>
+<area shape="rect" id="node36" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="3476,458,3719,514"/>
+<area shape="rect" id="node37" href="$show__on__source_8cpp.html" title=" " alt="" coords="1988,458,2172,514"/>
+<area shape="rect" id="node38" href="$static__simplifier_8cpp.html" title=" " alt="" coords="2196,458,2380,514"/>
+<area shape="rect" id="node39" href="$static__verifier_8cpp.html" title=" " alt="" coords="3268,458,3452,514"/>
+<area shape="rect" id="node40" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="2404,458,2620,514"/>
+<area shape="rect" id="node5" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="1118,695,1325,751"/>
+<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="696,695,955,751"/>
+<area shape="rect" id="node8" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="1519,695,1729,751"/>
+<area shape="rect" id="node10" href="$custom__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="1349,577,1547,633"/>
+<area shape="rect" id="node11" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="1572,577,1756,633"/>
+<area shape="rect" id="node13" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="5,695,235,751"/>
+<area shape="rect" id="node14" href="$static__show__domain_8cpp.html" title=" " alt="" coords="2584,695,2771,751"/>
+<area shape="rect" id="node15" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="259,695,453,751"/>
+<area shape="rect" id="node16" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="478,695,671,751"/>
+<area shape="rect" id="node17" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="369,807,562,863"/>
+<area shape="rect" id="node18" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="586,807,779,863"/>
+<area shape="rect" id="node20" href="$escape__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive escape analysis." alt="" coords="846,577,1042,633"/>
+<area shape="rect" id="node22" href="$global__may__alias_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive global may alias analysis." alt="" coords="43,577,234,633"/>
+<area shape="rect" id="node25" href="$invariant__propagation_8cpp.html" title="Invariant Propagation." alt="" coords="2796,577,3004,633"/>
+<area shape="rect" id="node28" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="513,577,719,633"/>
+<area shape="rect" id="node30" href="$uninitialized__domain_8cpp.html" title="Detection for Uninitialized Local Variables." alt="" coords="1831,577,2062,633"/>
+<area shape="rect" id="node31" href="$uninitialized_8cpp.html" title="Detection for Uninitialized Local Variables." alt="" coords="2086,577,2279,633"/>
+<area shape="rect" id="node33" href="$three__way__merge__abstract__interpreter_8cpp.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="3125,569,3341,640"/>
+<area shape="rect" id="node34" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="3365,569,3592,640"/>
+<area shape="rect" id="node35" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="3365,688,3592,759"/>
+<area shape="rect" id="node42" href="$ai__domain_8cpp.html" title="Abstract Interpretation Domain." alt="" coords="2487,221,2671,277"/>
+<area shape="rect" id="node44" href="$interval__domain_8h.html" title="Interval Domain." alt="" coords="2521,577,2721,633"/>
+<area shape="rect" id="node46" href="$invariant__set__domain_8h.html" title="Value Set." alt="" coords="2745,221,2953,277"/>
+<area shape="rect" id="node48" href="$variable__sensitivity__domain_8h.html" title="There are different ways of handling arrays, structures, unions and pointers." alt="" coords="3652,213,3879,284"/>
+<area shape="rect" id="node45" href="$interval__domain_8cpp.html" title="Interval Domain." alt="" coords="2795,695,2995,751"/>
+<area shape="rect" id="node47" href="$invariant__set__domain_8cpp.html" title="Invariant Set Domain." alt="" coords="2745,339,2953,395"/>
+<area shape="rect" id="node49" href="$variable__sensitivity__domain_8cpp.html" title=" " alt="" coords="3492,332,3719,403"/>
+<area shape="rect" id="node50" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="3794,339,4022,395"/>
+<area shape="rect" id="node51" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="3793,458,4012,514"/>
+<area shape="rect" id="node52" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="4037,458,4222,514"/>
+<area shape="rect" id="node55" href="$call__stack__history_8cpp.html" title="History for tracking the call stack and performing interprocedural analysis." alt="" coords="4191,221,4375,277"/>
+<area shape="rect" id="node57" href="$local__control__flow__history_8cpp.html" title="Track function&#45;local control flow for loop unwinding and path senstivity." alt="" coords="3921,221,4106,277"/>
 </map>

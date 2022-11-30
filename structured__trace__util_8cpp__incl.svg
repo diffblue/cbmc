@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Utilities for printing location info steps in the trace in a format agnostic way.">
 <polygon fill="#bfbfbf" stroke="black" points="741.5,-448.5 741.5,-489.5 881.5,-489.5 881.5,-448.5 741.5,-448.5"/>
 <text text-anchor="start" x="749.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="749.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structured__trace__util_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structured__trace__util_8h.html" target="_top" xlink:title="Utilities for printing location info steps in the trace in a format agnostic way.">
 <polygon fill="none" stroke="black" points="628.5,-392.5 628.5,-411.5 754.5,-411.5 754.5,-392.5 628.5,-392.5"/>
 <text text-anchor="middle" x="691.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">structured_trace_util.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node49 -->
 <g id="node24" class="node">
 <title>Node49</title>
-<g id="a_node24"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="773,-392.5 773,-411.5 850,-411.5 850,-392.5 773,-392.5"/>
 <text text-anchor="middle" x="811.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_trace.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="660.5,-336.5 660.5,-355.5 754.5,-355.5 754.5,-336.5 660.5,-336.5"/>
 <text text-anchor="middle" x="707.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -223,7 +223,7 @@
 <!-- Node46 -->
 <g id="node19" class="node">
 <title>Node46</title>
-<g id="a_node19"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="236.5,-224.5 236.5,-243.5 322.5,-243.5 322.5,-224.5 236.5,-224.5"/>
 <text text-anchor="middle" x="279.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -259,7 +259,7 @@
 <!-- Node43 -->
 <g id="node14" class="node">
 <title>Node43</title>
-<g id="a_node14"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="218,-168.5 218,-187.5 291,-187.5 291,-168.5 218,-168.5"/>
 <text text-anchor="middle" x="254.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -532,7 +532,7 @@
 <!-- Node51 -->
 <g id="node27" class="node">
 <title>Node51</title>
-<g id="a_node27"><a xlink:href="options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="options_8h.html" target="_top" xlink:title="Options.">
 <polygon fill="none" stroke="black" points="939.5,-336.5 939.5,-355.5 1019.5,-355.5 1019.5,-336.5 939.5,-336.5"/>
 <text text-anchor="middle" x="979.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/options.h</text>
 </a>

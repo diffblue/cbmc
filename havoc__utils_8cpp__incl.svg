@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Utilities for building havoc code for expressions.">
 <polygon fill="#bfbfbf" stroke="black" points="424.5,-739.5 424.5,-780.5 569.5,-780.5 569.5,-739.5 424.5,-739.5"/>
 <text text-anchor="start" x="432.5" y="-768.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="432.5" y="-757.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="havoc__utils_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="havoc__utils_8h.html" target="_top" xlink:title="Utilities for building havoc code for expressions.">
 <polygon fill="none" stroke="black" points="357.5,-448.5 357.5,-467.5 438.5,-467.5 438.5,-448.5 357.5,-448.5"/>
 <text text-anchor="middle" x="398" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">havoc_utils.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node40 -->
 <g id="node25" class="node">
 <title>Node40</title>
-<g id="a_node25"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="544.5,-616.5 544.5,-635.5 649.5,-635.5 649.5,-616.5 544.5,-616.5"/>
 <text text-anchor="middle" x="597" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/pointer_expr.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node50 -->
 <g id="node38" class="node">
 <title>Node50</title>
-<g id="a_node38"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="847.5,-672.5 847.5,-702.5 960.5,-702.5 960.5,-672.5 847.5,-672.5"/>
 <text text-anchor="start" x="855.5" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="904" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -143,7 +143,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="488.5,-336.5 488.5,-355.5 535.5,-355.5 535.5,-336.5 488.5,-336.5"/>
 <text text-anchor="middle" x="512" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -356,7 +356,7 @@
 <!-- Node15 -->
 <g id="node13" class="node">
 <title>Node15</title>
-<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="232,-56.5 232,-75.5 296,-75.5 296,-56.5 232,-56.5"/>
 <text text-anchor="middle" x="264" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -485,7 +485,7 @@
 <!-- Node41 -->
 <g id="node26" class="node">
 <title>Node41</title>
-<g id="a_node26"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="546.5,-560.5 546.5,-579.5 647.5,-579.5 647.5,-560.5 546.5,-560.5"/>
 <text text-anchor="middle" x="597" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -500,7 +500,7 @@
 <!-- Node47 -->
 <g id="node34" class="node">
 <title>Node47</title>
-<g id="a_node34"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="461.5,-560.5 461.5,-579.5 528.5,-579.5 528.5,-560.5 461.5,-560.5"/>
 <text text-anchor="middle" x="495" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -515,7 +515,7 @@
 <!-- Node42 -->
 <g id="node27" class="node">
 <title>Node42</title>
-<g id="a_node27"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="542.5,-504.5 542.5,-523.5 615.5,-523.5 615.5,-504.5 542.5,-504.5"/>
 <text text-anchor="middle" x="579" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

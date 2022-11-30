@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Loop Acceleration.">
 <polygon fill="#bfbfbf" stroke="black" points="227,-672.5 227,-713.5 376,-713.5 376,-672.5 227,-672.5"/>
 <text text-anchor="start" x="235" y="-701.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="235" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="polynomial_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="polynomial_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="41.5,-448.5 41.5,-467.5 121.5,-467.5 121.5,-448.5 41.5,-448.5"/>
 <text text-anchor="middle" x="81.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">polynomial.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node39 -->
 <g id="node25" class="node">
 <title>Node39</title>
-<g id="a_node25"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="539.5,-560.5 539.5,-579.5 625.5,-579.5 625.5,-560.5 539.5,-560.5"/>
 <text text-anchor="middle" x="582.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node47 -->
 <g id="node35" class="node">
 <title>Node47</title>
-<g id="a_node35"><a xlink:href="util_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="util_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="323,-616.5 323,-635.5 364,-635.5 364,-616.5 323,-616.5"/>
 <text text-anchor="middle" x="343.5" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">util.h</text>
 </a>
@@ -163,7 +163,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="255,-336.5 255,-355.5 302,-355.5 302,-336.5 255,-336.5"/>
 <text text-anchor="middle" x="278.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -367,7 +367,7 @@
 <!-- Node16 -->
 <g id="node14" class="node">
 <title>Node16</title>
-<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="325.5,-56.5 325.5,-75.5 389.5,-75.5 389.5,-56.5 325.5,-56.5"/>
 <text text-anchor="middle" x="357.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -511,7 +511,7 @@
 <!-- Node42 -->
 <g id="node28" class="node">
 <title>Node42</title>
-<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="546,-504.5 546,-523.5 619,-523.5 619,-504.5 546,-504.5"/>
 <text text-anchor="middle" x="582.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -694,7 +694,7 @@
 <!-- Node48 -->
 <g id="node36" class="node">
 <title>Node48</title>
-<g id="a_node36"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="325.5,-560.5 325.5,-579.5 445.5,-579.5 445.5,-560.5 325.5,-560.5"/>
 <text text-anchor="middle" x="385.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/bitvector_types.h</text>
 </a>

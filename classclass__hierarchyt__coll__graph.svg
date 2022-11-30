@@ -87,13 +87,13 @@
 <title>Node5&#45;&gt;Node4</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M121,-213.22C121,-197.7 121,-176.36 121,-164.62"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="117.5,-213.28 121,-223.28 124.5,-213.28 117.5,-213.28"/>
-<text text-anchor="middle" x="141" y="-197" font-family="Helvetica,sans-Serif" font-size="10.00"> parents</text>
-<text text-anchor="middle" x="141" y="-186" font-family="Helvetica,sans-Serif" font-size="10.00">children</text>
+<text text-anchor="middle" x="142.5" y="-197" font-family="Helvetica,sans-Serif" font-size="10.00"> children</text>
+<text text-anchor="middle" x="142.5" y="-186" font-family="Helvetica,sans-Serif" font-size="10.00">parents</text>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:title="STL class.">
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="75.5,-290.5 75.5,-309.5 172.5,-309.5 172.5,-290.5 75.5,-290.5"/>
 <text text-anchor="middle" x="124" y="-297.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
@@ -125,7 +125,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:title="STL class.">
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="190.5,-290.5 190.5,-309.5 291.5,-309.5 291.5,-290.5 190.5,-290.5"/>
 <text text-anchor="middle" x="241" y="-297.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; K, T &gt;</text>
 </a>

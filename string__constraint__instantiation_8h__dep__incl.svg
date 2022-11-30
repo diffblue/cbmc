@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Defines related function for string constraints.">
 <polygon fill="#bfbfbf" stroke="black" points="95.5,-78.5 95.5,-119.5 272.5,-119.5 272.5,-78.5 95.5,-78.5"/>
 <text text-anchor="start" x="103.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="103.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="string__constraint__instantiation_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="string__constraint__instantiation_8cpp.html" target="_top" xlink:title="Defines related function for string constraints.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 188,-41.5 188,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="string__refinement_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="string__refinement_8cpp.html" target="_top" xlink:title="String support via creating string constraints and progressively instantiating the universal constrai...">
 <polygon fill="none" stroke="black" points="206,-0.5 206,-41.5 344,-41.5 344,-0.5 206,-0.5"/>
 <text text-anchor="start" x="214" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="214" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>

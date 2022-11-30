@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="C++ Parser.">
 <polygon fill="#bfbfbf" stroke="black" points="397,-840.5 397,-870.5 556,-870.5 556,-840.5 397,-840.5"/>
 <text text-anchor="start" x="405" y="-858.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="476.5" y="-847.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_parser.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cpp__parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cpp__parser_8h.html" target="_top" xlink:title="C++ Parser.">
 <polygon fill="none" stroke="black" points="484.5,-784.5 484.5,-803.5 562.5,-803.5 562.5,-784.5 484.5,-784.5"/>
 <text text-anchor="middle" x="523.5" y="-791.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_parser.h</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="parser_8h.html" target="_top" xlink:title="Parser utilities.">
 <polygon fill="none" stroke="black" points="289.5,-448.5 289.5,-467.5 363.5,-467.5 363.5,-448.5 289.5,-448.5"/>
 <text text-anchor="middle" x="326.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/parser.h</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node55 -->
 <g id="node40" class="node">
 <title>Node55</title>
-<g id="a_node40"><a xlink:href="cpp__parse__tree_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="cpp__parse__tree_8h.html" target="_top" xlink:title="C++ Parser.">
 <polygon fill="none" stroke="black" points="1430.5,-728.5 1430.5,-747.5 1530.5,-747.5 1530.5,-728.5 1430.5,-728.5"/>
 <text text-anchor="middle" x="1480.5" y="-735.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_parse_tree.h</text>
 </a>
@@ -96,7 +96,7 @@
 <!-- Node69 -->
 <g id="node54" class="node">
 <title>Node69</title>
-<g id="a_node54"><a xlink:href="cpp__token__buffer_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="cpp__token__buffer_8h.html" target="_top" xlink:title="C++ Parser: Token Buffer.">
 <polygon fill="none" stroke="black" points="1760.5,-504.5 1760.5,-523.5 1868.5,-523.5 1868.5,-504.5 1760.5,-504.5"/>
 <text text-anchor="middle" x="1814.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_token_buffer.h</text>
 </a>
@@ -216,7 +216,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1206,-336.5 1206,-355.5 1253,-355.5 1253,-336.5 1206,-336.5"/>
 <text text-anchor="middle" x="1229.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -708,7 +708,7 @@
 <!-- Node49 -->
 <g id="node34" class="node">
 <title>Node49</title>
-<g id="a_node34"><a xlink:href="ansi__c__declaration_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="ansi__c__declaration_8h.html" target="_top" xlink:title="ANSI&#45;CC Language Type Checking.">
 <polygon fill="none" stroke="black" points="1000.5,-616.5 1000.5,-635.5 1116.5,-635.5 1116.5,-616.5 1000.5,-616.5"/>
 <text text-anchor="middle" x="1058.5" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">ansi_c_declaration.h</text>
 </a>
@@ -723,7 +723,7 @@
 <!-- Node50 -->
 <g id="node35" class="node">
 <title>Node50</title>
-<g id="a_node35"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1015.5,-560.5 1015.5,-579.5 1101.5,-579.5 1101.5,-560.5 1015.5,-560.5"/>
 <text text-anchor="middle" x="1058.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -759,7 +759,7 @@
 <!-- Node53 -->
 <g id="node37" class="node">
 <title>Node53</title>
-<g id="a_node37"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="905,-504.5 905,-523.5 978,-523.5 978,-504.5 905,-504.5"/>
 <text text-anchor="middle" x="941.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -861,7 +861,7 @@
 <!-- Node56 -->
 <g id="node41" class="node">
 <title>Node56</title>
-<g id="a_node41"><a xlink:href="cpp__item_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="cpp__item_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1445,-672.5 1445,-691.5 1516,-691.5 1516,-672.5 1445,-672.5"/>
 <text text-anchor="middle" x="1480.5" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_item.h</text>
 </a>
@@ -876,7 +876,7 @@
 <!-- Node57 -->
 <g id="node42" class="node">
 <title>Node57</title>
-<g id="a_node42"><a xlink:href="cpp__declaration_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="cpp__declaration_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1223,-560.5 1223,-579.5 1326,-579.5 1326,-560.5 1223,-560.5"/>
 <text text-anchor="middle" x="1274.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_declaration.h</text>
 </a>
@@ -891,7 +891,7 @@
 <!-- Node65 -->
 <g id="node50" class="node">
 <title>Node65</title>
-<g id="a_node50"><a xlink:href="cpp__linkage__spec_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="cpp__linkage__spec_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1425,-616.5 1425,-635.5 1536,-635.5 1536,-616.5 1425,-616.5"/>
 <text text-anchor="middle" x="1480.5" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_linkage_spec.h</text>
 </a>
@@ -906,7 +906,7 @@
 <!-- Node66 -->
 <g id="node51" class="node">
 <title>Node66</title>
-<g id="a_node51"><a xlink:href="cpp__namespace__spec_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="cpp__namespace__spec_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1496.5,-504.5 1496.5,-523.5 1628.5,-523.5 1628.5,-504.5 1496.5,-504.5"/>
 <text text-anchor="middle" x="1562.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_namespace_spec.h</text>
 </a>
@@ -921,7 +921,7 @@
 <!-- Node67 -->
 <g id="node52" class="node">
 <title>Node67</title>
-<g id="a_node52"><a xlink:href="cpp__using_8h.html" target="_top" xlink:title=" ">
+<g id="a_node52"><a xlink:href="cpp__using_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1592.5,-560.5 1592.5,-579.5 1666.5,-579.5 1666.5,-560.5 1592.5,-560.5"/>
 <text text-anchor="middle" x="1629.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_using.h</text>
 </a>
@@ -936,7 +936,7 @@
 <!-- Node68 -->
 <g id="node53" class="node">
 <title>Node68</title>
-<g id="a_node53"><a xlink:href="cpp__static__assert_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="cpp__static__assert_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1146.5,-616.5 1146.5,-635.5 1256.5,-635.5 1256.5,-616.5 1146.5,-616.5"/>
 <text text-anchor="middle" x="1201.5" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_static_assert.h</text>
 </a>
@@ -951,7 +951,7 @@
 <!-- Node58 -->
 <g id="node43" class="node">
 <title>Node58</title>
-<g id="a_node43"><a xlink:href="cpp__declarator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="cpp__declarator_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1381,-504.5 1381,-523.5 1478,-523.5 1478,-504.5 1381,-504.5"/>
 <text text-anchor="middle" x="1429.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_declarator.h</text>
 </a>
@@ -1011,7 +1011,7 @@
 <!-- Node64 -->
 <g id="node49" class="node">
 <title>Node64</title>
-<g id="a_node49"><a xlink:href="cpp__template__args_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="cpp__template__args_8h.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="1414,-448.5 1414,-467.5 1533,-467.5 1533,-448.5 1414,-448.5"/>
 <text text-anchor="middle" x="1473.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_template_args.h</text>
 </a>
@@ -1158,7 +1158,7 @@
 <!-- Node70 -->
 <g id="node55" class="node">
 <title>Node70</title>
-<g id="a_node55"><a xlink:href="cpp__token_8h.html" target="_top" xlink:title=" ">
+<g id="a_node55"><a xlink:href="cpp__token_8h.html" target="_top" xlink:title="C++ Parser: Token.">
 <polygon fill="none" stroke="black" points="1772,-448.5 1772,-467.5 1847,-467.5 1847,-448.5 1772,-448.5"/>
 <text text-anchor="middle" x="1809.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">cpp_token.h</text>
 </a>

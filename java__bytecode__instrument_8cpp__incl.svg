@@ -113,7 +113,7 @@
 <!-- Node55 -->
 <g id="node42" class="node">
 <title>Node55</title>
-<g id="a_node42"><a xlink:href="java__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="java__expr_8h.html" target="_top" xlink:title="Java&#45;specific exprt subclasses.">
 <polygon fill="none" stroke="black" points="867,-638.5 867,-657.5 940,-657.5 940,-638.5 867,-638.5"/>
 <text text-anchor="middle" x="903.5" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">java_expr.h</text>
 </a>
@@ -233,7 +233,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="811,-459.5 811,-478.5 878,-478.5 878,-459.5 811,-459.5"/>
 <text text-anchor="middle" x="844.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -386,7 +386,7 @@
 <!-- Node44 -->
 <g id="node29" class="node">
 <title>Node44</title>
-<g id="a_node29"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="808,-403.5 808,-422.5 881,-422.5 881,-403.5 808,-403.5"/>
 <text text-anchor="middle" x="844.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -479,7 +479,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="650,-224.5 650,-243.5 697,-243.5 697,-224.5 650,-224.5"/>
 <text text-anchor="middle" x="673.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -704,7 +704,7 @@
 <!-- Node47 -->
 <g id="node33" class="node">
 <title>Node47</title>
-<g id="a_node33"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="1004.5,-521 1004.5,-540 1090.5,-540 1090.5,-521 1004.5,-521"/>
 <text text-anchor="middle" x="1047.5" y="-528" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -725,7 +725,7 @@
 <!-- Node48 -->
 <g id="node34" class="node">
 <title>Node48</title>
-<g id="a_node34"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="937,-459.5 937,-478.5 1038,-478.5 1038,-459.5 937,-459.5"/>
 <text text-anchor="middle" x="987.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -995,7 +995,7 @@
 <!-- Node61 -->
 <g id="node50" class="node">
 <title>Node61</title>
-<g id="a_node50"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title="Given a class and a component (either field or method), find the closest parent that defines that com...">
 <polygon fill="none" stroke="black" points="464.5,-280.5 464.5,-310.5 598.5,-310.5 598.5,-280.5 464.5,-280.5"/>
 <text text-anchor="start" x="472.5" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/resolve</text>
 <text text-anchor="middle" x="531.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">_inherited_component.h</text>

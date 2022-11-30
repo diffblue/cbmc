@@ -1,17 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/strings/string_constraint_instantiation.cpp" name="/home/runner/work/cbmc/cbmc/src/solvers/strings/string_constraint_instantiation.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="577,5,827,61"/>
-<area shape="rect" id="node2" href="$string__constraint__instantiation_8h.html" title=" " alt="" coords="331,259,563,285"/>
+<area shape="rect" id="node1" title="Defines related function for string constraints." alt="" coords="577,5,827,61"/>
+<area shape="rect" id="node2" href="$string__constraint__instantiation_8h.html" title="Defines related function for string constraints." alt="" coords="331,259,563,285"/>
 <area shape="rect" id="node28" title=" " alt="" coords="394,333,479,360"/>
 <area shape="rect" id="node29" title=" " alt="" coords="1391,109,1506,136"/>
 <area shape="rect" id="node30" href="$arith__tools_8h.html" title=" " alt="" coords="638,259,766,285"/>
-<area shape="rect" id="node32" href="$expr__iterator_8h.html" title=" " alt="" coords="164,259,307,285"/>
+<area shape="rect" id="node32" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="164,259,307,285"/>
 <area shape="rect" id="node35" href="$format__expr_8h.html" title=" " alt="" coords="1239,557,1378,584"/>
-<area shape="rect" id="node37" href="$string__constraint_8h.html" title=" " alt="" coords="921,109,1064,136"/>
-<area shape="rect" id="node3" href="$std__expr_8h.html" title=" " alt="" coords="687,333,802,360"/>
+<area shape="rect" id="node37" href="$string__constraint_8h.html" title="Defines string constraints." alt="" coords="921,109,1064,136"/>
+<area shape="rect" id="node3" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="687,333,802,360"/>
 <area shape="rect" id="node27" title=" " alt="" coords="327,333,370,360"/>
 <area shape="rect" id="node4" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="459,483,556,509"/>
 <area shape="rect" id="node8" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="279,856,371,883"/>
-<area shape="rect" id="node22" href="$std__types_8h.html" title=" " alt="" coords="697,408,795,435"/>
+<area shape="rect" id="node22" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="697,408,795,435"/>
 <area shape="rect" id="node5" title=" " alt="" coords="429,557,505,584"/>
 <area shape="rect" id="node6" title=" " alt="" coords="228,931,320,957"/>
 <area shape="rect" id="node7" title=" " alt="" coords="480,632,567,659"/>
@@ -20,7 +20,7 @@
 <area shape="rect" id="node10" title=" " alt="" coords="627,931,702,957"/>
 <area shape="rect" id="node11" title=" " alt="" coords="953,931,1011,957"/>
 <area shape="rect" id="node13" href="$as__const_8h.html" title=" " alt="" coords="839,632,930,659"/>
-<area shape="rect" id="node14" href="$type_8h.html" title=" " alt="" coords="1005,632,1068,659"/>
+<area shape="rect" id="node14" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="1005,632,1068,659"/>
 <area shape="rect" id="node19" href="$validation__mode_8h.html" title=" " alt="" coords="483,781,625,808"/>
 <area shape="rect" id="node20" href="$validate__types_8h.html" title=" " alt="" coords="642,707,773,733"/>
 <area shape="rect" id="node21" href="$validate__expressions_8h.html" title=" " alt="" coords="643,632,815,659"/>
@@ -36,11 +36,11 @@
 <area shape="rect" id="node33" title=" " alt="" coords="44,333,107,360"/>
 <area shape="rect" id="node34" title=" " alt="" coords="131,333,201,360"/>
 <area shape="rect" id="node36" href="$format_8h.html" title=" " alt="" coords="1347,632,1425,659"/>
-<area shape="rect" id="node38" href="$string__expr_8h.html" title=" " alt="" coords="833,184,963,211"/>
+<area shape="rect" id="node38" href="$string__expr_8h.html" title="String expressions for the string solver." alt="" coords="833,184,963,211"/>
 <area shape="rect" id="node43" href="$union__find__replace_8h.html" title=" " alt="" coords="1038,184,1219,211"/>
-<area shape="rect" id="node39" href="$pointer__expr_8h.html" title=" " alt="" coords="841,259,955,285"/>
-<area shape="rect" id="node41" href="$refined__string__type_8h.html" title=" " alt="" coords="980,259,1139,285"/>
-<area shape="rect" id="node40" href="$bitvector__types_8h.html" title=" " alt="" coords="827,333,961,360"/>
+<area shape="rect" id="node39" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="841,259,955,285"/>
+<area shape="rect" id="node41" href="$refined__string__type_8h.html" title="Type for string expressions used by the string solver." alt="" coords="980,259,1139,285"/>
+<area shape="rect" id="node40" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="827,333,961,360"/>
 <area shape="rect" id="node42" href="$cprover__prefix_8h.html" title=" " alt="" coords="1088,333,1215,360"/>
 <area shape="rect" id="node44" href="$replace__expr_8h.html" title=" " alt="" coords="895,408,1013,435"/>
 </map>

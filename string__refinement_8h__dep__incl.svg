@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="String support via creating string constraints and progressively instantiating the universal constrai...">
 <polygon fill="#bfbfbf" stroke="black" points="474.5,-156.5 474.5,-197.5 612.5,-197.5 612.5,-156.5 474.5,-156.5"/>
 <text text-anchor="start" x="482.5" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="482.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cbmc__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cbmc__parse__options_8h.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="224.5,-78.5 224.5,-119.5 378.5,-119.5 378.5,-78.5 224.5,-78.5"/>
 <text text-anchor="start" x="232.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="232.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -39,7 +39,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="solver__factory_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="solver__factory_8cpp.html" target="_top" xlink:title="Solver Factory.">
 <polygon fill="none" stroke="black" points="396.5,-78.5 396.5,-119.5 534.5,-119.5 534.5,-78.5 396.5,-78.5"/>
 <text text-anchor="start" x="404.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="404.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -56,7 +56,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="string__refinement_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="string__refinement_8cpp.html" target="_top" xlink:title="String support via creating string constraints and progressively instantiating the universal constrai...">
 <polygon fill="none" stroke="black" points="552.5,-78.5 552.5,-119.5 690.5,-119.5 690.5,-78.5 552.5,-78.5"/>
 <text text-anchor="start" x="560.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="560.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
@@ -73,7 +73,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="jbmc__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="jbmc__parse__options_8h.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="708.5,-78.5 708.5,-119.5 852.5,-119.5 852.5,-78.5 708.5,-78.5"/>
 <text text-anchor="start" x="716.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="716.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -90,7 +90,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cbmc__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cbmc__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 197,-36 197,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="98.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_languages.cpp</text>
@@ -106,7 +106,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="cbmc__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="cbmc__main_8cpp.html" target="_top" xlink:title="CBMC Main Module.">
 <polygon fill="none" stroke="black" points="215.5,-6 215.5,-36 387.5,-36 387.5,-6 215.5,-6"/>
 <text text-anchor="start" x="223.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="301.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_main.cpp</text>
@@ -122,7 +122,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="405.5,-0.5 405.5,-41.5 559.5,-41.5 559.5,-0.5 405.5,-0.5"/>
 <text text-anchor="start" x="413.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="413.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -139,7 +139,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="jbmc__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="jbmc__main_8cpp.html" target="_top" xlink:title="CBMC Main Module.">
 <polygon fill="none" stroke="black" points="643.5,-0.5 643.5,-41.5 787.5,-41.5 787.5,-0.5 643.5,-0.5"/>
 <text text-anchor="start" x="651.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="651.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -156,7 +156,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="805.5,-0.5 805.5,-41.5 949.5,-41.5 949.5,-0.5 805.5,-0.5"/>
 <text text-anchor="start" x="813.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="813.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="JAVA Pointer Casts.">
 <polygon fill="#bfbfbf" stroke="black" points="211.5,-78.5 211.5,-119.5 375.5,-119.5 375.5,-78.5 211.5,-78.5"/>
 <text text-anchor="start" x="219.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="219.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="java__bytecode__typecheck__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="java__bytecode__typecheck__expr_8cpp.html" target="_top" xlink:title="JAVA Bytecode Conversion / Type Checking.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 193,-41.5 193,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="java__pointer__casts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="java__pointer__casts_8cpp.html" target="_top" xlink:title="JAVA Pointer Casts.">
 <polygon fill="none" stroke="black" points="211.5,-0.5 211.5,-41.5 375.5,-41.5 375.5,-0.5 211.5,-0.5"/>
 <text text-anchor="start" x="219.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="219.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="simple__method__stubbing_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="simple__method__stubbing_8cpp.html" target="_top" xlink:title="Java simple opaque stub generation.">
 <polygon fill="none" stroke="black" points="393.5,-0.5 393.5,-41.5 557.5,-41.5 557.5,-0.5 393.5,-0.5"/>
 <text text-anchor="start" x="401.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="401.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>

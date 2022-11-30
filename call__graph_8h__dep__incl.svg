@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Function Call Graphs.">
 <polygon fill="#bfbfbf" stroke="black" points="337,-234.5 337,-275.5 475,-275.5 475,-234.5 337,-234.5"/>
 <text text-anchor="start" x="345" y="-263.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="345" y="-252.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/call</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="call__graph_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="call__graph_8cpp.html" target="_top" xlink:title="Function Call Graphs.">
 <polygon fill="none" stroke="black" points="10,-156.5 10,-197.5 148,-197.5 148,-156.5 10,-156.5"/>
 <text text-anchor="start" x="18" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="18" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/call</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="call__graph__helpers_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="call__graph__helpers_8h.html" target="_top" xlink:title="Function Call Graph Helpers.">
 <polygon fill="none" stroke="black" points="166,-156.5 166,-197.5 304,-197.5 304,-156.5 166,-156.5"/>
 <text text-anchor="start" x="174" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="174" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/call</text>
@@ -56,7 +56,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="aggressive__slicer_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="aggressive__slicer_8h.html" target="_top" xlink:title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ...">
 <polygon fill="none" stroke="black" points="333.5,-156.5 333.5,-197.5 478.5,-197.5 478.5,-156.5 333.5,-156.5"/>
 <text text-anchor="start" x="341.5" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="341.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="469,-0.5 469,-41.5 663,-41.5 663,-0.5 469,-0.5"/>
 <text text-anchor="start" x="477" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="477" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -90,7 +90,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="slice__global__inits_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="slice__global__inits_8cpp.html" target="_top" xlink:title="Remove initializations of unused global variables.">
 <polygon fill="none" stroke="black" points="558,-156.5 558,-197.5 696,-197.5 696,-156.5 558,-156.5"/>
 <text text-anchor="start" x="566" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="566" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -107,7 +107,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="call__graph__helpers_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="call__graph__helpers_8cpp.html" target="_top" xlink:title="Function Call Graph Helpers.">
 <polygon fill="none" stroke="black" points="0,-78.5 0,-119.5 138,-119.5 138,-78.5 0,-78.5"/>
 <text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/call</text>
@@ -124,7 +124,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="aggressive__slicer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="aggressive__slicer_8cpp.html" target="_top" xlink:title="Aggressive program slicer.">
 <polygon fill="none" stroke="black" points="156.5,-78.5 156.5,-119.5 301.5,-119.5 301.5,-78.5 156.5,-78.5"/>
 <text text-anchor="start" x="164.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -147,7 +147,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="goto__instrument__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="goto__instrument__parse__options_8h.html" target="_top" xlink:title="Command Line Parsing.">
 <polygon fill="none" stroke="black" points="320,-78.5 320,-119.5 502,-119.5 502,-78.5 320,-78.5"/>
 <text text-anchor="start" x="328" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="328" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -164,7 +164,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="goto__instrument__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__instrument__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="107,-0.5 107,-41.5 283,-41.5 283,-0.5 107,-0.5"/>
 <text text-anchor="start" x="115" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="115" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -181,7 +181,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="goto__instrument__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="goto__instrument__main_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="301,-0.5 301,-41.5 451,-41.5 451,-0.5 301,-0.5"/>
 <text text-anchor="start" x="309" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="309" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Value Set.">
 <polygon fill="#bfbfbf" stroke="black" points="45,-504.5 45,-545.5 183,-545.5 183,-504.5 45,-504.5"/>
 <text text-anchor="start" x="53" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="53" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/ref_expr</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="ref__expr__set_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="ref__expr__set_8h.html" target="_top" xlink:title="Value Set.">
 <polygon fill="none" stroke="black" points="71,-448.5 71,-467.5 157,-467.5 157,-448.5 71,-448.5"/>
 <text text-anchor="middle" x="114" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">ref_expr_set.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node39 -->
 <g id="node24" class="node">
 <title>Node39</title>
-<g id="a_node24"><a xlink:href="reference__counting_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="reference__counting_8h.html" target="_top" xlink:title="Reference Counting.">
 <polygon fill="none" stroke="black" points="98.5,-168.5 98.5,-187.5 217.5,-187.5 217.5,-168.5 98.5,-168.5"/>
 <text text-anchor="middle" x="158" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">reference_counting.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="277.5,-336.5 277.5,-355.5 324.5,-355.5 324.5,-336.5 277.5,-336.5"/>
 <text text-anchor="middle" x="301" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -310,7 +310,7 @@
 <!-- Node16 -->
 <g id="node14" class="node">
 <title>Node16</title>
-<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="198,-56.5 198,-75.5 262,-75.5 262,-56.5 198,-56.5"/>
 <text text-anchor="middle" x="230" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>

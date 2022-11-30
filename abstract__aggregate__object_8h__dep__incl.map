@@ -1,10 +1,10 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/abstract_aggregate_object.h" name="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/abstract_aggregate_object.h">
-<area shape="rect" id="node1" title=" " alt="" coords="475,5,701,76"/>
-<area shape="rect" id="node2" href="$full__array__abstract__object_8h.html" title=" " alt="" coords="5,124,227,195"/>
-<area shape="rect" id="node5" href="$full__struct__abstract__object_8h.html" title=" " alt="" coords="952,124,1176,195"/>
-<area shape="rect" id="node7" href="$two__value__array__abstract__object_8h.html" title=" " alt="" coords="251,124,458,195"/>
-<area shape="rect" id="node8" href="$two__value__struct__abstract__object_8h.html" title=" " alt="" coords="483,124,693,195"/>
-<area shape="rect" id="node9" href="$two__value__union__abstract__object_8h.html" title=" " alt="" coords="718,124,927,195"/>
+<area shape="rect" id="node1" title="Common behaviour for abstract objects modelling aggregate values &#45; arrays, structs,..." alt="" coords="475,5,701,76"/>
+<area shape="rect" id="node2" href="$full__array__abstract__object_8h.html" title="An abstraction of an array value." alt="" coords="5,124,227,195"/>
+<area shape="rect" id="node5" href="$full__struct__abstract__object_8h.html" title="An abstraction of a structure that stores one abstract object per field." alt="" coords="952,124,1176,195"/>
+<area shape="rect" id="node7" href="$two__value__array__abstract__object_8h.html" title="The base type of all abstract array representations." alt="" coords="251,124,458,195"/>
+<area shape="rect" id="node8" href="$two__value__struct__abstract__object_8h.html" title="The base of all structure abstractions." alt="" coords="483,124,693,195"/>
+<area shape="rect" id="node9" href="$two__value__union__abstract__object_8h.html" title="The base of all union abstractions." alt="" coords="718,124,927,195"/>
 <area shape="rect" id="node3" href="$full__array__abstract__object_8cpp.html" title=" " alt="" coords="5,243,227,313"/>
 <area shape="rect" id="node4" href="$variable__sensitivity__object__factory_8cpp.html" title=" " alt="" coords="475,243,701,313"/>
 <area shape="rect" id="node6" href="$full__struct__abstract__object_8cpp.html" title=" " alt="" coords="952,243,1176,313"/>

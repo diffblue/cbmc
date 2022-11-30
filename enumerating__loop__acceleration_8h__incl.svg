@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Loop Acceleration.">
 <polygon fill="#bfbfbf" stroke="black" points="1123,-1041.5 1123,-1093.5 1285,-1093.5 1285,-1041.5 1123,-1041.5"/>
 <text text-anchor="start" x="1131" y="-1081.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1131" y="-1070.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="1373.5,-560.5 1373.5,-590.5 1486.5,-590.5 1486.5,-560.5 1373.5,-560.5"/>
 <text text-anchor="start" x="1381.5" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1430" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -69,7 +69,7 @@
 <!-- Node50 -->
 <g id="node31" class="node">
 <title>Node50</title>
-<g id="a_node31"><a xlink:href="natural__loops_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="natural__loops_8h.html" target="_top" xlink:title="Compute natural loops in a goto_function.">
 <polygon fill="none" stroke="black" points="1038,-873.5 1038,-892.5 1176,-892.5 1176,-873.5 1038,-873.5"/>
 <text text-anchor="middle" x="1107" y="-880.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/natural_loops.h</text>
 </a>
@@ -84,7 +84,7 @@
 <!-- Node72 -->
 <g id="node52" class="node">
 <title>Node72</title>
-<g id="a_node52"><a xlink:href="polynomial__accelerator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node52"><a xlink:href="polynomial__accelerator_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="1492,-985.5 1492,-1004.5 1632,-1004.5 1632,-985.5 1492,-985.5"/>
 <text text-anchor="middle" x="1562" y="-992.5" font-family="Helvetica,sans-Serif" font-size="10.00">polynomial_accelerator.h</text>
 </a>
@@ -99,7 +99,7 @@
 <!-- Node79 -->
 <g id="node59" class="node">
 <title>Node79</title>
-<g id="a_node59"><a xlink:href="path__enumerator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node59"><a xlink:href="path__enumerator_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="1159.5,-929.5 1159.5,-948.5 1268.5,-948.5 1268.5,-929.5 1159.5,-929.5"/>
 <text text-anchor="middle" x="1214" y="-936.5" font-family="Helvetica,sans-Serif" font-size="10.00">path_enumerator.h</text>
 </a>
@@ -114,7 +114,7 @@
 <!-- Node80 -->
 <g id="node60" class="node">
 <title>Node80</title>
-<g id="a_node60"><a xlink:href="sat__path__enumerator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="sat__path__enumerator_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="1232.5,-985.5 1232.5,-1004.5 1361.5,-1004.5 1361.5,-985.5 1232.5,-985.5"/>
 <text text-anchor="middle" x="1297" y="-992.5" font-family="Helvetica,sans-Serif" font-size="10.00">sat_path_enumerator.h</text>
 </a>
@@ -270,7 +270,7 @@
 <!-- Node47 -->
 <g id="node27" class="node">
 <title>Node47</title>
-<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="761,-448.5 761,-467.5 847,-467.5 847,-448.5 761,-448.5"/>
 <text text-anchor="middle" x="804" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -321,7 +321,7 @@
 <!-- Node44 -->
 <g id="node26" class="node">
 <title>Node44</title>
-<g id="a_node26"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="red" points="881.5,-392.5 881.5,-411.5 954.5,-411.5 954.5,-392.5 881.5,-392.5"/>
 <text text-anchor="middle" x="918" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -450,7 +450,7 @@
 <!-- Node17 -->
 <g id="node16" class="node">
 <title>Node17</title>
-<g id="a_node16"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1125.5,-224.5 1125.5,-243.5 1172.5,-243.5 1172.5,-224.5 1125.5,-224.5"/>
 <text text-anchor="middle" x="1149" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -684,7 +684,7 @@
 <!-- Node52 -->
 <g id="node33" class="node">
 <title>Node52</title>
-<g id="a_node33"><a xlink:href="goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="goto__model_8h.html" target="_top" xlink:title="Symbol Table + CFG.">
 <polygon fill="none" stroke="black" points="811.5,-806.5 811.5,-836.5 924.5,-836.5 924.5,-806.5 811.5,-806.5"/>
 <text text-anchor="start" x="819.5" y="-824.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="868" y="-813.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model.h</text>
@@ -700,7 +700,7 @@
 <!-- Node66 -->
 <g id="node46" class="node">
 <title>Node66</title>
-<g id="a_node46"><a xlink:href="cfg__dominators_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="cfg__dominators_8h.html" target="_top" xlink:title="Compute dominators for CFG of goto_function.">
 <polygon fill="none" stroke="black" points="1065.5,-812 1065.5,-831 1166.5,-831 1166.5,-812 1065.5,-812"/>
 <text text-anchor="middle" x="1116" y="-819" font-family="Helvetica,sans-Serif" font-size="10.00">cfg_dominators.h</text>
 </a>
@@ -715,7 +715,7 @@
 <!-- Node71 -->
 <g id="node51" class="node">
 <title>Node71</title>
-<g id="a_node51"><a xlink:href="loop__analysis_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="loop__analysis_8h.html" target="_top" xlink:title="Data structure representing a loop in a GOTO program and an interface shared by all analyses that fin...">
 <polygon fill="none" stroke="black" points="114,-812 114,-831 206,-831 206,-812 114,-812"/>
 <text text-anchor="middle" x="160" y="-819" font-family="Helvetica,sans-Serif" font-size="10.00">loop_analysis.h</text>
 </a>
@@ -776,7 +776,7 @@
 <!-- Node61 -->
 <g id="node41" class="node">
 <title>Node61</title>
-<g id="a_node41"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title="Abstract interface to eager or lazy GOTO models.">
 <polygon fill="none" stroke="black" points="896,-745 896,-764 1024,-764 1024,-745 896,-745"/>
 <text text-anchor="middle" x="960" y="-752" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_goto_model.h</text>
 </a>
@@ -791,7 +791,7 @@
 <!-- Node62 -->
 <g id="node42" class="node">
 <title>Node62</title>
-<g id="a_node42"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="1014,-683.5 1014,-702.5 1112,-702.5 1112,-683.5 1014,-683.5"/>
 <text text-anchor="middle" x="1063" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -923,7 +923,7 @@
 <!-- Node63 -->
 <g id="node43" class="node">
 <title>Node63</title>
-<g id="a_node43"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="1026,-627.5 1026,-646.5 1118,-646.5 1118,-627.5 1026,-627.5"/>
 <text text-anchor="middle" x="1072" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -1016,7 +1016,7 @@
 <!-- Node67 -->
 <g id="node48" class="node">
 <title>Node67</title>
-<g id="a_node48"><a xlink:href="cfg_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="cfg_8h.html" target="_top" xlink:title="Control Flow Graph.">
 <polygon fill="none" stroke="black" points="558,-745 558,-764 674,-764 674,-745 558,-745"/>
 <text text-anchor="middle" x="616" y="-752" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/cfg.h</text>
 </a>
@@ -1043,7 +1043,7 @@
 <!-- Node68 -->
 <g id="node49" class="node">
 <title>Node68</title>
-<g id="a_node49"><a xlink:href="dense__integer__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="dense__integer__map_8h.html" target="_top" xlink:title="Dense integer map.">
 <polygon fill="none" stroke="black" points="430,-560.5 430,-590.5 534,-590.5 534,-560.5 430,-560.5"/>
 <text text-anchor="start" x="438" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/dense_integer</text>
 <text text-anchor="middle" x="482" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">_map.h</text>
@@ -1059,7 +1059,7 @@
 <!-- Node69 -->
 <g id="node50" class="node">
 <title>Node69</title>
-<g id="a_node50"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="red" points="564,-683.5 564,-702.5 636,-702.5 636,-683.5 564,-683.5"/>
 <text text-anchor="middle" x="600" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -1176,7 +1176,7 @@
 <!-- Node73 -->
 <g id="node53" class="node">
 <title>Node73</title>
-<g id="a_node53"><a xlink:href="polynomial_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="polynomial_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="1534,-683.5 1534,-702.5 1614,-702.5 1614,-683.5 1534,-683.5"/>
 <text text-anchor="middle" x="1574" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">polynomial.h</text>
 </a>
@@ -1191,7 +1191,7 @@
 <!-- Node74 -->
 <g id="node54" class="node">
 <title>Node74</title>
-<g id="a_node54"><a xlink:href="path_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="path_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="1270.5,-873.5 1270.5,-892.5 1317.5,-892.5 1317.5,-873.5 1270.5,-873.5"/>
 <text text-anchor="middle" x="1294" y="-880.5" font-family="Helvetica,sans-Serif" font-size="10.00">path.h</text>
 </a>
@@ -1206,7 +1206,7 @@
 <!-- Node75 -->
 <g id="node55" class="node">
 <title>Node75</title>
-<g id="a_node55"><a xlink:href="acceleration__utils_8h.html" target="_top" xlink:title=" ">
+<g id="a_node55"><a xlink:href="acceleration__utils_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="1430,-929.5 1430,-948.5 1542,-948.5 1542,-929.5 1430,-929.5"/>
 <text text-anchor="middle" x="1486" y="-936.5" font-family="Helvetica,sans-Serif" font-size="10.00">acceleration_utils.h</text>
 </a>
@@ -1221,7 +1221,7 @@
 <!-- Node78 -->
 <g id="node58" class="node">
 <title>Node78</title>
-<g id="a_node58"><a xlink:href="cone__of__influence_8h.html" target="_top" xlink:title=" ">
+<g id="a_node58"><a xlink:href="cone__of__influence_8h.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="906.5,-873.5 906.5,-892.5 1019.5,-892.5 1019.5,-873.5 906.5,-873.5"/>
 <text text-anchor="middle" x="963" y="-880.5" font-family="Helvetica,sans-Serif" font-size="10.00">cone_of_influence.h</text>
 </a>
@@ -1320,7 +1320,7 @@
 <!-- Node76 -->
 <g id="node56" class="node">
 <title>Node76</title>
-<g id="a_node56"><a xlink:href="guard_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="guard_8h.html" target="_top" xlink:title="Guard Data Structure.">
 <polygon fill="none" stroke="black" points="1704,-873.5 1704,-892.5 1804,-892.5 1804,-873.5 1704,-873.5"/>
 <text text-anchor="middle" x="1754" y="-880.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/guard.h</text>
 </a>
@@ -1341,7 +1341,7 @@
 <!-- Node77 -->
 <g id="node57" class="node">
 <title>Node77</title>
-<g id="a_node57"><a xlink:href="guard__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="guard__expr_8h.html" target="_top" xlink:title="Guard Data Structure.">
 <polygon fill="none" stroke="black" points="1539,-392.5 1539,-411.5 1619,-411.5 1619,-392.5 1539,-392.5"/>
 <text text-anchor="middle" x="1579" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">guard_expr.h</text>
 </a>

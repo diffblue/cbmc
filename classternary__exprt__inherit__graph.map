@@ -1,18 +1,19 @@
 <map id="ternary_exprt" name="ternary_exprt">
-<area shape="rect" id="node1" title="An expression with three operands." alt="" coords="1028,233,1139,260"/>
-<area shape="rect" id="node7" href="$classbyte__update__exprt.html" title="Expression corresponding to op() where the bytes starting at position offset (given in number of byte..." alt="" coords="1202,5,1346,32"/>
-<area shape="rect" id="node8" href="$classieee__float__op__exprt.html" title="IEEE floating&#45;point operations These have two data operands (op0 and op1) and one rounding mode (op2)..." alt="" coords="1199,56,1349,83"/>
-<area shape="rect" id="node9" href="$classif__exprt.html" title="The trinary if&#45;then&#45;else operator." alt="" coords="1238,107,1310,133"/>
-<area shape="rect" id="node10" href="$classpointer__in__range__exprt.html" title="pointer_in_range(a, b, c) evaluates to true iff same_object(a, b, c) ∧ r_ok(a, offset(c)&#45;offset(a)) ∧..." alt="" coords="1188,157,1360,184"/>
-<area shape="rect" id="node11" href="$classreallocate__exprt.html" title=" " alt="" coords="1210,208,1338,235"/>
-<area shape="rect" id="node12" href="$classreallocate__state__exprt.html" title=" " alt="" coords="1190,259,1358,285"/>
-<area shape="rect" id="node13" href="$classstate__ok__exprt.html" title=" " alt="" coords="1215,309,1333,336"/>
-<area shape="rect" id="node14" href="$classtranst.html" title="Transition system, consisting of state invariant, initial state predicate, and transition predicate." alt="" coords="1244,360,1304,387"/>
-<area shape="rect" id="node15" href="$classupdate__exprt.html" title="Operator to update elements in structs and arrays." alt="" coords="1220,411,1328,437"/>
-<area shape="rect" id="node16" href="$classupdate__state__exprt.html" title=" " alt="" coords="1200,461,1348,488"/>
-<area shape="rect" id="node2" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,233,979,260"/>
-<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,233,804,260"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,233,699,260"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="431,219,597,275"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,226,187,267"/>
+<area shape="rect" id="node1" title="An expression with three operands." alt="" coords="1028,284,1139,311"/>
+<area shape="rect" id="node7" href="$classallocate__exprt.html" title=" " alt="" coords="1217,5,1331,32"/>
+<area shape="rect" id="node8" href="$classbyte__update__exprt.html" title="Expression corresponding to op() where the bytes starting at position offset (given in number of byte..." alt="" coords="1202,56,1346,83"/>
+<area shape="rect" id="node9" href="$classieee__float__op__exprt.html" title="IEEE floating&#45;point operations These have two data operands (op0 and op1) and one rounding mode (op2)..." alt="" coords="1199,107,1349,133"/>
+<area shape="rect" id="node10" href="$classif__exprt.html" title="The trinary if&#45;then&#45;else operator." alt="" coords="1238,157,1310,184"/>
+<area shape="rect" id="node11" href="$classpointer__in__range__exprt.html" title="pointer_in_range(a, b, c) evaluates to true iff same_object(a, b, c) ∧ r_ok(a, offset(c)&#45;offset(a)) ∧..." alt="" coords="1188,208,1360,235"/>
+<area shape="rect" id="node12" href="$classreallocate__exprt.html" title=" " alt="" coords="1210,259,1338,285"/>
+<area shape="rect" id="node13" href="$classreallocate__state__exprt.html" title=" " alt="" coords="1190,309,1358,336"/>
+<area shape="rect" id="node14" href="$classstate__ok__exprt.html" title=" " alt="" coords="1215,360,1333,387"/>
+<area shape="rect" id="node15" href="$classtranst.html" title="Transition system, consisting of state invariant, initial state predicate, and transition predicate." alt="" coords="1244,411,1304,437"/>
+<area shape="rect" id="node16" href="$classupdate__exprt.html" title="Operator to update elements in structs and arrays." alt="" coords="1220,461,1328,488"/>
+<area shape="rect" id="node17" href="$classupdate__state__exprt.html" title=" " alt="" coords="1200,512,1348,539"/>
+<area shape="rect" id="node2" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,284,979,311"/>
+<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,284,804,311"/>
+<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,284,699,311"/>
+<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="431,269,597,325"/>
+<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,277,187,318"/>
 </map>

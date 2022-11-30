@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="util">
 <polygon fill="#bfbfbf" stroke="black" points="161.5,-224.5 161.5,-254.5 299.5,-254.5 299.5,-224.5 161.5,-224.5"/>
 <text text-anchor="start" x="169.5" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="230.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_ids.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="159,-168.5 159,-187.5 218,-187.5 218,-168.5 159,-168.5"/>
 <text text-anchor="middle" x="188.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -96,7 +96,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="185.5,-112.5 185.5,-131.5 289.5,-131.5 289.5,-112.5 185.5,-112.5"/>
 <text text-anchor="middle" x="237.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -186,7 +186,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="string__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="string__hash_8h.html" target="_top" xlink:title="string hashing">
 <polygon fill="none" stroke="black" points="196.5,-56.5 196.5,-75.5 278.5,-75.5 278.5,-56.5 196.5,-56.5"/>
 <text text-anchor="middle" x="237.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_hash.h</text>
 </a>

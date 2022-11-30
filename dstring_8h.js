@@ -1,6 +1,5 @@
 var dstring_8h =
 [
-    [ "diagnostics_helpert", "structdiagnostics__helpert.html", "structdiagnostics__helpert" ],
     [ "dstringt", "classdstringt.html", "classdstringt" ],
     [ "dstring_hash", "structdstring__hash.html", "structdstring__hash" ],
     [ "hash< dstringt >", "structstd_1_1hash_3_01dstringt_01_4.html", "structstd_1_1hash_3_01dstringt_01_4" ],

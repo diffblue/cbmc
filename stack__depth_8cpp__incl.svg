@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Stack depth checks.">
 <polygon fill="#bfbfbf" stroke="black" points="551,-761.5 551,-802.5 696,-802.5 696,-761.5 551,-761.5"/>
 <text text-anchor="start" x="559" y="-790.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="559" y="-779.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="stack__depth_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="stack__depth_8h.html" target="_top" xlink:title="Stack depth checks.">
 <polygon fill="none" stroke="black" points="0,-700 0,-719 85,-719 85,-700 0,-700"/>
 <text text-anchor="middle" x="42.5" y="-707" font-family="Helvetica,sans-Serif" font-size="10.00">stack_depth.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node46 -->
 <g id="node33" class="node">
 <title>Node46</title>
-<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="1171.5,-448.5 1171.5,-467.5 1291.5,-467.5 1291.5,-448.5 1171.5,-448.5"/>
 <text text-anchor="middle" x="1231.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/bitvector_types.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node49 -->
 <g id="node36" class="node">
 <title>Node49</title>
-<g id="a_node36"><a xlink:href="goto__convert__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="goto__convert__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="903.5,-694.5 903.5,-724.5 1021.5,-724.5 1021.5,-694.5 903.5,-694.5"/>
 <text text-anchor="start" x="911.5" y="-712.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="962.5" y="-701.5" font-family="Helvetica,sans-Serif" font-size="10.00">_convert_functions.h</text>
@@ -98,7 +98,7 @@
 <!-- Node69 -->
 <g id="node53" class="node">
 <title>Node69</title>
-<g id="a_node53"><a xlink:href="goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="goto__model_8h.html" target="_top" xlink:title="Symbol Table + CFG.">
 <polygon fill="none" stroke="black" points="567,-627.5 567,-657.5 680,-657.5 680,-627.5 567,-627.5"/>
 <text text-anchor="start" x="575" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="623.5" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model.h</text>
@@ -190,7 +190,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1086,-448.5 1086,-467.5 1153,-467.5 1153,-448.5 1086,-448.5"/>
 <text text-anchor="middle" x="1119.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -352,7 +352,7 @@
 <!-- Node44 -->
 <g id="node30" class="node">
 <title>Node44</title>
-<g id="a_node30"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1175,-392.5 1175,-411.5 1248,-411.5 1248,-392.5 1175,-392.5"/>
 <text text-anchor="middle" x="1211.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -445,7 +445,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1280,-224.5 1280,-243.5 1327,-243.5 1327,-224.5 1280,-224.5"/>
 <text text-anchor="middle" x="1303.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -685,7 +685,7 @@
 <!-- Node48 -->
 <g id="node35" class="node">
 <title>Node48</title>
-<g id="a_node35"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="1085.5,-504.5 1085.5,-523.5 1171.5,-523.5 1171.5,-504.5 1085.5,-504.5"/>
 <text text-anchor="middle" x="1128.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -712,7 +712,7 @@
 <!-- Node50 -->
 <g id="node37" class="node">
 <title>Node50</title>
-<g id="a_node37"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="997,-633 997,-652 1116,-652 1116,-633 997,-633"/>
 <text text-anchor="middle" x="1056.5" y="-640" font-family="Helvetica,sans-Serif" font-size="10.00">goto_convert_class.h</text>
 </a>
@@ -727,7 +727,7 @@
 <!-- Node66 -->
 <g id="node50" class="node">
 <title>Node66</title>
-<g id="a_node50"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="617.5,-504.5 617.5,-523.5 715.5,-523.5 715.5,-504.5 617.5,-504.5"/>
 <text text-anchor="middle" x="666.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -868,7 +868,7 @@
 <!-- Node63 -->
 <g id="node49" class="node">
 <title>Node63</title>
-<g id="a_node49"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="222.5,-280.5 222.5,-299.5 316.5,-299.5 316.5,-280.5 222.5,-280.5"/>
 <text text-anchor="middle" x="269.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -1018,7 +1018,7 @@
 <!-- Node59 -->
 <g id="node47" class="node">
 <title>Node59</title>
-<g id="a_node47"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node47"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="red" points="1542.5,-448.5 1542.5,-467.5 1614.5,-467.5 1614.5,-448.5 1542.5,-448.5"/>
 <text text-anchor="middle" x="1578.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -1126,7 +1126,7 @@
 <!-- Node67 -->
 <g id="node51" class="node">
 <title>Node67</title>
-<g id="a_node51"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="688.5,-448.5 688.5,-467.5 780.5,-467.5 780.5,-448.5 688.5,-448.5"/>
 <text text-anchor="middle" x="734.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -1211,7 +1211,7 @@
 <!-- Node75 -->
 <g id="node58" class="node">
 <title>Node75</title>
-<g id="a_node58"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node58"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title="Abstract interface to eager or lazy GOTO models.">
 <polygon fill="none" stroke="black" points="605.5,-566 605.5,-585 733.5,-585 733.5,-566 605.5,-566"/>
 <text text-anchor="middle" x="669.5" y="-573" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_goto_model.h</text>
 </a>

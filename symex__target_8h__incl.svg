@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="#bfbfbf" stroke="black" points="546,-515.5 546,-556.5 707,-556.5 707,-515.5 546,-515.5"/>
 <text text-anchor="start" x="554" y="-544.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="554" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/symex</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="778,-448.5 778,-478.5 891,-478.5 891,-448.5 778,-448.5"/>
 <text text-anchor="start" x="786" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="834.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -38,7 +38,7 @@
 <!-- Node48 -->
 <g id="node30" class="node">
 <title>Node48</title>
-<g id="a_node30"><a xlink:href="renamed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="renamed_8h.html" target="_top" xlink:title="Class for expressions or types renamed up to a given level.">
 <polygon fill="none" stroke="black" points="319,-392.5 319,-411.5 388,-411.5 388,-392.5 319,-392.5"/>
 <text text-anchor="middle" x="353.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">renamed.h</text>
 </a>
@@ -188,7 +188,7 @@
 <!-- Node45 -->
 <g id="node27" class="node">
 <title>Node45</title>
-<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="372.5,-336.5 372.5,-355.5 458.5,-355.5 458.5,-336.5 372.5,-336.5"/>
 <text text-anchor="middle" x="415.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -239,7 +239,7 @@
 <!-- Node42 -->
 <g id="node22" class="node">
 <title>Node42</title>
-<g id="a_node22"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="460,-280.5 460,-299.5 533,-299.5 533,-280.5 460,-280.5"/>
 <text text-anchor="middle" x="496.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -383,7 +383,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="246,-112.5 246,-131.5 293,-131.5 293,-112.5 246,-112.5"/>
 <text text-anchor="middle" x="269.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -596,7 +596,7 @@
 <!-- Node49 -->
 <g id="node31" class="node">
 <title>Node49</title>
-<g id="a_node31"><a xlink:href="expr__iterator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="expr__iterator_8h.html" target="_top" xlink:title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,...">
 <polygon fill="none" stroke="black" points="163,-224.5 163,-243.5 270,-243.5 270,-224.5 163,-224.5"/>
 <text text-anchor="middle" x="216.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/expr_iterator.h</text>
 </a>

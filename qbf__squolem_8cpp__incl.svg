@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Squolem Backend.">
 <polygon fill="#bfbfbf" stroke="black" points="89,-459.5 89,-500.5 227,-500.5 227,-459.5 89,-459.5"/>
 <text text-anchor="start" x="97" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="97" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/qbf</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="qbf__squolem_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="qbf__squolem_8h.html" target="_top" xlink:title="Squolem Backend.">
 <polygon fill="none" stroke="black" points="113.5,-403.5 113.5,-422.5 202.5,-422.5 202.5,-403.5 113.5,-403.5"/>
 <text text-anchor="middle" x="158" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">qbf_squolem.h</text>
 </a>
@@ -104,7 +104,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title="CNF Generation.">
 <polygon fill="none" stroke="black" points="261,-224.5 261,-243.5 359,-243.5 359,-224.5 261,-224.5"/>
 <text text-anchor="middle" x="310" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf_clause_list.h</text>
 </a>
@@ -149,7 +149,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="cnf_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="cnf_8h.html" target="_top" xlink:title="CNF Generation, via Tseitin.">
 <polygon fill="none" stroke="black" points="362,-168.5 362,-187.5 402,-187.5 402,-168.5 362,-168.5"/>
 <text text-anchor="middle" x="382" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf.h</text>
 </a>

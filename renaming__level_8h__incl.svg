@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Renaming levels.">
 <polygon fill="#bfbfbf" stroke="black" points="575,-459.5 575,-500.5 749,-500.5 749,-459.5 575,-459.5"/>
 <text text-anchor="start" x="583" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="583" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/renaming</text>
@@ -37,7 +37,7 @@
 <!-- Node25 -->
 <g id="node23" class="node">
 <title>Node25</title>
-<g id="a_node23"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="sharing__map_8h.html" target="_top" xlink:title="Sharing map.">
 <polygon fill="none" stroke="black" points="608.5,-291.5 608.5,-310.5 715.5,-310.5 715.5,-291.5 608.5,-291.5"/>
 <text text-anchor="middle" x="662" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/sharing_map.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node47 -->
 <g id="node45" class="node">
 <title>Node47</title>
-<g id="a_node45"><a xlink:href="renamed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="renamed_8h.html" target="_top" xlink:title="Class for expressions or types renamed up to a given level.">
 <polygon fill="none" stroke="black" points="1493.5,-403.5 1493.5,-422.5 1562.5,-422.5 1562.5,-403.5 1493.5,-403.5"/>
 <text text-anchor="middle" x="1528" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">renamed.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="182,-179.5 182,-198.5 246,-198.5 246,-179.5 182,-179.5"/>
 <text text-anchor="middle" x="214" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -193,7 +193,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="186.5,-118 186.5,-137 245.5,-137 245.5,-118 186.5,-118"/>
 <text text-anchor="middle" x="216" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -259,7 +259,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="66,-56.5 66,-75.5 170,-75.5 170,-56.5 66,-56.5"/>
 <text text-anchor="middle" x="118" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -547,7 +547,7 @@
 <!-- Node35 -->
 <g id="node33" class="node">
 <title>Node35</title>
-<g id="a_node33"><a xlink:href="sharing__node_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="sharing__node_8h.html" target="_top" xlink:title="Sharing node.">
 <polygon fill="none" stroke="black" points="934.5,-179.5 934.5,-198.5 1025.5,-198.5 1025.5,-179.5 934.5,-179.5"/>
 <text text-anchor="middle" x="980" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">sharing_node.h</text>
 </a>
@@ -616,7 +616,7 @@
 <!-- Node36 -->
 <g id="node34" class="node">
 <title>Node36</title>
-<g id="a_node34"><a xlink:href="small__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="small__map_8h.html" target="_top" xlink:title="Small map.">
 <polygon fill="none" stroke="black" points="1215,-118 1215,-137 1295,-137 1295,-118 1215,-118"/>
 <text text-anchor="middle" x="1255" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">small_map.h</text>
 </a>
@@ -839,7 +839,7 @@
 <!-- Node48 -->
 <g id="node46" class="node">
 <title>Node48</title>
-<g id="a_node46"><a xlink:href="expr__iterator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="expr__iterator_8h.html" target="_top" xlink:title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,...">
 <polygon fill="none" stroke="black" points="1440.5,-235.5 1440.5,-254.5 1547.5,-254.5 1547.5,-235.5 1440.5,-235.5"/>
 <text text-anchor="middle" x="1494" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/expr_iterator.h</text>
 </a>
@@ -869,7 +869,7 @@
 <!-- Node61 -->
 <g id="node56" class="node">
 <title>Node61</title>
-<g id="a_node56"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1643,-347.5 1643,-366.5 1729,-366.5 1729,-347.5 1643,-347.5"/>
 <text text-anchor="middle" x="1686" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -965,7 +965,7 @@
 <!-- Node52 -->
 <g id="node50" class="node">
 <title>Node52</title>
-<g id="a_node50"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="red" points="2014.5,-118 2014.5,-137 2061.5,-137 2061.5,-118 2014.5,-118"/>
 <text text-anchor="middle" x="2038" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -1085,7 +1085,7 @@
 <!-- Node64 -->
 <g id="node59" class="node">
 <title>Node64</title>
-<g id="a_node59"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node59"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1649.5,-291.5 1649.5,-310.5 1722.5,-310.5 1722.5,-291.5 1649.5,-291.5"/>
 <text text-anchor="middle" x="1686" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Invariant Set Domain.">
 <polygon fill="#bfbfbf" stroke="black" points="940,-571.5 940,-612.5 1096,-612.5 1096,-571.5 940,-571.5"/>
 <text text-anchor="start" x="948" y="-600.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="948" y="-589.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/invariant</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="invariant__set__domain_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="invariant__set__domain_8h.html" target="_top" xlink:title="Value Set.">
 <polygon fill="none" stroke="black" points="952.5,-515.5 952.5,-534.5 1083.5,-534.5 1083.5,-515.5 952.5,-515.5"/>
 <text text-anchor="middle" x="1018" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">invariant_set_domain.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="ai__domain_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="ai__domain_8h.html" target="_top" xlink:title="Abstract Interpretation Domain.">
 <polygon fill="none" stroke="black" points="1608.5,-459.5 1608.5,-478.5 1685.5,-478.5 1685.5,-459.5 1608.5,-459.5"/>
 <text text-anchor="middle" x="1647" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">ai_domain.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node58 -->
 <g id="node39" class="node">
 <title>Node58</title>
-<g id="a_node39"><a xlink:href="invariant__set_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="invariant__set_8h.html" target="_top" xlink:title="Value Set.">
 <polygon fill="none" stroke="black" points="711.5,-280.5 711.5,-299.5 800.5,-299.5 800.5,-280.5 711.5,-280.5"/>
 <text text-anchor="middle" x="756" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">invariant_set.h</text>
 </a>
@@ -172,7 +172,7 @@
 <!-- Node35 -->
 <g id="node29" class="node">
 <title>Node35</title>
-<g id="a_node29"><a xlink:href="ai__history_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="ai__history_8h.html" target="_top" xlink:title="Abstract Interpretation history.">
 <polygon fill="none" stroke="black" points="1611,-403.5 1611,-422.5 1683,-422.5 1683,-403.5 1611,-403.5"/>
 <text text-anchor="middle" x="1647" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">ai_history.h</text>
 </a>
@@ -253,7 +253,7 @@
 <!-- Node30 -->
 <g id="node23" class="node">
 <title>Node30</title>
-<g id="a_node23"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="919.5,-224.5 919.5,-243.5 972.5,-243.5 972.5,-224.5 919.5,-224.5"/>
 <text text-anchor="middle" x="946" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>
@@ -295,7 +295,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="1257,-168.5 1257,-187.5 1321,-187.5 1321,-168.5 1257,-168.5"/>
 <text text-anchor="middle" x="1289" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -376,7 +376,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="1349.5,-112.5 1349.5,-131.5 1408.5,-131.5 1408.5,-112.5 1349.5,-112.5"/>
 <text text-anchor="middle" x="1379" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -589,7 +589,7 @@
 <!-- Node36 -->
 <g id="node30" class="node">
 <title>Node36</title>
-<g id="a_node30"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="1134.5,-336.5 1134.5,-366.5 1247.5,-366.5 1247.5,-336.5 1134.5,-336.5"/>
 <text text-anchor="start" x="1142.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1191" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -713,7 +713,7 @@
 <!-- Node55 -->
 <g id="node33" class="node">
 <title>Node55</title>
-<g id="a_node33"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="499,-112.5 499,-131.5 585,-131.5 585,-112.5 499,-112.5"/>
 <text text-anchor="middle" x="542" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>

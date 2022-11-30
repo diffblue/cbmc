@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="A special command line object to mimic ARM&#39;s armcc.">
 <polygon fill="#bfbfbf" stroke="black" points="228,-280.5 228,-321.5 366,-321.5 366,-280.5 228,-280.5"/>
 <text text-anchor="start" x="236" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="236" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/armcc</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="armcc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="armcc__cmdline_8h.html" target="_top" xlink:title="A special command line object to mimic ARM&#39;s armcc.">
 <polygon fill="none" stroke="black" points="91,-224.5 91,-243.5 191,-243.5 191,-224.5 91,-224.5"/>
 <text text-anchor="middle" x="141" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">armcc_cmdline.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="85.5,-168.5 85.5,-187.5 192.5,-187.5 192.5,-168.5 85.5,-168.5"/>
 <text text-anchor="middle" x="139" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_cmdline.h</text>
 </a>

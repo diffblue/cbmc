@@ -1,12 +1,12 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/variable_sensitivity_object_factory.h" name="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/variable_sensitivity_object_factory.h">
-<area shape="rect" id="node1" title=" " alt="" coords="985,5,1212,76"/>
-<area shape="rect" id="node2" href="$abstract__object_8h.html" title=" " alt="" coords="139,124,274,151"/>
-<area shape="rect" id="node45" href="$variable__sensitivity__configuration_8h.html" title=" " alt="" coords="2398,363,2549,404"/>
+<area shape="rect" id="node1" title="Tracks the user&#45;supplied configuration for VSD and build the correct type of abstract object when nee..." alt="" coords="985,5,1212,76"/>
+<area shape="rect" id="node2" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="139,124,274,151"/>
+<area shape="rect" id="node45" href="$variable__sensitivity__configuration_8h.html" title="Captures the user&#45;supplied configuration for VSD, determining which domain abstractions are used,..." alt="" coords="2398,363,2549,404"/>
 <area shape="rect" id="node3" title=" " alt="" coords="67,616,144,643"/>
 <area shape="rect" id="node4" title=" " alt="" coords="125,452,168,479"/>
 <area shape="rect" id="node5" title=" " alt="" coords="43,452,101,479"/>
-<area shape="rect" id="node6" href="$goto__program_8h.html" title=" " alt="" coords="1673,199,1823,240"/>
-<area shape="rect" id="node29" href="$sharing__map_8h.html" title=" " alt="" coords="917,370,1059,397"/>
+<area shape="rect" id="node6" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1673,199,1823,240"/>
+<area shape="rect" id="node29" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="917,370,1059,397"/>
 <area shape="rect" id="node7" href="$goto__instruction__code_8h.html" title=" " alt="" coords="1659,288,1837,315"/>
 <area shape="rect" id="node13" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1521,616,1613,643"/>
 <area shape="rect" id="node14" title=" " alt="" coords="2229,691,2288,717"/>
@@ -15,9 +15,9 @@
 <area shape="rect" id="node24" href="$deprecate_8h.html" title=" " alt="" coords="2173,452,2272,479"/>
 <area shape="rect" id="node25" href="$source__location_8h.html" title=" " alt="" coords="1908,370,2044,397"/>
 <area shape="rect" id="node8" href="$std__code__base_8h.html" title=" " alt="" coords="1591,370,1745,397"/>
-<area shape="rect" id="node22" href="$std__expr_8h.html" title=" " alt="" coords="1769,370,1884,397"/>
+<area shape="rect" id="node22" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1769,370,1884,397"/>
 <area shape="rect" id="node9" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="2073,534,2170,561"/>
-<area shape="rect" id="node17" href="$std__types_8h.html" title=" " alt="" coords="1653,452,1750,479"/>
+<area shape="rect" id="node17" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1653,452,1750,479"/>
 <area shape="rect" id="node20" href="$validate_8h.html" title=" " alt="" coords="1391,534,1478,561"/>
 <area shape="rect" id="node10" title=" " alt="" coords="2083,616,2159,643"/>
 <area shape="rect" id="node11" title=" " alt="" coords="1018,691,1110,717"/>
@@ -32,10 +32,10 @@
 <area shape="rect" id="node30" title=" " alt="" coords="1997,452,2048,479"/>
 <area shape="rect" id="node31" title=" " alt="" coords="838,452,925,479"/>
 <area shape="rect" id="node32" title=" " alt="" coords="917,616,971,643"/>
-<area shape="rect" id="node33" href="$sharing__node_8h.html" title=" " alt="" coords="557,452,678,479"/>
+<area shape="rect" id="node33" href="$sharing__node_8h.html" title="Sharing node." alt="" coords="557,452,678,479"/>
 <area shape="rect" id="node44" href="$threeval_8h.html" title=" " alt="" coords="1051,452,1139,479"/>
 <area shape="rect" id="node34" title=" " alt="" coords="291,534,389,561"/>
-<area shape="rect" id="node35" href="$small__map_8h.html" title=" " alt="" coords="413,534,520,561"/>
+<area shape="rect" id="node35" href="$small__map_8h.html" title="Small map." alt="" coords="413,534,520,561"/>
 <area shape="rect" id="node41" href="$make__unique_8h.html" title=" " alt="" coords="94,534,215,561"/>
 <area shape="rect" id="node42" href="$small__shared__n__way__ptr_8h.html" title=" " alt="" coords="766,527,925,568"/>
 <area shape="rect" id="node43" href="$small__shared__ptr_8h.html" title=" " alt="" coords="545,534,690,561"/>

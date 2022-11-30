@@ -1,13 +1,25 @@
 var annotated_dup =
 [
-    [ "detail", "namespacedetail.html", "namespacedetail" ],
-    [ "require_goto_statements", "namespacerequire__goto__statements.html", "namespacerequire__goto__statements" ],
-    [ "require_parse_tree", "namespacerequire__parse__tree.html", "namespacerequire__parse__tree" ],
-    [ "require_type", "namespacerequire__type.html", "namespacerequire__type" ],
+    [ "detail", "namespacedetail.html", [
+      [ "make_voidt", "structdetail_1_1make__voidt.html", "structdetail_1_1make__voidt" ],
+      [ "expr_try_dynamic_cast_return_typet", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", "structdetail_1_1expr__try__dynamic__cast__return__typet" ],
+      [ "expr_dynamic_cast_return_typet", "structdetail_1_1expr__dynamic__cast__return__typet.html", "structdetail_1_1expr__dynamic__cast__return__typet" ],
+      [ "always_falset", "structdetail_1_1always__falset.html", null ]
+    ] ],
+    [ "require_goto_statements", "namespacerequire__goto__statements.html", [
+      [ "pointer_assignment_locationt", "structrequire__goto__statements_1_1pointer__assignment__locationt.html", "structrequire__goto__statements_1_1pointer__assignment__locationt" ],
+      [ "no_decl_found_exceptiont", "classrequire__goto__statements_1_1no__decl__found__exceptiont.html", "classrequire__goto__statements_1_1no__decl__found__exceptiont" ]
+    ] ],
+    [ "require_parse_tree", "namespacerequire__parse__tree.html", [
+      [ "expected_instructiont", "structrequire__parse__tree_1_1expected__instructiont.html", "structrequire__parse__tree_1_1expected__instructiont" ]
+    ] ],
+    [ "require_type", "namespacerequire__type.html", [
+      [ "expected_type_argumentt", "structrequire__type_1_1expected__type__argumentt.html", "structrequire__type_1_1expected__type__argumentt" ]
+    ] ],
     [ "std", null, [
-      [ "hash< dstringt >", "structstd_1_1hash_3_01dstringt_01_4.html", "structstd_1_1hash_3_01dstringt_01_4" ],
       [ "hash< solver_hardnesst::hardness_ssa_keyt >", "structstd_1_1hash_3_01solver__hardnesst_1_1hardness__ssa__keyt_01_4.html", "structstd_1_1hash_3_01solver__hardnesst_1_1hardness__ssa__keyt_01_4" ],
       [ "hash< string_not_contains_constraintt >", "structstd_1_1hash_3_01string__not__contains__constraintt_01_4.html", "structstd_1_1hash_3_01string__not__contains__constraintt_01_4" ],
+      [ "hash< dstringt >", "structstd_1_1hash_3_01dstringt_01_4.html", "structstd_1_1hash_3_01dstringt_01_4" ],
       [ "hash<::symbol_exprt >", "structstd_1_1hash_3_1_1symbol__exprt_01_4.html", "structstd_1_1hash_3_1_1symbol__exprt_01_4" ]
     ] ],
     [ "__CPROVER_jsa_abstract_heap", "struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html", "struct_____c_p_r_o_v_e_r__jsa__abstract__heap" ],

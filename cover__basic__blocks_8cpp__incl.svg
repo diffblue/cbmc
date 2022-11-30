@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Basic blocks detection for Coverage Instrumentation.">
 <polygon fill="#bfbfbf" stroke="black" points="275.45,-459.5 275.45,-500.5 420.45,-500.5 420.45,-459.5 275.45,-459.5"/>
 <text text-anchor="start" x="283.45" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="283.45" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cover__basic__blocks_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cover__basic__blocks_8h.html" target="_top" xlink:title="Basic blocks detection for Coverage Instrumentation.">
 <polygon fill="none" stroke="black" points="203.95,-403.5 203.95,-422.5 323.95,-422.5 323.95,-403.5 203.95,-403.5"/>
 <text text-anchor="middle" x="263.95" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">cover_basic_blocks.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="333.45,-336.5 333.45,-366.5 446.45,-366.5 446.45,-336.5 333.45,-336.5"/>
 <text text-anchor="start" x="341.45" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="389.95" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -83,7 +83,7 @@
 <!-- Node49 -->
 <g id="node27" class="node">
 <title>Node49</title>
-<g id="a_node27"><a xlink:href="source__lines_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="source__lines_8h.html" target="_top" xlink:title="Set of source code lines contributing to a basic block.">
 <polygon fill="none" stroke="black" points="26.95,-168.5 26.95,-187.5 112.95,-187.5 112.95,-168.5 26.95,-168.5"/>
 <text text-anchor="middle" x="69.95" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">source_lines.h</text>
 </a>
@@ -248,7 +248,7 @@
 <!-- Node46 -->
 <g id="node21" class="node">
 <title>Node46</title>
-<g id="a_node21"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="790.95,-224.5 790.95,-243.5 876.95,-243.5 876.95,-224.5 790.95,-224.5"/>
 <text text-anchor="middle" x="833.95" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -284,7 +284,7 @@
 <!-- Node43 -->
 <g id="node16" class="node">
 <title>Node43</title>
-<g id="a_node16"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="805.45,-168.5 805.45,-187.5 878.45,-187.5 878.45,-168.5 805.45,-168.5"/>
 <text text-anchor="middle" x="841.95" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

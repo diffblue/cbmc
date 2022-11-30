@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Container for C&#45;Strings.">
 <polygon fill="#bfbfbf" stroke="black" points="247,-168.5 247,-209.5 385,-209.5 385,-168.5 247,-168.5"/>
 <text text-anchor="start" x="255" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="255" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/string</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="133,-112.5 133,-131.5 237,-131.5 237,-112.5 133,-112.5"/>
 <text text-anchor="middle" x="185" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -142,7 +142,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="string__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="string__hash_8h.html" target="_top" xlink:title="string hashing">
 <polygon fill="none" stroke="black" points="341,-56.5 341,-75.5 423,-75.5 423,-56.5 341,-56.5"/>
 <text text-anchor="middle" x="382" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_hash.h</text>
 </a>

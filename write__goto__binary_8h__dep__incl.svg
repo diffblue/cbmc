@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Write GOTO binaries.">
 <polygon fill="#bfbfbf" stroke="black" points="564,-78.5 564,-119.5 702,-119.5 702,-78.5 564,-78.5"/>
 <text text-anchor="start" x="572" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="572" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="compile_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="compile_8cpp.html" target="_top" xlink:title="Compile and link source and object files.">
 <polygon fill="none" stroke="black" points="156,-6 156,-36 320,-36 320,-6 156,-6"/>
 <text text-anchor="start" x="164" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="238" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/compile.cpp</text>
@@ -72,7 +72,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="536,-0.5 536,-41.5 730,-41.5 730,-0.5 536,-0.5"/>
 <text text-anchor="start" x="544" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="544" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -89,7 +89,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="read__bin__goto__object_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="read__bin__goto__object_8cpp.html" target="_top" xlink:title="Read goto object files.">
 <polygon fill="none" stroke="black" points="748,-0.5 748,-41.5 892,-41.5 892,-0.5 748,-0.5"/>
 <text text-anchor="start" x="756" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="756" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -106,7 +106,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="write__goto__binary_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="write__goto__binary_8cpp.html" target="_top" xlink:title="Write GOTO binaries.">
 <polygon fill="none" stroke="black" points="910,-0.5 910,-41.5 1048,-41.5 1048,-0.5 910,-0.5"/>
 <text text-anchor="start" x="918" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="918" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>

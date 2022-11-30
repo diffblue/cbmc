@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="irep hash functions">
 <polygon fill="#bfbfbf" stroke="black" points="242.5,-78.5 242.5,-108.5 383.5,-108.5 383.5,-78.5 242.5,-78.5"/>
 <text text-anchor="start" x="250.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="313" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_hash.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="irep_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="irep_8cpp.html" target="_top" xlink:title="Internal Representation.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 138,-36 138,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="69" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep.cpp</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="irep__hash_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="irep__hash_8cpp.html" target="_top" xlink:title="irep hash functions">
 <polygon fill="none" stroke="black" points="156,-6 156,-36 308,-36 308,-6 156,-6"/>
 <text text-anchor="start" x="164" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="232" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_hash.cpp</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="irep__hash__container_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="irep__hash__container_8cpp.html" target="_top" xlink:title="Hashing IREPs.">
 <polygon fill="none" stroke="black" points="326,-0.5 326,-41.5 464,-41.5 464,-0.5 326,-0.5"/>
 <text text-anchor="start" x="334" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="334" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_hash</text>

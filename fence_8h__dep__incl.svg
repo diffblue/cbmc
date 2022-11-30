@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Fences for instrumentation.">
 <polygon fill="#bfbfbf" stroke="black" points="163,-78.5 163,-119.5 308,-119.5 308,-78.5 163,-78.5"/>
 <text text-anchor="start" x="171" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="171" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="fence_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="fence_8cpp.html" target="_top" xlink:title="Fences for instrumentation.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 145,-41.5 145,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto2graph_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto2graph_8cpp.html" target="_top" xlink:title="Turns a goto&#45;program into an abstract event graph.">
 <polygon fill="none" stroke="black" points="163,-0.5 163,-41.5 308,-41.5 308,-0.5 163,-0.5"/>
 <text text-anchor="start" x="171" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="171" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

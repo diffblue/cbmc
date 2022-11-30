@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Conversion between exprt and miniBDD.">
 <polygon fill="#bfbfbf" stroke="black" points="815.5,-739.5 815.5,-780.5 953.5,-780.5 953.5,-739.5 815.5,-739.5"/>
 <text text-anchor="start" x="823.5" y="-768.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="823.5" y="-757.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/prop</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="bdd__expr_8h.html" target="_top" xlink:title="Binary decision diagram.">
+<g id="a_node2"><a xlink:href="bdd__expr_8h.html" target="_top" xlink:title="Conversion between exprt and miniBDD.">
 <polygon fill="none" stroke="black" points="311.5,-571.5 311.5,-590.5 381.5,-590.5 381.5,-571.5 311.5,-571.5"/>
 <text text-anchor="middle" x="346.5" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">bdd_expr.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node45 -->
 <g id="node33" class="node">
 <title>Node45</title>
-<g id="a_node33"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="841.5,-683.5 841.5,-702.5 927.5,-702.5 927.5,-683.5 841.5,-683.5"/>
 <text text-anchor="middle" x="884.5" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node38 -->
 <g id="node24" class="node">
 <title>Node38</title>
-<g id="a_node24"><a xlink:href="bdd_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="bdd_8h.html" target="_top" xlink:title="Choice between the different interface to BDD libraries.">
 <polygon fill="none" stroke="black" points="215,-515.5 215,-534.5 318,-534.5 318,-515.5 215,-515.5"/>
 <text text-anchor="middle" x="266.5" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/bdd/bdd.h</text>
 </a>
@@ -157,7 +157,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="771,-459.5 771,-478.5 818,-478.5 818,-459.5 771,-459.5"/>
 <text text-anchor="middle" x="794.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -361,7 +361,7 @@
 <!-- Node15 -->
 <g id="node13" class="node">
 <title>Node15</title>
-<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="404.5,-168.5 404.5,-187.5 468.5,-187.5 468.5,-168.5 404.5,-168.5"/>
 <text text-anchor="middle" x="436.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -496,7 +496,7 @@
 <!-- Node39 -->
 <g id="node25" class="node">
 <title>Node39</title>
-<g id="a_node25"><a xlink:href="bdd__mini_b_d_d_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="bdd__mini_b_d_d_8h.html" target="_top" xlink:title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th...">
 <polygon fill="none" stroke="black" points="220.5,-459.5 220.5,-478.5 312.5,-478.5 312.5,-459.5 220.5,-459.5"/>
 <text text-anchor="middle" x="266.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">bdd_miniBDD.h</text>
 </a>
@@ -517,7 +517,7 @@
 <!-- Node40 -->
 <g id="node27" class="node">
 <title>Node40</title>
-<g id="a_node27"><a xlink:href="mini_b_d_d_8h.html" target="_top" xlink:title="Small BDD implementation.">
+<g id="a_node27"><a xlink:href="mini_b_d_d_8h.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
 <polygon fill="none" stroke="black" points="166,-224.5 166,-254.5 285,-254.5 285,-224.5 166,-224.5"/>
 <text text-anchor="start" x="174" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/bdd/miniBDD</text>
 <text text-anchor="middle" x="225.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">/miniBDD.h</text>
@@ -638,7 +638,7 @@
 <!-- Node48 -->
 <g id="node36" class="node">
 <title>Node48</title>
-<g id="a_node36"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="848,-627.5 848,-646.5 921,-646.5 921,-627.5 848,-627.5"/>
 <text text-anchor="middle" x="884.5" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

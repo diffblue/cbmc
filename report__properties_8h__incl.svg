@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Property Reporting.">
 <polygon fill="#bfbfbf" stroke="black" points="25.5,-504.5 25.5,-545.5 163.5,-545.5 163.5,-504.5 25.5,-504.5"/>
 <text text-anchor="start" x="33.5" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="33.5" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/report</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="solver_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="solver_8h.html" target="_top" xlink:title="Equality Propagation.">
 <polygon fill="none" stroke="black" points="22,-448.5 22,-467.5 77,-467.5 77,-448.5 22,-448.5"/>
 <text text-anchor="middle" x="49.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">solver.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="solver__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="solver__types_8h.html" target="_top" xlink:title="Solver.">
 <polygon fill="none" stroke="black" points="95.5,-448.5 95.5,-467.5 183.5,-467.5 183.5,-448.5 95.5,-448.5"/>
 <text text-anchor="middle" x="139.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">solver_types.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="mathematical__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="mathematical__expr_8h.html" target="_top" xlink:title="API to expression classes for &#39;mathematical&#39; expressions.">
 <polygon fill="none" stroke="black" points="314,-392.5 314,-411.5 453,-411.5 453,-392.5 314,-392.5"/>
 <text text-anchor="middle" x="383.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/mathematical_expr.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node43 -->
 <g id="node22" class="node">
 <title>Node43</title>
-<g id="a_node22"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="265,-336.5 265,-355.5 332,-355.5 332,-336.5 265,-336.5"/>
 <text text-anchor="middle" x="298.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -142,7 +142,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="mathematical__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="mathematical__types_8h.html" target="_top" xlink:title="Mathematical types.">
 <polygon fill="none" stroke="black" points="391.5,-280.5 391.5,-299.5 517.5,-299.5 517.5,-280.5 391.5,-280.5"/>
 <text text-anchor="middle" x="454.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">mathematical_types.h</text>
 </a>
@@ -193,7 +193,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="red" points="772,-112.5 772,-131.5 819,-131.5 819,-112.5 772,-112.5"/>
 <text text-anchor="middle" x="795.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -448,7 +448,7 @@
 <!-- Node44 -->
 <g id="node23" class="node">
 <title>Node44</title>
-<g id="a_node23"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="262,-280.5 262,-299.5 335,-299.5 335,-280.5 262,-280.5"/>
 <text text-anchor="middle" x="298.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

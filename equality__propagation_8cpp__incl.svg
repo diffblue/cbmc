@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Equality Propagation.">
 <polygon fill="#bfbfbf" stroke="black" points="84.5,-616.5 84.5,-657.5 230.5,-657.5 230.5,-616.5 84.5,-616.5"/>
 <text text-anchor="start" x="92.5" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="92.5" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/equality</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="equality__propagation_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="equality__propagation_8h.html" target="_top" xlink:title="Equality Propagation.">
 <polygon fill="none" stroke="black" points="0,-504.5 0,-523.5 129,-523.5 129,-504.5 0,-504.5"/>
 <text text-anchor="middle" x="64.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">equality_propagation.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="568.5,-560.5 568.5,-579.5 654.5,-579.5 654.5,-560.5 568.5,-560.5"/>
 <text text-anchor="middle" x="611.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node44 -->
 <g id="node30" class="node">
 <title>Node44</title>
-<g id="a_node30"><a xlink:href="substitute__symbols_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="substitute__symbols_8h.html" target="_top" xlink:title="Symbol Substitution.">
 <polygon fill="none" stroke="black" points="190.5,-168.5 190.5,-187.5 330.5,-187.5 330.5,-168.5 190.5,-168.5"/>
 <text text-anchor="middle" x="260.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/substitute_symbols.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node41 -->
 <g id="node25" class="node">
 <title>Node41</title>
-<g id="a_node25"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="524,-504.5 524,-523.5 597,-523.5 597,-504.5 524,-504.5"/>
 <text text-anchor="middle" x="560.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -265,7 +265,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="487,-336.5 487,-355.5 534,-355.5 534,-336.5 487,-336.5"/>
 <text text-anchor="middle" x="510.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

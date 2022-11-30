@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Traces of GOTO Programs.">
 <polygon fill="#bfbfbf" stroke="black" points="1146,-515.5 1146,-556.5 1284,-556.5 1284,-515.5 1146,-515.5"/>
 <text text-anchor="start" x="1154" y="-544.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1154" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="json__goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="json__goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="1071.5,-459.5 1071.5,-478.5 1174.5,-478.5 1174.5,-459.5 1071.5,-459.5"/>
 <text text-anchor="middle" x="1123" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">json_goto_trace.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="857.5,-403.5 857.5,-422.5 934.5,-422.5 934.5,-403.5 857.5,-403.5"/>
 <text text-anchor="middle" x="896" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_trace.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node63 -->
 <g id="node43" class="node">
 <title>Node63</title>
-<g id="a_node43"><a xlink:href="json__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="json__expr_8h.html" target="_top" xlink:title="Expressions in JSON.">
 <polygon fill="none" stroke="black" points="1335,-342 1335,-361 1407,-361 1407,-342 1335,-342"/>
 <text text-anchor="middle" x="1371" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">json_expr.h</text>
 </a>
@@ -148,7 +148,7 @@
 <!-- Node53 -->
 <g id="node33" class="node">
 <title>Node53</title>
-<g id="a_node33"><a xlink:href="structured__trace__util_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="structured__trace__util_8h.html" target="_top" xlink:title="Utilities for printing location info steps in the trace in a format agnostic way.">
 <polygon fill="none" stroke="black" points="969,-403.5 969,-422.5 1095,-422.5 1095,-403.5 969,-403.5"/>
 <text text-anchor="middle" x="1032" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">structured_trace_util.h</text>
 </a>
@@ -178,7 +178,7 @@
 <!-- Node58 -->
 <g id="node38" class="node">
 <title>Node58</title>
-<g id="a_node38"><a xlink:href="json__irep_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="json__irep_8h.html" target="_top" xlink:title="Util.">
 <polygon fill="none" stroke="black" points="1189.5,-342 1189.5,-361 1278.5,-361 1278.5,-342 1189.5,-342"/>
 <text text-anchor="middle" x="1234" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">util/json_irep.h</text>
 </a>
@@ -238,7 +238,7 @@
 <!-- Node33 -->
 <g id="node20" class="node">
 <title>Node33</title>
-<g id="a_node20"><a xlink:href="options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="options_8h.html" target="_top" xlink:title="Options.">
 <polygon fill="none" stroke="black" points="668,-280.5 668,-299.5 748,-299.5 748,-280.5 668,-280.5"/>
 <text text-anchor="middle" x="708" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/options.h</text>
 </a>
@@ -253,7 +253,7 @@
 <!-- Node35 -->
 <g id="node23" class="node">
 <title>Node35</title>
-<g id="a_node23"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="839.5,-336.5 839.5,-366.5 952.5,-366.5 952.5,-336.5 839.5,-336.5"/>
 <text text-anchor="start" x="847.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="896" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -458,7 +458,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="1400,-168.5 1400,-187.5 1464,-187.5 1464,-168.5 1400,-168.5"/>
 <text text-anchor="middle" x="1432" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -629,7 +629,7 @@
 <!-- Node50 -->
 <g id="node30" class="node">
 <title>Node50</title>
-<g id="a_node30"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="186,-224.5 186,-243.5 272,-243.5 272,-224.5 186,-224.5"/>
 <text text-anchor="middle" x="229" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -665,7 +665,7 @@
 <!-- Node47 -->
 <g id="node28" class="node">
 <title>Node47</title>
-<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="red" points="218.5,-168.5 218.5,-187.5 291.5,-187.5 291.5,-168.5 218.5,-168.5"/>
 <text text-anchor="middle" x="255" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -824,7 +824,7 @@
 <!-- Node55 -->
 <g id="node35" class="node">
 <title>Node55</title>
-<g id="a_node35"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="774.5,-112.5 774.5,-131.5 827.5,-131.5 827.5,-112.5 774.5,-112.5"/>
 <text text-anchor="middle" x="801" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>

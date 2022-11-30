@@ -32,8 +32,8 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M124.75,-93.52C109.83,-75.64 86.26,-47.38 72.2,-30.52"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="122.21,-95.93 131.3,-101.37 127.58,-91.45 122.21,-95.93"/>
-<text text-anchor="middle" x="127.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> fraction</text>
-<text text-anchor="middle" x="127.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">exponent</text>
+<text text-anchor="middle" x="129" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> exponent</text>
+<text text-anchor="middle" x="129" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">fraction</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -51,8 +51,8 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="30.2,-170.93 35.05,-180.35 37.13,-169.96 30.2,-170.93"/>
 <text text-anchor="middle" x="50.5" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00"> NaN</text>
 <text text-anchor="middle" x="50.5" y="-114" font-family="Helvetica,sans-Serif" font-size="10.00">infinity</text>
-<text text-anchor="middle" x="50.5" y="-103" font-family="Helvetica,sans-Serif" font-size="10.00">zero</text>
-<text text-anchor="middle" x="50.5" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">sign</text>
+<text text-anchor="middle" x="50.5" y="-103" font-family="Helvetica,sans-Serif" font-size="10.00">sign</text>
+<text text-anchor="middle" x="50.5" y="-92" font-family="Helvetica,sans-Serif" font-size="10.00">zero</text>
 </g>
 <!-- Node3&#45;&gt;Node2 -->
 <g id="edge2" class="edge">
@@ -64,7 +64,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="90,-180.5 90,-199.5 187,-199.5 187,-180.5 90,-180.5"/>
 <text text-anchor="middle" x="138.5" y="-187.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>

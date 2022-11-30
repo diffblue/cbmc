@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,...">
 <polygon fill="#bfbfbf" stroke="black" points="656,-795.5 656,-847.5 804,-847.5 804,-795.5 656,-795.5"/>
 <text text-anchor="start" x="664" y="-835.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="664" y="-824.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -38,7 +38,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="626.5,-448.5 626.5,-467.5 693.5,-467.5 693.5,-448.5 626.5,-448.5"/>
 <text text-anchor="middle" x="660" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -53,7 +53,7 @@
 <!-- Node43 -->
 <g id="node28" class="node">
 <title>Node43</title>
-<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="387.5,-392.5 387.5,-411.5 460.5,-411.5 460.5,-392.5 387.5,-392.5"/>
 <text text-anchor="middle" x="424" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -98,7 +98,7 @@
 <!-- Node49 -->
 <g id="node35" class="node">
 <title>Node49</title>
-<g id="a_node35"><a xlink:href="goto__convert__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="goto__convert__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="870,-728.5 870,-758.5 988,-758.5 988,-728.5 870,-728.5"/>
 <text text-anchor="start" x="878" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="929" y="-735.5" font-family="Helvetica,sans-Serif" font-size="10.00">_convert_functions.h</text>
@@ -144,7 +144,7 @@
 <!-- Node68 -->
 <g id="node54" class="node">
 <title>Node68</title>
-<g id="a_node54"><a xlink:href="dfcc__contract__handler_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="dfcc__contract__handler_8h.html" target="_top" xlink:title="Specialisation of dfcc_contract_handlert for contracts.">
 <polygon fill="none" stroke="black" points="1149,-734 1149,-753 1281,-753 1281,-734 1149,-734"/>
 <text text-anchor="middle" x="1215" y="-741" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_contract_handler.h</text>
 </a>
@@ -159,7 +159,7 @@
 <!-- Node71 -->
 <g id="node57" class="node">
 <title>Node71</title>
-<g id="a_node57"><a xlink:href="dfcc__instrument_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="dfcc__instrument_8h.html" target="_top" xlink:title="Add instrumentation to a goto program to perform frame condition checks.">
 <polygon fill="none" stroke="black" points="410,-616.5 410,-635.5 514,-635.5 514,-616.5 410,-616.5"/>
 <text text-anchor="middle" x="462" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_instrument.h</text>
 </a>
@@ -174,7 +174,7 @@
 <!-- Node72 -->
 <g id="node58" class="node">
 <title>Node72</title>
-<g id="a_node58"><a xlink:href="dfcc__library_8h.html" target="_top" xlink:title=" ">
+<g id="a_node58"><a xlink:href="dfcc__library_8h.html" target="_top" xlink:title="Dynamic frame condition checking library loading.">
 <polygon fill="none" stroke="black" points="1308.5,-560.5 1308.5,-579.5 1389.5,-579.5 1389.5,-560.5 1308.5,-560.5"/>
 <text text-anchor="middle" x="1349" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_library.h</text>
 </a>
@@ -189,7 +189,7 @@
 <!-- Node73 -->
 <g id="node59" class="node">
 <title>Node73</title>
-<g id="a_node59"><a xlink:href="dfcc__spec__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node59"><a xlink:href="dfcc__spec__functions_8h.html" target="_top" xlink:title="Translate functions that specify assignable and freeable targets declaratively into active functions ...">
 <polygon fill="none" stroke="black" points="490,-672.5 490,-691.5 614,-691.5 614,-672.5 490,-672.5"/>
 <text text-anchor="middle" x="552" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_spec_functions.h</text>
 </a>
@@ -204,7 +204,7 @@
 <!-- Node74 -->
 <g id="node60" class="node">
 <title>Node74</title>
-<g id="a_node60"><a xlink:href="dfcc__utils_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="dfcc__utils_8h.html" target="_top" xlink:title="Dynamic frame condition checking utility functions.">
 <polygon fill="none" stroke="black" points="1564,-560.5 1564,-579.5 1636,-579.5 1636,-560.5 1564,-560.5"/>
 <text text-anchor="middle" x="1600" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_utils.h</text>
 </a>
@@ -501,7 +501,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="444.5,-224.5 444.5,-243.5 491.5,-243.5 491.5,-224.5 444.5,-224.5"/>
 <text text-anchor="middle" x="468" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -735,7 +735,7 @@
 <!-- Node46 -->
 <g id="node32" class="node">
 <title>Node46</title>
-<g id="a_node32"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="294,-504.5 294,-523.5 380,-523.5 380,-504.5 294,-504.5"/>
 <text text-anchor="middle" x="337" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -756,7 +756,7 @@
 <!-- Node47 -->
 <g id="node33" class="node">
 <title>Node47</title>
-<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="294.5,-448.5 294.5,-467.5 395.5,-467.5 395.5,-448.5 294.5,-448.5"/>
 <text text-anchor="middle" x="345" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -819,7 +819,7 @@
 <!-- Node50 -->
 <g id="node36" class="node">
 <title>Node50</title>
-<g id="a_node36"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="1685.5,-616.5 1685.5,-635.5 1804.5,-635.5 1804.5,-616.5 1685.5,-616.5"/>
 <text text-anchor="middle" x="1745" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_convert_class.h</text>
 </a>
@@ -834,7 +834,7 @@
 <!-- Node65 -->
 <g id="node51" class="node">
 <title>Node65</title>
-<g id="a_node51"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="880,-672.5 880,-691.5 978,-691.5 978,-672.5 880,-672.5"/>
 <text text-anchor="middle" x="929" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -966,7 +966,7 @@
 <!-- Node62 -->
 <g id="node48" class="node">
 <title>Node62</title>
-<g id="a_node48"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="892,-560.5 892,-579.5 986,-579.5 986,-560.5 892,-560.5"/>
 <text text-anchor="middle" x="939" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -1074,7 +1074,7 @@
 <!-- Node58 -->
 <g id="node45" class="node">
 <title>Node58</title>
-<g id="a_node45"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="red" points="1642,-504.5 1642,-523.5 1714,-523.5 1714,-504.5 1642,-504.5"/>
 <text text-anchor="middle" x="1678" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -1221,7 +1221,7 @@
 <!-- Node66 -->
 <g id="node52" class="node">
 <title>Node66</title>
-<g id="a_node52"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node52"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="572,-616.5 572,-635.5 664,-635.5 664,-616.5 572,-616.5"/>
 <text text-anchor="middle" x="618" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -1299,7 +1299,7 @@
 <!-- Node69 -->
 <g id="node55" class="node">
 <title>Node69</title>
-<g id="a_node55"><a xlink:href="dfcc__contract__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node55"><a xlink:href="dfcc__contract__functions_8h.html" target="_top" xlink:title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a...">
 <polygon fill="none" stroke="black" points="1194.5,-672.5 1194.5,-691.5 1335.5,-691.5 1335.5,-672.5 1194.5,-672.5"/>
 <text text-anchor="middle" x="1265" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_contract_functions.h</text>
 </a>
@@ -1350,7 +1350,7 @@
 <!-- Node70 -->
 <g id="node56" class="node">
 <title>Node70</title>
-<g id="a_node56"><a xlink:href="dfcc__contract__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="dfcc__contract__mode_8h.html" target="_top" xlink:title="Enum type representing the contract checking and replacement modes.">
 <polygon fill="none" stroke="black" points="750,-560.5 750,-579.5 874,-579.5 874,-560.5 750,-560.5"/>
 <text text-anchor="middle" x="812" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_contract_mode.h</text>
 </a>

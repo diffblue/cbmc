@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="A special command line object for Bruce&#39;s C Compiler.">
 <polygon fill="#bfbfbf" stroke="black" points="157,-280.5 157,-321.5 295,-321.5 295,-280.5 157,-280.5"/>
 <text text-anchor="start" x="165" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="165" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/bcc</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="bcc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="bcc__cmdline_8h.html" target="_top" xlink:title="A special command line object for Bruce&#39;s C Compiler Author: Michael Tautschnig Date: July 2016.">
 <polygon fill="none" stroke="black" points="92,-224.5 92,-243.5 178,-243.5 178,-224.5 92,-224.5"/>
 <text text-anchor="middle" x="135" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">bcc_cmdline.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="81.5,-168.5 81.5,-187.5 188.5,-187.5 188.5,-168.5 81.5,-168.5"/>
 <text text-anchor="middle" x="135" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_cmdline.h</text>
 </a>

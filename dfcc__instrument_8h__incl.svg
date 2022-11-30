@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Add instrumentation to a goto program to perform frame condition checks.">
 <polygon fill="#bfbfbf" stroke="black" points="998.5,-627.5 998.5,-679.5 1146.5,-679.5 1146.5,-627.5 998.5,-627.5"/>
 <text text-anchor="start" x="1006.5" y="-667.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1006.5" y="-656.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -38,7 +38,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="674,-448.5 674,-467.5 741,-467.5 741,-448.5 674,-448.5"/>
 <text text-anchor="middle" x="707.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -53,7 +53,7 @@
 <!-- Node43 -->
 <g id="node27" class="node">
 <title>Node43</title>
-<g id="a_node27"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="438,-392.5 438,-411.5 511,-411.5 511,-392.5 438,-392.5"/>
 <text text-anchor="middle" x="474.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -113,7 +113,7 @@
 <!-- Node50 -->
 <g id="node35" class="node">
 <title>Node50</title>
-<g id="a_node35"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="1059,-560.5 1059,-590.5 1172,-590.5 1172,-560.5 1059,-560.5"/>
 <text text-anchor="start" x="1067" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1115.5" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -144,7 +144,7 @@
 <!-- Node54 -->
 <g id="node39" class="node">
 <title>Node54</title>
-<g id="a_node39"><a xlink:href="dfcc__contract__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="dfcc__contract__mode_8h.html" target="_top" xlink:title="Enum type representing the contract checking and replacement modes.">
 <polygon fill="none" stroke="black" points="1328.5,-566 1328.5,-585 1452.5,-585 1452.5,-566 1328.5,-566"/>
 <text text-anchor="middle" x="1390.5" y="-573" font-family="Helvetica,sans-Serif" font-size="10.00">dfcc_contract_mode.h</text>
 </a>
@@ -456,7 +456,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="355,-224.5 355,-243.5 402,-243.5 402,-224.5 355,-224.5"/>
 <text text-anchor="middle" x="378.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -675,7 +675,7 @@
 <!-- Node46 -->
 <g id="node31" class="node">
 <title>Node46</title>
-<g id="a_node31"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="476.5,-504.5 476.5,-523.5 562.5,-523.5 562.5,-504.5 476.5,-504.5"/>
 <text text-anchor="middle" x="519.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -696,7 +696,7 @@
 <!-- Node47 -->
 <g id="node32" class="node">
 <title>Node47</title>
-<g id="a_node32"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="420,-448.5 420,-467.5 521,-467.5 521,-448.5 420,-448.5"/>
 <text text-anchor="middle" x="470.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>

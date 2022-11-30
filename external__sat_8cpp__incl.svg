@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Allows call an external SAT solver to allow faster integration of newer SAT solvers.">
 <polygon fill="#bfbfbf" stroke="black" points="555.1,-448.5 555.1,-489.5 693.1,-489.5 693.1,-448.5 555.1,-448.5"/>
 <text text-anchor="start" x="563.1" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="563.1" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/sat</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="external__sat_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="external__sat_8h.html" target="_top" xlink:title="Allows calling an external SAT solver to allow faster integration of newer SAT solvers.">
 <polygon fill="none" stroke="black" points="287.1,-392.5 287.1,-411.5 373.1,-411.5 373.1,-392.5 287.1,-392.5"/>
 <text text-anchor="middle" x="330.1" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">external_sat.h</text>
 </a>
@@ -157,7 +157,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title="CNF Generation.">
 <polygon fill="none" stroke="black" points="281.1,-336.5 281.1,-355.5 379.1,-355.5 379.1,-336.5 281.1,-336.5"/>
 <text text-anchor="middle" x="330.1" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf_clause_list.h</text>
 </a>
@@ -202,7 +202,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="cnf_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="cnf_8h.html" target="_top" xlink:title="CNF Generation, via Tseitin.">
 <polygon fill="none" stroke="black" points="246.1,-280.5 246.1,-299.5 286.1,-299.5 286.1,-280.5 246.1,-280.5"/>
 <text text-anchor="middle" x="266.1" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf.h</text>
 </a>

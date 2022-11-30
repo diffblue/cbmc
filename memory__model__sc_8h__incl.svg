@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Memory models for partial order concurrency.">
 <polygon fill="#bfbfbf" stroke="black" points="170.58,-694.5 170.58,-735.5 339.58,-735.5 339.58,-694.5 170.58,-694.5"/>
 <text text-anchor="start" x="178.58" y="-723.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="178.58" y="-712.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/memory</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="memory__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="memory__model_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="203.58,-638.5 203.58,-657.5 306.58,-657.5 306.58,-638.5 203.58,-638.5"/>
 <text text-anchor="middle" x="255.08" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="partial__order__concurrency_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="partial__order__concurrency_8h.html" target="_top" xlink:title="Add constraints to equation encoding partial orders on events.">
 <polygon fill="none" stroke="black" points="179.58,-582.5 179.58,-601.5 330.58,-601.5 330.58,-582.5 179.58,-582.5"/>
 <text text-anchor="middle" x="255.08" y="-589.5" font-family="Helvetica,sans-Serif" font-size="10.00">partial_order_concurrency.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="184.58,-526.5 184.58,-545.5 325.58,-545.5 325.58,-526.5 184.58,-526.5"/>
 <text text-anchor="middle" x="255.08" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target_equation.h</text>
 </a>
@@ -187,7 +187,7 @@
 <!-- Node59 -->
 <g id="node31" class="node">
 <title>Node59</title>
-<g id="a_node31"><a xlink:href="symex__target_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="symex__target_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="420.58,-409 420.58,-428 513.58,-428 513.58,-409 420.58,-409"/>
 <text text-anchor="middle" x="467.08" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target.h</text>
 </a>
@@ -319,7 +319,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="472.08,-168.5 472.08,-187.5 536.08,-187.5 536.08,-168.5 472.08,-168.5"/>
 <text text-anchor="middle" x="504.08" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -490,7 +490,7 @@
 <!-- Node51 -->
 <g id="node28" class="node">
 <title>Node51</title>
-<g id="a_node28"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="531.58,-403.5 531.58,-433.5 644.58,-433.5 644.58,-403.5 531.58,-403.5"/>
 <text text-anchor="start" x="539.58" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="588.08" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace.h</text>
@@ -512,7 +512,7 @@
 <!-- Node38 -->
 <g id="node27" class="node">
 <title>Node38</title>
-<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="320.58,-280.5 320.58,-299.5 387.58,-299.5 387.58,-280.5 320.58,-280.5"/>
 <text text-anchor="middle" x="354.08" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -551,7 +551,7 @@
 <!-- Node52 -->
 <g id="node29" class="node">
 <title>Node52</title>
-<g id="a_node29"><a xlink:href="options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="options_8h.html" target="_top" xlink:title="Options.">
 <polygon fill="none" stroke="red" points="173.08,-342 173.08,-361 253.08,-361 253.08,-342 173.08,-342"/>
 <text text-anchor="middle" x="213.08" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">util/options.h</text>
 </a>
@@ -566,7 +566,7 @@
 <!-- Node54 -->
 <g id="node30" class="node">
 <title>Node54</title>
-<g id="a_node30"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="531.58,-336.5 531.58,-366.5 644.58,-366.5 644.58,-336.5 531.58,-336.5"/>
 <text text-anchor="start" x="539.58" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="588.08" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -630,7 +630,7 @@
 <!-- Node60 -->
 <g id="node32" class="node">
 <title>Node60</title>
-<g id="a_node32"><a xlink:href="renamed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="renamed_8h.html" target="_top" xlink:title="Class for expressions or types renamed up to a given level.">
 <polygon fill="none" stroke="red" points="382.58,-342 382.58,-361 451.58,-361 451.58,-342 382.58,-342"/>
 <text text-anchor="middle" x="417.08" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">renamed.h</text>
 </a>

@@ -125,18 +125,18 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="413.96,-144.82 403.37,-145.09 411.82,-151.48 413.96,-144.82"/>
 <text text-anchor="middle" x="464.5" y="-178" font-family="Helvetica,sans-Serif" font-size="10.00"> address_map</text>
 </g>
-<!-- Node14 -->
+<!-- Node15 -->
 <g id="node9" class="node">
-<title>Node14</title>
+<title>Node15</title>
 <g id="a_node9"><a xlink:href="classdstringt.html" target="_top" xlink:title="dstringt has one field, an unsigned integer no which is an index into a static table of strings.">
 <polygon fill="none" stroke="black" points="46.5,-171.5 46.5,-190.5 100.5,-190.5 100.5,-171.5 46.5,-171.5"/>
 <text text-anchor="middle" x="73.5" y="-178.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstringt</text>
 </a>
 </g>
 </g>
-<!-- Node14&#45;&gt;Node16 -->
+<!-- Node15&#45;&gt;Node16 -->
 <g id="edge8" class="edge">
-<title>Node14&#45;&gt;Node16</title>
+<title>Node15&#45;&gt;Node16</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M110.76,-183.51C152.61,-185.35 223.1,-185.21 281,-169 299.22,-163.9 318.04,-153.81 332.08,-145.17"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="110.68,-180 100.51,-182.99 110.32,-186.99 110.68,-180"/>
 <text text-anchor="middle" x="223" y="-187" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -161,7 +161,7 @@
 <!-- Node20 -->
 <g id="node11" class="node">
 <title>Node20</title>
-<g id="a_node11"><a xlink:title="STL class.">
+<g id="a_node11"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="23,-69.5 23,-88.5 124,-88.5 124,-69.5 23,-69.5"/>
 <text text-anchor="middle" x="73.5" y="-76.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; K, T &gt;</text>
 </a>
@@ -174,9 +174,9 @@
 <polygon fill="orange" stroke="orange" points="134.46,-80.91 124.15,-83.36 133.73,-87.87 134.46,-80.91"/>
 <text text-anchor="middle" x="223" y="-110" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, a_rect &gt;</text>
 </g>
-<!-- Node27 -->
+<!-- Node28 -->
 <g id="node15" class="node">
-<title>Node27</title>
+<title>Node28</title>
 <g id="a_node15"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="299,-190 299,-220 412,-220 412,-190 299,-190"/>
 <text text-anchor="start" x="307" y="-208" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; event_it,</text>
@@ -184,16 +184,16 @@
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node27 -->
+<!-- Node20&#45;&gt;Node28 -->
 <g id="edge16" class="edge">
-<title>Node20&#45;&gt;Node27</title>
+<title>Node20&#45;&gt;Node28</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M133.57,-89.66C138.39,-91.93 142.95,-94.68 147,-98 161.14,-109.6 150.43,-123.95 165,-135 206.76,-166.65 232.41,-136.39 281,-156 301.48,-164.26 322.18,-178.74 336.36,-189.82"/>
 <polygon fill="orange" stroke="orange" points="134.64,-86.32 124.06,-85.86 132.04,-92.82 134.64,-86.32"/>
 <text text-anchor="middle" x="223" y="-159" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; event_it, unsigned &gt;</text>
 </g>
-<!-- Node28 -->
+<!-- Node29 -->
 <g id="node17" class="node">
-<title>Node28</title>
+<title>Node29</title>
 <g id="a_node17"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="534,-35.5 534,-76.5 647,-76.5 647,-35.5 534,-35.5"/>
 <text text-anchor="start" x="542" y="-64.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; std::pair</text>
@@ -202,9 +202,9 @@
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node28 -->
+<!-- Node20&#45;&gt;Node29 -->
 <g id="edge20" class="edge">
-<title>Node20&#45;&gt;Node28</title>
+<title>Node20&#45;&gt;Node29</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M134.34,-76.33C234.85,-71.84 436.15,-62.85 533.81,-58.49"/>
 <polygon fill="orange" stroke="orange" points="134.18,-72.83 124.35,-76.77 134.49,-79.82 134.18,-72.83"/>
 <text text-anchor="start" x="299.5" y="-94" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; std::pair&lt; event</text>
@@ -259,9 +259,9 @@
 <text text-anchor="middle" x="223" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00"> symbol_table1</text>
 <text text-anchor="middle" x="223" y="-338" font-family="Helvetica,sans-Serif" font-size="10.00">symbol_table2</text>
 </g>
-<!-- Node27&#45;&gt;Node5 -->
+<!-- Node28&#45;&gt;Node5 -->
 <g id="edge14" class="edge">
-<title>Node27&#45;&gt;Node5</title>
+<title>Node28&#45;&gt;Node5</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M422.19,-205C451.66,-205 486.52,-205 516.77,-205"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="422.01,-201.5 412.01,-205 422.01,-208.5 422.01,-201.5"/>
 <text text-anchor="middle" x="464.5" y="-208" font-family="Helvetica,sans-Serif" font-size="10.00"> numbering</text>
@@ -269,55 +269,55 @@
 <!-- Node19 -->
 <g id="node16" class="node">
 <title>Node19</title>
-<g id="a_node16"><a xlink:title="STL iterator class.">
+<g id="a_node16"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="17,-210 17,-240 130,-240 130,-210 17,-210"/>
 <text text-anchor="start" x="25" y="-228" font-family="Helvetica,sans-Serif" font-size="10.00">std::list&lt; T &gt;::const</text>
 <text text-anchor="middle" x="73.5" y="-217" font-family="Helvetica,sans-Serif" font-size="10.00">_iterator</text>
 </a>
 </g>
 </g>
-<!-- Node19&#45;&gt;Node27 -->
+<!-- Node19&#45;&gt;Node28 -->
 <g id="edge15" class="edge">
-<title>Node19&#45;&gt;Node27</title>
+<title>Node19&#45;&gt;Node28</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M140.19,-220.31C188.44,-216.86 253.27,-212.23 298.95,-208.97"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="139.88,-216.82 130.15,-221.02 140.38,-223.8 139.88,-216.82"/>
 <text text-anchor="middle" x="223" y="-222" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node28&#45;&gt;Node4 -->
+<!-- Node29&#45;&gt;Node4 -->
 <g id="edge17" class="edge">
-<title>Node28&#45;&gt;Node4</title>
+<title>Node29&#45;&gt;Node4</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M656.91,-77.76C708.23,-94.83 777.17,-117.77 815.41,-130.49"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="657.82,-74.37 647.22,-74.54 655.61,-81.02 657.82,-74.37"/>
 <text text-anchor="middle" x="723" y="-116" font-family="Helvetica,sans-Serif" font-size="10.00"> choice_symbols</text>
 </g>
-<!-- Node29 -->
+<!-- Node30 -->
 <g id="node18" class="node">
-<title>Node29</title>
+<title>Node30</title>
 <g id="a_node18"><a xlink:href="classsymbol__exprt.html" target="_top" xlink:title="Expression to hold a symbol (variable)">
 <polygon fill="none" stroke="black" points="314,-0.5 314,-19.5 397,-19.5 397,-0.5 314,-0.5"/>
 <text text-anchor="middle" x="355.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">symbol_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node29&#45;&gt;Node28 -->
+<!-- Node30&#45;&gt;Node29 -->
 <g id="edge18" class="edge">
-<title>Node29&#45;&gt;Node28</title>
+<title>Node30&#45;&gt;Node29</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M407.38,-15.95C434.69,-19.53 468.84,-24.64 499,-31 510.32,-33.39 522.33,-36.38 533.76,-39.45"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="407.64,-12.46 397.28,-14.65 406.75,-19.4 407.64,-12.46"/>
 <text text-anchor="middle" x="464.5" y="-34" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node30 -->
+<!-- Node31 -->
 <g id="node19" class="node">
-<title>Node30</title>
+<title>Node31</title>
 <g id="a_node19"><a xlink:href="classnullary__exprt.html" target="_top" xlink:title="An expression without operands.">
 <polygon fill="none" stroke="red" points="33,-0.5 33,-19.5 114,-19.5 114,-0.5 33,-0.5"/>
 <text text-anchor="middle" x="73.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">nullary_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node30&#45;&gt;Node29 -->
+<!-- Node31&#45;&gt;Node30 -->
 <g id="edge19" class="edge">
-<title>Node30&#45;&gt;Node29</title>
+<title>Node31&#45;&gt;Node30</title>
 <path fill="none" stroke="midnightblue" d="M124.06,-10C178.1,-10 263.56,-10 313.81,-10"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="124.02,-6.5 114.02,-10 124.02,-13.5 124.02,-6.5"/>
 </g>

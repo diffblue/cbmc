@@ -58,7 +58,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="21.5,-245.5 21.5,-264.5 118.5,-264.5 118.5,-245.5 21.5,-245.5"/>
 <text text-anchor="middle" x="70" y="-252.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
@@ -101,11 +101,11 @@
 <title>Node6&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M189.97,-102.2C181.28,-84.38 166.08,-56.97 147,-38 139.5,-30.54 129.57,-24.23 121.03,-19.58"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="186.89,-103.88 194.31,-111.44 193.23,-100.9 186.89,-103.88"/>
-<text text-anchor="start" x="185" y="-85" font-family="Helvetica,sans-Serif" font-size="10.00"> not_enough_arguments</text>
-<text text-anchor="middle" x="244" y="-74" font-family="Helvetica,sans-Serif" font-size="10.00">_set</text>
-<text text-anchor="middle" x="244" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">recursive_call_set</text>
-<text text-anchor="middle" x="244" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">no_body_set</text>
-<text text-anchor="middle" x="244" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">missing_function_set</text>
+<text text-anchor="middle" x="242.5" y="-85" font-family="Helvetica,sans-Serif" font-size="10.00"> missing_function_set</text>
+<text text-anchor="middle" x="242.5" y="-74" font-family="Helvetica,sans-Serif" font-size="10.00">no_body_set</text>
+<text text-anchor="start" x="185" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">not_enough_arguments</text>
+<text text-anchor="middle" x="242.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">_set</text>
+<text text-anchor="middle" x="242.5" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">recursive_call_set</text>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node">
@@ -126,7 +126,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:title="STL class.">
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="236,-178.5 236,-197.5 318,-197.5 318,-178.5 236,-178.5"/>
 <text text-anchor="middle" x="277" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::set&lt; K &gt;</text>
 </a>

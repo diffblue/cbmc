@@ -113,25 +113,25 @@
 <path fill="none" stroke="midnightblue" d="M51.5,-393.12C51.5,-383.82 51.5,-373.06 51.5,-365.71"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="48,-393.41 51.5,-403.41 55,-393.41 48,-393.41"/>
 </g>
-<!-- Node12 -->
+<!-- Node13 -->
 <g id="node8" class="node">
-<title>Node12</title>
-<g id="a_node8"><a xlink:title="STL class.">
+<title>Node13</title>
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="161,-279.5 161,-298.5 258,-298.5 258,-279.5 161,-279.5"/>
 <text text-anchor="middle" x="209.5" y="-286.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node12&#45;&gt;Node2 -->
+<!-- Node13&#45;&gt;Node2 -->
 <g id="edge8" class="edge">
-<title>Node12&#45;&gt;Node2</title>
+<title>Node13&#45;&gt;Node2</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M229.07,-272.37C232.1,-268.97 234.79,-265.13 236.5,-261 263.03,-196.94 262.43,-169.3 236.5,-105 233.58,-97.76 227.68,-91.37 222.24,-86.63"/>
 <polygon fill="orange" stroke="orange" points="226.48,-270.01 221.69,-279.46 231.32,-275.06 226.48,-270.01"/>
 <text text-anchor="middle" x="296" y="-175" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; monomialt &gt;</text>
 </g>
-<!-- Node12&#45;&gt;Node4 -->
+<!-- Node13&#45;&gt;Node4 -->
 <g id="edge7" class="edge">
-<title>Node12&#45;&gt;Node4</title>
+<title>Node13&#45;&gt;Node4</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M151.24,-280.03C140.83,-275.95 131.18,-269.92 124.5,-261 118.34,-252.78 118.44,-241.02 119.89,-231.79"/>
 <polygon fill="orange" stroke="orange" points="150.36,-283.42 160.95,-283.24 152.56,-276.78 150.36,-283.42"/>
 <text text-anchor="middle" x="180.5" y="-253" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; monomialt::termt &gt;</text>

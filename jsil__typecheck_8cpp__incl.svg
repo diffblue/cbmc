@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Jsil Language.">
 <polygon fill="#bfbfbf" stroke="black" points="653.5,-795.5 653.5,-825.5 826.5,-825.5 826.5,-795.5 653.5,-795.5"/>
 <text text-anchor="start" x="661.5" y="-813.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="740" y="-802.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/jsil/jsil_typecheck.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="jsil__typecheck_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="jsil__typecheck_8h.html" target="_top" xlink:title="Jsil Language.">
 <polygon fill="none" stroke="black" points="395.5,-448.5 395.5,-467.5 490.5,-467.5 490.5,-448.5 395.5,-448.5"/>
 <text text-anchor="middle" x="443" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">jsil_typecheck.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node50 -->
 <g id="node46" class="node">
 <title>Node50</title>
-<g id="a_node46"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="948,-560.5 948,-579.5 1068,-579.5 1068,-560.5 948,-560.5"/>
 <text text-anchor="middle" x="1008" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/bitvector_types.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node57 -->
 <g id="node53" class="node">
 <title>Node57</title>
-<g id="a_node53"><a xlink:href="expr2jsil_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="expr2jsil_8h.html" target="_top" xlink:title="Jsil Language.">
 <polygon fill="none" stroke="black" points="102,-739.5 102,-758.5 170,-758.5 170,-739.5 102,-739.5"/>
 <text text-anchor="middle" x="136" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">expr2jsil.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node58 -->
 <g id="node54" class="node">
 <title>Node58</title>
-<g id="a_node54"><a xlink:href="jsil__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="jsil__types_8h.html" target="_top" xlink:title="Jsil Language.">
 <polygon fill="none" stroke="black" points="737,-739.5 737,-758.5 809,-758.5 809,-739.5 737,-739.5"/>
 <text text-anchor="middle" x="773" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">jsil_types.h</text>
 </a>
@@ -304,7 +304,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="294,-168.5 294,-187.5 358,-187.5 358,-168.5 294,-168.5"/>
 <text text-anchor="middle" x="326" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -334,7 +334,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="294.5,-112.5 294.5,-131.5 353.5,-131.5 353.5,-112.5 294.5,-112.5"/>
 <text text-anchor="middle" x="324" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -400,7 +400,7 @@
 <!-- Node17 -->
 <g id="node16" class="node">
 <title>Node17</title>
-<g id="a_node16"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="1174,-56.5 1174,-75.5 1278,-75.5 1278,-56.5 1174,-56.5"/>
 <text text-anchor="middle" x="1226" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -670,7 +670,7 @@
 <!-- Node49 -->
 <g id="node45" class="node">
 <title>Node49</title>
-<g id="a_node45"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="700,-560.5 700,-579.5 786,-579.5 786,-560.5 700,-560.5"/>
 <text text-anchor="middle" x="743" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -721,7 +721,7 @@
 <!-- Node46 -->
 <g id="node42" class="node">
 <title>Node46</title>
-<g id="a_node42"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="971.5,-504.5 971.5,-523.5 1044.5,-523.5 1044.5,-504.5 971.5,-504.5"/>
 <text text-anchor="middle" x="1008" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -796,7 +796,7 @@
 <!-- Node40 -->
 <g id="node37" class="node">
 <title>Node40</title>
-<g id="a_node37"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1174.5,-336.5 1174.5,-355.5 1221.5,-355.5 1221.5,-336.5 1174.5,-336.5"/>
 <text text-anchor="middle" x="1198" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -1108,7 +1108,7 @@
 <!-- Node60 -->
 <g id="node56" class="node">
 <title>Node60</title>
-<g id="a_node56"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="781,-622 781,-641 867,-641 867,-622 781,-622"/>
 <text text-anchor="middle" x="824" y="-629" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>

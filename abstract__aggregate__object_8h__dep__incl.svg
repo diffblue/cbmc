@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Common behaviour for abstract objects modelling aggregate values &#45; arrays, structs,...">
 <polygon fill="#bfbfbf" stroke="black" points="352.5,-178.5 352.5,-230.5 521.5,-230.5 521.5,-178.5 352.5,-178.5"/>
 <text text-anchor="start" x="360.5" y="-218.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="360.5" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="full__array__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="full__array__abstract__object_8h.html" target="_top" xlink:title="An abstraction of an array value.">
 <polygon fill="none" stroke="black" points="0,-89.5 0,-141.5 166,-141.5 166,-89.5 0,-89.5"/>
 <text text-anchor="start" x="8" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -41,7 +41,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="full__struct__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="full__struct__abstract__object_8h.html" target="_top" xlink:title="An abstraction of a structure that stores one abstract object per field.">
 <polygon fill="none" stroke="black" points="710,-89.5 710,-141.5 878,-141.5 878,-89.5 710,-89.5"/>
 <text text-anchor="start" x="718" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="718" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -59,7 +59,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="two__value__array__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="two__value__array__abstract__object_8h.html" target="_top" xlink:title="The base type of all abstract array representations.">
 <polygon fill="none" stroke="black" points="184.5,-89.5 184.5,-141.5 339.5,-141.5 339.5,-89.5 184.5,-89.5"/>
 <text text-anchor="start" x="192.5" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="192.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -77,7 +77,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="two__value__struct__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="two__value__struct__abstract__object_8h.html" target="_top" xlink:title="The base of all structure abstractions.">
 <polygon fill="none" stroke="black" points="358,-89.5 358,-141.5 516,-141.5 516,-89.5 358,-89.5"/>
 <text text-anchor="start" x="366" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="366" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -95,7 +95,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="two__value__union__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="two__value__union__abstract__object_8h.html" target="_top" xlink:title="The base of all union abstractions.">
 <polygon fill="none" stroke="black" points="534.5,-89.5 534.5,-141.5 691.5,-141.5 691.5,-89.5 534.5,-89.5"/>
 <text text-anchor="start" x="542.5" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="542.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>

@@ -31,10 +31,10 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M98,-90.22C98,-68.95 98,-35.22 98,-19.54"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="94.5,-90.3 98,-100.3 101.5,-90.3 94.5,-90.3"/>
-<text text-anchor="middle" x="137.5" y="-74" font-family="Helvetica,sans-Serif" font-size="10.00"> post_declarator</text>
-<text text-anchor="middle" x="137.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">pre_declarator</text>
-<text text-anchor="middle" x="137.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">initializer</text>
-<text text-anchor="middle" x="137.5" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">declarator</text>
+<text text-anchor="middle" x="136" y="-74" font-family="Helvetica,sans-Serif" font-size="10.00"> declarator</text>
+<text text-anchor="middle" x="136" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">initializer</text>
+<text text-anchor="middle" x="136" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">post_declarator</text>
+<text text-anchor="middle" x="136" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">pre_declarator</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="19.5,-234.5 19.5,-253.5 84.5,-253.5 84.5,-234.5 19.5,-234.5"/>
 <text text-anchor="middle" x="52" y="-241.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
@@ -71,10 +71,10 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:title="STL class.">
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="0,-291.5 0,-321.5 104,-321.5 104,-291.5 0,-291.5"/>
 <text text-anchor="start" x="8" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
-<text text-anchor="middle" x="52" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
+<text text-anchor="middle" x="52" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Char &gt;</text>
 </a>
 </g>
 </g>
@@ -87,7 +87,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:title="STL class.">
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="96.5,-167.5 96.5,-186.5 193.5,-186.5 193.5,-167.5 96.5,-167.5"/>
 <text text-anchor="middle" x="145" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>

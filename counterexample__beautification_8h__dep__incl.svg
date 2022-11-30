@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Counterexample Beautification.">
 <polygon fill="#bfbfbf" stroke="black" points="292.5,-89.5 292.5,-130.5 472.5,-130.5 472.5,-89.5 292.5,-89.5"/>
 <text text-anchor="start" x="300.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="300.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="counterexample__beautification_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="counterexample__beautification_8cpp.html" target="_top" xlink:title="Counterexample Beautification using Incremental SAT.">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 191,-47 191,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="multi__path__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="multi__path__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using Bounded Model Checking.">
 <polygon fill="none" stroke="black" points="209,-6 209,-47 382,-47 382,-6 209,-6"/>
 <text text-anchor="start" x="217" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="217" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="single__loop__incremental__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="single__loop__incremental__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop.">
 <polygon fill="none" stroke="black" points="400,-0.5 400,-52.5 539,-52.5 539,-0.5 400,-0.5"/>
 <text text-anchor="start" x="408" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="408" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -74,7 +74,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="single__path__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="single__path__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution.">
 <polygon fill="none" stroke="black" points="557.5,-6 557.5,-47 733.5,-47 733.5,-6 557.5,-6"/>
 <text text-anchor="start" x="565.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="565.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Type Naming for C.">
 <polygon fill="#bfbfbf" stroke="black" points="419.5,-78.5 419.5,-108.5 582.5,-108.5 582.5,-78.5 419.5,-78.5"/>
 <text text-anchor="start" x="427.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="501" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/type2name.h</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="none" stroke="black" points="156.5,-0.5 156.5,-41.5 315.5,-41.5 315.5,-0.5 156.5,-0.5"/>
 <text text-anchor="start" x="164.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="c__typecheck__initializer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="c__typecheck__initializer_8cpp.html" target="_top" xlink:title="ANSI&#45;C Conversion / Type Checking.">
 <polygon fill="none" stroke="black" points="333.5,-0.5 333.5,-41.5 492.5,-41.5 492.5,-0.5 333.5,-0.5"/>
 <text text-anchor="start" x="341.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="341.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -72,7 +72,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="c__typecheck__type_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="c__typecheck__type_8cpp.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="510.5,-0.5 510.5,-41.5 669.5,-41.5 669.5,-0.5 510.5,-0.5"/>
 <text text-anchor="start" x="518.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="518.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -89,7 +89,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="type2name_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="type2name_8cpp.html" target="_top" xlink:title="Type Naming for C.">
 <polygon fill="none" stroke="black" points="688,-6 688,-36 862,-36 862,-6 688,-6"/>
 <text text-anchor="start" x="696" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="775" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/type2name.cpp</text>
@@ -105,7 +105,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="dump__c_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="dump__c_8cpp.html" target="_top" xlink:title="Dump Goto&#45;Program as C/C++ Source.">
 <polygon fill="none" stroke="black" points="880.5,-0.5 880.5,-41.5 1025.5,-41.5 1025.5,-0.5 880.5,-0.5"/>
 <text text-anchor="start" x="888.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="888.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

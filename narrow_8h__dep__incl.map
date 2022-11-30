@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/narrow.h" name="/home/runner/work/cbmc/cbmc/src/util/narrow.h">
-<area shape="rect" id="node1" title=" " alt="" coords="7229,5,7413,47"/>
-<area shape="rect" id="node2" href="$forward__list__as__map_8h.html" title=" " alt="" coords="1609,95,1793,151"/>
-<area shape="rect" id="node6" href="$string2int_8h.html" title=" " alt="" coords="3209,206,3395,247"/>
-<area shape="rect" id="node34" href="$symex__target__equation_8h.html" title=" " alt="" coords="7213,95,7428,151"/>
-<area shape="rect" id="node45" href="$literal_8h.html" title=" " alt="" coords="5377,95,5561,151"/>
-<area shape="rect" id="node55" href="$bdd__cudd_8h.html" title=" " alt="" coords="7453,95,7637,151"/>
-<area shape="rect" id="node56" href="$bdd__expr_8cpp.html" title=" " alt="" coords="7661,95,7845,151"/>
-<area shape="rect" id="node57" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="7869,95,8055,151"/>
-<area shape="rect" id="node58" href="$piped__process_8cpp.html" title=" " alt="" coords="8079,102,8312,143"/>
-<area shape="rect" id="node59" href="$java__types_8h.html" title=" " alt="" coords="6329,199,6547,255"/>
-<area shape="rect" id="node3" href="$irep_8h.html" title=" " alt="" coords="231,206,415,247"/>
-<area shape="rect" id="node4" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="5,310,207,366"/>
-<area shape="rect" id="node5" href="$irep_8cpp.html" title=" " alt="" coords="231,317,415,359"/>
-<area shape="rect" id="node7" href="$gcc__version_8cpp.html" title=" " alt="" coords="2599,317,2834,359"/>
-<area shape="rect" id="node8" href="$convert__integer__literal_8cpp.html" title=" " alt="" coords="2858,310,3058,366"/>
-<area shape="rect" id="node9" href="$preprocessor__line_8cpp.html" title=" " alt="" coords="3083,310,3297,366"/>
-<area shape="rect" id="node10" href="$taint__parser_8cpp.html" title=" " alt="" coords="3322,310,3506,366"/>
-<area shape="rect" id="node11" href="$ms__cl__version_8cpp.html" title=" " alt="" coords="3530,310,3714,366"/>
-<area shape="rect" id="node12" href="$report__util_8cpp.html" title=" " alt="" coords="3738,310,3922,366"/>
-<area shape="rect" id="node13" href="$symex__coverage_8cpp.html" title=" " alt="" coords="3946,310,4130,366"/>
-<area shape="rect" id="node14" href="$goto__harness__generator_8cpp.html" title=" " alt="" coords="4155,310,4364,366"/>
-<area shape="rect" id="node15" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="4389,303,4594,373"/>
-<area shape="rect" id="node16" href="$document__properties_8cpp.html" title=" " alt="" coords="4619,310,4812,366"/>
-<area shape="rect" id="node17" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="4837,310,5058,366"/>
-<area shape="rect" id="node18" href="$goto__instrument__parse__options_8cpp.html" title=" " alt="" coords="5082,310,5341,366"/>
-<area shape="rect" id="node19" href="$skip__loops_8cpp.html" title=" " alt="" coords="5365,310,5559,366"/>
-<area shape="rect" id="node20" href="$unwindset_8cpp.html" title=" " alt="" coords="5583,310,5776,366"/>
-<area shape="rect" id="node21" href="$interpreter_8cpp.html" title=" " alt="" coords="5801,310,5985,366"/>
-<area shape="rect" id="node22" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="440,310,644,366"/>
-<area shape="rect" id="node23" href="$gdb__api_8cpp.html" title=" " alt="" coords="668,310,872,366"/>
-<area shape="rect" id="node24" href="$qbf__skizzo__core_8cpp.html" title=" " alt="" coords="897,310,1081,366"/>
-<area shape="rect" id="node25" href="$satcheck__zcore_8cpp.html" title=" " alt="" coords="1105,310,1289,366"/>
-<area shape="rect" id="node26" href="$smt2__conv_8cpp.html" title=" " alt="" coords="6009,310,6193,366"/>
-<area shape="rect" id="node27" href="$bitvector__types_8cpp.html" title=" " alt="" coords="1313,310,1497,366"/>
-<area shape="rect" id="node28" href="$config_8cpp.html" title=" " alt="" coords="1521,317,1705,359"/>
-<area shape="rect" id="node29" href="$src_2util_2message_8cpp.html" title=" " alt="" coords="1729,317,1928,359"/>
-<area shape="rect" id="node30" href="$options_8cpp.html" title=" " alt="" coords="1952,317,2140,359"/>
-<area shape="rect" id="node31" href="$string2int_8cpp.html" title=" " alt="" coords="2165,317,2367,359"/>
-<area shape="rect" id="node32" href="$xml_8cpp.html" title=" " alt="" coords="2391,317,2575,359"/>
-<area shape="rect" id="node33" href="$java__local__variable__table_8cpp.html" title=" " alt="" coords="6217,310,6435,366"/>
-<area shape="rect" id="node35" href="$goto__symex_8h.html" title=" " alt="" coords="7569,199,7768,255"/>
-<area shape="rect" id="node36" href="$bmc__util_8cpp.html" title=" " alt="" coords="7793,199,7977,255"/>
-<area shape="rect" id="node37" href="$goto__symex__fault__localizer_8cpp.html" title=" " alt="" coords="8001,199,8232,255"/>
-<area shape="rect" id="node38" href="$graphml__witness_8cpp.html" title=" " alt="" coords="8257,199,8441,255"/>
-<area shape="rect" id="node39" href="$goto__symex__state_8cpp.html" title=" " alt="" coords="8465,199,8664,255"/>
-<area shape="rect" id="node40" href="$postcondition_8cpp.html" title=" " alt="" coords="8687,206,8973,247"/>
-<area shape="rect" id="node41" href="$precondition_8cpp.html" title=" " alt="" coords="6572,206,6851,247"/>
-<area shape="rect" id="node42" href="$show__program_8cpp.html" title=" " alt="" coords="6875,199,7079,255"/>
-<area shape="rect" id="node43" href="$show__vcc_8cpp.html" title=" " alt="" coords="7103,199,7307,255"/>
-<area shape="rect" id="node44" href="$symex__slice__class_8h.html" title=" " alt="" coords="7331,199,7545,255"/>
-<area shape="rect" id="node46" href="$hardness__collector_8h.html" title=" " alt="" coords="6105,199,6304,255"/>
-<area shape="rect" id="node47" href="$prop_8h.html" title=" " alt="" coords="4422,199,4606,255"/>
-<area shape="rect" id="node48" href="$boolbv__map_8h.html" title=" " alt="" coords="4631,199,4832,255"/>
-<area shape="rect" id="node49" href="$smt2__conv_8h.html" title=" " alt="" coords="5689,199,5873,255"/>
-<area shape="rect" id="node50" href="$prop__minimize_8h.html" title=" " alt="" coords="4857,199,5041,255"/>
-<area shape="rect" id="node51" href="$literal__expr_8h.html" title=" " alt="" coords="5897,199,6081,255"/>
-<area shape="rect" id="node52" href="$literal_8cpp.html" title=" " alt="" coords="5065,199,5249,255"/>
-<area shape="rect" id="node53" href="$qbf__bdd__core_8cpp.html" title=" " alt="" coords="5273,199,5457,255"/>
-<area shape="rect" id="node54" href="$resolution__proof_8h.html" title=" " alt="" coords="5481,199,5665,255"/>
-<area shape="rect" id="node60" href="$assignments__from__json_8cpp.html" title=" " alt="" coords="6459,310,6678,366"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4915,5,5099,47"/>
+<area shape="rect" id="node2" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1673,95,1888,151"/>
+<area shape="rect" id="node20" href="$bdd__cudd_8h.html" title="Interface to Cudd BDD functions that are used in CBMC BDD functions should only be accessed through t..." alt="" coords="4291,95,4475,151"/>
+<area shape="rect" id="node21" href="$bdd__expr_8cpp.html" title="Conversion between exprt and miniBDD." alt="" coords="4499,95,4683,151"/>
+<area shape="rect" id="node22" href="$literal_8h.html" title=" " alt="" coords="4707,95,4891,151"/>
+<area shape="rect" id="node33" href="$forward__list__as__map_8h.html" title=" " alt="" coords="4915,95,5099,151"/>
+<area shape="rect" id="node36" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="5175,95,5360,151"/>
+<area shape="rect" id="node37" href="$piped__process_8cpp.html" title="Subprocess communication with pipes." alt="" coords="5384,102,5617,143"/>
+<area shape="rect" id="node38" href="$string2int_8h.html" title=" " alt="" coords="6150,206,6337,247"/>
+<area shape="rect" id="node60" href="$java__types_8h.html" title=" " alt="" coords="5642,95,5861,151"/>
+<area shape="rect" id="node3" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="321,310,505,366"/>
+<area shape="rect" id="node4" href="$counterexample__beautification_8h.html" title="Counterexample Beautification." alt="" coords="781,199,1021,255"/>
+<area shape="rect" id="node5" href="$goto__symex__fault__localizer_8cpp.html" title="Fault Localization for Goto Symex." alt="" coords="1045,199,1276,255"/>
+<area shape="rect" id="node6" href="$goto__symex__property__decider_8h.html" title="Property Decider for Goto&#45;Symex." alt="" coords="295,199,530,255"/>
+<area shape="rect" id="node7" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="1341,310,1559,366"/>
+<area shape="rect" id="node8" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="1797,199,1981,255"/>
+<area shape="rect" id="node9" href="$build__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="554,199,757,255"/>
+<area shape="rect" id="node10" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="1351,199,1549,255"/>
+<area shape="rect" id="node11" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="2005,199,2204,255"/>
+<area shape="rect" id="node12" href="$partial__order__concurrency_8h.html" title="Add constraints to equation encoding partial orders on events." alt="" coords="2228,199,2440,255"/>
+<area shape="rect" id="node13" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="1573,199,1772,255"/>
+<area shape="rect" id="node14" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="2463,206,2749,247"/>
+<area shape="rect" id="node15" href="$precondition_8cpp.html" title="Symbolic Execution." alt="" coords="2773,206,3052,247"/>
+<area shape="rect" id="node16" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="3076,199,3280,255"/>
+<area shape="rect" id="node17" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="3304,199,3508,255"/>
+<area shape="rect" id="node18" href="$symex__slice__class_8h.html" title="Slicer for symex traces." alt="" coords="3532,199,3747,255"/>
+<area shape="rect" id="node19" href="$symex__target__equation_8cpp.html" title="Symbolic Execution Implementation of functions to build SSA equation." alt="" coords="5,199,220,255"/>
+<area shape="rect" id="node23" href="$boolbv__map_8h.html" title=" " alt="" coords="5020,199,5221,255"/>
+<area shape="rect" id="node24" href="$hardness__collector_8h.html" title="Capability to collect the statistics of the complexity of individual solver queries." alt="" coords="5245,199,5444,255"/>
+<area shape="rect" id="node25" href="$literal_8cpp.html" title="Literals." alt="" coords="5469,199,5653,255"/>
+<area shape="rect" id="node26" href="$literal__expr_8h.html" title=" " alt="" coords="3771,199,3955,255"/>
+<area shape="rect" id="node28" href="$prop_8h.html" title=" " alt="" coords="4187,199,4371,255"/>
+<area shape="rect" id="node29" href="$prop__minimize_8h.html" title="SAT Minimizer." alt="" coords="4395,199,4579,255"/>
+<area shape="rect" id="node30" href="$qbf__bdd__core_8cpp.html" title=" " alt="" coords="4603,199,4787,255"/>
+<area shape="rect" id="node31" href="$resolution__proof_8h.html" title=" " alt="" coords="4811,199,4995,255"/>
+<area shape="rect" id="node32" href="$smt2__conv_8h.html" title=" " alt="" coords="3979,199,4163,255"/>
+<area shape="rect" id="node27" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="3875,310,4059,366"/>
+<area shape="rect" id="node34" href="$irep_8h.html" title=" " alt="" coords="5677,206,5861,247"/>
+<area shape="rect" id="node35" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="4084,310,4285,366"/>
+<area shape="rect" id="node39" href="$gcc__version_8cpp.html" title=" " alt="" coords="6242,317,6477,359"/>
+<area shape="rect" id="node40" href="$convert__integer__literal_8cpp.html" title="C++ Language Conversion." alt="" coords="6501,310,6701,366"/>
+<area shape="rect" id="node41" href="$preprocessor__line_8cpp.html" title="ANSI&#45;C Language Conversion." alt="" coords="6725,310,6940,366"/>
+<area shape="rect" id="node42" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="6965,310,7149,366"/>
+<area shape="rect" id="node43" href="$ms__cl__version_8cpp.html" title=" " alt="" coords="7173,310,7357,366"/>
+<area shape="rect" id="node44" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="7381,310,7565,366"/>
+<area shape="rect" id="node45" href="$symex__coverage_8cpp.html" title="Record and print code coverage of symbolic execution." alt="" coords="7589,310,7773,366"/>
+<area shape="rect" id="node46" href="$goto__harness__generator_8cpp.html" title=" " alt="" coords="7797,310,8007,366"/>
+<area shape="rect" id="node47" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="8031,303,8237,373"/>
+<area shape="rect" id="node48" href="$document__properties_8cpp.html" title="Subgoal Documentation." alt="" coords="8261,310,8455,366"/>
+<area shape="rect" id="node49" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="8479,310,8701,366"/>
+<area shape="rect" id="node50" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="8725,310,8983,366"/>
+<area shape="rect" id="node51" href="$skip__loops_8cpp.html" title="Skip over selected loops by adding gotos." alt="" coords="4309,310,4503,366"/>
+<area shape="rect" id="node52" href="$unwindset_8cpp.html" title=" " alt="" coords="4527,310,4720,366"/>
+<area shape="rect" id="node53" href="$interpreter_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="4745,310,4929,366"/>
+<area shape="rect" id="node54" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="4953,310,5157,366"/>
+<area shape="rect" id="node55" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="5181,310,5385,366"/>
+<area shape="rect" id="node56" href="$qbf__skizzo__core_8cpp.html" title=" " alt="" coords="5410,310,5594,366"/>
+<area shape="rect" id="node57" href="$satcheck__zcore_8cpp.html" title=" " alt="" coords="5618,310,5802,366"/>
+<area shape="rect" id="node58" href="$bitvector__types_8cpp.html" title="Pre&#45;defined bitvector types." alt="" coords="5826,310,6010,366"/>
+<area shape="rect" id="node59" href="$config_8cpp.html" title=" " alt="" coords="6034,317,6218,359"/>
 </map>

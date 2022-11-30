@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Goto Checker using Single Path Symbolic Execution for Java.">
 <polygon fill="#bfbfbf" stroke="black" points="569.5,-794.5 569.5,-835.5 760.5,-835.5 760.5,-794.5 569.5,-794.5"/>
 <text text-anchor="start" x="577.5" y="-823.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="577.5" y="-812.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="single__path__symex__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="single__path__symex__checker_8h.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution.">
 <polygon fill="none" stroke="black" points="532.5,-727.5 532.5,-757.5 665.5,-757.5 665.5,-727.5 532.5,-727.5"/>
 <text text-anchor="start" x="540.5" y="-745.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;checker/single</text>
 <text text-anchor="middle" x="599" y="-734.5" font-family="Helvetica,sans-Serif" font-size="10.00">_path_symex_checker.h</text>
@@ -38,7 +38,7 @@
 <!-- Node131 -->
 <g id="node60" class="node">
 <title>Node131</title>
-<g id="a_node60"><a xlink:href="java__bmc__util_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="java__bmc__util_8h.html" target="_top" xlink:title="Bounded Model Checking Utils for Java.">
 <polygon fill="none" stroke="black" points="684,-733 684,-752 778,-752 778,-733 684,-733"/>
 <text text-anchor="middle" x="731" y="-740" font-family="Helvetica,sans-Serif" font-size="10.00">java_bmc_util.h</text>
 </a>
@@ -53,7 +53,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__symex__property__decider_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__symex__property__decider_8h.html" target="_top" xlink:title="Property Decider for Goto&#45;Symex.">
 <polygon fill="none" stroke="black" points="466.5,-593.5 466.5,-623.5 589.5,-623.5 589.5,-593.5 466.5,-593.5"/>
 <text text-anchor="start" x="474.5" y="-611.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_symex_property</text>
 <text text-anchor="middle" x="528" y="-600.5" font-family="Helvetica,sans-Serif" font-size="10.00">_decider.h</text>
@@ -69,7 +69,7 @@
 <!-- Node82 -->
 <g id="node44" class="node">
 <title>Node82</title>
-<g id="a_node44"><a xlink:href="goto__trace__provider_8h.html" target="_top" xlink:title=" ">
+<g id="a_node44"><a xlink:href="goto__trace__provider_8h.html" target="_top" xlink:title="Interface for returning Goto Traces from Goto Checkers.">
 <polygon fill="none" stroke="black" points="185,-666 185,-685 307,-685 307,-666 185,-666"/>
 <text text-anchor="middle" x="246" y="-673" font-family="Helvetica,sans-Serif" font-size="10.00">goto_trace_provider.h</text>
 </a>
@@ -84,7 +84,7 @@
 <!-- Node83 -->
 <g id="node45" class="node">
 <title>Node83</title>
-<g id="a_node45"><a xlink:href="single__path__symex__only__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="single__path__symex__only__checker_8h.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution only.">
 <polygon fill="none" stroke="black" points="583.5,-660.5 583.5,-690.5 720.5,-690.5 720.5,-660.5 583.5,-660.5"/>
 <text text-anchor="start" x="591.5" y="-678.5" font-family="Helvetica,sans-Serif" font-size="10.00">single_path_symex_only</text>
 <text text-anchor="middle" x="652" y="-667.5" font-family="Helvetica,sans-Serif" font-size="10.00">_checker.h</text>
@@ -100,7 +100,7 @@
 <!-- Node130 -->
 <g id="node59" class="node">
 <title>Node130</title>
-<g id="a_node59"><a xlink:href="witness__provider_8h.html" target="_top" xlink:title=" ">
+<g id="a_node59"><a xlink:href="witness__provider_8h.html" target="_top" xlink:title="Interface for outputting GraphML Witnesses for Goto Checkers.">
 <polygon fill="none" stroke="black" points="739,-666 739,-685 847,-685 847,-666 739,-666"/>
 <text text-anchor="middle" x="793" y="-673" font-family="Helvetica,sans-Serif" font-size="10.00">witness_provider.h</text>
 </a>
@@ -115,7 +115,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="720,-526.5 720,-556.5 866,-556.5 866,-526.5 720,-526.5"/>
 <text text-anchor="start" x="728" y="-544.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;symex/symex_target</text>
 <text text-anchor="middle" x="793" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">_equation.h</text>
@@ -131,7 +131,7 @@
 <!-- Node65 -->
 <g id="node33" class="node">
 <title>Node65</title>
-<g id="a_node33"><a xlink:href="properties_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="properties_8h.html" target="_top" xlink:title="Properties.">
 <polygon fill="none" stroke="black" points="616.5,-409 616.5,-428 691.5,-428 691.5,-409 616.5,-409"/>
 <text text-anchor="middle" x="654" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">properties.h</text>
 </a>
@@ -146,7 +146,7 @@
 <!-- Node66 -->
 <g id="node35" class="node">
 <title>Node66</title>
-<g id="a_node35"><a xlink:href="solver__factory_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="solver__factory_8h.html" target="_top" xlink:title="Solver Factory.">
 <polygon fill="none" stroke="black" points="251,-532 251,-551 345,-551 345,-532 251,-532"/>
 <text text-anchor="middle" x="298" y="-539" font-family="Helvetica,sans-Serif" font-size="10.00">solver_factory.h</text>
 </a>
@@ -281,7 +281,7 @@
 <!-- Node59 -->
 <g id="node31" class="node">
 <title>Node59</title>
-<g id="a_node31"><a xlink:href="symex__target_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="symex__target_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="709.5,-409 709.5,-428 802.5,-428 802.5,-409 709.5,-409"/>
 <text text-anchor="middle" x="756" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target.h</text>
 </a>
@@ -413,7 +413,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="873,-168.5 873,-187.5 937,-187.5 937,-168.5 873,-168.5"/>
 <text text-anchor="middle" x="905" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -584,7 +584,7 @@
 <!-- Node51 -->
 <g id="node28" class="node">
 <title>Node51</title>
-<g id="a_node28"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="red" points="485.5,-403.5 485.5,-433.5 598.5,-433.5 598.5,-403.5 485.5,-403.5"/>
 <text text-anchor="start" x="493.5" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="542" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace.h</text>
@@ -606,7 +606,7 @@
 <!-- Node38 -->
 <g id="node27" class="node">
 <title>Node38</title>
-<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="1191.5,-280.5 1191.5,-299.5 1258.5,-299.5 1258.5,-280.5 1191.5,-280.5"/>
 <text text-anchor="middle" x="1225" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -645,7 +645,7 @@
 <!-- Node54 -->
 <g id="node29" class="node">
 <title>Node54</title>
-<g id="a_node29"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="549.5,-336.5 549.5,-366.5 662.5,-366.5 662.5,-336.5 549.5,-336.5"/>
 <text text-anchor="start" x="557.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="606" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -712,7 +712,7 @@
 <!-- Node60 -->
 <g id="node32" class="node">
 <title>Node60</title>
-<g id="a_node32"><a xlink:href="renamed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="renamed_8h.html" target="_top" xlink:title="Class for expressions or types renamed up to a given level.">
 <polygon fill="none" stroke="red" points="867.5,-342 867.5,-361 936.5,-361 936.5,-342 867.5,-342"/>
 <text text-anchor="middle" x="902" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">renamed.h</text>
 </a>
@@ -925,7 +925,7 @@
 <!-- Node72 -->
 <g id="node41" class="node">
 <title>Node72</title>
-<g id="a_node41"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="red" points="1039.5,-342 1039.5,-361 1144.5,-361 1144.5,-342 1039.5,-342"/>
 <text text-anchor="middle" x="1092" y="-349" font-family="Helvetica,sans-Serif" font-size="10.00">util/pointer_expr.h</text>
 </a>
@@ -952,7 +952,7 @@
 <!-- Node84 -->
 <g id="node46" class="node">
 <title>Node84</title>
-<g id="a_node46"><a xlink:href="unwindset_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="unwindset_8h.html" target="_top" xlink:title="Loop unwinding.">
 <polygon fill="none" stroke="black" points="1340,-409 1340,-428 1498,-428 1498,-409 1340,-409"/>
 <text text-anchor="middle" x="1419" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;instrument/unwindset.h</text>
 </a>
@@ -982,7 +982,7 @@
 <!-- Node128 -->
 <g id="node57" class="node">
 <title>Node128</title>
-<g id="a_node57"><a xlink:href="incremental__goto__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="incremental__goto__checker_8h.html" target="_top" xlink:title="Incremental Goto Checker Interface.">
 <polygon fill="none" stroke="black" points="549.5,-470.5 549.5,-489.5 702.5,-489.5 702.5,-470.5 549.5,-470.5"/>
 <text text-anchor="middle" x="626" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">incremental_goto_checker.h</text>
 </a>
@@ -1060,7 +1060,7 @@
 <!-- Node86 -->
 <g id="node48" class="node">
 <title>Node86</title>
-<g id="a_node48"><a xlink:href="dirty_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="dirty_8h.html" target="_top" xlink:title="Variables whose address is taken.">
 <polygon fill="none" stroke="black" points="1408.5,-470.5 1408.5,-489.5 1501.5,-489.5 1501.5,-470.5 1408.5,-470.5"/>
 <text text-anchor="middle" x="1455" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/dirty.h</text>
 </a>
@@ -1075,7 +1075,7 @@
 <!-- Node90 -->
 <g id="node50" class="node">
 <title>Node90</title>
-<g id="a_node50"><a xlink:href="local__safe__pointers_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="local__safe__pointers_8h.html" target="_top" xlink:title="Local safe pointer analysis.">
 <polygon fill="none" stroke="black" points="1039.5,-403.5 1039.5,-433.5 1152.5,-433.5 1152.5,-403.5 1039.5,-403.5"/>
 <text text-anchor="start" x="1047.5" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/local_safe</text>
 <text text-anchor="middle" x="1096" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_pointers.h</text>
@@ -1091,7 +1091,7 @@
 <!-- Node91 -->
 <g id="node51" class="node">
 <title>Node91</title>
-<g id="a_node51"><a xlink:href="goto__symex__state_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="goto__symex__state_8h.html" target="_top" xlink:title="Symbolic Execution.">
 <polygon fill="none" stroke="red" points="1722,-532 1722,-551 1838,-551 1838,-532 1722,-532"/>
 <text text-anchor="middle" x="1780" y="-539" font-family="Helvetica,sans-Serif" font-size="10.00">goto_symex_state.h</text>
 </a>
@@ -1124,7 +1124,7 @@
 <!-- Node87 -->
 <g id="node49" class="node">
 <title>Node87</title>
-<g id="a_node49"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="red" points="1170.5,-403.5 1170.5,-433.5 1283.5,-433.5 1283.5,-403.5 1170.5,-403.5"/>
 <text text-anchor="start" x="1178.5" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1227" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_functions.h</text>
@@ -1224,7 +1224,7 @@
 <!-- Node96 -->
 <g id="node54" class="node">
 <title>Node96</title>
-<g id="a_node54"><a xlink:href="guard_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="guard_8h.html" target="_top" xlink:title="Guard Data Structure.">
 <polygon fill="none" stroke="red" points="2012,-470.5 2012,-489.5 2112,-489.5 2112,-470.5 2012,-470.5"/>
 <text text-anchor="middle" x="2062" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/guard.h</text>
 </a>

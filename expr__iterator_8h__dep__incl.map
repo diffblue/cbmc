@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/expr_iterator.h" name="/home/runner/work/cbmc/cbmc/src/util/expr_iterator.h">
-<area shape="rect" id="node1" title=" " alt="" coords="6624,5,6832,47"/>
-<area shape="rect" id="node2" href="$local__safe__pointers_8cpp.html" title=" " alt="" coords="5,102,189,158"/>
-<area shape="rect" id="node3" href="$renamed_8h.html" title=" " alt="" coords="4447,109,4687,151"/>
-<area shape="rect" id="node13" href="$symex__clean__expr_8cpp.html" title=" " alt="" coords="3830,852,4045,908"/>
-<area shape="rect" id="node16" href="$symex__main_8cpp.html" title=" " alt="" coords="1737,852,1951,908"/>
-<area shape="rect" id="node45" href="$goto__program_8cpp.html" title=" " alt="" coords="5371,102,5555,158"/>
-<area shape="rect" id="node46" href="$remove__virtual__functions_8cpp.html" title=" " alt="" coords="5579,102,5797,158"/>
-<area shape="rect" id="node47" href="$value__set__dereference_8cpp.html" title=" " alt="" coords="5822,102,6023,158"/>
-<area shape="rect" id="node48" href="$smt2__conv_8cpp.html" title=" " alt="" coords="6048,102,6232,158"/>
-<area shape="rect" id="node49" href="$string__constraint__instantiation_8cpp.html" title=" " alt="" coords="6256,102,6507,158"/>
-<area shape="rect" id="node50" href="$string__dependencies_8cpp.html" title=" " alt="" coords="6531,102,6717,158"/>
-<area shape="rect" id="node51" href="$string__refinement_8cpp.html" title=" " alt="" coords="6741,102,6925,158"/>
-<area shape="rect" id="node52" href="$expr_8cpp.html" title=" " alt="" coords="6949,109,7133,151"/>
-<area shape="rect" id="node53" href="$expr__util_8cpp.html" title=" " alt="" coords="7157,109,7355,151"/>
-<area shape="rect" id="node54" href="$rename__symbol_8cpp.html" title=" " alt="" coords="7379,102,7563,158"/>
-<area shape="rect" id="node55" href="$replace__expr_8cpp.html" title=" " alt="" coords="7587,102,7771,158"/>
-<area shape="rect" id="node56" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="7795,102,8013,158"/>
-<area shape="rect" id="node57" href="$java__bytecode__concurrency__instrumentation_8cpp.html" title=" " alt="" coords="8037,95,8256,165"/>
-<area shape="rect" id="node58" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="8280,102,8499,158"/>
-<area shape="rect" id="node59" href="$lift__clinit__calls_8cpp.html" title=" " alt="" coords="8523,102,8741,158"/>
-<area shape="rect" id="node60" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="8766,102,9015,158"/>
-<area shape="rect" id="node4" href="$symex__target_8h.html" title=" " alt="" coords="3822,317,4037,373"/>
-<area shape="rect" id="node43" href="$renaming__level_8h.html" title=" " alt="" coords="4451,213,4683,269"/>
-<area shape="rect" id="node5" href="$ssa__step_8h.html" title=" " alt="" coords="2603,525,2795,581"/>
-<area shape="rect" id="node6" href="$symex__target__equation_8h.html" title=" " alt="" coords="1767,629,1982,685"/>
-<area shape="rect" id="node32" href="$frame_8h.html" title=" " alt="" coords="4308,429,4529,470"/>
-<area shape="rect" id="node37" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="4061,741,4259,797"/>
-<area shape="rect" id="node41" href="$symex__assign_8h.html" title=" " alt="" coords="3822,741,4037,797"/>
-<area shape="rect" id="node42" href="$symex__target_8cpp.html" title=" " alt="" coords="3967,421,4182,477"/>
-<area shape="rect" id="node30" href="$symex__target__equation_8cpp.html" title=" " alt="" coords="2525,741,2739,797"/>
-<area shape="rect" id="node31" href="$ssa__step_8cpp.html" title=" " alt="" coords="2669,629,2861,685"/>
-<area shape="rect" id="node7" href="$build__goto__trace_8h.html" title=" " alt="" coords="1219,741,1421,797"/>
-<area shape="rect" id="node9" href="$bmc__util_8cpp.html" title=" " alt="" coords="1283,956,1467,1012"/>
-<area shape="rect" id="node10" href="$goto__symex__property__decider_8h.html" title=" " alt="" coords="1477,852,1712,908"/>
-<area shape="rect" id="node11" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="3599,741,3798,797"/>
-<area shape="rect" id="node12" href="$scratch__program_8h.html" title=" " alt="" coords="1976,852,2195,908"/>
-<area shape="rect" id="node18" href="$goto__symex_8h.html" title=" " alt="" coords="1546,741,1745,797"/>
-<area shape="rect" id="node20" href="$partial__order__concurrency_8h.html" title=" " alt="" coords="1769,741,1981,797"/>
-<area shape="rect" id="node21" href="$counterexample__beautification_8h.html" title=" " alt="" coords="2005,741,2245,797"/>
-<area shape="rect" id="node22" href="$goto__symex__fault__localizer_8cpp.html" title=" " alt="" coords="2270,741,2501,797"/>
-<area shape="rect" id="node23" href="$graphml__witness_8cpp.html" title=" " alt="" coords="264,741,448,797"/>
-<area shape="rect" id="node24" href="$goto__symex__state_8cpp.html" title=" " alt="" coords="3377,741,3575,797"/>
-<area shape="rect" id="node25" href="$postcondition_8cpp.html" title=" " alt="" coords="2764,748,3049,789"/>
-<area shape="rect" id="node26" href="$precondition_8cpp.html" title=" " alt="" coords="3074,748,3353,789"/>
-<area shape="rect" id="node27" href="$show__program_8cpp.html" title=" " alt="" coords="473,741,677,797"/>
-<area shape="rect" id="node28" href="$show__vcc_8cpp.html" title=" " alt="" coords="701,741,905,797"/>
-<area shape="rect" id="node29" href="$symex__slice__class_8h.html" title=" " alt="" coords="929,741,1143,797"/>
-<area shape="rect" id="node8" href="$bmc__util_8h.html" title=" " alt="" coords="1219,852,1403,908"/>
-<area shape="rect" id="node14" href="$symex__dereference_8cpp.html" title=" " alt="" coords="3591,852,3806,908"/>
-<area shape="rect" id="node15" href="$symex__function__call_8cpp.html" title=" " alt="" coords="2891,852,3106,908"/>
-<area shape="rect" id="node17" href="$symex__start__thread_8cpp.html" title=" " alt="" coords="3130,852,3345,908"/>
-<area shape="rect" id="node19" href="$goto__symex_8cpp.html" title=" " alt="" coords="3369,852,3567,908"/>
-<area shape="rect" id="node33" href="$call__stack_8h.html" title=" " alt="" coords="4329,525,4522,581"/>
-<area shape="rect" id="node34" href="$goto__symex__state_8h.html" title=" " alt="" coords="4467,629,4666,685"/>
-<area shape="rect" id="node35" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="4551,733,4766,804"/>
-<area shape="rect" id="node36" href="$complexity__limiter_8cpp.html" title=" " alt="" coords="4284,741,4527,797"/>
-<area shape="rect" id="node38" href="$goto__state_8cpp.html" title=" " alt="" coords="4841,741,5039,797"/>
-<area shape="rect" id="node39" href="$renaming__level_8cpp.html" title=" " alt="" coords="5064,741,5296,797"/>
-<area shape="rect" id="node40" href="$symex__assign_8cpp.html" title=" " alt="" coords="4382,852,4597,908"/>
-<area shape="rect" id="node44" href="$goto__state_8h.html" title=" " alt="" coords="4603,317,4802,373"/>
+<area shape="rect" id="node1" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="4851,5,5059,47"/>
+<area shape="rect" id="node2" href="$local__safe__pointers_8cpp.html" title="Local safe pointer analysis." alt="" coords="2763,102,2947,158"/>
+<area shape="rect" id="node3" href="$goto__program_8cpp.html" title="Program Transformation." alt="" coords="2971,102,3155,158"/>
+<area shape="rect" id="node4" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="3179,102,3398,158"/>
+<area shape="rect" id="node5" href="$renamed_8h.html" title="Class for expressions or types renamed up to a given level." alt="" coords="3734,109,3974,151"/>
+<area shape="rect" id="node17" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4069,859,4284,915"/>
+<area shape="rect" id="node20" href="$symex__main_8cpp.html" title="Symbolic Execution." alt="" coords="2892,859,3107,915"/>
+<area shape="rect" id="node47" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4049,102,4251,158"/>
+<area shape="rect" id="node48" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4275,102,4459,158"/>
+<area shape="rect" id="node49" href="$string__constraint__instantiation_8cpp.html" title="Defines related function for string constraints." alt="" coords="4483,102,4734,158"/>
+<area shape="rect" id="node50" href="$string__dependencies_8cpp.html" title=" " alt="" coords="4758,102,4945,158"/>
+<area shape="rect" id="node51" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="4969,102,5153,158"/>
+<area shape="rect" id="node52" href="$expr_8cpp.html" title="Expression Representation." alt="" coords="5177,109,5361,151"/>
+<area shape="rect" id="node53" href="$expr__util_8cpp.html" title=" " alt="" coords="5385,109,5582,151"/>
+<area shape="rect" id="node54" href="$rename__symbol_8cpp.html" title=" " alt="" coords="5606,102,5790,158"/>
+<area shape="rect" id="node55" href="$replace__expr_8cpp.html" title=" " alt="" coords="5814,102,5998,158"/>
+<area shape="rect" id="node56" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="6022,102,6241,158"/>
+<area shape="rect" id="node57" href="$java__bytecode__concurrency__instrumentation_8cpp.html" title=" " alt="" coords="6265,95,6483,165"/>
+<area shape="rect" id="node58" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="6507,102,6726,158"/>
+<area shape="rect" id="node59" href="$lift__clinit__calls_8cpp.html" title=" " alt="" coords="6750,102,6969,158"/>
+<area shape="rect" id="node60" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="6993,102,7243,158"/>
+<area shape="rect" id="node6" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="3913,213,4145,269"/>
+<area shape="rect" id="node27" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="3624,317,3839,373"/>
+<area shape="rect" id="node7" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="4115,317,4313,373"/>
+<area shape="rect" id="node10" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="4065,637,4264,693"/>
+<area shape="rect" id="node22" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="4557,748,4789,804"/>
+<area shape="rect" id="node25" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="2795,755,3081,797"/>
+<area shape="rect" id="node26" href="$precondition_8cpp.html" title="Symbolic Execution." alt="" coords="2492,755,2771,797"/>
+<area shape="rect" id="node8" href="$frame_8h.html" title="Class for stack frames." alt="" coords="3819,429,4041,470"/>
+<area shape="rect" id="node12" href="$goto__state_8cpp.html" title=" " alt="" coords="4333,748,4532,804"/>
+<area shape="rect" id="node9" href="$call__stack_8h.html" title=" " alt="" coords="3833,525,4027,581"/>
+<area shape="rect" id="node24" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="3819,629,4041,700"/>
+<area shape="rect" id="node11" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="4061,748,4260,804"/>
+<area shape="rect" id="node13" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="3600,748,3799,804"/>
+<area shape="rect" id="node14" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="3155,748,3353,804"/>
+<area shape="rect" id="node23" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="4308,859,4523,915"/>
+<area shape="rect" id="node15" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="2323,852,2508,923"/>
+<area shape="rect" id="node16" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="2649,859,2867,915"/>
+<area shape="rect" id="node18" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3369,859,3584,915"/>
+<area shape="rect" id="node19" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3131,859,3345,915"/>
+<area shape="rect" id="node21" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="3608,859,3823,915"/>
+<area shape="rect" id="node28" href="$ssa__step_8h.html" title=" " alt="" coords="1723,525,1915,581"/>
+<area shape="rect" id="node31" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1825,637,2040,693"/>
+<area shape="rect" id="node45" href="$symex__assign_8h.html" title="Symbolic Execution of assignments." alt="" coords="3823,748,4037,804"/>
+<area shape="rect" id="node46" href="$symex__target_8cpp.html" title="Symbolic Execution." alt="" coords="3479,421,3693,477"/>
+<area shape="rect" id="node29" href="$ssa__step_8cpp.html" title=" " alt="" coords="1609,637,1801,693"/>
+<area shape="rect" id="node30" href="$symex__target__equation_8cpp.html" title="Symbolic Execution Implementation of functions to build SSA equation." alt="" coords="5,748,220,804"/>
+<area shape="rect" id="node32" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="349,859,533,915"/>
+<area shape="rect" id="node33" href="$counterexample__beautification_8h.html" title="Counterexample Beautification." alt="" coords="522,748,762,804"/>
+<area shape="rect" id="node35" href="$goto__symex__fault__localizer_8cpp.html" title="Fault Localization for Goto Symex." alt="" coords="787,748,1017,804"/>
+<area shape="rect" id="node36" href="$goto__symex__property__decider_8h.html" title="Property Decider for Goto&#45;Symex." alt="" coords="2182,748,2417,804"/>
+<area shape="rect" id="node37" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="1042,748,1226,804"/>
+<area shape="rect" id="node38" href="$build__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="245,748,447,804"/>
+<area shape="rect" id="node39" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="3377,748,3576,804"/>
+<area shape="rect" id="node41" href="$partial__order__concurrency_8h.html" title="Add constraints to equation encoding partial orders on events." alt="" coords="1251,748,1463,804"/>
+<area shape="rect" id="node42" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="1487,748,1691,804"/>
+<area shape="rect" id="node43" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="1715,748,1919,804"/>
+<area shape="rect" id="node44" href="$symex__slice__class_8h.html" title="Slicer for symex traces." alt="" coords="1943,748,2157,804"/>
+<area shape="rect" id="node34" href="$counterexample__beautification_8cpp.html" title="Counterexample Beautification using Incremental SAT." alt="" coords="557,859,812,915"/>
+<area shape="rect" id="node40" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="3847,859,4045,915"/>
 </map>

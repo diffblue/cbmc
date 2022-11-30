@@ -1,24 +1,21 @@
 <map id="constant_propagator_ait" name="constant_propagator_ait">
-<area shape="rect" id="node1" title=" " alt="" coords="2293,316,2473,343"/>
-<area shape="rect" id="node2" href="$classait.html" title=" " alt="" coords="2023,273,2211,314"/>
-<area shape="rect" id="node3" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="1333,203,1545,229"/>
-<area shape="rect" id="node17" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="1687,255,1813,281"/>
-<area shape="rect" id="node4" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="1173,203,1251,229"/>
-<area shape="rect" id="node5" href="$classmessage__handlert.html" title=" " alt="" coords="839,288,982,315"/>
-<area shape="rect" id="node16" href="$classnull__message__handlert.html" title=" " alt="" coords="1353,299,1526,325"/>
-<area shape="rect" id="node6" title=" " alt="" coords="436,268,623,295"/>
-<area shape="rect" id="node7" title="STL class." alt="" coords="157,257,287,284"/>
-<area shape="rect" id="node8" title=" " alt="" coords="5,221,44,248"/>
-<area shape="rect" id="node11" title="STL class." alt="" coords="451,188,608,215"/>
-<area shape="rect" id="node9" title=" " alt="" coords="816,222,1005,263"/>
-<area shape="rect" id="node10" href="$classai__domain__factory__baset.html" title=" " alt="" coords="436,320,623,347"/>
-<area shape="rect" id="node12" title=" " alt="" coords="837,91,984,133"/>
-<area shape="rect" id="node14" title=" " alt="" coords="818,157,1003,198"/>
-<area shape="rect" id="node13" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="463,5,596,32"/>
-<area shape="rect" id="node15" href="$classai__history__factory__baset.html" title="As more detailed histories can get complex (for example, nested loops or deep, mutually recursive cal..." alt="" coords="460,57,599,98"/>
-<area shape="rect" id="node18" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="2088,345,2145,372"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1679,369,1821,410"/>
-<area shape="rect" id="node20" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1403,363,1475,389"/>
-<area shape="rect" id="node21" title="STL class." alt="" coords="1348,413,1531,440"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1193,413,1231,440"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2432,105,2612,132"/>
+<area shape="rect" id="node2" href="$classait.html" title=" " alt="" coords="2161,69,2349,110"/>
+<area shape="rect" id="node3" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="1472,76,1684,103"/>
+<area shape="rect" id="node13" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="1825,25,1952,52"/>
+<area shape="rect" id="node4" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="1173,84,1251,111"/>
+<area shape="rect" id="node5" href="$classmessage__handlert.html" title=" " alt="" coords="839,5,982,32"/>
+<area shape="rect" id="node14" href="$classnull__message__handlert.html" title=" " alt="" coords="1275,5,1448,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="436,9,623,36"/>
+<area shape="rect" id="node7" title=" " alt="" coords="157,21,287,48"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,57,44,84"/>
+<area shape="rect" id="node10" title=" " alt="" coords="451,112,608,139"/>
+<area shape="rect" id="node9" title=" " alt="" coords="816,122,1005,163"/>
+<area shape="rect" id="node11" title=" " alt="" coords="837,187,984,229"/>
+<area shape="rect" id="node12" title=" " alt="" coords="818,57,1003,98"/>
+<area shape="rect" id="node15" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="2227,135,2284,161"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1817,127,1960,169"/>
+<area shape="rect" id="node17" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1542,131,1614,157"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1487,181,1669,208"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1193,181,1231,208"/>
 </map>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Solver.">
 <polygon fill="#bfbfbf" stroke="black" points="392.03,-448.5 392.03,-489.5 530.03,-489.5 530.03,-448.5 392.03,-448.5"/>
 <text text-anchor="start" x="400.03" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="400.03" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/solver</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="mathematical__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="mathematical__expr_8h.html" target="_top" xlink:title="API to expression classes for &#39;mathematical&#39; expressions.">
 <polygon fill="none" stroke="black" points="255.53,-392.5 255.53,-411.5 394.53,-411.5 394.53,-392.5 255.53,-392.5"/>
 <text text-anchor="middle" x="325.03" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/mathematical_expr.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node41 -->
 <g id="node20" class="node">
 <title>Node41</title>
-<g id="a_node20"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="294.53,-336.5 294.53,-355.5 361.53,-355.5 361.53,-336.5 294.53,-336.5"/>
 <text text-anchor="middle" x="328.03" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="mathematical__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="mathematical__types_8h.html" target="_top" xlink:title="Mathematical types.">
 <polygon fill="none" stroke="black" points="71.03,-280.5 71.03,-299.5 197.03,-299.5 197.03,-280.5 71.03,-280.5"/>
 <text text-anchor="middle" x="134.03" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">mathematical_types.h</text>
 </a>
@@ -148,7 +148,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="232.53,-112.5 232.53,-131.5 279.53,-131.5 279.53,-112.5 232.53,-112.5"/>
 <text text-anchor="middle" x="256.03" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -424,7 +424,7 @@
 <!-- Node42 -->
 <g id="node21" class="node">
 <title>Node42</title>
-<g id="a_node21"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="356.53,-280.5 356.53,-299.5 429.53,-299.5 429.53,-280.5 356.53,-280.5"/>
 <text text-anchor="middle" x="393.03" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

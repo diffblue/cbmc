@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Cover Goals Reporting Utilities.">
 <polygon fill="#bfbfbf" stroke="black" points="88.5,-167.5 88.5,-208.5 231.5,-208.5 231.5,-167.5 88.5,-167.5"/>
 <text text-anchor="start" x="96.5" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="96.5" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,54 +22,54 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cover__goals__verifier__with__trace__storage_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="5,-78.5 5,-130.5 149,-130.5 149,-78.5 5,-78.5"/>
-<text text-anchor="start" x="13" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="13" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
-<text text-anchor="start" x="13" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cover_goals_verifier_with</text>
-<text text-anchor="middle" x="77" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace_storage.h</text>
+<g id="a_node2"><a xlink:href="cover__goals__report__util_8cpp.html" target="_top" xlink:title="Cover Goals Reporting Utilities.">
+<polygon fill="none" stroke="black" points="0,-84 0,-125 154,-125 154,-84 0,-84"/>
+<text text-anchor="start" x="8" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="8" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
+<text text-anchor="middle" x="77" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cover_goals_report_util.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M132.75,-160.24C123.04,-150.71 112.14,-140 102.57,-130.61"/>
+<path fill="none" stroke="midnightblue" d="M132.54,-160.04C120.9,-148.6 107.58,-135.53 96.91,-125.05"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="130.32,-162.76 139.91,-167.27 135.22,-157.77 130.32,-162.76"/>
-</g>
-<!-- Node4 -->
-<g id="node4" class="node">
-<title>Node4</title>
-<g id="a_node4"><a xlink:href="cover__goals__report__util_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="167,-84 167,-125 321,-125 321,-84 167,-84"/>
-<text text-anchor="start" x="175" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="175" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
-<text text-anchor="middle" x="244" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cover_goals_report_util.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node4 -->
-<g id="edge3" class="edge">
-<title>Node1&#45;&gt;Node4</title>
-<path fill="none" stroke="midnightblue" d="M187.79,-160.04C199.57,-148.6 213.05,-135.53 223.85,-125.05"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="185.07,-157.8 180.33,-167.27 189.95,-162.82 185.07,-157.8"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 154,-41.5 154,-0.5 0,-0.5"/>
-<text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
-<text text-anchor="middle" x="77" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_options.cpp</text>
+<g id="a_node3"><a xlink:href="cover__goals__verifier__with__trace__storage_8h.html" target="_top" xlink:title="Goto verifier for covering goals that stores traces.">
+<polygon fill="none" stroke="black" points="172,-78.5 172,-130.5 316,-130.5 316,-78.5 172,-78.5"/>
+<text text-anchor="start" x="180" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="180" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
+<text text-anchor="start" x="180" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cover_goals_verifier_with</text>
+<text text-anchor="middle" x="244" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace_storage.h</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node3 -->
+<!-- Node1&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
-<title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M77,-68.15C77,-59.05 77,-49.6 77,-41.63"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="73.5,-68.16 77,-78.16 80.5,-68.16 73.5,-68.16"/>
+<title>Node1&#45;&gt;Node3</title>
+<path fill="none" stroke="midnightblue" d="M187.58,-160.24C197.41,-150.71 208.44,-140 218.12,-130.61"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="185.07,-157.8 180.33,-167.27 189.95,-162.82 185.07,-157.8"/>
+</g>
+<!-- Node4 -->
+<g id="node4" class="node">
+<title>Node4</title>
+<g id="a_node4"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
+<polygon fill="none" stroke="black" points="167,-0.5 167,-41.5 321,-41.5 321,-0.5 167,-0.5"/>
+<text text-anchor="start" x="175" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="175" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
+<text text-anchor="middle" x="244" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_options.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node3&#45;&gt;Node4 -->
+<g id="edge3" class="edge">
+<title>Node3&#45;&gt;Node4</title>
+<path fill="none" stroke="midnightblue" d="M244,-68.15C244,-59.05 244,-49.6 244,-41.63"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="240.5,-68.16 244,-78.16 247.5,-68.16 240.5,-68.16"/>
 </g>
 </g>
 </svg>

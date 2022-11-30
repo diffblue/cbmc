@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="JSON Commandline Interface.">
 <polygon fill="#bfbfbf" stroke="black" points="231,-728.5 231,-758.5 410,-758.5 410,-728.5 231,-728.5"/>
 <text text-anchor="start" x="239" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="320.5" y="-735.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/json/json_interface.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="json__interface_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="json__interface_8h.html" target="_top" xlink:title="JSON Commandline Interface.">
 <polygon fill="none" stroke="black" points="35,-672.5 35,-691.5 130,-691.5 130,-672.5 35,-672.5"/>
 <text text-anchor="middle" x="82.5" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">json_interface.h</text>
 </a>
@@ -363,7 +363,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="687.5,-224.5 687.5,-243.5 751.5,-243.5 751.5,-224.5 687.5,-224.5"/>
 <text text-anchor="middle" x="719.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -393,7 +393,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="529,-168.5 529,-187.5 588,-187.5 588,-168.5 529,-168.5"/>
 <text text-anchor="middle" x="558.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -459,7 +459,7 @@
 <!-- Node23 -->
 <g id="node22" class="node">
 <title>Node23</title>
-<g id="a_node22"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="640.5,-112.5 640.5,-131.5 744.5,-131.5 744.5,-112.5 640.5,-112.5"/>
 <text text-anchor="middle" x="692.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -597,7 +597,7 @@
 <!-- Node35 -->
 <g id="node31" class="node">
 <title>Node35</title>
-<g id="a_node31"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="1355,-280.5 1355,-299.5 1408,-299.5 1408,-280.5 1355,-280.5"/>
 <text text-anchor="middle" x="1381.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>
@@ -732,7 +732,7 @@
 <!-- Node42 -->
 <g id="node38" class="node">
 <title>Node42</title>
-<g id="a_node38"><a xlink:href="parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="parser_8h.html" target="_top" xlink:title="Parser utilities.">
 <polygon fill="none" stroke="black" points="788.5,-616.5 788.5,-635.5 862.5,-635.5 862.5,-616.5 788.5,-616.5"/>
 <text text-anchor="middle" x="825.5" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/parser.h</text>
 </a>
@@ -813,7 +813,7 @@
 <!-- Node44 -->
 <g id="node40" class="node">
 <title>Node44</title>
-<g id="a_node40"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1058,-504.5 1058,-523.5 1105,-523.5 1105,-504.5 1058,-504.5"/>
 <text text-anchor="middle" x="1081.5" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

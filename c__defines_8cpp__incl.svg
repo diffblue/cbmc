@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="c_defines">
 <polygon fill="#bfbfbf" stroke="black" points="281.5,-168.5 281.5,-198.5 456.5,-198.5 456.5,-168.5 281.5,-168.5"/>
 <text text-anchor="start" x="289.5" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="369" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/c_defines.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="c__defines_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="c__defines_8h.html" target="_top" xlink:title="c_defines">
 <polygon fill="none" stroke="black" points="230.5,-112.5 230.5,-131.5 301.5,-131.5 301.5,-112.5 230.5,-112.5"/>
 <text text-anchor="middle" x="266" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">c_defines.h</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="cscanner_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="cscanner_8h.html" target="_top" xlink:title="cscanner">
 <polygon fill="none" stroke="black" points="436,-112.5 436,-131.5 504,-131.5 504,-112.5 436,-112.5"/>
 <text text-anchor="middle" x="470" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">cscanner.h</text>
 </a>
@@ -192,7 +192,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="ctoken_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="ctoken_8h.html" target="_top" xlink:title="ctoken">
 <polygon fill="none" stroke="black" points="445,-56.5 445,-75.5 503,-75.5 503,-56.5 445,-56.5"/>
 <text text-anchor="middle" x="474" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">ctoken.h</text>
 </a>

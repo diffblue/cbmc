@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="There are different ways of handling arrays, structures, unions and pointers.">
 <polygon fill="#bfbfbf" stroke="black" points="330,-178.5 330,-230.5 500,-230.5 500,-178.5 330,-178.5"/>
 <text text-anchor="start" x="338" y="-218.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="338" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="three__way__merge__abstract__interpreter_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="three__way__merge__abstract__interpreter_8cpp.html" target="_top" xlink:title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit...">
 <polygon fill="none" stroke="black" points="37,-89.5 37,-141.5 199,-141.5 199,-89.5 37,-89.5"/>
 <text text-anchor="start" x="45" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="45" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -41,7 +41,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="variable__sensitivity__dependence__graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="variable__sensitivity__dependence__graph_8h.html" target="_top" xlink:title="A forked and modified version of analyses/dependence_graph.">
 <polygon fill="none" stroke="black" points="217,-89.5 217,-141.5 387,-141.5 387,-89.5 217,-89.5"/>
 <text text-anchor="start" x="225" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="225" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -94,7 +94,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="goto__analyzer__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__analyzer__parse__options_8h.html" target="_top" xlink:title="Goto&#45;Analyser Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="649.5,-95 649.5,-136 820.5,-136 820.5,-95 649.5,-95"/>
 <text text-anchor="start" x="657.5" y="-124" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="657.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -152,7 +152,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="goto__analyzer__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="goto__analyzer__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="502,-6 502,-47 666,-47 666,-6 502,-6"/>
 <text text-anchor="start" x="510" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="510" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -169,7 +169,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="goto__analyzer__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="goto__analyzer__main_8cpp.html" target="_top" xlink:title="Goto&#45;Analyser Main Module.">
 <polygon fill="none" stroke="black" points="684.5,-6 684.5,-47 823.5,-47 823.5,-6 684.5,-6"/>
 <text text-anchor="start" x="692.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="692.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -186,7 +186,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Goto&#45;Analyser Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="842,-6 842,-47 1024,-47 1024,-6 842,-6"/>
 <text text-anchor="start" x="850" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="850" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>

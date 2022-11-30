@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="interval__domain_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="interval__domain_8h.html" target="_top" xlink:title="Interval Domain.">
 <polygon fill="none" stroke="black" points="422,-89.5 422,-130.5 572,-130.5 572,-89.5 422,-89.5"/>
 <text text-anchor="start" x="430" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="430" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/interval</text>
@@ -56,7 +56,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="interval__analysis_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="interval__analysis_8cpp.html" target="_top" xlink:title="Interval Analysis – implements the functionality necessary for performing abstract interpretation ove...">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 150,-47 150,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/interval</text>
@@ -73,7 +73,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="interval__domain_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="interval__domain_8cpp.html" target="_top" xlink:title="Interval Domain.">
 <polygon fill="none" stroke="black" points="168,-6 168,-47 318,-47 318,-6 168,-6"/>
 <text text-anchor="start" x="176" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="176" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/interval</text>
@@ -107,7 +107,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="492,-6 492,-47 686,-47 686,-6 492,-6"/>
 <text text-anchor="start" x="500" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="500" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -124,7 +124,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="janalyzer__parse__options_8cpp.html" target="_top" xlink:title="JANALYZER Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="704,-6 704,-47 862,-47 862,-6 704,-6"/>
 <text text-anchor="start" x="712" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="712" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/janalyzer</text>
@@ -141,7 +141,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="string__constraint__generator__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="string__constraint__generator__main_8cpp.html" target="_top" xlink:title="Generates string constraints to link results from string functions with their arguments.">
 <polygon fill="none" stroke="black" points="880,-0.5 880,-52.5 1034,-52.5 1034,-0.5 880,-0.5"/>
 <text text-anchor="start" x="888" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="888" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>

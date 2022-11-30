@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Traces of GOTO Programs.">
 <polygon fill="#bfbfbf" stroke="black" points="360,-156.5 360,-197.5 498,-197.5 498,-156.5 360,-156.5"/>
 <text text-anchor="start" x="368" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="368" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="c__test__input__generator_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="c__test__input__generator_8cpp.html" target="_top" xlink:title="Test Input Generator for C.">
 <polygon fill="none" stroke="black" points="0,-78.5 0,-119.5 138,-119.5 138,-78.5 0,-78.5"/>
 <text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/c_test</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="bmc__util_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="bmc__util_8cpp.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="156,-78.5 156,-119.5 294,-119.5 294,-78.5 156,-78.5"/>
 <text text-anchor="start" x="164" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="report__util_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="report__util_8cpp.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="312,-78.5 312,-119.5 450,-119.5 450,-78.5 312,-78.5"/>
 <text text-anchor="start" x="320" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="320" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -73,24 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="interpreter__class_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="506,-78.5 506,-119.5 644,-119.5 644,-78.5 506,-78.5"/>
-<text text-anchor="start" x="514" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="514" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text text-anchor="middle" x="575" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/interpreter_class.h</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node5 -->
-<g id="edge4" class="edge">
-<title>Node1&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M475.55,-151.77C495.56,-141.35 518.64,-129.34 537.53,-119.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="473.85,-148.71 466.6,-156.43 477.08,-154.92 473.85,-148.71"/>
-</g>
-<!-- Node6 -->
-<g id="node6" class="node">
-<title>Node6</title>
-<g id="a_node6"><a xlink:href="interpreter_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="interpreter_8cpp.html" target="_top" xlink:title="Interpreter for GOTO Programs.">
 <polygon fill="none" stroke="black" points="409,-0.5 409,-41.5 547,-41.5 547,-0.5 409,-0.5"/>
 <text text-anchor="start" x="417" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="417" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -98,16 +81,33 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node6 -->
-<g id="edge7" class="edge">
-<title>Node1&#45;&gt;Node6</title>
+<!-- Node1&#45;&gt;Node5 -->
+<g id="edge4" class="edge">
+<title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M446.35,-147.58C451.02,-138.96 455.69,-129.31 459,-120 468.35,-93.71 473.45,-61.73 475.95,-41.61"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="443.21,-146.02 441.35,-156.45 449.31,-149.46 443.21,-146.02"/>
+</g>
+<!-- Node6 -->
+<g id="node6" class="node">
+<title>Node6</title>
+<g id="a_node6"><a xlink:href="interpreter__class_8h.html" target="_top" xlink:title="Interpreter for GOTO Programs.">
+<polygon fill="none" stroke="black" points="506,-78.5 506,-119.5 644,-119.5 644,-78.5 506,-78.5"/>
+<text text-anchor="start" x="514" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="514" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
+<text text-anchor="middle" x="575" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/interpreter_class.h</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node6 -->
+<g id="edge5" class="edge">
+<title>Node1&#45;&gt;Node6</title>
+<path fill="none" stroke="midnightblue" d="M475.55,-151.77C495.56,-141.35 518.64,-129.34 537.53,-119.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="473.85,-148.71 466.6,-156.43 477.08,-154.92 473.85,-148.71"/>
 </g>
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="json__goto__trace_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="json__goto__trace_8cpp.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="662,-78.5 662,-119.5 800,-119.5 800,-78.5 662,-78.5"/>
 <text text-anchor="start" x="670" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="670" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -121,16 +121,16 @@
 <path fill="none" stroke="midnightblue" d="M507.97,-156.38C550.88,-145.69 604.87,-132.19 653,-120 655.85,-119.28 658.75,-118.54 661.68,-117.8"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="507.01,-153.01 498.15,-158.83 508.7,-159.81 507.01,-153.01"/>
 </g>
-<!-- Node5&#45;&gt;Node6 -->
-<g id="edge5" class="edge">
-<title>Node5&#45;&gt;Node6</title>
+<!-- Node6&#45;&gt;Node5 -->
+<g id="edge6" class="edge">
+<title>Node6&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M541.9,-72.06C529.13,-62.06 514.76,-50.8 502.9,-41.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="539.99,-75.02 550.02,-78.43 544.31,-69.51 539.99,-75.02"/>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="interpreter__evaluate_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="interpreter__evaluate_8cpp.html" target="_top" xlink:title="Interpreter for GOTO Programs.">
 <polygon fill="none" stroke="black" points="565,-0.5 565,-41.5 705,-41.5 705,-0.5 565,-0.5"/>
 <text text-anchor="start" x="573" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="573" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -138,9 +138,9 @@
 </a>
 </g>
 </g>
-<!-- Node5&#45;&gt;Node7 -->
-<g id="edge6" class="edge">
-<title>Node5&#45;&gt;Node7</title>
+<!-- Node6&#45;&gt;Node7 -->
+<g id="edge7" class="edge">
+<title>Node6&#45;&gt;Node7</title>
 <path fill="none" stroke="midnightblue" d="M596.84,-70.34C604.39,-60.78 612.68,-50.27 619.6,-41.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="593.9,-68.41 590.45,-78.43 599.4,-72.75 593.9,-68.41"/>
 </g>

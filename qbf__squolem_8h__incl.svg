@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Squolem Backend.">
 <polygon fill="#bfbfbf" stroke="black" points="89,-403.5 89,-444.5 227,-444.5 227,-403.5 89,-403.5"/>
 <text text-anchor="start" x="97" y="-432.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="97" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/qbf</text>
@@ -89,7 +89,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title="CNF Generation.">
 <polygon fill="none" stroke="black" points="261,-224.5 261,-243.5 359,-243.5 359,-224.5 261,-224.5"/>
 <text text-anchor="middle" x="310" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf_clause_list.h</text>
 </a>
@@ -134,7 +134,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="cnf_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="cnf_8h.html" target="_top" xlink:title="CNF Generation, via Tseitin.">
 <polygon fill="none" stroke="black" points="363,-168.5 363,-187.5 403,-187.5 403,-168.5 363,-168.5"/>
 <text text-anchor="middle" x="383" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">cnf.h</text>
 </a>

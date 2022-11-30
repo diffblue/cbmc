@@ -1,6 +1,5 @@
 var sharing__node_8h =
 [
-    [ "sharing_nodet", "classsharing__nodet.html", "classsharing__nodet" ],
     [ "d_internalt", "classd__internalt.html", "classd__internalt" ],
     [ "d_containert", "classd__containert.html", "classd__containert" ],
     [ "d_leaft", "classd__leaft.html", "classd__leaft" ],

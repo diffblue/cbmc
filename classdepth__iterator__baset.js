@@ -2,6 +2,8 @@ var classdepth__iterator__baset =
 [
     [ "difference_type", "classdepth__iterator__baset.html#a495c4c5968235548116e5ddc0722e439", null ],
     [ "iterator_category", "classdepth__iterator__baset.html#a9681dca5515c0763c4b7ab83ebf730b4", null ],
+    [ "pointer", "classdepth__iterator__baset.html#a5c49478c4ea4d0d6836f8043213f4920", null ],
+    [ "reference", "classdepth__iterator__baset.html#ac205f9dce308ea047ec71265cb416d9d", null ],
     [ "value_type", "classdepth__iterator__baset.html#af6993a5d7d507987d24b0e4b0d772e03", null ],
     [ "depth_iterator_baset", "classdepth__iterator__baset.html#af4c1b7cab27e7bff4c591d69d2a9a0ac", null ],
     [ "depth_iterator_baset", "classdepth__iterator__baset.html#a3dd8f644ea3702c7f8aaee8ff926a93a", null ],
@@ -22,7 +24,5 @@ var classdepth__iterator__baset =
     [ "operator==", "classdepth__iterator__baset.html#a7d73aed10018ae9f4355202848fb47ab", null ],
     [ "push_expr", "classdepth__iterator__baset.html#a69842641f6eaf99a1ac96b02e9094e4e", null ],
     [ "depth_iterator_baset", "classdepth__iterator__baset.html#a7aa6de46bede697177c515d6b04a91f3", null ],
-    [ "m_stack", "classdepth__iterator__baset.html#a2cec83d7f4f5ff4cc2f40e91bdbbae87", null ],
-    [ "pointer", "classdepth__iterator__baset.html#a20dda5e95cecca563f3754cb2aa217d5", null ],
-    [ "reference", "classdepth__iterator__baset.html#a9fa87d3cfa2a89ccb6d8c158407435c7", null ]
+    [ "m_stack", "classdepth__iterator__baset.html#a2cec83d7f4f5ff4cc2f40e91bdbbae87", null ]
 ];

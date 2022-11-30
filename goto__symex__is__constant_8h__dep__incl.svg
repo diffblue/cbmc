@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="GOTO Symex constant propagation.">
 <polygon fill="#bfbfbf" stroke="black" points="167,-78.5 167,-119.5 316,-119.5 316,-78.5 167,-78.5"/>
 <text text-anchor="start" x="175" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="175" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/goto</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__symex__state_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__symex__state_8cpp.html" target="_top" xlink:title="Symbolic Execution.">
 <polygon fill="none" stroke="black" points="167,-0.5 167,-41.5 316,-41.5 316,-0.5 167,-0.5"/>
 <text text-anchor="start" x="175" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="175" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/goto</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="symex__goto_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="symex__goto_8cpp.html" target="_top" xlink:title="Symbolic Execution.">
 <polygon fill="none" stroke="black" points="334,-0.5 334,-41.5 495,-41.5 495,-0.5 334,-0.5"/>
 <text text-anchor="start" x="342" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="342" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/symex</text>

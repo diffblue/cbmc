@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Slicer for symex traces.">
 <polygon fill="#bfbfbf" stroke="black" points="322.5,-156.5 322.5,-186.5 481.5,-186.5 481.5,-156.5 322.5,-156.5"/>
 <text text-anchor="start" x="330.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="402" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/slice.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="bmc__util_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="bmc__util_8cpp.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="0,-73 0,-114 138,-114 138,-73 0,-73"/>
 <text text-anchor="start" x="8" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="single__loop__incremental__symex__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="single__loop__incremental__symex__checker_8cpp.html" target="_top" xlink:title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop.">
 <polygon fill="none" stroke="black" points="156.5,-67.5 156.5,-119.5 295.5,-119.5 295.5,-67.5 156.5,-67.5"/>
 <text text-anchor="start" x="164.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="scratch__program_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="scratch__program_8cpp.html" target="_top" xlink:title="Loop Acceleration.">
 <polygon fill="none" stroke="black" points="314,-73 314,-114 490,-114 490,-73 314,-73"/>
 <text text-anchor="start" x="322" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="322" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="slice_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="slice_8cpp.html" target="_top" xlink:title="Slicer for symex traces.">
 <polygon fill="none" stroke="black" points="487,-0.5 487,-30.5 657,-30.5 657,-0.5 487,-0.5"/>
 <text text-anchor="start" x="495" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="572" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/slice.cpp</text>
@@ -89,7 +89,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="symex__slice__class_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="symex__slice__class_8h.html" target="_top" xlink:title="Slicer for symex traces.">
 <polygon fill="none" stroke="black" points="546.5,-73 546.5,-114 707.5,-114 707.5,-73 546.5,-73"/>
 <text text-anchor="start" x="554.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="554.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/symex</text>

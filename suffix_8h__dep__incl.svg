@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="none" stroke="black" points="200.5,-6 200.5,-47 359.5,-47 359.5,-6 200.5,-6"/>
 <text text-anchor="start" x="208.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="208.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -70,7 +70,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="gcc__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="gcc__mode_8cpp.html" target="_top" xlink:title="GCC Mode.">
 <polygon fill="none" stroke="black" points="548,-6 548,-47 686,-47 686,-6 548,-6"/>
 <text text-anchor="start" x="556" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="556" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/gcc</text>
@@ -87,7 +87,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="hybrid__binary_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="hybrid__binary_8cpp.html" target="_top" xlink:title="Create hybrid binary with goto&#45;binary section.">
 <polygon fill="none" stroke="black" points="704,-6 704,-47 842,-47 842,-6 704,-6"/>
 <text text-anchor="start" x="712" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="712" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/hybrid</text>
@@ -139,7 +139,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="remove__returns_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="remove__returns_8cpp.html" target="_top" xlink:title="Replace function returns by assignments to global variables.">
 <polygon fill="none" stroke="black" points="1224,-6 1224,-47 1362,-47 1362,-6 1224,-6"/>
 <text text-anchor="start" x="1232" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1232" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -156,7 +156,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="system__library__symbols_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="system__library__symbols_8cpp.html" target="_top" xlink:title="Goto Programs.">
 <polygon fill="none" stroke="black" points="1380.5,-6 1380.5,-47 1539.5,-47 1539.5,-6 1380.5,-6"/>
 <text text-anchor="start" x="1388.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1388.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -292,7 +292,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="java__enum__static__init__unwind__handler_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="java__enum__static__init__unwind__handler_8cpp.html" target="_top" xlink:title="Unwind loops in static initializers.">
 <polygon fill="none" stroke="black" points="2798.5,-0.5 2798.5,-52.5 2965.5,-52.5 2965.5,-0.5 2798.5,-0.5"/>
 <text text-anchor="start" x="2806.5" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2806.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>

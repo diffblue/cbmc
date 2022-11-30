@@ -1,13 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/call_graph.h" name="/home/runner/work/cbmc/cbmc/src/analyses/call_graph.h">
-<area shape="rect" id="node1" title=" " alt="" coords="455,5,639,61"/>
-<area shape="rect" id="node2" href="$call__graph_8cpp.html" title=" " alt="" coords="19,109,203,165"/>
-<area shape="rect" id="node3" href="$call__graph__helpers_8h.html" title=" " alt="" coords="227,109,411,165"/>
-<area shape="rect" id="node6" href="$aggressive__slicer_8h.html" title=" " alt="" coords="450,109,643,165"/>
-<area shape="rect" id="node10" href="$goto__instrument__parse__options_8cpp.html" title=" " alt="" coords="631,317,889,373"/>
-<area shape="rect" id="node11" href="$slice__global__inits_8cpp.html" title=" " alt="" coords="749,109,933,165"/>
-<area shape="rect" id="node4" href="$call__graph__helpers_8cpp.html" title=" " alt="" coords="5,213,189,269"/>
-<area shape="rect" id="node5" href="$aggressive__slicer_8cpp.html" title=" " alt="" coords="214,213,407,269"/>
-<area shape="rect" id="node7" href="$goto__instrument__parse__options_8h.html" title=" " alt="" coords="432,213,675,269"/>
-<area shape="rect" id="node8" href="$goto__instrument__languages_8cpp.html" title=" " alt="" coords="148,317,383,373"/>
-<area shape="rect" id="node9" href="$goto__instrument__main_8cpp.html" title=" " alt="" coords="407,317,607,373"/>
+<area shape="rect" id="node1" title="Function Call Graphs." alt="" coords="455,5,639,61"/>
+<area shape="rect" id="node2" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="19,109,203,165"/>
+<area shape="rect" id="node3" href="$call__graph__helpers_8h.html" title="Function Call Graph Helpers." alt="" coords="227,109,411,165"/>
+<area shape="rect" id="node6" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="450,109,643,165"/>
+<area shape="rect" id="node10" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="631,317,889,373"/>
+<area shape="rect" id="node11" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="749,109,933,165"/>
+<area shape="rect" id="node4" href="$call__graph__helpers_8cpp.html" title="Function Call Graph Helpers." alt="" coords="5,213,189,269"/>
+<area shape="rect" id="node5" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="214,213,407,269"/>
+<area shape="rect" id="node7" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="432,213,675,269"/>
+<area shape="rect" id="node8" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="148,317,383,373"/>
+<area shape="rect" id="node9" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="407,317,607,373"/>
 </map>

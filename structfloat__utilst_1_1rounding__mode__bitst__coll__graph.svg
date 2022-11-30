@@ -32,10 +32,10 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M58.5,-101C58.5,-80.74 58.5,-49.11 58.5,-30.84"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="55,-101.18 58.5,-111.18 62,-101.18 55,-101.18"/>
-<text text-anchor="middle" x="107" y="-85" font-family="Helvetica,sans-Serif" font-size="10.00"> round_to_zero</text>
+<text text-anchor="middle" x="107" y="-85" font-family="Helvetica,sans-Serif" font-size="10.00"> round_to_even</text>
 <text text-anchor="middle" x="107" y="-74" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_minus_inf</text>
 <text text-anchor="middle" x="107" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_plus_inf</text>
-<text text-anchor="middle" x="107" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_even</text>
+<text text-anchor="middle" x="107" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_zero</text>
 </g>
 </g>
 </svg>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Initialize a Goto Program.">
 <polygon fill="#bfbfbf" stroke="black" points="614,-89.5 614,-130.5 752,-130.5 752,-89.5 614,-89.5"/>
 <text text-anchor="start" x="622" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="622" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 154,-47 154,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title="cprover Command Line Options Processing">
 <polygon fill="none" stroke="black" points="172.5,-6 172.5,-47 315.5,-47 315.5,-6 172.5,-6"/>
 <text text-anchor="start" x="180.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="180.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/cprover</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Goto&#45;Analyser Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="334,-6 334,-47 516,-47 516,-6 334,-6"/>
 <text text-anchor="start" x="342" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="342" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__diff__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__diff__parse__options_8cpp.html" target="_top" xlink:title="GOTO&#45;DIFF Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="534,-6 534,-47 672,-47 672,-6 534,-6"/>
 <text text-anchor="start" x="542" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="542" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;diff/goto</text>
@@ -108,7 +108,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="initialize__goto__model_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="initialize__goto__model_8cpp.html" target="_top" xlink:title="Get a Goto Program.">
 <polygon fill="none" stroke="black" points="856.5,-6 856.5,-47 1001.5,-47 1001.5,-6 856.5,-6"/>
 <text text-anchor="start" x="864.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="864.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -142,7 +142,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="jdiff__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="jdiff__parse__options_8cpp.html" target="_top" xlink:title="JDIFF Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="1202,-6 1202,-47 1340,-47 1340,-6 1202,-6"/>
 <text text-anchor="start" x="1210" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1210" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jdiff/jdiff</text>

@@ -1,62 +1,53 @@
 <map id="k_inductiont" name="k_inductiont">
-<area shape="rect" id="node1" title=" " alt="" coords="3411,935,3513,961"/>
-<area shape="rect" id="node2" href="$classlocal__may__aliast.html" title=" " alt="" coords="2702,1076,2834,1103"/>
-<area shape="rect" id="node3" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="2370,1164,2427,1191"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1900,1169,2043,1210"/>
-<area shape="rect" id="node5" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1522,943,1594,969"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1900,1103,2043,1145"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1886,871,2057,897"/>
-<area shape="rect" id="node6" title="STL class." alt="" coords="1467,1153,1649,1180"/>
-<area shape="rect" id="node7" title=" " alt="" coords="752,1201,791,1228"/>
-<area shape="rect" id="node18" title="STL class." alt="" coords="1089,688,1223,715"/>
-<area shape="rect" id="node23" title="STL class." alt="" coords="1080,1286,1232,1327"/>
-<area shape="rect" id="node39" title="STL class." alt="" coords="1072,1352,1240,1379"/>
-<area shape="rect" id="node8" title=" " alt="" coords="2310,1052,2487,1079"/>
-<area shape="rect" id="node9" href="$classlocal__may__aliast_1_1loc__infot.html" title=" " alt="" coords="1892,986,2051,1027"/>
-<area shape="rect" id="node10" href="$classunsigned__union__find.html" title=" " alt="" coords="1481,997,1635,1024"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1073,993,1239,1034"/>
-<area shape="rect" id="node12" title="STL class." alt="" coords="707,876,836,903"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1077,637,1235,664"/>
-<area shape="rect" id="node24" title=" " alt="" coords="1468,1204,1648,1231"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1077,807,1235,833"/>
-<area shape="rect" id="node13" title=" " alt="" coords="320,681,359,708"/>
-<area shape="rect" id="node35" title="STL class." alt="" coords="917,740,1025,767"/>
-<area shape="rect" id="node45" title=" " alt="" coords="717,609,825,636"/>
-<area shape="rect" id="node47" title=" " alt="" coords="1479,509,1637,536"/>
-<area shape="rect" id="node56" href="$classcfg__dominators__templatet.html" title="Dominator graph." alt="" coords="1874,349,2069,390"/>
-<area shape="rect" id="node60" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="2301,381,2496,422"/>
-<area shape="rect" id="node14" href="$classlocal__cfgt.html" title=" " alt="" coords="1929,808,2014,835"/>
-<area shape="rect" id="node51" href="$classgrapht.html" title=" " alt="" coords="1467,292,1649,348"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1460,823,1656,865"/>
-<area shape="rect" id="node17" title="STL iterator class." alt="" coords="1081,927,1231,969"/>
-<area shape="rect" id="node42" title=" " alt="" coords="1463,569,1653,610"/>
-<area shape="rect" id="node19" href="$classnumberingt.html" title=" " alt="" coords="2323,1253,2474,1294"/>
-<area shape="rect" id="node20" title=" " alt="" coords="1473,1335,1643,1391"/>
-<area shape="rect" id="node21" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1128,1235,1184,1261"/>
-<area shape="rect" id="node22" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="745,1144,797,1171"/>
-<area shape="rect" id="node26" title=" " alt="" coords="1477,1255,1639,1311"/>
-<area shape="rect" id="node38" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1481,1415,1635,1441"/>
-<area shape="rect" id="node25" href="$classnumberingt.html" title=" " alt="" coords="1872,1297,2071,1324"/>
-<area shape="rect" id="node27" href="$classlocalst.html" title=" " alt="" coords="2366,1104,2431,1131"/>
-<area shape="rect" id="node29" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="2710,867,2826,893"/>
-<area shape="rect" id="node31" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="2339,743,2458,769"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1884,701,2059,728"/>
-<area shape="rect" id="node33" href="$structstatement__list__parse__treet_1_1instructiont.html" title="Represents a regular Statement List instruction which consists out of one or more codet tokens." alt="" coords="1479,694,1637,735"/>
-<area shape="rect" id="node36" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1920,1415,2023,1441"/>
-<area shape="rect" id="node37" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1488,1465,1628,1492"/>
-<area shape="rect" id="node40" href="$classnatural__loops__templatet.html" title=" " alt="" coords="3088,491,3269,547"/>
-<area shape="rect" id="node41" href="$classloop__analysist.html" title=" " alt="" coords="2319,523,2479,565"/>
-<area shape="rect" id="node43" title="STL iterator class." alt="" coords="1074,201,1238,228"/>
-<area shape="rect" id="node48" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="2649,249,2887,305"/>
-<area shape="rect" id="node44" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="1077,587,1235,613"/>
-<area shape="rect" id="node46" href="$classloop__analysist.html" title=" " alt="" coords="1894,509,2049,536"/>
-<area shape="rect" id="node59" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="2677,465,2859,506"/>
-<area shape="rect" id="node49" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="2302,102,2495,173"/>
-<area shape="rect" id="node50" href="$classcfg__baset.html" title=" " alt="" coords="1875,44,2068,100"/>
-<area shape="rect" id="node52" href="$classcfg__baset_1_1entry__mapt.html" title=" " alt="" coords="5,117,141,158"/>
-<area shape="rect" id="node53" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="264,168,415,195"/>
-<area shape="rect" id="node55" href="$classcfg__baset.html" title=" " alt="" coords="672,128,871,184"/>
-<area shape="rect" id="node58" href="$classcfg__baset.html" title=" " alt="" coords="679,245,863,272"/>
-<area shape="rect" id="node54" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="1080,135,1232,177"/>
-<area shape="rect" id="node57" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="1476,226,1640,267"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4015,373,4117,400"/>
+<area shape="rect" id="node2" href="$classlocal__may__aliast.html" title=" " alt="" coords="2089,373,2221,400"/>
+<area shape="rect" id="node3" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="1612,308,1669,335"/>
+<area shape="rect" id="node4" title=" " alt="" coords="951,301,1093,342"/>
+<area shape="rect" id="node5" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="569,284,641,311"/>
+<area shape="rect" id="node26" title=" " alt="" coords="951,366,1093,407"/>
+<area shape="rect" id="node28" title=" " alt="" coords="937,73,1107,100"/>
+<area shape="rect" id="node35" title=" " alt="" coords="945,638,1099,679"/>
+<area shape="rect" id="node6" title=" " alt="" coords="513,449,696,476"/>
+<area shape="rect" id="node7" title=" " alt="" coords="215,777,254,804"/>
+<area shape="rect" id="node19" title=" " alt="" coords="537,915,672,941"/>
+<area shape="rect" id="node23" title=" " alt="" coords="529,701,681,742"/>
+<area shape="rect" id="node36" title=" " alt="" coords="521,805,689,832"/>
+<area shape="rect" id="node42" title=" " alt="" coords="550,1016,659,1043"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1780,191,1957,217"/>
+<area shape="rect" id="node9" href="$classlocal__may__aliast_1_1loc__infot.html" title=" " alt="" coords="1333,183,1492,225"/>
+<area shape="rect" id="node10" href="$classunsigned__union__find.html" title=" " alt="" coords="945,196,1099,223"/>
+<area shape="rect" id="node11" title=" " alt="" coords="522,198,687,239"/>
+<area shape="rect" id="node12" href="$structunsigned__union__find_1_1nodet.html" title=" " alt="" coords="157,241,312,282"/>
+<area shape="rect" id="node13" title=" " alt="" coords="170,189,299,216"/>
+<area shape="rect" id="node16" title=" " alt="" coords="525,617,684,644"/>
+<area shape="rect" id="node24" title=" " alt="" coords="720,524,900,551"/>
+<area shape="rect" id="node30" title=" " alt="" coords="517,23,692,49"/>
+<area shape="rect" id="node14" title=" " alt="" coords="5,867,44,893"/>
+<area shape="rect" id="node31" title=" " alt="" coords="181,55,289,81"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1789,1071,1948,1097"/>
+<area shape="rect" id="node44" href="$classcfg__dominators__templatet.html" title=" " alt="" coords="2961,922,3156,963"/>
+<area shape="rect" id="node15" href="$classlocal__cfgt.html" title=" " alt="" coords="1370,575,1455,601"/>
+<area shape="rect" id="node47" href="$classgrapht.html" title=" " alt="" coords="926,832,1118,888"/>
+<area shape="rect" id="node17" title=" " alt="" coords="924,703,1120,745"/>
+<area shape="rect" id="node18" title=" " alt="" coords="529,551,680,593"/>
+<area shape="rect" id="node20" href="$classnumberingt.html" title=" " alt="" coords="1793,435,1944,477"/>
+<area shape="rect" id="node21" href="$classnumberingt.html" title=" " alt="" coords="1313,443,1512,469"/>
+<area shape="rect" id="node22" title=" " alt="" coords="941,495,1103,551"/>
+<area shape="rect" id="node34" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1336,676,1489,703"/>
+<area shape="rect" id="node25" href="$classlocalst.html" title=" " alt="" coords="1608,373,1673,400"/>
+<area shape="rect" id="node27" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="1355,73,1471,100"/>
+<area shape="rect" id="node29" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="963,23,1081,49"/>
+<area shape="rect" id="node32" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1817,625,1920,652"/>
+<area shape="rect" id="node33" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1343,625,1483,652"/>
+<area shape="rect" id="node37" href="$classnatural__loops__templatet.html" title=" " alt="" coords="3692,924,3873,980"/>
+<area shape="rect" id="node38" href="$classloop__analysist.html" title=" " alt="" coords="2981,1007,3136,1033"/>
+<area shape="rect" id="node43" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="3309,931,3491,973"/>
+<area shape="rect" id="node40" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="1333,1084,1492,1111"/>
+<area shape="rect" id="node41" title=" " alt="" coords="968,1029,1076,1056"/>
+<area shape="rect" id="node45" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="2383,862,2547,903"/>
+<area shape="rect" id="node51" href="$classcfg__dominators__templatet.html" title="Dominator graph." alt="" coords="2620,862,2815,903"/>
+<area shape="rect" id="node46" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="1337,804,1488,831"/>
+<area shape="rect" id="node50" href="$classcfg__baset.html" title=" " alt="" coords="1769,855,1968,911"/>
+<area shape="rect" id="node48" href="$classcfg__baset_1_1entry__mapt.html" title=" " alt="" coords="954,913,1090,954"/>
+<area shape="rect" id="node49" href="$classprocedure__local__cfg__baset.html" title=" " alt="" coords="2079,862,2231,903"/>
 </map>

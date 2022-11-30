@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Output of the program (SSA) constraints.">
 <polygon fill="#bfbfbf" stroke="black" points="149.5,-89.5 149.5,-130.5 302.5,-130.5 302.5,-89.5 149.5,-89.5"/>
 <text text-anchor="start" x="157.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="157.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/show</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="multi__path__symex__only__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="multi__path__symex__only__checker_8cpp.html" target="_top" xlink:title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-52.5 138,-52.5 138,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -40,7 +40,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="single__path__symex__only__checker_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="single__path__symex__only__checker_8cpp.html" target="_top" xlink:title="Goto Checker using Single Path Symbolic Execution only.">
 <polygon fill="none" stroke="black" points="156,-0.5 156,-52.5 296,-52.5 296,-0.5 156,-0.5"/>
 <text text-anchor="start" x="164" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -58,7 +58,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="show__program_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="show__program_8cpp.html" target="_top" xlink:title="Output of the program (SSA) constraints.">
 <polygon fill="none" stroke="black" points="314.5,-6 314.5,-47 467.5,-47 467.5,-6 314.5,-6"/>
 <text text-anchor="start" x="322.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="322.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/show</text>

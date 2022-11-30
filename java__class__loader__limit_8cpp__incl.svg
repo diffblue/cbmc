@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="limit class path loading">
 <polygon fill="#bfbfbf" stroke="black" points="540,-672.5 540,-713.5 704,-713.5 704,-672.5 540,-672.5"/>
 <text text-anchor="start" x="548" y="-701.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="548" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="java__class__loader__limit_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="java__class__loader__limit_8h.html" target="_top" xlink:title="limit class path loading">
 <polygon fill="none" stroke="black" points="30,-616.5 30,-635.5 170,-635.5 170,-616.5 30,-616.5"/>
 <text text-anchor="middle" x="100" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">java_class_loader_limit.h</text>
 </a>
@@ -319,7 +319,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="683,-168.5 683,-187.5 747,-187.5 747,-168.5 683,-168.5"/>
 <text text-anchor="middle" x="715" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -349,7 +349,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="584.5,-112.5 584.5,-131.5 643.5,-131.5 643.5,-112.5 584.5,-112.5"/>
 <text text-anchor="middle" x="614" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -493,7 +493,7 @@
 <!-- Node36 -->
 <g id="node29" class="node">
 <title>Node36</title>
-<g id="a_node29"><a xlink:href="parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="parser_8h.html" target="_top" xlink:title="Parser utilities.">
 <polygon fill="none" stroke="black" points="464,-560.5 464,-579.5 538,-579.5 538,-560.5 464,-560.5"/>
 <text text-anchor="middle" x="501" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/parser.h</text>
 </a>
@@ -589,7 +589,7 @@
 <!-- Node38 -->
 <g id="node31" class="node">
 <title>Node38</title>
-<g id="a_node31"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="846.5,-448.5 846.5,-467.5 893.5,-467.5 893.5,-448.5 846.5,-448.5"/>
 <text text-anchor="middle" x="870" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -772,7 +772,7 @@
 <!-- Node47 -->
 <g id="node40" class="node">
 <title>Node47</title>
-<g id="a_node40"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="1286.5,-224.5 1286.5,-243.5 1339.5,-243.5 1339.5,-224.5 1286.5,-224.5"/>
 <text text-anchor="middle" x="1313" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>

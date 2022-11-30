@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="graph of abstract events">
 <polygon fill="#bfbfbf" stroke="black" points="268,-156.5 268,-197.5 413,-197.5 413,-156.5 268,-156.5"/>
 <text text-anchor="start" x="276" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="276" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cycle__collection_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cycle__collection_8cpp.html" target="_top" xlink:title="collection of cycles in graph of abstract events">
 <polygon fill="none" stroke="black" points="0,-78.5 0,-119.5 149,-119.5 149,-78.5 0,-78.5"/>
 <text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="event__graph_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="event__graph_8cpp.html" target="_top" xlink:title="graph of abstract events">
 <polygon fill="none" stroke="black" points="167,-78.5 167,-119.5 312,-119.5 312,-78.5 167,-78.5"/>
 <text text-anchor="start" x="175" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="175" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto2graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto2graph_8h.html" target="_top" xlink:title="Instrumenter.">
 <polygon fill="none" stroke="black" points="369,-78.5 369,-119.5 514,-119.5 514,-78.5 369,-78.5"/>
 <text text-anchor="start" x="377" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="377" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="instrumenter__pensieve_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="instrumenter__pensieve_8h.html" target="_top" xlink:title="Instrumenter.">
 <polygon fill="none" stroke="black" points="178.5,-0.5 178.5,-41.5 350.5,-41.5 350.5,-0.5 178.5,-0.5"/>
 <text text-anchor="start" x="186.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="186.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -90,7 +90,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="pair__collection_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="pair__collection_8cpp.html" target="_top" xlink:title="collection of pairs (for Pensieve&#39;s static delay&#45;set analysis) in graph of abstract events">
 <polygon fill="none" stroke="black" points="532,-78.5 532,-119.5 677,-119.5 677,-78.5 532,-78.5"/>
 <text text-anchor="start" x="540" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="540" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -107,7 +107,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto2graph_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto2graph_8cpp.html" target="_top" xlink:title="Turns a goto&#45;program into an abstract event graph.">
 <polygon fill="none" stroke="black" points="369,-0.5 369,-41.5 514,-41.5 514,-0.5 369,-0.5"/>
 <text text-anchor="start" x="377" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="377" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -130,7 +130,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="instrumenter__strategies_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="instrumenter__strategies_8cpp.html" target="_top" xlink:title="Strategies for picking the abstract events to instrument.">
 <polygon fill="none" stroke="black" points="532.5,-0.5 532.5,-41.5 720.5,-41.5 720.5,-0.5 532.5,-0.5"/>
 <text text-anchor="start" x="540.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="540.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -147,7 +147,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="weak__memory_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="weak__memory_8cpp.html" target="_top" xlink:title="Weak Memory Instrumentation for Threaded Goto Programs.">
 <polygon fill="none" stroke="black" points="739,-0.5 739,-41.5 884,-41.5 884,-0.5 739,-0.5"/>
 <text text-anchor="start" x="747" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="747" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

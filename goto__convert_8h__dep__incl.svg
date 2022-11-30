@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Program Transformation.">
 <polygon fill="#bfbfbf" stroke="black" points="348,-78.5 348,-119.5 486,-119.5 486,-78.5 348,-78.5"/>
 <text text-anchor="start" x="356" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="356" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="model__argc__argv_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="model__argc__argv_8cpp.html" target="_top" xlink:title="Initialize command line arguments.">
 <polygon fill="none" stroke="black" points="184.5,-0.5 184.5,-41.5 329.5,-41.5 329.5,-0.5 184.5,-0.5"/>
 <text text-anchor="start" x="192.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="192.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__convert_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__convert_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="348,-0.5 348,-41.5 486,-41.5 486,-0.5 348,-0.5"/>
 <text text-anchor="start" x="356" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="356" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="convert__java__nondet_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="convert__java__nondet_8cpp.html" target="_top" xlink:title="Convert side_effect_expr_nondett expressions.">
 <polygon fill="none" stroke="black" points="504,-0.5 504,-41.5 668,-41.5 668,-0.5 504,-0.5"/>
 <text text-anchor="start" x="512" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="512" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -90,7 +90,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="remove__java__new_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="remove__java__new_8cpp.html" target="_top" xlink:title="Remove Java New Operators.">
 <polygon fill="none" stroke="black" points="686,-0.5 686,-41.5 850,-41.5 850,-0.5 686,-0.5"/>
 <text text-anchor="start" x="694" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="694" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>

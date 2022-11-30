@@ -63,8 +63,8 @@
 <title>Node4&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M213.94,-68.79C209.82,-58.26 203.68,-46.39 195,-38 186.39,-29.68 174.8,-23.7 163.97,-19.52"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="210.67,-70.04 217.29,-78.31 217.27,-67.71 210.67,-70.04"/>
-<text text-anchor="middle" x="236" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00"> must_bits</text>
-<text text-anchor="middle" x="236" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">may_bits</text>
+<text text-anchor="middle" x="234.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00"> may_bits</text>
+<text text-anchor="middle" x="234.5" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">must_bits</text>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node">
@@ -85,7 +85,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:title="STL class.">
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="230.5,-156.5 230.5,-175.5 331.5,-175.5 331.5,-156.5 230.5,-156.5"/>
 <text text-anchor="middle" x="281" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; K, T &gt;</text>
 </a>

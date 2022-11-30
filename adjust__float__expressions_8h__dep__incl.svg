@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Symbolic Execution.">
 <polygon fill="#bfbfbf" stroke="black" points="1348,-89.5 1348,-130.5 1497,-130.5 1497,-89.5 1348,-89.5"/>
 <text text-anchor="start" x="1356" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1356" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="constant__propagator_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="constant__propagator_8cpp.html" target="_top" xlink:title="Constant Propagation.">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 155,-47 155,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/constant</text>
@@ -74,7 +74,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="none" stroke="black" points="502,-6 502,-47 661,-47 661,-6 502,-6"/>
 <text text-anchor="start" x="510" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="510" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -108,7 +108,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="cprover__parse__options_8cpp.html" target="_top" xlink:title="cprover Command Line Options Processing">
 <polygon fill="none" stroke="black" points="844,-6 844,-47 987,-47 987,-6 844,-6"/>
 <text text-anchor="start" x="852" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="852" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/cprover</text>
@@ -125,7 +125,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="full__slicer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="full__slicer_8cpp.html" target="_top" xlink:title="Slicing.">
 <polygon fill="none" stroke="black" points="1005,-6 1005,-47 1150,-47 1150,-6 1005,-6"/>
 <text text-anchor="start" x="1013" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1013" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -142,7 +142,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="adjust__float__expressions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="adjust__float__expressions_8cpp.html" target="_top" xlink:title="Symbolic Execution.">
 <polygon fill="none" stroke="black" points="1168,-6 1168,-47 1329,-47 1329,-6 1168,-6"/>
 <text text-anchor="start" x="1176" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1176" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -159,7 +159,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="process__goto__program_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="process__goto__program_8cpp.html" target="_top" xlink:title="Get a Goto Program.">
 <polygon fill="none" stroke="black" points="1347,-6 1347,-47 1498,-47 1498,-6 1347,-6"/>
 <text text-anchor="start" x="1355" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1355" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -176,7 +176,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="jsil__entry__point_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="jsil__entry__point_8cpp.html" target="_top" xlink:title="Jsil Language.">
 <polygon fill="none" stroke="black" points="1516.5,-6 1516.5,-47 1654.5,-47 1654.5,-6 1516.5,-6"/>
 <text text-anchor="start" x="1524.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1524.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/jsil/jsil_entry</text>
@@ -193,7 +193,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="jsil__internal__additions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="jsil__internal__additions_8cpp.html" target="_top" xlink:title="Jsil Language.">
 <polygon fill="none" stroke="black" points="1672.5,-6 1672.5,-47 1812.5,-47 1812.5,-6 1672.5,-6"/>
 <text text-anchor="start" x="1680.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1680.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/jsil/jsil_internal</text>
@@ -210,7 +210,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="remove__internal__symbols_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="remove__internal__symbols_8cpp.html" target="_top" xlink:title="Remove symbols that are internal only.">
 <polygon fill="none" stroke="black" points="1830.5,-6 1830.5,-47 1970.5,-47 1970.5,-6 1830.5,-6"/>
 <text text-anchor="start" x="1838.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1838.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/linking/remove</text>
@@ -227,7 +227,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="statement__list__entry__point_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="statement__list__entry__point_8cpp.html" target="_top" xlink:title="Statement List Language Entry Point.">
 <polygon fill="none" stroke="black" points="1989,-6 1989,-47 2160,-47 2160,-6 1989,-6"/>
 <text text-anchor="start" x="1997" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1997" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/statement&#45;list</text>
@@ -278,7 +278,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="2582.5,-6 2582.5,-47 2726.5,-47 2726.5,-6 2582.5,-6"/>
 <text text-anchor="start" x="2590.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2590.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -295,7 +295,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="jdiff__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="jdiff__parse__options_8cpp.html" target="_top" xlink:title="JDIFF Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="2744.5,-6 2744.5,-47 2882.5,-47 2882.5,-6 2744.5,-6"/>
 <text text-anchor="start" x="2752.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2752.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jdiff/jdiff</text>

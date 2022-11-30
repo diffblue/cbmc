@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Type Naming for C.">
 <polygon fill="#bfbfbf" stroke="black" points="841,-627.5 841,-657.5 1015,-657.5 1015,-627.5 841,-627.5"/>
 <text text-anchor="start" x="849" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="928" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/type2name.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="type2name_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="type2name_8h.html" target="_top" xlink:title="Type Naming for C.">
 <polygon fill="none" stroke="black" points="1138.5,-515.5 1138.5,-534.5 1219.5,-534.5 1219.5,-515.5 1138.5,-515.5"/>
 <text text-anchor="middle" x="1179" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">type2name.h</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="467.5,-459.5 467.5,-478.5 534.5,-478.5 534.5,-459.5 467.5,-459.5"/>
 <text text-anchor="middle" x="501" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -111,7 +111,7 @@
 <!-- Node50 -->
 <g id="node35" class="node">
 <title>Node50</title>
-<g id="a_node35"><a xlink:href="pointer__offset__size_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="pointer__offset__size_8h.html" target="_top" xlink:title="Pointer Logic.">
 <polygon fill="none" stroke="black" points="1073.5,-392.5 1073.5,-422.5 1176.5,-422.5 1176.5,-392.5 1073.5,-392.5"/>
 <text text-anchor="start" x="1081.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/pointer_offset</text>
 <text text-anchor="middle" x="1125" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">_size.h</text>
@@ -352,7 +352,7 @@
 <!-- Node44 -->
 <g id="node28" class="node">
 <title>Node44</title>
-<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="464.5,-398 464.5,-417 537.5,-417 537.5,-398 464.5,-398"/>
 <text text-anchor="middle" x="501" y="-405" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -445,7 +445,7 @@
 <!-- Node20 -->
 <g id="node20" class="node">
 <title>Node20</title>
-<g id="a_node20"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="612.5,-224.5 612.5,-243.5 659.5,-243.5 659.5,-224.5 612.5,-224.5"/>
 <text text-anchor="middle" x="636" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -664,7 +664,7 @@
 <!-- Node47 -->
 <g id="node32" class="node">
 <title>Node47</title>
-<g id="a_node32"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="560,-515.5 560,-534.5 646,-534.5 646,-515.5 560,-515.5"/>
 <text text-anchor="middle" x="603" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -685,7 +685,7 @@
 <!-- Node48 -->
 <g id="node33" class="node">
 <title>Node48</title>
-<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="552.5,-459.5 552.5,-478.5 653.5,-478.5 653.5,-459.5 552.5,-459.5"/>
 <text text-anchor="middle" x="603" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Filters for the Coverage Instrumentation.">
 <polygon fill="#bfbfbf" stroke="black" points="408.5,-694.5 408.5,-735.5 553.5,-735.5 553.5,-694.5 408.5,-694.5"/>
 <text text-anchor="start" x="416.5" y="-723.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="416.5" y="-712.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cover__filter_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cover__filter_8h.html" target="_top" xlink:title="Filters for the Coverage Instrumentation.">
 <polygon fill="none" stroke="black" points="240,-633 240,-652 320,-652 320,-633 240,-633"/>
 <text text-anchor="middle" x="280" y="-640" font-family="Helvetica,sans-Serif" font-size="10.00">cover_filter.h</text>
 </a>
@@ -113,7 +113,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="293.5,-560.5 293.5,-590.5 406.5,-590.5 406.5,-560.5 293.5,-560.5"/>
 <text text-anchor="start" x="301.5" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="350" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">_functions.h</text>
@@ -129,7 +129,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="218,-504.5 218,-523.5 310,-523.5 310,-504.5 218,-504.5"/>
 <text text-anchor="middle" x="264" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -174,7 +174,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="257,-280.5 257,-299.5 349,-299.5 349,-280.5 257,-280.5"/>
 <text text-anchor="middle" x="303" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -189,7 +189,7 @@
 <!-- Node47 -->
 <g id="node27" class="node">
 <title>Node47</title>
-<g id="a_node27"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="605,-448.5 605,-467.5 699,-467.5 699,-448.5 605,-448.5"/>
 <text text-anchor="middle" x="652" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -309,7 +309,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="516.5,-112.5 516.5,-131.5 563.5,-131.5 563.5,-112.5 516.5,-112.5"/>
 <text text-anchor="middle" x="540" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -645,7 +645,7 @@
 <!-- Node50 -->
 <g id="node30" class="node">
 <title>Node50</title>
-<g id="a_node30"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="322,-336.5 322,-355.5 408,-355.5 408,-336.5 322,-336.5"/>
 <text text-anchor="middle" x="365" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>

@@ -1,7 +1,7 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1115,5,1341,61"/>
-<area shape="rect" id="node2" href="$partial__order__concurrency_8h.html" title=" " alt="" coords="1127,109,1329,136"/>
-<area shape="rect" id="node3" href="$symex__target__equation_8h.html" title=" " alt="" coords="1134,184,1322,211"/>
+<area shape="rect" id="node1" title="Memory models for partial order concurrency." alt="" coords="1115,5,1341,61"/>
+<area shape="rect" id="node2" href="$partial__order__concurrency_8h.html" title="Add constraints to equation encoding partial orders on events." alt="" coords="1127,109,1329,136"/>
+<area shape="rect" id="node3" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1134,184,1322,211"/>
 <area shape="rect" id="node4" title=" " alt="" coords="709,736,795,763"/>
 <area shape="rect" id="node5" title=" " alt="" coords="280,811,344,837"/>
 <area shape="rect" id="node6" title=" " alt="" coords="1975,512,2017,539"/>
@@ -10,7 +10,7 @@
 <area shape="rect" id="node22" href="$narrow_8h.html" title=" " alt="" coords="1919,736,1998,763"/>
 <area shape="rect" id="node23" href="$src_2util_2message_8h.html" title=" " alt="" coords="977,430,1095,457"/>
 <area shape="rect" id="node29" href="$ssa__step_8h.html" title=" " alt="" coords="1265,259,1356,285"/>
-<area shape="rect" id="node41" href="$symex__target_8h.html" title=" " alt="" coords="1249,341,1373,367"/>
+<area shape="rect" id="node41" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1249,341,1373,367"/>
 <area shape="rect" id="node8" title=" " alt="" coords="1575,885,1641,912"/>
 <area shape="rect" id="node9" title=" " alt="" coords="399,885,473,912"/>
 <area shape="rect" id="node10" title=" " alt="" coords="928,885,987,912"/>
@@ -18,9 +18,9 @@
 <area shape="rect" id="node13" title=" " alt="" coords="489,341,604,367"/>
 <area shape="rect" id="node14" href="$irep_8h.html" title=" " alt="" coords="596,587,655,613"/>
 <area shape="rect" id="node15" title=" " alt="" coords="705,661,767,688"/>
-<area shape="rect" id="node16" href="$irep__ids_8h.html" title=" " alt="" coords="349,661,435,688"/>
+<area shape="rect" id="node16" href="$irep__ids_8h.html" title="util" alt="" coords="349,661,435,688"/>
 <area shape="rect" id="node19" href="$forward__list__as__map_8h.html" title=" " alt="" coords="459,661,629,688"/>
-<area shape="rect" id="node17" href="$dstring_8h.html" title=" " alt="" coords="195,736,274,763"/>
+<area shape="rect" id="node17" href="$dstring_8h.html" title="Container for C&#45;Strings." alt="" coords="195,736,274,763"/>
 <area shape="rect" id="node18" title=" " alt="" coords="349,736,448,763"/>
 <area shape="rect" id="node20" title=" " alt="" coords="472,736,571,763"/>
 <area shape="rect" id="node21" href="$as__const_8h.html" title=" " alt="" coords="595,736,685,763"/>
@@ -30,17 +30,17 @@
 <area shape="rect" id="node27" href="$optional_8h.html" title=" " alt="" coords="945,587,1031,613"/>
 <area shape="rect" id="node28" title=" " alt="" coords="995,661,1146,688"/>
 <area shape="rect" id="node30" href="$ssa__expr_8h.html" title=" " alt="" coords="1971,430,2087,457"/>
-<area shape="rect" id="node34" href="$goto__trace_8h.html" title=" " alt="" coords="1074,333,1225,375"/>
-<area shape="rect" id="node31" href="$std__expr_8h.html" title=" " alt="" coords="1755,587,1845,613"/>
+<area shape="rect" id="node34" href="$goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1074,333,1225,375"/>
+<area shape="rect" id="node31" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1755,587,1845,613"/>
 <area shape="rect" id="node32" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1798,736,1895,763"/>
-<area shape="rect" id="node33" href="$std__types_8h.html" title=" " alt="" coords="1747,661,1845,688"/>
-<area shape="rect" id="node35" href="$options_8h.html" title=" " alt="" coords="1789,430,1896,457"/>
-<area shape="rect" id="node37" href="$goto__program_8h.html" title=" " alt="" coords="1199,423,1350,464"/>
+<area shape="rect" id="node33" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1747,661,1845,688"/>
+<area shape="rect" id="node35" href="$options_8h.html" title="Options." alt="" coords="1789,430,1896,457"/>
+<area shape="rect" id="node37" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1199,423,1350,464"/>
 <area shape="rect" id="node36" title=" " alt="" coords="1900,512,1951,539"/>
 <area shape="rect" id="node38" href="$goto__instruction__code_8h.html" title=" " alt="" coords="1647,512,1825,539"/>
 <area shape="rect" id="node39" title=" " alt="" coords="1275,736,1317,763"/>
 <area shape="rect" id="node40" title=" " alt="" coords="1345,512,1404,539"/>
-<area shape="rect" id="node42" href="$renamed_8h.html" title=" " alt="" coords="1479,512,1571,539"/>
-<area shape="rect" id="node43" href="$expr__iterator_8h.html" title=" " alt="" coords="1326,661,1469,688"/>
+<area shape="rect" id="node42" href="$renamed_8h.html" title="Class for expressions or types renamed up to a given level." alt="" coords="1479,512,1571,539"/>
+<area shape="rect" id="node43" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="1326,661,1469,688"/>
 <area shape="rect" id="node44" href="$simplify__expr_8h.html" title=" " alt="" coords="1432,587,1579,613"/>
 </map>

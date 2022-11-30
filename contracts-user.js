@@ -19,7 +19,9 @@ var contracts_user =
     [ "Assigns Clauses", "contracts-assigns.html", [
       [ "Syntax", "contracts-assigns.html#autotoc_md57", [
         [ "Lvalue targets", "contracts-assigns.html#autotoc_md58", null ],
-        [ "Object slice targets", "contracts-assigns.html#autotoc_md59", null ],
+        [ "Object slice targets", "contracts-assigns.html#autotoc_md59", null ]
+      ] ],
+      [ "@code{c}", "contracts-assigns.html#autotoc_md61", [
         [ "Function parameters", "contracts-assigns.html#autotoc_md62", null ],
         [ "Inductive data structures", "contracts-assigns.html#autotoc_md63", null ]
       ] ],

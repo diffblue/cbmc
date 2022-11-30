@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Verify and use annotated invariants and pre/post&#45;conditions.">
 <polygon fill="#bfbfbf" stroke="black" points="331,-167.5 331,-208.5 476,-208.5 476,-167.5 331,-167.5"/>
 <text text-anchor="start" x="339" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="339" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title="Verify and use annotated loop and function contracts.">
 <polygon fill="none" stroke="black" points="0,-84 0,-125 145,-125 145,-84 0,-84"/>
 <text text-anchor="start" x="8" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -75,7 +75,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="memory__predicates_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="memory__predicates_8cpp.html" target="_top" xlink:title="Predicates to specify memory footprint in function contracts.">
 <polygon fill="none" stroke="black" points="496,-84 496,-125 681,-125 681,-84 496,-84"/>
 <text text-anchor="start" x="504" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="504" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -92,7 +92,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8h.html" target="_top" xlink:title="Command Line Parsing.">
 <polygon fill="none" stroke="black" points="699.5,-84 699.5,-125 881.5,-125 881.5,-84 699.5,-84"/>
 <text text-anchor="start" x="707.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="707.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -109,7 +109,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="goto__instrument__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="goto__instrument__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="521.5,-0.5 521.5,-41.5 697.5,-41.5 697.5,-0.5 521.5,-0.5"/>
 <text text-anchor="start" x="529.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="529.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -126,7 +126,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="goto__instrument__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__instrument__main_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="715.5,-0.5 715.5,-41.5 865.5,-41.5 865.5,-0.5 715.5,-0.5"/>
 <text text-anchor="start" x="723.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="723.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -143,7 +143,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="883.5,-0.5 883.5,-41.5 1077.5,-41.5 1077.5,-0.5 883.5,-0.5"/>
 <text text-anchor="start" x="891.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="891.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

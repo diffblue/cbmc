@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="This module is responsible for the synthesis of code (in the form of a sequence of codet statements) ...">
 <polygon fill="#bfbfbf" stroke="black" points="364,-78.5 364,-119.5 528,-119.5 528,-78.5 364,-78.5"/>
 <text text-anchor="start" x="372" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="372" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="convert__java__nondet_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="convert__java__nondet_8cpp.html" target="_top" xlink:title="Convert side_effect_expr_nondett expressions.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 164,-41.5 164,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -90,7 +90,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="simple__method__stubbing_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="simple__method__stubbing_8cpp.html" target="_top" xlink:title="Java simple opaque stub generation.">
 <polygon fill="none" stroke="black" points="728,-0.5 728,-41.5 892,-41.5 892,-0.5 728,-0.5"/>
 <text text-anchor="start" x="736" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="736" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>

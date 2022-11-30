@@ -101,7 +101,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:title="STL class.">
+<g id="a_node7"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="142.5,-291.19 142.5,-310.19 207.5,-310.19 207.5,-291.19 142.5,-291.19"/>
 <text text-anchor="middle" x="175" y="-298.19" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
@@ -128,9 +128,9 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="218.3,-304.99 207.84,-306.65 217.05,-311.88 218.3,-304.99"/>
 <text text-anchor="middle" x="308.5" y="-334.69" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node21 -->
+<!-- Node17 -->
 <g id="node15" class="node">
-<title>Node21</title>
+<title>Node17</title>
 <g id="a_node15"><a xlink:href="structjava__class__loader__baset_1_1classpath__entryt.html" target="_top" xlink:title="An entry in the classpath.">
 <polygon fill="none" stroke="black" points="393,-241.69 393,-271.69 529,-271.69 529,-241.69 393,-241.69"/>
 <text text-anchor="start" x="401" y="-259.69" font-family="Helvetica,sans-Serif" font-size="10.00">java_class_loader_baset</text>
@@ -138,9 +138,9 @@
 </a>
 </g>
 </g>
-<!-- Node7&#45;&gt;Node21 -->
+<!-- Node7&#45;&gt;Node17 -->
 <g id="edge18" class="edge">
-<title>Node7&#45;&gt;Node21</title>
+<title>Node7&#45;&gt;Node17</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M210.67,-287.79C224.04,-283.29 239.57,-278.64 254,-275.69 299.75,-266.37 352.16,-261.62 392.66,-259.19"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="209.22,-284.59 200.92,-291.17 211.52,-291.2 209.22,-284.59"/>
 <text text-anchor="middle" x="308.5" y="-278.69" font-family="Helvetica,sans-Serif" font-size="10.00"> path</text>
@@ -148,7 +148,7 @@
 <!-- Node9 -->
 <g id="node8" class="node">
 <title>Node9</title>
-<g id="a_node8"><a xlink:title="STL class.">
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="118,-329.69 118,-359.69 232,-359.69 232,-329.69 118,-329.69"/>
 <text text-anchor="start" x="126" y="-347.69" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
 <text text-anchor="middle" x="175" y="-336.69" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; K, T &gt;</text>
@@ -178,18 +178,18 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="25.21,-277.6 18.4,-269.48 18.66,-280.07 25.21,-277.6"/>
 <text text-anchor="middle" x="71.5" y="-339.69" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node19 -->
+<!-- Node15 -->
 <g id="node13" class="node">
-<title>Node19</title>
-<g id="a_node13"><a xlink:title="STL class.">
+<title>Node15</title>
+<g id="a_node13"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="124.5,-203.19 124.5,-222.19 225.5,-222.19 225.5,-203.19 124.5,-203.19"/>
 <text text-anchor="middle" x="175" y="-210.19" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; K, T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node10&#45;&gt;Node19 -->
+<!-- Node10&#45;&gt;Node15 -->
 <g id="edge14" class="edge">
-<title>Node10&#45;&gt;Node19</title>
+<title>Node10&#45;&gt;Node15</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M38.83,-252.78C66.04,-244.71 111.19,-231.32 141.74,-222.26"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="37.61,-249.49 29.01,-255.69 39.6,-256.2 37.61,-249.49"/>
 <text text-anchor="middle" x="71.5" y="-252.69" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -210,41 +210,41 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="26.4,-224.36 19.23,-216.56 19.97,-227.13 26.4,-224.36"/>
 <text text-anchor="middle" x="71.5" y="-302.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node11&#45;&gt;Node19 -->
+<!-- Node11&#45;&gt;Node15 -->
 <g id="edge15" class="edge">
-<title>Node11&#45;&gt;Node19</title>
+<title>Node11&#45;&gt;Node15</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M39.26,-207.59C61.64,-208.44 95.87,-209.74 124.23,-210.81"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="39.14,-204.09 29.01,-207.21 38.87,-211.08 39.14,-204.09"/>
 <text text-anchor="middle" x="71.5" y="-212.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node22 -->
+<!-- Node18 -->
 <g id="node16" class="node">
-<title>Node22</title>
-<g id="a_node16"><a xlink:title="STL class.">
+<title>Node18</title>
+<g id="a_node16"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="134.5,-165.19 134.5,-184.19 215.5,-184.19 215.5,-165.19 134.5,-165.19"/>
 <text text-anchor="middle" x="175" y="-172.19" font-family="Helvetica,sans-Serif" font-size="10.00">std::list&lt; T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node11&#45;&gt;Node22 -->
+<!-- Node11&#45;&gt;Node18 -->
 <g id="edge20" class="edge">
-<title>Node11&#45;&gt;Node22</title>
+<title>Node11&#45;&gt;Node18</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M38.38,-196.5C41.25,-195.45 44.17,-194.48 47,-193.69 75.68,-185.76 108.99,-180.93 134.29,-178.13"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="37.02,-193.28 29.05,-200.26 39.63,-199.77 37.02,-193.28"/>
 <text text-anchor="middle" x="71.5" y="-196.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node26 -->
+<!-- Node22 -->
 <g id="node20" class="node">
-<title>Node26</title>
-<g id="a_node20"><a xlink:title="STL class.">
+<title>Node22</title>
+<g id="a_node20"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="126.5,-2.19 126.5,-21.19 223.5,-21.19 223.5,-2.19 126.5,-2.19"/>
 <text text-anchor="middle" x="175" y="-9.19" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node11&#45;&gt;Node26 -->
+<!-- Node11&#45;&gt;Node22 -->
 <g id="edge29" class="edge">
-<title>Node11&#45;&gt;Node26</title>
+<title>Node11&#45;&gt;Node22</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M23.35,-187.55C37.46,-155.05 69.79,-88.45 114,-45.69 124.67,-35.37 139.08,-27.07 151.11,-21.26"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="20.1,-186.26 19.42,-196.83 26.55,-188.99 20.1,-186.26"/>
 <text text-anchor="middle" x="71.5" y="-139.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
@@ -282,17 +282,17 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="246.19,-430.45 236.23,-434.06 246.27,-437.45 246.19,-430.45"/>
 <text text-anchor="middle" x="308.5" y="-437.69" font-family="Helvetica,sans-Serif" font-size="10.00"> m_state</text>
 </g>
-<!-- Node19&#45;&gt;Node4 -->
+<!-- Node15&#45;&gt;Node4 -->
 <g id="edge13" class="edge">
-<title>Node19&#45;&gt;Node4</title>
+<title>Node15&#45;&gt;Node4</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M235.97,-214.33C308.38,-216.65 433.81,-221.77 541,-231.69 666.57,-243.32 812.68,-264.7 892.78,-277.1"/>
 <polygon fill="orange" stroke="orange" points="235.79,-210.82 225.68,-214.01 235.57,-217.82 235.79,-210.82"/>
 <text text-anchor="start" x="565" y="-257.69" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; std::string, jar</text>
 <text text-anchor="middle" x="606" y="-246.69" font-family="Helvetica,sans-Serif" font-size="10.00">_filet &gt;</text>
 </g>
-<!-- Node23 -->
+<!-- Node19 -->
 <g id="node17" class="node">
-<title>Node23</title>
+<title>Node19</title>
 <g id="a_node17"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="381,-92.69 381,-122.69 541,-122.69 541,-92.69 381,-92.69"/>
 <text text-anchor="start" x="389" y="-110.69" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; irep_idt,</text>
@@ -300,17 +300,17 @@
 </a>
 </g>
 </g>
-<!-- Node19&#45;&gt;Node23 -->
+<!-- Node15&#45;&gt;Node19 -->
 <g id="edge25" class="edge">
-<title>Node19&#45;&gt;Node23</title>
+<title>Node15&#45;&gt;Node19</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M224.56,-199.44C228.53,-197.72 232.4,-195.81 236,-193.69 245.48,-188.11 244.56,-182.35 254,-176.69 296.38,-151.29 349.33,-133.82 390.93,-122.81"/>
 <polygon fill="orange" stroke="orange" points="223.23,-196.2 215.19,-203.1 225.78,-202.72 223.23,-196.2"/>
 <text text-anchor="start" x="254" y="-190.69" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, parse_tree</text>
 <text text-anchor="middle" x="308.5" y="-179.69" font-family="Helvetica,sans-Serif" font-size="10.00">_with_overlayst &gt;</text>
 </g>
-<!-- Node20 -->
+<!-- Node16 -->
 <g id="node14" class="node">
-<title>Node20</title>
+<title>Node16</title>
 <g id="a_node14"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="671,-155.19 671,-196.19 808,-196.19 808,-155.19 671,-155.19"/>
 <text text-anchor="start" x="679" y="-184.19" font-family="Helvetica,sans-Serif" font-size="10.00">std::list&lt; java_class</text>
@@ -319,84 +319,84 @@
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node2 -->
+<!-- Node16&#45;&gt;Node2 -->
 <g id="edge16" class="edge">
-<title>Node20&#45;&gt;Node2</title>
+<title>Node16&#45;&gt;Node2</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M818.36,-175.69C938.63,-175.69 1167.52,-175.69 1280.9,-175.69"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="818.13,-172.19 808.13,-175.69 818.13,-179.19 818.13,-172.19"/>
 <text text-anchor="middle" x="1079" y="-178.69" font-family="Helvetica,sans-Serif" font-size="10.00"> classpath_entries</text>
 </g>
-<!-- Node21&#45;&gt;Node20 -->
+<!-- Node17&#45;&gt;Node16 -->
 <g id="edge17" class="edge">
-<title>Node21&#45;&gt;Node20</title>
+<title>Node17&#45;&gt;Node16</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M489.03,-235.46C507.63,-222.03 533.49,-205.58 559,-196.69 594.7,-184.26 636.57,-178.87 670.88,-176.66"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="486.73,-232.81 480.77,-241.57 490.89,-238.44 486.73,-232.81"/>
 <text text-anchor="middle" x="606" y="-199.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node22&#45;&gt;Node20 -->
+<!-- Node18&#45;&gt;Node16 -->
 <g id="edge19" class="edge">
-<title>Node22&#45;&gt;Node20</title>
+<title>Node18&#45;&gt;Node16</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M225.79,-174.78C326.82,-174.96 556.03,-175.37 670.63,-175.57"/>
 <polygon fill="orange" stroke="orange" points="225.56,-171.28 215.55,-174.76 225.55,-178.28 225.56,-171.28"/>
 <text text-anchor="start" x="395.5" y="-189.69" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; java_class_loader</text>
 <text text-anchor="middle" x="461" y="-178.69" font-family="Helvetica,sans-Serif" font-size="10.00">_baset::classpath_entryt &gt;</text>
 </g>
-<!-- Node22&#45;&gt;Node23 -->
+<!-- Node18&#45;&gt;Node19 -->
 <g id="edge23" class="edge">
-<title>Node22&#45;&gt;Node23</title>
+<title>Node18&#45;&gt;Node19</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M189.52,-157.2C203.57,-140.59 227.21,-116.73 254,-106.69 294.02,-91.7 341.57,-90.92 380.89,-94.35"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="186.69,-155.14 183.09,-165.11 192.11,-159.56 186.69,-155.14"/>
 <text text-anchor="middle" x="308.5" y="-109.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node23&#45;&gt;Node1 -->
+<!-- Node19&#45;&gt;Node1 -->
 <g id="edge22" class="edge">
-<title>Node23&#45;&gt;Node1</title>
+<title>Node19&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M551.49,-112.08C605.61,-114.37 676.01,-116.69 738.5,-116.69 738.5,-116.69 738.5,-116.69 1350,-116.69 1389.99,-116.69 1435.08,-124.45 1466.55,-131.14"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="551.38,-108.57 541.24,-111.64 551.08,-115.57 551.38,-108.57"/>
 <text text-anchor="middle" x="1079" y="-119.69" font-family="Helvetica,sans-Serif" font-size="10.00"> class_map</text>
 </g>
-<!-- Node24 -->
+<!-- Node20 -->
 <g id="node18" class="node">
-<title>Node24</title>
+<title>Node20</title>
 <g id="a_node18"><a xlink:href="classdstringt.html" target="_top" xlink:title="dstringt has one field, an unsigned integer no which is an index into a static table of strings.">
 <polygon fill="none" stroke="black" points="148,-55.19 148,-74.19 202,-74.19 202,-55.19 148,-55.19"/>
 <text text-anchor="middle" x="175" y="-62.19" font-family="Helvetica,sans-Serif" font-size="10.00">dstringt</text>
 </a>
 </g>
 </g>
-<!-- Node24&#45;&gt;Node23 -->
+<!-- Node20&#45;&gt;Node19 -->
 <g id="edge24" class="edge">
-<title>Node24&#45;&gt;Node23</title>
+<title>Node20&#45;&gt;Node19</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M212.06,-63.03C250,-62.02 311.27,-62.5 363,-72.69 384.61,-76.95 407.84,-85.2 426.15,-92.62"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="211.89,-59.53 202,-63.34 212.11,-66.53 211.89,-59.53"/>
 <text text-anchor="middle" x="308.5" y="-75.69" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node25 -->
+<!-- Node21 -->
 <g id="node19" class="node">
-<title>Node25</title>
+<title>Node21</title>
 <g id="a_node19"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="397,-28.19 397,-47.19 525,-47.19 525,-28.19 397,-28.19"/>
 <text text-anchor="middle" x="461" y="-35.19" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; dstringt &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node24&#45;&gt;Node25 -->
+<!-- Node20&#45;&gt;Node21 -->
 <g id="edge27" class="edge">
-<title>Node24&#45;&gt;Node25</title>
+<title>Node20&#45;&gt;Node21</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M207.96,-51.49C221.85,-46.43 238.47,-41.25 254,-38.69 301.46,-30.87 355.92,-30.99 396.91,-32.87"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="206.5,-48.31 198.39,-55.12 208.98,-54.85 206.5,-48.31"/>
 <text text-anchor="middle" x="308.5" y="-41.69" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node25&#45;&gt;Node1 -->
+<!-- Node21&#45;&gt;Node1 -->
 <g id="edge26" class="edge">
-<title>Node25&#45;&gt;Node1</title>
+<title>Node21&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M535.21,-44.24C590.9,-48.66 669.47,-53.69 738.5,-53.69 738.5,-53.69 738.5,-53.69 1350,-53.69 1413.11,-53.69 1474.54,-108.4 1497.27,-131.05"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="535.33,-40.74 525.08,-43.43 534.77,-47.72 535.33,-40.74"/>
 <text text-anchor="middle" x="1079" y="-56.69" font-family="Helvetica,sans-Serif" font-size="10.00"> java_load_classes</text>
 </g>
-<!-- Node26&#45;&gt;Node25 -->
+<!-- Node22&#45;&gt;Node21 -->
 <g id="edge28" class="edge">
-<title>Node26&#45;&gt;Node25</title>
+<title>Node22&#45;&gt;Node21</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M233.74,-3.59C270.89,0.16 320.08,2.41 363,-4.69 389.85,-9.14 419.25,-20.06 438.57,-28.12"/>
 <polygon fill="orange" stroke="orange" points="233.17,-0.13 223.6,-4.68 233.91,-7.09 233.17,-0.13"/>
 <text text-anchor="middle" x="308.5" y="-7.69" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; dstringt &gt;</text>

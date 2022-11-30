@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="convert__string__literal_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="convert__string__literal_8cpp.html" target="_top" xlink:title="C/C++ Language Conversion.">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 143,-47 143,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/literals</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="unescape__string_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="unescape__string_8cpp.html" target="_top" xlink:title="ANSI&#45;C Language Conversion.">
 <polygon fill="none" stroke="black" points="161.5,-6 161.5,-47 299.5,-47 299.5,-6 161.5,-6"/>
 <text text-anchor="start" x="169.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="169.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/literals</text>
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="ms__cl__cmdline_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="ms__cl__cmdline_8cpp.html" target="_top" xlink:title="A special command line object for the CL options.">
 <polygon fill="none" stroke="black" points="317.5,-6 317.5,-47 455.5,-47 455.5,-6 317.5,-6"/>
 <text text-anchor="start" x="325.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="325.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/ms_cl</text>
@@ -72,7 +72,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="ms__link__cmdline_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="ms__link__cmdline_8cpp.html" target="_top" xlink:title="A special command line object for LINK options.">
 <polygon fill="none" stroke="black" points="474,-6 474,-47 617,-47 617,-6 474,-6"/>
 <text text-anchor="start" x="482" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="482" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/ms_link</text>
@@ -89,7 +89,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="string__constraint__generator__constants_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="string__constraint__generator__constants_8cpp.html" target="_top" xlink:title="Generates string constraints for constant strings.">
 <polygon fill="none" stroke="black" points="635.5,-0.5 635.5,-52.5 789.5,-52.5 789.5,-0.5 635.5,-0.5"/>
 <text text-anchor="start" x="643.5" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="643.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>

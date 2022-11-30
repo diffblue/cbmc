@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Represents an entry in the write_stackt.">
 <polygon fill="#bfbfbf" stroke="black" points="83.5,-78.5 83.5,-119.5 252.5,-119.5 252.5,-78.5 83.5,-78.5"/>
 <text text-anchor="start" x="91.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="91.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="write__stack_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="write__stack_8cpp.html" target="_top" xlink:title="Represents a stack of write operations to an addressable memory location.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 152,-41.5 152,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="write__stack__entry_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="write__stack__entry_8cpp.html" target="_top" xlink:title="Represents an entry in the write_stackt.">
 <polygon fill="none" stroke="black" points="170,-0.5 170,-41.5 350,-41.5 350,-0.5 170,-0.5"/>
 <text text-anchor="start" x="178" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="178" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>

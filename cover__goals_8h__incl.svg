@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Cover a set of goals incrementally.">
 <polygon fill="#bfbfbf" stroke="black" points="33,-560.5 33,-601.5 171,-601.5 171,-560.5 33,-560.5"/>
 <text text-anchor="start" x="41" y="-589.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="41" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/prop</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title="Decision Procedure Interface.">
 <polygon fill="none" stroke="black" points="0,-112.5 0,-131.5 158,-131.5 158,-112.5 0,-112.5"/>
 <text text-anchor="middle" x="79" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/decision_procedure.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="666.5,-448.5 666.5,-467.5 713.5,-467.5 713.5,-448.5 666.5,-448.5"/>
 <text text-anchor="middle" x="690" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -316,7 +316,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="252,-168.5 252,-187.5 316,-187.5 316,-168.5 252,-168.5"/>
 <text text-anchor="middle" x="284" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -397,7 +397,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="214.5,-112.5 214.5,-131.5 273.5,-131.5 273.5,-112.5 214.5,-112.5"/>
 <text text-anchor="middle" x="244" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>

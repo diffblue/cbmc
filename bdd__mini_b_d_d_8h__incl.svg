@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th...">
 <polygon fill="#bfbfbf" stroke="black" points="39.5,-123.5 39.5,-164.5 177.5,-164.5 177.5,-123.5 39.5,-123.5"/>
 <text text-anchor="start" x="47.5" y="-152.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="47.5" y="-141.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/bdd</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="mini_b_d_d_8h.html" target="_top" xlink:title="Small BDD implementation.">
+<g id="a_node3"><a xlink:href="mini_b_d_d_8h.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
 <polygon fill="none" stroke="black" points="111,-56.5 111,-86.5 230,-86.5 230,-56.5 111,-56.5"/>
 <text text-anchor="start" x="119" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/bdd/miniBDD</text>
 <text text-anchor="middle" x="170.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">/miniBDD.h</text>

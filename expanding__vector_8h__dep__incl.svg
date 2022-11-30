@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="local__bitvector__analysis_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="local__bitvector__analysis_8h.html" target="_top" xlink:title="Field&#45;insensitive, location&#45;sensitive bitvector analysis.">
 <polygon fill="none" stroke="black" points="273,-156.5 273,-197.5 411,-197.5 411,-156.5 273,-156.5"/>
 <text text-anchor="start" x="281" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="281" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/local</text>
@@ -39,7 +39,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="java__bytecode__convert__method__class_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="java__bytecode__convert__method__class_8h.html" target="_top" xlink:title="JAVA Bytecode Language Conversion.">
 <polygon fill="none" stroke="black" points="486.5,-156.5 486.5,-197.5 701.5,-197.5 701.5,-156.5 486.5,-156.5"/>
 <text text-anchor="start" x="494.5" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="494.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -56,7 +56,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="local__bitvector__analysis_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="local__bitvector__analysis_8cpp.html" target="_top" xlink:title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis.">
 <polygon fill="none" stroke="black" points="0,-78.5 0,-119.5 138,-119.5 138,-78.5 0,-78.5"/>
 <text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/local</text>
@@ -73,7 +73,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__check__c_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__check__c_8cpp.html" target="_top" xlink:title="Checks for Errors in C/C++ Programs.">
 <polygon fill="none" stroke="black" points="156,-78.5 156,-119.5 294,-119.5 294,-78.5 156,-78.5"/>
 <text text-anchor="start" x="164" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/goto</text>
@@ -90,7 +90,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="312,-78.5 312,-119.5 506,-119.5 506,-78.5 312,-78.5"/>
 <text text-anchor="start" x="320" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="320" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -107,24 +107,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="java__bytecode__convert__method_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="561.5,-78.5 561.5,-119.5 746.5,-119.5 746.5,-78.5 561.5,-78.5"/>
-<text text-anchor="start" x="569.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="569.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
-<text text-anchor="middle" x="654" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/java_bytecode_convert_method.h</text>
-</a>
-</g>
-</g>
-<!-- Node6&#45;&gt;Node7 -->
-<g id="edge6" class="edge">
-<title>Node6&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M615.84,-148.34C623.39,-138.78 631.68,-128.27 638.6,-119.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="612.9,-146.41 609.45,-156.43 618.4,-150.75 612.9,-146.41"/>
-</g>
-<!-- Node9 -->
-<g id="node9" class="node">
-<title>Node9</title>
-<g id="a_node9"><a xlink:href="java__bytecode__convert__method_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="java__bytecode__convert__method_8cpp.html" target="_top" xlink:title="JAVA Bytecode Language Conversion.">
 <polygon fill="none" stroke="black" points="348,-0.5 348,-41.5 544,-41.5 544,-0.5 348,-0.5"/>
 <text text-anchor="start" x="356" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="356" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -132,16 +115,33 @@
 </a>
 </g>
 </g>
-<!-- Node6&#45;&gt;Node9 -->
-<g id="edge11" class="edge">
-<title>Node6&#45;&gt;Node9</title>
+<!-- Node6&#45;&gt;Node7 -->
+<g id="edge6" class="edge">
+<title>Node6&#45;&gt;Node7</title>
 <path fill="none" stroke="midnightblue" d="M573.91,-147.98C558.74,-127.63 536.87,-99.94 515,-78 501.93,-64.89 485.95,-51.76 472.66,-41.52"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="571.23,-150.24 579.98,-156.21 576.86,-146.08 571.23,-150.24"/>
+</g>
+<!-- Node8 -->
+<g id="node8" class="node">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="java__bytecode__convert__method_8h.html" target="_top" xlink:title="JAVA Bytecode Language Conversion.">
+<polygon fill="none" stroke="black" points="561.5,-78.5 561.5,-119.5 746.5,-119.5 746.5,-78.5 561.5,-78.5"/>
+<text text-anchor="start" x="569.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="569.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
+<text text-anchor="middle" x="654" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/java_bytecode_convert_method.h</text>
+</a>
+</g>
+</g>
+<!-- Node6&#45;&gt;Node8 -->
+<g id="edge7" class="edge">
+<title>Node6&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M615.84,-148.34C623.39,-138.78 631.68,-128.27 638.6,-119.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="612.9,-146.41 609.45,-156.43 618.4,-150.75 612.9,-146.41"/>
 </g>
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="java__local__variable__table_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="java__local__variable__table_8cpp.html" target="_top" xlink:title="Java local variable table processing.">
 <polygon fill="none" stroke="black" points="765,-78.5 765,-119.5 929,-119.5 929,-78.5 765,-78.5"/>
 <text text-anchor="start" x="773" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="773" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -155,10 +155,16 @@
 <path fill="none" stroke="midnightblue" d="M669.09,-153.44C705,-142.66 747.57,-129.87 782.07,-119.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="667.72,-150.2 659.15,-156.43 669.74,-156.9 667.72,-150.2"/>
 </g>
-<!-- Node8 -->
-<g id="node8" class="node">
-<title>Node8</title>
-<g id="a_node8"><a xlink:href="java__bytecode__convert__class_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node8&#45;&gt;Node7 -->
+<g id="edge9" class="edge">
+<title>Node8&#45;&gt;Node7</title>
+<path fill="none" stroke="midnightblue" d="M590.74,-74.89C561.55,-64.22 527.26,-51.69 499.38,-41.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="589.84,-78.28 600.43,-78.43 592.24,-71.71 589.84,-78.28"/>
+</g>
+<!-- Node9 -->
+<g id="node9" class="node">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="java__bytecode__convert__class_8cpp.html" target="_top" xlink:title="JAVA Bytecode Language Conversion.">
 <polygon fill="none" stroke="black" points="562.5,-0.5 562.5,-41.5 745.5,-41.5 745.5,-0.5 562.5,-0.5"/>
 <text text-anchor="start" x="570.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="570.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -166,17 +172,11 @@
 </a>
 </g>
 </g>
-<!-- Node7&#45;&gt;Node8 -->
-<g id="edge7" class="edge">
-<title>Node7&#45;&gt;Node8</title>
+<!-- Node8&#45;&gt;Node9 -->
+<g id="edge8" class="edge">
+<title>Node8&#45;&gt;Node9</title>
 <path fill="none" stroke="midnightblue" d="M654,-68.3C654,-59.3 654,-49.65 654,-41.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="650.5,-68.43 654,-78.43 657.5,-68.43 650.5,-68.43"/>
-</g>
-<!-- Node7&#45;&gt;Node9 -->
-<g id="edge8" class="edge">
-<title>Node7&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M590.74,-74.89C561.55,-64.22 527.26,-51.69 499.38,-41.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="589.84,-78.28 600.43,-78.43 592.24,-71.71 589.84,-78.28"/>
 </g>
 <!-- Node10 -->
 <g id="node10" class="node">
@@ -189,16 +189,16 @@
 </a>
 </g>
 </g>
-<!-- Node7&#45;&gt;Node10 -->
-<g id="edge9" class="edge">
-<title>Node7&#45;&gt;Node10</title>
+<!-- Node8&#45;&gt;Node10 -->
+<g id="edge10" class="edge">
+<title>Node8&#45;&gt;Node10</title>
 <path fill="none" stroke="midnightblue" d="M713.09,-74.61C739.89,-64 771.22,-51.6 796.72,-41.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="711.45,-71.49 703.44,-78.43 714.03,-78 711.45,-71.49"/>
 </g>
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="lambda__synthesis_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="lambda__synthesis_8cpp.html" target="_top" xlink:title="Java lambda code synthesis.">
 <polygon fill="none" stroke="black" points="946,-0.5 946,-41.5 1110,-41.5 1110,-0.5 946,-0.5"/>
 <text text-anchor="start" x="954" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="954" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -206,9 +206,9 @@
 </a>
 </g>
 </g>
-<!-- Node7&#45;&gt;Node11 -->
-<g id="edge10" class="edge">
-<title>Node7&#45;&gt;Node11</title>
+<!-- Node8&#45;&gt;Node11 -->
+<g id="edge11" class="edge">
+<title>Node8&#45;&gt;Node11</title>
 <path fill="none" stroke="midnightblue" d="M756.83,-77.76C830.3,-63.28 919.18,-45.72 937,-42 939.85,-41.4 942.75,-40.79 945.68,-40.17"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="755.71,-74.41 746.57,-79.78 757.06,-81.28 755.71,-74.41"/>
 </g>

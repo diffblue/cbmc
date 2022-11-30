@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="type__size__mapping_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="type__size__mapping_8h.html" target="_top" xlink:title="Utilities for making a map of types to associated sizes.">
 <polygon fill="none" stroke="black" points="805,-805.5 805,-824.5 925,-824.5 925,-805.5 805,-805.5"/>
 <text text-anchor="middle" x="865" y="-812.5" font-family="Helvetica,sans-Serif" font-size="10.00">type_size_mapping.h</text>
 </a>
@@ -53,7 +53,7 @@
 <!-- Node47 -->
 <g id="node32" class="node">
 <title>Node47</title>
-<g id="a_node32"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="339.5,-682.5 339.5,-701.5 444.5,-701.5 444.5,-682.5 339.5,-682.5"/>
 <text text-anchor="middle" x="392" y="-689.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/pointer_expr.h</text>
 </a>
@@ -98,7 +98,7 @@
 <!-- Node66 -->
 <g id="node50" class="node">
 <title>Node66</title>
-<g id="a_node50"><a xlink:href="pointer__offset__size_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="pointer__offset__size_8h.html" target="_top" xlink:title="Pointer Logic.">
 <polygon fill="none" stroke="black" points="703.5,-559.5 703.5,-589.5 806.5,-589.5 806.5,-559.5 703.5,-559.5"/>
 <text text-anchor="start" x="711.5" y="-577.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/pointer_offset</text>
 <text text-anchor="middle" x="755" y="-566.5" font-family="Helvetica,sans-Serif" font-size="10.00">_size.h</text>
@@ -161,7 +161,7 @@
 <!-- Node46 -->
 <g id="node31" class="node">
 <title>Node46</title>
-<g id="a_node31"><a xlink:href="object__tracking_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="object__tracking_8h.html" target="_top" xlink:title="Data structures and algorithms used by smt2_incremental_decision_proceduret to track data about the o...">
 <polygon fill="none" stroke="black" points="503.5,-738.5 503.5,-768.5 646.5,-768.5 646.5,-738.5 503.5,-738.5"/>
 <text text-anchor="start" x="511.5" y="-756.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="575" y="-745.5" font-family="Helvetica,sans-Serif" font-size="10.00">/object_tracking.h</text>
@@ -239,7 +239,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="555.5,-380.5 555.5,-399.5 602.5,-399.5 602.5,-380.5 555.5,-380.5"/>
 <text text-anchor="middle" x="579" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -443,7 +443,7 @@
 <!-- Node15 -->
 <g id="node13" class="node">
 <title>Node15</title>
-<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="1200,-56.5 1200,-75.5 1264,-75.5 1264,-56.5 1200,-56.5"/>
 <text text-anchor="middle" x="1232" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -588,7 +588,7 @@
 <!-- Node40 -->
 <g id="node25" class="node">
 <title>Node40</title>
-<g id="a_node25"><a xlink:href="type__traits_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="type__traits_8h.html" target="_top" xlink:title="Back ports of utilities available in the &lt;type_traits&gt; library for C++14 or C++17 to C++11.">
 <polygon fill="none" stroke="black" points="746.5,-112.5 746.5,-142.5 889.5,-142.5 889.5,-112.5 746.5,-112.5"/>
 <text text-anchor="start" x="754.5" y="-130.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="818" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">/type_traits.h</text>
@@ -619,7 +619,7 @@
 <!-- Node42 -->
 <g id="node27" class="node">
 <title>Node42</title>
-<g id="a_node27"><a xlink:href="smt__sorts_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="smt__sorts_8h.html" target="_top" xlink:title="Data structure for smt sorts.">
 <polygon fill="none" stroke="black" points="1068,-185 1068,-204 1142,-204 1142,-185 1068,-185"/>
 <text text-anchor="middle" x="1105" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">smt_sorts.h</text>
 </a>
@@ -751,7 +751,7 @@
 <!-- Node48 -->
 <g id="node33" class="node">
 <title>Node48</title>
-<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="343.5,-626.5 343.5,-645.5 444.5,-645.5 444.5,-626.5 343.5,-626.5"/>
 <text text-anchor="middle" x="394" y="-633.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -766,7 +766,7 @@
 <!-- Node54 -->
 <g id="node38" class="node">
 <title>Node54</title>
-<g id="a_node38"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="145.5,-626.5 145.5,-645.5 212.5,-645.5 212.5,-626.5 145.5,-626.5"/>
 <text text-anchor="middle" x="179" y="-633.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -781,7 +781,7 @@
 <!-- Node49 -->
 <g id="node34" class="node">
 <title>Node49</title>
-<g id="a_node34"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="272.5,-565 272.5,-584 345.5,-584 345.5,-565 272.5,-565"/>
 <text text-anchor="middle" x="309" y="-572" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

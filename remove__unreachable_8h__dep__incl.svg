@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Program Transformation.">
 <polygon fill="#bfbfbf" stroke="black" points="160,-78.5 160,-119.5 298,-119.5 298,-78.5 160,-78.5"/>
 <text text-anchor="start" x="168" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="168" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="reachability__slicer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="reachability__slicer_8cpp.html" target="_top" xlink:title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,...">
 <polygon fill="none" stroke="black" points="156.5,-0.5 156.5,-41.5 301.5,-41.5 301.5,-0.5 156.5,-0.5"/>
 <text text-anchor="start" x="164.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="remove__unreachable_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="remove__unreachable_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="319.5,-0.5 319.5,-41.5 462.5,-41.5 462.5,-0.5 319.5,-0.5"/>
 <text text-anchor="start" x="327.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="327.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>

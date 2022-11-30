@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="c__wrangler_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="c__wrangler_8cpp.html" target="_top" xlink:title="C Wrangler.">
 <polygon fill="none" stroke="black" points="394,-6 394,-36 576,-36 576,-6 394,-6"/>
 <text text-anchor="start" x="402" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="485" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/c_wrangler.cpp</text>
@@ -69,7 +69,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="as__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="as__mode_8cpp.html" target="_top" xlink:title="Assembler Mode.">
 <polygon fill="none" stroke="black" points="594,-6 594,-36 764,-36 764,-6 594,-6"/>
 <text text-anchor="start" x="602" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="679" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/as_mode.cpp</text>
@@ -85,7 +85,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="compile_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="compile_8cpp.html" target="_top" xlink:title="Compile and link source and object files.">
 <polygon fill="none" stroke="black" points="782,-6 782,-36 946,-36 946,-6 782,-6"/>
 <text text-anchor="start" x="790" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="864" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/compile.cpp</text>
@@ -101,7 +101,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="gcc__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="gcc__mode_8cpp.html" target="_top" xlink:title="GCC Mode.">
 <polygon fill="none" stroke="black" points="964,-0.5 964,-41.5 1102,-41.5 1102,-0.5 964,-0.5"/>
 <text text-anchor="start" x="972" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="972" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/gcc</text>
@@ -118,7 +118,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="hybrid__binary_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="hybrid__binary_8cpp.html" target="_top" xlink:title="Create hybrid binary with goto&#45;binary section.">
 <polygon fill="none" stroke="black" points="1120,-0.5 1120,-41.5 1258,-41.5 1258,-0.5 1120,-0.5"/>
 <text text-anchor="start" x="1128" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1128" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/hybrid</text>
@@ -135,7 +135,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="ld__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="ld__mode_8cpp.html" target="_top" xlink:title="LD Mode.">
 <polygon fill="none" stroke="black" points="1276.5,-6 1276.5,-36 1443.5,-36 1443.5,-6 1276.5,-6"/>
 <text text-anchor="start" x="1284.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="1360" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/ld_mode.cpp</text>
@@ -185,7 +185,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="osx__fat__reader_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="osx__fat__reader_8cpp.html" target="_top" xlink:title="Read Mach&#45;O.">
 <polygon fill="none" stroke="black" points="1774,-0.5 1774,-41.5 1912,-41.5 1912,-0.5 1774,-0.5"/>
 <text text-anchor="start" x="1782" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1782" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -202,7 +202,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="external__sat_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="external__sat_8cpp.html" target="_top" xlink:title="Allows call an external SAT solver to allow faster integration of newer SAT solvers.">
 <polygon fill="none" stroke="black" points="1930,-0.5 1930,-41.5 2068,-41.5 2068,-0.5 1930,-0.5"/>
 <text text-anchor="start" x="1938" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1938" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/sat</text>

@@ -123,7 +123,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:title="STL class.">
+<g id="a_node7"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="0,-141.5 0,-160.5 97,-160.5 97,-141.5 0,-141.5"/>
 <text text-anchor="middle" x="48.5" y="-148.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>
@@ -166,16 +166,16 @@
 <title>Node9&#45;&gt;Node4</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M605.31,-290.66C639.18,-286.42 680.26,-280.92 717,-275 732.48,-272.51 749.59,-269.29 763.87,-266.48"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="604.54,-287.23 595.05,-291.93 605.4,-294.17 604.54,-287.23"/>
-<text text-anchor="middle" x="668.5" y="-401" font-family="Helvetica,sans-Serif" font-size="10.00"> cyan</text>
-<text text-anchor="middle" x="668.5" y="-390" font-family="Helvetica,sans-Serif" font-size="10.00">bright_yellow</text>
-<text text-anchor="middle" x="668.5" y="-379" font-family="Helvetica,sans-Serif" font-size="10.00">bold</text>
-<text text-anchor="middle" x="668.5" y="-368" font-family="Helvetica,sans-Serif" font-size="10.00">yellow</text>
-<text text-anchor="middle" x="668.5" y="-357" font-family="Helvetica,sans-Serif" font-size="10.00">bright_blue</text>
-<text text-anchor="middle" x="668.5" y="-346" font-family="Helvetica,sans-Serif" font-size="10.00">magenta</text>
-<text text-anchor="middle" x="668.5" y="-335" font-family="Helvetica,sans-Serif" font-size="10.00">reset</text>
-<text text-anchor="middle" x="668.5" y="-324" font-family="Helvetica,sans-Serif" font-size="10.00">bright_magenta</text>
-<text text-anchor="middle" x="668.5" y="-313" font-family="Helvetica,sans-Serif" font-size="10.00">underline</text>
-<text text-anchor="middle" x="668.5" y="-302" font-family="Helvetica,sans-Serif" font-size="10.00">blue</text>
+<text text-anchor="middle" x="668.5" y="-401" font-family="Helvetica,sans-Serif" font-size="10.00"> blue</text>
+<text text-anchor="middle" x="668.5" y="-390" font-family="Helvetica,sans-Serif" font-size="10.00">bold</text>
+<text text-anchor="middle" x="668.5" y="-379" font-family="Helvetica,sans-Serif" font-size="10.00">bright_blue</text>
+<text text-anchor="middle" x="668.5" y="-368" font-family="Helvetica,sans-Serif" font-size="10.00">bright_cyan</text>
+<text text-anchor="middle" x="668.5" y="-357" font-family="Helvetica,sans-Serif" font-size="10.00">bright_green</text>
+<text text-anchor="middle" x="668.5" y="-346" font-family="Helvetica,sans-Serif" font-size="10.00">bright_magenta</text>
+<text text-anchor="middle" x="668.5" y="-335" font-family="Helvetica,sans-Serif" font-size="10.00">bright_red</text>
+<text text-anchor="middle" x="668.5" y="-324" font-family="Helvetica,sans-Serif" font-size="10.00">bright_yellow</text>
+<text text-anchor="middle" x="668.5" y="-313" font-family="Helvetica,sans-Serif" font-size="10.00">cyan</text>
+<text text-anchor="middle" x="668.5" y="-302" font-family="Helvetica,sans-Serif" font-size="10.00">faint</text>
 <text text-anchor="middle" x="668.5" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">...</text>
 </g>
 <!-- Node10&#45;&gt;Node4 -->
@@ -188,7 +188,7 @@
 <!-- Node11 -->
 <g id="node10" class="node">
 <title>Node11</title>
-<g id="a_node10"><a xlink:title="STL class.">
+<g id="a_node10"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="743.5,-169.5 743.5,-188.5 849.5,-188.5 849.5,-169.5 743.5,-169.5"/>
 <text text-anchor="middle" x="796.5" y="-176.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::ostringstream</text>
 </a>
@@ -203,10 +203,10 @@
 <!-- Node12 -->
 <g id="node11" class="node">
 <title>Node12</title>
-<g id="a_node11"><a xlink:title="STL class.">
+<g id="a_node11"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="465,-164 465,-194 602,-194 602,-164 465,-164"/>
 <text text-anchor="start" x="473" y="-182" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_ostringstream</text>
-<text text-anchor="middle" x="533.5" y="-171" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; char &gt;</text>
+<text text-anchor="middle" x="533.5" y="-171" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; Char &gt;</text>
 </a>
 </g>
 </g>
@@ -301,10 +301,10 @@
 <title>Node26&#45;&gt;Node28</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M565.51,-56.75C581.47,-50.63 601.43,-44.06 620,-41 708.34,-26.43 812.6,-31.82 875.84,-37.54"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="564.14,-53.52 556.14,-60.46 566.72,-60.03 564.14,-53.52"/>
-<text text-anchor="middle" x="668.5" y="-77" font-family="Helvetica,sans-Serif" font-size="10.00"> round_to_zero</text>
+<text text-anchor="middle" x="668.5" y="-77" font-family="Helvetica,sans-Serif" font-size="10.00"> round_to_even</text>
 <text text-anchor="middle" x="668.5" y="-66" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_minus_inf</text>
 <text text-anchor="middle" x="668.5" y="-55" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_plus_inf</text>
-<text text-anchor="middle" x="668.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_even</text>
+<text text-anchor="middle" x="668.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">round_to_zero</text>
 </g>
 <!-- Node27 -->
 <g id="node17" class="node">

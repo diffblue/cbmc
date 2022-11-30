@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="C++ Language Module.">
 <polygon fill="#bfbfbf" stroke="black" points="492,-78.5 492,-108.5 655,-108.5 655,-78.5 492,-78.5"/>
 <text text-anchor="start" x="500" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="573.5" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_language.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cbmc__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cbmc__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 197,-36 197,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="98.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_languages.cpp</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title="C++ Language Module.">
 <polygon fill="none" stroke="black" points="215.5,-6 215.5,-36 389.5,-36 389.5,-6 215.5,-6"/>
 <text text-anchor="start" x="223.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="302.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_language.cpp</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__analyzer__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__analyzer__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="407.5,-0.5 407.5,-41.5 571.5,-41.5 571.5,-0.5 407.5,-0.5"/>
 <text text-anchor="start" x="415.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="415.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -70,7 +70,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__cc__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__cc__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="589.5,-0.5 589.5,-41.5 727.5,-41.5 727.5,-0.5 589.5,-0.5"/>
 <text text-anchor="start" x="597.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="597.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/goto</text>
@@ -87,7 +87,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__diff__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__diff__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="745.5,-0.5 745.5,-41.5 883.5,-41.5 883.5,-0.5 745.5,-0.5"/>
 <text text-anchor="start" x="753.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="753.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;diff/goto</text>
@@ -104,7 +104,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="goto__instrument__languages_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="goto__instrument__languages_8cpp.html" target="_top" xlink:title="Language Registration.">
 <polygon fill="none" stroke="black" points="901.5,-0.5 901.5,-41.5 1077.5,-41.5 1077.5,-0.5 901.5,-0.5"/>
 <text text-anchor="start" x="909.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="909.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

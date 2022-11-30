@@ -1,6 +1,9 @@
 var classlazy__goto__functions__mapt =
 [
     [ "can_generate_function_bodyt", "classlazy__goto__functions__mapt.html#a8fcacf7efbd7a5755e6dccc7304f775f", null ],
+    [ "const_mapped_type", "classlazy__goto__functions__mapt.html#a776623d2fdec9d8e2bbc1da491b70baf", null ],
+    [ "const_pointer", "classlazy__goto__functions__mapt.html#a88467beab8d6f1e84cd8131d7b34afbe", null ],
+    [ "const_reference", "classlazy__goto__functions__mapt.html#aa8920c3249bd6ff70853b39631a8f132", null ],
     [ "generate_function_bodyt", "classlazy__goto__functions__mapt.html#a72c2a432a0162e0de841eddb4a752100", null ],
     [ "key_type", "classlazy__goto__functions__mapt.html#aa66793c24acd0ebdbd96c329cf0e8ee1", null ],
     [ "mapped_type", "classlazy__goto__functions__mapt.html#abe014942a2587fb2f40bcc27d619416a", null ],
@@ -18,9 +21,6 @@ var classlazy__goto__functions__mapt =
     [ "ensure_function_loaded", "classlazy__goto__functions__mapt.html#a2ebe7bb51a8f72f5a29b6947de7caeb2", null ],
     [ "ensure_function_loaded_internal", "classlazy__goto__functions__mapt.html#afb6fe9ee34de15d84eceaa42b68cbe4f", null ],
     [ "unload", "classlazy__goto__functions__mapt.html#a844a44057f28acf41ca9e4fac3862d32", null ],
-    [ "const_mapped_type", "classlazy__goto__functions__mapt.html#a08952e7791b3549e388b4e716e2d7b53", null ],
-    [ "const_pointer", "classlazy__goto__functions__mapt.html#a43d9f0c156a37cf2128bfd86ab78bb35", null ],
-    [ "const_reference", "classlazy__goto__functions__mapt.html#a19796728910d2daea69d641e82a1b8cd", null ],
     [ "driver_program_can_generate_function_body", "classlazy__goto__functions__mapt.html#aac3a6b71ca4ff6c20b0d408a9dfd146f", null ],
     [ "driver_program_generate_function_body", "classlazy__goto__functions__mapt.html#aefca4806668ff8e2c34efe2bf94706de", null ],
     [ "goto_functions", "classlazy__goto__functions__mapt.html#a604fc65737b761db0f2e0d6efd48d7fc", null ],

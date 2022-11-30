@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Interface to Cudd BDD functions that are used in CBMC BDD functions should only be accessed through t...">
 <polygon fill="#bfbfbf" stroke="black" points="49,-168.5 49,-209.5 187,-209.5 187,-168.5 49,-168.5"/>
 <text text-anchor="start" x="57" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="57" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/bdd</text>

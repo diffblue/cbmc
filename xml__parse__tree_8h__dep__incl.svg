@@ -12,17 +12,34 @@
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="266,-156.5 266,-197.5 404,-197.5 404,-156.5 266,-156.5"/>
-<text text-anchor="start" x="274" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="274" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
-<text text-anchor="middle" x="335" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">_parse_tree.h</text>
+<polygon fill="#bfbfbf" stroke="black" points="110,-156.5 110,-197.5 248,-197.5 248,-156.5 110,-156.5"/>
+<text text-anchor="start" x="118" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="118" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
+<text text-anchor="middle" x="179" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">_parse_tree.h</text>
 </a>
 </g>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="xml__parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="xml__parse__tree_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="32,-78.5 32,-119.5 170,-119.5 170,-78.5 32,-78.5"/>
+<text text-anchor="start" x="40" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="40" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
+<text text-anchor="middle" x="101" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">_parse_tree.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge">
+<title>Node1&#45;&gt;Node2</title>
+<path fill="none" stroke="midnightblue" d="M151.5,-149.2C141.45,-139.42 130.29,-128.54 121.02,-119.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="149.31,-151.96 158.91,-156.43 154.19,-146.94 149.31,-151.96"/>
+</g>
+<!-- Node3 -->
+<g id="node3" class="node">
+<title>Node3</title>
+<g id="a_node3"><a xlink:href="xml__parser_8h.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="188,-78.5 188,-119.5 326,-119.5 326,-78.5 188,-78.5"/>
 <text text-anchor="start" x="196" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="196" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
@@ -30,49 +47,32 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node2 -->
-<g id="edge1" class="edge">
-<title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M307.5,-149.2C297.45,-139.42 286.29,-128.54 277.02,-119.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="305.31,-151.96 314.91,-156.43 310.19,-146.94 305.31,-151.96"/>
+<!-- Node1&#45;&gt;Node3 -->
+<g id="edge2" class="edge">
+<title>Node1&#45;&gt;Node3</title>
+<path fill="none" stroke="midnightblue" d="M206.5,-149.2C216.55,-139.42 227.71,-128.54 236.98,-119.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="203.81,-146.94 199.09,-156.43 208.69,-151.96 203.81,-146.94"/>
 </g>
-<!-- Node6 -->
-<g id="node6" class="node">
-<title>Node6</title>
-<g id="a_node6"><a xlink:href="xml__parse__tree_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="344,-78.5 344,-119.5 482,-119.5 482,-78.5 344,-78.5"/>
-<text text-anchor="start" x="352" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="352" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
-<text text-anchor="middle" x="413" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">_parse_tree.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node6 -->
-<g id="edge5" class="edge">
-<title>Node1&#45;&gt;Node6</title>
-<path fill="none" stroke="midnightblue" d="M362.5,-149.2C372.55,-139.42 383.71,-128.54 392.98,-119.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="359.81,-146.94 355.09,-156.43 364.69,-151.96 359.81,-146.94"/>
-</g>
-<!-- Node3 -->
-<g id="node3" class="node">
-<title>Node3</title>
-<g id="a_node3"><a xlink:href="graphml_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node4 -->
+<g id="node4" class="node">
+<title>Node4</title>
+<g id="a_node4"><a xlink:href="graphml_8cpp.html" target="_top" xlink:title="Read/write graphs as GraphML.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 170,-36 170,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="85" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/graphml.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node3 -->
-<g id="edge2" class="edge">
-<title>Node2&#45;&gt;Node3</title>
+<!-- Node3&#45;&gt;Node4 -->
+<g id="edge3" class="edge">
+<title>Node3&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M203.32,-74.28C174.97,-61.76 141.14,-46.81 116.93,-36.11"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="202.14,-77.59 212.71,-78.43 204.97,-71.19 202.14,-77.59"/>
 </g>
-<!-- Node4 -->
-<g id="node4" class="node">
-<title>Node4</title>
-<g id="a_node4"><a xlink:href="xml__interface_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node5 -->
+<g id="node5" class="node">
+<title>Node5</title>
+<g id="a_node5"><a xlink:href="xml__interface_8cpp.html" target="_top" xlink:title="XML Interface.">
 <polygon fill="none" stroke="black" points="188,-0.5 188,-41.5 326,-41.5 326,-0.5 188,-0.5"/>
 <text text-anchor="start" x="196" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="196" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
@@ -80,16 +80,16 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node4 -->
-<g id="edge3" class="edge">
-<title>Node2&#45;&gt;Node4</title>
+<!-- Node3&#45;&gt;Node5 -->
+<g id="edge4" class="edge">
+<title>Node3&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M257,-68.3C257,-59.3 257,-49.65 257,-41.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="253.5,-68.43 257,-78.43 260.5,-68.43 253.5,-68.43"/>
 </g>
-<!-- Node5 -->
-<g id="node5" class="node">
-<title>Node5</title>
-<g id="a_node5"><a xlink:href="xml__parser_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node6 -->
+<g id="node6" class="node">
+<title>Node6</title>
+<g id="a_node6"><a xlink:href="xml__parser_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="344,-0.5 344,-41.5 482,-41.5 482,-0.5 344,-0.5"/>
 <text text-anchor="start" x="352" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="352" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/xml</text>
@@ -97,9 +97,9 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node5 -->
-<g id="edge4" class="edge">
-<title>Node2&#45;&gt;Node5</title>
+<!-- Node3&#45;&gt;Node6 -->
+<g id="edge5" class="edge">
+<title>Node3&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M306.45,-73.91C327.9,-63.46 352.69,-51.38 372.96,-41.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="304.63,-70.9 297.17,-78.43 307.7,-77.19 304.63,-70.9"/>
 </g>

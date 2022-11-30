@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Goto Trace Storage.">
 <polygon fill="#bfbfbf" stroke="black" points="399,-167.5 399,-208.5 537,-208.5 537,-167.5 399,-167.5"/>
 <text text-anchor="start" x="407" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="407" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="c__test__input__generator_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="c__test__input__generator_8cpp.html" target="_top" xlink:title="Test Input Generator for C.">
 <polygon fill="none" stroke="black" points="0,-84 0,-125 138,-125 138,-84 0,-84"/>
 <text text-anchor="start" x="8" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/c_test</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="all__properties__verifier__with__fault__localization_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="all__properties__verifier__with__fault__localization_8h.html" target="_top" xlink:title="Goto verifier for verifying all properties that stores traces and localizes faults.">
 <polygon fill="none" stroke="black" points="318.5,-78.5 318.5,-130.5 459.5,-130.5 459.5,-78.5 318.5,-78.5"/>
 <text text-anchor="start" x="326.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="326.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -57,7 +57,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="all__properties__verifier__with__trace__storage_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="all__properties__verifier__with__trace__storage_8h.html" target="_top" xlink:title="Goto verifier for verifying all properties that stores traces.">
 <polygon fill="none" stroke="black" points="478,-78.5 478,-130.5 616,-130.5 616,-78.5 478,-78.5"/>
 <text text-anchor="start" x="486" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="486" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -75,7 +75,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="cover__goals__verifier__with__trace__storage_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="cover__goals__verifier__with__trace__storage_8h.html" target="_top" xlink:title="Goto verifier for covering goals that stores traces.">
 <polygon fill="none" stroke="black" points="156,-78.5 156,-130.5 300,-130.5 300,-78.5 156,-78.5"/>
 <text text-anchor="start" x="164" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -93,7 +93,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="goto__trace__storage_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="goto__trace__storage_8cpp.html" target="_top" xlink:title="Goto Trace Storage.">
 <polygon fill="none" stroke="black" points="634,-84 634,-125 772,-125 772,-84 634,-84"/>
 <text text-anchor="start" x="642" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="642" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -110,7 +110,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="report__util_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="report__util_8cpp.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="790,-84 790,-125 928,-125 928,-84 790,-84"/>
 <text text-anchor="start" x="798" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="798" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -127,7 +127,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="303,-0.5 303,-41.5 457,-41.5 457,-0.5 303,-0.5"/>
 <text text-anchor="start" x="311" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="311" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -144,7 +144,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="475,-0.5 475,-41.5 619,-41.5 619,-0.5 475,-0.5"/>
 <text text-anchor="start" x="483" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="483" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>

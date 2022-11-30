@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="C Wrangler.">
 <polygon fill="#bfbfbf" stroke="black" points="1311,-392.5 1311,-422.5 1493,-422.5 1493,-392.5 1311,-392.5"/>
 <text text-anchor="start" x="1319" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="1402" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/c_wrangler.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="c__wrangler_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="c__wrangler_8h.html" target="_top" xlink:title="C Wrangler.">
 <polygon fill="none" stroke="black" points="0,-336.5 0,-355.5 78,-355.5 78,-336.5 0,-336.5"/>
 <text text-anchor="middle" x="39" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">c_wrangler.h</text>
 </a>
@@ -141,7 +141,7 @@
 <!-- Node40 -->
 <g id="node36" class="node">
 <title>Node40</title>
-<g id="a_node36"><a xlink:href="c__defines_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="c__defines_8h.html" target="_top" xlink:title="c_defines">
 <polygon fill="none" stroke="black" points="1318.5,-112.5 1318.5,-131.5 1389.5,-131.5 1389.5,-112.5 1318.5,-112.5"/>
 <text text-anchor="middle" x="1354" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">c_defines.h</text>
 </a>
@@ -156,7 +156,7 @@
 <!-- Node41 -->
 <g id="node37" class="node">
 <title>Node41</title>
-<g id="a_node37"><a xlink:href="ctokenit_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="ctokenit_8h.html" target="_top" xlink:title="ctokenit">
 <polygon fill="none" stroke="black" points="1446.5,-112.5 1446.5,-131.5 1511.5,-131.5 1511.5,-112.5 1446.5,-112.5"/>
 <text text-anchor="middle" x="1479" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">ctokenit.h</text>
 </a>
@@ -171,7 +171,7 @@
 <!-- Node43 -->
 <g id="node39" class="node">
 <title>Node43</title>
-<g id="a_node39"><a xlink:href="mini__c__parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="mini__c__parser_8h.html" target="_top" xlink:title="Mini C Parser.">
 <polygon fill="none" stroke="black" points="1568.5,-112.5 1568.5,-131.5 1661.5,-131.5 1661.5,-112.5 1568.5,-112.5"/>
 <text text-anchor="middle" x="1615" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">mini_c_parser.h</text>
 </a>
@@ -396,7 +396,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="1001,-168.5 1001,-187.5 1065,-187.5 1065,-168.5 1001,-168.5"/>
 <text text-anchor="middle" x="1033" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -426,7 +426,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="1088.5,-112.5 1088.5,-131.5 1147.5,-131.5 1147.5,-112.5 1088.5,-112.5"/>
 <text text-anchor="middle" x="1118" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -492,7 +492,7 @@
 <!-- Node19 -->
 <g id="node18" class="node">
 <title>Node19</title>
-<g id="a_node18"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="1098,-56.5 1098,-75.5 1202,-75.5 1202,-56.5 1098,-56.5"/>
 <text text-anchor="middle" x="1150" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -645,7 +645,7 @@
 <!-- Node34 -->
 <g id="node30" class="node">
 <title>Node34</title>
-<g id="a_node30"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="550.5,-112.5 550.5,-131.5 603.5,-131.5 603.5,-112.5 550.5,-112.5"/>
 <text text-anchor="middle" x="577" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>
@@ -777,7 +777,7 @@
 <!-- Node42 -->
 <g id="node38" class="node">
 <title>Node42</title>
-<g id="a_node38"><a xlink:href="ctoken_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="ctoken_8h.html" target="_top" xlink:title="ctoken">
 <polygon fill="none" stroke="black" points="1572,-56.5 1572,-75.5 1630,-75.5 1630,-56.5 1572,-56.5"/>
 <text text-anchor="middle" x="1601" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">ctoken.h</text>
 </a>

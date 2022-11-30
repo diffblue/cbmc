@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Slicing.">
 <polygon fill="#bfbfbf" stroke="black" points="210.5,-156.5 210.5,-197.5 355.5,-197.5 355.5,-156.5 210.5,-156.5"/>
 <text text-anchor="start" x="218.5" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="218.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cbmc__parse__options_8cpp.html" target="_top" xlink:title="CBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="0,-78.5 0,-119.5 154,-119.5 154,-78.5 0,-78.5"/>
 <text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cbmc/cbmc_parse</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="full__slicer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="full__slicer_8cpp.html" target="_top" xlink:title="Slicing.">
 <polygon fill="none" stroke="black" points="109.5,-0.5 109.5,-41.5 254.5,-41.5 254.5,-0.5 109.5,-0.5"/>
 <text text-anchor="start" x="117.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="117.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="full__slicer__class_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="full__slicer__class_8h.html" target="_top" xlink:title="Goto Program Slicing.">
 <polygon fill="none" stroke="black" points="210.5,-78.5 210.5,-119.5 355.5,-119.5 355.5,-78.5 210.5,-78.5"/>
 <text text-anchor="start" x="218.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="218.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -73,7 +73,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__instrument__parse__options_8cpp.html" target="_top" xlink:title="Main Module.">
 <polygon fill="none" stroke="black" points="374,-78.5 374,-119.5 568,-119.5 568,-78.5 374,-78.5"/>
 <text text-anchor="start" x="382" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="382" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -90,7 +90,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="jbmc__parse__options_8cpp.html" target="_top" xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="586,-78.5 586,-119.5 730,-119.5 730,-78.5 586,-78.5"/>
 <text text-anchor="start" x="594" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="594" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -113,7 +113,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="reachability__slicer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="reachability__slicer_8cpp.html" target="_top" xlink:title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,...">
 <polygon fill="none" stroke="black" points="272.5,-0.5 272.5,-41.5 417.5,-41.5 417.5,-0.5 272.5,-0.5"/>
 <text text-anchor="start" x="280.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="280.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>

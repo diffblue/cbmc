@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="API to expression classes that are internal to the C frontend.">
 <polygon fill="#bfbfbf" stroke="black" points="1380.5,-89.5 1380.5,-119.5 1519.5,-119.5 1519.5,-89.5 1380.5,-89.5"/>
 <text text-anchor="start" x="1388.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="1450" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_expr.h</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="c__typecheck__code_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="c__typecheck__code_8cpp.html" target="_top" xlink:title="C Language Type Checking.">
 <polygon fill="none" stroke="black" points="167.5,-6 167.5,-47 326.5,-47 326.5,-6 167.5,-6"/>
 <text text-anchor="start" x="175.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="175.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -54,7 +54,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="c__typecheck__expr_8cpp.html" target="_top" xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="none" stroke="black" points="344.5,-6 344.5,-47 503.5,-47 503.5,-6 344.5,-6"/>
 <text text-anchor="start" x="352.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="352.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -71,7 +71,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="c__typecheck__gcc__polymorphic__builtins_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="c__typecheck__gcc__polymorphic__builtins_8cpp.html" target="_top" xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="none" stroke="black" points="522,-6 522,-47 688,-47 688,-6 522,-6"/>
 <text text-anchor="start" x="530" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="530" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -88,7 +88,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="contracts_8cpp.html" target="_top" xlink:title="Verify and use annotated loop and function contracts.">
 <polygon fill="none" stroke="black" points="706.5,-6 706.5,-47 851.5,-47 851.5,-6 706.5,-6"/>
 <text text-anchor="start" x="714.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="714.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -249,7 +249,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="instrument__spec__assigns_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="instrument__spec__assigns_8cpp.html" target="_top" xlink:title="Specify write set in code contracts.">
 <polygon fill="none" stroke="black" points="2210.5,-0.5 2210.5,-52.5 2359.5,-52.5 2359.5,-0.5 2210.5,-0.5"/>
 <text text-anchor="start" x="2218.5" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2218.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -284,7 +284,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="goto__convert__side__effect_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="goto__convert__side__effect_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="2541,-6 2541,-47 2703,-47 2703,-6 2541,-6"/>
 <text text-anchor="start" x="2549" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2549" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -301,7 +301,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="remove__vector_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="remove__vector_8cpp.html" target="_top" xlink:title="Remove &#39;vector&#39; data type.">
 <polygon fill="none" stroke="black" points="2721,-6 2721,-47 2859,-47 2859,-6 2721,-6"/>
 <text text-anchor="start" x="2729" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2729" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>

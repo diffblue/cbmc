@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="#bfbfbf" stroke="black" points="1055.5,-728.5 1055.5,-769.5 1214.5,-769.5 1214.5,-728.5 1055.5,-728.5"/>
 <text text-anchor="start" x="1063.5" y="-757.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1063.5" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/c_typecheck</text>
@@ -82,7 +82,7 @@
 <!-- Node49 -->
 <g id="node46" class="node">
 <title>Node49</title>
-<g id="a_node46"><a xlink:href="designator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="designator_8h.html" target="_top" xlink:title="ANSI&#45;C Language Type Checking.">
 <polygon fill="none" stroke="black" points="1354.5,-448.5 1354.5,-467.5 1431.5,-467.5 1431.5,-448.5 1354.5,-448.5"/>
 <text text-anchor="middle" x="1393" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">designator.h</text>
 </a>
@@ -229,7 +229,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="1019,-224.5 1019,-243.5 1083,-243.5 1083,-224.5 1019,-224.5"/>
 <text text-anchor="middle" x="1051" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -259,7 +259,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="1077.5,-168.5 1077.5,-187.5 1136.5,-187.5 1136.5,-168.5 1077.5,-168.5"/>
 <text text-anchor="middle" x="1107" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -325,7 +325,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="957,-112.5 957,-131.5 1061,-131.5 1061,-112.5 957,-112.5"/>
 <text text-anchor="middle" x="1009" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -406,7 +406,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="string__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="string__hash_8h.html" target="_top" xlink:title="string hashing">
 <polygon fill="none" stroke="black" points="1001,-56.5 1001,-75.5 1083,-75.5 1083,-56.5 1001,-56.5"/>
 <text text-anchor="middle" x="1042" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_hash.h</text>
 </a>
@@ -532,7 +532,7 @@
 <!-- Node45 -->
 <g id="node42" class="node">
 <title>Node45</title>
-<g id="a_node42"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="181.5,-616.5 181.5,-635.5 248.5,-635.5 248.5,-616.5 181.5,-616.5"/>
 <text text-anchor="middle" x="215" y="-623.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -583,7 +583,7 @@
 <!-- Node42 -->
 <g id="node39" class="node">
 <title>Node42</title>
-<g id="a_node39"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="229.5,-560.5 229.5,-579.5 302.5,-579.5 302.5,-560.5 229.5,-560.5"/>
 <text text-anchor="middle" x="266" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -667,7 +667,7 @@
 <!-- Node32 -->
 <g id="node32" class="node">
 <title>Node32</title>
-<g id="a_node32"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="632.5,-392.5 632.5,-411.5 679.5,-411.5 679.5,-392.5 632.5,-392.5"/>
 <text text-anchor="middle" x="656" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

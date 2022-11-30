@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Fences for instrumentation.">
 <polygon fill="#bfbfbf" stroke="black" points="272.5,-459.5 272.5,-500.5 417.5,-500.5 417.5,-459.5 272.5,-459.5"/>
 <text text-anchor="start" x="280.5" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="280.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="fence_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="fence_8h.html" target="_top" xlink:title="Fences for instrumentation.">
 <polygon fill="none" stroke="black" points="232.5,-403.5 232.5,-422.5 285.5,-422.5 285.5,-403.5 232.5,-403.5"/>
 <text text-anchor="middle" x="259" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">fence.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="171.5,-336.5 171.5,-366.5 284.5,-366.5 284.5,-336.5 171.5,-336.5"/>
 <text text-anchor="start" x="179.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="228" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -218,7 +218,7 @@
 <!-- Node46 -->
 <g id="node18" class="node">
 <title>Node46</title>
-<g id="a_node18"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="400,-224.5 400,-243.5 486,-243.5 486,-224.5 400,-224.5"/>
 <text text-anchor="middle" x="443" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -254,7 +254,7 @@
 <!-- Node43 -->
 <g id="node13" class="node">
 <title>Node43</title>
-<g id="a_node13"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="528.5,-168.5 528.5,-187.5 601.5,-187.5 601.5,-168.5 528.5,-168.5"/>
 <text text-anchor="middle" x="565" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

@@ -1,31 +1,31 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/pointer_predicates.h" name="/home/runner/work/cbmc/cbmc/src/util/pointer_predicates.h">
-<area shape="rect" id="node1" title=" " alt="" coords="3037,5,3221,61"/>
-<area shape="rect" id="node2" href="$c__typecheck__expr_8cpp.html" title=" " alt="" coords="5,117,217,173"/>
-<area shape="rect" id="node3" href="$goto__check__c_8cpp.html" title=" " alt="" coords="242,117,426,173"/>
-<area shape="rect" id="node4" href="$axioms_8cpp.html" title=" " alt="" coords="450,124,666,165"/>
+<area shape="rect" id="node1" title="Various predicates over pointers in programs." alt="" coords="3037,5,3221,61"/>
+<area shape="rect" id="node2" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="5,117,217,173"/>
+<area shape="rect" id="node3" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="242,117,426,173"/>
+<area shape="rect" id="node4" href="$axioms_8cpp.html" title="Axioms." alt="" coords="450,124,666,165"/>
 <area shape="rect" id="node5" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="691,117,908,173"/>
-<area shape="rect" id="node6" href="$c__safety__checks_8cpp.html" title=" " alt="" coords="932,117,1128,173"/>
-<area shape="rect" id="node7" href="$instrument__contracts_8cpp.html" title=" " alt="" coords="1152,117,1364,173"/>
-<area shape="rect" id="node8" href="$may__be__same__object_8cpp.html" title=" " alt="" coords="1389,117,1573,173"/>
-<area shape="rect" id="node9" href="$simplify__state__expr_8cpp.html" title=" " alt="" coords="1597,117,1791,173"/>
+<area shape="rect" id="node6" href="$c__safety__checks_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="932,117,1128,173"/>
+<area shape="rect" id="node7" href="$instrument__contracts_8cpp.html" title="Instrument Contracts." alt="" coords="1152,117,1364,173"/>
+<area shape="rect" id="node8" href="$may__be__same__object_8cpp.html" title="May Be Same Object." alt="" coords="1389,117,1573,173"/>
+<area shape="rect" id="node9" href="$simplify__state__expr_8cpp.html" title="Simplify State Expressions." alt="" coords="1597,117,1791,173"/>
 <area shape="rect" id="node10" href="$dfcc_8cpp.html" title=" " alt="" coords="1815,109,2013,180"/>
 <area shape="rect" id="node11" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2037,109,2234,180"/>
 <area shape="rect" id="node12" href="$dfcc__library_8cpp.html" title=" " alt="" coords="2258,109,2455,180"/>
 <area shape="rect" id="node13" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2479,109,2677,180"/>
-<area shape="rect" id="node14" href="$instrument__spec__assigns_8cpp.html" title=" " alt="" coords="2701,109,2900,180"/>
+<area shape="rect" id="node14" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="2701,109,2900,180"/>
 <area shape="rect" id="node15" href="$utils_8cpp.html" title=" " alt="" coords="2924,117,3117,173"/>
-<area shape="rect" id="node16" href="$race__check_8cpp.html" title=" " alt="" coords="3141,117,3335,173"/>
-<area shape="rect" id="node17" href="$graphml__witness_8cpp.html" title=" " alt="" coords="3359,117,3543,173"/>
-<area shape="rect" id="node18" href="$mm__io_8cpp.html" title=" " alt="" coords="3567,117,3751,173"/>
-<area shape="rect" id="node19" href="$string__abstraction_8cpp.html" title=" " alt="" coords="3775,117,3959,173"/>
-<area shape="rect" id="node20" href="$symex__builtin__functions_8cpp.html" title=" " alt="" coords="3984,117,4199,173"/>
-<area shape="rect" id="node21" href="$value__set__dereference_8cpp.html" title=" " alt="" coords="4223,117,4424,173"/>
+<area shape="rect" id="node16" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="3141,117,3335,173"/>
+<area shape="rect" id="node17" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="3359,117,3543,173"/>
+<area shape="rect" id="node18" href="$mm__io_8cpp.html" title="Perform Memory&#45;mapped I/O instrumentation." alt="" coords="3567,117,3751,173"/>
+<area shape="rect" id="node19" href="$string__abstraction_8cpp.html" title="String Abstraction." alt="" coords="3775,117,3959,173"/>
+<area shape="rect" id="node20" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3984,117,4199,173"/>
+<area shape="rect" id="node21" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4223,117,4424,173"/>
 <area shape="rect" id="node22" href="$bv__pointers_8cpp.html" title=" " alt="" coords="4448,117,4649,173"/>
-<area shape="rect" id="node23" href="$pointer__logic_8cpp.html" title=" " alt="" coords="4673,117,4875,173"/>
-<area shape="rect" id="node24" href="$smt2__conv_8cpp.html" title=" " alt="" coords="4899,117,5083,173"/>
+<area shape="rect" id="node23" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="4673,117,4875,173"/>
+<area shape="rect" id="node24" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4899,117,5083,173"/>
 <area shape="rect" id="node25" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5108,109,5304,180"/>
 <area shape="rect" id="node26" href="$object__tracking_8cpp.html" title=" " alt="" coords="5328,117,5567,173"/>
 <area shape="rect" id="node27" href="$pointer__expr_8cpp.html" title=" " alt="" coords="5591,117,5775,173"/>
-<area shape="rect" id="node28" href="$pointer__predicates_8cpp.html" title=" " alt="" coords="5799,117,5983,173"/>
+<area shape="rect" id="node28" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="5799,117,5983,173"/>
 <area shape="rect" id="node29" href="$simplify__expr__pointer_8cpp.html" title=" " alt="" coords="6007,117,6191,173"/>
 </map>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac...">
 <polygon fill="#bfbfbf" stroke="black" points="376.5,-178.5 376.5,-230.5 528.5,-230.5 528.5,-178.5 376.5,-178.5"/>
 <text text-anchor="start" x="384.5" y="-218.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="384.5" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="data__dependency__context_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="data__dependency__context_8h.html" target="_top" xlink:title="Maintain data dependencies as a context in the variable sensitivity domain.">
 <polygon fill="none" stroke="black" points="187,-89.5 187,-141.5 348,-141.5 348,-89.5 187,-89.5"/>
 <text text-anchor="start" x="195" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="195" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -41,7 +41,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="liveness__context_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="liveness__context_8h.html" target="_top" xlink:title="Maintain a context in the variable sensitvity domain that records the liveness region for a given abs...">
 <polygon fill="none" stroke="black" points="369.5,-95 369.5,-136 535.5,-136 535.5,-95 369.5,-95"/>
 <text text-anchor="start" x="377.5" y="-124" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="377.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>
@@ -76,7 +76,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="data__dependency__context_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="data__dependency__context_8cpp.html" target="_top" xlink:title="Maintain data dependencies as a context in the variable sensitivity domain.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-52.5 161,-52.5 161,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/variable</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Read/write graphs as GraphML.">
 <polygon fill="#bfbfbf" stroke="black" points="154,-156.5 154,-186.5 312,-186.5 312,-156.5 154,-156.5"/>
 <text text-anchor="start" x="162" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="233" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/graphml.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="graphml__witness_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="graphml__witness_8h.html" target="_top" xlink:title="Witnesses for Traces and Proofs.">
 <polygon fill="none" stroke="black" points="78,-78.5 78,-119.5 216,-119.5 216,-78.5 78,-78.5"/>
 <text text-anchor="start" x="86" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="86" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -38,7 +38,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="graphml_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="graphml_8cpp.html" target="_top" xlink:title="Read/write graphs as GraphML.">
 <polygon fill="none" stroke="black" points="234,-84 234,-114 404,-114 404,-84 234,-84"/>
 <text text-anchor="start" x="242" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="319" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/xmllang/graphml.cpp</text>
@@ -54,7 +54,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="bmc__util_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="bmc__util_8cpp.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 138,-41.5 138,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -71,7 +71,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="graphml__witness_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="graphml__witness_8cpp.html" target="_top" xlink:title="Witnesses for Traces and Proofs.">
 <polygon fill="none" stroke="black" points="156,-0.5 156,-41.5 294,-41.5 294,-0.5 156,-0.5"/>
 <text text-anchor="start" x="164" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="164" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>

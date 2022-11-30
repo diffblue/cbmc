@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Hashing IREPs.">
 <polygon fill="#bfbfbf" stroke="black" points="467.5,-392.5 467.5,-433.5 605.5,-433.5 605.5,-392.5 467.5,-392.5"/>
 <text text-anchor="start" x="475.5" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="475.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_hash</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="irep__hash__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="irep__hash__container_8h.html" target="_top" xlink:title="IREP Hash Container.">
 <polygon fill="none" stroke="black" points="208,-336.5 208,-355.5 331,-355.5 331,-336.5 208,-336.5"/>
 <text text-anchor="middle" x="269.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_hash_container.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node30 -->
 <g id="node30" class="node">
 <title>Node30</title>
-<g id="a_node30"><a xlink:href="irep__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="irep__hash_8h.html" target="_top" xlink:title="irep hash functions">
 <polygon fill="none" stroke="black" points="758,-336.5 758,-355.5 831,-355.5 831,-336.5 758,-336.5"/>
 <text text-anchor="middle" x="794.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_hash.h</text>
 </a>
@@ -154,7 +154,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="425.5,-224.5 425.5,-243.5 489.5,-243.5 489.5,-224.5 425.5,-224.5"/>
 <text text-anchor="middle" x="457.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -235,7 +235,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="428,-168.5 428,-187.5 487,-187.5 487,-168.5 428,-168.5"/>
 <text text-anchor="middle" x="457.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -301,7 +301,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="335.5,-112.5 335.5,-131.5 439.5,-131.5 439.5,-112.5 335.5,-112.5"/>
 <text text-anchor="middle" x="387.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -382,7 +382,7 @@
 <!-- Node20 -->
 <g id="node20" class="node">
 <title>Node20</title>
-<g id="a_node20"><a xlink:href="string__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="string__hash_8h.html" target="_top" xlink:title="string hashing">
 <polygon fill="none" stroke="black" points="307.5,-56.5 307.5,-75.5 389.5,-75.5 389.5,-56.5 307.5,-56.5"/>
 <text text-anchor="middle" x="348.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_hash.h</text>
 </a>

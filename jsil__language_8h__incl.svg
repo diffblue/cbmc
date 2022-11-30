@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Jsil Language.">
 <polygon fill="#bfbfbf" stroke="black" points="86.5,-728.5 86.5,-758.5 243.5,-758.5 243.5,-728.5 86.5,-728.5"/>
 <text text-anchor="start" x="94.5" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="165" y="-735.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/jsil/jsil_language.h</text>
@@ -51,7 +51,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="language_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="language_8h.html" target="_top" xlink:title="Abstract interface to support a programming language.">
 <polygon fill="none" stroke="black" points="178,-392.5 178,-411.5 288,-411.5 288,-392.5 178,-392.5"/>
 <text text-anchor="middle" x="233" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">langapi/language.h</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node36 -->
 <g id="node29" class="node">
 <title>Node36</title>
-<g id="a_node29"><a xlink:href="jsil__parse__tree_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="jsil__parse__tree_8h.html" target="_top" xlink:title="Jsil Language.">
 <polygon fill="none" stroke="black" points="515.5,-672.5 515.5,-691.5 612.5,-691.5 612.5,-672.5 515.5,-672.5"/>
 <text text-anchor="middle" x="564" y="-679.5" font-family="Helvetica,sans-Serif" font-size="10.00">jsil_parse_tree.h</text>
 </a>
@@ -372,7 +372,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="575,-168.5 575,-187.5 639,-187.5 639,-168.5 575,-168.5"/>
 <text text-anchor="middle" x="607" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -402,7 +402,7 @@
 <!-- Node20 -->
 <g id="node20" class="node">
 <title>Node20</title>
-<g id="a_node20"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="453.5,-112.5 453.5,-131.5 512.5,-131.5 512.5,-112.5 453.5,-112.5"/>
 <text text-anchor="middle" x="483" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -588,7 +588,7 @@
 <!-- Node51 -->
 <g id="node45" class="node">
 <title>Node51</title>
-<g id="a_node45"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1180.5,-560.5 1180.5,-579.5 1247.5,-579.5 1247.5,-560.5 1180.5,-560.5"/>
 <text text-anchor="middle" x="1214" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -639,7 +639,7 @@
 <!-- Node48 -->
 <g id="node41" class="node">
 <title>Node48</title>
-<g id="a_node41"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1268.5,-504.5 1268.5,-523.5 1341.5,-523.5 1341.5,-504.5 1268.5,-504.5"/>
 <text text-anchor="middle" x="1305" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -714,7 +714,7 @@
 <!-- Node42 -->
 <g id="node36" class="node">
 <title>Node42</title>
-<g id="a_node36"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1266.5,-336.5 1266.5,-355.5 1313.5,-355.5 1313.5,-336.5 1266.5,-336.5"/>
 <text text-anchor="middle" x="1290" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

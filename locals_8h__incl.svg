@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Local variables whose address is taken.">
 <polygon fill="#bfbfbf" stroke="black" points="610.5,-336.5 610.5,-366.5 760.5,-366.5 760.5,-336.5 610.5,-336.5"/>
 <text text-anchor="start" x="618.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="685.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/locals.h</text>
@@ -111,7 +111,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="456.5,-224.5 456.5,-243.5 520.5,-243.5 520.5,-224.5 456.5,-224.5"/>
 <text text-anchor="middle" x="488.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -192,7 +192,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="544,-168.5 544,-187.5 603,-187.5 603,-168.5 544,-168.5"/>
 <text text-anchor="middle" x="573.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -249,7 +249,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="519.5,-112.5 519.5,-131.5 623.5,-131.5 623.5,-112.5 519.5,-112.5"/>
 <text text-anchor="middle" x="571.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -330,7 +330,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="string__hash_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="string__hash_8h.html" target="_top" xlink:title="string hashing">
 <polygon fill="none" stroke="black" points="517.5,-56.5 517.5,-75.5 599.5,-75.5 599.5,-56.5 517.5,-56.5"/>
 <text text-anchor="middle" x="558.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_hash.h</text>
 </a>

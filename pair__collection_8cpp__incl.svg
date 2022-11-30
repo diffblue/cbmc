@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="collection of pairs (for Pensieve&#39;s static delay&#45;set analysis) in graph of abstract events">
 <polygon fill="#bfbfbf" stroke="black" points="652.5,-448.5 652.5,-489.5 797.5,-489.5 797.5,-448.5 652.5,-448.5"/>
 <text text-anchor="start" x="660.5" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="660.5" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="event__graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="event__graph_8h.html" target="_top" xlink:title="graph of abstract events">
 <polygon fill="none" stroke="black" points="576,-392.5 576,-411.5 662,-411.5 662,-392.5 576,-392.5"/>
 <text text-anchor="middle" x="619" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">event_graph.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="black" points="626,-280.5 626,-299.5 698,-299.5 698,-280.5 626,-280.5"/>
 <text text-anchor="middle" x="662" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -157,7 +157,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="abstract__event_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="abstract__event_8h.html" target="_top" xlink:title="abstract events">
 <polygon fill="none" stroke="black" points="536,-336.5 536,-355.5 634,-355.5 634,-336.5 536,-336.5"/>
 <text text-anchor="middle" x="585" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_event.h</text>
 </a>
@@ -172,7 +172,7 @@
 <!-- Node37 -->
 <g id="node31" class="node">
 <title>Node37</title>
-<g id="a_node31"><a xlink:href="wmm_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="wmm_8h.html" target="_top" xlink:title="memory models">
 <polygon fill="none" stroke="black" points="327.5,-280.5 327.5,-299.5 380.5,-299.5 380.5,-280.5 327.5,-280.5"/>
 <text text-anchor="middle" x="354" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">wmm.h</text>
 </a>
@@ -187,7 +187,7 @@
 <!-- Node38 -->
 <g id="node32" class="node">
 <title>Node38</title>
-<g id="a_node32"><a xlink:href="data__dp_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="data__dp_8h.html" target="_top" xlink:title="data dependencies">
 <polygon fill="none" stroke="black" points="414.5,-336.5 414.5,-355.5 479.5,-355.5 479.5,-336.5 414.5,-336.5"/>
 <text text-anchor="middle" x="447" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">data_dp.h</text>
 </a>
@@ -463,7 +463,7 @@
 <!-- Node22 -->
 <g id="node22" class="node">
 <title>Node22</title>
-<g id="a_node22"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="229,-168.5 229,-187.5 293,-187.5 293,-168.5 229,-168.5"/>
 <text text-anchor="middle" x="261" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -493,7 +493,7 @@
 <!-- Node23 -->
 <g id="node23" class="node">
 <title>Node23</title>
-<g id="a_node23"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="258.5,-112.5 258.5,-131.5 317.5,-131.5 317.5,-112.5 258.5,-112.5"/>
 <text text-anchor="middle" x="288" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>

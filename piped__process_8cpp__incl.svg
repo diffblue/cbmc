@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Subprocess communication with pipes.">
 <polygon fill="#bfbfbf" stroke="black" points="255,-448.5 255,-478.5 430,-478.5 430,-448.5 255,-448.5"/>
 <text text-anchor="start" x="263" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="342.5" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/piped_process.cpp</text>
@@ -156,7 +156,7 @@
 <!-- Node34 -->
 <g id="node29" class="node">
 <title>Node34</title>
-<g id="a_node29"><a xlink:href="piped__process_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="piped__process_8h.html" target="_top" xlink:title="Subprocess communication with pipes.">
 <polygon fill="none" stroke="black" points="689,-392.5 689,-411.5 784,-411.5 784,-392.5 689,-392.5"/>
 <text text-anchor="middle" x="736.5" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">piped_process.h</text>
 </a>
@@ -348,7 +348,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="824.5,-168.5 824.5,-187.5 888.5,-187.5 888.5,-168.5 824.5,-168.5"/>
 <text text-anchor="middle" x="856.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -378,7 +378,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="912,-112.5 912,-131.5 971,-131.5 971,-112.5 912,-112.5"/>
 <text text-anchor="middle" x="941.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -444,7 +444,7 @@
 <!-- Node21 -->
 <g id="node20" class="node">
 <title>Node21</title>
-<g id="a_node20"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="839.5,-56.5 839.5,-75.5 943.5,-75.5 943.5,-56.5 839.5,-56.5"/>
 <text text-anchor="middle" x="891.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>

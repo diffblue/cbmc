@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Memory model for partial order concurrency.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-336.5 0,-377.5 169,-377.5 169,-336.5 0,-336.5"/>
 <text text-anchor="start" x="8" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/memory</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="memory__model__pso_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="memory__model__pso_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="22,-280.5 22,-299.5 147,-299.5 147,-280.5 22,-280.5"/>
 <text text-anchor="middle" x="84.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model_pso.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="memory__model__tso_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="memory__model__tso_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="23,-224.5 23,-243.5 146,-243.5 146,-224.5 23,-224.5"/>
 <text text-anchor="middle" x="84.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model_tso.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="memory__model__sc_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="memory__model__sc_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="25,-168.5 25,-187.5 144,-187.5 144,-168.5 25,-168.5"/>
 <text text-anchor="middle" x="84.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model_sc.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="memory__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="memory__model_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="33,-112.5 33,-131.5 136,-131.5 136,-112.5 33,-112.5"/>
 <text text-anchor="middle" x="84.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="partial__order__concurrency_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="partial__order__concurrency_8h.html" target="_top" xlink:title="Add constraints to equation encoding partial orders on events.">
 <polygon fill="none" stroke="black" points="9,-56.5 9,-75.5 160,-75.5 160,-56.5 9,-56.5"/>
 <text text-anchor="middle" x="84.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">partial_order_concurrency.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="red" points="14,-0.5 14,-19.5 155,-19.5 155,-0.5 14,-0.5"/>
 <text text-anchor="middle" x="84.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target_equation.h</text>
 </a>

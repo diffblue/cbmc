@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="JBMC Command Line Option Processing.">
 <polygon fill="#bfbfbf" stroke="black" points="1013,-380.5 1013,-421.5 1157,-421.5 1157,-380.5 1013,-380.5"/>
 <text text-anchor="start" x="1021" y="-409.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1021" y="-398.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/jbmc/jbmc</text>
@@ -82,7 +82,7 @@
 <!-- Node38 -->
 <g id="node19" class="node">
 <title>Node38</title>
-<g id="a_node19"><a xlink:href="language_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="language_8h.html" target="_top" xlink:title="Abstract interface to support a programming language.">
 <polygon fill="none" stroke="black" points="2335,-185 2335,-204 2445,-204 2445,-185 2335,-185"/>
 <text text-anchor="middle" x="2390" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">langapi/language.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node41 -->
 <g id="node22" class="node">
 <title>Node41</title>
-<g id="a_node22"><a xlink:href="bmc__util_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="bmc__util_8h.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="398,-319 398,-338 532,-338 532,-319 398,-319"/>
 <text text-anchor="middle" x="465" y="-326" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;checker/bmc_util.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node76 -->
 <g id="node31" class="node">
 <title>Node76</title>
-<g id="a_node31"><a xlink:href="class__hierarchy_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="class__hierarchy_8h.html" target="_top" xlink:title="Class Hierarchy.">
 <polygon fill="none" stroke="black" points="1718,-179.5 1718,-209.5 1834,-209.5 1834,-179.5 1718,-179.5"/>
 <text text-anchor="start" x="1726" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/class</text>
 <text text-anchor="middle" x="1776" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">_hierarchy.h</text>
@@ -128,7 +128,7 @@
 <!-- Node62 -->
 <g id="node34" class="node">
 <title>Node62</title>
-<g id="a_node34"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="1427.5,-179.5 1427.5,-209.5 1540.5,-209.5 1540.5,-179.5 1427.5,-179.5"/>
 <text text-anchor="start" x="1435.5" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1484" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace.h</text>
@@ -144,7 +144,7 @@
 <!-- Node80 -->
 <g id="node36" class="node">
 <title>Node80</title>
-<g id="a_node36"><a xlink:href="show__properties_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="show__properties_8h.html" target="_top" xlink:title="Show the properties.">
 <polygon fill="none" stroke="black" points="1046.5,-179.5 1046.5,-209.5 1163.5,-209.5 1163.5,-179.5 1046.5,-179.5"/>
 <text text-anchor="start" x="1054.5" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/show</text>
 <text text-anchor="middle" x="1105" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">_properties.h</text>
@@ -160,7 +160,7 @@
 <!-- Node81 -->
 <g id="node37" class="node">
 <title>Node81</title>
-<g id="a_node37"><a xlink:href="string__refinement_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="string__refinement_8h.html" target="_top" xlink:title="String support via creating string constraints and progressively instantiating the universal constrai...">
 <polygon fill="none" stroke="black" points="959.5,-246.5 959.5,-276.5 1078.5,-276.5 1078.5,-246.5 959.5,-246.5"/>
 <text text-anchor="start" x="967.5" y="-264.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/strings/string</text>
 <text text-anchor="middle" x="1019" y="-253.5" font-family="Helvetica,sans-Serif" font-size="10.00">_refinement.h</text>
@@ -208,7 +208,7 @@
 <!-- Node159 -->
 <g id="node59" class="node">
 <title>Node159</title>
-<g id="a_node59"><a xlink:href="json__interface_8h.html" target="_top" xlink:title=" ">
+<g id="a_node59"><a xlink:href="json__interface_8h.html" target="_top" xlink:title="JSON Commandline Interface.">
 <polygon fill="none" stroke="black" points="2596,-319 2596,-338 2714,-338 2714,-319 2596,-319"/>
 <text text-anchor="middle" x="2655" y="-326" font-family="Helvetica,sans-Serif" font-size="10.00">json/json_interface.h</text>
 </a>
@@ -223,7 +223,7 @@
 <!-- Node160 -->
 <g id="node60" class="node">
 <title>Node160</title>
-<g id="a_node60"><a xlink:href="xml__interface_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="xml__interface_8h.html" target="_top" xlink:title="XML Interface.">
 <polygon fill="none" stroke="black" points="2732,-319 2732,-338 2868,-338 2868,-319 2732,-319"/>
 <text text-anchor="middle" x="2800" y="-326" font-family="Helvetica,sans-Serif" font-size="10.00">xmllang/xml_interface.h</text>
 </a>
@@ -553,7 +553,7 @@
 <!-- Node42 -->
 <g id="node23" class="node">
 <title>Node42</title>
-<g id="a_node23"><a xlink:href="unwindset_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="unwindset_8h.html" target="_top" xlink:title="Loop unwinding.">
 <polygon fill="none" stroke="black" points="112,-185 112,-204 270,-204 270,-185 112,-185"/>
 <text text-anchor="middle" x="191" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;instrument/unwindset.h</text>
 </a>
@@ -568,7 +568,7 @@
 <!-- Node44 -->
 <g id="node26" class="node">
 <title>Node44</title>
-<g id="a_node26"><a xlink:href="build__goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="build__goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="red" points="340.5,-246.5 340.5,-276.5 469.5,-276.5 469.5,-246.5 340.5,-246.5"/>
 <text text-anchor="start" x="348.5" y="-264.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;symex/build_goto</text>
 <text text-anchor="middle" x="405" y="-253.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace.h</text>
@@ -584,7 +584,7 @@
 <!-- Node73 -->
 <g id="node27" class="node">
 <title>Node73</title>
-<g id="a_node27"><a xlink:href="incremental__goto__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="incremental__goto__checker_8h.html" target="_top" xlink:title="Incremental Goto Checker Interface.">
 <polygon fill="none" stroke="black" points="1809.5,-252 1809.5,-271 1962.5,-271 1962.5,-252 1809.5,-252"/>
 <text text-anchor="middle" x="1886" y="-259" font-family="Helvetica,sans-Serif" font-size="10.00">incremental_goto_checker.h</text>
 </a>
@@ -599,7 +599,7 @@
 <!-- Node74 -->
 <g id="node28" class="node">
 <title>Node74</title>
-<g id="a_node28"><a xlink:href="properties_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="properties_8h.html" target="_top" xlink:title="Properties.">
 <polygon fill="none" stroke="black" points="1334.5,-185 1334.5,-204 1409.5,-204 1409.5,-185 1334.5,-185"/>
 <text text-anchor="middle" x="1372" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">properties.h</text>
 </a>
@@ -719,7 +719,7 @@
 <!-- Node64 -->
 <g id="node29" class="node">
 <title>Node64</title>
-<g id="a_node29"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node29"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="1263.5,-112.5 1263.5,-142.5 1376.5,-142.5 1376.5,-112.5 1263.5,-112.5"/>
 <text text-anchor="start" x="1271.5" y="-130.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1320" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -804,7 +804,7 @@
 <!-- Node77 -->
 <g id="node33" class="node">
 <title>Node77</title>
-<g id="a_node33"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="red" points="1799,-118 1799,-137 1871,-137 1871,-118 1799,-118"/>
 <text text-anchor="middle" x="1835" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -885,7 +885,7 @@
 <!-- Node63 -->
 <g id="node35" class="node">
 <title>Node63</title>
-<g id="a_node35"><a xlink:href="options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="options_8h.html" target="_top" xlink:title="Options.">
 <polygon fill="none" stroke="black" points="390,-118 390,-137 470,-137 470,-118 390,-118"/>
 <text text-anchor="middle" x="430" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">util/options.h</text>
 </a>
@@ -945,7 +945,7 @@
 <!-- Node84 -->
 <g id="node39" class="node">
 <title>Node84</title>
-<g id="a_node39"><a xlink:href="bv__refinement_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="bv__refinement_8h.html" target="_top" xlink:title="Abstraction Refinement Loop.">
 <polygon fill="none" stroke="red" points="920,-179.5 920,-209.5 1028,-209.5 1028,-179.5 920,-179.5"/>
 <text text-anchor="start" x="928" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/refinement</text>
 <text text-anchor="middle" x="974" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">/bv_refinement.h</text>
@@ -961,7 +961,7 @@
 <!-- Node110 -->
 <g id="node40" class="node">
 <title>Node110</title>
-<g id="a_node40"><a xlink:href="string__constraint__generator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="string__constraint__generator_8h.html" target="_top" xlink:title="Generates string constraints to link results from string functions with their arguments.">
 <polygon fill="none" stroke="red" points="609.5,-118 609.5,-137 768.5,-137 768.5,-118 609.5,-118"/>
 <text text-anchor="middle" x="689" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">string_constraint_generator.h</text>
 </a>
@@ -976,7 +976,7 @@
 <!-- Node123 -->
 <g id="node41" class="node">
 <title>Node123</title>
-<g id="a_node41"><a xlink:href="string__dependencies_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="string__dependencies_8h.html" target="_top" xlink:title="Keeps track of dependencies between strings.">
 <polygon fill="none" stroke="red" points="622,-185 622,-204 748,-204 748,-185 622,-185"/>
 <text text-anchor="middle" x="685" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">string_dependencies.h</text>
 </a>
@@ -1078,7 +1078,7 @@
 <!-- Node130 -->
 <g id="node46" class="node">
 <title>Node130</title>
-<g id="a_node46"><a xlink:href="prefix__filter_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="prefix__filter_8h.html" target="_top" xlink:title="Prefix Filtering.">
 <polygon fill="none" stroke="black" points="824.5,-118 824.5,-137 923.5,-137 923.5,-118 824.5,-118"/>
 <text text-anchor="middle" x="874" y="-125" font-family="Helvetica,sans-Serif" font-size="10.00">util/prefix_filter.h</text>
 </a>
@@ -1108,7 +1108,7 @@
 <!-- Node132 -->
 <g id="node48" class="node">
 <title>Node132</title>
-<g id="a_node48"><a xlink:href="ci__lazy__methods_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="ci__lazy__methods_8h.html" target="_top" xlink:title="Collect methods needed to be loaded using the lazy method.">
 <polygon fill="none" stroke="red" points="1645.5,-252 1645.5,-271 1752.5,-271 1752.5,-252 1645.5,-252"/>
 <text text-anchor="middle" x="1699" y="-259" font-family="Helvetica,sans-Serif" font-size="10.00">ci_lazy_methods.h</text>
 </a>
@@ -1123,7 +1123,7 @@
 <!-- Node138 -->
 <g id="node49" class="node">
 <title>Node138</title>
-<g id="a_node49"><a xlink:href="synthetic__methods__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="synthetic__methods__map_8h.html" target="_top" xlink:title="Synthetic methods are particular methods internally generated by the Java frontend,...">
 <polygon fill="none" stroke="black" points="1890,-185 1890,-204 2036,-204 2036,-185 1890,-185"/>
 <text text-anchor="middle" x="1963" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">synthetic_methods_map.h</text>
 </a>
@@ -1138,7 +1138,7 @@
 <!-- Node139 -->
 <g id="node50" class="node">
 <title>Node139</title>
-<g id="a_node50"><a xlink:href="ci__lazy__methods__needed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="ci__lazy__methods__needed_8h.html" target="_top" xlink:title="Context&#45;insensitive lazy methods container.">
 <polygon fill="none" stroke="black" points="2167.5,-185 2167.5,-204 2316.5,-204 2316.5,-185 2167.5,-185"/>
 <text text-anchor="middle" x="2242" y="-192" font-family="Helvetica,sans-Serif" font-size="10.00">ci_lazy_methods_needed.h</text>
 </a>
@@ -1214,7 +1214,7 @@
 <!-- Node154 -->
 <g id="node55" class="node">
 <title>Node154</title>
-<g id="a_node55"><a xlink:href="java__string__library__preprocess_8h.html" target="_top" xlink:title=" ">
+<g id="a_node55"><a xlink:href="java__string__library__preprocess_8h.html" target="_top" xlink:title="Produce code for simple implementation of String Java libraries.">
 <polygon fill="none" stroke="red" points="2653.5,-179.5 2653.5,-209.5 2760.5,-209.5 2760.5,-179.5 2653.5,-179.5"/>
 <text text-anchor="start" x="2661.5" y="-197.5" font-family="Helvetica,sans-Serif" font-size="10.00">java_string_library</text>
 <text text-anchor="middle" x="2707" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">_preprocess.h</text>
@@ -1230,7 +1230,7 @@
 <!-- Node157 -->
 <g id="node56" class="node">
 <title>Node157</title>
-<g id="a_node56"><a xlink:href="select__pointer__type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="select__pointer__type_8h.html" target="_top" xlink:title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)...">
 <polygon fill="none" stroke="red" points="2418,-252 2418,-271 2540,-271 2540,-252 2418,-252"/>
 <text text-anchor="middle" x="2479" y="-259" font-family="Helvetica,sans-Serif" font-size="10.00">select_pointer_type.h</text>
 </a>

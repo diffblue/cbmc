@@ -1,12 +1,12 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_bytecode_convert_class.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_bytecode_convert_class.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1137,5,1366,61"/>
+<area shape="rect" id="node1" title="JAVA Bytecode Language Conversion." alt="" coords="1137,5,1366,61"/>
 <area shape="rect" id="node2" title=" " alt="" coords="1099,109,1214,136"/>
 <area shape="rect" id="node3" href="$java__bytecode__parse__tree_8h.html" title=" " alt="" coords="1126,184,1286,225"/>
 <area shape="rect" id="node40" href="$java__class__loader_8h.html" title=" " alt="" coords="1335,109,1485,136"/>
 <area shape="rect" id="node4" title=" " alt="" coords="146,348,189,375"/>
 <area shape="rect" id="node5" title=" " alt="" coords="1654,1020,1705,1047"/>
 <area shape="rect" id="node6" href="$optional_8h.html" title=" " alt="" coords="1098,1095,1210,1121"/>
-<area shape="rect" id="node8" href="$std__types_8h.html" title=" " alt="" coords="466,572,589,599"/>
+<area shape="rect" id="node8" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="466,572,589,599"/>
 <area shape="rect" id="node31" href="$bytecode__info_8h.html" title=" " alt="" coords="67,273,193,300"/>
 <area shape="rect" id="node33" href="$java__types_8h.html" title=" " alt="" coords="375,273,480,300"/>
 <area shape="rect" id="node7" title=" " alt="" coords="1079,1169,1229,1196"/>
@@ -17,7 +17,7 @@
 <area shape="rect" id="node27" href="$mp__arith_8h.html" title=" " alt="" coords="816,647,908,673"/>
 <area shape="rect" id="node30" title=" " alt="" coords="1233,1095,1357,1121"/>
 <area shape="rect" id="node10" href="$as__const_8h.html" title=" " alt="" coords="525,796,615,823"/>
-<area shape="rect" id="node11" href="$type_8h.html" title=" " alt="" coords="640,796,703,823"/>
+<area shape="rect" id="node11" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="640,796,703,823"/>
 <area shape="rect" id="node21" href="$validation__mode_8h.html" title=" " alt="" coords="624,945,767,972"/>
 <area shape="rect" id="node22" href="$validate__types_8h.html" title=" " alt="" coords="821,871,951,897"/>
 <area shape="rect" id="node23" href="$validate__expressions_8h.html" title=" " alt="" coords="779,796,951,823"/>
@@ -35,11 +35,11 @@
 <area shape="rect" id="node32" title=" " alt="" coords="55,348,122,375"/>
 <area shape="rect" id="node34" title=" " alt="" coords="547,348,633,375"/>
 <area shape="rect" id="node35" href="$c__types_8h.html" title=" " alt="" coords="414,348,523,375"/>
-<area shape="rect" id="node38" href="$std__expr_8h.html" title=" " alt="" coords="248,497,337,524"/>
+<area shape="rect" id="node38" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="248,497,337,524"/>
 <area shape="rect" id="node39" href="$narrow_8h.html" title=" " alt="" coords="5,1095,84,1121"/>
-<area shape="rect" id="node36" href="$pointer__expr_8h.html" title=" " alt="" coords="413,423,527,449"/>
-<area shape="rect" id="node37" href="$bitvector__types_8h.html" title=" " alt="" coords="436,497,571,524"/>
-<area shape="rect" id="node41" href="$fixed__keys__map__wrapper_8h.html" title=" " alt="" coords="1335,184,1485,225"/>
+<area shape="rect" id="node36" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="413,423,527,449"/>
+<area shape="rect" id="node37" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="436,497,571,524"/>
+<area shape="rect" id="node41" href="$fixed__keys__map__wrapper_8h.html" title="A wrapper for maps that gives read&#45;write access to elements but without allowing addition or removal ..." alt="" coords="1335,184,1485,225"/>
 <area shape="rect" id="node42" href="$java__class__loader__base_8h.html" title=" " alt="" coords="1280,871,1468,897"/>
 <area shape="rect" id="node43" href="$jar__pool_8h.html" title=" " alt="" coords="1461,945,1548,972"/>
 <area shape="rect" id="node44" href="$jar__file_8h.html" title=" " alt="" coords="1461,1020,1540,1047"/>

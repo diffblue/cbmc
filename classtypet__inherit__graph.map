@@ -1,5 +1,5 @@
 <map id="typet" name="typet">
-<area shape="rect" id="node1" title="The type of an expression, extends irept." alt="" coords="748,777,804,804"/>
+<area shape="rect" id="node1" title="The type of an expression, extends irept." alt="" coords="748,803,804,829"/>
 <area shape="rect" id="node5" href="$classannotated__typet.html" title=" " alt="" coords="867,157,997,184"/>
 <area shape="rect" id="node6" href="$classbitvector__typet.html" title="Base class of fixed&#45;width bit&#45;vector types." alt="" coords="871,208,993,235"/>
 <area shape="rect" id="node19" href="$classbool__typet.html" title="The Boolean type." alt="" coords="887,347,977,373"/>
@@ -22,9 +22,9 @@
 <area shape="rect" id="node52" href="$classtype__with__subtypet.html" title="Type with a single subtype." alt="" coords="857,1261,1007,1288"/>
 <area shape="rect" id="node58" href="$classtypedef__typet.html" title="A typedef." alt="" coords="875,1312,989,1339"/>
 <area shape="rect" id="node59" href="$classuninitialized__typet.html" title=" " alt="" coords="861,1363,1003,1389"/>
-<area shape="rect" id="node2" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,777,699,804"/>
-<area shape="rect" id="node3" href="$classsharing__treet.html" title=" " alt="" coords="431,763,597,819"/>
-<area shape="rect" id="node4" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,770,187,811"/>
+<area shape="rect" id="node2" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,803,699,829"/>
+<area shape="rect" id="node3" href="$classsharing__treet.html" title=" " alt="" coords="431,788,597,844"/>
+<area shape="rect" id="node4" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,795,187,837"/>
 <area shape="rect" id="node7" href="$classbv__typet.html" title="Fixed&#45;width bit&#45;vector without numerical interpretation." alt="" coords="1108,5,1187,32"/>
 <area shape="rect" id="node8" href="$classc__bit__field__typet.html" title="Type for C bit fields These are both &#39;bitvector_typet&#39; (they have a width) and &#39;type_with_subtypet&#39; (..." alt="" coords="1083,56,1212,83"/>
 <area shape="rect" id="node9" href="$classc__bool__typet.html" title="The C/C++ Booleans." alt="" coords="1095,107,1200,133"/>

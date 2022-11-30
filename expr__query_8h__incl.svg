@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Helper class for querying expressions Throw CATCH exceptions when the query fails.">
 <polygon fill="#bfbfbf" stroke="black" points="289,-515.5 289,-556.5 427,-556.5 427,-515.5 289,-515.5"/>
 <text text-anchor="start" x="297" y="-544.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="297" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/unit/testing&#45;utils</text>
@@ -67,7 +67,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="smt__to__smt2__string_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="smt__to__smt2__string_8h.html" target="_top" xlink:title="Streaming SMT data structures to a string based output stream.">
 <polygon fill="none" stroke="black" points="4.5,-392.5 4.5,-422.5 147.5,-422.5 147.5,-392.5 4.5,-392.5"/>
 <text text-anchor="start" x="12.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="76" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">/smt_to_smt2_string.h</text>
@@ -251,7 +251,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="440.5,-336.5 440.5,-355.5 487.5,-355.5 487.5,-336.5 440.5,-336.5"/>
 <text text-anchor="middle" x="464" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -431,7 +431,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="392,-56.5 392,-75.5 456,-75.5 456,-56.5 392,-56.5"/>
 <text text-anchor="middle" x="424" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>

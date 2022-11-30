@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Misc Utilities.">
 <polygon fill="#bfbfbf" stroke="black" points="77,-78.5 77,-108.5 229,-108.5 229,-78.5 77,-78.5"/>
 <text text-anchor="start" x="85" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="153" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/array_name.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="goto__check__c_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="goto__check__c_8cpp.html" target="_top" xlink:title="Checks for Errors in C/C++ Programs.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 138,-41.5 138,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/ansi&#45;c/goto</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="array__name_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="array__name_8cpp.html" target="_top" xlink:title="Misc Utilities.">
 <polygon fill="none" stroke="black" points="156,-6 156,-36 320,-36 320,-6 156,-6"/>
 <text text-anchor="start" x="164" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="238" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/array_name.cpp</text>

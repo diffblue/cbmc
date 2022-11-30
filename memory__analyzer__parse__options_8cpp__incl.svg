@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Commandline parser for the memory analyzer executing main work.">
 <polygon fill="#bfbfbf" stroke="black" points="868.57,-492.5 868.57,-533.5 1070.57,-533.5 1070.57,-492.5 868.57,-492.5"/>
 <text text-anchor="start" x="876.57" y="-521.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="876.57" y="-510.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/memory&#45;analyzer</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="memory__analyzer__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="memory__analyzer__parse__options_8h.html" target="_top" xlink:title="This code does the command line parsing for the memory&#45;analyzer tool.">
 <polygon fill="none" stroke="black" points="465.07,-425.5 465.07,-455.5 602.07,-455.5 602.07,-425.5 465.07,-425.5"/>
 <text text-anchor="start" x="473.07" y="-443.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_analyzer_parse</text>
 <text text-anchor="middle" x="533.57" y="-432.5" font-family="Helvetica,sans-Serif" font-size="10.00">_options.h</text>
@@ -68,7 +68,7 @@
 <!-- Node43 -->
 <g id="node28" class="node">
 <title>Node43</title>
-<g id="a_node28"><a xlink:href="exit__codes_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="exit__codes_8h.html" target="_top" xlink:title="Document and give macros for the exit codes of CPROVER binaries.">
 <polygon fill="none" stroke="black" points="1036.07,-431 1036.07,-450 1133.07,-450 1133.07,-431 1036.07,-431"/>
 <text text-anchor="middle" x="1084.57" y="-438" font-family="Helvetica,sans-Serif" font-size="10.00">util/exit_codes.h</text>
 </a>
@@ -98,7 +98,7 @@
 <!-- Node45 -->
 <g id="node30" class="node">
 <title>Node45</title>
-<g id="a_node30"><a xlink:href="goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="goto__model_8h.html" target="_top" xlink:title="Symbol Table + CFG.">
 <polygon fill="none" stroke="black" points="2085.07,-302.5 2085.07,-332.5 2198.07,-332.5 2198.07,-302.5 2085.07,-302.5"/>
 <text text-anchor="start" x="2093.07" y="-320.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="2141.57" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model.h</text>
@@ -114,7 +114,7 @@
 <!-- Node74 -->
 <g id="node44" class="node">
 <title>Node74</title>
-<g id="a_node44"><a xlink:href="read__goto__binary_8h.html" target="_top" xlink:title=" ">
+<g id="a_node44"><a xlink:href="read__goto__binary_8h.html" target="_top" xlink:title="Read Goto Programs.">
 <polygon fill="none" stroke="black" points="112.07,-168.5 112.07,-198.5 225.07,-198.5 225.07,-168.5 112.07,-168.5"/>
 <text text-anchor="start" x="120.07" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/read</text>
 <text text-anchor="middle" x="168.57" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">_goto_binary.h</text>
@@ -130,7 +130,7 @@
 <!-- Node75 -->
 <g id="node45" class="node">
 <title>Node75</title>
-<g id="a_node45"><a xlink:href="show__symbol__table_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="show__symbol__table_8h.html" target="_top" xlink:title="Show the symbol table.">
 <polygon fill="none" stroke="black" points="1250.07,-425.5 1250.07,-455.5 1367.07,-455.5 1367.07,-425.5 1250.07,-425.5"/>
 <text text-anchor="start" x="1258.07" y="-443.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/show</text>
 <text text-anchor="middle" x="1308.57" y="-432.5" font-family="Helvetica,sans-Serif" font-size="10.00">_symbol_table.h</text>
@@ -176,7 +176,7 @@
 <!-- Node84 -->
 <g id="node55" class="node">
 <title>Node84</title>
-<g id="a_node55"><a xlink:href="analyze__symbol_8h.html" target="_top" xlink:title=" ">
+<g id="a_node55"><a xlink:href="analyze__symbol_8h.html" target="_top" xlink:title="High&#45;level interface to gdb.">
 <polygon fill="none" stroke="black" points="1598.07,-308 1598.07,-327 1703.07,-327 1703.07,-308 1598.07,-308"/>
 <text text-anchor="middle" x="1650.57" y="-315" font-family="Helvetica,sans-Serif" font-size="10.00">analyze_symbol.h</text>
 </a>
@@ -458,7 +458,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="814.57,-56.5 814.57,-75.5 878.57,-75.5 878.57,-56.5 814.57,-56.5"/>
 <text text-anchor="middle" x="846.57" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -726,7 +726,7 @@
 <!-- Node61 -->
 <g id="node38" class="node">
 <title>Node61</title>
-<g id="a_node38"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title="Abstract interface to eager or lazy GOTO models.">
 <polygon fill="none" stroke="black" points="2252.57,-241 2252.57,-260 2380.57,-260 2380.57,-241 2252.57,-241"/>
 <text text-anchor="middle" x="2316.57" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_goto_model.h</text>
 </a>
@@ -741,7 +741,7 @@
 <!-- Node62 -->
 <g id="node39" class="node">
 <title>Node62</title>
-<g id="a_node39"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="2175.57,-174 2175.57,-193 2273.57,-193 2273.57,-174 2175.57,-174"/>
 <text text-anchor="middle" x="2224.57" y="-181" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -873,7 +873,7 @@
 <!-- Node63 -->
 <g id="node40" class="node">
 <title>Node63</title>
-<g id="a_node40"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="red" points="2198.57,-112.5 2198.57,-131.5 2290.57,-131.5 2290.57,-112.5 2198.57,-112.5"/>
 <text text-anchor="middle" x="2244.57" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -957,7 +957,7 @@
 <!-- Node78 -->
 <g id="node48" class="node">
 <title>Node78</title>
-<g id="a_node48"><a xlink:href="language_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="language_8h.html" target="_top" xlink:title="Abstract interface to support a programming language.">
 <polygon fill="none" stroke="black" points="1145.57,-308 1145.57,-327 1255.57,-327 1255.57,-308 1145.57,-308"/>
 <text text-anchor="middle" x="1200.57" y="-315" font-family="Helvetica,sans-Serif" font-size="10.00">langapi/language.h</text>
 </a>
@@ -1065,7 +1065,7 @@
 <!-- Node80 -->
 <g id="node51" class="node">
 <title>Node80</title>
-<g id="a_node51"><a xlink:href="ansi__c__declaration_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="ansi__c__declaration_8h.html" target="_top" xlink:title="ANSI&#45;CC Language Type Checking.">
 <polygon fill="none" stroke="red" points="1282.57,-241 1282.57,-260 1398.57,-260 1398.57,-241 1282.57,-241"/>
 <text text-anchor="middle" x="1340.57" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">ansi_c_declaration.h</text>
 </a>
@@ -1144,7 +1144,7 @@
 <!-- Node85 -->
 <g id="node56" class="node">
 <title>Node85</title>
-<g id="a_node56"><a xlink:href="gdb__api_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="gdb__api_8h.html" target="_top" xlink:title="Low&#45;level interface to gdb.">
 <polygon fill="none" stroke="red" points="1858.57,-241 1858.57,-260 1922.57,-260 1922.57,-241 1858.57,-241"/>
 <text text-anchor="middle" x="1890.57" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">gdb_api.h</text>
 </a>

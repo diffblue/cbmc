@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="hardness__collector_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="hardness__collector_8h.html" target="_top" xlink:title="Capability to collect the statistics of the complexity of individual solver queries.">
 <polygon fill="none" stroke="black" points="104.5,-515.5 104.5,-534.5 259.5,-534.5 259.5,-515.5 104.5,-515.5"/>
 <text text-anchor="middle" x="182" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/hardness_collector.h</text>
 </a>
@@ -113,7 +113,7 @@
 <!-- Node51 -->
 <g id="node41" class="node">
 <title>Node51</title>
-<g id="a_node41"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="812.5,-806.5 812.5,-836.5 925.5,-836.5 925.5,-806.5 812.5,-806.5"/>
 <text text-anchor="start" x="820.5" y="-824.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="869" y="-813.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -324,7 +324,7 @@
 <!-- Node43 -->
 <g id="node32" class="node">
 <title>Node43</title>
-<g id="a_node32"><a xlink:href="conflict__provider_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="conflict__provider_8h.html" target="_top" xlink:title="Capability to check whether an expression is a reason for the solver returning UNSAT.">
 <polygon fill="none" stroke="black" points="372,-515.5 372,-534.5 516,-534.5 516,-515.5 372,-515.5"/>
 <text text-anchor="middle" x="444" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/conflict_provider.h</text>
 </a>
@@ -369,7 +369,7 @@
 <!-- Node49 -->
 <g id="node38" class="node">
 <title>Node49</title>
-<g id="a_node38"><a xlink:href="solver__resource__limits_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="solver__resource__limits_8h.html" target="_top" xlink:title="Solver capability to set resource limits.">
 <polygon fill="none" stroke="black" points="534,-515.5 534,-534.5 670,-534.5 670,-515.5 534,-515.5"/>
 <text text-anchor="middle" x="602" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">solver_resource_limits.h</text>
 </a>
@@ -399,7 +399,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="1196.5,-459.5 1196.5,-478.5 1243.5,-478.5 1243.5,-459.5 1196.5,-459.5"/>
 <text text-anchor="middle" x="1220" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -585,7 +585,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="1022,-168.5 1022,-187.5 1086,-187.5 1086,-168.5 1022,-168.5"/>
 <text text-anchor="middle" x="1054" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -762,7 +762,7 @@
 <!-- Node47 -->
 <g id="node36" class="node">
 <title>Node47</title>
-<g id="a_node36"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title="Decision procedure with incremental solving with contexts and assumptions.">
 <polygon fill="none" stroke="black" points="184.5,-392.5 184.5,-422.5 311.5,-422.5 311.5,-392.5 184.5,-392.5"/>
 <text text-anchor="start" x="192.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/stack_decision</text>
 <text text-anchor="middle" x="248" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">_procedure.h</text>
@@ -784,7 +784,7 @@
 <!-- Node48 -->
 <g id="node37" class="node">
 <title>Node48</title>
-<g id="a_node37"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title="Decision Procedure Interface.">
 <polygon fill="none" stroke="black" points="154,-336.5 154,-355.5 274,-355.5 274,-336.5 154,-336.5"/>
 <text text-anchor="middle" x="214" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">decision_procedure.h</text>
 </a>
@@ -901,7 +901,7 @@
 <!-- Node59 -->
 <g id="node49" class="node">
 <title>Node59</title>
-<g id="a_node49"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1458,-694.5 1458,-713.5 1544,-713.5 1544,-694.5 1458,-694.5"/>
 <text text-anchor="middle" x="1501" y="-701.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -943,7 +943,7 @@
 <!-- Node56 -->
 <g id="node46" class="node">
 <title>Node56</title>
-<g id="a_node46"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1371.5,-638.5 1371.5,-657.5 1444.5,-657.5 1444.5,-638.5 1371.5,-638.5"/>
 <text text-anchor="middle" x="1408" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

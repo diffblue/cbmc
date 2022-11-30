@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="CRANGLER Command Line Option Processing.">
 <polygon fill="#bfbfbf" stroke="black" points="696.5,-560.5 696.5,-601.5 845.5,-601.5 845.5,-560.5 696.5,-560.5"/>
 <text text-anchor="start" x="704.5" y="-589.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="704.5" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/crangler</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="crangler__parse__options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="crangler__parse__options_8h.html" target="_top" xlink:title="CRANGLER Command Line Option Processing.">
 <polygon fill="none" stroke="black" points="300.5,-448.5 300.5,-467.5 439.5,-467.5 439.5,-448.5 300.5,-448.5"/>
 <text text-anchor="middle" x="370" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">crangler_parse_options.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node39 -->
 <g id="node28" class="node">
 <title>Node39</title>
-<g id="a_node28"><a xlink:href="exit__codes_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="exit__codes_8h.html" target="_top" xlink:title="Document and give macros for the exit codes of CPROVER binaries.">
 <polygon fill="none" stroke="black" points="722.5,-504.5 722.5,-523.5 819.5,-523.5 819.5,-504.5 722.5,-504.5"/>
 <text text-anchor="middle" x="771" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/exit_codes.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node57 -->
 <g id="node46" class="node">
 <title>Node57</title>
-<g id="a_node46"><a xlink:href="c__wrangler_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="c__wrangler_8h.html" target="_top" xlink:title="C Wrangler.">
 <polygon fill="none" stroke="black" points="1014,-504.5 1014,-523.5 1092,-523.5 1092,-504.5 1014,-504.5"/>
 <text text-anchor="middle" x="1053" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">c_wrangler.h</text>
 </a>
@@ -472,7 +472,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="1019,-56.5 1019,-75.5 1083,-75.5 1083,-56.5 1019,-56.5"/>
 <text text-anchor="middle" x="1051" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -586,7 +586,7 @@
 <!-- Node43 -->
 <g id="node32" class="node">
 <title>Node43</title>
-<g id="a_node32"><a xlink:href="parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="parser_8h.html" target="_top" xlink:title="Parser utilities.">
 <polygon fill="none" stroke="black" points="615,-448.5 615,-467.5 689,-467.5 689,-448.5 615,-448.5"/>
 <text text-anchor="middle" x="652" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/parser.h</text>
 </a>
@@ -682,7 +682,7 @@
 <!-- Node45 -->
 <g id="node34" class="node">
 <title>Node45</title>
-<g id="a_node34"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="908.5,-336.5 908.5,-355.5 955.5,-355.5 955.5,-336.5 908.5,-336.5"/>
 <text text-anchor="middle" x="932" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -865,7 +865,7 @@
 <!-- Node54 -->
 <g id="node43" class="node">
 <title>Node54</title>
-<g id="a_node43"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="1032.5,-168.5 1032.5,-187.5 1085.5,-187.5 1085.5,-168.5 1032.5,-168.5"/>
 <text text-anchor="middle" x="1059" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>

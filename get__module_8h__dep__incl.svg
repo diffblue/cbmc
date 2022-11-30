@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Find module symbol using name.">
 <polygon fill="#bfbfbf" stroke="black" points="5.5,-67.5 5.5,-97.5 157.5,-97.5 157.5,-67.5 5.5,-67.5"/>
 <text text-anchor="start" x="13.5" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="81.5" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/get_module.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="get__module_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="get__module_8cpp.html" target="_top" xlink:title="Find module symbol using name.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 163,-30.5 163,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="81.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/get_module.cpp</text>

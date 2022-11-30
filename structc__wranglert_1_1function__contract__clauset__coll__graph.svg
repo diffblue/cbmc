@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:title="STL class.">
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="27,-89.5 27,-108.5 92,-108.5 92,-89.5 27,-89.5"/>
 <text text-anchor="middle" x="59.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
@@ -32,16 +32,16 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M59.5,-79.23C59.5,-64.41 59.5,-44.05 59.5,-30.6"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="56,-79.28 59.5,-89.28 63,-79.28 56,-79.28"/>
-<text text-anchor="middle" x="79.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> content</text>
-<text text-anchor="middle" x="79.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">clause</text>
+<text text-anchor="middle" x="78" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> clause</text>
+<text text-anchor="middle" x="78" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">content</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:title="STL class.">
+<g id="a_node3"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="7.5,-146.5 7.5,-176.5 111.5,-176.5 111.5,-146.5 7.5,-146.5"/>
 <text text-anchor="start" x="15.5" y="-164.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
-<text text-anchor="middle" x="59.5" y="-153.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
+<text text-anchor="middle" x="59.5" y="-153.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Char &gt;</text>
 </a>
 </g>
 </g>

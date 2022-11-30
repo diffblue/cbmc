@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Guard Data Structure Implementation using BDDs.">
 <polygon fill="#bfbfbf" stroke="black" points="22,-235.5 22,-265.5 195,-265.5 195,-235.5 22,-235.5"/>
 <text text-anchor="start" x="30" y="-253.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="108.5" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/guard_bdd.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="bdd_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="bdd_8h.html" target="_top" xlink:title="Choice between the different interface to BDD libraries.">
 <polygon fill="none" stroke="black" points="57,-179.5 57,-198.5 160,-198.5 160,-179.5 57,-179.5"/>
 <text text-anchor="middle" x="108.5" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/bdd/bdd.h</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="bdd__mini_b_d_d_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="bdd__mini_b_d_d_8h.html" target="_top" xlink:title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th...">
 <polygon fill="none" stroke="black" points="62.5,-123.5 62.5,-142.5 154.5,-142.5 154.5,-123.5 62.5,-123.5"/>
 <text text-anchor="middle" x="108.5" y="-130.5" font-family="Helvetica,sans-Serif" font-size="10.00">bdd_miniBDD.h</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="mini_b_d_d_8h.html" target="_top" xlink:title="Small BDD implementation.">
+<g id="a_node5"><a xlink:href="mini_b_d_d_8h.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
 <polygon fill="none" stroke="black" points="111,-56.5 111,-86.5 230,-86.5 230,-56.5 111,-56.5"/>
 <text text-anchor="start" x="119" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/bdd/miniBDD</text>
 <text text-anchor="middle" x="170.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">/miniBDD.h</text>

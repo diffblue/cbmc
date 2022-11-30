@@ -1,15 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/symex_start_thread.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/symex_start_thread.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="495,5,710,61"/>
-<area shape="rect" id="node2" href="$goto__symex_8h.html" title=" " alt="" coords="471,109,585,136"/>
+<area shape="rect" id="node1" title="Symbolic Execution." alt="" coords="495,5,710,61"/>
+<area shape="rect" id="node2" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="471,109,585,136"/>
 <area shape="rect" id="node51" href="$exception__utils_8h.html" title=" " alt="" coords="19,683,152,710"/>
-<area shape="rect" id="node52" href="$expr__initializer_8h.html" title=" " alt="" coords="5,109,160,136"/>
-<area shape="rect" id="node53" href="$expr__skeleton_8h.html" title=" " alt="" coords="1292,184,1417,211"/>
+<area shape="rect" id="node52" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="5,109,160,136"/>
+<area shape="rect" id="node53" href="$expr__skeleton_8h.html" title="Expression skeleton." alt="" coords="1292,184,1417,211"/>
 <area shape="rect" id="node54" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="1971,266,2090,293"/>
-<area shape="rect" id="node60" href="$symex__assign_8h.html" title=" " alt="" coords="453,505,579,531"/>
+<area shape="rect" id="node60" href="$symex__assign_8h.html" title="Symbolic Execution of assignments." alt="" coords="453,505,579,531"/>
 <area shape="rect" id="node3" href="$src_2util_2message_8h.html" title=" " alt="" coords="414,683,533,710"/>
-<area shape="rect" id="node22" href="$complexity__limiter_8h.html" title=" " alt="" coords="286,184,442,211"/>
-<area shape="rect" id="node44" href="$symex__config_8h.html" title=" " alt="" coords="466,184,590,211"/>
-<area shape="rect" id="node45" href="$symex__target__equation_8h.html" title=" " alt="" coords="689,423,877,449"/>
+<area shape="rect" id="node22" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="286,184,442,211"/>
+<area shape="rect" id="node44" href="$symex__config_8h.html" title="Symbolic Execution." alt="" coords="466,184,590,211"/>
+<area shape="rect" id="node45" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="689,423,877,449"/>
 <area shape="rect" id="node4" title=" " alt="" coords="1583,915,1670,941"/>
 <area shape="rect" id="node5" title=" " alt="" coords="869,765,933,792"/>
 <area shape="rect" id="node6" title=" " alt="" coords="788,1139,863,1165"/>
@@ -22,7 +22,7 @@
 <area shape="rect" id="node13" href="$irep_8h.html" title=" " alt="" coords="1065,840,1124,867"/>
 <area shape="rect" id="node20" href="$optional_8h.html" title=" " alt="" coords="142,840,229,867"/>
 <area shape="rect" id="node14" title=" " alt="" coords="921,915,983,941"/>
-<area shape="rect" id="node15" href="$irep__ids_8h.html" title=" " alt="" coords="1059,915,1144,941"/>
+<area shape="rect" id="node15" href="$irep__ids_8h.html" title="util" alt="" coords="1059,915,1144,941"/>
 <area shape="rect" id="node16" href="$forward__list__as__map_8h.html" title=" " alt="" coords="1219,915,1389,941"/>
 <area shape="rect" id="node17" title=" " alt="" coords="659,989,744,1016"/>
 <area shape="rect" id="node18" href="$as__const_8h.html" title=" " alt="" coords="1513,989,1604,1016"/>
@@ -30,33 +30,33 @@
 <area shape="rect" id="node21" title=" " alt="" coords="129,915,279,941"/>
 <area shape="rect" id="node23" href="$complexity__violation_8h.html" title=" " alt="" coords="384,348,555,375"/>
 <area shape="rect" id="node24" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="402,259,585,300"/>
-<area shape="rect" id="node25" href="$goto__symex__state_8h.html" title=" " alt="" coords="1504,348,1659,375"/>
+<area shape="rect" id="node25" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="1504,348,1659,375"/>
 <area shape="rect" id="node26" href="$nodiscard_8h.html" title=" " alt="" coords="1345,505,1468,531"/>
 <area shape="rect" id="node27" href="$ssa__expr_8h.html" title=" " alt="" coords="1383,594,1499,621"/>
-<area shape="rect" id="node28" href="$std__expr_8h.html" title=" " alt="" coords="1834,683,1923,710"/>
+<area shape="rect" id="node28" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1834,683,1923,710"/>
 <area shape="rect" id="node31" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="1821,423,1968,449"/>
-<area shape="rect" id="node34" href="$guard_8h.html" title=" " alt="" coords="1468,683,1601,710"/>
+<area shape="rect" id="node34" href="$guard_8h.html" title="Guard Data Structure." alt="" coords="1468,683,1601,710"/>
 <area shape="rect" id="node36" href="$call__stack_8h.html" title=" " alt="" coords="1041,423,1140,449"/>
-<area shape="rect" id="node38" href="$goto__state_8h.html" title=" " alt="" coords="1257,594,1359,621"/>
-<area shape="rect" id="node39" href="$renaming__level_8h.html" title=" " alt="" coords="1206,683,1341,710"/>
+<area shape="rect" id="node38" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="1257,594,1359,621"/>
+<area shape="rect" id="node39" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="1206,683,1341,710"/>
 <area shape="rect" id="node42" href="$field__sensitivity_8h.html" title=" " alt="" coords="1383,423,1518,449"/>
 <area shape="rect" id="node43" title=" " alt="" coords="1992,423,2069,449"/>
-<area shape="rect" id="node29" href="$std__types_8h.html" title=" " alt="" coords="1885,765,1982,792"/>
+<area shape="rect" id="node29" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1885,765,1982,792"/>
 <area shape="rect" id="node30" href="$expr_8h.html" title=" " alt="" coords="1677,840,1739,867"/>
 <area shape="rect" id="node32" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="2023,505,2183,531"/>
 <area shape="rect" id="node33" title=" " alt="" coords="2081,594,2132,621"/>
-<area shape="rect" id="node35" href="$guard__expr_8h.html" title=" " alt="" coords="1488,765,1595,792"/>
-<area shape="rect" id="node37" href="$frame_8h.html" title=" " alt="" coords="989,505,1062,531"/>
-<area shape="rect" id="node40" href="$symex__target_8h.html" title=" " alt="" coords="527,594,651,621"/>
-<area shape="rect" id="node41" href="$goto__program_8h.html" title=" " alt="" coords="657,676,807,717"/>
+<area shape="rect" id="node35" href="$guard__expr_8h.html" title="Guard Data Structure." alt="" coords="1488,765,1595,792"/>
+<area shape="rect" id="node37" href="$frame_8h.html" title="Class for stack frames." alt="" coords="989,505,1062,531"/>
+<area shape="rect" id="node40" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="527,594,651,621"/>
+<area shape="rect" id="node41" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="657,676,807,717"/>
 <area shape="rect" id="node46" title=" " alt="" coords="820,505,863,531"/>
 <area shape="rect" id="node47" href="$merge__irep_8h.html" title=" " alt="" coords="1087,505,1220,531"/>
 <area shape="rect" id="node49" href="$ssa__step_8h.html" title=" " alt="" coords="655,505,745,531"/>
 <area shape="rect" id="node48" title=" " alt="" coords="1676,594,1791,621"/>
-<area shape="rect" id="node50" href="$goto__trace_8h.html" title=" " alt="" coords="675,587,826,628"/>
-<area shape="rect" id="node55" href="$dirty_8h.html" title=" " alt="" coords="2210,423,2334,449"/>
-<area shape="rect" id="node57" href="$local__safe__pointers_8h.html" title=" " alt="" coords="1847,497,1998,539"/>
-<area shape="rect" id="node56" href="$goto__functions_8h.html" title=" " alt="" coords="2207,505,2337,531"/>
-<area shape="rect" id="node58" href="$pointer__expr_8h.html" title=" " alt="" coords="1917,594,2057,621"/>
-<area shape="rect" id="node59" href="$bitvector__types_8h.html" title=" " alt="" coords="1947,683,2082,710"/>
+<area shape="rect" id="node50" href="$goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="675,587,826,628"/>
+<area shape="rect" id="node55" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="2210,423,2334,449"/>
+<area shape="rect" id="node57" href="$local__safe__pointers_8h.html" title="Local safe pointer analysis." alt="" coords="1847,497,1998,539"/>
+<area shape="rect" id="node56" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="2207,505,2337,531"/>
+<area shape="rect" id="node58" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1917,594,2057,621"/>
+<area shape="rect" id="node59" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="1947,683,2082,710"/>
 </map>

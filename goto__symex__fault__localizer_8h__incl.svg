@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Fault Localization for Goto Symex.">
 <polygon fill="#bfbfbf" stroke="black" points="251.5,-470.5 251.5,-511.5 413.5,-511.5 413.5,-470.5 251.5,-470.5"/>
 <text text-anchor="start" x="259.5" y="-499.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="259.5" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -37,7 +37,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="fault__localization__provider_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="fault__localization__provider_8h.html" target="_top" xlink:title="Interface for Goto Checkers to provide Fault Localization.">
 <polygon fill="none" stroke="black" points="571,-403.5 571,-433.5 672,-433.5 672,-403.5 571,-403.5"/>
 <text text-anchor="start" x="579" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">fault_localization</text>
 <text text-anchor="middle" x="621.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_provider.h</text>
@@ -83,7 +83,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="565,-336.5 565,-366.5 678,-366.5 678,-336.5 565,-336.5"/>
 <text text-anchor="start" x="573" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="621.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -225,7 +225,7 @@
 <!-- Node48 -->
 <g id="node20" class="node">
 <title>Node48</title>
-<g id="a_node20"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="558.5,-224.5 558.5,-243.5 644.5,-243.5 644.5,-224.5 558.5,-224.5"/>
 <text text-anchor="middle" x="601.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -261,7 +261,7 @@
 <!-- Node45 -->
 <g id="node16" class="node">
 <title>Node45</title>
-<g id="a_node16"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="375,-168.5 375,-187.5 448,-187.5 448,-168.5 375,-168.5"/>
 <text text-anchor="middle" x="411.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

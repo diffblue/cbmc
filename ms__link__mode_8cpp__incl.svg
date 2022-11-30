@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Visual Studio Link Mode.">
 <polygon fill="#bfbfbf" stroke="black" points="181.5,-616.5 181.5,-657.5 324.5,-657.5 324.5,-616.5 181.5,-616.5"/>
 <text text-anchor="start" x="189.5" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="189.5" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/ms_link</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="ms__link__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="ms__link__mode_8h.html" target="_top" xlink:title="Visual Studio Link Mode.">
 <polygon fill="none" stroke="black" points="300.5,-392.5 300.5,-411.5 397.5,-411.5 397.5,-392.5 300.5,-392.5"/>
 <text text-anchor="middle" x="349" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">ms_link_mode.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node42 -->
 <g id="node27" class="node">
 <title>Node42</title>
-<g id="a_node27"><a xlink:href="compile_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="compile_8h.html" target="_top" xlink:title="Compile and link source and object files.">
 <polygon fill="none" stroke="black" points="646.5,-560.5 646.5,-579.5 711.5,-579.5 711.5,-560.5 646.5,-560.5"/>
 <text text-anchor="middle" x="679" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">compile.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node55 -->
 <g id="node42" class="node">
 <title>Node55</title>
-<g id="a_node42"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="20.5,-560.5 20.5,-579.5 127.5,-579.5 127.5,-560.5 20.5,-560.5"/>
 <text text-anchor="middle" x="74" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_cmdline.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node34 -->
 <g id="node18" class="node">
 <title>Node34</title>
-<g id="a_node18"><a xlink:href="goto__cc__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="goto__cc__mode_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="240,-56.5 240,-75.5 336,-75.5 336,-56.5 240,-56.5"/>
 <text text-anchor="middle" x="288" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_mode.h</text>
 </a>
@@ -511,7 +511,7 @@
 <!-- Node43 -->
 <g id="node28" class="node">
 <title>Node43</title>
-<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1039,-504.5 1039,-523.5 1131,-523.5 1131,-504.5 1039,-504.5"/>
 <text text-anchor="middle" x="1085" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -649,7 +649,7 @@
 <!-- Node45 -->
 <g id="node31" class="node">
 <title>Node45</title>
-<g id="a_node31"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="858.5,-336.5 858.5,-355.5 905.5,-355.5 905.5,-336.5 858.5,-336.5"/>
 <text text-anchor="middle" x="882" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

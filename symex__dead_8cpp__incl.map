@@ -1,11 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/symex_dead.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/symex_dead.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1577,5,1791,61"/>
-<area shape="rect" id="node2" href="$goto__symex_8h.html" title=" " alt="" coords="1219,109,1333,136"/>
-<area shape="rect" id="node31" href="$std__expr_8h.html" title=" " alt="" coords="1863,669,1953,695"/>
+<area shape="rect" id="node1" title="Symbolic Execution." alt="" coords="1577,5,1791,61"/>
+<area shape="rect" id="node2" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="1219,109,1333,136"/>
+<area shape="rect" id="node31" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1863,669,1953,695"/>
 <area shape="rect" id="node3" href="$src_2util_2message_8h.html" title=" " alt="" coords="1119,669,1238,695"/>
-<area shape="rect" id="node25" href="$complexity__limiter_8h.html" title=" " alt="" coords="1362,184,1518,211"/>
-<area shape="rect" id="node45" href="$symex__config_8h.html" title=" " alt="" coords="1214,184,1338,211"/>
-<area shape="rect" id="node46" href="$symex__target__equation_8h.html" title=" " alt="" coords="822,423,1010,449"/>
+<area shape="rect" id="node25" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="1362,184,1518,211"/>
+<area shape="rect" id="node45" href="$symex__config_8h.html" title="Symbolic Execution." alt="" coords="1214,184,1338,211"/>
+<area shape="rect" id="node46" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="822,423,1010,449"/>
 <area shape="rect" id="node4" title=" " alt="" coords="1521,751,1607,777"/>
 <area shape="rect" id="node5" title=" " alt="" coords="317,1049,381,1076"/>
 <area shape="rect" id="node6" title=" " alt="" coords="1457,1124,1532,1151"/>
@@ -18,9 +18,9 @@
 <area shape="rect" id="node13" href="$irep_8h.html" title=" " alt="" coords="841,825,900,852"/>
 <area shape="rect" id="node23" href="$optional_8h.html" title=" " alt="" coords="925,825,1011,852"/>
 <area shape="rect" id="node14" title=" " alt="" coords="439,900,502,927"/>
-<area shape="rect" id="node15" href="$irep__ids_8h.html" title=" " alt="" coords="829,900,915,927"/>
+<area shape="rect" id="node15" href="$irep__ids_8h.html" title="util" alt="" coords="829,900,915,927"/>
 <area shape="rect" id="node18" href="$forward__list__as__map_8h.html" title=" " alt="" coords="635,900,805,927"/>
-<area shape="rect" id="node16" href="$dstring_8h.html" title=" " alt="" coords="835,975,914,1001"/>
+<area shape="rect" id="node16" href="$dstring_8h.html" title="Container for C&#45;Strings." alt="" coords="835,975,914,1001"/>
 <area shape="rect" id="node17" title=" " alt="" coords="939,975,1037,1001"/>
 <area shape="rect" id="node19" title=" " alt="" coords="387,975,472,1001"/>
 <area shape="rect" id="node20" title=" " alt="" coords="712,975,811,1001"/>
@@ -29,26 +29,26 @@
 <area shape="rect" id="node24" title=" " alt="" coords="1041,900,1191,927"/>
 <area shape="rect" id="node26" href="$complexity__violation_8h.html" title=" " alt="" coords="1331,348,1501,375"/>
 <area shape="rect" id="node27" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="1454,259,1637,300"/>
-<area shape="rect" id="node28" href="$goto__symex__state_8h.html" title=" " alt="" coords="1525,348,1680,375"/>
+<area shape="rect" id="node28" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="1525,348,1680,375"/>
 <area shape="rect" id="node29" href="$nodiscard_8h.html" title=" " alt="" coords="1623,497,1745,524"/>
 <area shape="rect" id="node30" href="$ssa__expr_8h.html" title=" " alt="" coords="1771,579,1887,606"/>
 <area shape="rect" id="node32" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="419,423,565,449"/>
-<area shape="rect" id="node35" href="$guard_8h.html" title=" " alt="" coords="1619,669,1752,695"/>
+<area shape="rect" id="node35" href="$guard_8h.html" title="Guard Data Structure." alt="" coords="1619,669,1752,695"/>
 <area shape="rect" id="node37" href="$call__stack_8h.html" title=" " alt="" coords="1341,423,1440,449"/>
-<area shape="rect" id="node39" href="$goto__state_8h.html" title=" " alt="" coords="1377,579,1479,606"/>
-<area shape="rect" id="node40" href="$renaming__level_8h.html" title=" " alt="" coords="1315,669,1450,695"/>
+<area shape="rect" id="node39" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="1377,579,1479,606"/>
+<area shape="rect" id="node40" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="1315,669,1450,695"/>
 <area shape="rect" id="node43" href="$field__sensitivity_8h.html" title=" " alt="" coords="1718,423,1853,449"/>
 <area shape="rect" id="node44" title=" " alt="" coords="1616,423,1693,449"/>
 <area shape="rect" id="node33" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="144,497,304,524"/>
 <area shape="rect" id="node34" title=" " alt="" coords="211,751,261,777"/>
-<area shape="rect" id="node36" href="$guard__expr_8h.html" title=" " alt="" coords="1632,751,1739,777"/>
-<area shape="rect" id="node38" href="$frame_8h.html" title=" " alt="" coords="1366,497,1439,524"/>
-<area shape="rect" id="node41" href="$symex__target_8h.html" title=" " alt="" coords="862,579,986,606"/>
-<area shape="rect" id="node42" href="$goto__program_8h.html" title=" " alt="" coords="795,661,946,703"/>
+<area shape="rect" id="node36" href="$guard__expr_8h.html" title="Guard Data Structure." alt="" coords="1632,751,1739,777"/>
+<area shape="rect" id="node38" href="$frame_8h.html" title="Class for stack frames." alt="" coords="1366,497,1439,524"/>
+<area shape="rect" id="node41" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="862,579,986,606"/>
+<area shape="rect" id="node42" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="795,661,946,703"/>
 <area shape="rect" id="node47" title=" " alt="" coords="93,751,136,777"/>
 <area shape="rect" id="node48" href="$merge__irep_8h.html" title=" " alt="" coords="395,497,528,524"/>
 <area shape="rect" id="node50" href="$ssa__step_8h.html" title=" " alt="" coords="912,497,1003,524"/>
 <area shape="rect" id="node49" title=" " alt="" coords="309,579,424,606"/>
-<area shape="rect" id="node51" href="$goto__trace_8h.html" title=" " alt="" coords="569,572,719,613"/>
-<area shape="rect" id="node52" href="$options_8h.html" title=" " alt="" coords="144,669,251,695"/>
+<area shape="rect" id="node51" href="$goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="569,572,719,613"/>
+<area shape="rect" id="node52" href="$options_8h.html" title="Options." alt="" coords="144,669,251,695"/>
 </map>

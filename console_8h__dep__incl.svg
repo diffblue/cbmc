@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Console.">
 <polygon fill="#bfbfbf" stroke="black" points="698,-78.5 698,-108.5 836,-108.5 836,-78.5 698,-78.5"/>
 <text text-anchor="start" x="706" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="767" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/console.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="generalization_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="generalization_8cpp.html" target="_top" xlink:title="Generalization.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 196,-36 196,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="98" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/generalization.cpp</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="inductiveness_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="inductiveness_8cpp.html" target="_top" xlink:title="Inductiveness.">
 <polygon fill="none" stroke="black" points="214,-6 214,-36 408,-36 408,-6 214,-6"/>
 <text text-anchor="start" x="222" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="311" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/inductiveness.cpp</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="propagate_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="propagate_8cpp.html" target="_top" xlink:title="Propagate.">
 <polygon fill="none" stroke="black" points="426,-6 426,-36 602,-36 602,-6 426,-6"/>
 <text text-anchor="start" x="434" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="514" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/propagate.cpp</text>
@@ -69,7 +69,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="report__properties_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="report__properties_8cpp.html" target="_top" xlink:title="Solver.">
 <polygon fill="none" stroke="black" points="620,-0.5 620,-41.5 758,-41.5 758,-0.5 620,-0.5"/>
 <text text-anchor="start" x="628" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="628" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/report</text>
@@ -86,7 +86,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="report__traces_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="report__traces_8cpp.html" target="_top" xlink:title="Solver.">
 <polygon fill="none" stroke="black" points="776,-0.5 776,-41.5 914,-41.5 914,-0.5 776,-0.5"/>
 <text text-anchor="start" x="784" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="784" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/report</text>
@@ -103,7 +103,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="solver__progress_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="solver__progress_8cpp.html" target="_top" xlink:title="Solver Progress Reporting.">
 <polygon fill="none" stroke="black" points="932,-0.5 932,-41.5 1070,-41.5 1070,-0.5 932,-0.5"/>
 <text text-anchor="start" x="940" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="940" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/solver</text>

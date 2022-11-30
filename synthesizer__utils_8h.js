@@ -1,6 +1,5 @@
 var synthesizer__utils_8h =
 [
-    [ "loop_templatet", "classloop__templatet.html", "classloop__templatet" ],
     [ "invariant_mapt", "synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c", null ],
     [ "annotate_invariants", "synthesizer__utils_8h.html#adbaf3cb86ea581b649f6598ae5caabee", null ],
     [ "get_loop_end", "synthesizer__utils_8h.html#ae0af75cc5b9107423465e2c30e582383", null ],

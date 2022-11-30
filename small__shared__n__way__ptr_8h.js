@@ -1,7 +1,6 @@
 var small__shared__n__way__ptr_8h =
 [
     [ "get_typet", "structget__typet.html", "structget__typet" ],
-    [ "small_shared_n_way_pointee_baset", "classsmall__shared__n__way__pointee__baset.html", "classsmall__shared__n__way__pointee__baset" ],
     [ "destructt", "structdestructt.html", "structdestructt" ],
     [ "destructt< 0, pointee_baset, Ts... >", "structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4.html", "structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4" ],
     [ "small_shared_n_way_ptrt", "classsmall__shared__n__way__ptrt.html", "classsmall__shared__n__way__ptrt" ],

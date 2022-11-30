@@ -1,10 +1,10 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/counterexample_beautification.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/counterexample_beautification.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1666,5,1921,61"/>
-<area shape="rect" id="node2" href="$counterexample__beautification_8h.html" title=" " alt="" coords="1675,109,1911,136"/>
-<area shape="rect" id="node29" href="$std__expr_8h.html" title=" " alt="" coords="335,609,425,635"/>
-<area shape="rect" id="node60" href="$prop__minimize_8h.html" title=" " alt="" coords="2254,855,2469,881"/>
-<area shape="rect" id="node3" href="$symex__target__equation_8h.html" title=" " alt="" coords="795,184,989,225"/>
-<area shape="rect" id="node46" href="$bv__minimize_8h.html" title=" " alt="" coords="2579,601,2714,643"/>
+<area shape="rect" id="node1" title="Counterexample Beautification using Incremental SAT." alt="" coords="1666,5,1921,61"/>
+<area shape="rect" id="node2" href="$counterexample__beautification_8h.html" title="Counterexample Beautification." alt="" coords="1675,109,1911,136"/>
+<area shape="rect" id="node29" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="335,609,425,635"/>
+<area shape="rect" id="node60" href="$prop__minimize_8h.html" title="SAT Minimizer." alt="" coords="2254,855,2469,881"/>
+<area shape="rect" id="node3" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="795,184,989,225"/>
+<area shape="rect" id="node46" href="$bv__minimize_8h.html" title="SAT&#45;optimizer for minimizing expressions." alt="" coords="2579,601,2714,643"/>
 <area shape="rect" id="node4" title=" " alt="" coords="735,1228,820,1255"/>
 <area shape="rect" id="node5" title=" " alt="" coords="1984,1303,2048,1329"/>
 <area shape="rect" id="node6" title=" " alt="" coords="1649,929,1692,956"/>
@@ -13,7 +13,7 @@
 <area shape="rect" id="node20" href="$narrow_8h.html" title=" " alt="" coords="478,1228,557,1255"/>
 <area shape="rect" id="node21" href="$src_2util_2message_8h.html" title=" " alt="" coords="1113,929,1231,956"/>
 <area shape="rect" id="node27" href="$ssa__step_8h.html" title=" " alt="" coords="888,273,979,300"/>
-<area shape="rect" id="node42" href="$symex__target_8h.html" title=" " alt="" coords="849,355,973,382"/>
+<area shape="rect" id="node42" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="849,355,973,382"/>
 <area shape="rect" id="node8" title=" " alt="" coords="334,1377,399,1404"/>
 <area shape="rect" id="node9" title=" " alt="" coords="740,1377,815,1404"/>
 <area shape="rect" id="node10" title=" " alt="" coords="1179,1377,1237,1404"/>
@@ -21,9 +21,9 @@
 <area shape="rect" id="node13" title=" " alt="" coords="872,929,987,956"/>
 <area shape="rect" id="node14" href="$irep_8h.html" title=" " alt="" coords="967,1079,1025,1105"/>
 <area shape="rect" id="node15" title=" " alt="" coords="1701,1153,1763,1180"/>
-<area shape="rect" id="node16" href="$irep__ids_8h.html" title=" " alt="" coords="1151,1153,1236,1180"/>
+<area shape="rect" id="node16" href="$irep__ids_8h.html" title="util" alt="" coords="1151,1153,1236,1180"/>
 <area shape="rect" id="node18" href="$forward__list__as__map_8h.html" title=" " alt="" coords="570,1153,739,1180"/>
-<area shape="rect" id="node17" href="$dstring_8h.html" title=" " alt="" coords="1221,1228,1299,1255"/>
+<area shape="rect" id="node17" href="$dstring_8h.html" title="Container for C&#45;Strings." alt="" coords="1221,1228,1299,1255"/>
 <area shape="rect" id="node19" href="$as__const_8h.html" title=" " alt="" coords="596,1228,687,1255"/>
 <area shape="rect" id="node22" title=" " alt="" coords="489,1004,575,1031"/>
 <area shape="rect" id="node23" href="$deprecate_8h.html" title=" " alt="" coords="1100,1079,1199,1105"/>
@@ -31,29 +31,29 @@
 <area shape="rect" id="node25" href="$optional_8h.html" title=" " alt="" coords="1325,1079,1411,1105"/>
 <area shape="rect" id="node26" title=" " alt="" coords="1362,1153,1513,1180"/>
 <area shape="rect" id="node28" href="$ssa__expr_8h.html" title=" " alt="" coords="667,445,783,471"/>
-<area shape="rect" id="node35" href="$goto__trace_8h.html" title=" " alt="" coords="1270,348,1421,389"/>
+<area shape="rect" id="node35" href="$goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1270,348,1421,389"/>
 <area shape="rect" id="node30" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="355,780,453,807"/>
-<area shape="rect" id="node33" href="$std__types_8h.html" title=" " alt="" coords="418,698,515,725"/>
+<area shape="rect" id="node33" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="418,698,515,725"/>
 <area shape="rect" id="node31" href="$expr_8h.html" title=" " alt="" coords="582,855,645,881"/>
-<area shape="rect" id="node32" href="$type_8h.html" title=" " alt="" coords="1373,929,1435,956"/>
+<area shape="rect" id="node32" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="1373,929,1435,956"/>
 <area shape="rect" id="node34" href="$mp__arith_8h.html" title=" " alt="" coords="2570,929,2662,956"/>
-<area shape="rect" id="node36" href="$options_8h.html" title=" " alt="" coords="1504,855,1611,881"/>
-<area shape="rect" id="node38" href="$goto__program_8h.html" title=" " alt="" coords="1035,437,1186,479"/>
+<area shape="rect" id="node36" href="$options_8h.html" title="Options." alt="" coords="1504,855,1611,881"/>
+<area shape="rect" id="node38" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1035,437,1186,479"/>
 <area shape="rect" id="node37" title=" " alt="" coords="2032,929,2083,956"/>
 <area shape="rect" id="node39" href="$goto__instruction__code_8h.html" title=" " alt="" coords="402,527,579,553"/>
 <area shape="rect" id="node40" title=" " alt="" coords="1965,929,2008,956"/>
 <area shape="rect" id="node41" title=" " alt="" coords="1021,527,1080,553"/>
-<area shape="rect" id="node43" href="$renamed_8h.html" title=" " alt="" coords="603,527,695,553"/>
-<area shape="rect" id="node44" href="$expr__iterator_8h.html" title=" " alt="" coords="549,780,691,807"/>
+<area shape="rect" id="node43" href="$renamed_8h.html" title="Class for expressions or types renamed up to a given level." alt="" coords="603,527,695,553"/>
+<area shape="rect" id="node44" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="549,780,691,807"/>
 <area shape="rect" id="node45" href="$simplify__expr_8h.html" title=" " alt="" coords="465,609,612,635"/>
 <area shape="rect" id="node47" href="$bv__pointers_8h.html" title=" " alt="" coords="2206,691,2341,732"/>
 <area shape="rect" id="node59" href="$satcheck_8h.html" title=" " alt="" coords="2563,698,2730,725"/>
 <area shape="rect" id="node48" href="$nodiscard_8h.html" title=" " alt="" coords="2695,929,2817,956"/>
 <area shape="rect" id="node49" href="$boolbv_8h.html" title=" " alt="" coords="2088,780,2165,807"/>
-<area shape="rect" id="node57" href="$pointer__logic_8h.html" title=" " alt="" coords="1817,780,1935,807"/>
+<area shape="rect" id="node57" href="$pointer__logic_8h.html" title="Pointer Logic." alt="" coords="1817,780,1935,807"/>
 <area shape="rect" id="node50" href="$endianness__map_8h.html" title=" " alt="" coords="1931,1079,2101,1105"/>
-<area shape="rect" id="node51" href="$functions_8h.html" title=" " alt="" coords="2024,855,2229,881"/>
-<area shape="rect" id="node52" href="$arrays_8h.html" title=" " alt="" coords="1685,855,1760,881"/>
+<area shape="rect" id="node51" href="$functions_8h.html" title="Uninterpreted Functions." alt="" coords="2024,855,2229,881"/>
+<area shape="rect" id="node52" href="$arrays_8h.html" title="Theory of Arrays with Extensionality." alt="" coords="1685,855,1760,881"/>
 <area shape="rect" id="node53" href="$boolbv__map_8h.html" title=" " alt="" coords="1784,855,1899,881"/>
 <area shape="rect" id="node55" href="$boolbv__width_8h.html" title=" " alt="" coords="1358,855,1479,881"/>
 <area shape="rect" id="node56" href="$bv__utils_8h.html" title=" " alt="" coords="2696,855,2781,881"/>

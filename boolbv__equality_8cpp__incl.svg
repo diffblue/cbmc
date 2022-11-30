@@ -52,7 +52,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="130.06,-353 130.06,-372 197.06,-372 197.06,-353 130.06,-353"/>
 <text text-anchor="middle" x="163.56" y="-360" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -175,7 +175,7 @@
 <!-- Node41 -->
 <g id="node22" class="node">
 <title>Node41</title>
-<g id="a_node22"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="95.06,-291.5 95.06,-310.5 168.06,-310.5 168.06,-291.5 95.06,-291.5"/>
 <text text-anchor="middle" x="131.56" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -268,7 +268,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="428.06,-112.5 428.06,-131.5 475.06,-131.5 475.06,-112.5 428.06,-112.5"/>
 <text text-anchor="middle" x="451.56" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -535,7 +535,7 @@
 <!-- Node46 -->
 <g id="node30" class="node">
 <title>Node46</title>
-<g id="a_node30"><a xlink:href="functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="functions_8h.html" target="_top" xlink:title="Uninterpreted Functions.">
 <polygon fill="none" stroke="black" points="469.56,-470.5 469.56,-489.5 623.56,-489.5 623.56,-470.5 469.56,-470.5"/>
 <text text-anchor="middle" x="546.56" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/lowering/functions.h</text>
 </a>
@@ -550,7 +550,7 @@
 <!-- Node51 -->
 <g id="node35" class="node">
 <title>Node51</title>
-<g id="a_node35"><a xlink:href="arrays_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="arrays_8h.html" target="_top" xlink:title="Theory of Arrays with Extensionality.">
 <polygon fill="none" stroke="black" points="698.56,-470.5 698.56,-489.5 754.56,-489.5 754.56,-470.5 698.56,-470.5"/>
 <text text-anchor="middle" x="726.56" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">arrays.h</text>
 </a>
@@ -667,7 +667,7 @@
 <!-- Node49 -->
 <g id="node33" class="node">
 <title>Node49</title>
-<g id="a_node33"><a xlink:href="mathematical__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="mathematical__expr_8h.html" target="_top" xlink:title="API to expression classes for &#39;mathematical&#39; expressions.">
 <polygon fill="none" stroke="black" points="287.06,-414.5 287.06,-433.5 426.06,-433.5 426.06,-414.5 287.06,-414.5"/>
 <text text-anchor="middle" x="356.56" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/mathematical_expr.h</text>
 </a>
@@ -688,7 +688,7 @@
 <!-- Node50 -->
 <g id="node34" class="node">
 <title>Node50</title>
-<g id="a_node34"><a xlink:href="mathematical__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="mathematical__types_8h.html" target="_top" xlink:title="Mathematical types.">
 <polygon fill="none" stroke="black" points="262.56,-291.5 262.56,-310.5 388.56,-310.5 388.56,-291.5 262.56,-291.5"/>
 <text text-anchor="middle" x="325.56" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">mathematical_types.h</text>
 </a>
@@ -899,7 +899,7 @@
 <!-- Node58 -->
 <g id="node43" class="node">
 <title>Node58</title>
-<g id="a_node43"><a xlink:href="conflict__provider_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="conflict__provider_8h.html" target="_top" xlink:title="Capability to check whether an expression is a reason for the solver returning UNSAT.">
 <polygon fill="none" stroke="black" points="986.56,-291.5 986.56,-310.5 1130.56,-310.5 1130.56,-291.5 986.56,-291.5"/>
 <text text-anchor="middle" x="1058.56" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/conflict_provider.h</text>
 </a>
@@ -914,7 +914,7 @@
 <!-- Node59 -->
 <g id="node44" class="node">
 <title>Node59</title>
-<g id="a_node44"><a xlink:href="hardness__collector_8h.html" target="_top" xlink:title=" ">
+<g id="a_node44"><a xlink:href="hardness__collector_8h.html" target="_top" xlink:title="Capability to collect the statistics of the complexity of individual solver queries.">
 <polygon fill="none" stroke="black" points="1280.06,-291.5 1280.06,-310.5 1435.06,-310.5 1435.06,-291.5 1280.06,-291.5"/>
 <text text-anchor="middle" x="1357.56" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/hardness_collector.h</text>
 </a>
@@ -959,7 +959,7 @@
 <!-- Node67 -->
 <g id="node51" class="node">
 <title>Node67</title>
-<g id="a_node51"><a xlink:href="solver__resource__limits_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="solver__resource__limits_8h.html" target="_top" xlink:title="Solver capability to set resource limits.">
 <polygon fill="none" stroke="black" points="832.56,-291.5 832.56,-310.5 968.56,-310.5 968.56,-291.5 832.56,-291.5"/>
 <text text-anchor="middle" x="900.56" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">solver_resource_limits.h</text>
 </a>
@@ -1091,7 +1091,7 @@
 <!-- Node65 -->
 <g id="node50" class="node">
 <title>Node65</title>
-<g id="a_node50"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title="Decision procedure with incremental solving with contexts and assumptions.">
 <polygon fill="none" stroke="red" points="959.06,-224.5 959.06,-254.5 1086.06,-254.5 1086.06,-224.5 959.06,-224.5"/>
 <text text-anchor="start" x="967.06" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/stack_decision</text>
 <text text-anchor="middle" x="1022.56" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">_procedure.h</text>

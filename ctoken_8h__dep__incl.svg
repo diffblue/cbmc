@@ -11,82 +11,82 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="472.5,-156.5 472.5,-186.5 622.5,-186.5 622.5,-156.5 472.5,-156.5"/>
-<text text-anchor="start" x="480.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="middle" x="547.5" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctoken.h</text>
+<g id="a_node1"><a xlink:title="ctoken">
+<polygon fill="#bfbfbf" stroke="black" points="467.5,-156.5 467.5,-186.5 617.5,-186.5 617.5,-156.5 467.5,-156.5"/>
+<text text-anchor="start" x="475.5" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="middle" x="542.5" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctoken.h</text>
 </a>
 </g>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cscanner_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="208,-84 208,-114 369,-114 369,-84 208,-84"/>
-<text text-anchor="start" x="216" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="middle" x="288.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/cscanner.h</text>
+<g id="a_node2"><a xlink:href="cscanner_8h.html" target="_top" xlink:title="cscanner">
+<polygon fill="none" stroke="black" points="199,-84 199,-114 360,-114 360,-84 199,-84"/>
+<text text-anchor="start" x="207" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="middle" x="279.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/cscanner.h</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M486.21,-153.82C441.79,-141.73 382.39,-125.56 340.33,-114.11"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="485.45,-157.24 496.02,-156.49 487.29,-150.48 485.45,-157.24"/>
+<path fill="none" stroke="midnightblue" d="M480.55,-153.89C435.41,-141.79 374.93,-125.58 332.13,-114.11"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="479.66,-157.28 490.23,-156.49 481.47,-150.52 479.66,-157.28"/>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="ctokenit_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="552,-84 552,-114 709,-114 709,-84 552,-84"/>
-<text text-anchor="start" x="560" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="middle" x="630.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctokenit.h</text>
+<g id="a_node6"><a xlink:href="ctoken_8cpp.html" target="_top" xlink:title="ctoken">
+<polygon fill="none" stroke="black" points="378,-84 378,-114 539,-114 539,-84 378,-84"/>
+<text text-anchor="start" x="386" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="middle" x="458.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctoken.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node6 -->
 <g id="edge5" class="edge">
 <title>Node1&#45;&gt;Node6</title>
-<path fill="none" stroke="midnightblue" d="M572.27,-149.46C585.76,-138 602.08,-124.14 614.01,-114"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="569.65,-147.09 564.3,-156.23 574.18,-152.43 569.65,-147.09"/>
+<path fill="none" stroke="midnightblue" d="M517.82,-149.79C504.09,-138.27 487.37,-124.23 475.19,-114"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="515.59,-152.49 525.5,-156.23 520.09,-147.12 515.59,-152.49"/>
 </g>
-<!-- Node9 -->
-<g id="node9" class="node">
-<title>Node9</title>
-<g id="a_node9"><a xlink:href="mini__c__parser_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="395.5,-78.5 395.5,-119.5 533.5,-119.5 533.5,-78.5 395.5,-78.5"/>
-<text text-anchor="start" x="403.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="403.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/mini</text>
-<text text-anchor="middle" x="464.5" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">_c_parser.h</text>
+<!-- Node7 -->
+<g id="node7" class="node">
+<title>Node7</title>
+<g id="a_node7"><a xlink:href="ctokenit_8h.html" target="_top" xlink:title="ctokenit">
+<polygon fill="none" stroke="black" points="714,-84 714,-114 871,-114 871,-84 714,-84"/>
+<text text-anchor="start" x="722" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="middle" x="792.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctokenit.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node9 -->
-<g id="edge8" class="edge">
-<title>Node1&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M522.96,-149.66C511.76,-140.15 498.57,-128.94 487.56,-119.59"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="520.82,-152.43 530.7,-156.23 525.35,-147.09 520.82,-152.43"/>
+<!-- Node1&#45;&gt;Node7 -->
+<g id="edge6" class="edge">
+<title>Node1&#45;&gt;Node7</title>
+<path fill="none" stroke="midnightblue" d="M601.93,-153.74C644.77,-141.66 701.96,-125.53 742.48,-114.11"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="600.87,-150.4 592.19,-156.49 602.77,-157.14 600.87,-150.4"/>
 </g>
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="ctoken_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="727,-84 727,-114 888,-114 888,-84 727,-84"/>
-<text text-anchor="start" x="735" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="middle" x="807.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctoken.cpp</text>
+<g id="a_node10"><a xlink:href="mini__c__parser_8h.html" target="_top" xlink:title="Mini C Parser.">
+<polygon fill="none" stroke="black" points="557.5,-78.5 557.5,-119.5 695.5,-119.5 695.5,-78.5 557.5,-78.5"/>
+<text text-anchor="start" x="565.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="565.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/mini</text>
+<text text-anchor="middle" x="626.5" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">_c_parser.h</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node10 -->
-<g id="edge11" class="edge">
+<g id="edge9" class="edge">
 <title>Node1&#45;&gt;Node10</title>
-<path fill="none" stroke="midnightblue" d="M609.02,-153.82C653.61,-141.73 713.25,-125.56 755.47,-114.11"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="607.91,-150.49 599.18,-156.49 609.75,-157.25 607.91,-150.49"/>
+<path fill="none" stroke="midnightblue" d="M567.33,-149.66C578.67,-140.15 592.01,-128.94 603.16,-119.59"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="564.91,-147.12 559.5,-156.23 569.41,-152.49 564.91,-147.12"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="c__defines_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="c__defines_8cpp.html" target="_top" xlink:title="c_defines">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 175,-36 175,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="87.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/c_defines.cpp</text>
@@ -96,8 +96,8 @@
 <!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
 <title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M241.47,-80.22C205.85,-66.75 157.57,-48.5 124.64,-36.04"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="240.57,-83.62 251.16,-83.88 243.05,-77.07 240.57,-83.62"/>
+<path fill="none" stroke="midnightblue" d="M234.14,-80.05C200.16,-66.59 154.3,-48.44 122.97,-36.04"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="233.25,-83.46 243.84,-83.88 235.83,-76.95 233.25,-83.46"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
@@ -112,13 +112,13 @@
 <!-- Node2&#45;&gt;Node4 -->
 <g id="edge3" class="edge">
 <title>Node2&#45;&gt;Node4</title>
-<path fill="none" stroke="midnightblue" d="M285.61,-73.59C284.15,-61.26 282.43,-46.72 281.19,-36.23"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="282.16,-74.19 286.81,-83.7 289.11,-73.36 282.16,-74.19"/>
+<path fill="none" stroke="midnightblue" d="M279.5,-73.59C279.5,-61.26 279.5,-46.72 279.5,-36.23"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="276,-73.7 279.5,-83.7 283,-73.71 276,-73.7"/>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="mini__c__parser_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="mini__c__parser_8cpp.html" target="_top" xlink:title="Mini C Parser.">
 <polygon fill="none" stroke="black" points="383.5,-0.5 383.5,-41.5 521.5,-41.5 521.5,-0.5 383.5,-0.5"/>
 <text text-anchor="start" x="391.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="391.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/mini</text>
@@ -129,52 +129,52 @@
 <!-- Node2&#45;&gt;Node5 -->
 <g id="edge4" class="edge">
 <title>Node2&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M328.09,-79.65C352.89,-68.16 384.84,-53.36 410.15,-41.63"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="326.56,-76.5 318.96,-83.88 329.51,-82.85 326.56,-76.5"/>
+<path fill="none" stroke="midnightblue" d="M320.92,-79.81C347.13,-68.29 381.01,-53.41 407.82,-41.63"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="319.38,-76.66 311.63,-83.88 322.2,-83.07 319.38,-76.66"/>
 </g>
-<!-- Node7 -->
-<g id="node7" class="node">
-<title>Node7</title>
-<g id="a_node7"><a xlink:href="c__wrangler_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node8 -->
+<g id="node8" class="node">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="c__wrangler_8cpp.html" target="_top" xlink:title="C Wrangler.">
 <polygon fill="none" stroke="black" points="539.5,-6 539.5,-36 721.5,-36 721.5,-6 539.5,-6"/>
 <text text-anchor="start" x="547.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="630.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/c_wrangler.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node6&#45;&gt;Node7 -->
-<g id="edge6" class="edge">
-<title>Node6&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M630.5,-73.59C630.5,-61.26 630.5,-46.72 630.5,-36.23"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="627,-73.7 630.5,-83.7 634,-73.71 627,-73.7"/>
+<!-- Node7&#45;&gt;Node8 -->
+<g id="edge7" class="edge">
+<title>Node7&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M753.12,-79.52C724.56,-66.13 686.52,-48.28 660.43,-36.04"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="751.87,-82.8 762.41,-83.88 754.84,-76.47 751.87,-82.8"/>
 </g>
-<!-- Node8 -->
-<g id="node8" class="node">
-<title>Node8</title>
-<g id="a_node8"><a xlink:href="ctokenit_8cpp.html" target="_top" xlink:title=" ">
+<!-- Node9 -->
+<g id="node9" class="node">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="ctokenit_8cpp.html" target="_top" xlink:title="ctokenit">
 <polygon fill="none" stroke="black" points="739.5,-6 739.5,-36 907.5,-36 907.5,-6 739.5,-6"/>
 <text text-anchor="start" x="747.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="823.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/ctokenit.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node6&#45;&gt;Node8 -->
-<g id="edge7" class="edge">
-<title>Node6&#45;&gt;Node8</title>
-<path fill="none" stroke="midnightblue" d="M676.09,-80.05C710.26,-66.59 756.35,-48.44 787.84,-36.04"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="674.37,-76.96 666.35,-83.88 676.94,-83.48 674.37,-76.96"/>
+<!-- Node7&#45;&gt;Node9 -->
+<g id="edge8" class="edge">
+<title>Node7&#45;&gt;Node9</title>
+<path fill="none" stroke="midnightblue" d="M802.15,-74.33C807.25,-61.85 813.33,-46.94 817.7,-36.23"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="798.87,-73.12 798.33,-83.7 805.35,-75.77 798.87,-73.12"/>
 </g>
-<!-- Node9&#45;&gt;Node5 -->
+<!-- Node10&#45;&gt;Node5 -->
+<g id="edge11" class="edge">
+<title>Node10&#45;&gt;Node5</title>
+<path fill="none" stroke="midnightblue" d="M572.31,-74.33C548.16,-63.78 520.07,-51.51 497.16,-41.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="571.13,-77.63 581.69,-78.43 573.93,-71.22 571.13,-77.63"/>
+</g>
+<!-- Node10&#45;&gt;Node8 -->
 <g id="edge10" class="edge">
-<title>Node9&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M459.81,-68.3C458.39,-59.3 456.87,-49.65 455.58,-41.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="456.39,-69.1 461.41,-78.43 463.31,-68 456.39,-69.1"/>
-</g>
-<!-- Node9&#45;&gt;Node7 -->
-<g id="edge9" class="edge">
-<title>Node9&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M516.66,-74.12C543.95,-61.63 576.42,-46.76 599.69,-36.11"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="514.88,-71.08 507.25,-78.43 517.8,-77.45 514.88,-71.08"/>
+<title>Node10&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M628.06,-68.28C628.64,-57.25 629.28,-45.25 629.75,-36.23"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="624.56,-68.26 627.53,-78.43 631.55,-68.63 624.56,-68.26"/>
 </g>
 </g>
 </svg>

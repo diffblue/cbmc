@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Simplify State Expression.">
 <polygon fill="#bfbfbf" stroke="black" points="299.5,-78.5 299.5,-119.5 444.5,-119.5 444.5,-78.5 299.5,-78.5"/>
 <text text-anchor="start" x="307.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="307.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/simplify</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="axioms_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="axioms_8cpp.html" target="_top" xlink:title="Axioms.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 162,-36 162,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="81" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/axioms.cpp</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="counterexample__found_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="counterexample__found_8cpp.html" target="_top" xlink:title="Counterexample Found.">
 <polygon fill="none" stroke="black" points="180.5,-0.5 180.5,-41.5 365.5,-41.5 365.5,-0.5 180.5,-0.5"/>
 <text text-anchor="start" x="188.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="188.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/counterexample</text>
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="propagate_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="propagate_8cpp.html" target="_top" xlink:title="Propagate.">
 <polygon fill="none" stroke="black" points="383,-6 383,-36 559,-36 559,-6 383,-6"/>
 <text text-anchor="start" x="391" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="471" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/propagate.cpp</text>
@@ -71,7 +71,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="simplify__state__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="simplify__state__expr_8cpp.html" target="_top" xlink:title="Simplify State Expressions.">
 <polygon fill="none" stroke="black" points="577.5,-0.5 577.5,-41.5 722.5,-41.5 722.5,-0.5 577.5,-0.5"/>
 <text text-anchor="start" x="585.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="585.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cprover/simplify</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Streaming SMT data structures to a string based output stream.">
 <polygon fill="#bfbfbf" stroke="black" points="559.5,-245.5 559.5,-297.5 706.5,-297.5 706.5,-245.5 559.5,-245.5"/>
 <text text-anchor="start" x="567.5" y="-285.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="567.5" y="-274.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="smt__response__validation_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="smt__response__validation_8cpp.html" target="_top" xlink:title="Validation of smt response parse trees to produce either a strongly typed smt_responset representatio...">
 <polygon fill="none" stroke="black" points="314,-156.5 314,-208.5 466,-208.5 466,-156.5 314,-156.5"/>
 <text text-anchor="start" x="322" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="322" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
@@ -162,7 +162,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="expr__query_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="expr__query_8h.html" target="_top" xlink:title="Helper class for querying expressions Throw CATCH exceptions when the query fails.">
 <polygon fill="none" stroke="black" points="728,-78.5 728,-119.5 866,-119.5 866,-78.5 728,-78.5"/>
 <text text-anchor="start" x="736" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="736" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/unit/testing&#45;utils</text>
@@ -196,7 +196,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="require__expr_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="require__expr_8cpp.html" target="_top" xlink:title="Helper functions for requiring specific expressions If the expression is of the wrong type,...">
 <polygon fill="none" stroke="black" points="1040,-78.5 1040,-119.5 1178,-119.5 1178,-78.5 1040,-78.5"/>
 <text text-anchor="start" x="1048" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1048" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/unit/testing&#45;utils</text>

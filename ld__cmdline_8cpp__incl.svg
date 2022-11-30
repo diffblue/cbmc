@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="A special command line object for the ld&#45;like options.">
 <polygon fill="#bfbfbf" stroke="black" points="134.5,-280.5 134.5,-310.5 313.5,-310.5 313.5,-280.5 134.5,-280.5"/>
 <text text-anchor="start" x="142.5" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="224" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/ld_cmdline.cpp</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="ld__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="ld__cmdline_8h.html" target="_top" xlink:title="A special command line object for the ld&#45;like options.">
 <polygon fill="none" stroke="black" points="97.5,-224.5 97.5,-243.5 176.5,-243.5 176.5,-224.5 97.5,-224.5"/>
 <text text-anchor="middle" x="137" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">ld_cmdline.h</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="83.5,-168.5 83.5,-187.5 190.5,-187.5 190.5,-168.5 83.5,-168.5"/>
 <text text-anchor="middle" x="137" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_cmdline.h</text>
 </a>

@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class.">
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="886,-461.5 886,-480.5 951,-480.5 951,-461.5 886,-461.5"/>
 <text text-anchor="middle" x="918.5" y="-468.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
@@ -121,10 +121,10 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:title="STL class.">
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="668,-456 668,-486 772,-486 772,-456 668,-456"/>
 <text text-anchor="start" x="676" y="-474" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
-<text text-anchor="middle" x="720" y="-463" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
+<text text-anchor="middle" x="720" y="-463" font-family="Helvetica,sans-Serif" font-size="10.00"> Char &gt;</text>
 </a>
 </g>
 </g>
@@ -137,7 +137,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:title="STL class.">
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="861.5,-239 861.5,-269 975.5,-269 975.5,-239 861.5,-239"/>
 <text text-anchor="start" x="869.5" y="-257" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
 <text text-anchor="middle" x="918.5" y="-246" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; K, T &gt;</text>
@@ -187,7 +187,7 @@
 <!-- Node21 -->
 <g id="node16" class="node">
 <title>Node21</title>
-<g id="a_node16"><a xlink:title="STL class.">
+<g id="a_node16"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="868,-180.5 868,-199.5 969,-199.5 969,-180.5 868,-180.5"/>
 <text text-anchor="middle" x="918.5" y="-187.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; K, T &gt;</text>
 </a>
@@ -203,7 +203,7 @@
 <!-- Node35 -->
 <g id="node30" class="node">
 <title>Node35</title>
-<g id="a_node30"><a xlink:title="STL class.">
+<g id="a_node30"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="877.5,-104.5 877.5,-123.5 959.5,-123.5 959.5,-104.5 877.5,-104.5"/>
 <text text-anchor="middle" x="918.5" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::set&lt; K &gt;</text>
 </a>
@@ -374,18 +374,18 @@
 <path fill="none" stroke="midnightblue" d="M290.27,-265.18C312.4,-266.04 342.82,-267.23 367.95,-268.21"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="290.26,-261.68 280.13,-264.78 289.99,-268.67 290.26,-261.68"/>
 </g>
-<!-- Node18 -->
+<!-- Node19 -->
 <g id="node15" class="node">
-<title>Node18</title>
+<title>Node19</title>
 <g id="a_node15"><a xlink:href="classdstringt.html" target="_top" xlink:title="dstringt has one field, an unsigned integer no which is an index into a static table of strings.">
 <polygon fill="none" stroke="black" points="891.5,-142.5 891.5,-161.5 945.5,-161.5 945.5,-142.5 891.5,-142.5"/>
 <text text-anchor="middle" x="918.5" y="-149.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstringt</text>
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node9 -->
+<!-- Node19&#45;&gt;Node9 -->
 <g id="edge15" class="edge">
-<title>Node18&#45;&gt;Node9</title>
+<title>Node19&#45;&gt;Node9</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M955.39,-143.4C963.45,-140.7 971.76,-137.27 979,-133 988.48,-127.41 986.77,-120.07 997,-116 1054.68,-93.07 1127.64,-110.85 1171.19,-125.88"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="954.3,-140.07 945.76,-146.34 956.34,-146.76 954.3,-140.07"/>
 <text text-anchor="middle" x="1064.5" y="-119" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -400,9 +400,9 @@
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node29 -->
+<!-- Node19&#45;&gt;Node29 -->
 <g id="edge32" class="edge">
-<title>Node18&#45;&gt;Node29</title>
+<title>Node19&#45;&gt;Node29</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M955.45,-142.88C999.05,-133.67 1073.93,-123.95 1132,-148 1134,-148.83 1172.49,-187.82 1194.27,-209.99"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="954.59,-139.48 945.59,-145.06 956.11,-146.32 954.59,-139.48"/>
 <text text-anchor="middle" x="1064.5" y="-151" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -416,9 +416,9 @@
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node34 -->
+<!-- Node19&#45;&gt;Node34 -->
 <g id="edge41" class="edge">
-<title>Node18&#45;&gt;Node34</title>
+<title>Node19&#45;&gt;Node34</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M955.49,-145.88C963.96,-143.07 972.42,-138.97 979,-133 994.03,-119.34 981.13,-103.67 997,-91 1041.01,-55.85 1106.54,-48.55 1153.08,-48.5"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="954.36,-142.56 945.67,-148.62 956.24,-149.31 954.36,-142.56"/>
 <text text-anchor="middle" x="1064.5" y="-94" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -461,7 +461,7 @@
 <!-- Node25 -->
 <g id="node20" class="node">
 <title>Node25</title>
-<g id="a_node20"><a xlink:title="STL class.">
+<g id="a_node20"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="881,-546.5 881,-565.5 956,-565.5 956,-546.5 881,-546.5"/>
 <text text-anchor="middle" x="918.5" y="-553.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::istream</text>
 </a>
@@ -477,10 +477,10 @@
 <!-- Node26 -->
 <g id="node21" class="node">
 <title>Node26</title>
-<g id="a_node21"><a xlink:title="STL class.">
+<g id="a_node21"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="667,-541 667,-571 773,-571 773,-541 667,-541"/>
 <text text-anchor="start" x="675" y="-559" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_istream</text>
-<text text-anchor="middle" x="720" y="-548" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; char &gt;</text>
+<text text-anchor="middle" x="720" y="-548" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; Char &gt;</text>
 </a>
 </g>
 </g>
@@ -493,7 +493,7 @@
 <!-- Node27 -->
 <g id="node22" class="node">
 <title>Node27</title>
-<g id="a_node22"><a xlink:title="STL class.">
+<g id="a_node22"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="502,-546.5 502,-565.5 630,-565.5 630,-546.5 502,-546.5"/>
 <text text-anchor="middle" x="566" y="-553.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_ios&lt; Char &gt;</text>
 </a>
@@ -508,7 +508,7 @@
 <!-- Node28 -->
 <g id="node23" class="node">
 <title>Node28</title>
-<g id="a_node23"><a xlink:title="STL class.">
+<g id="a_node23"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="375,-546.5 375,-565.5 455,-565.5 455,-546.5 375,-546.5"/>
 <text text-anchor="middle" x="415" y="-553.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::ios_base</text>
 </a>

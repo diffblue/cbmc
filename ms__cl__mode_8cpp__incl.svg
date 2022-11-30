@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Visual Studio CL Mode.">
 <polygon fill="#bfbfbf" stroke="black" points="1204,-616.5 1204,-657.5 1342,-657.5 1342,-616.5 1204,-616.5"/>
 <text text-anchor="start" x="1212" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="1212" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/ms_cl</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="ms__cl__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="ms__cl__mode_8h.html" target="_top" xlink:title="Visual Studio CL Mode.">
 <polygon fill="none" stroke="black" points="1229.5,-392.5 1229.5,-411.5 1316.5,-411.5 1316.5,-392.5 1229.5,-392.5"/>
 <text text-anchor="middle" x="1273" y="-399.5" font-family="Helvetica,sans-Serif" font-size="10.00">ms_cl_mode.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node48 -->
 <g id="node33" class="node">
 <title>Node48</title>
-<g id="a_node33"><a xlink:href="compile_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="compile_8h.html" target="_top" xlink:title="Compile and link source and object files.">
 <polygon fill="none" stroke="black" points="666.5,-560.5 666.5,-579.5 731.5,-579.5 731.5,-560.5 666.5,-560.5"/>
 <text text-anchor="middle" x="699" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">compile.h</text>
 </a>
@@ -172,7 +172,7 @@
 <!-- Node34 -->
 <g id="node18" class="node">
 <title>Node34</title>
-<g id="a_node18"><a xlink:href="goto__cc__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="goto__cc__mode_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="1279,-56.5 1279,-75.5 1375,-75.5 1375,-56.5 1279,-56.5"/>
 <text text-anchor="middle" x="1327" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_mode.h</text>
 </a>
@@ -187,7 +187,7 @@
 <!-- Node35 -->
 <g id="node19" class="node">
 <title>Node35</title>
-<g id="a_node19"><a xlink:href="ms__cl__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="ms__cl__cmdline_8h.html" target="_top" xlink:title="A special command line object for the gcc&#45;like options.">
 <polygon fill="none" stroke="black" points="1190,-336.5 1190,-355.5 1288,-355.5 1288,-336.5 1190,-336.5"/>
 <text text-anchor="middle" x="1239" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">ms_cl_cmdline.h</text>
 </a>
@@ -445,7 +445,7 @@
 <!-- Node36 -->
 <g id="node20" class="node">
 <title>Node36</title>
-<g id="a_node20"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="goto__cc__cmdline_8h.html" target="_top" xlink:title="Command line interpretation for goto&#45;cc.">
 <polygon fill="none" stroke="black" points="1153.5,-280.5 1153.5,-299.5 1260.5,-299.5 1260.5,-280.5 1153.5,-280.5"/>
 <text text-anchor="middle" x="1207" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_cc_cmdline.h</text>
 </a>
@@ -637,7 +637,7 @@
 <!-- Node49 -->
 <g id="node34" class="node">
 <title>Node49</title>
-<g id="a_node34"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="313,-504.5 313,-523.5 405,-523.5 405,-504.5 313,-504.5"/>
 <text text-anchor="middle" x="359" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -775,7 +775,7 @@
 <!-- Node51 -->
 <g id="node37" class="node">
 <title>Node51</title>
-<g id="a_node37"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="423.5,-336.5 423.5,-355.5 470.5,-355.5 470.5,-336.5 423.5,-336.5"/>
 <text text-anchor="middle" x="447" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="binary irep conversions with hashing">
 <polygon fill="#bfbfbf" stroke="black" points="142,-78.5 142,-108.5 320,-108.5 320,-78.5 142,-78.5"/>
 <text text-anchor="start" x="150" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="231" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_serialization.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="read__bin__goto__object_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="read__bin__goto__object_8cpp.html" target="_top" xlink:title="Read goto object files.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 144,-41.5 144,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="write__goto__binary_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="write__goto__binary_8cpp.html" target="_top" xlink:title="Write GOTO binaries.">
 <polygon fill="none" stroke="black" points="162,-0.5 162,-41.5 300,-41.5 300,-0.5 162,-0.5"/>
 <text text-anchor="start" x="170" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="170" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="irep__serialization_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="irep__serialization_8cpp.html" target="_top" xlink:title="binary irep conversions with hashing">
 <polygon fill="none" stroke="black" points="318.5,-6 318.5,-36 507.5,-36 507.5,-6 318.5,-6"/>
 <text text-anchor="start" x="326.5" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="413" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/irep_serialization.cpp</text>

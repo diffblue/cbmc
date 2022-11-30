@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_types.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_types.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4685,5,4904,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4297,5,4516,61"/>
 <area shape="rect" id="node2" href="$assignments__from__json_8cpp.html" title=" " alt="" coords="5,117,224,173"/>
-<area shape="rect" id="node3" href="$java__bytecode__parse__tree_8h.html" title=" " alt="" coords="1295,117,1513,173"/>
-<area shape="rect" id="node10" href="$java__entry__point_8cpp.html" title=" " alt="" coords="784,451,1003,507"/>
-<area shape="rect" id="node17" href="$java__bytecode__convert__class_8cpp.html" title=" " alt="" coords="2793,659,3037,715"/>
-<area shape="rect" id="node22" href="$java__bytecode__convert__method_8cpp.html" title=" " alt="" coords="3061,659,3323,715"/>
-<area shape="rect" id="node23" href="$lambda__synthesis_8cpp.html" title=" " alt="" coords="440,659,659,715"/>
-<area shape="rect" id="node24" href="$java__local__variable__table_8cpp.html" title=" " alt="" coords="3171,555,3389,611"/>
-<area shape="rect" id="node28" href="$java__bytecode__parser_8cpp.html" title=" " alt="" coords="3079,235,3297,291"/>
-<area shape="rect" id="node32" href="$java__string__library__preprocess_8h.html" title=" " alt="" coords="3515,235,3752,291"/>
-<area shape="rect" id="node34" href="$java__string__library__preprocess_8cpp.html" title=" " alt="" coords="3859,347,4111,403"/>
-<area shape="rect" id="node36" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="3878,117,4173,173"/>
-<area shape="rect" id="node37" href="$ci__lazy__methods__needed_8cpp.html" title=" " alt="" coords="3827,235,4045,291"/>
-<area shape="rect" id="node40" href="$select__pointer__type_8cpp.html" title=" " alt="" coords="4673,235,4892,291"/>
-<area shape="rect" id="node41" href="$code__with__references_8cpp.html" title=" " alt="" coords="4248,117,4467,173"/>
-<area shape="rect" id="node42" href="$create__array__with__type__intrinsic_8cpp.html" title=" " alt="" coords="4491,117,4757,173"/>
-<area shape="rect" id="node43" href="$java__qualifiers_8h.html" title=" " alt="" coords="4832,117,5051,173"/>
-<area shape="rect" id="node44" href="$expr2java_8cpp.html" title=" " alt="" coords="4916,235,5135,291"/>
-<area shape="rect" id="node46" href="$java__bytecode__concurrency__instrumentation_8cpp.html" title=" " alt="" coords="5075,109,5293,180"/>
-<area shape="rect" id="node47" href="$java__bytecode__instrument_8cpp.html" title=" " alt="" coords="5317,117,5544,173"/>
-<area shape="rect" id="node48" href="$java__bytecode__internal__additions_8cpp.html" title=" " alt="" coords="5568,117,5840,173"/>
-<area shape="rect" id="node49" href="$java__bytecode__typecheck__type_8cpp.html" title=" " alt="" coords="5864,117,6123,173"/>
-<area shape="rect" id="node50" href="$java__pointer__casts_8cpp.html" title=" " alt="" coords="6147,117,6365,173"/>
-<area shape="rect" id="node51" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="6389,117,6608,173"/>
-<area shape="rect" id="node52" href="$java__string__literals_8cpp.html" title=" " alt="" coords="6632,117,6851,173"/>
-<area shape="rect" id="node53" href="$java__types_8cpp.html" title=" " alt="" coords="6875,117,7093,173"/>
-<area shape="rect" id="node54" href="$remove__exceptions_8cpp.html" title=" " alt="" coords="7117,117,7336,173"/>
-<area shape="rect" id="node55" href="$remove__instanceof_8cpp.html" title=" " alt="" coords="7360,117,7579,173"/>
-<area shape="rect" id="node56" href="$remove__java__new_8cpp.html" title=" " alt="" coords="7603,117,7821,173"/>
-<area shape="rect" id="node57" href="$simple__method__stubbing_8cpp.html" title=" " alt="" coords="7845,117,8064,173"/>
-<area shape="rect" id="node58" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="8089,117,8338,173"/>
-<area shape="rect" id="node59" href="$require__type_8h.html" title=" " alt="" coords="8363,117,8571,173"/>
-<area shape="rect" id="node4" href="$ci__lazy__methods_8h.html" title=" " alt="" coords="1416,235,1635,291"/>
-<area shape="rect" id="node18" href="$java__class__loader_8h.html" title=" " alt="" coords="1173,235,1392,291"/>
-<area shape="rect" id="node19" href="$java__bytecode__convert__class_8h.html" title=" " alt="" coords="2699,347,2928,403"/>
-<area shape="rect" id="node20" href="$java__bytecode__convert__method__class_8h.html" title=" " alt="" coords="3003,451,3290,507"/>
-<area shape="rect" id="node21" href="$java__bytecode__convert__method_8h.html" title=" " alt="" coords="2850,555,3097,611"/>
-<area shape="rect" id="node26" href="$lambda__synthesis_8h.html" title=" " alt="" coords="536,555,755,611"/>
-<area shape="rect" id="node27" href="$java__bytecode__parse__tree_8cpp.html" title=" " alt="" coords="581,235,805,291"/>
-<area shape="rect" id="node29" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="829,235,1048,291"/>
-<area shape="rect" id="node30" href="$require__parse__tree_8h.html" title=" " alt="" coords="349,235,557,291"/>
-<area shape="rect" id="node5" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="1027,451,1245,507"/>
-<area shape="rect" id="node6" href="$java__bytecode__language_8h.html" title=" " alt="" coords="1605,347,1824,403"/>
-<area shape="rect" id="node9" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="953,659,1172,715"/>
-<area shape="rect" id="node7" href="$janalyzer__parse__options_8h.html" title=" " alt="" coords="2478,451,2674,507"/>
-<area shape="rect" id="node8" href="$janalyzer__parse__options_8cpp.html" title=" " alt="" coords="2464,555,2675,611"/>
-<area shape="rect" id="node11" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1819,451,2037,507"/>
-<area shape="rect" id="node12" href="$jbmc__parse__options_8h.html" title=" " alt="" coords="1552,451,1744,507"/>
-<area shape="rect" id="node13" href="$jbmc__parse__options_8cpp.html" title=" " alt="" coords="1619,555,1811,611"/>
-<area shape="rect" id="node14" href="$jdiff__languages_8cpp.html" title=" " alt="" coords="2061,451,2245,507"/>
-<area shape="rect" id="node15" href="$jdiff__parse__options_8cpp.html" title=" " alt="" coords="2269,451,2453,507"/>
-<area shape="rect" id="node16" href="$load__java__class_8cpp.html" title=" " alt="" coords="1320,451,1528,507"/>
-<area shape="rect" id="node25" href="$java__class__loader_8cpp.html" title=" " alt="" coords="807,347,1025,403"/>
-<area shape="rect" id="node31" href="$require__parse__tree_8cpp.html" title=" " alt="" coords="349,347,557,403"/>
-<area shape="rect" id="node33" href="$java__object__factory_8cpp.html" title=" " alt="" coords="4136,347,4355,403"/>
-<area shape="rect" id="node35" href="$java__utils_8cpp.html" title=" " alt="" coords="3565,347,3784,403"/>
-<area shape="rect" id="node38" href="$generic__parameter__specialization__map_8cpp.html" title=" " alt="" coords="4340,235,4649,291"/>
-<area shape="rect" id="node39" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="4070,228,4317,299"/>
-<area shape="rect" id="node45" href="$java__qualifiers_8cpp.html" title=" " alt="" coords="5159,235,5377,291"/>
-<area shape="rect" id="node60" href="$require__type_8cpp.html" title=" " alt="" coords="8363,235,8571,291"/>
+<area shape="rect" id="node3" href="$ci__lazy__methods__needed_8cpp.html" title="Context&#45;insensitive lazy methods container." alt="" coords="299,235,517,291"/>
+<area shape="rect" id="node4" href="$code__with__references_8cpp.html" title=" " alt="" coords="3860,117,4079,173"/>
+<area shape="rect" id="node5" href="$create__array__with__type__intrinsic_8cpp.html" title="Implementation of CProver.createArrayWithType intrinsic." alt="" coords="4103,117,4369,173"/>
+<area shape="rect" id="node6" href="$expr2java_8cpp.html" title=" " alt="" coords="4297,235,4516,291"/>
+<area shape="rect" id="node7" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="851,117,1146,173"/>
+<area shape="rect" id="node12" href="$select__pointer__type_8cpp.html" title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)..." alt="" coords="1147,235,1365,291"/>
+<area shape="rect" id="node13" href="$java__bytecode__concurrency__instrumentation_8cpp.html" title=" " alt="" coords="4687,109,4905,180"/>
+<area shape="rect" id="node14" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="3741,673,3985,729"/>
+<area shape="rect" id="node15" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="1484,673,1745,729"/>
+<area shape="rect" id="node16" href="$java__bytecode__instrument_8cpp.html" title=" " alt="" coords="4929,117,5156,173"/>
+<area shape="rect" id="node17" href="$java__bytecode__internal__additions_8cpp.html" title=" " alt="" coords="5180,117,5452,173"/>
+<area shape="rect" id="node18" href="$java__bytecode__parse__tree_8h.html" title=" " alt="" coords="1863,117,2081,173"/>
+<area shape="rect" id="node25" href="$java__entry__point_8cpp.html" title=" " alt="" coords="3455,465,3673,521"/>
+<area shape="rect" id="node34" href="$lambda__synthesis_8cpp.html" title="Java lambda code synthesis." alt="" coords="1147,673,1365,729"/>
+<area shape="rect" id="node35" href="$java__local__variable__table_8cpp.html" title="Java local variable table processing." alt="" coords="1863,569,2081,625"/>
+<area shape="rect" id="node37" href="$java__bytecode__parser_8cpp.html" title=" " alt="" coords="3143,235,3361,291"/>
+<area shape="rect" id="node44" href="$java__bytecode__typecheck__type_8cpp.html" title="JAVA Bytecode Conversion / Type Checking." alt="" coords="5476,117,5735,173"/>
+<area shape="rect" id="node45" href="$java__pointer__casts_8cpp.html" title="JAVA Pointer Casts." alt="" coords="5759,117,5977,173"/>
+<area shape="rect" id="node46" href="$java__qualifiers_8h.html" title="Java&#45;specific type qualifiers." alt="" coords="4444,117,4663,173"/>
+<area shape="rect" id="node48" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="6001,117,6220,173"/>
+<area shape="rect" id="node49" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="4194,354,4446,410"/>
+<area shape="rect" id="node50" href="$java__string__library__preprocess_8h.html" title="Produce code for simple implementation of String Java libraries." alt="" coords="3708,235,3945,291"/>
+<area shape="rect" id="node52" href="$java__string__literals_8cpp.html" title=" " alt="" coords="6244,117,6463,173"/>
+<area shape="rect" id="node53" href="$java__types_8cpp.html" title=" " alt="" coords="6487,117,6705,173"/>
+<area shape="rect" id="node54" href="$remove__exceptions_8cpp.html" title="Remove exception handling." alt="" coords="6729,117,6948,173"/>
+<area shape="rect" id="node55" href="$remove__instanceof_8cpp.html" title="Remove Instance&#45;of Operators." alt="" coords="6972,117,7191,173"/>
+<area shape="rect" id="node56" href="$remove__java__new_8cpp.html" title="Remove Java New Operators." alt="" coords="7215,117,7433,173"/>
+<area shape="rect" id="node57" href="$simple__method__stubbing_8cpp.html" title="Java simple opaque stub generation." alt="" coords="7457,117,7676,173"/>
+<area shape="rect" id="node58" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="7701,117,7950,173"/>
+<area shape="rect" id="node59" href="$require__type_8h.html" title="Helper functions for requiring specific types If the type is of the wrong type, throw a CATCH excepti..." alt="" coords="7975,117,8183,173"/>
+<area shape="rect" id="node8" href="$generic__parameter__specialization__map_8cpp.html" title=" " alt="" coords="541,235,851,291"/>
+<area shape="rect" id="node9" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="875,228,1122,299"/>
+<area shape="rect" id="node10" href="$generic__parameter__specialization__map__keys_8cpp.html" title=" " alt="" coords="875,347,1122,417"/>
+<area shape="rect" id="node11" href="$java__object__factory_8cpp.html" title=" " alt="" coords="1248,354,1467,410"/>
+<area shape="rect" id="node19" href="$ci__lazy__methods_8h.html" title="Collect methods needed to be loaded using the lazy method." alt="" coords="2689,235,2908,291"/>
+<area shape="rect" id="node31" href="$java__bytecode__convert__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="1681,354,1911,410"/>
+<area shape="rect" id="node32" href="$java__bytecode__convert__method__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="1501,465,1787,521"/>
+<area shape="rect" id="node33" href="$java__bytecode__convert__method_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="1491,569,1738,625"/>
+<area shape="rect" id="node36" href="$java__bytecode__parse__tree_8cpp.html" title=" " alt="" coords="2411,235,2635,291"/>
+<area shape="rect" id="node38" href="$java__class__loader_8h.html" title=" " alt="" coords="1936,235,2155,291"/>
+<area shape="rect" id="node40" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="1541,235,1760,291"/>
+<area shape="rect" id="node41" href="$lambda__synthesis_8h.html" title="Java lambda code synthesis." alt="" coords="1248,569,1467,625"/>
+<area shape="rect" id="node42" href="$require__parse__tree_8h.html" title="Utilties for inspecting java_parse_treet." alt="" coords="2179,235,2387,291"/>
+<area shape="rect" id="node20" href="$ci__lazy__methods_8cpp.html" title=" " alt="" coords="1964,465,2183,521"/>
+<area shape="rect" id="node21" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="1889,673,2108,729"/>
+<area shape="rect" id="node22" href="$java__bytecode__language_8h.html" title=" " alt="" coords="2689,354,2908,410"/>
+<area shape="rect" id="node23" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="2225,569,2436,625"/>
+<area shape="rect" id="node24" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="2258,465,2454,521"/>
+<area shape="rect" id="node26" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="2996,465,3215,521"/>
+<area shape="rect" id="node27" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3051,569,3243,625"/>
+<area shape="rect" id="node28" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="3239,465,3431,521"/>
+<area shape="rect" id="node29" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="2529,465,2713,521"/>
+<area shape="rect" id="node30" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="2737,465,2921,521"/>
+<area shape="rect" id="node39" href="$java__class__loader_8cpp.html" title=" " alt="" coords="1935,354,2153,410"/>
+<area shape="rect" id="node43" href="$require__parse__tree_8cpp.html" title=" " alt="" coords="2279,354,2487,410"/>
+<area shape="rect" id="node47" href="$java__qualifiers_8cpp.html" title="Java&#45;specific type qualifiers." alt="" coords="4540,235,4759,291"/>
+<area shape="rect" id="node51" href="$java__utils_8cpp.html" title=" " alt="" coords="3951,354,4169,410"/>
+<area shape="rect" id="node60" href="$require__type_8cpp.html" title=" " alt="" coords="7975,235,8183,291"/>
 </map>

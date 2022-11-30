@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Generic exception types primarily designed for use with invariants.">
 <polygon fill="#bfbfbf" stroke="black" points="254.5,-78.5 254.5,-108.5 430.5,-108.5 430.5,-78.5 254.5,-78.5"/>
 <text text-anchor="start" x="262.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="342.5" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/base_exceptions.h</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="reaching__definitions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="reaching__definitions_8cpp.html" target="_top" xlink:title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,...">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 155,-41.5 155,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/reaching</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cpp__instantiate__template_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cpp__instantiate__template_8cpp.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="173,-0.5 173,-41.5 334,-41.5 334,-0.5 173,-0.5"/>
 <text text-anchor="start" x="181" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="181" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_instantiate</text>
@@ -55,7 +55,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="cpp__typecheck__template_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="cpp__typecheck__template_8cpp.html" target="_top" xlink:title="C++ Language Type Checking.">
 <polygon fill="none" stroke="black" points="352,-0.5 352,-41.5 511,-41.5 511,-0.5 352,-0.5"/>
 <text text-anchor="start" x="360" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="360" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_typecheck</text>
@@ -72,7 +72,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__symex__state_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__symex__state_8cpp.html" target="_top" xlink:title="Symbolic Execution.">
 <polygon fill="none" stroke="black" points="529,-0.5 529,-41.5 678,-41.5 678,-0.5 529,-0.5"/>
 <text text-anchor="start" x="537" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="537" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/goto</text>

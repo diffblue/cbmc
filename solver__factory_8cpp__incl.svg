@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Solver Factory.">
 <polygon fill="#bfbfbf" stroke="black" points="2306.5,-447.5 2306.5,-488.5 2444.5,-488.5 2444.5,-447.5 2306.5,-447.5"/>
 <text text-anchor="start" x="2314.5" y="-476.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="2314.5" y="-465.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="solver__factory_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="solver__factory_8h.html" target="_top" xlink:title="Solver Factory.">
 <polygon fill="none" stroke="black" points="1262.5,-380.5 1262.5,-399.5 1356.5,-399.5 1356.5,-380.5 1262.5,-380.5"/>
 <text text-anchor="middle" x="1309.5" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">solver_factory.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node57 -->
 <g id="node21" class="node">
 <title>Node57</title>
-<g id="a_node21"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="stack__decision__procedure_8h.html" target="_top" xlink:title="Decision procedure with incremental solving with contexts and assumptions.">
 <polygon fill="none" stroke="black" points="964,-168.5 964,-198.5 1091,-198.5 1091,-168.5 964,-168.5"/>
 <text text-anchor="start" x="972" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/stack_decision</text>
 <text text-anchor="middle" x="1027.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">_procedure.h</text>
@@ -128,7 +128,7 @@
 <!-- Node65 -->
 <g id="node30" class="node">
 <title>Node65</title>
-<g id="a_node30"><a xlink:href="options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="options_8h.html" target="_top" xlink:title="Options.">
 <polygon fill="none" stroke="black" points="2765.5,-241 2765.5,-260 2845.5,-260 2845.5,-241 2765.5,-241"/>
 <text text-anchor="middle" x="2805.5" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">util/options.h</text>
 </a>
@@ -173,7 +173,7 @@
 <!-- Node68 -->
 <g id="node33" class="node">
 <title>Node68</title>
-<g id="a_node33"><a xlink:href="bv__dimacs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="bv__dimacs_8h.html" target="_top" xlink:title="Writing DIMACS Files.">
 <polygon fill="none" stroke="black" points="2970,-375 2970,-405 3071,-405 3071,-375 2970,-375"/>
 <text text-anchor="start" x="2978" y="-393" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/flattening</text>
 <text text-anchor="middle" x="3020.5" y="-382" font-family="Helvetica,sans-Serif" font-size="10.00">/bv_dimacs.h</text>
@@ -189,7 +189,7 @@
 <!-- Node84 -->
 <g id="node35" class="node">
 <title>Node84</title>
-<g id="a_node35"><a xlink:href="solver__resource__limits_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="solver__resource__limits_8h.html" target="_top" xlink:title="Solver capability to set resource limits.">
 <polygon fill="none" stroke="black" points="2239.5,-241 2239.5,-260 2375.5,-260 2375.5,-241 2239.5,-241"/>
 <text text-anchor="middle" x="2307.5" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">solver_resource_limits.h</text>
 </a>
@@ -204,7 +204,7 @@
 <!-- Node87 -->
 <g id="node36" class="node">
 <title>Node87</title>
-<g id="a_node36"><a xlink:href="bv__refinement_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="bv__refinement_8h.html" target="_top" xlink:title="Abstraction Refinement Loop.">
 <polygon fill="none" stroke="black" points="3093.5,-235.5 3093.5,-265.5 3201.5,-265.5 3201.5,-235.5 3093.5,-235.5"/>
 <text text-anchor="start" x="3101.5" y="-253.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/refinement</text>
 <text text-anchor="middle" x="3147.5" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">/bv_refinement.h</text>
@@ -236,7 +236,7 @@
 <!-- Node91 -->
 <g id="node39" class="node">
 <title>Node91</title>
-<g id="a_node39"><a xlink:href="external__sat_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="external__sat_8h.html" target="_top" xlink:title="Allows calling an external SAT solver to allow faster integration of newer SAT solvers.">
 <polygon fill="none" stroke="black" points="1427,-375 1427,-405 1540,-405 1540,-375 1427,-375"/>
 <text text-anchor="start" x="1435" y="-393" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/sat/external</text>
 <text text-anchor="middle" x="1483.5" y="-382" font-family="Helvetica,sans-Serif" font-size="10.00">_sat.h</text>
@@ -267,7 +267,7 @@
 <!-- Node93 -->
 <g id="node41" class="node">
 <title>Node93</title>
-<g id="a_node41"><a xlink:href="smt2__incremental__decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="smt2__incremental__decision__procedure_8h.html" target="_top" xlink:title="Decision procedure with incremental SMT2 solving.">
 <polygon fill="none" stroke="black" points="531.5,-369.5 531.5,-410.5 685.5,-410.5 685.5,-369.5 531.5,-369.5"/>
 <text text-anchor="start" x="539.5" y="-398.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="start" x="539.5" y="-387.5" font-family="Helvetica,sans-Serif" font-size="10.00">/smt2_incremental_decision</text>
@@ -300,7 +300,7 @@
 <!-- Node115 -->
 <g id="node51" class="node">
 <title>Node115</title>
-<g id="a_node51"><a xlink:href="string__refinement_8h.html" target="_top" xlink:title=" ">
+<g id="a_node51"><a xlink:href="string__refinement_8h.html" target="_top" xlink:title="String support via creating string constraints and progressively instantiating the universal constrai...">
 <polygon fill="none" stroke="black" points="2832,-302.5 2832,-332.5 2951,-332.5 2951,-302.5 2832,-302.5"/>
 <text text-anchor="start" x="2840" y="-320.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/strings/string</text>
 <text text-anchor="middle" x="2891.5" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">_refinement.h</text>
@@ -637,7 +637,7 @@
 <!-- Node51 -->
 <g id="node19" class="node">
 <title>Node51</title>
-<g id="a_node19"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="879,-174 879,-193 946,-193 946,-174 879,-174"/>
 <text text-anchor="middle" x="912.5" y="-181" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -685,7 +685,7 @@
 <!-- Node58 -->
 <g id="node22" class="node">
 <title>Node58</title>
-<g id="a_node22"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="decision__procedure_8h.html" target="_top" xlink:title="Decision Procedure Interface.">
 <polygon fill="none" stroke="black" points="1263.5,-112.5 1263.5,-131.5 1383.5,-131.5 1383.5,-112.5 1263.5,-112.5"/>
 <text text-anchor="middle" x="1323.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">decision_procedure.h</text>
 </a>
@@ -829,7 +829,7 @@
 <!-- Node89 -->
 <g id="node38" class="node">
 <title>Node89</title>
-<g id="a_node38"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="cnf__clause__list_8h.html" target="_top" xlink:title="CNF Generation.">
 <polygon fill="none" stroke="red" points="1361.5,-241 1361.5,-260 1459.5,-260 1459.5,-241 1361.5,-241"/>
 <text text-anchor="middle" x="1410.5" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">cnf_clause_list.h</text>
 </a>
@@ -902,7 +902,7 @@
 <!-- Node102 -->
 <g id="node43" class="node">
 <title>Node102</title>
-<g id="a_node43"><a xlink:href="object__tracking_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="object__tracking_8h.html" target="_top" xlink:title="Data structures and algorithms used by smt2_incremental_decision_proceduret to track data about the o...">
 <polygon fill="none" stroke="red" points="437,-235.5 437,-265.5 580,-265.5 580,-235.5 437,-235.5"/>
 <text text-anchor="start" x="445" y="-253.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="508.5" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">/object_tracking.h</text>
@@ -965,7 +965,7 @@
 <!-- Node111 -->
 <g id="node47" class="node">
 <title>Node111</title>
-<g id="a_node47"><a xlink:href="type__size__mapping_8h.html" target="_top" xlink:title=" ">
+<g id="a_node47"><a xlink:href="type__size__mapping_8h.html" target="_top" xlink:title="Utilities for making a map of types to associated sizes.">
 <polygon fill="none" stroke="red" points="261,-302.5 261,-332.5 404,-332.5 404,-302.5 261,-302.5"/>
 <text text-anchor="start" x="269" y="-320.5" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/smt2_incremental</text>
 <text text-anchor="middle" x="332.5" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00">/type_size_mapping.h</text>
@@ -1059,7 +1059,7 @@
 <!-- Node113 -->
 <g id="node49" class="node">
 <title>Node113</title>
-<g id="a_node49"><a xlink:href="piped__process_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="piped__process_8h.html" target="_top" xlink:title="Subprocess communication with pipes.">
 <polygon fill="none" stroke="red" points="1591.5,-241 1591.5,-260 1705.5,-260 1705.5,-241 1591.5,-241"/>
 <text text-anchor="middle" x="1648.5" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">util/piped_process.h</text>
 </a>
@@ -1135,7 +1135,7 @@
 <!-- Node118 -->
 <g id="node53" class="node">
 <title>Node118</title>
-<g id="a_node53"><a xlink:href="string__constraint__generator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="string__constraint__generator_8h.html" target="_top" xlink:title="Generates string constraints to link results from string functions with their arguments.">
 <polygon fill="none" stroke="red" points="2667,-174 2667,-193 2826,-193 2826,-174 2667,-174"/>
 <text text-anchor="middle" x="2746.5" y="-181" font-family="Helvetica,sans-Serif" font-size="10.00">string_constraint_generator.h</text>
 </a>
@@ -1150,7 +1150,7 @@
 <!-- Node129 -->
 <g id="node54" class="node">
 <title>Node129</title>
-<g id="a_node54"><a xlink:href="string__dependencies_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="string__dependencies_8h.html" target="_top" xlink:title="Keeps track of dependencies between strings.">
 <polygon fill="none" stroke="red" points="2393.5,-241 2393.5,-260 2519.5,-260 2519.5,-241 2393.5,-241"/>
 <text text-anchor="middle" x="2456.5" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">string_dependencies.h</text>
 </a>
@@ -1222,7 +1222,7 @@
 <!-- Node82 -->
 <g id="node57" class="node">
 <title>Node82</title>
-<g id="a_node57"><a xlink:href="hardness__collector_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="hardness__collector_8h.html" target="_top" xlink:title="Capability to collect the statistics of the complexity of individual solver queries.">
 <polygon fill="none" stroke="black" points="1876,-241 1876,-260 2031,-260 2031,-241 1876,-241"/>
 <text text-anchor="middle" x="1953.5" y="-248" font-family="Helvetica,sans-Serif" font-size="10.00">solvers/hardness_collector.h</text>
 </a>
@@ -1268,7 +1268,7 @@
 <!-- Node133 -->
 <g id="node60" class="node">
 <title>Node133</title>
-<g id="a_node60"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="2358,-168.5 2358,-198.5 2471,-198.5 2471,-168.5 2358,-168.5"/>
 <text text-anchor="start" x="2366" y="-186.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="2414.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>

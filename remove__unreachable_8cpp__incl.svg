@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Program Transformation.">
 <polygon fill="#bfbfbf" stroke="black" points="126.5,-616.5 126.5,-657.5 269.5,-657.5 269.5,-616.5 126.5,-616.5"/>
 <text text-anchor="start" x="134.5" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="134.5" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="remove__unreachable_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="remove__unreachable_8h.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="0,-560.5 0,-579.5 128,-579.5 128,-560.5 0,-560.5"/>
 <text text-anchor="middle" x="64" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">remove_unreachable.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="black" points="192,-560.5 192,-579.5 290,-579.5 290,-560.5 192,-560.5"/>
 <text text-anchor="middle" x="241" y="-567.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="goto__function_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="goto__function_8h.html" target="_top" xlink:title="Goto Function.">
 <polygon fill="none" stroke="black" points="372,-504.5 372,-523.5 464,-523.5 464,-504.5 372,-504.5"/>
 <text text-anchor="middle" x="418" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_function.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="620,-280.5 620,-299.5 712,-299.5 712,-280.5 620,-280.5"/>
 <text text-anchor="middle" x="666" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -142,7 +142,7 @@
 <!-- Node47 -->
 <g id="node27" class="node">
 <title>Node47</title>
-<g id="a_node27"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="305,-448.5 305,-467.5 399,-467.5 399,-448.5 305,-448.5"/>
 <text text-anchor="middle" x="352" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -262,7 +262,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="769.5,-112.5 769.5,-131.5 816.5,-131.5 816.5,-112.5 769.5,-112.5"/>
 <text text-anchor="middle" x="793" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -589,7 +589,7 @@
 <!-- Node50 -->
 <g id="node30" class="node">
 <title>Node50</title>
-<g id="a_node30"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="398,-336.5 398,-355.5 484,-355.5 484,-336.5 398,-336.5"/>
 <text text-anchor="middle" x="441" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>

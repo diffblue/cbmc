@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Add constraints to equation encoding partial orders on events.">
 <polygon fill="#bfbfbf" stroke="black" points="805,-582.5 805,-623.5 964,-623.5 964,-582.5 805,-582.5"/>
 <text text-anchor="start" x="813" y="-611.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="813" y="-600.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/partial</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="814,-526.5 814,-545.5 955,-545.5 955,-526.5 814,-526.5"/>
 <text text-anchor="middle" x="884.5" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target_equation.h</text>
 </a>
@@ -157,7 +157,7 @@
 <!-- Node57 -->
 <g id="node48" class="node">
 <title>Node57</title>
-<g id="a_node48"><a xlink:href="symex__target_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="symex__target_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="1172,-409 1172,-428 1265,-428 1265,-409 1172,-409"/>
 <text text-anchor="middle" x="1218.5" y="-416" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target.h</text>
 </a>
@@ -289,7 +289,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="405.5,-168.5 405.5,-187.5 469.5,-187.5 469.5,-168.5 405.5,-168.5"/>
 <text text-anchor="middle" x="437.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -319,7 +319,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="290,-112.5 290,-131.5 349,-131.5 349,-112.5 290,-112.5"/>
 <text text-anchor="middle" x="319.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -376,7 +376,7 @@
 <!-- Node19 -->
 <g id="node18" class="node">
 <title>Node19</title>
-<g id="a_node18"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="89.5,-56.5 89.5,-75.5 193.5,-75.5 193.5,-56.5 89.5,-56.5"/>
 <text text-anchor="middle" x="141.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -604,7 +604,7 @@
 <!-- Node49 -->
 <g id="node40" class="node">
 <title>Node49</title>
-<g id="a_node40"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="black" points="654,-403.5 654,-433.5 767,-433.5 767,-403.5 654,-403.5"/>
 <text text-anchor="start" x="662" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="710.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace.h</text>
@@ -626,7 +626,7 @@
 <!-- Node36 -->
 <g id="node33" class="node">
 <title>Node36</title>
-<g id="a_node33"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1464,-224.5 1464,-243.5 1531,-243.5 1531,-224.5 1464,-224.5"/>
 <text text-anchor="middle" x="1497.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -662,7 +662,7 @@
 <!-- Node46 -->
 <g id="node37" class="node">
 <title>Node46</title>
-<g id="a_node37"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node37"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1318,-168.5 1318,-187.5 1391,-187.5 1391,-168.5 1318,-168.5"/>
 <text text-anchor="middle" x="1354.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -827,7 +827,7 @@
 <!-- Node50 -->
 <g id="node41" class="node">
 <title>Node50</title>
-<g id="a_node41"><a xlink:href="options_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="options_8h.html" target="_top" xlink:title="Options.">
 <polygon fill="none" stroke="black" points="211.5,-56.5 211.5,-75.5 291.5,-75.5 291.5,-56.5 211.5,-56.5"/>
 <text text-anchor="middle" x="251.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/options.h</text>
 </a>
@@ -842,7 +842,7 @@
 <!-- Node52 -->
 <g id="node43" class="node">
 <title>Node52</title>
-<g id="a_node43"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node43"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="1074,-336.5 1074,-366.5 1187,-366.5 1187,-336.5 1074,-336.5"/>
 <text text-anchor="start" x="1082" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1130.5" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -1011,7 +1011,7 @@
 <!-- Node58 -->
 <g id="node49" class="node">
 <title>Node58</title>
-<g id="a_node49"><a xlink:href="renamed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="renamed_8h.html" target="_top" xlink:title="Class for expressions or types renamed up to a given level.">
 <polygon fill="none" stroke="black" points="1608,-280.5 1608,-299.5 1677,-299.5 1677,-280.5 1608,-280.5"/>
 <text text-anchor="middle" x="1642.5" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">renamed.h</text>
 </a>
@@ -1032,7 +1032,7 @@
 <!-- Node59 -->
 <g id="node50" class="node">
 <title>Node59</title>
-<g id="a_node50"><a xlink:href="expr__iterator_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="expr__iterator_8h.html" target="_top" xlink:title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,...">
 <polygon fill="none" stroke="black" points="1672,-168.5 1672,-187.5 1779,-187.5 1779,-168.5 1672,-168.5"/>
 <text text-anchor="middle" x="1725.5" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/expr_iterator.h</text>
 </a>

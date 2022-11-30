@@ -33,8 +33,8 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M194.5,-79.09C194.5,-63.44 194.5,-43.68 194.5,-30.6"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="191,-79.13 194.5,-89.13 198,-79.13 191,-79.13"/>
-<text text-anchor="middle" x="217.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> empty_d</text>
-<text text-anchor="middle" x="217.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">data</text>
+<text text-anchor="middle" x="216" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> data</text>
+<text text-anchor="middle" x="216" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">empty_d</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -70,7 +70,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:title="STL class.">
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="146,-234.5 146,-253.5 243,-253.5 243,-234.5 146,-234.5"/>
 <text text-anchor="middle" x="194.5" y="-241.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; T &gt;</text>
 </a>

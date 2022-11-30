@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="A special command line object for the gcc&#45;like options.">
 <polygon fill="#bfbfbf" stroke="black" points="190,-156.5 190,-197.5 328,-197.5 328,-156.5 190,-156.5"/>
 <text text-anchor="start" x="198" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="198" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/gcc</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cw__mode_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cw__mode_8h.html" target="_top" xlink:title="Base class for command line interpretation.">
 <polygon fill="none" stroke="black" points="69.5,-84 69.5,-114 230.5,-114 230.5,-84 69.5,-84"/>
 <text text-anchor="start" x="77.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="150" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/cw_mode.h</text>
@@ -38,7 +38,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="goto__cc__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="goto__cc__main_8cpp.html" target="_top" xlink:title="GOTO&#45;CC Main Module.">
 <polygon fill="none" stroke="black" points="190,-0.5 190,-41.5 328,-41.5 328,-0.5 190,-0.5"/>
 <text text-anchor="start" x="198" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="198" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/goto</text>
@@ -55,7 +55,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="gcc__cmdline_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="gcc__cmdline_8cpp.html" target="_top" xlink:title="A special command line object for the gcc&#45;like options.">
 <polygon fill="none" stroke="black" points="287,-78.5 287,-119.5 425,-119.5 425,-78.5 287,-78.5"/>
 <text text-anchor="start" x="295" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="295" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/gcc</text>
@@ -72,7 +72,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cw__mode_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cw__mode_8cpp.html" target="_top" xlink:title="Command line option container.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 172,-36 172,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="86" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;cc/cw_mode.cpp</text>

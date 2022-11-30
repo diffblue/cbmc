@@ -1,19 +1,19 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;analyzer/goto_analyzer_languages.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;analyzer/goto_analyzer_languages.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1736,5,1955,61"/>
-<area shape="rect" id="node2" href="$goto__analyzer__parse__options_8h.html" title=" " alt="" coords="1575,109,1732,151"/>
+<area shape="rect" id="node1" title="Language Registration." alt="" coords="1736,5,1955,61"/>
+<area shape="rect" id="node2" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1575,109,1732,151"/>
 <area shape="rect" id="node52" href="$mode_8h.html" title=" " alt="" coords="1741,385,1864,411"/>
 <area shape="rect" id="node53" href="$ansi__c__language_8h.html" title=" " alt="" coords="2282,206,2467,233"/>
-<area shape="rect" id="node58" href="$cpp__language_8h.html" title=" " alt="" coords="2506,206,2657,233"/>
+<area shape="rect" id="node58" href="$cpp__language_8h.html" title="C++ Language Module." alt="" coords="2506,206,2657,233"/>
 <area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="1877,206,2027,233"/>
 <area shape="rect" id="node21" href="$ui__message_8h.html" title=" " alt="" coords="2040,295,2152,322"/>
 <area shape="rect" id="node23" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="2597,385,2715,411"/>
 <area shape="rect" id="node24" href="$validation__interface_8h.html" title=" " alt="" coords="660,206,849,233"/>
-<area shape="rect" id="node25" href="$goto__model_8h.html" title=" " alt="" coords="198,288,349,329"/>
-<area shape="rect" id="node39" href="$show__goto__functions_8h.html" title=" " alt="" coords="925,199,1081,240"/>
-<area shape="rect" id="node40" href="$show__properties_8h.html" title=" " alt="" coords="1657,467,1813,508"/>
-<area shape="rect" id="node41" href="$variable__sensitivity__domain_8h.html" title=" " alt="" coords="1295,199,1518,240"/>
-<area shape="rect" id="node49" href="$goto__check__c_8h.html" title=" " alt="" coords="1105,206,1271,233"/>
-<area shape="rect" id="node50" href="$language_8h.html" title=" " alt="" coords="2176,295,2323,322"/>
+<area shape="rect" id="node25" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="198,288,349,329"/>
+<area shape="rect" id="node39" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="925,199,1081,240"/>
+<area shape="rect" id="node40" href="$show__properties_8h.html" title="Show the properties." alt="" coords="1657,467,1813,508"/>
+<area shape="rect" id="node41" href="$variable__sensitivity__domain_8h.html" title="There are different ways of handling arrays, structures, unions and pointers." alt="" coords="1295,199,1518,240"/>
+<area shape="rect" id="node49" href="$goto__check__c_8h.html" title="Program Transformation." alt="" coords="1105,206,1271,233"/>
+<area shape="rect" id="node50" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="2176,295,2323,322"/>
 <area shape="rect" id="node4" title=" " alt="" coords="2013,705,2072,732"/>
 <area shape="rect" id="node5" href="$cmdline_8h.html" title=" " alt="" coords="2262,474,2349,501"/>
 <area shape="rect" id="node11" href="$src_2util_2message_8h.html" title=" " alt="" coords="1989,385,2083,411"/>
@@ -29,34 +29,34 @@
 <area shape="rect" id="node16" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2358,631,2450,657"/>
 <area shape="rect" id="node17" href="$source__location_8h.html" title=" " alt="" coords="1939,474,2075,501"/>
 <area shape="rect" id="node18" href="$irep_8h.html" title=" " alt="" coords="1660,556,1719,583"/>
-<area shape="rect" id="node19" href="$irep__ids_8h.html" title=" " alt="" coords="1361,631,1447,657"/>
+<area shape="rect" id="node19" href="$irep__ids_8h.html" title="util" alt="" coords="1361,631,1447,657"/>
 <area shape="rect" id="node20" href="$forward__list__as__map_8h.html" title=" " alt="" coords="1558,631,1727,657"/>
 <area shape="rect" id="node22" title=" " alt="" coords="2525,474,2603,501"/>
 <area shape="rect" id="node26" href="$journalling__symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="564,377,735,419"/>
 <area shape="rect" id="node31" href="$namespace_8h.html" title=" " alt="" coords="1498,474,1633,501"/>
 <area shape="rect" id="node32" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="393,385,540,411"/>
-<area shape="rect" id="node33" href="$abstract__goto__model_8h.html" title=" " alt="" coords="97,385,268,411"/>
-<area shape="rect" id="node34" href="$goto__functions_8h.html" title=" " alt="" coords="229,474,360,501"/>
+<area shape="rect" id="node33" href="$abstract__goto__model_8h.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="97,385,268,411"/>
+<area shape="rect" id="node34" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="229,474,360,501"/>
 <area shape="rect" id="node37" href="$validate__goto__model_8h.html" title=" " alt="" coords="5,474,176,501"/>
 <area shape="rect" id="node27" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="384,474,544,501"/>
 <area shape="rect" id="node29" title=" " alt="" coords="1257,474,1372,501"/>
 <area shape="rect" id="node30" title=" " alt="" coords="619,474,679,501"/>
 <area shape="rect" id="node28" title=" " alt="" coords="808,556,859,583"/>
-<area shape="rect" id="node35" href="$goto__function_8h.html" title=" " alt="" coords="393,556,516,583"/>
+<area shape="rect" id="node35" href="$goto__function_8h.html" title="Goto Function." alt="" coords="393,556,516,583"/>
 <area shape="rect" id="node36" href="$cprover__prefix_8h.html" title=" " alt="" coords="217,556,369,583"/>
 <area shape="rect" id="node38" href="$validation__mode_8h.html" title=" " alt="" coords="19,556,162,583"/>
-<area shape="rect" id="node42" href="$ai__domain_8h.html" title=" " alt="" coords="1106,295,1270,322"/>
-<area shape="rect" id="node47" href="$abstract__environment_8h.html" title=" " alt="" coords="871,288,1081,329"/>
-<area shape="rect" id="node48" href="$variable__sensitivity__configuration_8h.html" title=" " alt="" coords="704,467,963,508"/>
+<area shape="rect" id="node42" href="$ai__domain_8h.html" title="Abstract Interpretation Domain." alt="" coords="1106,295,1270,322"/>
+<area shape="rect" id="node47" href="$abstract__environment_8h.html" title="An abstract version of a program environment." alt="" coords="871,288,1081,329"/>
+<area shape="rect" id="node48" href="$variable__sensitivity__configuration_8h.html" title="Captures the user&#45;supplied configuration for VSD, determining which domain abstractions are used,..." alt="" coords="704,467,963,508"/>
 <area shape="rect" id="node43" href="$json_8h.html" title=" " alt="" coords="987,474,1074,501"/>
 <area shape="rect" id="node44" href="$make__unique_8h.html" title=" " alt="" coords="2325,385,2472,411"/>
 <area shape="rect" id="node45" href="$xml_8h.html" title=" " alt="" coords="1098,474,1182,501"/>
-<area shape="rect" id="node46" href="$ai__history_8h.html" title=" " alt="" coords="1148,385,1244,411"/>
+<area shape="rect" id="node46" href="$ai__history_8h.html" title="Abstract Interpretation history." alt="" coords="1148,385,1244,411"/>
 <area shape="rect" id="node51" title=" " alt="" coords="2259,385,2301,411"/>
 <area shape="rect" id="node54" href="$ansi__c__parse__tree_8h.html" title=" " alt="" coords="2891,295,3042,322"/>
 <area shape="rect" id="node56" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="2498,295,2721,322"/>
-<area shape="rect" id="node55" href="$ansi__c__declaration_8h.html" title=" " alt="" coords="2891,385,3045,411"/>
+<area shape="rect" id="node55" href="$ansi__c__declaration_8h.html" title="ANSI&#45;CC Language Type Checking." alt="" coords="2891,385,3045,411"/>
 <area shape="rect" id="node57" href="$object__factory__parameters_8h.html" title=" " alt="" coords="2790,467,2930,508"/>
-<area shape="rect" id="node59" href="$cpp__parse__tree_8h.html" title=" " alt="" coords="3067,295,3200,322"/>
-<area shape="rect" id="node60" href="$cpp__item_8h.html" title=" " alt="" coords="3171,385,3266,411"/>
+<area shape="rect" id="node59" href="$cpp__parse__tree_8h.html" title="C++ Parser." alt="" coords="3067,295,3200,322"/>
+<area shape="rect" id="node60" href="$cpp__item_8h.html" title="C++ Language Type Checking." alt="" coords="3171,385,3266,411"/>
 </map>

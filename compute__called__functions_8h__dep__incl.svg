@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Query Called Functions.">
 <polygon fill="#bfbfbf" stroke="black" points="271,-78.5 271,-119.5 427,-119.5 427,-78.5 271,-78.5"/>
 <text text-anchor="start" x="279" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="279" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="unreachable__instructions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="unreachable__instructions_8cpp.html" target="_top" xlink:title="List all unreachable instructions.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 162,-41.5 162,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;analyzer</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="compute__called__functions_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="compute__called__functions_8cpp.html" target="_top" xlink:title="Query Called Functions.">
 <polygon fill="none" stroke="black" points="180.5,-0.5 180.5,-41.5 347.5,-41.5 347.5,-0.5 180.5,-0.5"/>
 <text text-anchor="start" x="188.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="188.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="link__to__library_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="link__to__library_8cpp.html" target="_top" xlink:title="Library Linking.">
 <polygon fill="none" stroke="black" points="366,-0.5 366,-41.5 504,-41.5 504,-0.5 366,-0.5"/>
 <text text-anchor="start" x="374" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="374" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
@@ -73,7 +73,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="remove__function__pointers_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="remove__function__pointers_8cpp.html" target="_top" xlink:title="Program Transformation.">
 <polygon fill="none" stroke="black" points="522.5,-0.5 522.5,-41.5 689.5,-41.5 689.5,-0.5 522.5,-0.5"/>
 <text text-anchor="start" x="530.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="530.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>

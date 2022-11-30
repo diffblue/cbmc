@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Memory model for partial order concurrency.">
 <polygon fill="#bfbfbf" stroke="black" points="503.5,-627.5 503.5,-668.5 672.5,-668.5 672.5,-627.5 503.5,-627.5"/>
 <text text-anchor="start" x="511.5" y="-656.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="511.5" y="-645.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;symex/memory</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="memory__model__sc_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="memory__model__sc_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="484.5,-571.5 484.5,-590.5 603.5,-590.5 603.5,-571.5 484.5,-571.5"/>
 <text text-anchor="middle" x="544" y="-578.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model_sc.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node39 -->
 <g id="node24" class="node">
 <title>Node39</title>
-<g id="a_node24"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="578.5,-224.5 578.5,-243.5 645.5,-243.5 645.5,-224.5 578.5,-224.5"/>
 <text text-anchor="middle" x="612" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_expr.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="memory__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="memory__model_8h.html" target="_top" xlink:title="Memory models for partial order concurrency.">
 <polygon fill="none" stroke="black" points="484.5,-515.5 484.5,-534.5 587.5,-534.5 587.5,-515.5 484.5,-515.5"/>
 <text text-anchor="middle" x="536" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">memory_model.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="partial__order__concurrency_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="partial__order__concurrency_8h.html" target="_top" xlink:title="Add constraints to equation encoding partial orders on events.">
 <polygon fill="none" stroke="black" points="396.5,-459.5 396.5,-478.5 547.5,-478.5 547.5,-459.5 396.5,-459.5"/>
 <text text-anchor="middle" x="472" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">partial_order_concurrency.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="symex__target__equation_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="black" points="366.5,-403.5 366.5,-422.5 507.5,-422.5 507.5,-403.5 366.5,-403.5"/>
 <text text-anchor="middle" x="437" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target_equation.h</text>
 </a>
@@ -217,7 +217,7 @@
 <!-- Node60 -->
 <g id="node26" class="node">
 <title>Node60</title>
-<g id="a_node26"><a xlink:href="symex__target_8h.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="symex__target_8h.html" target="_top" xlink:title="Generate Equation using Symbolic Execution.">
 <polygon fill="none" stroke="red" points="156.5,-286 156.5,-305 249.5,-305 249.5,-286 156.5,-286"/>
 <text text-anchor="middle" x="203" y="-293" font-family="Helvetica,sans-Serif" font-size="10.00">symex_target.h</text>
 </a>
@@ -448,7 +448,7 @@
 <!-- Node52 -->
 <g id="node25" class="node">
 <title>Node52</title>
-<g id="a_node25"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="goto__trace_8h.html" target="_top" xlink:title="Traces of GOTO Programs.">
 <polygon fill="none" stroke="red" points="267.5,-280.5 267.5,-310.5 380.5,-310.5 380.5,-280.5 267.5,-280.5"/>
 <text text-anchor="start" x="275.5" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="324" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">_trace.h</text>

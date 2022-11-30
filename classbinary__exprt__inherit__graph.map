@@ -1,5 +1,5 @@
 <map id="binary_exprt" name="binary_exprt">
-<area shape="rect" id="node1" title="A base class for binary expressions." alt="" coords="1028,1193,1132,1220"/>
+<area shape="rect" id="node1" title="A base class for binary expressions." alt="" coords="1028,1168,1132,1195"/>
 <area shape="rect" id="node7" href="$classallocate__exprt.html" title=" " alt="" coords="1215,263,1330,289"/>
 <area shape="rect" id="node8" href="$classallocate__state__exprt.html" title=" " alt="" coords="1195,313,1350,340"/>
 <area shape="rect" id="node9" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="1187,364,1359,391"/>
@@ -34,11 +34,11 @@
 <area shape="rect" id="node57" href="$classstate__cstrlen__exprt.html" title=" " alt="" coords="1199,1944,1346,1971"/>
 <area shape="rect" id="node58" href="$classstate__object__size__exprt.html" title=" " alt="" coords="1185,1995,1361,2021"/>
 <area shape="rect" id="node59" href="$classstate__type__compatible__exprt.html" title=" " alt="" coords="1187,2046,1358,2087"/>
-<area shape="rect" id="node2" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,1193,979,1220"/>
-<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,1193,804,1220"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,1193,699,1220"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="431,1179,597,1235"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1186,187,1227"/>
+<area shape="rect" id="node2" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,1168,979,1195"/>
+<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,1168,804,1195"/>
+<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,1168,699,1195"/>
+<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="431,1153,597,1209"/>
+<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1161,187,1202"/>
 <area shape="rect" id="node10" href="$classbinary__overflow__exprt.html" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to o..." alt="" coords="1421,81,1588,108"/>
 <area shape="rect" id="node15" href="$classbinary__relation__exprt.html" title="A base class for relations, i.e., binary predicates whose two operands have the same type." alt="" coords="1424,132,1585,159"/>
 <area shape="rect" id="node16" href="$classextractbit__exprt.html" title="Extracts a single bit of a bit&#45;vector operand." alt="" coords="1441,183,1568,209"/>

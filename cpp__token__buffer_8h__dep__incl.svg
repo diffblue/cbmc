@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="C++ Parser: Token Buffer.">
 <polygon fill="#bfbfbf" stroke="black" points="353,-145.5 353,-186.5 491,-186.5 491,-145.5 353,-145.5"/>
 <text text-anchor="start" x="361" y="-174.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="361" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_token</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="cpp__parser_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="cpp__parser_8h.html" target="_top" xlink:title="C++ Parser.">
 <polygon fill="none" stroke="black" points="230,-73 230,-103 378,-103 378,-73 230,-73"/>
 <text text-anchor="start" x="238" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="304" y="-80" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_parser.h</text>
@@ -38,7 +38,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="parse_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="parse_8cpp.html" target="_top" xlink:title="C++ Language Parsing.">
 <polygon fill="none" stroke="black" points="370,-0.5 370,-30.5 508,-30.5 508,-0.5 370,-0.5"/>
 <text text-anchor="start" x="378" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="439" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/parse.cpp</text>
@@ -54,7 +54,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="cpp__token__buffer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="cpp__token__buffer_8cpp.html" target="_top" xlink:title="C++ Parser: Token Buffer.">
 <polygon fill="none" stroke="black" points="450,-67.5 450,-108.5 588,-108.5 588,-67.5 450,-67.5"/>
 <text text-anchor="start" x="458" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="458" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_token</text>
@@ -71,7 +71,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="cpp__language_8cpp.html" target="_top" xlink:title="C++ Language Module.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 174,-30.5 174,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="87" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_language.cpp</text>
@@ -87,7 +87,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="cpp__parser_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="cpp__parser_8cpp.html" target="_top" xlink:title="C++ Parser.">
 <polygon fill="none" stroke="black" points="192.5,-0.5 192.5,-30.5 351.5,-30.5 351.5,-0.5 192.5,-0.5"/>
 <text text-anchor="start" x="200.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="272" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/cpp/cpp_parser.cpp</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Function Call Graph Helpers.">
 <polygon fill="#bfbfbf" stroke="black" points="140,-459.5 140,-500.5 278,-500.5 278,-459.5 140,-459.5"/>
 <text text-anchor="start" x="148" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="148" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/call</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="call__graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="call__graph_8h.html" target="_top" xlink:title="Function Call Graphs.">
 <polygon fill="none" stroke="black" points="171,-403.5 171,-422.5 247,-422.5 247,-403.5 171,-403.5"/>
 <text text-anchor="middle" x="209" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">call_graph.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="black" points="180,-112.5 180,-131.5 252,-131.5 252,-112.5 180,-112.5"/>
 <text text-anchor="middle" x="216" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -97,7 +97,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="411.5,-336.5 411.5,-366.5 524.5,-366.5 524.5,-336.5 411.5,-336.5"/>
 <text text-anchor="start" x="419.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="468" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -404,7 +404,7 @@
 <!-- Node51 -->
 <g id="node28" class="node">
 <title>Node51</title>
-<g id="a_node28"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="628,-224.5 628,-243.5 714,-243.5 714,-224.5 628,-224.5"/>
 <text text-anchor="middle" x="671" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -440,7 +440,7 @@
 <!-- Node48 -->
 <g id="node24" class="node">
 <title>Node48</title>
-<g id="a_node24"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="612.5,-168.5 612.5,-187.5 685.5,-187.5 685.5,-168.5 612.5,-168.5"/>
 <text text-anchor="middle" x="649" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

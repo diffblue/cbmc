@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Introduce LET for common subexpressions.">
 <polygon fill="#bfbfbf" stroke="black" points="185.88,-448.5 185.88,-489.5 323.88,-489.5 323.88,-448.5 185.88,-448.5"/>
 <text text-anchor="start" x="193.88" y="-477.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="193.88" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="211.88,-336.5 211.88,-355.5 297.88,-355.5 297.88,-336.5 211.88,-336.5"/>
 <text text-anchor="middle" x="254.88" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -88,7 +88,7 @@
 <!-- Node41 -->
 <g id="node20" class="node">
 <title>Node41</title>
-<g id="a_node20"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="381.38,-280.5 381.38,-299.5 454.38,-299.5 454.38,-280.5 381.38,-280.5"/>
 <text text-anchor="middle" x="417.88" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>
@@ -241,7 +241,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="587.38,-112.5 587.38,-131.5 634.38,-131.5 634.38,-112.5 587.38,-112.5"/>
 <text text-anchor="middle" x="610.88" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>

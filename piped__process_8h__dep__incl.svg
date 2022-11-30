@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Subprocess communication with pipes.">
 <polygon fill="#bfbfbf" stroke="black" points="247,-178.5 247,-208.5 411,-208.5 411,-178.5 247,-178.5"/>
 <text text-anchor="start" x="255" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="329" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/piped_process.h</text>
@@ -39,7 +39,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="piped__process_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="piped__process_8cpp.html" target="_top" xlink:title="Subprocess communication with pipes.">
 <polygon fill="none" stroke="black" points="329.5,-100.5 329.5,-130.5 504.5,-130.5 504.5,-100.5 329.5,-100.5"/>
 <text text-anchor="start" x="337.5" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="417" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/piped_process.cpp</text>
@@ -55,7 +55,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="solver__factory_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="solver__factory_8cpp.html" target="_top" xlink:title="Solver Factory.">
 <polygon fill="none" stroke="black" points="0,-6 0,-47 138,-47 138,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>

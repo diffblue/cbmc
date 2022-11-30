@@ -23,7 +23,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="variable__sensitivity__dependence__graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="variable__sensitivity__dependence__graph_8h.html" target="_top" xlink:title="A forked and modified version of analyses/dependence_graph.">
 <polygon fill="none" stroke="black" points="1434.5,-615.5 1434.5,-645.5 1557.5,-645.5 1557.5,-615.5 1434.5,-615.5"/>
 <text text-anchor="start" x="1442.5" y="-633.5" font-family="Helvetica,sans-Serif" font-size="10.00">variable_sensitivity</text>
 <text text-anchor="middle" x="1496" y="-622.5" font-family="Helvetica,sans-Serif" font-size="10.00">_dependence_graph.h</text>
@@ -54,7 +54,7 @@
 <!-- Node98 -->
 <g id="node52" class="node">
 <title>Node98</title>
-<g id="a_node52"><a xlink:href="data__dependency__context_8h.html" target="_top" xlink:title=" ">
+<g id="a_node52"><a xlink:href="data__dependency__context_8h.html" target="_top" xlink:title="Maintain data dependencies as a context in the variable sensitivity domain.">
 <polygon fill="none" stroke="black" points="173,-621 173,-640 327,-640 327,-621 173,-621"/>
 <text text-anchor="middle" x="250" y="-628" font-family="Helvetica,sans-Serif" font-size="10.00">data_dependency_context.h</text>
 </a>
@@ -99,7 +99,7 @@
 <!-- Node104 -->
 <g id="node58" class="node">
 <title>Node104</title>
-<g id="a_node58"><a xlink:href="json__irep_8h.html" target="_top" xlink:title=" ">
+<g id="a_node58"><a xlink:href="json__irep_8h.html" target="_top" xlink:title="Util.">
 <polygon fill="none" stroke="black" points="2176.5,-297 2176.5,-316 2265.5,-316 2265.5,-297 2176.5,-297"/>
 <text text-anchor="middle" x="2221" y="-304" font-family="Helvetica,sans-Serif" font-size="10.00">util/json_irep.h</text>
 </a>
@@ -129,7 +129,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="three__way__merge__abstract__interpreter_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="three__way__merge__abstract__interpreter_8h.html" target="_top" xlink:title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit...">
 <polygon fill="none" stroke="black" points="1421.5,-548.5 1421.5,-578.5 1570.5,-578.5 1570.5,-548.5 1421.5,-548.5"/>
 <text text-anchor="start" x="1429.5" y="-566.5" font-family="Helvetica,sans-Serif" font-size="10.00">three_way_merge_abstract</text>
 <text text-anchor="middle" x="1496" y="-555.5" font-family="Helvetica,sans-Serif" font-size="10.00">_interpreter.h</text>
@@ -145,7 +145,7 @@
 <!-- Node75 -->
 <g id="node40" class="node">
 <title>Node75</title>
-<g id="a_node40"><a xlink:href="variable__sensitivity__domain_8h.html" target="_top" xlink:title=" ">
+<g id="a_node40"><a xlink:href="variable__sensitivity__domain_8h.html" target="_top" xlink:title="There are different ways of handling arrays, structures, unions and pointers.">
 <polygon fill="none" stroke="black" points="488.5,-425.5 488.5,-455.5 601.5,-455.5 601.5,-425.5 488.5,-425.5"/>
 <text text-anchor="start" x="496.5" y="-443.5" font-family="Helvetica,sans-Serif" font-size="10.00">variable_sensitivity</text>
 <text text-anchor="middle" x="545" y="-432.5" font-family="Helvetica,sans-Serif" font-size="10.00">_domain.h</text>
@@ -161,7 +161,7 @@
 <!-- Node92 -->
 <g id="node45" class="node">
 <title>Node92</title>
-<g id="a_node45"><a xlink:href="cfg__dominators_8h.html" target="_top" xlink:title=" ">
+<g id="a_node45"><a xlink:href="cfg__dominators_8h.html" target="_top" xlink:title="Compute dominators for CFG of goto_function.">
 <polygon fill="none" stroke="black" points="1788,-364 1788,-383 1936,-383 1936,-364 1788,-364"/>
 <text text-anchor="middle" x="1862" y="-371" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/cfg_dominators.h</text>
 </a>
@@ -176,7 +176,7 @@
 <!-- Node95 -->
 <g id="node48" class="node">
 <title>Node95</title>
-<g id="a_node48"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="black" points="2114,-230 2114,-249 2186,-249 2186,-230 2114,-230"/>
 <text text-anchor="middle" x="2150" y="-237" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -206,7 +206,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="ai_8h.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="ai_8h.html" target="_top" xlink:title="Abstract Interpretation.">
 <polygon fill="none" stroke="black" points="989.5,-492.5 989.5,-511.5 1070.5,-511.5 1070.5,-492.5 989.5,-492.5"/>
 <text text-anchor="middle" x="1030" y="-499.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/ai.h</text>
 </a>
@@ -317,7 +317,7 @@
 <!-- Node40 -->
 <g id="node27" class="node">
 <title>Node40</title>
-<g id="a_node27"><a xlink:href="goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="goto__model_8h.html" target="_top" xlink:title="Symbol Table + CFG.">
 <polygon fill="none" stroke="red" points="1339.5,-358.5 1339.5,-388.5 1452.5,-388.5 1452.5,-358.5 1339.5,-358.5"/>
 <text text-anchor="start" x="1347.5" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="1396" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model.h</text>
@@ -333,7 +333,7 @@
 <!-- Node71 -->
 <g id="node33" class="node">
 <title>Node71</title>
-<g id="a_node33"><a xlink:href="ai__domain_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="ai__domain_8h.html" target="_top" xlink:title="Abstract Interpretation Domain.">
 <polygon fill="none" stroke="black" points="886.5,-364 886.5,-383 963.5,-383 963.5,-364 886.5,-364"/>
 <text text-anchor="middle" x="925" y="-371" font-family="Helvetica,sans-Serif" font-size="10.00">ai_domain.h</text>
 </a>
@@ -348,7 +348,7 @@
 <!-- Node72 -->
 <g id="node34" class="node">
 <title>Node72</title>
-<g id="a_node34"><a xlink:href="ai__history_8h.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="ai__history_8h.html" target="_top" xlink:title="Abstract Interpretation history.">
 <polygon fill="none" stroke="black" points="886,-297 886,-316 958,-316 958,-297 886,-297"/>
 <text text-anchor="middle" x="922" y="-304" font-family="Helvetica,sans-Serif" font-size="10.00">ai_history.h</text>
 </a>
@@ -363,7 +363,7 @@
 <!-- Node73 -->
 <g id="node38" class="node">
 <title>Node73</title>
-<g id="a_node38"><a xlink:href="ai__storage_8h.html" target="_top" xlink:title=" ">
+<g id="a_node38"><a xlink:href="ai__storage_8h.html" target="_top" xlink:title="Abstract Interpretation Storage.">
 <polygon fill="none" stroke="black" points="819.5,-431 819.5,-450 896.5,-450 896.5,-431 819.5,-431"/>
 <text text-anchor="middle" x="858" y="-438" font-family="Helvetica,sans-Serif" font-size="10.00">ai_storage.h</text>
 </a>
@@ -378,7 +378,7 @@
 <!-- Node74 -->
 <g id="node39" class="node">
 <title>Node74</title>
-<g id="a_node39"><a xlink:href="is__threaded_8h.html" target="_top" xlink:title=" ">
+<g id="a_node39"><a xlink:href="is__threaded_8h.html" target="_top" xlink:title="Over&#45;approximate Concurrency for Threaded Goto Programs.">
 <polygon fill="none" stroke="black" points="1096.5,-431 1096.5,-450 1179.5,-450 1179.5,-431 1096.5,-431"/>
 <text text-anchor="middle" x="1138" y="-438" font-family="Helvetica,sans-Serif" font-size="10.00">is_threaded.h</text>
 </a>
@@ -459,7 +459,7 @@
 <!-- Node32 -->
 <g id="node20" class="node">
 <title>Node32</title>
-<g id="a_node20"><a xlink:href="range_8h.html" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="range_8h.html" target="_top" xlink:title="Ranges: pair of begin and end iterators, which can be initialized from containers,...">
 <polygon fill="none" stroke="black" points="1760.5,-168.5 1760.5,-187.5 1813.5,-187.5 1813.5,-168.5 1760.5,-168.5"/>
 <text text-anchor="middle" x="1787" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">range.h</text>
 </a>
@@ -501,7 +501,7 @@
 <!-- Node17 -->
 <g id="node16" class="node">
 <title>Node17</title>
-<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="red" points="1504,-56.5 1504,-75.5 1568,-75.5 1568,-56.5 1504,-56.5"/>
 <text text-anchor="middle" x="1536" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -784,7 +784,7 @@
 <!-- Node55 -->
 <g id="node31" class="node">
 <title>Node55</title>
-<g id="a_node31"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="abstract__goto__model_8h.html" target="_top" xlink:title="Abstract interface to eager or lazy GOTO models.">
 <polygon fill="none" stroke="red" points="1516,-297 1516,-316 1644,-316 1644,-297 1516,-297"/>
 <text text-anchor="middle" x="1580" y="-304" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_goto_model.h</text>
 </a>
@@ -799,7 +799,7 @@
 <!-- Node56 -->
 <g id="node32" class="node">
 <title>Node56</title>
-<g id="a_node32"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="goto__functions_8h.html" target="_top" xlink:title="Goto Programs with Functions.">
 <polygon fill="none" stroke="red" points="1800,-230 1800,-249 1898,-249 1898,-230 1800,-230"/>
 <text text-anchor="middle" x="1849" y="-237" font-family="Helvetica,sans-Serif" font-size="10.00">goto_functions.h</text>
 </a>
@@ -886,7 +886,7 @@
 <!-- Node63 -->
 <g id="node35" class="node">
 <title>Node63</title>
-<g id="a_node35"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node35"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="red" points="982,-230 982,-249 1076,-249 1076,-230 982,-230"/>
 <text text-anchor="middle" x="1029" y="-237" font-family="Helvetica,sans-Serif" font-size="10.00">goto_program.h</text>
 </a>
@@ -1015,7 +1015,7 @@
 <!-- Node76 -->
 <g id="node41" class="node">
 <title>Node76</title>
-<g id="a_node41"><a xlink:href="abstract__environment_8h.html" target="_top" xlink:title=" ">
+<g id="a_node41"><a xlink:href="abstract__environment_8h.html" target="_top" xlink:title="An abstract version of a program environment.">
 <polygon fill="none" stroke="black" points="368,-358.5 368,-388.5 526,-388.5 526,-358.5 368,-358.5"/>
 <text text-anchor="start" x="376" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="447" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">/abstract_environment.h</text>
@@ -1031,7 +1031,7 @@
 <!-- Node91 -->
 <g id="node44" class="node">
 <title>Node91</title>
-<g id="a_node44"><a xlink:href="variable__sensitivity__configuration_8h.html" target="_top" xlink:title=" ">
+<g id="a_node44"><a xlink:href="variable__sensitivity__configuration_8h.html" target="_top" xlink:title="Captures the user&#45;supplied configuration for VSD, determining which domain abstractions are used,...">
 <polygon fill="none" stroke="black" points="370,-224.5 370,-254.5 564,-254.5 564,-224.5 370,-224.5"/>
 <text text-anchor="start" x="378" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="467" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">/variable_sensitivity_configuration.h</text>
@@ -1047,7 +1047,7 @@
 <!-- Node77 -->
 <g id="node42" class="node">
 <title>Node77</title>
-<g id="a_node42"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="abstract__object_8h.html" target="_top" xlink:title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari...">
 <polygon fill="none" stroke="red" points="172.5,-297 172.5,-316 273.5,-316 273.5,-297 172.5,-297"/>
 <text text-anchor="middle" x="223" y="-304" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_object.h</text>
 </a>
@@ -1143,7 +1143,7 @@
 <!-- Node93 -->
 <g id="node46" class="node">
 <title>Node93</title>
-<g id="a_node46"><a xlink:href="cfg_8h.html" target="_top" xlink:title=" ">
+<g id="a_node46"><a xlink:href="cfg_8h.html" target="_top" xlink:title="Control Flow Graph.">
 <polygon fill="none" stroke="black" points="1966,-297 1966,-316 2082,-316 2082,-297 1966,-297"/>
 <text text-anchor="middle" x="2024" y="-304" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/cfg.h</text>
 </a>
@@ -1164,7 +1164,7 @@
 <!-- Node94 -->
 <g id="node47" class="node">
 <title>Node94</title>
-<g id="a_node47"><a xlink:href="dense__integer__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node47"><a xlink:href="dense__integer__map_8h.html" target="_top" xlink:title="Dense integer map.">
 <polygon fill="none" stroke="red" points="1954,-224.5 1954,-254.5 2058,-254.5 2058,-224.5 1954,-224.5"/>
 <text text-anchor="start" x="1962" y="-242.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/dense_integer</text>
 <text text-anchor="middle" x="2006" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">_map.h</text>
@@ -1186,7 +1186,7 @@
 <!-- Node66 -->
 <g id="node50" class="node">
 <title>Node66</title>
-<g id="a_node50"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node50"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="red" points="2346,-168.5 2346,-187.5 2432,-187.5 2432,-168.5 2346,-168.5"/>
 <text text-anchor="middle" x="2389" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -1294,7 +1294,7 @@
 <!-- Node99 -->
 <g id="node53" class="node">
 <title>Node99</title>
-<g id="a_node53"><a xlink:href="write__location__context_8h.html" target="_top" xlink:title=" ">
+<g id="a_node53"><a xlink:href="write__location__context_8h.html" target="_top" xlink:title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac...">
 <polygon fill="none" stroke="black" points="73.5,-431 73.5,-450 210.5,-450 210.5,-431 73.5,-431"/>
 <text text-anchor="middle" x="142" y="-438" font-family="Helvetica,sans-Serif" font-size="10.00">write_location_context.h</text>
 </a>
@@ -1315,7 +1315,7 @@
 <!-- Node100 -->
 <g id="node54" class="node">
 <title>Node100</title>
-<g id="a_node54"><a xlink:href="context__abstract__object_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="context__abstract__object_8h.html" target="_top" xlink:title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co...">
 <polygon fill="none" stroke="black" points="116,-358.5 116,-388.5 274,-388.5 274,-358.5 116,-358.5"/>
 <text text-anchor="start" x="124" y="-376.5" font-family="Helvetica,sans-Serif" font-size="10.00">analyses/variable&#45;sensitivity</text>
 <text text-anchor="middle" x="195" y="-365.5" font-family="Helvetica,sans-Serif" font-size="10.00">/context_abstract_object.h</text>

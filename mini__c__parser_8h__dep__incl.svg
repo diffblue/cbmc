@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Mini C Parser.">
 <polygon fill="#bfbfbf" stroke="black" points="111,-78.5 111,-119.5 249,-119.5 249,-78.5 111,-78.5"/>
 <text text-anchor="start" x="119" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="119" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/mini</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="c__wrangler_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="c__wrangler_8cpp.html" target="_top" xlink:title="C Wrangler.">
 <polygon fill="none" stroke="black" points="0,-6 0,-36 182,-36 182,-6 0,-6"/>
 <text text-anchor="start" x="8" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="middle" x="91" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/c_wrangler.cpp</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="mini__c__parser_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="mini__c__parser_8cpp.html" target="_top" xlink:title="Mini C Parser.">
 <polygon fill="none" stroke="black" points="200,-0.5 200,-41.5 338,-41.5 338,-0.5 200,-0.5"/>
 <text text-anchor="start" x="208" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="208" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/crangler/mini</text>

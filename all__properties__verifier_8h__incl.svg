@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Goto Verifier for Verifying all Properties.">
 <polygon fill="#bfbfbf" stroke="black" points="302,-515.5 302,-556.5 440,-556.5 440,-515.5 302,-515.5"/>
 <text text-anchor="start" x="310" y="-544.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="310" y="-533.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;checker</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="goto__verifier_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="goto__verifier_8h.html" target="_top" xlink:title="Goto Verifier Interface.">
 <polygon fill="none" stroke="black" points="378,-459.5 378,-478.5 464,-478.5 464,-459.5 378,-459.5"/>
 <text text-anchor="middle" x="421" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto_verifier.h</text>
 </a>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="properties_8h.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="properties_8h.html" target="_top" xlink:title="Properties.">
 <polygon fill="none" stroke="black" points="275.5,-403.5 275.5,-422.5 350.5,-422.5 350.5,-403.5 275.5,-403.5"/>
 <text text-anchor="middle" x="313" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">properties.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node52 -->
 <g id="node22" class="node">
 <title>Node52</title>
-<g id="a_node22"><a xlink:href="incremental__goto__checker_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="incremental__goto__checker_8h.html" target="_top" xlink:title="Incremental Goto Checker Interface.">
 <polygon fill="none" stroke="black" points="482.5,-459.5 482.5,-478.5 635.5,-478.5 635.5,-459.5 482.5,-459.5"/>
 <text text-anchor="middle" x="559" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">incremental_goto_checker.h</text>
 </a>
@@ -67,7 +67,7 @@
 <!-- Node54 -->
 <g id="node24" class="node">
 <title>Node54</title>
-<g id="a_node24"><a xlink:href="report__util_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="report__util_8h.html" target="_top" xlink:title="Bounded Model Checking Utilities.">
 <polygon fill="none" stroke="black" points="284,-459.5 284,-478.5 360,-478.5 360,-459.5 284,-459.5"/>
 <text text-anchor="middle" x="322" y="-466.5" font-family="Helvetica,sans-Serif" font-size="10.00">report_util.h</text>
 </a>
@@ -118,7 +118,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="goto__program_8h.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="goto__program_8h.html" target="_top" xlink:title="Concrete Goto Program.">
 <polygon fill="none" stroke="black" points="238.5,-336.5 238.5,-366.5 351.5,-366.5 351.5,-336.5 238.5,-336.5"/>
 <text text-anchor="start" x="246.5" y="-354.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/goto</text>
 <text text-anchor="middle" x="295" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">_program.h</text>
@@ -269,7 +269,7 @@
 <!-- Node48 -->
 <g id="node15" class="node">
 <title>Node48</title>
-<g id="a_node15"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="269,-224.5 269,-243.5 355,-243.5 355,-224.5 269,-224.5"/>
 <text text-anchor="middle" x="312" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -305,7 +305,7 @@
 <!-- Node45 -->
 <g id="node13" class="node">
 <title>Node45</title>
-<g id="a_node13"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="red" points="240.5,-168.5 240.5,-187.5 313.5,-187.5 313.5,-168.5 240.5,-168.5"/>
 <text text-anchor="middle" x="277" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">std_types.h</text>
 </a>

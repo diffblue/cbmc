@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Context&#45;insensitive lazy methods container.">
 <polygon fill="#bfbfbf" stroke="black" points="720,-974.5 720,-1015.5 884,-1015.5 884,-974.5 720,-974.5"/>
 <text text-anchor="start" x="728" y="-1003.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="728" y="-992.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/jbmc/src/java_bytecode</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="ci__lazy__methods__needed_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="ci__lazy__methods__needed_8h.html" target="_top" xlink:title="Context&#45;insensitive lazy methods container.">
 <polygon fill="none" stroke="black" points="191.5,-795.5 191.5,-814.5 340.5,-814.5 340.5,-795.5 191.5,-795.5"/>
 <text text-anchor="middle" x="266" y="-802.5" font-family="Helvetica,sans-Serif" font-size="10.00">ci_lazy_methods_needed.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node28 -->
 <g id="node21" class="node">
 <title>Node28</title>
-<g id="a_node21"><a xlink:href="std__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="std__types_8h.html" target="_top" xlink:title="Pre&#45;defined types.">
 <polygon fill="none" stroke="black" points="1076,-627.5 1076,-646.5 1168,-646.5 1168,-627.5 1076,-627.5"/>
 <text text-anchor="middle" x="1122" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_types.h</text>
 </a>
@@ -82,7 +82,7 @@
 <!-- Node48 -->
 <g id="node42" class="node">
 <title>Node48</title>
-<g id="a_node42"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title=" ">
+<g id="a_node42"><a xlink:href="resolve__inherited__component_8h.html" target="_top" xlink:title="Given a class and a component (either field or method), find the closest parent that defines that com...">
 <polygon fill="none" stroke="black" points="693,-504.5 693,-534.5 827,-534.5 827,-504.5 693,-504.5"/>
 <text text-anchor="start" x="701" y="-522.5" font-family="Helvetica,sans-Serif" font-size="10.00">goto&#45;programs/resolve</text>
 <text text-anchor="middle" x="760" y="-511.5" font-family="Helvetica,sans-Serif" font-size="10.00">_inherited_component.h</text>
@@ -144,7 +144,7 @@
 <!-- Node71 -->
 <g id="node60" class="node">
 <title>Node71</title>
-<g id="a_node60"><a xlink:href="select__pointer__type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node60"><a xlink:href="select__pointer__type_8h.html" target="_top" xlink:title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)...">
 <polygon fill="none" stroke="black" points="1070,-851.5 1070,-870.5 1192,-870.5 1192,-851.5 1070,-851.5"/>
 <text text-anchor="middle" x="1131" y="-858.5" font-family="Helvetica,sans-Serif" font-size="10.00">select_pointer_type.h</text>
 </a>
@@ -234,7 +234,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="456,-168.5 456,-187.5 520,-187.5 520,-168.5 456,-168.5"/>
 <text text-anchor="middle" x="488" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -315,7 +315,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="373.5,-112.5 373.5,-131.5 432.5,-131.5 432.5,-112.5 373.5,-112.5"/>
 <text text-anchor="middle" x="403" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -537,7 +537,7 @@
 <!-- Node30 -->
 <g id="node23" class="node">
 <title>Node30</title>
-<g id="a_node23"><a xlink:href="type_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="type_8h.html" target="_top" xlink:title="Defines typet, type_with_subtypet and type_with_subtypest.">
 <polygon fill="none" stroke="black" points="814.5,-448.5 814.5,-467.5 861.5,-467.5 861.5,-448.5 814.5,-448.5"/>
 <text text-anchor="middle" x="838" y="-455.5" font-family="Helvetica,sans-Serif" font-size="10.00">type.h</text>
 </a>
@@ -1059,7 +1059,7 @@
 <!-- Node58 -->
 <g id="node52" class="node">
 <title>Node58</title>
-<g id="a_node52"><a xlink:href="std__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node52"><a xlink:href="std__expr_8h.html" target="_top" xlink:title="API to expression classes.">
 <polygon fill="none" stroke="black" points="1191,-683.5 1191,-702.5 1277,-702.5 1277,-683.5 1191,-683.5"/>
 <text text-anchor="middle" x="1234" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/std_expr.h</text>
 </a>
@@ -1182,7 +1182,7 @@
 <!-- Node67 -->
 <g id="node56" class="node">
 <title>Node67</title>
-<g id="a_node56"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title=" ">
+<g id="a_node56"><a xlink:href="pointer__expr_8h.html" target="_top" xlink:title="API to expression classes for Pointers.">
 <polygon fill="none" stroke="black" points="1150,-739.5 1150,-758.5 1236,-758.5 1236,-739.5 1150,-739.5"/>
 <text text-anchor="middle" x="1193" y="-746.5" font-family="Helvetica,sans-Serif" font-size="10.00">pointer_expr.h</text>
 </a>
@@ -1203,7 +1203,7 @@
 <!-- Node68 -->
 <g id="node57" class="node">
 <title>Node68</title>
-<g id="a_node57"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="bitvector__types_8h.html" target="_top" xlink:title="Pre&#45;defined bitvector types.">
 <polygon fill="none" stroke="black" points="1071.5,-683.5 1071.5,-702.5 1172.5,-702.5 1172.5,-683.5 1071.5,-683.5"/>
 <text text-anchor="middle" x="1122" y="-690.5" font-family="Helvetica,sans-Serif" font-size="10.00">bitvector_types.h</text>
 </a>
@@ -1236,7 +1236,7 @@
 <!-- Node70 -->
 <g id="node59" class="node">
 <title>Node70</title>
-<g id="a_node59"><a xlink:href="synthetic__methods__map_8h.html" target="_top" xlink:title=" ">
+<g id="a_node59"><a xlink:href="synthetic__methods__map_8h.html" target="_top" xlink:title="Synthetic methods are particular methods internally generated by the Java frontend,...">
 <polygon fill="none" stroke="black" points="408,-627.5 408,-646.5 554,-646.5 554,-627.5 408,-627.5"/>
 <text text-anchor="middle" x="481" y="-634.5" font-family="Helvetica,sans-Serif" font-size="10.00">synthetic_methods_map.h</text>
 </a>

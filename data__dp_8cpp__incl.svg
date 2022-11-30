@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="data dependencies">
 <polygon fill="#bfbfbf" stroke="black" points="585.5,-392.5 585.5,-433.5 730.5,-433.5 730.5,-392.5 585.5,-392.5"/>
 <text text-anchor="start" x="593.5" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="593.5" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="data__dp_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="data__dp_8h.html" target="_top" xlink:title="data dependencies">
 <polygon fill="none" stroke="black" points="444.5,-336.5 444.5,-355.5 509.5,-355.5 509.5,-336.5 444.5,-336.5"/>
 <text text-anchor="middle" x="477" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">data_dp.h</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node31 -->
 <g id="node27" class="node">
 <title>Node31</title>
-<g id="a_node27"><a xlink:href="abstract__event_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="abstract__event_8h.html" target="_top" xlink:title="abstract events">
 <polygon fill="none" stroke="black" points="609,-336.5 609,-355.5 707,-355.5 707,-336.5 609,-336.5"/>
 <text text-anchor="middle" x="658" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_event.h</text>
 </a>
@@ -184,7 +184,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="228,-168.5 228,-187.5 292,-187.5 292,-168.5 228,-168.5"/>
 <text text-anchor="middle" x="260" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -265,7 +265,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="145.5,-112.5 145.5,-131.5 204.5,-131.5 204.5,-112.5 145.5,-112.5"/>
 <text text-anchor="middle" x="175" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -331,7 +331,7 @@
 <!-- Node18 -->
 <g id="node17" class="node">
 <title>Node18</title>
-<g id="a_node17"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="216,-56.5 216,-75.5 320,-75.5 320,-56.5 216,-56.5"/>
 <text text-anchor="middle" x="268" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
@@ -460,7 +460,7 @@
 <!-- Node32 -->
 <g id="node28" class="node">
 <title>Node32</title>
-<g id="a_node28"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="black" points="609,-112.5 609,-131.5 681,-131.5 681,-112.5 609,-112.5"/>
 <text text-anchor="middle" x="645" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -475,7 +475,7 @@
 <!-- Node37 -->
 <g id="node33" class="node">
 <title>Node37</title>
-<g id="a_node33"><a xlink:href="wmm_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="wmm_8h.html" target="_top" xlink:title="memory models">
 <polygon fill="none" stroke="black" points="686.5,-280.5 686.5,-299.5 739.5,-299.5 739.5,-280.5 686.5,-280.5"/>
 <text text-anchor="middle" x="713" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">wmm.h</text>
 </a>

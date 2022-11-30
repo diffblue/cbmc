@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="This code does the command line parsing for the memory&#45;analyzer tool.">
 <polygon fill="#bfbfbf" stroke="black" points="82.5,-78.5 82.5,-119.5 273.5,-119.5 273.5,-78.5 82.5,-78.5"/>
 <text text-anchor="start" x="90.5" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="90.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/memory&#45;analyzer</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="memory__analyzer__main_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="memory__analyzer__main_8cpp.html" target="_top" xlink:title="Memory analyzer interface.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 158,-41.5 158,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/memory&#45;analyzer</text>
@@ -39,7 +39,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="memory__analyzer__parse__options_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="memory__analyzer__parse__options_8cpp.html" target="_top" xlink:title="Commandline parser for the memory analyzer executing main work.">
 <polygon fill="none" stroke="black" points="176,-0.5 176,-41.5 378,-41.5 378,-0.5 176,-0.5"/>
 <text text-anchor="start" x="184" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="184" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/memory&#45;analyzer</text>

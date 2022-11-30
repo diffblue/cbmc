@@ -1,22 +1,20 @@
 <map id="string_dependenciest" name="string_dependenciest">
-<area shape="rect" id="node1" title="Keep track of dependencies between strings." alt="" coords="2689,173,2851,200"/>
-<area shape="rect" id="node2" title=" " alt="" coords="1781,34,1945,75"/>
-<area shape="rect" id="node3" title="STL class." alt="" coords="1212,99,1341,125"/>
-<area shape="rect" id="node5" title=" " alt="" coords="2316,127,2489,183"/>
-<area shape="rect" id="node17" title=" " alt="" coords="2318,207,2487,263"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1568,296,1755,323"/>
-<area shape="rect" id="node4" title=" " alt="" coords="14,68,53,95"/>
-<area shape="rect" id="node13" title="STL class." alt="" coords="175,263,327,305"/>
-<area shape="rect" id="node16" title="STL class." alt="" coords="351,9,508,36"/>
-<area shape="rect" id="node6" href="$classstring__dependenciest_1_1builtin__function__nodet.html" title="A builtin function node contains a builtin function call." alt="" coords="1972,150,2147,191"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1576,150,1747,191"/>
-<area shape="rect" id="node8" href="$classstring__builtin__functiont.html" title="Base class for string functions that are built in the solver." alt="" coords="1191,251,1363,277"/>
-<area shape="rect" id="node9" href="$classarray__poolt.html" title="Correspondance between arrays and pointers string representations." alt="" coords="929,283,1025,309"/>
-<area shape="rect" id="node10" title=" " alt="" coords="543,376,700,432"/>
-<area shape="rect" id="node11" href="$classarray__string__exprt.html" title=" " alt="" coords="180,492,321,519"/>
-<area shape="rect" id="node15" title=" " alt="" coords="541,207,701,263"/>
-<area shape="rect" id="node18" href="$classstring__dependenciest_1_1string__nodet.html" title="A string node points to builtin_function on which it depends." alt="" coords="1979,289,2140,330"/>
-<area shape="rect" id="node20" title=" " alt="" coords="532,552,711,608"/>
-<area shape="rect" id="node12" href="$classexprt.html" title="Base class for all expressions." alt="" coords="5,311,61,337"/>
-<area shape="rect" id="node14" href="$classsymbol__generatort.html" title="Generation of fresh symbols of a given type." alt="" coords="549,287,694,313"/>
+<area shape="rect" id="node1" title="Keep track of dependencies between strings." alt="" coords="1903,147,2064,174"/>
+<area shape="rect" id="node2" title=" " alt="" coords="991,116,1155,157"/>
+<area shape="rect" id="node3" title=" " alt="" coords="401,154,530,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1529,49,1703,105"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1531,179,1701,235"/>
+<area shape="rect" id="node11" title=" " alt="" coords="777,231,964,258"/>
+<area shape="rect" id="node4" title=" " alt="" coords="228,154,267,181"/>
+<area shape="rect" id="node8" title=" " alt="" coords="387,49,544,75"/>
+<area shape="rect" id="node17" title=" " alt="" coords="389,345,541,387"/>
+<area shape="rect" id="node6" href="$classstring__dependenciest_1_1builtin__function__nodet.html" title="A builtin function node contains a builtin function call." alt="" coords="1183,5,1358,47"/>
+<area shape="rect" id="node7" title=" " alt="" coords="785,5,956,47"/>
+<area shape="rect" id="node10" href="$classstring__dependenciest_1_1string__nodet.html" title="A string node points to builtin_function on which it depends." alt="" coords="1190,232,1351,273"/>
+<area shape="rect" id="node12" href="$classarray__string__exprt.html" title=" " alt="" coords="800,287,941,314"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1181,302,1360,358"/>
+<area shape="rect" id="node13" href="$classexprt.html" title="Base class for all expressions." alt="" coords="437,287,493,314"/>
+<area shape="rect" id="node14" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="221,287,273,314"/>
+<area shape="rect" id="node15" href="$classsharing__treet.html" title=" " alt="" coords="5,273,172,329"/>
+<area shape="rect" id="node18" title=" " alt="" coords="228,353,267,379"/>
 </map>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="graph of abstract events">
 <polygon fill="#bfbfbf" stroke="black" points="140.24,-392.5 140.24,-433.5 285.24,-433.5 285.24,-392.5 140.24,-392.5"/>
 <text text-anchor="start" x="148.24" y="-421.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="148.24" y="-410.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;instrument</text>
@@ -82,7 +82,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="graph_8h.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="graph_8h.html" target="_top" xlink:title="A Template Class for Graphs.">
 <polygon fill="none" stroke="black" points="185.74,-112.5 185.74,-131.5 257.74,-131.5 257.74,-112.5 185.74,-112.5"/>
 <text text-anchor="middle" x="221.74" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">util/graph.h</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="abstract__event_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="abstract__event_8h.html" target="_top" xlink:title="abstract events">
 <polygon fill="none" stroke="black" points="163.74,-336.5 163.74,-355.5 261.74,-355.5 261.74,-336.5 163.74,-336.5"/>
 <text text-anchor="middle" x="212.74" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_event.h</text>
 </a>
@@ -127,7 +127,7 @@
 <!-- Node36 -->
 <g id="node32" class="node">
 <title>Node36</title>
-<g id="a_node32"><a xlink:href="wmm_8h.html" target="_top" xlink:title=" ">
+<g id="a_node32"><a xlink:href="wmm_8h.html" target="_top" xlink:title="memory models">
 <polygon fill="none" stroke="black" points="129.24,-280.5 129.24,-299.5 182.24,-299.5 182.24,-280.5 129.24,-280.5"/>
 <text text-anchor="middle" x="155.74" y="-287.5" font-family="Helvetica,sans-Serif" font-size="10.00">wmm.h</text>
 </a>
@@ -142,7 +142,7 @@
 <!-- Node37 -->
 <g id="node33" class="node">
 <title>Node37</title>
-<g id="a_node33"><a xlink:href="data__dp_8h.html" target="_top" xlink:title=" ">
+<g id="a_node33"><a xlink:href="data__dp_8h.html" target="_top" xlink:title="data dependencies">
 <polygon fill="none" stroke="black" points="342.24,-336.5 342.24,-355.5 407.24,-355.5 407.24,-336.5 342.24,-336.5"/>
 <text text-anchor="middle" x="374.74" y="-343.5" font-family="Helvetica,sans-Serif" font-size="10.00">data_dp.h</text>
 </a>
@@ -418,7 +418,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="irep__ids_8h.html" target="_top" xlink:title="util">
 <polygon fill="none" stroke="black" points="785.74,-168.5 785.74,-187.5 849.74,-187.5 849.74,-168.5 785.74,-168.5"/>
 <text text-anchor="middle" x="817.74" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">irep_ids.h</text>
 </a>
@@ -448,7 +448,7 @@
 <!-- Node22 -->
 <g id="node22" class="node">
 <title>Node22</title>
-<g id="a_node22"><a xlink:href="dstring_8h.html" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="dstring_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="black" points="788.24,-112.5 788.24,-131.5 847.24,-131.5 847.24,-112.5 788.24,-112.5"/>
 <text text-anchor="middle" x="817.74" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">dstring.h</text>
 </a>
@@ -505,7 +505,7 @@
 <!-- Node25 -->
 <g id="node24" class="node">
 <title>Node25</title>
-<g id="a_node24"><a xlink:href="string__container_8h.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="string__container_8h.html" target="_top" xlink:title="Container for C&#45;Strings.">
 <polygon fill="none" stroke="red" points="691.74,-56.5 691.74,-75.5 795.74,-75.5 795.74,-56.5 691.74,-56.5"/>
 <text text-anchor="middle" x="743.74" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">string_container.h</text>
 </a>
