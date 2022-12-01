@@ -1,5 +1,6 @@
 var NAVTREEINDEX114 =
 {
+"satabs.html#man_install-satabs":[3],
 "satabs.html#man_satabs":[0,4,6,0],
 "satabs.html#man_satabs-background":[0,4,6,0,7],
 "satabs.html#man_satabs-libraries":[0,4,6,0,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX114 =
 "signal__catcher_8h.html#ac2fe251653825161c628a05a4ba646c2":[7,0,2,27,193,4],
 "signal__catcher_8h.html#adaf1353fdc4025080123cce151b2d54b":[7,0,2,27,193,1],
 "signal__catcher_8h_source.html":[7,0,2,27,193],
-"simple__method__stubbing_8cpp.html":[7,0,1,0,1,115],
-"simple__method__stubbing_8cpp.html#a4f141080035d6f08eff36859ba62e876":[7,0,1,0,1,115,1]
+"simple__method__stubbing_8cpp.html":[7,0,1,0,1,115]
 };

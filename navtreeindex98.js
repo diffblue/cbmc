@@ -1,5 +1,6 @@
 var NAVTREEINDEX98 =
 {
+"goto__program2code_8h_source.html":[7,0,2,13,53],
 "goto__program_8cpp.html":[7,0,2,14,46],
 "goto__program_8cpp.html#a05347f45452007ecfae3f2bd335f278d":[7,0,2,14,46,8],
 "goto__program_8cpp.html#a4c175287486eefd35b86b2910abdf5a8":[7,0,2,14,46,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX98 =
 "guard__expr_8h_source.html":[7,0,2,0,37],
 "hardness__collector_8h.html":[7,0,2,24,14],
 "hardness__collector_8h_source.html":[7,0,2,24,14],
-"havoc__assigns__clause__targets_8cpp.html":[7,0,2,13,1,5],
-"havoc__assigns__clause__targets_8cpp_source.html":[7,0,2,13,1,5]
+"havoc__assigns__clause__targets_8cpp.html":[7,0,2,13,1,5]
 };

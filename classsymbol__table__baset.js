@@ -20,6 +20,7 @@ var classsymbol__table__baset =
     [ "insert", "classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b", null ],
     [ "lookup", "classsymbol__table__baset.html#a730ad9cb8648402cf3a93b917ecb39c4", null ],
     [ "lookup_ref", "classsymbol__table__baset.html#aa73f5af5f8d596334f12b5efd828057c", null ],
+    [ "match_name_or_base_name", "classsymbol__table__baset.html#ab725988cc4d2300a554efc5b9ff8db34", null ],
     [ "move", "classsymbol__table__baset.html#a3e50e3cab03dcafa022a94c180033bda", null ],
     [ "next_unused_suffix", "classsymbol__table__baset.html#af49d3f175a8208fd4eebce216fc2c748", null ],
     [ "next_unused_suffix", "classsymbol__table__baset.html#a8297760146b8d43272b6a2c87d97628f", null ],
