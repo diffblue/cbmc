@@ -133,8 +133,8 @@ $(document).ready(function(){initNavTree('vcd__goto__trace_8cpp_source.html','')
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::string result;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      result+=<a class="code" href="vcd__goto__trace_8cpp.html#ae7453b9e06cc73117d55b73a8740857e">as_vcd_binary</a>(*it, ns);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      result += <a class="code" href="vcd__goto__trace_8cpp.html#ae7453b9e06cc73117d55b73a8740857e">as_vcd_binary</a>(op, ns);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div>
@@ -142,8 +142,8 @@ $(document).ready(function(){initNavTree('vcd__goto__trace_8cpp_source.html','')
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  {</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    std::string result;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      result+=<a class="code" href="vcd__goto__trace_8cpp.html#ae7453b9e06cc73117d55b73a8740857e">as_vcd_binary</a>(*it, ns);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      result += <a class="code" href="vcd__goto__trace_8cpp.html#ae7453b9e06cc73117d55b73a8740857e">as_vcd_binary</a>(op, ns);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
@@ -249,6 +249,7 @@ $(document).ready(function(){initNavTree('vcd__goto__trace_8cpp_source.html','')
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
+<div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassgoto__tracet_html"><div class="ttname"><a href="classgoto__tracet.html">goto_tracet</a></div><div class="ttdoc">Trace of a GOTO program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__trace_8h_source.html#l00176">goto_trace.h:177</a></div></div>
 <div class="ttc" id="aclassgoto__tracet_html_a2866800eca70125c3aafaecd435cbd78"><div class="ttname"><a href="classgoto__tracet.html#a2866800eca70125c3aafaecd435cbd78">goto_tracet::steps</a></div><div class="ttdeci">stepst steps</div><div class="ttdef"><b>Definition:</b> <a href="goto__trace_8h_source.html#l00180">goto_trace.h:180</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
@@ -257,7 +258,6 @@ $(document).ready(function(){initNavTree('vcd__goto__trace_8cpp_source.html','')
 <div class="ttc" id="aclassnumberingt_html"><div class="ttname"><a href="classnumberingt.html">numberingt&lt; irep_idt &gt;</a></div></div>
 <div class="ttc" id="aclassnumberingt_html_a0e1fb469b2514c49951812546c14d386"><div class="ttname"><a href="classnumberingt.html#a0e1fb469b2514c49951812546c14d386">numberingt::number</a></div><div class="ttdeci">number_type number(const key_type &amp;a)</div><div class="ttdef"><b>Definition:</b> <a href="numbering_8h_source.html#l00037">numbering.h:37</a></div></div>
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
-<div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
 <div class="ttc" id="agoto__trace_8h_html"><div class="ttname"><a href="goto__trace_8h.html">goto_trace.h</a></div><div class="ttdoc">Traces of GOTO Programs.</div></div>
 <div class="ttc" id="ajson__expr_8cpp_html_a8ac246d85d634a72a481f40e23ccdd79"><div class="ttname"><a href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">binary</a></div><div class="ttdeci">static std::string binary(const constant_exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="json__expr_8cpp_source.html#l00188">json_expr.cpp:188</a></div></div>
 <div class="ttc" id="anumbering_8h_html"><div class="ttname"><a href="numbering_8h.html">numbering.h</a></div></div>

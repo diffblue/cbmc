@@ -127,9 +127,9 @@ $(document).ready(function(){initNavTree('boolbv__constraint__select__one_8cpp_s
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    b.reserve(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size());</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="comment">// add constraints</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> it_bv=<a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(*it);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> it_bv = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(op);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keywordflow">if</span>(it_bv.size()!=bv.size())</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;constraint_select_one expects matching width&quot;</span>;</div>
@@ -142,9 +142,9 @@ $(document).ready(function(){initNavTree('boolbv__constraint__select__one_8cpp_s
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  {</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    std::size_t op_nr=0;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op_bv=<a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(*it);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op_bv = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(op);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <span class="keywordflow">if</span>(op_nr==0)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        bv=op_bv;</div>
@@ -181,7 +181,6 @@ $(document).ready(function(){initNavTree('boolbv__constraint__select__one_8cpp_s
 <div class="ttc" id="aclasspropt_html_ab1dda85468d1f7f4070376bba890b707"><div class="ttname"><a href="classpropt.html#ab1dda85468d1f7f4070376bba890b707">propt::new_variables</a></div><div class="ttdeci">virtual bvt new_variables(std::size_t width)</div><div class="ttdoc">generates a bitvector of given width with new variables</div><div class="ttdef"><b>Definition:</b> <a href="prop_8cpp_source.html#l00030">prop.cpp:30</a></div></div>
 <div class="ttc" id="aclasspropt_html_acd417a4b281966755360a57a77a78b48"><div class="ttname"><a href="classpropt.html#acd417a4b281966755360a57a77a78b48">propt::new_variable</a></div><div class="ttdeci">virtual literalt new_variable()=0</div></div>
 <div class="ttc" id="aclasspropt_html_ae353a5b55cad71394ce2c7c43b585547"><div class="ttname"><a href="classpropt.html#ae353a5b55cad71394ce2c7c43b585547">propt::has_set_to</a></div><div class="ttdeci">virtual bool has_set_to() const</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00079">prop.h:79</a></div></div>
-<div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a85799413406af5cdda0b28a7480e21f0"><div class="ttname"><a href="std__expr_8h.html#a85799413406af5cdda0b28a7480e21f0">to_multi_ary_expr</a></div><div class="ttdeci">const multi_ary_exprt &amp; to_multi_ary_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a multi_ary_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00932">std_expr.h:932</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

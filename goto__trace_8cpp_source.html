@@ -340,13 +340,13 @@ $(document).ready(function(){initNavTree('goto__trace_8cpp_source.html',''); ini
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  {</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    std::string result;</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    {</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      <span class="keywordflow">if</span>(result.empty())</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        result=<span class="stringliteral">&quot;{ &quot;</span>;</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        result+=<span class="stringliteral">&quot;, &quot;</span>;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      result+=<a class="code" href="goto__trace_8cpp.html#a5ff93f09148cd89251ec7e1ade910599">trace_numeric_value</a>(*it, ns, options);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      result += <a class="code" href="goto__trace_8cpp.html#a5ff93f09148cd89251ec7e1ade910599">trace_numeric_value</a>(op, ns, options);</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordflow">return</span> result+<span class="stringliteral">&quot; }&quot;</span>;</div>

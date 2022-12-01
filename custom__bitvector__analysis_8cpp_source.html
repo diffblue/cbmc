@@ -778,169 +778,171 @@ $(document).ready(function(){initNavTree('custom__bitvector__analysis_8cpp_sourc
 <div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must || src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
 <div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160; </div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;  <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, src)</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classcustom__bitvector__domaint.html#a6967740a8d76ecd7635e876e3244b241">has_get_must_or_may</a>(*it))</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160; </div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;}</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160; </div>
-<div class="line"><a name="l00697"></a><span class="lineno"><a class="line" href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">  697</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">custom_bitvector_domaint::eval</a>(</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;  <a class="code" href="classcustom__bitvector__analysist.html">custom_bitvector_analysist</a> &amp;custom_bitvector_analysis)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must || src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  {</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()==2)</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    {</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;      <span class="keywordtype">unsigned</span> bit_nr =</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;        custom_bitvector_analysis.<a class="code" href="classcustom__bitvector__analysist.html#abfec5f3858670f9fba8011a54954318e">get_bit_nr</a>(<a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(src).op1());</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160; </div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;      <a class="code" href="classexprt.html">exprt</a> pointer = <a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(src).<a class="code" href="classbinary__exprt.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>();</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;  {</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classcustom__bitvector__domaint.html#a6967740a8d76ecd7635e876e3244b241">has_get_must_or_may</a>(op))</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;  }</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160; </div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;}</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160; </div>
+<div class="line"><a name="l00699"></a><span class="lineno"><a class="line" href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">  699</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">custom_bitvector_domaint::eval</a>(</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;  <a class="code" href="classcustom__bitvector__analysist.html">custom_bitvector_analysist</a> &amp;custom_bitvector_analysis)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must || src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  {</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()==2)</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    {</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;      <span class="keywordtype">unsigned</span> bit_nr =</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;        custom_bitvector_analysis.<a class="code" href="classcustom__bitvector__analysist.html#abfec5f3858670f9fba8011a54954318e">get_bit_nr</a>(<a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(src).op1());</div>
 <div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160; </div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;      <span class="keywordflow">if</span>(pointer.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_pointer)</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;        <span class="keywordflow">return</span> src;</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160; </div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;        pointer.<a class="code" href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">is_constant</a>() &amp;&amp;</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;        <a class="code" href="expr__util_8cpp.html#ae2ae8e358c96aa4b13b11a502bc9328b">is_null_pointer</a>(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(pointer))) <span class="comment">// NULL means all</span></div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;      {</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;        <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;        {</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;          <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;bit : <a class="code" href="classcustom__bitvector__domaint.html#a7d8e4d90c58e4b6410fc453ec79b1220">may_bits</a>)</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;            <span class="keywordflow">if</span>(<a class="code" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a>(bit.second, bit_nr))</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;              <span class="keywordflow">return</span> <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160; </div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        }</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must)</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        {</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        }</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;          <span class="keywordflow">return</span> src;</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;      }</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;      {</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        <a class="code" href="structcustom__bitvector__domaint_1_1vectorst.html">custom_bitvector_domaint::vectorst</a> v=</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;          <a class="code" href="classcustom__bitvector__domaint.html#a6aacbc0b27c16b3504dc5045940985ae">get_rhs</a>(<a class="code" href="classdereference__exprt.html">dereference_exprt</a>(pointer));</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160; </div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        <span class="keywordtype">bool</span> value=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;      <a class="code" href="classexprt.html">exprt</a> pointer = <a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(src).<a class="code" href="classbinary__exprt.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>();</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160; </div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;      <span class="keywordflow">if</span>(pointer.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_pointer)</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;        <span class="keywordflow">return</span> src;</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160; </div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;        pointer.<a class="code" href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">is_constant</a>() &amp;&amp;</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;        <a class="code" href="expr__util_8cpp.html#ae2ae8e358c96aa4b13b11a502bc9328b">is_null_pointer</a>(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(pointer))) <span class="comment">// NULL means all</span></div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;      {</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;        <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;        {</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;          <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;bit : <a class="code" href="classcustom__bitvector__domaint.html#a7d8e4d90c58e4b6410fc453ec79b1220">may_bits</a>)</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;            <span class="keywordflow">if</span>(<a class="code" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a>(bit.second, bit_nr))</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;              <span class="keywordflow">return</span> <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160; </div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        }</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must)</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        {</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        }</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;          <span class="keywordflow">return</span> src;</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;      }</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;      {</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        <a class="code" href="structcustom__bitvector__domaint_1_1vectorst.html">custom_bitvector_domaint::vectorst</a> v=</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;          <a class="code" href="classcustom__bitvector__domaint.html#a6aacbc0b27c16b3504dc5045940985ae">get_rhs</a>(<a class="code" href="classdereference__exprt.html">dereference_exprt</a>(pointer));</div>
 <div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160; </div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must)</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;          value=<a class="code" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a>(v.<a class="code" href="structcustom__bitvector__domaint_1_1vectorst.html#a696aab27d2dcd2945799d7caf15f7e02">must_bits</a>, bit_nr);</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;          value=<a class="code" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a>(v.<a class="code" href="structcustom__bitvector__domaint_1_1vectorst.html#a8e63ad9556014e9d62249310281306ee">may_bits</a>, bit_nr);</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160; </div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;        <span class="keywordflow">if</span>(value)</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;      }</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    }</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;      <span class="keywordflow">return</span> src;</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;  }</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;  {</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    <a class="code" href="classexprt.html">exprt</a> tmp=src;</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    <a class="code" href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a>(it, tmp)</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;      *it=<a class="code" href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">eval</a>(*it, custom_bitvector_analysis);</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160; </div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    <span class="keywordflow">return</span> tmp;</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;  }</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;}</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160; </div>
-<div class="line"><a name="l00763"></a><span class="lineno"><a class="line" href="classcustom__bitvector__analysist.html#aafdc4fe9781622db7999a7dd75940b1b">  763</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcustom__bitvector__analysist.html#aafdc4fe9781622db7999a7dd75940b1b">custom_bitvector_analysist::instrument</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;)</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;{</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;}</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160; </div>
-<div class="line"><a name="l00767"></a><span class="lineno"><a class="line" href="classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb">  767</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb">custom_bitvector_analysist::check</a>(</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;  <span class="keywordtype">bool</span> use_xml,</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;  std::ostream &amp;out)</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;{</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;  <span class="keywordtype">unsigned</span> pass=0, fail=0, unknown=0;</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160; </div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;  {</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="keywordflow">if</span>(!gf_entry.second.body.has_assertion())</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160; </div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    <span class="comment">// TODO this is a hard-coded hack</span></div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    <span class="keywordflow">if</span>(gf_entry.first == <span class="stringliteral">&quot;__actual_thread_spawn&quot;</span>)</div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160; </div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    <span class="keywordflow">if</span>(!use_xml)</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;******** Function &quot;</span> &lt;&lt; gf_entry.first &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160; </div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;    <a class="code" href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a>(i_it, gf_entry.second.body)</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;    {</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;      <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> description;</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160; </div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;      <span class="keywordflow">if</span>(i_it-&gt;is_assert())</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;      {</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="classcustom__bitvector__domaint.html#a6967740a8d76ecd7635e876e3244b241">custom_bitvector_domaint::has_get_must_or_may</a>(i_it-&gt;condition()))</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;        {</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;          <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        }</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160; </div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        <span class="keywordflow">if</span>(<span class="keyword">operator</span>[](i_it).has_values.is_false())</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;          <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160; </div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;        <a class="code" href="classexprt.html">exprt</a> tmp = <a class="code" href="classcustom__bitvector__analysist.html#a51d3cb2016b005dd8b9c9ac3a67ac5bd">eval</a>(i_it-&gt;condition(), i_it);</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        result = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(std::move(tmp), ns);</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160; </div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        description = i_it-&gt;source_location().get_comment();</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;      }</div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160; </div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;      <span class="keywordflow">if</span>(use_xml)</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;      {</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;&lt;result status=\&quot;&quot;</span>;</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;        <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;SUCCESS&quot;</span>;</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;FAILURE&quot;</span>;</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;UNKNOWN&quot;</span>;</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;\&quot;&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;        out &lt;&lt; <a class="code" href="properties_8cpp.html#acd585c0c596ee5156e84358863fb8794">xml</a>(i_it-&gt;source_location());</div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;&lt;description&gt;&quot;</span></div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;            &lt;&lt; description</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;&lt;/description&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;&lt;/result&gt;\n\n&quot;</span>;</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;      }</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;      {</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;        out &lt;&lt; i_it-&gt;source_location();</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        <span class="keywordflow">if</span>(!description.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; description;</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;: &quot;</span>;</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;        out &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, gf_entry.first, result);</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;      }</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160; </div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;      <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;        pass++;</div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;        fail++;</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        unknown++;</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    }</div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160; </div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;    <span class="keywordflow">if</span>(!use_xml)</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;      out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;  }</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160; </div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;  <span class="keywordflow">if</span>(!use_xml)</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;SUMMARY: &quot;</span> &lt;&lt; pass &lt;&lt; <span class="stringliteral">&quot; pass, &quot;</span> &lt;&lt; fail &lt;&lt; <span class="stringliteral">&quot; fail, &quot;</span></div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;        &lt;&lt; unknown &lt;&lt; <span class="stringliteral">&quot; unknown\n&quot;</span>;</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;}</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        <span class="keywordtype">bool</span> value=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160; </div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_must)</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;          value=<a class="code" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a>(v.<a class="code" href="structcustom__bitvector__domaint_1_1vectorst.html#a696aab27d2dcd2945799d7caf15f7e02">must_bits</a>, bit_nr);</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_get_may)</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;          value=<a class="code" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a>(v.<a class="code" href="structcustom__bitvector__domaint_1_1vectorst.html#a8e63ad9556014e9d62249310281306ee">may_bits</a>, bit_nr);</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160; </div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        <span class="keywordflow">if</span>(value)</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;      }</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    }</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;      <span class="keywordflow">return</span> src;</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;  }</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;  {</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;    <a class="code" href="classexprt.html">exprt</a> tmp=src;</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    <a class="code" href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a>(it, tmp)</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;      *it=<a class="code" href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">eval</a>(*it, custom_bitvector_analysis);</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160; </div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    <span class="keywordflow">return</span> tmp;</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;  }</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;}</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160; </div>
+<div class="line"><a name="l00765"></a><span class="lineno"><a class="line" href="classcustom__bitvector__analysist.html#aafdc4fe9781622db7999a7dd75940b1b">  765</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcustom__bitvector__analysist.html#aafdc4fe9781622db7999a7dd75940b1b">custom_bitvector_analysist::instrument</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;)</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;{</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;}</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160; </div>
+<div class="line"><a name="l00769"></a><span class="lineno"><a class="line" href="classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb">  769</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb">custom_bitvector_analysist::check</a>(</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;  <span class="keywordtype">bool</span> use_xml,</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;  std::ostream &amp;out)</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;{</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;  <span class="keywordtype">unsigned</span> pass=0, fail=0, unknown=0;</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160; </div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;  {</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    <span class="keywordflow">if</span>(!gf_entry.second.body.has_assertion())</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160; </div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="comment">// TODO this is a hard-coded hack</span></div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    <span class="keywordflow">if</span>(gf_entry.first == <span class="stringliteral">&quot;__actual_thread_spawn&quot;</span>)</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160; </div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    <span class="keywordflow">if</span>(!use_xml)</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;******** Function &quot;</span> &lt;&lt; gf_entry.first &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160; </div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <a class="code" href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a>(i_it, gf_entry.second.body)</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    {</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;      <a class="code" href="classexprt.html">exprt</a> result;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> description;</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160; </div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;      <span class="keywordflow">if</span>(i_it-&gt;is_assert())</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;      {</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="classcustom__bitvector__domaint.html#a6967740a8d76ecd7635e876e3244b241">custom_bitvector_domaint::has_get_must_or_may</a>(i_it-&gt;condition()))</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        {</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;          <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        }</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160; </div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        <span class="keywordflow">if</span>(<span class="keyword">operator</span>[](i_it).has_values.is_false())</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;          <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160; </div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        <a class="code" href="classexprt.html">exprt</a> tmp = <a class="code" href="classcustom__bitvector__analysist.html#a51d3cb2016b005dd8b9c9ac3a67ac5bd">eval</a>(i_it-&gt;condition(), i_it);</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        result = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(std::move(tmp), ns);</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160; </div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;        description = i_it-&gt;source_location().get_comment();</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;      }</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160; </div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;      <span class="keywordflow">if</span>(use_xml)</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;      {</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;&lt;result status=\&quot;&quot;</span>;</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;SUCCESS&quot;</span>;</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;FAILURE&quot;</span>;</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;UNKNOWN&quot;</span>;</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;\&quot;&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;        out &lt;&lt; <a class="code" href="properties_8cpp.html#acd585c0c596ee5156e84358863fb8794">xml</a>(i_it-&gt;source_location());</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;&lt;description&gt;&quot;</span></div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;            &lt;&lt; description</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;&lt;/description&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;&lt;/result&gt;\n\n&quot;</span>;</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;      }</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;      {</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        out &lt;&lt; i_it-&gt;source_location();</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        <span class="keywordflow">if</span>(!description.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;          out &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; description;</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;: &quot;</span>;</div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        out &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, gf_entry.first, result);</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;        out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;      }</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160; </div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;      <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;        pass++;</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(result.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        fail++;</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;        unknown++;</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;    }</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160; </div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    <span class="keywordflow">if</span>(!use_xml)</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;      out &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;  }</div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160; </div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;  <span class="keywordflow">if</span>(!use_xml)</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;SUMMARY: &quot;</span> &lt;&lt; pass &lt;&lt; <span class="stringliteral">&quot; pass, &quot;</span> &lt;&lt; fail &lt;&lt; <span class="stringliteral">&quot; fail, &quot;</span></div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;        &lt;&lt; unknown &lt;&lt; <span class="stringliteral">&quot; unknown\n&quot;</span>;</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;}</div>
 <div class="ttc" id="ac__safety__checks_8cpp_html_a1675f729dc854238dd23840d004c7c0a"><div class="ttname"><a href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a></div><div class="ttdeci">static exprt guard(const exprt::operandst &amp;guards, exprt cond)</div><div class="ttdef"><b>Definition:</b> <a href="c__safety__checks_8cpp_source.html#l00069">c_safety_checks.cpp:69</a></div></div>
 <div class="ttc" id="aclassai__baset_html"><div class="ttname"><a href="classai__baset.html">ai_baset</a></div><div class="ttdoc">This is the basic interface of the abstract interpreter with default implementations of the core func...</div><div class="ttdef"><b>Definition:</b> <a href="ai_8h_source.html#l00118">ai.h:119</a></div></div>
 <div class="ttc" id="aclassai__baset_html_a0cfc0a58d1d91dded976b169d53e3079"><div class="ttname"><a href="classai__baset.html#a0cfc0a58d1d91dded976b169d53e3079">ai_baset::locationt</a></div><div class="ttdeci">goto_programt::const_targett locationt</div><div class="ttdef"><b>Definition:</b> <a href="ai_8h_source.html#l00126">ai.h:126</a></div></div>
@@ -953,9 +955,9 @@ $(document).ready(function(){initNavTree('custom__bitvector__analysis_8cpp_sourc
 <div class="ttc" id="aclasscustom__bitvector__analysist_html_a0bd3e0ca7af9f7b43a3b0bd6655d5749"><div class="ttname"><a href="classcustom__bitvector__analysist.html#a0bd3e0ca7af9f7b43a3b0bd6655d5749">custom_bitvector_analysist::aliases</a></div><div class="ttdeci">std::set&lt; exprt &gt; aliases(const exprt &amp;, locationt loc)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00192">custom_bitvector_analysis.cpp:192</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__analysist_html_a2d4d6c3888c2e5bd2c10f137c8a4de5e"><div class="ttname"><a href="classcustom__bitvector__analysist.html#a2d4d6c3888c2e5bd2c10f137c8a4de5e">custom_bitvector_analysist::local_may_alias_factory</a></div><div class="ttdeci">local_may_alias_factoryt local_may_alias_factory</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00175">custom_bitvector_analysis.h:175</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__analysist_html_a51d3cb2016b005dd8b9c9ac3a67ac5bd"><div class="ttname"><a href="classcustom__bitvector__analysist.html#a51d3cb2016b005dd8b9c9ac3a67ac5bd">custom_bitvector_analysist::eval</a></div><div class="ttdeci">exprt eval(const exprt &amp;src, locationt loc)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00156">custom_bitvector_analysis.h:156</a></div></div>
-<div class="ttc" id="aclasscustom__bitvector__analysist_html_a8b89bc3749b6b78d2de05c36a4e552bb"><div class="ttname"><a href="classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb">custom_bitvector_analysist::check</a></div><div class="ttdeci">void check(const goto_modelt &amp;, bool xml, std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00767">custom_bitvector_analysis.cpp:767</a></div></div>
+<div class="ttc" id="aclasscustom__bitvector__analysist_html_a8b89bc3749b6b78d2de05c36a4e552bb"><div class="ttname"><a href="classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb">custom_bitvector_analysist::check</a></div><div class="ttdeci">void check(const goto_modelt &amp;, bool xml, std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00769">custom_bitvector_analysis.cpp:769</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__analysist_html_a9d609032b6115a7d7db72433ab98871b"><div class="ttname"><a href="classcustom__bitvector__analysist.html#a9d609032b6115a7d7db72433ab98871b">custom_bitvector_analysist::bits</a></div><div class="ttdeci">bitst bits</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00164">custom_bitvector_analysis.h:164</a></div></div>
-<div class="ttc" id="aclasscustom__bitvector__analysist_html_aafdc4fe9781622db7999a7dd75940b1b"><div class="ttname"><a href="classcustom__bitvector__analysist.html#aafdc4fe9781622db7999a7dd75940b1b">custom_bitvector_analysist::instrument</a></div><div class="ttdeci">void instrument(goto_functionst &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00763">custom_bitvector_analysis.cpp:763</a></div></div>
+<div class="ttc" id="aclasscustom__bitvector__analysist_html_aafdc4fe9781622db7999a7dd75940b1b"><div class="ttname"><a href="classcustom__bitvector__analysist.html#aafdc4fe9781622db7999a7dd75940b1b">custom_bitvector_analysist::instrument</a></div><div class="ttdeci">void instrument(goto_functionst &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00765">custom_bitvector_analysis.cpp:765</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__analysist_html_abfec5f3858670f9fba8011a54954318e"><div class="ttname"><a href="classcustom__bitvector__analysist.html#abfec5f3858670f9fba8011a54954318e">custom_bitvector_analysist::get_bit_nr</a></div><div class="ttdeci">unsigned get_bit_nr(const exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00177">custom_bitvector_analysis.cpp:177</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__domaint_html"><div class="ttname"><a href="classcustom__bitvector__domaint.html">custom_bitvector_domaint</a></div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00023">custom_bitvector_analysis.h:24</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__domaint_html_a0e975d9b56b9093b6d6a05e5b7084d57"><div class="ttname"><a href="classcustom__bitvector__domaint.html#a0e975d9b56b9093b6d6a05e5b7084d57">custom_bitvector_domaint::set_bit</a></div><div class="ttdeci">void set_bit(const exprt &amp;, unsigned bit_nr, modet)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00049">custom_bitvector_analysis.cpp:49</a></div></div>
@@ -980,7 +982,7 @@ $(document).ready(function(){initNavTree('custom__bitvector__analysis_8cpp_sourc
 <div class="ttc" id="aclasscustom__bitvector__domaint_html_aaebe3bf03e64e447da8056043061b4fa"><div class="ttname"><a href="classcustom__bitvector__domaint.html#aaebe3bf03e64e447da8056043061b4fa">custom_bitvector_domaint::erase_blank_vectors</a></div><div class="ttdeci">void erase_blank_vectors(bitst &amp;)</div><div class="ttdoc">erase blank bitvectors</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00672">custom_bitvector_analysis.cpp:672</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__domaint_html_ac685a1a97d2f6a1e2dc2c61aacf11063"><div class="ttname"><a href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">custom_bitvector_domaint::get_bit</a></div><div class="ttdeci">static bool get_bit(const bit_vectort src, unsigned bit_nr)</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00138">custom_bitvector_analysis.h:138</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__domaint_html_ada9e8cd22ab2268dbfca64a754dc5c85"><div class="ttname"><a href="classcustom__bitvector__domaint.html#ada9e8cd22ab2268dbfca64a754dc5c85">custom_bitvector_domaint::make_bottom</a></div><div class="ttdeci">void make_bottom() final override</div><div class="ttdoc">no states</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00039">custom_bitvector_analysis.h:39</a></div></div>
-<div class="ttc" id="aclasscustom__bitvector__domaint_html_add2c91c400c9a08463ffacfe5b5bfd5d"><div class="ttname"><a href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">custom_bitvector_domaint::eval</a></div><div class="ttdeci">exprt eval(const exprt &amp;src, custom_bitvector_analysist &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00697">custom_bitvector_analysis.cpp:697</a></div></div>
+<div class="ttc" id="aclasscustom__bitvector__domaint_html_add2c91c400c9a08463ffacfe5b5bfd5d"><div class="ttname"><a href="classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d">custom_bitvector_domaint::eval</a></div><div class="ttdeci">exprt eval(const exprt &amp;src, custom_bitvector_analysist &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8cpp_source.html#l00699">custom_bitvector_analysis.cpp:699</a></div></div>
 <div class="ttc" id="aclasscustom__bitvector__domaint_html_afe04693ac8094eda10341ce5d2dd6b09"><div class="ttname"><a href="classcustom__bitvector__domaint.html#afe04693ac8094eda10341ce5d2dd6b09">custom_bitvector_domaint::has_values</a></div><div class="ttdeci">tvt has_values</div><div class="ttdef"><b>Definition:</b> <a href="custom__bitvector__analysis_8h_source.html#l00110">custom_bitvector_analysis.h:110</a></div></div>
 <div class="ttc" id="aclassdereference__exprt_html"><div class="ttname"><a href="classdereference__exprt.html">dereference_exprt</a></div><div class="ttdoc">Operator to dereference a pointer.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00716">pointer_expr.h:717</a></div></div>
 <div class="ttc" id="aclassdereference__exprt_html_a97bdc1ba5db648290508a124bed8955c"><div class="ttname"><a href="classdereference__exprt.html#a97bdc1ba5db648290508a124bed8955c">dereference_exprt::pointer</a></div><div class="ttdeci">exprt &amp; pointer()</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00730">pointer_expr.h:730</a></div></div>
@@ -1030,7 +1032,6 @@ $(document).ready(function(){initNavTree('custom__bitvector__analysis_8cpp_sourc
 <div class="ttc" id="acover_8h_html_a41eb306d120f6b785ac0bce7985f6b11ac919ba68ee2489bb9ca2cb6ba78cacdc"><div class="ttname"><a href="cover_8h.html#a41eb306d120f6b785ac0bce7985f6b11ac919ba68ee2489bb9ca2cb6ba78cacdc">coverage_criteriont::ASSUME</a></div><div class="ttdeci">@ ASSUME</div></div>
 <div class="ttc" id="acprover__prefix_8h_html_a5f537726f4fcb4d977cbd151c99a39df"><div class="ttname"><a href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a></div><div class="ttdeci">#define CPROVER_PREFIX</div><div class="ttdef"><b>Definition:</b> <a href="cprover__prefix_8h_source.html#l00014">cprover_prefix.h:14</a></div></div>
 <div class="ttc" id="acustom__bitvector__analysis_8h_html"><div class="ttname"><a href="custom__bitvector__analysis_8h.html">custom_bitvector_analysis.h</a></div><div class="ttdoc">Field-insensitive, location-sensitive bitvector analysis.</div></div>
-<div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
 <div class="ttc" id="aexpr_8h_html_aa4c7b7e1741461e72adae54944e86d49"><div class="ttname"><a href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a></div><div class="ttdeci">#define Forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00027">expr.h:27</a></div></div>
 <div class="ttc" id="aexpr__util_8cpp_html_ad7237ef22ecf42bb51ceb62cfe524595"><div class="ttname"><a href="expr__util_8cpp.html#ad7237ef22ecf42bb51ceb62cfe524595">boolean_negate</a></div><div class="ttdeci">exprt boolean_negate(const exprt &amp;src)</div><div class="ttdoc">negate a Boolean expression, possibly removing a not_exprt, and swapping false and true</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00129">expr_util.cpp:129</a></div></div>
 <div class="ttc" id="aexpr__util_8cpp_html_ae2ae8e358c96aa4b13b11a502bc9328b"><div class="ttname"><a href="expr__util_8cpp.html#ae2ae8e358c96aa4b13b11a502bc9328b">is_null_pointer</a></div><div class="ttdeci">bool is_null_pointer(const constant_exprt &amp;expr)</div><div class="ttdoc">Returns true if expr has a pointer type and a value NULL; it also returns true when expr has value ze...</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00356">expr_util.cpp:356</a></div></div>

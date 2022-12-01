@@ -214,9 +214,9 @@ $(document).ready(function(){initNavTree('prop__conv__solver_8cpp_source.html','
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  {</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool &amp;&amp; expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size() &gt;= 1)</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">auto</span> tmp = <a class="code" href="classprop__conv__solvert.html#a42ebf45b2df3a0e7787f70af9d818021">get_bool</a>(*it);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">auto</span> tmp = <a class="code" href="classprop__conv__solvert.html#a42ebf45b2df3a0e7787f70af9d818021">get_bool</a>(op);</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">if</span>(!tmp.has_value())</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;          <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
@@ -334,8 +334,8 @@ $(document).ready(function(){initNavTree('prop__conv__solver_8cpp_source.html','
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    std::vector&lt;literalt&gt; op_bv;</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    op_bv.reserve(op.size());</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      op_bv.push_back(<a class="code" href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">convert</a>(*it));</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      op_bv.push_back(<a class="code" href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">convert</a>(op));</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">// add constraints</span></div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
@@ -461,8 +461,8 @@ $(document).ready(function(){initNavTree('prop__conv__solver_8cpp_source.html','
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160; </div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_and)</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        {</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;          <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <a class="code" href="classprop__conv__solvert.html#a9dfb15a803314547c533b32085878905">add_constraints_to_prop</a>(*it, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;          <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <a class="code" href="classprop__conv__solvert.html#a9dfb15a803314547c533b32085878905">add_constraints_to_prop</a>(op, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;          <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;        }</div>
@@ -476,8 +476,8 @@ $(document).ready(function(){initNavTree('prop__conv__solver_8cpp_source.html','
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv;</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;            bv.reserve(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size());</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;              bv.push_back(<a class="code" href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">convert</a>(*it));</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;              bv.push_back(<a class="code" href="classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc">convert</a>(op));</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160; </div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;            <a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(bv);</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;            <span class="keywordflow">return</span>;</div>
@@ -510,8 +510,8 @@ $(document).ready(function(){initNavTree('prop__conv__solver_8cpp_source.html','
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        }</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_or) <span class="comment">// !(a || b)  ==  (!a &amp;&amp; !b)</span></div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        {</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;          <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;            <a class="code" href="classprop__conv__solvert.html#a9dfb15a803314547c533b32085878905">add_constraints_to_prop</a>(*it, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;          <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;            <a class="code" href="classprop__conv__solvert.html#a9dfb15a803314547c533b32085878905">add_constraints_to_prop</a>(op, <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;          <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        }</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      }</div>
@@ -756,7 +756,6 @@ $(document).ready(function(){initNavTree('prop__conv__solver_8cpp_source.html','
 <div class="ttc" id="aclasssymbol__exprt_html_a8dc820d1f2bbd1c5d9144ad4849c2d4c"><div class="ttname"><a href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">symbol_exprt::get_identifier</a></div><div class="ttdeci">const irep_idt &amp; get_identifier() const</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00142">std_expr.h:142</a></div></div>
 <div class="ttc" id="aclasstrue__exprt_html"><div class="ttname"><a href="classtrue__exprt.html">true_exprt</a></div><div class="ttdoc">The Boolean constant true.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03007">std_expr.h:3008</a></div></div>
 <div class="ttc" id="aclasstvt_html_ad6dadd01efde5b03f98a8b5d7553a107"><div class="ttname"><a href="classtvt.html#ad6dadd01efde5b03f98a8b5d7553a107">tvt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00025">threeval.h:25</a></div></div>
-<div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="aliteral_8h_html_ad2dfd63c2c74c4a666f97dd385f57230"><div class="ttname"><a href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a></div><div class="ttdeci">literalt const_literal(bool value)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00188">literal.h:188</a></div></div>
 <div class="ttc" id="aliteral__expr_8h_html"><div class="ttname"><a href="literal__expr_8h.html">literal_expr.h</a></div></div>

@@ -199,9 +199,9 @@ $(document).ready(function(){initNavTree('simplify__expr__if_8cpp_source.html','
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
 <div class="line"><a name="l00106"></a><span class="lineno"><a class="line" href="classsimplify__exprt.html#a24a23bf4647cad0ee788ceb2691e4af9">  106</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsimplify__exprt.html#a24a23bf4647cad0ee788ceb2691e4af9">simplify_exprt::simplify_if_conj</a>(<a class="code" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;cond)</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;{</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, cond)</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : cond.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span>(expr == *it)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span>(expr == op)</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    {</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      expr = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -218,9 +218,9 @@ $(document).ready(function(){initNavTree('simplify__expr__if_8cpp_source.html','
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
 <div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="classsimplify__exprt.html#a454c2a3d05b04780c771689824e50dc6">  125</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsimplify__exprt.html#a454c2a3d05b04780c771689824e50dc6">simplify_exprt::simplify_if_disj</a>(<a class="code" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;cond)</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, cond)</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : cond.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">if</span>(expr == *it)</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">if</span>(expr == op)</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    {</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      expr = <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -345,12 +345,12 @@ $(document).ready(function(){initNavTree('simplify__expr__if_8cpp_source.html','
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">// a ? b : c  --&gt; a ? b[a/true] : c</span></div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordflow">if</span>(cond.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_and)</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, cond)</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : <a class="code" href="as__const_8h.html#a3f867a238882d97da88bccd5aeb93c19">as_const</a>(cond).operands())</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      {</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordflow">if</span>(it-&gt;id() == ID_not)</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;          local_replace_map.insert(std::make_pair(it-&gt;op0(), <a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordflow">if</span>(op.id() == ID_not)</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;          local_replace_map.insert(std::make_pair(op.op0(), <a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;          local_replace_map.insert(std::make_pair(*it, <a class="code" href="classtrue__exprt.html">true_exprt</a>()));</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;          local_replace_map.insert(std::make_pair(op, <a class="code" href="classtrue__exprt.html">true_exprt</a>()));</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      }</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    }</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordflow">else</span></div>
@@ -368,12 +368,12 @@ $(document).ready(function(){initNavTree('simplify__expr__if_8cpp_source.html','
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="comment">// a ? b : c  --&gt; a ? b : c[a/false]</span></div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordflow">if</span>(cond.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_or)</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    {</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <a class="code" href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a>(it, cond)</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : <a class="code" href="as__const_8h.html#a3f867a238882d97da88bccd5aeb93c19">as_const</a>(cond).operands())</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      {</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">if</span>(it-&gt;id() == ID_not)</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;          local_replace_map.insert(std::make_pair(it-&gt;op0(), <a class="code" href="classtrue__exprt.html">true_exprt</a>()));</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">if</span>(op.id() == ID_not)</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;          local_replace_map.insert(std::make_pair(op.op0(), <a class="code" href="classtrue__exprt.html">true_exprt</a>()));</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;          local_replace_map.insert(std::make_pair(*it, <a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;          local_replace_map.insert(std::make_pair(op, <a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      }</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    }</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">else</span></div>
@@ -504,6 +504,7 @@ $(document).ready(function(){initNavTree('simplify__expr__if_8cpp_source.html','
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a921fb92421ece03cfac32ce34e24e100"><div class="ttname"><a href="arith__tools_8cpp.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a></div><div class="ttdeci">bool to_integer(const constant_exprt &amp;expr, mp_integer &amp;int_value)</div><div class="ttdoc">Convert a constant expression expr to an arbitrary-precision integer.</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00020">arith_tools.cpp:20</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
+<div class="ttc" id="aas__const_8h_html_a3f867a238882d97da88bccd5aeb93c19"><div class="ttname"><a href="as__const_8h.html#a3f867a238882d97da88bccd5aeb93c19">as_const</a></div><div class="ttdeci">const T &amp; as_const(T &amp;value)</div><div class="ttdoc">Return a reference to the same object but ensures the type is const.</div><div class="ttdef"><b>Definition:</b> <a href="as__const_8h_source.html#l00014">as_const.h:14</a></div></div>
 <div class="ttc" id="aclassand__exprt_html"><div class="ttname"><a href="classand__exprt.html">and_exprt</a></div><div class="ttdoc">Boolean AND.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02070">std_expr.h:2071</a></div></div>
 <div class="ttc" id="aclassbool__typet_html"><div class="ttname"><a href="classbool__typet.html">bool_typet</a></div><div class="ttdoc">The Boolean type.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00035">std_types.h:36</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
@@ -539,7 +540,6 @@ $(document).ready(function(){initNavTree('simplify__expr__if_8cpp_source.html','
 <div class="ttc" id="aclasssimplify__exprt_html_aeead73ae3d17be163dded212e9b37fa9"><div class="ttname"><a href="classsimplify__exprt.html#aeead73ae3d17be163dded212e9b37fa9">simplify_exprt::do_simplify_if</a></div><div class="ttdeci">bool do_simplify_if</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__class_8h_source.html#l00099">simplify_expr_class.h:99</a></div></div>
 <div class="ttc" id="aclasstrue__exprt_html"><div class="ttname"><a href="classtrue__exprt.html">true_exprt</a></div><div class="ttdoc">The Boolean constant true.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03007">std_expr.h:3008</a></div></div>
 <div class="ttc" id="aclassunary__exprt_html_a7b8e5933140d1314f3970b9a52362936"><div class="ttname"><a href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">unary_exprt::op</a></div><div class="ttdeci">const exprt &amp; op() const</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00326">std_expr.h:326</a></div></div>
-<div class="ttc" id="aexpr_8h_html_a14b84c9d2b2aab8f36fe3ea90d10cba5"><div class="ttname"><a href="expr_8h.html#a14b84c9d2b2aab8f36fe3ea90d10cba5">forall_operands</a></div><div class="ttdeci">#define forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00020">expr.h:20</a></div></div>
 <div class="ttc" id="aexpr_8h_html_aa4c7b7e1741461e72adae54944e86d49"><div class="ttname"><a href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a></div><div class="ttdeci">#define Forall_operands(it, expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00027">expr.h:27</a></div></div>
 <div class="ttc" id="arange_8h_html"><div class="ttname"><a href="range_8h.html">range.h</a></div><div class="ttdoc">Ranges: pair of begin and end iterators, which can be initialized from containers,...</div></div>
 <div class="ttc" id="arange_8h_html_a3bac630c9834ad1c0add32d789a123b7"><div class="ttname"><a href="range_8h.html#a3bac630c9834ad1c0add32d789a123b7">make_range</a></div><div class="ttdeci">ranget&lt; iteratort &gt; make_range(iteratort begin, iteratort end)</div><div class="ttdef"><b>Definition:</b> <a href="range_8h_source.html#l00524">range.h:524</a></div></div>
