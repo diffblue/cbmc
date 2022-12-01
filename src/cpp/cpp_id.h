@@ -87,7 +87,7 @@ public:
 
   void set_parent(cpp_idt &_parent)
   {
-    assert(_parent.is_scope);
+    PRECONDITION(_parent.is_scope);
     parent=&_parent;
   }
 

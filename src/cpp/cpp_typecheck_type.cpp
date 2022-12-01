@@ -24,8 +24,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_type(typet &type)
 {
-  assert(!type.id().empty());
-  assert(type.is_not_nil());
+  PRECONDITION(!type.id().empty());
+  PRECONDITION(type.is_not_nil());
 
   try
   {
@@ -66,7 +66,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     }
 
     type=symbol_expr.type();
-    assert(type.is_not_nil());
+    PRECONDITION(type.is_not_nil());
 
     if(type.get_bool(ID_C_constant))
       qualifiers.is_constant = true;
@@ -109,7 +109,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
       if(class_object.id()==ID_cpp_name)
       {
-        assert(class_object.get_sub().back().id()=="::");
+        DATA_INVARIANT(
+          class_object.get_sub().back().id() == "::", "scope suffix expected");
         class_object.get_sub().pop_back();
       }
 
@@ -309,5 +310,5 @@ void cpp_typecheckt::typecheck_type(typet &type)
     throw 0;
   }
 
-  assert(type.is_not_nil());
+  CHECK_RETURN(type.is_not_nil());
 }

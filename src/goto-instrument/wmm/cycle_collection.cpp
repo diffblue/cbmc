@@ -70,7 +70,7 @@ void event_grapht::graph_explorert::collect_cycles(
     break;
 
   case Unknown:
-    assert(false);
+    UNREACHABLE;
   }
 
   if(order->empty())
@@ -494,7 +494,7 @@ bool event_grapht::graph_explorert::backtrack(
       mark[vertex]=false;
     }
 
-    assert(!point_stack.empty());
+    DATA_INVARIANT(!point_stack.empty(), "element required");
     point_stack.pop();
 
     /* removes variable access */
@@ -542,7 +542,7 @@ bool event_grapht::graph_explorert::backtrack(
 
       if(!marked_stack.empty())
       {
-        assert(marked_stack.top()==vertex);
+        DATA_INVARIANT(marked_stack.top() == vertex, "should match");
         mark[vertex]=true;
       }
       else

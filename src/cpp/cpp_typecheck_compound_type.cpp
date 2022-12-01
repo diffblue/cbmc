@@ -305,8 +305,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(is_cast_operator)
   {
-    assert(declarator.name().get_sub().size()==2 &&
-           declarator.name().get_sub().front().id()==ID_operator);
+    PRECONDITION(
+      declarator.name().get_sub().size() == 2 &&
+      declarator.name().get_sub().front().id() == ID_operator);
 
     typet type=static_cast<typet &>(declarator.name().get_sub()[1]);
     declarator.type().add_subtype() = type;
@@ -515,9 +516,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           is_virtual=true;
           const code_typet &code_type=to_code_type(comp.type());
-          assert(!code_type.parameters().empty());
+          DATA_INVARIANT(
+            !code_type.parameters().empty(), "must have parameters");
           const typet &pointer_type=code_type.parameters()[0].type();
-          assert(pointer_type.id()==ID_pointer);
+          DATA_INVARIANT(
+            pointer_type.id() == ID_pointer, "this must be pointer");
           virtual_bases.insert(
             to_pointer_type(pointer_type).base_type().get(ID_identifier));
         }
@@ -937,8 +940,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // enter scope of compound
   cpp_scopes.set_scope(symbol.name);
 
-  assert(symbol.type.id()==ID_struct ||
-         symbol.type.id()==ID_union);
+  PRECONDITION(symbol.type.id() == ID_struct || symbol.type.id() == ID_union);
 
   struct_union_typet &type=
     to_struct_union_type(symbol.type);
@@ -1181,7 +1183,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       // build declaration
       cpp_declarationt cpctor;
       default_cpctor(symbol, cpctor);
-      assert(cpctor.declarators().size()==1);
+      CHECK_RETURN(cpctor.declarators().size() == 1);
 
       exprt value(ID_cpp_not_typechecked);
       value.copy_to_operands(cpctor.declarators()[0].value());
@@ -1199,7 +1201,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       // build declaration
       cpp_declarationt assignop;
       default_assignop(symbol, assignop);
-      assert(assignop.declarators().size()==1);
+      CHECK_RETURN(assignop.declarators().size() == 1);
 
       // The value will be typechecked only if the operator
       // is actually used
@@ -1477,8 +1479,8 @@ bool cpp_typecheckt::get_component(
 {
   const typet &followed_type=follow(object.type());
 
-  assert(followed_type.id()==ID_struct ||
-         followed_type.id()==ID_union);
+  PRECONDITION(
+    followed_type.id() == ID_struct || followed_type.id() == ID_union);
 
   struct_union_typet final_type=
     to_struct_union_type(followed_type);
@@ -1579,8 +1581,7 @@ bool cpp_typecheckt::check_component_access(
   if(access==ID_public)
     return false; // ok
 
-  assert(access==ID_private ||
-         access==ID_protected);
+  PRECONDITION(access == ID_private || access == ID_protected);
 
   const irep_idt &struct_identifier=
     struct_union_type.get(ID_name);
@@ -1683,8 +1684,8 @@ void cpp_typecheckt::make_ptr_typecast(
 {
   typet src_type=expr.type();
 
-  assert(src_type.id()==  ID_pointer);
-  assert(dest_type.id()== ID_pointer);
+  PRECONDITION(src_type.id() == ID_pointer);
+  PRECONDITION(dest_type.id() == ID_pointer);
 
   const struct_typet &src_struct = to_struct_type(
     static_cast<const typet &>(follow(to_pointer_type(src_type).base_type())));

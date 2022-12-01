@@ -431,8 +431,9 @@ void goto_convertt::do_cpp_new(
     const typet &return_type=
       code_type.return_type();
 
-    assert(code_type.parameters().size()==1 ||
-           code_type.parameters().size()==2);
+    DATA_INVARIANT(
+      code_type.parameters().size() == 1 || code_type.parameters().size() == 2,
+      "new has one or two parameters");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -462,8 +463,9 @@ void goto_convertt::do_cpp_new(
 
     const typet &return_type=code_type.return_type();
 
-    assert(code_type.parameters().size()==2 ||
-           code_type.parameters().size()==3);
+    DATA_INVARIANT(
+      code_type.parameters().size() == 2 || code_type.parameters().size() == 3,
+      "placement new has two or three parameters");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);

@@ -33,7 +33,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   goto_programt::targett end=goto_program.instructions.end();
   end--;
 
-  assert(end->is_end_function());
+  DATA_INVARIANT(end->is_end_function(), "must be end of function");
 
   goto_program.insert_before_swap(end);
 

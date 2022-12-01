@@ -671,7 +671,9 @@ void c_typecheck_baset::apply_asm_label(
 
       if(!asm_label_map.insert(
           std::make_pair(p_id, p_new_id)).second)
-        assert(asm_label_map[p_id]==p_new_id);
+      {
+        CHECK_RETURN(asm_label_map[p_id] == p_new_id);
+      }
     }
   }
 }

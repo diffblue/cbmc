@@ -763,8 +763,8 @@ void java_bytecode_convert_classt::convert(
     if(s_it!=symbol_table.symbols.end())
       symbol_table.erase(s_it); // erase, we stubbed it
 
-    if(symbol_table.add(new_symbol))
-      assert(false && "failed to add static field symbol");
+    const bool failed = symbol_table.add(new_symbol);
+    CHECK_RETURN_WITH_DIAGNOSTICS(!failed, "failed to add static field symbol");
   }
   else
   {

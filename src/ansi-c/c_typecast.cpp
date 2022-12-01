@@ -698,13 +698,13 @@ void c_typecastt::implicit_typecast_arithmetic(
     }
     else if(c_type1==COMPLEX)
     {
-      assert(c_type1==COMPLEX && c_type2!=COMPLEX);
+      INVARIANT(c_type2 != COMPLEX, "both types were COMPLEX");
       do_typecast(expr2, to_complex_type(type1).subtype());
       do_typecast(expr2, type1);
     }
     else
     {
-      assert(c_type1!=COMPLEX && c_type2==COMPLEX);
+      INVARIANT(c_type2 == COMPLEX, "neither type was COMPLEX");
       do_typecast(expr1, to_complex_type(type2).subtype());
       do_typecast(expr1, type2);
     }

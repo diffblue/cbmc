@@ -23,8 +23,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
   elaborate_class_template(object.type());
 
   typet tmp_type(follow(object.type()));
-
-  assert(!is_reference(tmp_type));
+  CHECK_RETURN(!is_reference(tmp_type));
 
   // PODs don't need a destructor
   if(cpp_is_pod(tmp_type))

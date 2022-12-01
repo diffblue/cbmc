@@ -264,9 +264,9 @@ void interval_domaint::assume_rec(
   // we now have lhs <  rhs or
   //             lhs <= rhs
 
-  assert(id==ID_lt || id==ID_le);
+  DATA_INVARIANT(id == ID_lt || id == ID_le, "unexpected comparison operator");
 
-  #ifdef DEBUG
+#ifdef DEBUG
   std::cout << "assume_rec: "
             << from_expr(lhs) << " " << id << " "
             << from_expr(rhs) << "\n";

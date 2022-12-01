@@ -39,7 +39,7 @@ symbolt &cpp_declarator_convertert::convert(
   const cpp_member_spect &member_spec,
   cpp_declaratort &declarator)
 {
-  assert(declaration_type.is_not_nil());
+  PRECONDITION(declaration_type.is_not_nil());
 
   if(declaration_type.id()=="cpp-cast-operator")
   {
@@ -51,9 +51,9 @@ symbolt &cpp_declarator_convertert::convert(
     declarator.name().get_sub().back().swap(name);
   }
 
-  assert(declarator.id()==ID_cpp_declarator);
+  PRECONDITION(declarator.id() == ID_cpp_declarator);
   final_type=declarator.merge_type(declaration_type);
-  assert(final_type.is_not_nil());
+  CHECK_RETURN(final_type.is_not_nil());
 
   cpp_storage_spect final_storage_spec = storage_spec;
   final_storage_spec |= cpp_storage_spect(final_type);

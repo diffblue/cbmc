@@ -77,7 +77,7 @@ unsigned inv_object_storet::add(const exprt &expr)
 
 bool inv_object_storet::is_constant(unsigned n) const
 {
-  assert(n<entries.size());
+  PRECONDITION(n < entries.size());
   return entries[n].is_constant;
 }
 

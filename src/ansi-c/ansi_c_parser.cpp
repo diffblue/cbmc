@@ -85,7 +85,7 @@ void ansi_c_parsert::add_declarator(
   exprt &declaration,
   irept &declarator)
 {
-  assert(declarator.is_not_nil());
+  PRECONDITION(declarator.is_not_nil());
   ansi_c_declarationt &ansi_c_declaration=
     to_ansi_c_declaration(declaration);
 

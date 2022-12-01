@@ -689,7 +689,7 @@ bool acceleration_utilst::do_arrays(
         }
         else
         {
-          assert(!"ITSALLGONEWRONG");
+          UNREACHABLE;
         }
 
         or_exprt unchanged_by_this_one(

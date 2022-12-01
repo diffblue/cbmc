@@ -64,7 +64,7 @@ void k_inductiont::process_loop(
   const goto_programt::targett loop_head,
   const loopt &loop)
 {
-  assert(!loop.empty());
+  PRECONDITION(!loop.empty());
 
   // save the loop guard
   const exprt loop_guard = loop_head->condition();
@@ -126,14 +126,16 @@ void k_inductiont::process_loop(
     }
 
     // now turn any assertions in iterations 0..k-1 into assumptions
-    assert(iteration_points.size()==k+1);
+    DATA_INVARIANT(
+      iteration_points.size() == k + 1, "number of iteration points");
 
-    assert(k>=1);
+    DATA_INVARIANT(k >= 1, "at least one iteration");
     goto_programt::targett end=iteration_points[k-1];
 
     for(goto_programt::targett t=loop_head; t!=end; t++)
     {
-      assert(t!=goto_function.body.instructions.end());
+      DATA_INVARIANT(
+        t != goto_function.body.instructions.end(), "t is in range");
       if(t->is_assert())
         t->turn_into_assume();
     }

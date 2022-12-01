@@ -134,8 +134,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
       underlying_type =
         follow_tag(to_c_enum_tag_type(underlying_type)).underlying_type();
 
-      assert(underlying_type.id()==ID_signedbv ||
-             underlying_type.id()==ID_unsignedbv);
+      DATA_INVARIANT(
+        underlying_type.id() == ID_signedbv ||
+          underlying_type.id() == ID_unsignedbv,
+        "underlying type must be bitvector");
     }
 
     if(underlying_type.id()==ID_signedbv ||
@@ -198,7 +200,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
         }
         else
         {
-          assert(config.ansi_c.long_long_int_width==64);
+          PRECONDITION(config.ansi_c.long_long_int_width == 64);
 
           if(is_signed)
             result=signed_long_long_int_type();
@@ -780,7 +782,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   if(type.find(ID_tag).is_nil())
   {
     // Anonymous? Must come with body.
-    assert(have_body);
+    PRECONDITION(have_body);
 
     // produce symbol
     type_symbolt compound_symbol{irep_idt{}, type, mode};
@@ -904,7 +906,7 @@ void c_typecheck_baset::typecheck_compound_body(
   for(auto &decl : old_components)
   {
     // the arguments are member declarations or static assertions
-    assert(decl.id()==ID_declaration);
+    PRECONDITION(decl.id() == ID_declaration);
 
     ansi_c_declarationt &declaration=
       to_ansi_c_declaration(static_cast<exprt &>(decl));
@@ -914,8 +916,8 @@ void c_typecheck_baset::typecheck_compound_body(
       struct_union_typet::componentt new_component;
       new_component.id(ID_static_assert);
       new_component.add_source_location()=declaration.source_location();
+      PRECONDITION(declaration.operands().size() == 2);
       new_component.operands().swap(declaration.operands());
-      assert(new_component.operands().size()==2);
       components.push_back(new_component);
     }
     else

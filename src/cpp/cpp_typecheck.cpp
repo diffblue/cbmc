@@ -64,11 +64,11 @@ const struct_typet &cpp_typecheckt::this_struct_type()
   const exprt &this_expr=
     cpp_scopes.current_scope().this_expr;
 
-  assert(this_expr.is_not_nil());
-  assert(this_expr.type().id()==ID_pointer);
+  CHECK_RETURN(this_expr.is_not_nil());
+  CHECK_RETURN(this_expr.type().id() == ID_pointer);
 
   const typet &t = follow(to_pointer_type(this_expr.type()).base_type());
-  assert(t.id()==ID_struct);
+  CHECK_RETURN(t.id() == ID_struct);
   return to_struct_type(t);
 }
 
@@ -167,9 +167,9 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     if(cpp_is_pod(symbol.type))
       continue;
 
-    assert(symbol.is_static_lifetime);
-    assert(!symbol.is_type);
-    assert(symbol.type.id()!=ID_code);
+    DATA_INVARIANT(symbol.is_static_lifetime, "should be static");
+    DATA_INVARIANT(!symbol.is_type, "should not be a type");
+    DATA_INVARIANT(symbol.type.id() != ID_code, "should not be code");
 
     exprt symbol_expr=cpp_symbol_expr(symbol);
 
@@ -228,7 +228,7 @@ void cpp_typecheckt::do_not_typechecked()
         symbol.value.id() == ID_cpp_not_typechecked &&
         symbol.value.get_bool(ID_is_used))
       {
-        assert(symbol.type.id()==ID_code);
+        DATA_INVARIANT(symbol.type.id() == ID_code, "must be code");
         exprt value = symbol.value;
 
         if(symbol.base_name=="operator=")

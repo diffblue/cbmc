@@ -142,7 +142,8 @@ void uninitializedt::add_assertions(
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
-            assert(tracking.find(identifier)!=tracking.end());
+            INVARIANT(
+              tracking.find(identifier) != tracking.end(), "not tracked");
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
 
             // insert assertion

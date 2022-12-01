@@ -808,7 +808,7 @@ void value_sett::get_value_set_rec(
             statement==ID_cpp_new_array)
     {
       PRECONDITION(suffix.empty());
-      assert(expr_type.id()==ID_pointer);
+      PRECONDITION(expr_type.id() == ID_pointer);
 
       dynamic_object_exprt dynamic_object(
         to_pointer_type(expr_type).base_type());
@@ -1103,7 +1103,7 @@ void value_sett::dereference_rec(
   // remove pointer typecasts
   if(src.id()==ID_typecast)
   {
-    assert(src.type().id()==ID_pointer);
+    PRECONDITION(src.type().id() == ID_pointer);
 
     dereference_rec(to_typecast_expr(src).op(), dest);
   }

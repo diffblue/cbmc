@@ -488,7 +488,7 @@ static java_bytecode_convert_methodt::method_offsett get_common_dominator(
       ++domit;
       ++repeats;
     }
-    assert(repeats<=merge_vars.size());
+    INVARIANT(repeats <= merge_vars.size(), "out of bounds");
     if(repeats==merge_vars.size())
       return dom;
   }
