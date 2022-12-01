@@ -549,6 +549,6 @@ var searchData=
   ['attempt_5fassign_5flength_5ffrom_5ftype_28994',['attempt_assign_length_from_type',['../array__pool_8cpp.html#a1a8d38ce1a05480a972bab7e99566270',1,'array_pool.cpp']]],
   ['automatic_28995',['automatic',['../classformat__spect.html#ae9c149d338141f346c4c092b792d9049',1,'format_spect']]],
   ['automatont_28996',['automatont',['../classautomatont.html#ab797188f0a6c517d95c5e42fcbe1acd2',1,'automatont']]],
-  ['auxiliary_5fsymbolt_28997',['auxiliary_symbolt',['../classauxiliary__symbolt.html#a24713c19590a551cb78ef5c70417ffb2',1,'auxiliary_symbolt::auxiliary_symbolt(const irep_idt &amp;name, const typet &amp;type)'],['../classauxiliary__symbolt.html#ab8ff6f246bc245a022f35d410b405eab',1,'auxiliary_symbolt::auxiliary_symbolt()']]],
+  ['auxiliary_5fsymbolt_28997',['auxiliary_symbolt',['../classauxiliary__symbolt.html#aa31cd5fcc66bf310612038b9446aa0cc',1,'auxiliary_symbolt::auxiliary_symbolt(const irep_idt &amp;name, typet type, const irep_idt &amp;mode)'],['../classauxiliary__symbolt.html#ab8ff6f246bc245a022f35d410b405eab',1,'auxiliary_symbolt::auxiliary_symbolt()']]],
   ['axiomst_28998',['axiomst',['../classaxiomst.html#abaad874acfe8eaa7583951798f1f338b',1,'axiomst']]]
 ];

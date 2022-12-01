@@ -527,227 +527,225 @@ $(document).ready(function(){initNavTree('accelerate_8cpp_source.html',''); init
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160; </div>
 <div class="line"><a name="l00436"></a><span class="lineno"><a class="line" href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">  436</a></span>&#160;<a class="code" href="classsymbolt.html">symbolt</a> <a class="code" href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">acceleratet::make_symbol</a>(std::string name, <a class="code" href="classtypet.html">typet</a> type)</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;{</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> ret;</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  ret.<a class="code" href="classsymbolt.html#a5f0165e0d2582194a6e7e13730288663">module</a>=<span class="stringliteral">&quot;accelerate&quot;</span>;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;  ret.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>=name;</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  ret.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a>=name;</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  ret.<a class="code" href="classsymbolt.html#ab8f816e539d2c409771d2faba7aee8c0">pretty_name</a>=name;</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;  ret.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>=type;</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> ret{name, std::move(type), <a class="code" href="classdstringt.html">irep_idt</a>{}};</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  ret.module=<span class="stringliteral">&quot;accelerate&quot;</span>;</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;  ret.base_name=name;</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  ret.pretty_name=name;</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160; </div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;  <a class="code" href="classacceleratet.html#a60b0b40bad14de4329f47bf9f7fa3d28">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">add</a>(ret);</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  <a class="code" href="classacceleratet.html#a60b0b40bad14de4329f47bf9f7fa3d28">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">add</a>(ret);</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;}</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; </div>
-<div class="line"><a name="l00450"></a><span class="lineno"><a class="line" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">  450</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">acceleratet::decl</a>(<a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;, <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>)</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;{</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>=<a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(t);</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <a class="code" href="classcode__declt.html">code_declt</a> code(sym);</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160; </div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>-&gt;make_decl();</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>-&gt;code=code;</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;}</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160; </div>
-<div class="line"><a name="l00461"></a><span class="lineno"><a class="line" href="classacceleratet.html#ae22bd0650bf9e0e0abc26fcad8a29526">  461</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">acceleratet::decl</a>(<a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;sym, <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t, <a class="code" href="classexprt.html">exprt</a> init)</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;{</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>(sym, t);</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160; </div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    t, <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(<a class="code" href="classcode__assignt.html">code_assignt</a>(sym, init)));</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;}</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160; </div>
-<div class="line"><a name="l00469"></a><span class="lineno"><a class="line" href="classacceleratet.html#a0cb05930fb7cd4695ea2ae8acfadcebb">  469</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a0cb05930fb7cd4695ea2ae8acfadcebb">acceleratet::insert_automaton</a>(<a class="code" href="classtrace__automatont.html">trace_automatont</a> &amp;automaton)</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;{</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> state_sym=<a class="code" href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">make_symbol</a>(<span class="stringliteral">&quot;trace_automaton::state&quot;</span>,</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;}</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
+<div class="line"><a name="l00448"></a><span class="lineno"><a class="line" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">  448</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">acceleratet::decl</a>(<a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;, <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>)</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;{</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>=<a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(t);</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  <a class="code" href="classcode__declt.html">code_declt</a> code(sym);</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160; </div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>-&gt;make_decl();</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>-&gt;code=code;</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;}</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160; </div>
+<div class="line"><a name="l00459"></a><span class="lineno"><a class="line" href="classacceleratet.html#ae22bd0650bf9e0e0abc26fcad8a29526">  459</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">acceleratet::decl</a>(<a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;sym, <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t, <a class="code" href="classexprt.html">exprt</a> init)</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;{</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>(sym, t);</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160; </div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    t, <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(<a class="code" href="classcode__assignt.html">code_assignt</a>(sym, init)));</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;}</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160; </div>
+<div class="line"><a name="l00467"></a><span class="lineno"><a class="line" href="classacceleratet.html#a0cb05930fb7cd4695ea2ae8acfadcebb">  467</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a0cb05930fb7cd4695ea2ae8acfadcebb">acceleratet::insert_automaton</a>(<a class="code" href="classtrace__automatont.html">trace_automatont</a> &amp;automaton)</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;{</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> state_sym=<a class="code" href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">make_symbol</a>(<span class="stringliteral">&quot;trace_automaton::state&quot;</span>,</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;      <a class="code" href="util_8cpp.html#a1541c9d453d0bd1a38540053ff3de409">unsigned_poly_type</a>());</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> next_state_sym=<a class="code" href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">make_symbol</a>(<span class="stringliteral">&quot;trace_automaton::next_state&quot;</span>,</div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;      <a class="code" href="util_8cpp.html#a1541c9d453d0bd1a38540053ff3de409">unsigned_poly_type</a>());</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> next_state_sym=<a class="code" href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">make_symbol</a>(<span class="stringliteral">&quot;trace_automaton::next_state&quot;</span>,</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;      <a class="code" href="util_8cpp.html#a1541c9d453d0bd1a38540053ff3de409">unsigned_poly_type</a>());</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> state=state_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> next_state=next_state_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160; </div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <a class="code" href="classtrace__automatont.html#a5f1ac8c9d33c2a93aa9856a4c626fd3f">trace_automatont::sym_mapt</a> transitions;</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  <a class="code" href="trace__automaton_8h.html#a082a39f8f14980efcc958b0136d8260b">state_sett</a> accept_states;</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160; </div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  automaton.<a class="code" href="classtrace__automatont.html#a1fd2cdbf1c509b054cfdce9682983290">get_transitions</a>(transitions);</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  automaton.<a class="code" href="classtrace__automatont.html#a51448e6f687f36ac2ebd2f817901127d">accept_states</a>(accept_states);</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160; </div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  std::cout</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    &lt;&lt; <span class="stringliteral">&quot;Inserting trace automaton with &quot;</span></div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    &lt;&lt; automaton.<a class="code" href="classtrace__automatont.html#ae6f3c49e15a6999033bd926192168837">num_states</a>() &lt;&lt; <span class="stringliteral">&quot; states, &quot;</span></div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    &lt;&lt; accept_states.size() &lt;&lt; <span class="stringliteral">&quot; accepting states and &quot;</span></div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    &lt;&lt; transitions.size() &lt;&lt; <span class="stringliteral">&quot; transitions\n&quot;</span>;</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160; </div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  <span class="comment">// Declare the variables we&#39;ll use to encode the state machine.</span></div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=<a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>(state, t, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(automaton.<a class="code" href="classtrace__automatont.html#a44322bb983c856537f2a849816541a13">init_state</a>(), state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>(next_state, t);</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160; </div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  <span class="comment">// Now for each program location that appears as a symbol in the</span></div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  <span class="comment">// trace automaton, add the appropriate code to drive the state</span></div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <span class="comment">// machine.</span></div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;sym : automaton.<a class="code" href="classtrace__automatont.html#a4dab78ddf7a59da6dd7f6932ba6d0bf0">alphabet</a>)</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  {</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    <a class="code" href="classscratch__programt.html">scratch_programt</a> state_machine{</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;      <a class="code" href="classacceleratet.html#a60b0b40bad14de4329f47bf9f7fa3d28">symbol_table</a>, <a class="code" href="classacceleratet.html#a3b6c7dd214a4105fd5f707a6c917d12f">message_handler</a>, <a class="code" href="classacceleratet.html#af8528106a86266cb7846210a320d345b">guard_manager</a>};</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;    <a class="code" href="classtrace__automatont.html#aa93cdad57dcee7054631a67b33cb5dc3">trace_automatont::sym_range_pairt</a> p=transitions.equal_range(sym);</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160; </div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;    <a class="code" href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">build_state_machine</a>(p.first, p.second, accept_states, state, next_state,</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;        state_machine);</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160; </div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a32df6bf5af52e1065afd63fc549bd906">insert_before_swap</a>(sym, state_machine);</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  }</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;}</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160; </div>
-<div class="line"><a name="l00511"></a><span class="lineno"><a class="line" href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">  511</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">acceleratet::build_state_machine</a>(</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  trace_automatont::sym_mapt::iterator begin,</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;  trace_automatont::sym_mapt::iterator end,</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;  <a class="code" href="trace__automaton_8h.html#a082a39f8f14980efcc958b0136d8260b">state_sett</a> &amp;accept_states,</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> state,</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> next_state,</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> &amp;state_machine)</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;{</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;  std::map&lt;unsigned int, unsigned int&gt; successor_counts;</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> max_count=0;</div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> likely_next=0;</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160; </div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;  <span class="comment">// Optimisation: find the most common successor state and initialise</span></div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;  <span class="comment">// next_state to that value.  This reduces the size of the state machine</span></div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;  <span class="comment">// driver substantially.</span></div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;  <span class="keywordflow">for</span>(trace_automatont::sym_mapt::iterator p=begin; p!=end; ++p)</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;  {</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    <a class="code" href="classtrace__automatont.html#ad8328d4ff7c1d22e811b6347c46c7057">trace_automatont::state_pairt</a> state_pair=p-&gt;second;</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> to=state_pair.second;</div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> count=0;</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160; </div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    <span class="keywordflow">if</span>(successor_counts.find(to)==successor_counts.end())</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    {</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;      count=1;</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    }</div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    {</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;      count=successor_counts[to] + 1;</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    }</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> state=state_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> next_state=next_state_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>();</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160; </div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <a class="code" href="classtrace__automatont.html#a5f1ac8c9d33c2a93aa9856a4c626fd3f">trace_automatont::sym_mapt</a> transitions;</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  <a class="code" href="trace__automaton_8h.html#a082a39f8f14980efcc958b0136d8260b">state_sett</a> accept_states;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160; </div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  automaton.<a class="code" href="classtrace__automatont.html#a1fd2cdbf1c509b054cfdce9682983290">get_transitions</a>(transitions);</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  automaton.<a class="code" href="classtrace__automatont.html#a51448e6f687f36ac2ebd2f817901127d">accept_states</a>(accept_states);</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160; </div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  std::cout</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    &lt;&lt; <span class="stringliteral">&quot;Inserting trace automaton with &quot;</span></div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    &lt;&lt; automaton.<a class="code" href="classtrace__automatont.html#ae6f3c49e15a6999033bd926192168837">num_states</a>() &lt;&lt; <span class="stringliteral">&quot; states, &quot;</span></div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    &lt;&lt; accept_states.size() &lt;&lt; <span class="stringliteral">&quot; accepting states and &quot;</span></div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    &lt;&lt; transitions.size() &lt;&lt; <span class="stringliteral">&quot; transitions\n&quot;</span>;</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160; </div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  <span class="comment">// Declare the variables we&#39;ll use to encode the state machine.</span></div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=<a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>(state, t, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(automaton.<a class="code" href="classtrace__automatont.html#a44322bb983c856537f2a849816541a13">init_state</a>(), state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;  <a class="code" href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">decl</a>(next_state, t);</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160; </div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  <span class="comment">// Now for each program location that appears as a symbol in the</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  <span class="comment">// trace automaton, add the appropriate code to drive the state</span></div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  <span class="comment">// machine.</span></div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;sym : automaton.<a class="code" href="classtrace__automatont.html#a4dab78ddf7a59da6dd7f6932ba6d0bf0">alphabet</a>)</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  {</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;    <a class="code" href="classscratch__programt.html">scratch_programt</a> state_machine{</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;      <a class="code" href="classacceleratet.html#a60b0b40bad14de4329f47bf9f7fa3d28">symbol_table</a>, <a class="code" href="classacceleratet.html#a3b6c7dd214a4105fd5f707a6c917d12f">message_handler</a>, <a class="code" href="classacceleratet.html#af8528106a86266cb7846210a320d345b">guard_manager</a>};</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    <a class="code" href="classtrace__automatont.html#aa93cdad57dcee7054631a67b33cb5dc3">trace_automatont::sym_range_pairt</a> p=transitions.equal_range(sym);</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160; </div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;    <a class="code" href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">build_state_machine</a>(p.first, p.second, accept_states, state, next_state,</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;        state_machine);</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160; </div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;    <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a32df6bf5af52e1065afd63fc549bd906">insert_before_swap</a>(sym, state_machine);</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;  }</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;}</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160; </div>
+<div class="line"><a name="l00509"></a><span class="lineno"><a class="line" href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">  509</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">acceleratet::build_state_machine</a>(</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;  trace_automatont::sym_mapt::iterator begin,</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;  trace_automatont::sym_mapt::iterator end,</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  <a class="code" href="trace__automaton_8h.html#a082a39f8f14980efcc958b0136d8260b">state_sett</a> &amp;accept_states,</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> state,</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> next_state,</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;  <a class="code" href="classscratch__programt.html">scratch_programt</a> &amp;state_machine)</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;{</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  std::map&lt;unsigned int, unsigned int&gt; successor_counts;</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> max_count=0;</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> likely_next=0;</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160; </div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;  <span class="comment">// Optimisation: find the most common successor state and initialise</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;  <span class="comment">// next_state to that value.  This reduces the size of the state machine</span></div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;  <span class="comment">// driver substantially.</span></div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;  <span class="keywordflow">for</span>(trace_automatont::sym_mapt::iterator p=begin; p!=end; ++p)</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;  {</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;    <a class="code" href="classtrace__automatont.html#ad8328d4ff7c1d22e811b6347c46c7057">trace_automatont::state_pairt</a> state_pair=p-&gt;second;</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> to=state_pair.second;</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> count=0;</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160; </div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    <span class="keywordflow">if</span>(successor_counts.find(to)==successor_counts.end())</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    {</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;      count=1;</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    }</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    {</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;      count=successor_counts[to] + 1;</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    }</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160; </div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    successor_counts[to]=count;</div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160; </div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    successor_counts[to]=count;</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160; </div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    <span class="keywordflow">if</span>(count &gt; max_count)</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    {</div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;      max_count=count;</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;      likely_next=to;</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;    }</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;  }</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160; </div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  <span class="comment">// Optimisation: if there is only one possible successor state, just</span></div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;  <span class="comment">// jump straight to it instead of driving the whole machine.</span></div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;  <span class="keywordflow">if</span>(successor_counts.size()==1)</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;  {</div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;    <span class="keywordflow">if</span>(accept_states.find(likely_next)!=accept_states.end())</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    {</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;      <span class="comment">// It&#39;s an accept state.  Just assume(false).</span></div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;      state_machine.<a class="code" href="classscratch__programt.html#a396031bbb3696e371479526b67d800c6">assume</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>());</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    }</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;    {</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;      state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(state,</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;          <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(likely_next, next_state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    }</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160; </div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;  }</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160; </div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;  state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(next_state,</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;      <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(likely_next, next_state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;  <span class="keywordflow">for</span>(trace_automatont::sym_mapt::iterator p=begin; p!=end; ++p)</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;  {</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <a class="code" href="classtrace__automatont.html#ad8328d4ff7c1d22e811b6347c46c7057">trace_automatont::state_pairt</a> state_pair=p-&gt;second;</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> from=state_pair.first;</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> to=state_pair.second;</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160; </div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    <span class="keywordflow">if</span>(to==likely_next)</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    {</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    }</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160; </div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <span class="comment">// We&#39;re encoding the transition</span></div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    <span class="keywordflow">if</span>(count &gt; max_count)</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    {</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;      max_count=count;</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;      likely_next=to;</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    }</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;  }</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160; </div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;  <span class="comment">// Optimisation: if there is only one possible successor state, just</span></div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;  <span class="comment">// jump straight to it instead of driving the whole machine.</span></div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  <span class="keywordflow">if</span>(successor_counts.size()==1)</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;  {</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    <span class="keywordflow">if</span>(accept_states.find(likely_next)!=accept_states.end())</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    {</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;      <span class="comment">// It&#39;s an accept state.  Just assume(false).</span></div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;      state_machine.<a class="code" href="classscratch__programt.html#a396031bbb3696e371479526b67d800c6">assume</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>());</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    }</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    {</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;      state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(state,</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;          <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(likely_next, next_state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    }</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160; </div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;  }</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;  state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(next_state,</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;      <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(likely_next, next_state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160; </div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;  <span class="keywordflow">for</span>(trace_automatont::sym_mapt::iterator p=begin; p!=end; ++p)</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;  {</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;    <a class="code" href="classtrace__automatont.html#ad8328d4ff7c1d22e811b6347c46c7057">trace_automatont::state_pairt</a> state_pair=p-&gt;second;</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> from=state_pair.first;</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> to=state_pair.second;</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160; </div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    <span class="keywordflow">if</span>(to==likely_next)</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    {</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    }</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160; </div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    <span class="comment">// We&#39;re encoding the transition</span></div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <span class="comment">//   from -loc-&gt; to</span></div>
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="comment">//   from -loc-&gt; to</span></div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="comment">// which we encode by inserting:</span></div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    <span class="comment">// which we encode by inserting:</span></div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    <span class="comment">//   next_state=(state==from) ? to : next_state;</span></div>
 <div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    <span class="comment">//   next_state=(state==from) ? to : next_state;</span></div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    <span class="comment">// just before loc.</span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    <a class="code" href="classequal__exprt.html">equal_exprt</a> <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>(state, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(from, state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    <a class="code" href="classif__exprt.html">if_exprt</a> rhs(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(to, next_state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()), next_state);</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;    state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(next_state, rhs);</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;  }</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160; </div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;  <span class="comment">// Update the state and assume(false) if we&#39;ve hit an accept state.</span></div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(state, next_state);</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160; </div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  <span class="keywordflow">for</span>(state_sett::iterator it=accept_states.begin();</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;      it!=accept_states.end();</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;      ++it)</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  {</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    state_machine.<a class="code" href="classscratch__programt.html#a396031bbb3696e371479526b67d800c6">assume</a>(</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;      <a class="code" href="classnot__exprt.html">not_exprt</a>(<a class="code" href="classequal__exprt.html">equal_exprt</a>(state, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(*it, state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()))));</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  }</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;}</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
-<div class="line"><a name="l00608"></a><span class="lineno"><a class="line" href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">  608</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">acceleratet::accelerate_loops</a>()</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;{</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <span class="keywordtype">int</span> num_accelerated=0;</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160; </div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  <span class="keywordflow">for</span>(natural_loops_mutablet::loop_mapt::iterator it =</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;      <a class="code" href="classacceleratet.html#a3a66e4438691dbd4175481b721b66eeb">natural_loops</a>.<a class="code" href="classloop__analysist.html#a356c89ce65ce5fa00056bf59261102c5">loop_map</a>.begin();</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;      it!=<a class="code" href="classacceleratet.html#a3a66e4438691dbd4175481b721b66eeb">natural_loops</a>.<a class="code" href="classloop__analysist.html#a356c89ce65ce5fa00056bf59261102c5">loop_map</a>.end();</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;      ++it)</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  {</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=it-&gt;first;</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    num_accelerated += <a class="code" href="classacceleratet.html#afe3cc074caff65fdbed1cb53e8d6b47b">accelerate_loop</a>(t);</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  }</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    <span class="comment">// just before loc.</span></div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    <a class="code" href="classequal__exprt.html">equal_exprt</a> <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>(state, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(from, state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    <a class="code" href="classif__exprt.html">if_exprt</a> rhs(<a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(to, next_state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()), next_state);</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(next_state, rhs);</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;  }</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160; </div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;  <span class="comment">// Update the state and assume(false) if we&#39;ve hit an accept state.</span></div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;  state_machine.<a class="code" href="classscratch__programt.html#a45a12409282c11eb9bce7255273e9e36">assign</a>(state, next_state);</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160; </div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  <span class="keywordflow">for</span>(state_sett::iterator it=accept_states.begin();</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;      it!=accept_states.end();</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;      ++it)</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  {</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    state_machine.<a class="code" href="classscratch__programt.html#a396031bbb3696e371479526b67d800c6">assume</a>(</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;      <a class="code" href="classnot__exprt.html">not_exprt</a>(<a class="code" href="classequal__exprt.html">equal_exprt</a>(state, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(*it, state.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()))));</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  }</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;}</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160; </div>
+<div class="line"><a name="l00606"></a><span class="lineno"><a class="line" href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">  606</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">acceleratet::accelerate_loops</a>()</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;{</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  <span class="keywordtype">int</span> num_accelerated=0;</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <span class="keywordflow">for</span>(natural_loops_mutablet::loop_mapt::iterator it =</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;      <a class="code" href="classacceleratet.html#a3a66e4438691dbd4175481b721b66eeb">natural_loops</a>.<a class="code" href="classloop__analysist.html#a356c89ce65ce5fa00056bf59261102c5">loop_map</a>.begin();</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;      it!=<a class="code" href="classacceleratet.html#a3a66e4438691dbd4175481b721b66eeb">natural_loops</a>.<a class="code" href="classloop__analysist.html#a356c89ce65ce5fa00056bf59261102c5">loop_map</a>.end();</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;      ++it)</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;  {</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;    <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> t=it-&gt;first;</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    num_accelerated += <a class="code" href="classacceleratet.html#afe3cc074caff65fdbed1cb53e8d6b47b">accelerate_loop</a>(t);</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  }</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160; </div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160; </div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;  <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160; </div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  <span class="keywordflow">if</span>(num_accelerated &gt; 0)</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;  {</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Engaging crush mode...\n&quot;</span>;</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160; </div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    <a class="code" href="classacceleratet.html#a9e6d5b10910ccd66ae6f7e0c92c7836d">restrict_traces</a>();</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    <span class="comment">// add_dirty_checks();</span></div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160; </div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Crush mode engaged.\n&quot;</span>;</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  }</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160; </div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  <span class="keywordflow">return</span> num_accelerated;</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;}</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160; </div>
-<div class="line"><a name="l00637"></a><span class="lineno"><a class="line" href="accelerate_8cpp.html#a8a91da12e88de68b88495a89b6db7f49">  637</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="accelerate_8cpp.html#a8a91da12e88de68b88495a89b6db7f49">accelerate_functions</a>(</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;  <span class="keywordtype">bool</span> use_z3,</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;  <a class="code" href="structguard__expr__managert.html">guard_managert</a> &amp;guard_manager)</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;{</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;  {</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Accelerating function &quot;</span> &lt;&lt; gf_entry.first &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    <a class="code" href="classacceleratet.html">acceleratet</a> accelerate(</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;      gf_entry.second.body, goto_model, message_handler, use_z3, guard_manager);</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;  <span class="keywordflow">if</span>(num_accelerated &gt; 0)</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;  {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Engaging crush mode...\n&quot;</span>;</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160; </div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    <a class="code" href="classacceleratet.html#a9e6d5b10910ccd66ae6f7e0c92c7836d">restrict_traces</a>();</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;    <span class="comment">// add_dirty_checks();</span></div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    <a class="code" href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">program</a>.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160; </div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Crush mode engaged.\n&quot;</span>;</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  }</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160; </div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  <span class="keywordflow">return</span> num_accelerated;</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;}</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160; </div>
+<div class="line"><a name="l00635"></a><span class="lineno"><a class="line" href="accelerate_8cpp.html#a8a91da12e88de68b88495a89b6db7f49">  635</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="accelerate_8cpp.html#a8a91da12e88de68b88495a89b6db7f49">accelerate_functions</a>(</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;  <span class="keywordtype">bool</span> use_z3,</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  <a class="code" href="structguard__expr__managert.html">guard_managert</a> &amp;guard_manager)</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;{</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  {</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Accelerating function &quot;</span> &lt;&lt; gf_entry.first &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <a class="code" href="classacceleratet.html">acceleratet</a> accelerate(</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;      gf_entry.second.body, goto_model, message_handler, use_z3, guard_manager);</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160; </div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keywordtype">int</span> num_accelerated=accelerate.<a class="code" href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">accelerate_loops</a>();</div>
 <div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160; </div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="keywordtype">int</span> num_accelerated=accelerate.<a class="code" href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">accelerate_loops</a>();</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160; </div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    <span class="keywordflow">if</span>(num_accelerated &gt; 0)</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    {</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;Added &quot;</span> &lt;&lt; num_accelerated</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;                &lt;&lt; <span class="stringliteral">&quot; accelerator(s)\n&quot;</span>;</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    }</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  }</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;}</div>
-<div class="ttc" id="aaccelerate_8cpp_html_a8a91da12e88de68b88495a89b6db7f49"><div class="ttname"><a href="accelerate_8cpp.html#a8a91da12e88de68b88495a89b6db7f49">accelerate_functions</a></div><div class="ttdeci">void accelerate_functions(goto_modelt &amp;goto_model, message_handlert &amp;message_handler, bool use_z3, guard_managert &amp;guard_manager)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00637">accelerate.cpp:637</a></div></div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="keywordflow">if</span>(num_accelerated &gt; 0)</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    {</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;Added &quot;</span> &lt;&lt; num_accelerated</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;                &lt;&lt; <span class="stringliteral">&quot; accelerator(s)\n&quot;</span>;</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    }</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;  }</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;}</div>
+<div class="ttc" id="aaccelerate_8cpp_html_a8a91da12e88de68b88495a89b6db7f49"><div class="ttname"><a href="accelerate_8cpp.html#a8a91da12e88de68b88495a89b6db7f49">accelerate_functions</a></div><div class="ttdeci">void accelerate_functions(goto_modelt &amp;goto_model, message_handlert &amp;message_handler, bool use_z3, guard_managert &amp;guard_manager)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00635">accelerate.cpp:635</a></div></div>
 <div class="ttc" id="aaccelerate_8h_html"><div class="ttname"><a href="accelerate_8h.html">accelerate.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
 <div class="ttc" id="aaccelerator_8h_html"><div class="ttname"><a href="accelerator_8h.html">accelerator.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
@@ -756,19 +754,19 @@ $(document).ready(function(){initNavTree('accelerate_8cpp_source.html',''); init
 <div class="ttc" id="aclassacceleratet_html"><div class="ttname"><a href="classacceleratet.html">acceleratet</a></div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00026">accelerate.h:27</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a051ab3d4d79bc9472ae92d75eeec6ce7"><div class="ttname"><a href="classacceleratet.html#a051ab3d4d79bc9472ae92d75eeec6ce7">acceleratet::add_dirty_checks</a></div><div class="ttdeci">void add_dirty_checks()</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00348">accelerate.cpp:348</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a059bc62fc5d2947396aed0fdf7408e68"><div class="ttname"><a href="classacceleratet.html#a059bc62fc5d2947396aed0fdf7408e68">acceleratet::insert_accelerator</a></div><div class="ttdeci">void insert_accelerator(goto_programt::targett &amp;loop_header, goto_programt::targett &amp;back_jump, path_acceleratort &amp;accelerator, subsumed_patht &amp;subsumed_path)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00177">accelerate.cpp:177</a></div></div>
-<div class="ttc" id="aclassacceleratet_html_a0cb05930fb7cd4695ea2ae8acfadcebb"><div class="ttname"><a href="classacceleratet.html#a0cb05930fb7cd4695ea2ae8acfadcebb">acceleratet::insert_automaton</a></div><div class="ttdeci">void insert_automaton(trace_automatont &amp;automaton)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00469">accelerate.cpp:469</a></div></div>
+<div class="ttc" id="aclassacceleratet_html_a0cb05930fb7cd4695ea2ae8acfadcebb"><div class="ttname"><a href="classacceleratet.html#a0cb05930fb7cd4695ea2ae8acfadcebb">acceleratet::insert_automaton</a></div><div class="ttdeci">void insert_automaton(trace_automatont &amp;automaton)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00467">accelerate.cpp:467</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a11ad1d986619dc0dc470c9097be76451"><div class="ttname"><a href="classacceleratet.html#a11ad1d986619dc0dc470c9097be76451">acceleratet::utils</a></div><div class="ttdeci">acceleration_utilst utils</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00118">accelerate.h:118</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a1467f4ac59fef0436db16a4289a92760"><div class="ttname"><a href="classacceleratet.html#a1467f4ac59fef0436db16a4289a92760">acceleratet::program</a></div><div class="ttdeci">goto_programt &amp; program</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00111">accelerate.h:111</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a17f66c59d1566fc0fe40b80f25a2fe3e"><div class="ttname"><a href="classacceleratet.html#a17f66c59d1566fc0fe40b80f25a2fe3e">acceleratet::make_symbol</a></div><div class="ttdeci">symbolt make_symbol(std::string name, typet type)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00436">accelerate.cpp:436</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a3a66e4438691dbd4175481b721b66eeb"><div class="ttname"><a href="classacceleratet.html#a3a66e4438691dbd4175481b721b66eeb">acceleratet::natural_loops</a></div><div class="ttdeci">natural_loops_mutablet natural_loops</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00116">accelerate.h:116</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a3b6c7dd214a4105fd5f707a6c917d12f"><div class="ttname"><a href="classacceleratet.html#a3b6c7dd214a4105fd5f707a6c917d12f">acceleratet::message_handler</a></div><div class="ttdeci">message_handlert &amp; message_handler</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00057">accelerate.h:57</a></div></div>
-<div class="ttc" id="aclassacceleratet_html_a4e9a0e85f1d6bc1eb3ef994c29ffe8cc"><div class="ttname"><a href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">acceleratet::decl</a></div><div class="ttdeci">void decl(symbol_exprt &amp;sym, goto_programt::targett t)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00450">accelerate.cpp:450</a></div></div>
+<div class="ttc" id="aclassacceleratet_html_a4e9a0e85f1d6bc1eb3ef994c29ffe8cc"><div class="ttname"><a href="classacceleratet.html#a4e9a0e85f1d6bc1eb3ef994c29ffe8cc">acceleratet::decl</a></div><div class="ttdeci">void decl(symbol_exprt &amp;sym, goto_programt::targett t)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00448">accelerate.cpp:448</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a60b0b40bad14de4329f47bf9f7fa3d28"><div class="ttname"><a href="classacceleratet.html#a60b0b40bad14de4329f47bf9f7fa3d28">acceleratet::symbol_table</a></div><div class="ttdeci">symbol_tablet &amp; symbol_table</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00113">accelerate.h:113</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a7663dcca7393013d6f75c0893bc60817"><div class="ttname"><a href="classacceleratet.html#a7663dcca7393013d6f75c0893bc60817">acceleratet::dirty_vars_map</a></div><div class="ttdeci">expr_mapt dirty_vars_map</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00124">accelerate.h:124</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a87d40e60d0d29d7a521db6aa6e04207f"><div class="ttname"><a href="classacceleratet.html#a87d40e60d0d29d7a521db6aa6e04207f">acceleratet::subsumed</a></div><div class="ttdeci">subsumed_pathst subsumed</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00117">accelerate.h:117</a></div></div>
-<div class="ttc" id="aclassacceleratet_html_a8b4ffb2ae97afed2b89aad760e95e5e7"><div class="ttname"><a href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">acceleratet::accelerate_loops</a></div><div class="ttdeci">int accelerate_loops()</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00608">accelerate.cpp:608</a></div></div>
+<div class="ttc" id="aclassacceleratet_html_a8b4ffb2ae97afed2b89aad760e95e5e7"><div class="ttname"><a href="classacceleratet.html#a8b4ffb2ae97afed2b89aad760e95e5e7">acceleratet::accelerate_loops</a></div><div class="ttdeci">int accelerate_loops()</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00606">accelerate.cpp:606</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a8b8fed903926b2055a938de711071ae1"><div class="ttname"><a href="classacceleratet.html#a8b8fed903926b2055a938de711071ae1">acceleratet::contains_nested_loops</a></div><div class="ttdeci">bool contains_nested_loops(goto_programt::targett &amp;loop_header)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00058">accelerate.cpp:58</a></div></div>
-<div class="ttc" id="aclassacceleratet_html_a929b64b91d4f17526cbac1e7207bc8a5"><div class="ttname"><a href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">acceleratet::build_state_machine</a></div><div class="ttdeci">void build_state_machine(trace_automatont::sym_mapt::iterator p, trace_automatont::sym_mapt::iterator end, state_sett &amp;accept_states, symbol_exprt state, symbol_exprt next_state, scratch_programt &amp;state_machine)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00511">accelerate.cpp:511</a></div></div>
+<div class="ttc" id="aclassacceleratet_html_a929b64b91d4f17526cbac1e7207bc8a5"><div class="ttname"><a href="classacceleratet.html#a929b64b91d4f17526cbac1e7207bc8a5">acceleratet::build_state_machine</a></div><div class="ttdeci">void build_state_machine(trace_automatont::sym_mapt::iterator p, trace_automatont::sym_mapt::iterator end, state_sett &amp;accept_states, symbol_exprt state, symbol_exprt next_state, scratch_programt &amp;state_machine)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00509">accelerate.cpp:509</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a965708d234fc87bdcbb47914b9833da1"><div class="ttname"><a href="classacceleratet.html#a965708d234fc87bdcbb47914b9833da1">acceleratet::make_overflow_loc</a></div><div class="ttdeci">void make_overflow_loc(goto_programt::targett loop_header, goto_programt::targett &amp;loop_end, goto_programt::targett &amp;overflow_loc)</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00234">accelerate.cpp:234</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_a9e6d5b10910ccd66ae6f7e0c92c7836d"><div class="ttname"><a href="classacceleratet.html#a9e6d5b10910ccd66ae6f7e0c92c7836d">acceleratet::restrict_traces</a></div><div class="ttdeci">void restrict_traces()</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8cpp_source.html#l00277">accelerate.cpp:277</a></div></div>
 <div class="ttc" id="aclassacceleratet_html_aa4e0803d155ac2968e0572418ff03803"><div class="ttname"><a href="classacceleratet.html#aa4e0803d155ac2968e0572418ff03803">acceleratet::overflow_locs</a></div><div class="ttdeci">overflow_mapt overflow_locs</div><div class="ttdef"><b>Definition:</b> <a href="accelerate_8h_source.html#l00122">accelerate.h:122</a></div></div>
@@ -840,12 +838,8 @@ $(document).ready(function(){initNavTree('accelerate_8cpp_source.html',''); init
 <div class="ttc" id="aclasssymbol__table__baset_html_aa73f5af5f8d596334f12b5efd828057c"><div class="ttname"><a href="classsymbol__table__baset.html#aa73f5af5f8d596334f12b5efd828057c">symbol_table_baset::lookup_ref</a></div><div class="ttdeci">const symbolt &amp; lookup_ref(const irep_idt &amp;name) const</div><div class="ttdoc">Find a symbol in the symbol table for read-only access.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table__base_8h_source.html#l00104">symbol_table_base.h:104</a></div></div>
 <div class="ttc" id="aclasssymbol__table__baset_html_ace726bfe2960bd1ad332c5ac52768e10"><div class="ttname"><a href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">symbol_table_baset::add</a></div><div class="ttdeci">bool add(const symbolt &amp;symbol)</div><div class="ttdoc">Add a new symbol to the symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table__base_8cpp_source.html#l00018">symbol_table_base.cpp:18</a></div></div>
 <div class="ttc" id="aclasssymbolt_html"><div class="ttname"><a href="classsymbolt.html">symbolt</a></div><div class="ttdoc">Symbol table entry.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00027">symbol.h:28</a></div></div>
-<div class="ttc" id="aclasssymbolt_html_a070b47061b10021d1407737d61924699"><div class="ttname"><a href="classsymbolt.html#a070b47061b10021d1407737d61924699">symbolt::base_name</a></div><div class="ttdeci">irep_idt base_name</div><div class="ttdoc">Base (non-scoped) name.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00046">symbol.h:46</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_a5f0165e0d2582194a6e7e13730288663"><div class="ttname"><a href="classsymbolt.html#a5f0165e0d2582194a6e7e13730288663">symbolt::module</a></div><div class="ttdeci">irep_idt module</div><div class="ttdoc">Name of module the symbol belongs to.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00043">symbol.h:43</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_a9de2ce93a8d7b742d0d057110832c432"><div class="ttname"><a href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbolt::symbol_expr</a></div><div class="ttdeci">class symbol_exprt symbol_expr() const</div><div class="ttdoc">Produces a symbol_exprt for a symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8cpp_source.html#l00121">symbol.cpp:121</a></div></div>
-<div class="ttc" id="aclasssymbolt_html_ab2a27b105ccbeb19c64265c09198bb17"><div class="ttname"><a href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">symbolt::type</a></div><div class="ttdeci">typet type</div><div class="ttdoc">Type of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00031">symbol.h:31</a></div></div>
-<div class="ttc" id="aclasssymbolt_html_ab4fe07eaa16795818379d87e5e510686"><div class="ttname"><a href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">symbolt::name</a></div><div class="ttdeci">irep_idt name</div><div class="ttdoc">The unique identifier.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00040">symbol.h:40</a></div></div>
-<div class="ttc" id="aclasssymbolt_html_ab8f816e539d2c409771d2faba7aee8c0"><div class="ttname"><a href="classsymbolt.html#ab8f816e539d2c409771d2faba7aee8c0">symbolt::pretty_name</a></div><div class="ttdeci">irep_idt pretty_name</div><div class="ttdoc">Language-specific display name.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00052">symbol.h:52</a></div></div>
 <div class="ttc" id="aclasstrace__automatont_html"><div class="ttname"><a href="classtrace__automatont.html">trace_automatont</a></div><div class="ttdef"><b>Definition:</b> <a href="trace__automaton_8h_source.html#l00088">trace_automaton.h:89</a></div></div>
 <div class="ttc" id="aclasstrace__automatont_html_a1fd2cdbf1c509b054cfdce9682983290"><div class="ttname"><a href="classtrace__automatont.html#a1fd2cdbf1c509b054cfdce9682983290">trace_automatont::get_transitions</a></div><div class="ttdeci">void get_transitions(sym_mapt &amp;transitions)</div><div class="ttdef"><b>Definition:</b> <a href="trace__automaton_8cpp_source.html#l00346">trace_automaton.cpp:346</a></div></div>
 <div class="ttc" id="aclasstrace__automatont_html_a44322bb983c856537f2a849816541a13"><div class="ttname"><a href="classtrace__automatont.html#a44322bb983c856537f2a849816541a13">trace_automatont::init_state</a></div><div class="ttdeci">statet init_state()</div><div class="ttdef"><b>Definition:</b> <a href="trace__automaton_8h_source.html#l00105">trace_automaton.h:105</a></div></div>

@@ -1,6 +1,7 @@
 var classsymbolt =
 [
     [ "symbolt", "classsymbolt.html#a37752210d3570bc45670e52959ccb607", null ],
+    [ "symbolt", "classsymbolt.html#a6434fdcaeff1d097a7b3d5227e154a09", null ],
     [ "clear", "classsymbolt.html#a1f0329d0a410dbccac2b39f9c838a1b4", null ],
     [ "display_name", "classsymbolt.html#a41b053de346250ea6fb1bf27f8cc6a43", null ],
     [ "is_compiled", "classsymbolt.html#a8ea5f45d62b5b8eba7b24fcd2f8ba602", null ],

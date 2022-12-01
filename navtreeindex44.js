@@ -1,5 +1,6 @@
 var NAVTREEINDEX44 =
 {
+"classjsil__declarationt.html#afcbf031599fe517979ec440f63c9852e":[6,0,695,13],
 "classjsil__languaget.html":[6,0,696],
 "classjsil__languaget.html#a098cda038c88aea2e52005adaef40a50":[6,0,696,12],
 "classjsil__languaget.html#a0f15e6db59a5303c4dbe47b20a2e9a60":[6,0,696,17],
@@ -248,6 +249,5 @@ var NAVTREEINDEX44 =
 "classk__inductiont.html#aa23a4ada8d2682346f7af1cf9e6fad7c":[6,0,716,10],
 "classk__inductiont.html#ab14d9189cfa72934e2a6d319bcb0622e":[6,0,716,0],
 "classk__inductiont.html#ac135c8e2ff3dcb609c7ba47066fb76b2":[6,0,716,9],
-"classk__inductiont.html#ad712f71dc85a95cab61b25fad9846cfd":[6,0,716,4],
-"classk__inductiont.html#afe26a8bc87618fe94b5906990f7ae296":[6,0,716,2]
+"classk__inductiont.html#ad712f71dc85a95cab61b25fad9846cfd":[6,0,716,4]
 };

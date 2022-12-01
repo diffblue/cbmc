@@ -340,311 +340,297 @@ $(document).ready(function(){initNavTree('ansi__c__entry__point_8cpp_source.html
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      <a class="code" href="classnamespacet.html">namespacet</a> ns(symbol_table);</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      {</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <a class="code" href="classsymbolt.html">symbolt</a> argc_symbol;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        argc_symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = <span class="stringliteral">&quot;argc&#39;&quot;</span>;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        argc_symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a> = <span class="stringliteral">&quot;argc&#39;&quot;</span>;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = <a class="code" href="c__types_8cpp.html#a7acad2c30feee311bc25620ae1913813">signed_int_type</a>();</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        argc_symbol.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        argc_symbol.<a class="code" href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">is_lvalue</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        argc_symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a> = ID_C;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keyword">auto</span> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a> = symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(argc_symbol);</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.second &amp;&amp; <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.first != argc_symbol)</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;          <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;argc already exists but is not usable&quot;</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                          &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        }</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;argc_symbol = ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;argc&#39;&quot;</span>);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      {</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        <span class="comment">// we make the type of this thing an array of pointers</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="comment">// need to add one to the size -- the array is terminated</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="comment">// with NULL</span></div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> one_expr = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(1, argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keyword">const</span> <a class="code" href="classplus__exprt.html">plus_exprt</a> size_expr(argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), one_expr);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> argv_type(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()), size_expr);</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <a class="code" href="classsymbolt.html">symbolt</a> argv_symbol;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        argv_symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = <span class="stringliteral">&quot;argv&#39;&quot;</span>;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        argv_symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a> = <span class="stringliteral">&quot;argv&#39;&quot;</span>;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        argv_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = argv_type;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        argv_symbol.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        argv_symbol.<a class="code" href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">is_lvalue</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        argv_symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a> = ID_C;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keyword">auto</span> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a> = symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(argv_symbol);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.second &amp;&amp; <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.first != argv_symbol)</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        {</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;          <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;argv already exists but is not usable&quot;</span></div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                          &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        }</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      }</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160; </div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;argv_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;argv&#39;&quot;</span>);</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;argv_array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(argv_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <a class="code" href="classsymbolt.html">symbolt</a> argc_symbol{<span class="stringliteral">&quot;argc&#39;&quot;</span>, <a class="code" href="c__types_8cpp.html#a7acad2c30feee311bc25620ae1913813">signed_int_type</a>(), ID_C};</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        argc_symbol.base_name = <span class="stringliteral">&quot;argc&#39;&quot;</span>;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        argc_symbol.is_static_lifetime = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        argc_symbol.is_lvalue = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="keyword">auto</span> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a> = symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(argc_symbol);</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.second &amp;&amp; <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.first != argc_symbol)</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        {</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;          <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;argc already exists but is not usable&quot;</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                          &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        }</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;argc_symbol = ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;argc&#39;&quot;</span>);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      {</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="comment">// we make the type of this thing an array of pointers</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="comment">// need to add one to the size -- the array is terminated</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="comment">// with NULL</span></div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> one_expr = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(1, argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        <span class="keyword">const</span> <a class="code" href="classplus__exprt.html">plus_exprt</a> size_expr(argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), one_expr);</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> argv_type(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()), size_expr);</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <a class="code" href="classsymbolt.html">symbolt</a> argv_symbol{<span class="stringliteral">&quot;argv&#39;&quot;</span>, argv_type, ID_C};</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        argv_symbol.base_name = <span class="stringliteral">&quot;argv&#39;&quot;</span>;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        argv_symbol.is_static_lifetime = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        argv_symbol.is_lvalue = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="keyword">auto</span> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a> = symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(argv_symbol);</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.second &amp;&amp; <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>.first != argv_symbol)</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        {</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;          <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;argv already exists but is not usable&quot;</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                          &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        }</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      }</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;argv_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;argv&#39;&quot;</span>);</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;argv_array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(argv_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      {</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        <span class="comment">// Assume argc is at least zero. Note that we don&#39;t assume it&#39;s</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <span class="comment">// at least one, since this isn&#39;t guaranteed, as exemplified by</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <span class="comment">// https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkit.txt</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <span class="comment">// The C standard only guarantees &quot;The value of argc shall be</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="comment">// nonnegative.&quot; and &quot;argv[argc] shall be a null pointer.&quot;</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <a class="code" href="classexprt.html">exprt</a> zero = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      {</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        <span class="comment">// Assume argc is at least zero. Note that we don&#39;t assume it&#39;s</span></div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        <span class="comment">// at least one, since this isn&#39;t guaranteed, as exemplified by</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="comment">// https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkit.txt</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <span class="comment">// The C standard only guarantees &quot;The value of argc shall be</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        <span class="comment">// nonnegative.&quot; and &quot;argv[argc] shall be a null pointer.&quot;</span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        <a class="code" href="classexprt.html">exprt</a> zero = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a> ge(</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;          argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), ID_ge, std::move(zero));</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a> ge(</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;          argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), ID_ge, std::move(zero));</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(std::move(ge)));</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      }</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#a0de9ed1494d4fd6ab841392e22c304fa">max_argc</a>.has_value())</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      {</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        <a class="code" href="classexprt.html">exprt</a> bound_expr =</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;          <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(*<a class="code" href="config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#a0de9ed1494d4fd6ab841392e22c304fa">max_argc</a>, argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(std::move(ge)));</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      }</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a> le(</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;          argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), ID_le, std::move(bound_expr));</div>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#a0de9ed1494d4fd6ab841392e22c304fa">max_argc</a>.has_value())</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      {</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        <a class="code" href="classexprt.html">exprt</a> bound_expr =</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;          <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(*<a class="code" href="config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#a0de9ed1494d4fd6ab841392e22c304fa">max_argc</a>, argc_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160; </div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a> le(</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;          argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), ID_le, std::move(bound_expr));</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(std::move(le)));</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      }</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      <span class="comment">// record argc as an input</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__inputt.html">code_inputt</a>{<span class="stringliteral">&quot;argc&quot;</span>, argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>()});</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      <span class="keywordflow">if</span>(parameters.size()==3)</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      {</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;        {</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;          <a class="code" href="classsymbolt.html">symbolt</a> envp_size_symbol;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = <span class="stringliteral">&quot;envp_size&#39;&quot;</span>;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a> = <span class="stringliteral">&quot;envp_size&#39;&quot;</span>;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">size_type</a>();</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a> = ID_C;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(std::move(le)));</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      }</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160; </div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <span class="comment">// record argc as an input</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__inputt.html">code_inputt</a>{<span class="stringliteral">&quot;argc&quot;</span>, argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>()});</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      <span class="keywordflow">if</span>(parameters.size()==3)</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;      {</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        {</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;          <a class="code" href="classsymbolt.html">symbolt</a> envp_size_symbol{<span class="stringliteral">&quot;envp_size&#39;&quot;</span>, <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">size_type</a>(), ID_C};</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;          envp_size_symbol.base_name = <span class="stringliteral">&quot;envp_size&#39;&quot;</span>;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;          envp_size_symbol.is_static_lifetime = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160; </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;          <span class="keywordflow">if</span>(!symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(std::move(envp_size_symbol)).second)</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;          {</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;            <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>()</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;              &lt;&lt; <span class="stringliteral">&quot;failed to insert envp_size symbol&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;          }</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        }</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_size_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp_size&#39;&quot;</span>);</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160; </div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;          <span class="keywordflow">if</span>(!symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(std::move(envp_size_symbol)).second)</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;          {</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;            message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>()</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;              &lt;&lt; <span class="stringliteral">&quot;failed to insert envp_size symbol&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;          }</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;        }</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        {</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;          <a class="code" href="classsymbolt.html">symbolt</a> envp_symbol{</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            <span class="stringliteral">&quot;envp&#39;&quot;</span>,</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;            <a class="code" href="classarray__typet.html">array_typet</a>(</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;              <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()), envp_size_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>()),</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            ID_C};</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;          envp_symbol.base_name = <span class="stringliteral">&quot;envp&#39;&quot;</span>;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;          envp_symbol.is_static_lifetime = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_size_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp_size&#39;&quot;</span>);</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160; </div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;          <a class="code" href="classsymbolt.html">symbolt</a> envp_symbol;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = <span class="stringliteral">&quot;envp&#39;&quot;</span>;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a> = <span class="stringliteral">&quot;envp&#39;&quot;</span>;</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = <a class="code" href="classarray__typet.html">array_typet</a>(</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;            <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()), envp_size_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>());</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a> = ID_C;</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;          <span class="keywordflow">if</span>(!symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(std::move(envp_symbol)).second)</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;          {</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;            <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;            message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to insert envp symbol&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;          }</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        }</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        <span class="comment">// assume envp_size is INTMAX-1</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> max =</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;          <a class="code" href="bitvector__types_8h.html#aa8def4269e57de650cc8d1cb1ded3c6b">to_integer_bitvector_type</a>(envp_size_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>).<a class="code" href="classinteger__bitvector__typet.html#a4f5e2798087167b8b86627f87e36db91">largest</a>();</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;          <span class="keywordflow">if</span>(!symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(std::move(envp_symbol)).second)</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;          {</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;            <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;            message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to insert envp symbol&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;          }</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        }</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160; </div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <span class="comment">// assume envp_size is INTMAX-1</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> max =</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;          <a class="code" href="bitvector__types_8h.html#aa8def4269e57de650cc8d1cb1ded3c6b">to_integer_bitvector_type</a>(envp_size_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>).<a class="code" href="classinteger__bitvector__typet.html#a4f5e2798087167b8b86627f87e36db91">largest</a>();</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160; </div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <a class="code" href="classexprt.html">exprt</a> max_minus_one=<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(max-1, envp_size_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a> le(</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), ID_le, std::move(max_minus_one));</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(le));</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      }</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      {</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="comment">/* zero_string doesn&#39;t work yet */</span></div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        <a class="code" href="classexprt.html">exprt</a> max_minus_one=<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(max-1, envp_size_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160; </div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;        <a class="code" href="classbinary__relation__exprt.html">binary_relation_exprt</a> le(</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;          envp_size_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), ID_le, std::move(max_minus_one));</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(le));</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      }</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      {</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;        <span class="comment">/* zero_string doesn&#39;t work yet */</span></div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;        <span class="comment">/*</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;<span class="comment">        exprt zero_string(ID_zero_string, array_typet());</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;<span class="comment">        zero_string.type().subtype()=char_type();</span></div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;<span class="comment">        zero_string.type().set(ID_size, &quot;infinity&quot;);</span></div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="comment">        const index_exprt index(zero_string, from_integer(0, uint_type()));</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="comment">        exprt address_of =</span></div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;<span class="comment">          typecast_exprt::conditional_cast(</span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="comment">            address_of_exprt(index, pointer_type(char_type())),</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment">            argv_symbol.type.subtype());</span></div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="comment">        // assign argv[*] to the address of a string-object</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="comment">        array_of_exprt array_of(address_of, argv_symbol.type);</span></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment">        init_code.copy_to_operands(</span></div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="comment">          code_assignt(argv_symbol.symbol_expr(), array_of));</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="comment">        */</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      }</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;      {</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="comment">// assign argv[argc] to NULL</span></div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnull__pointer__exprt.html">null_pointer_exprt</a> <span class="keyword">null</span>(</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;          <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(argv_array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>()));</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        <span class="comment">/*</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="comment">        exprt zero_string(ID_zero_string, array_typet());</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="comment">        zero_string.type().subtype()=char_type();</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="comment">        zero_string.type().set(ID_size, &quot;infinity&quot;);</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="comment">        const index_exprt index(zero_string, from_integer(0, uint_type()));</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="comment">        exprt address_of =</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="comment">          typecast_exprt::conditional_cast(</span></div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="comment">            address_of_exprt(index, pointer_type(char_type())),</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;<span class="comment">            argv_symbol.type.subtype());</span></div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;<span class="comment">        // assign argv[*] to the address of a string-object</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;<span class="comment">        array_of_exprt array_of(address_of, argv_symbol.type);</span></div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;<span class="comment">        init_code.copy_to_operands(</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;<span class="comment">          code_assignt(argv_symbol.symbol_expr(), array_of));</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="comment">        */</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;      }</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160; </div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;      {</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="comment">// assign argv[argc] to NULL</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        <span class="keyword">const</span> <a class="code" href="classnull__pointer__exprt.html">null_pointer_exprt</a> <span class="keyword">null</span>(</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;          <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(argv_array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>()));</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;          argv_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;          <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;            argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), argv_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__frontend__assignt.html">code_frontend_assignt</a>(index_expr, <span class="keyword">null</span>));</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="comment">// disable bounds check on that one</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ad5897ca2d58747b62e187ca4d9459882">statements</a>().back().add_source_location().add_pragma(</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;          <span class="stringliteral">&quot;disable:bounds-check&quot;</span>);</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      }</div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;          argv_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;          <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), argv_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__frontend__assignt.html">code_frontend_assignt</a>(index_expr, <span class="keyword">null</span>));</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="comment">// disable bounds check on that one</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ad5897ca2d58747b62e187ca4d9459882">statements</a>().back().add_source_location().add_pragma(</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;          <span class="stringliteral">&quot;disable:bounds-check&quot;</span>);</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;      }</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;      <span class="keywordflow">if</span>(parameters.size()==3)</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;      {</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp&#39;&quot;</span>);</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;envp_array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(envp_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_size_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp_size&#39;&quot;</span>);</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;      <span class="keywordflow">if</span>(parameters.size()==3)</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;      {</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp&#39;&quot;</span>);</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;envp_array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(envp_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_size_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp_size&#39;&quot;</span>);</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160; </div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="comment">// assume envp[envp_size] is NULL</span></div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        <a class="code" href="classnull__pointer__exprt.html">null_pointer_exprt</a> <span class="keyword">null</span>(</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;          <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(envp_array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>()));</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;          <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;            envp_size_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), envp_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        <a class="code" href="classequal__exprt.html">equal_exprt</a> <a class="code" href="string__format__builtin__function_8cpp.html#abf3c047773612079e676522ae5c3d0f0">is_null</a>(std::move(index_expr), std::move(<span class="keyword">null</span>));</div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160; </div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        <span class="comment">// assume envp[envp_size] is NULL</span></div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        <a class="code" href="classnull__pointer__exprt.html">null_pointer_exprt</a> <span class="keyword">null</span>(</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;          <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(envp_array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>()));</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160; </div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;          envp_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;          <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;            envp_size_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), envp_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(<a class="code" href="string__format__builtin__function_8cpp.html#abf3c047773612079e676522ae5c3d0f0">is_null</a>));</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        <span class="comment">// disable bounds check on that one</span></div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ad5897ca2d58747b62e187ca4d9459882">statements</a>().back().add_source_location().add_pragma(</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;          <span class="stringliteral">&quot;disable:bounds-check&quot;</span>);</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;      }</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160; </div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      {</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;operands=call_main.<a class="code" href="classcode__function__callt.html#a1d39cf39a0698dc0985803030f7ecf18">arguments</a>();</div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160; </div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        <a class="code" href="classequal__exprt.html">equal_exprt</a> <a class="code" href="string__format__builtin__function_8cpp.html#abf3c047773612079e676522ae5c3d0f0">is_null</a>(std::move(index_expr), std::move(<span class="keyword">null</span>));</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160; </div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(<a class="code" href="classcode__assumet.html">code_assumet</a>(<a class="code" href="string__format__builtin__function_8cpp.html#abf3c047773612079e676522ae5c3d0f0">is_null</a>));</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        <span class="comment">// disable bounds check on that one</span></div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        init_code.<a class="code" href="classcode__blockt.html#ad5897ca2d58747b62e187ca4d9459882">statements</a>().back().add_source_location().add_pragma(</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;          <span class="stringliteral">&quot;disable:bounds-check&quot;</span>);</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;      }</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        <span class="keywordflow">if</span>(parameters.size()==3)</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;          operands.resize(3);</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;          operands.resize(2);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160; </div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        <a class="code" href="classexprt.html">exprt</a> &amp;op0=operands[0];</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        <a class="code" href="classexprt.html">exprt</a> &amp;op1=operands[1];</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;      {</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;operands=call_main.<a class="code" href="classcode__function__callt.html#a1d39cf39a0698dc0985803030f7ecf18">arguments</a>();</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        op0 = <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;          argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), parameters[0].<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; </div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        <span class="keywordflow">if</span>(parameters.size()==3)</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;          operands.resize(3);</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;          operands.resize(2);</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <a class="code" href="classexprt.html">exprt</a> &amp;op0=operands[0];</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        <a class="code" href="classexprt.html">exprt</a> &amp;op1=operands[1];</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160; </div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        op0 = <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;          argc_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(), parameters[0].<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160; </div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;        {</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;          <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;            argv_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;            <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, argv_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;          <span class="comment">// disable bounds check on that one</span></div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;          index_expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>().<a class="code" href="classsource__locationt.html#ab307233ea9bc41d1c5a08af47745f767">add_pragma</a>(<span class="stringliteral">&quot;disable:bounds-check&quot;</span>);</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160; </div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;          <span class="keyword">const</span> <a class="code" href="classpointer__typet.html">pointer_typet</a> &amp;<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a> =</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;            <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(parameters[1].type());</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;          op1 = <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;            <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(index_expr), <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>);</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        }</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160; </div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        <span class="comment">// do we need envp?</span></div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        <span class="keywordflow">if</span>(parameters.size()==3)</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;        {</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;          <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp&#39;&quot;</span>);</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;          <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;envp_array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(envp_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160; </div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;          <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;            envp_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;            <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, envp_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160; </div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;          <span class="keyword">const</span> <a class="code" href="classpointer__typet.html">pointer_typet</a> &amp;<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a> =</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;            <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(parameters[2].type());</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160; </div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;          operands[2] = <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;            <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(index_expr), <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>);</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        }</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      }</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    }</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    {</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;      <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns{symbol_table};</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;      <span class="keyword">const</span> std::string main_signature = <a class="code" href="expr2c_8cpp.html#a96bc0ff0dc9f39815bb58300372e32a3">type2c</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>, ns);</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = symbol.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a>;</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;main&#39; with signature &#39;&quot;</span> &lt;&lt; main_signature</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;&#39; found,&quot;</span></div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot; but expecting one of:\n&quot;</span></div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;   int main(void)\n&quot;</span></div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;   int main(int argc, char *argv[])\n&quot;</span></div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;   int main(int argc, char *argv[], char *envp[])\n&quot;</span></div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;If this is a non-standard main entry point please &quot;</span></div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;                         <span class="stringliteral">&quot;provide a custom\n&quot;</span></div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;entry function and use --function instead&quot;</span></div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;                      &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    }</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;  }</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;  {</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    <span class="comment">// produce nondet arguments</span></div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    call_main.<a class="code" href="classcode__function__callt.html#a1d39cf39a0698dc0985803030f7ecf18">arguments</a>() = <a class="code" href="ansi__c__entry__point_8cpp.html#a943dac4bc060bfd7e2c1ae01bdb0bb60">build_function_environment</a>(</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;      parameters, init_code, symbol_table, object_factory_parameters);</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  }</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160; </div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;  init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(std::move(call_main));</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160; </div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;  <span class="comment">// TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        {</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;          <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;            argv_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;            <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, argv_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;          <span class="comment">// disable bounds check on that one</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;          index_expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>().<a class="code" href="classsource__locationt.html#ab307233ea9bc41d1c5a08af47745f767">add_pragma</a>(<span class="stringliteral">&quot;disable:bounds-check&quot;</span>);</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;          <span class="keyword">const</span> <a class="code" href="classpointer__typet.html">pointer_typet</a> &amp;<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a> =</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;            <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(parameters[1].type());</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160; </div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;          op1 = <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;            <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(index_expr), <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>);</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;        }</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;        <span class="comment">// do we need envp?</span></div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        <span class="keywordflow">if</span>(parameters.size()==3)</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;        {</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;          <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;envp_symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="stringliteral">&quot;envp&#39;&quot;</span>);</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;          <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;envp_array_type = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(envp_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160; </div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;          <a class="code" href="classindex__exprt.html">index_exprt</a> index_expr(</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;            envp_symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;            <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, envp_array_type.<a class="code" href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">index_type</a>()));</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160; </div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;          <span class="keyword">const</span> <a class="code" href="classpointer__typet.html">pointer_typet</a> &amp;<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a> =</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;            <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(parameters[2].type());</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160; </div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;          operands[2] = <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;            <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(index_expr), <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>);</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;        }</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;      }</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;    }</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    {</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;      <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns{symbol_table};</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;      <span class="keyword">const</span> std::string main_signature = <a class="code" href="expr2c_8cpp.html#a96bc0ff0dc9f39815bb58300372e32a3">type2c</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>, ns);</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;      <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = symbol.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a>;</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;main&#39; with signature &#39;&quot;</span> &lt;&lt; main_signature</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;&#39; found,&quot;</span></div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot; but expecting one of:\n&quot;</span></div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;   int main(void)\n&quot;</span></div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;   int main(int argc, char *argv[])\n&quot;</span></div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;   int main(int argc, char *argv[], char *envp[])\n&quot;</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;If this is a non-standard main entry point please &quot;</span></div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;                         <span class="stringliteral">&quot;provide a custom\n&quot;</span></div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;entry function and use --function instead&quot;</span></div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;                      &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    }</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  }</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;  {</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;    <span class="comment">// produce nondet arguments</span></div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;    call_main.<a class="code" href="classcode__function__callt.html#a1d39cf39a0698dc0985803030f7ecf18">arguments</a>() = <a class="code" href="ansi__c__entry__point_8cpp.html#a943dac4bc060bfd7e2c1ae01bdb0bb60">build_function_environment</a>(</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;      parameters, init_code, symbol_table, object_factory_parameters);</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;  }</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160; </div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(std::move(call_main));</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160; </div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;  <span class="comment">// TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT</span></div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160; </div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  <a class="code" href="ansi__c__entry__point_8cpp.html#aa530872ad7c71ef3eeb7da6e68e53981">record_function_outputs</a>(symbol, init_code, symbol_table);</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160; </div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;  <span class="comment">// now call destructor functions (a GCC extension)</span></div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160; </div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol_table_entry : symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  {</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol = symbol_table_entry.second;</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_code)</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;      <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160; </div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;  <a class="code" href="ansi__c__entry__point_8cpp.html#aa530872ad7c71ef3eeb7da6e68e53981">record_function_outputs</a>(symbol, init_code, symbol_table);</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160; </div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;  <span class="comment">// now call destructor functions (a GCC extension)</span></div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160; </div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol_table_entry : symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;  {</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol = symbol_table_entry.second;</div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160; </div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_code)</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;      code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_destructor &amp;&amp;</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;      code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().empty())</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    {</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;      <a class="code" href="classcode__function__callt.html">code_function_callt</a> destructor_call(symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>());</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;      destructor_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = symbol.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a>;</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;      init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(std::move(destructor_call));</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    }</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;  }</div>
 <div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160; </div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;      code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_destructor &amp;&amp;</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;      code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().empty())</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    {</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;      <a class="code" href="classcode__function__callt.html">code_function_callt</a> destructor_call(symbol.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>());</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;      destructor_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = symbol.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a>;</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;      init_code.<a class="code" href="classcode__blockt.html#ab6b759ece6370bafd5db2d133f6982a3">add</a>(std::move(destructor_call));</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    }</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;  }</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160; </div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;  <span class="comment">// add the entry point symbol</span></div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> new_symbol;</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160; </div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;  new_symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>=<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>();</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;  new_symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = <a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>();</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  new_symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = <a class="code" href="classcode__typet.html">code_typet</a>({}, <a class="code" href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a>());</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;  new_symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(init_code);</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;  new_symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>=symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>;</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160; </div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;  <span class="keywordflow">if</span>(!symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(std::move(new_symbol)).second)</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;  {</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to insert main symbol&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;  }</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160; </div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;}</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;  <span class="comment">// add the entry point symbol</span></div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;  <a class="code" href="classsymbolt.html">symbolt</a> new_symbol{</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    <a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>(), <a class="code" href="classcode__typet.html">code_typet</a>{{}, <a class="code" href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a>()}, symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>};</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;  new_symbol.base_name = <a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>();</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;  new_symbol.value.swap(init_code);</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160; </div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  <span class="keywordflow">if</span>(!symbol_table.<a class="code" href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">insert</a>(std::move(new_symbol)).second)</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;  {</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to insert main symbol&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;  }</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160; </div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;}</div>
 <div class="ttc" id="aallocate__objects_8h_html_aef2674dc0460f626c48668130d60b964a5e09903ff74b78d3a6e4c04be1ca923f"><div class="ttname"><a href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964a5e09903ff74b78d3a6e4c04be1ca923f">lifetimet::AUTOMATIC_LOCAL</a></div><div class="ttdeci">@ AUTOMATIC_LOCAL</div><div class="ttdoc">Allocate local objects with automatic lifetime.</div></div>
 <div class="ttc" id="aansi__c__entry__point_8cpp_html_a02cf3646d20c33e7f0c5a34cf8af95ae"><div class="ttname"><a href="ansi__c__entry__point_8cpp.html#a02cf3646d20c33e7f0c5a34cf8af95ae">generate_ansi_c_start_function</a></div><div class="ttdeci">bool generate_ansi_c_start_function(const symbolt &amp;symbol, symbol_table_baset &amp;symbol_table, message_handlert &amp;message_handler, const c_object_factory_parameterst &amp;object_factory_parameters)</div><div class="ttdoc">Generate a _start function for a specific function.</div><div class="ttdef"><b>Definition:</b> <a href="ansi__c__entry__point_8cpp_source.html#l00184">ansi_c_entry_point.cpp:184</a></div></div>
 <div class="ttc" id="aansi__c__entry__point_8cpp_html_a943dac4bc060bfd7e2c1ae01bdb0bb60"><div class="ttname"><a href="ansi__c__entry__point_8cpp.html#a943dac4bc060bfd7e2c1ae01bdb0bb60">build_function_environment</a></div><div class="ttdeci">exprt::operandst build_function_environment(const code_typet::parameterst &amp;parameters, code_blockt &amp;init_code, symbol_table_baset &amp;symbol_table, const c_object_factory_parameterst &amp;object_factory_parameters)</div><div class="ttdef"><b>Definition:</b> <a href="ansi__c__entry__point_8cpp_source.html#l00025">ansi_c_entry_point.cpp:25</a></div></div>
@@ -667,7 +653,7 @@ $(document).ready(function(){initNavTree('ansi__c__entry__point_8cpp_source.html
 <div class="ttc" id="aclassarray__typet_html"><div class="ttname"><a href="classarray__typet.html">array_typet</a></div><div class="ttdoc">Arrays with given size.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00762">std_types.h:763</a></div></div>
 <div class="ttc" id="aclassarray__typet_html_a495c3967a3dd34348f1f2ec550cbdd4a"><div class="ttname"><a href="classarray__typet.html#a495c3967a3dd34348f1f2ec550cbdd4a">array_typet::index_type</a></div><div class="ttdeci">typet index_type() const</div><div class="ttdoc">The type of the index expressions into any instance of this type.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8cpp_source.html#l00033">std_types.cpp:33</a></div></div>
 <div class="ttc" id="aclassarray__typet_html_a5bfec0edb101127e2bad971906b3c3b1"><div class="ttname"><a href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">array_typet::element_type</a></div><div class="ttdeci">const typet &amp; element_type() const</div><div class="ttdoc">The type of the elements of the array.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00785">std_types.h:785</a></div></div>
-<div class="ttc" id="aclassauxiliary__symbolt_html"><div class="ttname"><a href="classauxiliary__symbolt.html">auxiliary_symbolt</a></div><div class="ttdoc">Internally generated symbol table entryThis is a symbol generated as part of translation to or modifi...</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00146">symbol.h:147</a></div></div>
+<div class="ttc" id="aclassauxiliary__symbolt_html"><div class="ttname"><a href="classauxiliary__symbolt.html">auxiliary_symbolt</a></div><div class="ttdoc">Internally generated symbol table entryThis is a symbol generated as part of translation to or modifi...</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00168">symbol.h:169</a></div></div>
 <div class="ttc" id="aclassbinary__relation__exprt_html"><div class="ttname"><a href="classbinary__relation__exprt.html">binary_relation_exprt</a></div><div class="ttdoc">A base class for relations, i.e., binary predicates whose two operands have the same type.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00706">std_expr.h:707</a></div></div>
 <div class="ttc" id="aclasscode__assumet_html"><div class="ttname"><a href="classcode__assumet.html">code_assumet</a></div><div class="ttdoc">An assumption, which must hold in subsequent code.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00216">std_code.h:217</a></div></div>
 <div class="ttc" id="aclasscode__blockt_html"><div class="ttname"><a href="classcode__blockt.html">code_blockt</a></div><div class="ttdoc">A codet representing sequential composition of program statements.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00129">std_code.h:130</a></div></div>
@@ -706,7 +692,6 @@ $(document).ready(function(){initNavTree('ansi__c__entry__point_8cpp_source.html
 <div class="ttc" id="aclassindex__exprt_html"><div class="ttname"><a href="classindex__exprt.html">index_exprt</a></div><div class="ttdoc">Array index operator.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01409">std_expr.h:1410</a></div></div>
 <div class="ttc" id="aclassinteger__bitvector__typet_html_a4f5e2798087167b8b86627f87e36db91"><div class="ttname"><a href="classinteger__bitvector__typet.html#a4f5e2798087167b8b86627f87e36db91">integer_bitvector_typet::largest</a></div><div class="ttdeci">mp_integer largest() const</div><div class="ttdoc">Return the largest value that can be represented using this type.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__types_8cpp_source.html#l00038">bitvector_types.cpp:38</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
-<div class="ttc" id="aclassirept_html_ad18d7e80452e8f3e26217db334ad5105"><div class="ttname"><a href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">irept::swap</a></div><div class="ttdeci">void swap(irept &amp;irep)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00442">irep.h:442</a></div></div>
 <div class="ttc" id="aclassirept_html_afa2098e6870bd6fb415025781a3a5db1"><div class="ttname"><a href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">irept::is_nil</a></div><div class="ttdeci">bool is_nil() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00376">irep.h:376</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassmessaget_1_1mstreamt_html_ae35463c8d5f00a49e034580d11845daa"><div class="ttname"><a href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">messaget::mstreamt::source_location</a></div><div class="ttdeci">source_locationt source_location</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00247">message.h:247</a></div></div>
@@ -729,12 +714,11 @@ $(document).ready(function(){initNavTree('ansi__c__entry__point_8cpp_source.html
 <div class="ttc" id="aclasssymbol__table__baset_html_ae1b8eff24b5b55eda54ae3ea9e98fb2b"><div class="ttname"><a href="classsymbol__table__baset.html#ae1b8eff24b5b55eda54ae3ea9e98fb2b">symbol_table_baset::insert</a></div><div class="ttdeci">virtual std::pair&lt; symbolt &amp;, bool &gt; insert(symbolt symbol)=0</div><div class="ttdoc">Move or copy a new symbol to the symbol table.</div></div>
 <div class="ttc" id="aclasssymbolt_html"><div class="ttname"><a href="classsymbolt.html">symbolt</a></div><div class="ttdoc">Symbol table entry.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00027">symbol.h:28</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_a070b47061b10021d1407737d61924699"><div class="ttname"><a href="classsymbolt.html#a070b47061b10021d1407737d61924699">symbolt::base_name</a></div><div class="ttdeci">irep_idt base_name</div><div class="ttdoc">Base (non-scoped) name.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00046">symbol.h:46</a></div></div>
-<div class="ttc" id="aclasssymbolt_html_a6317578dd5e0ea50e815d1ee89b4f3f8"><div class="ttname"><a href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">symbolt::is_static_lifetime</a></div><div class="ttdeci">bool is_static_lifetime</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00065">symbol.h:65</a></div></div>
+<div class="ttc" id="aclasssymbolt_html_a6317578dd5e0ea50e815d1ee89b4f3f8"><div class="ttname"><a href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">symbolt::is_static_lifetime</a></div><div class="ttdeci">bool is_static_lifetime</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00070">symbol.h:70</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_a8a5e457ca222a34e8930b9f09c805124"><div class="ttname"><a href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">symbolt::location</a></div><div class="ttdeci">source_locationt location</div><div class="ttdoc">Source code location of definition of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00037">symbol.h:37</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_a9de2ce93a8d7b742d0d057110832c432"><div class="ttname"><a href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbolt::symbol_expr</a></div><div class="ttdeci">class symbol_exprt symbol_expr() const</div><div class="ttdoc">Produces a symbol_exprt for a symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8cpp_source.html#l00121">symbol.cpp:121</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ab2a27b105ccbeb19c64265c09198bb17"><div class="ttname"><a href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">symbolt::type</a></div><div class="ttdeci">typet type</div><div class="ttdoc">Type of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00031">symbol.h:31</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ab4fe07eaa16795818379d87e5e510686"><div class="ttname"><a href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">symbolt::name</a></div><div class="ttdeci">irep_idt name</div><div class="ttdoc">The unique identifier.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00040">symbol.h:40</a></div></div>
-<div class="ttc" id="aclasssymbolt_html_ae33b970aa239c4b661443181d131e117"><div class="ttname"><a href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">symbolt::is_lvalue</a></div><div class="ttdeci">bool is_lvalue</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00066">symbol.h:66</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ae9f24768cf9a0096bc3a9163a9662bdd"><div class="ttname"><a href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">symbolt::value</a></div><div class="ttdeci">exprt value</div><div class="ttdoc">Initial value of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00034">symbol.h:34</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_aeac110ec1d8838902a5541dbf1a3bda2"><div class="ttname"><a href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">symbolt::mode</a></div><div class="ttdeci">irep_idt mode</div><div class="ttdoc">Language mode.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00049">symbol.h:49</a></div></div>
 <div class="ttc" id="aclasstypecast__exprt_html_a2bfd5894f5cb1287403a7b3ae74b7fd7"><div class="ttname"><a href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a></div><div class="ttdeci">static exprt conditional_cast(const exprt &amp;expr, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02025">std_expr.h:2025</a></div></div>
