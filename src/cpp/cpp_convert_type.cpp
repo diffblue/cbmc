@@ -33,21 +33,16 @@ public:
   void write(typet &type) override;
 
   cpp_convert_typet(message_handlert &message_handler, const typet &type)
-    : ansi_c_convert_typet(message_handler)
+    : ansi_c_convert_typet(message_handler),
+      wchar_t_count(0),
+      char16_t_count(0),
+      char32_t_count(0)
   {
-    read(type);
+    source_location = type.source_location();
+    read_rec(type);
   }
 
 protected:
-  void clear() override
-  {
-    wchar_t_count = 0;
-    char16_t_count = 0;
-    char32_t_count = 0;
-
-    ansi_c_convert_typet::clear();
-  }
-
   void read_rec(const typet &type) override;
   void read_function_type(const typet &type);
   void read_template(const typet &type);

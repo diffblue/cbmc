@@ -35,9 +35,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
 {
   // we first convert, and then check
   {
-    ansi_c_convert_typet ansi_c_convert_type(get_message_handler());
-
-    ansi_c_convert_type.read(type);
+    ansi_c_convert_typet ansi_c_convert_type{get_message_handler(), type};
     ansi_c_convert_type.write(type);
   }
 

@@ -19,13 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "gcc_types.h"
 
-void ansi_c_convert_typet::read(const typet &type)
-{
-  clear();
-  source_location=type.source_location();
-  read_rec(type);
-}
-
 void ansi_c_convert_typet::read_rec(const typet &type)
 {
   if(type.id()==ID_merged_type)
