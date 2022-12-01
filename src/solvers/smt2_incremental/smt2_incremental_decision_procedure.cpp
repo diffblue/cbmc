@@ -431,50 +431,52 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         return {};
       return smt_array_theoryt::select(*array, *index);
     }
-    return get_identifier(
-      expr, expression_handle_identifiers, expression_identifiers);
-  }();
-  if(!descriptor)
-  {
+    if(
+      auto identifier_descriptor = get_identifier(
+        expr, expression_handle_identifiers, expression_identifiers))
+    {
+      return identifier_descriptor;
+    }
     if(gather_dependent_expressions(expr).empty())
     {
       INVARIANT(
         objects_are_already_tracked(expr, object_map),
         "Objects in expressions being read should already be tracked from "
         "point of being set/handled.");
-      descriptor = ::convert_expr_to_smt(
+      return ::convert_expr_to_smt(
         expr,
         object_map,
         pointer_sizes_map,
         object_size_function.make_application,
         is_dynamic_object_function.make_application);
     }
-    else
+    return {};
+  }();
+  if(!descriptor)
+  {
+    if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr))
     {
-      if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr))
-      {
-        // Note this case is currently expected to be encountered during trace
-        // generation for -
-        //  * Steps which were removed via --slice-formula.
-        //  * Getting concurrency clock values.
-        // The below implementation which returns the given expression was chosen
-        // based on the implementation of `smt2_convt::get` in the non-incremental
-        // smt2 decision procedure.
-        log.warning()
-          << "`get` attempted for unknown symbol, with identifier - \n"
-          << symbol_expr->get_identifier() << messaget::eom;
-        return expr;
-      }
-      exprt copy = expr;
-      for(auto &op : copy.operands())
-      {
-        exprt eval_op = get(op);
-        if(eval_op.is_nil())
-          return nil_exprt{};
-        op = std::move(eval_op);
-      }
-      return copy;
+      // Note this case is currently expected to be encountered during trace
+      // generation for -
+      //  * Steps which were removed via --slice-formula.
+      //  * Getting concurrency clock values.
+      // The below implementation which returns the given expression was chosen
+      // based on the implementation of `smt2_convt::get` in the non-incremental
+      // smt2 decision procedure.
+      log.warning()
+        << "`get` attempted for unknown symbol, with identifier - \n"
+        << symbol_expr->get_identifier() << messaget::eom;
+      return expr;
     }
+    exprt copy = expr;
+    for(auto &op : copy.operands())
+    {
+      exprt eval_op = get(op);
+      if(eval_op.is_nil())
+        return nil_exprt{};
+      op = std::move(eval_op);
+    }
+    return copy;
   }
   if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
   {
