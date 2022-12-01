@@ -285,8 +285,8 @@ $(document).ready(function(){initNavTree('dump__c__class_8h_source.html',''); in
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <a class="code" href="classcode__frontend__declt.html">code_frontend_declt</a> d(sym);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    std::string d_str=<a class="code" href="classdump__ct.html#a11247e682cce1e7f3b0ccfedd162be75">expr_to_string</a>(d);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    assert(!d_str.empty());</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    assert(*d_str.rbegin()==<span class="charliteral">&#39;;&#39;</span>);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(!d_str.empty());</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(*d_str.rbegin() == <span class="charliteral">&#39;;&#39;</span>);</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">return</span> d_str.substr(0, d_str.size()-1);</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  }</div>
@@ -408,6 +408,7 @@ $(document).ready(function(){initNavTree('dump__c__class_8h_source.html',''); in
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
 <div class="ttc" id="aconfig_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
 <div class="ttc" id="astructdump__c__configurationt_html"><div class="ttname"><a href="structdump__c__configurationt.html">dump_c_configurationt</a></div><div class="ttdoc">Used for configuring the behaviour of dump_c.</div><div class="ttdef"><b>Definition:</b> <a href="dump__c__class_8h_source.html#l00026">dump_c_class.h:27</a></div></div>
 <div class="ttc" id="astructdump__c__configurationt_html_a0045902c0743fa1b9f770f6de0fff586"><div class="ttname"><a href="structdump__c__configurationt.html#a0045902c0743fa1b9f770f6de0fff586">dump_c_configurationt::disable_include_function_decls</a></div><div class="ttdeci">dump_c_configurationt disable_include_function_decls()</div><div class="ttdef"><b>Definition:</b> <a href="dump__c__class_8h_source.html#l00062">dump_c_class.h:62</a></div></div>

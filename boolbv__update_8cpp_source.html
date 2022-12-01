@@ -144,7 +144,7 @@ $(document).ready(function(){initNavTree('boolbv__update_8cpp_source.html',''); 
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// update</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">for</span>(std::size_t i=0; i&lt;new_value_width; i++)</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      assert(offset+i&lt;bv.size());</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(offset + i &lt; bv.size(), <span class="stringliteral">&quot;update must be in bounds&quot;</span>);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      bv[offset+i]=new_value_bv[i];</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    }</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
@@ -192,7 +192,7 @@ $(document).ready(function(){initNavTree('boolbv__update_8cpp_source.html',''); 
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">for</span>(std::size_t j=0; j&lt;element_size; j++)</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      {</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        std::size_t idx=new_offset+j;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        assert(idx&lt;bv.size());</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(idx &lt; bv.size(), <span class="stringliteral">&quot;index must be in bounds&quot;</span>);</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        bv[idx]=<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#a4de2b26ac13f43030627a89d8d53970c">lselect</a>(equal, tmp_bv[idx], bv[idx]);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      }</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    }</div>

@@ -493,10 +493,10 @@ $(document).ready(function(){initNavTree('goto2graph_8h_source.html',''); initRe
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="comment">/* sets rendering options */</span></div>
 <div class="line"><a name="l00410"></a><span class="lineno"><a class="line" href="classinstrumentert.html#aece99d7b0636d95723e47516c2573eef">  410</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classinstrumentert.html#aece99d7b0636d95723e47516c2573eef">set_rendering_options</a>(<span class="keywordtype">bool</span> aligned, <span class="keywordtype">bool</span> file, <span class="keywordtype">bool</span> <span class="keyword">function</span>)</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  {</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <a class="code" href="classinstrumentert.html#a52e2033f9e76e7d2dfd7bb02ff1e2032">render_po_aligned</a> = aligned;</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <a class="code" href="classinstrumentert.html#aa82ecd2d9446aeb3a06a987becf22221">render_by_file</a> = file;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    <a class="code" href="classinstrumentert.html#a8b4a80015186ade8f48cea132ff4f12d">render_by_function</a> = <span class="keyword">function</span>;</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    assert(!<a class="code" href="classinstrumentert.html#aa82ecd2d9446aeb3a06a987becf22221">render_by_file</a> || !<a class="code" href="classinstrumentert.html#a8b4a80015186ade8f48cea132ff4f12d">render_by_function</a>);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!file || !<span class="keyword">function</span>);</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <a class="code" href="classinstrumentert.html#a52e2033f9e76e7d2dfd7bb02ff1e2032">render_po_aligned</a> = aligned;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    <a class="code" href="classinstrumentert.html#aa82ecd2d9446aeb3a06a987becf22221">render_by_file</a> = file;</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    <a class="code" href="classinstrumentert.html#a8b4a80015186ade8f48cea132ff4f12d">render_by_function</a> = <span class="keyword">function</span>;</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  }</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="comment">/* prints outputs:</span></div>
@@ -623,6 +623,7 @@ $(document).ready(function(){initNavTree('goto2graph_8h_source.html',''); initRe
 <div class="ttc" id="aevent__graph_8h_html"><div class="ttname"><a href="event__graph_8h.html">event_graph.h</a></div><div class="ttdoc">graph of abstract events</div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>
 <div class="ttc" id="astructevent__grapht_1_1critical__cyclet_1_1delayt_html"><div class="ttname"><a href="structevent__grapht_1_1critical__cyclet_1_1delayt.html">event_grapht::critical_cyclet::delayt</a></div><div class="ttdef"><b>Definition:</b> <a href="event__graph_8h_source.html#l00163">event_graph.h:164</a></div></div>
 <div class="ttc" id="awmm_8h_html"><div class="ttname"><a href="wmm_8h.html">wmm.h</a></div><div class="ttdoc">memory models</div></div>

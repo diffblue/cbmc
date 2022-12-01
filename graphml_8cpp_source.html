@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        e_it!=<a class="code" href="properties_8cpp.html#acd585c0c596ee5156e84358863fb8794">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.end();</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        e_it++)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      assert(e_it-&gt;name==<span class="stringliteral">&quot;data&quot;</span>);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(e_it-&gt;name == <span class="stringliteral">&quot;data&quot;</span>, <span class="stringliteral">&quot;expected data node&quot;</span>);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">if</span>(e_it-&gt;get_attribute(<span class="stringliteral">&quot;key&quot;</span>)==<span class="stringliteral">&quot;violation&quot;</span> &amp;&amp;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;         e_it-&gt;data==<span class="stringliteral">&quot;true&quot;</span>)</div>
@@ -235,7 +235,7 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <a class="code" href="classgraphmlt.html">graphmlt</a> &amp;dest,</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <a class="code" href="classgrapht.html#a5540e066a17ae99760cdf5094de02a79">graphmlt::node_indext</a> &amp;entry)</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;{</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  assert(dest.<a class="code" href="classgrapht.html#ae58199101cf06f67dda693f4e1133522">empty</a>());</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(dest.<a class="code" href="classgrapht.html#ae58199101cf06f67dda693f4e1133522">empty</a>());</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <a class="code" href="graphml_8cpp.html#a9a63d3f548e1411d5db941065c0c177e">name_mapt</a> name_to_node;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  std::map&lt;std::string, std::map&lt;std::string, std::string&gt; &gt; defaults;</div>
@@ -248,17 +248,17 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      defaults,</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      dest,</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      entrynode);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; !err &amp;&amp; i&lt;dest.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++i)</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  {</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">const</span> <a class="code" href="structxml__graph__nodet.html">graphmlt::nodet</a> &amp;n=dest[i];</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(!n.<a class="code" href="structxml__graph__nodet.html#afd87e1aff7954b26d3ec627a8b686f6f">node_name</a>.empty(), <span class="stringliteral">&quot;node should be named&quot;</span>);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  assert(!entrynode.empty());</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(!entrynode.empty());</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; !err &amp;&amp; i&lt;dest.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++i)</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  {</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">const</span> <a class="code" href="structxml__graph__nodet.html">graphmlt::nodet</a> &amp;n=dest[i];</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(!n.<a class="code" href="structxml__graph__nodet.html#afd87e1aff7954b26d3ec627a8b686f6f">node_name</a>.empty(), <span class="stringliteral">&quot;node should be named&quot;</span>);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  name_mapt::const_iterator it=name_to_node.find(entrynode);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  assert(it!=name_to_node.end());</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(it != name_to_node.end());</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  entry=it-&gt;second;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">return</span> err;</div>
@@ -665,7 +665,10 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="ttc" id="agraphml_8cpp_html_ab18197bd247fc6133ae5dcfee6c96866"><div class="ttname"><a href="graphml_8cpp.html#ab18197bd247fc6133ae5dcfee6c96866">build_graph_rec</a></div><div class="ttdeci">static bool build_graph_rec(const xmlt &amp;xml, name_mapt &amp;name_to_node, std::map&lt; std::string, std::map&lt; std::string, std::string &gt; &gt; &amp;defaults, graphmlt &amp;dest, std::string &amp;entrynode)</div><div class="ttdef"><b>Definition:</b> <a href="graphml_8cpp_source.html#l00033">graphml.cpp:33</a></div></div>
 <div class="ttc" id="agraphml_8h_html"><div class="ttname"><a href="graphml_8h.html">graphml.h</a></div><div class="ttdoc">Read/write graphs as GraphML.</div></div>
 <div class="ttc" id="aproperties_8cpp_html_acd585c0c596ee5156e84358863fb8794"><div class="ttname"><a href="properties_8cpp.html#acd585c0c596ee5156e84358863fb8794">xml</a></div><div class="ttdeci">xmlt xml(const irep_idt &amp;property_id, const property_infot &amp;property_info)</div><div class="ttdef"><b>Definition:</b> <a href="properties_8cpp_source.html#l00110">properties.cpp:110</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00510">invariant.h:510</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
 <div class="ttc" id="astructxml__graph__nodet_html"><div class="ttname"><a href="structxml__graph__nodet.html">xml_graph_nodet</a></div><div class="ttdef"><b>Definition:</b> <a href="graphml_8h_source.html#l00029">graphml.h:30</a></div></div>
 <div class="ttc" id="astructxml__graph__nodet_html_a0bf842bcc4a68d978091e46faa862992"><div class="ttname"><a href="structxml__graph__nodet.html#a0bf842bcc4a68d978091e46faa862992">xml_graph_nodet::invariant</a></div><div class="ttdeci">std::string invariant</div><div class="ttdef"><b>Definition:</b> <a href="graphml_8h_source.html#l00039">graphml.h:39</a></div></div>

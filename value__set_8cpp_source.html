@@ -895,7 +895,7 @@ $(document).ready(function(){initNavTree('value__set_8cpp_source.html',''); init
 <div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;            statement==ID_cpp_new_array)</div>
 <div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    {</div>
 <div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(suffix.empty());</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;      assert(expr_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer);</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(expr_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer);</div>
 <div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160; </div>
 <div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;      <a class="code" href="classdynamic__object__exprt.html">dynamic_object_exprt</a> dynamic_object(</div>
 <div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;        <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(expr_type).base_type());</div>
@@ -1190,7 +1190,7 @@ $(document).ready(function(){initNavTree('value__set_8cpp_source.html',''); init
 <div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;  <span class="comment">// remove pointer typecasts</span></div>
 <div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_typecast)</div>
 <div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;  {</div>
-<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;    assert(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer);</div>
+<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer);</div>
 <div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160; </div>
 <div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;    <a class="code" href="classvalue__sett.html#a628e069bb7f4902c925d81bd772187f6">dereference_rec</a>(<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(src).op(), dest);</div>
 <div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;  }</div>

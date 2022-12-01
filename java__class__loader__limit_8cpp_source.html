@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('java__class__loader__limit_8cpp_source
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  }</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    assert(java_cp_include_files.length()&gt;1);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(java_cp_include_files.length() &gt; 1);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classjsont.html">jsont</a> json_cp_config;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="json__parser_8cpp.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;         java_cp_include_files.substr(1),</div>
@@ -136,7 +136,7 @@ $(document).ready(function(){initNavTree('java__class__loader__limit_8cpp_source
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;the JSON file has a wrong format&quot;</span>;</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <a class="code" href="classjsont.html">jsont</a> &amp;file_entry : <a class="code" href="json_8h.html#a244f54be01cfa8959260a79ed790f881">to_json_array</a>(include_files))</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      assert(file_entry.is_string());</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(file_entry.is_string());</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <a class="code" href="classjava__class__loader__limitt.html#ae1c2606e7ff86272a9d11f76360d7736">set_matcher</a>.insert(file_entry.value);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>

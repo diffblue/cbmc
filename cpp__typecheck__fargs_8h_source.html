@@ -148,7 +148,7 @@ $(document).ready(function(){initNavTree('cpp__typecheck__fargs_8h_source.html',
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
 <div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classcpp__typecheck__fargst.html#a676f8c1c1edd5e4e6e16c27ff0a093d8">   57</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classcpp__typecheck__fargst.html#a676f8c1c1edd5e4e6e16c27ff0a093d8">remove_object</a>()</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    assert(<a class="code" href="classcpp__typecheck__fargst.html#af7cb1d9227f5660ec69cc6636fc359e2">has_object</a>);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code" href="classcpp__typecheck__fargst.html#af7cb1d9227f5660ec69cc6636fc359e2">has_object</a>);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <a class="code" href="classcpp__typecheck__fargst.html#a1f2e30f8e7f4091ecb00d6cdeeda010e">operands</a>.erase(<a class="code" href="classcpp__typecheck__fargst.html#a1f2e30f8e7f4091ecb00d6cdeeda010e">operands</a>.begin());</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="classcpp__typecheck__fargst.html#af7cb1d9227f5660ec69cc6636fc359e2">has_object</a> = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  }</div>
@@ -173,6 +173,7 @@ $(document).ready(function(){initNavTree('cpp__typecheck__fargs_8h_source.html',
 <div class="ttc" id="aclassside__effect__expr__function__callt_html"><div class="ttname"><a href="classside__effect__expr__function__callt.html">side_effect_expr_function_callt</a></div><div class="ttdoc">A side_effect_exprt representation of a function call side effect.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01691">std_code.h:1692</a></div></div>
 <div class="ttc" id="acpp__typecheck_8cpp_html_ab233842332b3f6e0bba4bfc144b4a5ed"><div class="ttname"><a href="cpp__typecheck_8cpp.html#ab233842332b3f6e0bba4bfc144b4a5ed">cpp_typecheck</a></div><div class="ttdeci">bool cpp_typecheck(cpp_parse_treet &amp;cpp_parse_tree, symbol_table_baset &amp;symbol_table, const std::string &amp;module, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="cpp__typecheck_8cpp_source.html#l00085">cpp_typecheck.cpp:85</a></div></div>
 <div class="ttc" id="aexpr_8h_html"><div class="ttname"><a href="expr_8h.html">expr.h</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -344,9 +344,9 @@ $(document).ready(function(){initNavTree('interval__domain_8cpp_source.html','')
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <span class="comment">// we now have lhs &lt;  rhs or</span></div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="comment">//             lhs &lt;= rhs</span></div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  assert(<span class="keywordtype">id</span>==ID_lt || <span class="keywordtype">id</span>==ID_le);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(<span class="keywordtype">id</span> == ID_lt || <span class="keywordtype">id</span> == ID_le, <span class="stringliteral">&quot;unexpected comparison operator&quot;</span>);</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="preprocessor">  #ifdef DEBUG</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;assume_rec: &quot;</span></div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;            &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(lhs) &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <span class="keywordtype">id</span> &lt;&lt; <span class="stringliteral">&quot; &quot;</span></div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;            &lt;&lt; <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(rhs) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>

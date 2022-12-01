@@ -132,7 +132,7 @@ $(document).ready(function(){initNavTree('json__parser_8h_source.html',''); init
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classjson__parsert.html#a00fe8ee431870e0bcb05cf3d9a03831d">   39</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classjson__parsert.html#a00fe8ee431870e0bcb05cf3d9a03831d">pop</a>(<a class="code" href="classjsont.html">jsont</a> &amp;dest)</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    assert(!<a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>.empty());</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>.empty());</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    dest.<a class="code" href="classjsont.html#a53b61ab0dd9eb980565247050050d9e0">swap</a>(<a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>.top());</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>.pop();</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
@@ -180,6 +180,7 @@ $(document).ready(function(){initNavTree('json__parser_8h_source.html',''); init
 <div class="ttc" id="ajson__parser_8h_html_a6528d476d2f9560d00b748aae0f8280d"><div class="ttname"><a href="json__parser_8h.html#a6528d476d2f9560d00b748aae0f8280d">yyjsonrestart</a></div><div class="ttdeci">void yyjsonrestart(FILE *input_file)</div></div>
 <div class="ttc" id="ajson__parser_8h_html_a67325da801067cab880ea8aaf0128af8"><div class="ttname"><a href="json__parser_8h.html#a67325da801067cab880ea8aaf0128af8">json_parser</a></div><div class="ttdeci">json_parsert json_parser</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8cpp_source.html#l00013">json_parser.cpp:13</a></div></div>
 <div class="ttc" id="aparser_8h_html"><div class="ttname"><a href="parser_8h.html">parser.h</a></div><div class="ttdoc">Parser utilities.</div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

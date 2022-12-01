@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('cpp__id_8h_source.html',''); initResiz
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
 <div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="classcpp__idt.html#ad6bc5752de4a26774231bf5cf63b57c4">   88</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classcpp__idt.html#ad6bc5752de4a26774231bf5cf63b57c4">set_parent</a>(<a class="code" href="classcpp__idt.html">cpp_idt</a> &amp;_parent)</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    assert(_parent.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(_parent.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="classcpp__idt.html#afc57fbfda25151c0a7f3c29b826bf888">parent</a>=&amp;_parent;</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  }</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>

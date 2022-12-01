@@ -115,14 +115,14 @@ $(document).ready(function(){initNavTree('convert__character__literal_8cpp_sourc
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">bool</span> force_integer_type,</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  assert(src.size()&gt;=2);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src.size() &gt;= 2);</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="classexprt.html">exprt</a> result;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">if</span>(src[0]==<span class="charliteral">&#39;L&#39;</span> || src[0]==<span class="charliteral">&#39;u&#39;</span> || src[0]==<span class="charliteral">&#39;U&#39;</span>)</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    assert(src[1]==<span class="charliteral">&#39;\&#39;&#39;</span>);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    assert(src[src.size()-1]==<span class="charliteral">&#39;\&#39;&#39;</span>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src[1] == <span class="charliteral">&#39;\&#39;&#39;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src[src.size() - 1] == <span class="charliteral">&#39;\&#39;&#39;</span>);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    std::basic_string&lt;unsigned int&gt; value=</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <a class="code" href="unescape__string_8cpp.html#ad1494f7f07ce2a6b22794cf488be8f7a">unescape_wide_string</a>(std::string(src, 2, src.size()-3));</div>
@@ -160,8 +160,8 @@ $(document).ready(function(){initNavTree('convert__character__literal_8cpp_sourc
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    assert(src[0]==<span class="charliteral">&#39;\&#39;&#39;</span>);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    assert(src[src.size()-1]==<span class="charliteral">&#39;\&#39;&#39;</span>);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src[0] == <span class="charliteral">&#39;\&#39;&#39;</span>);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src[src.size() - 1] == <span class="charliteral">&#39;\&#39;&#39;</span>);</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    std::string value=</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <a class="code" href="unescape__string_8cpp.html#abc78b6934c6b0e7ec55065b8f9308ef5">unescape_string</a>(std::string(src, 1, src.size()-2));</div>
@@ -212,6 +212,7 @@ $(document).ready(function(){initNavTree('convert__character__literal_8cpp_sourc
 <div class="ttc" id="aconvert__character__literal_8h_html"><div class="ttname"><a href="convert__character__literal_8h.html">convert_character_literal.h</a></div><div class="ttdoc">C++ Language Conversion.</div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 <div class="ttc" id="aunescape__string_8cpp_html_abc78b6934c6b0e7ec55065b8f9308ef5"><div class="ttname"><a href="unescape__string_8cpp.html#abc78b6934c6b0e7ec55065b8f9308ef5">unescape_string</a></div><div class="ttdeci">std::string unescape_string(const std::string &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="unescape__string_8cpp_source.html#l00151">unescape_string.cpp:151</a></div></div>
 <div class="ttc" id="aunescape__string_8cpp_html_ad1494f7f07ce2a6b22794cf488be8f7a"><div class="ttname"><a href="unescape__string_8cpp.html#ad1494f7f07ce2a6b22794cf488be8f7a">unescape_wide_string</a></div><div class="ttdeci">std::basic_string&lt; unsigned int &gt; unescape_wide_string(const std::string &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="unescape__string_8cpp_source.html#l00156">unescape_string.cpp:156</a></div></div>

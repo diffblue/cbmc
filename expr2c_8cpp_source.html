@@ -746,222 +746,222 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;  <span class="comment">// Either we are including the body (in which case it makes sense to include</span></div>
 <div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;  <span class="comment">// or exclude the parameters) or there is no body so therefore we definitely</span></div>
 <div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;  <span class="comment">// shouldn&#39;t be including the parameters</span></div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;  assert(inc_struct_body || !inc_padding_components);</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160; </div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstruct__typet.html">struct_typet</a> &amp;struct_type=<a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(src);</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160; </div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;  std::string dest=qualifiers+<span class="stringliteral">&quot;struct&quot;</span>;</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160; </div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;tag=struct_type.<a class="code" href="classstruct__union__typet.html#a38532531d1afab4fd7053ade858178ab">get_tag</a>();</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;  <span class="keywordflow">if</span>(!tag.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;    dest+=<span class="stringliteral">&quot; &quot;</span>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(tag);</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160; </div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;  <span class="keywordflow">if</span>(inc_struct_body &amp;&amp; !struct_type.<a class="code" href="classstruct__union__typet.html#acf6d6c6bb45dd9586dae1584786e6c12">is_incomplete</a>())</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;  {</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    dest+=<span class="stringliteral">&quot; {&quot;</span>;</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160; </div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    {</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;      <span class="comment">// Skip padding parameters unless we including them</span></div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_is_padding() &amp;&amp; !inc_padding_components)</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;      {</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;      }</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160; </div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;      dest+=<span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;      dest+=<a class="code" href="classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2">convert_rec</a>(</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type(),</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        <a class="code" href="classc__qualifierst.html">c_qualifierst</a>(),</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name()));</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;      dest+=<span class="charliteral">&#39;;&#39;</span>;</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    }</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160; </div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    dest+=<span class="stringliteral">&quot; }&quot;</span>;</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  }</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160; </div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  dest+=declarator;</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160; </div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;  <span class="keywordflow">return</span> dest;</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;}</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160; </div>
-<div class="line"><a name="l00715"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">  715</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">expr2ct::convert_array_type</a>(</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;src,</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;  <span class="keyword">const</span> <a class="code" href="classqualifierst.html">qualifierst</a> &amp;qualifiers,</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;  <span class="keyword">const</span> std::string &amp;declarator_str)</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;{</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">convert_array_type</a>(</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    src, qualifiers, declarator_str, <a class="code" href="classexpr2ct.html#a492ae94c455e53058af1ef5cc833a83b">configuration</a>.<a class="code" href="structexpr2c__configurationt.html#ad13d10f9355df436553a7b4eb0009725">include_array_size</a>);</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;}</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160; </div>
-<div class="line"><a name="l00732"></a><span class="lineno"><a class="line" href="classexpr2ct.html#acd0a7ec83917577d3e5a9a65c32ab2e3">  732</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">expr2ct::convert_array_type</a>(</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;src,</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  <span class="keyword">const</span> <a class="code" href="classqualifierst.html">qualifierst</a> &amp;qualifiers,</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;  <span class="keyword">const</span> std::string &amp;declarator_str,</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  <span class="keywordtype">bool</span> inc_size_if_possible)</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;{</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;  <span class="comment">// The [...] gets attached to the declarator.</span></div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;  std::string array_suffix;</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160; </div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src).size().is_nil() || !inc_size_if_possible)</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    array_suffix=<span class="stringliteral">&quot;[]&quot;</span>;</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    array_suffix=<span class="stringliteral">&quot;[&quot;</span>+<a class="code" href="classexpr2ct.html#ac016add9a0d643ba311f449ed36a001b">convert</a>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src).size())+<span class="stringliteral">&quot;]&quot;</span>;</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160; </div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;  <span class="comment">// This won&#39;t really parse without declarator.</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;  <span class="comment">// Note that qualifiers are passed down.</span></div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2">convert_rec</a>(</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src).element_type(),</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    qualifiers,</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    declarator_str + array_suffix);</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;}</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160; </div>
-<div class="line"><a name="l00754"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a159e51077d32a73c0e273e394cbebb16">  754</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a159e51077d32a73c0e273e394cbebb16">expr2ct::convert_typecast</a>(</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypecast__exprt.html">typecast_exprt</a> &amp;src,</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;  <span class="keywordtype">unsigned</span> &amp;precedence)</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;{</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=1)</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a46afef352efd4b60e1e534d519520db5">convert_norep</a>(src, precedence);</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160; </div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;  <span class="comment">// some special cases</span></div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160; </div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;to_type = src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;<a class="code" href="language__util_8cpp.html#ae0f4bc480749d46843bf822d619d1392">from_type</a> = src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160; </div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;  <span class="keywordflow">if</span>(to_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bool &amp;&amp;</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;     <a class="code" href="language__util_8cpp.html#ae0f4bc480749d46843bf822d619d1392">from_type</a>.id()==ID_bool)</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), precedence);</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160; </div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;  <span class="keywordflow">if</span>(to_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool &amp;&amp;</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;     <a class="code" href="language__util_8cpp.html#ae0f4bc480749d46843bf822d619d1392">from_type</a>.id()==ID_c_bool)</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), precedence);</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160; </div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;  std::string dest = <span class="stringliteral">&quot;(&quot;</span> + <a class="code" href="classexpr2ct.html#ac016add9a0d643ba311f449ed36a001b">convert</a>(to_type) + <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160; </div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;  <span class="keywordtype">unsigned</span> p;</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;  std::string tmp=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), p);</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160; </div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p)</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;  dest+=tmp;</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p)</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160; </div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;  <span class="keywordflow">return</span> dest;</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;}</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160; </div>
-<div class="line"><a name="l00788"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a821818ae653c02cdaf84b61e6f137695">  788</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a821818ae653c02cdaf84b61e6f137695">expr2ct::convert_trinary</a>(</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;  <span class="keyword">const</span> <a class="code" href="classternary__exprt.html">ternary_exprt</a> &amp;src,</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;  <span class="keyword">const</span> std::string &amp;symbol1,</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;  <span class="keyword">const</span> std::string &amp;symbol2,</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;  <span class="keywordtype">unsigned</span> precedence)</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;{</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op0=src.<a class="code" href="classternary__exprt.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>();</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op1=src.<a class="code" href="classternary__exprt.html#a45b09d80623454a1e7b85a995484a4dd">op1</a>();</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op2=src.<a class="code" href="classternary__exprt.html#a716fd9c320aac24015294f0f094a068d">op2</a>();</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160; </div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;  <span class="keywordtype">unsigned</span> p0, p1, p2;</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160; </div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;  std::string s_op0=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(op0, p0);</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;  std::string s_op1=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(op1, p1);</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;  std::string s_op2=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(op2, p2);</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160; </div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;  std::string dest;</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160; </div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p0)</div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;  dest+=s_op0;</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p0)</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160; </div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;  dest+=symbol1;</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160; </div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p1)</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;  dest+=s_op1;</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p1)</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160; </div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;  dest+=symbol2;</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160; </div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p2)</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;  dest+=s_op2;</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p2)</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160; </div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;  <span class="keywordflow">return</span> dest;</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;}</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160; </div>
-<div class="line"><a name="l00835"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a30c4c868b660fb7ffc7bd1f992a6e51d">  835</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a30c4c868b660fb7ffc7bd1f992a6e51d">expr2ct::convert_binding</a>(</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbinding__exprt.html">binding_exprt</a> &amp;src,</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;  <span class="keyword">const</span> std::string &amp;symbol,</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;  <span class="keywordtype">unsigned</span> precedence)</div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;{</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;  <span class="comment">// our made-up syntax can only do one symbol</span></div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().size() != 1)</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a46afef352efd4b60e1e534d519520db5">convert_norep</a>(src, precedence);</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160; </div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;  <span class="keywordtype">unsigned</span> p0, p1;</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160; </div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;  std::string op0 = <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().front(), p0);</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;  std::string op1 = <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classbinding__exprt.html#a2b4b3083a57a5d0d14057ecdba159513">where</a>(), p1);</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160; </div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;  std::string dest=symbol+<span class="stringliteral">&quot; { &quot;</span>;</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;  dest += <a class="code" href="classexpr2ct.html#ac016add9a0d643ba311f449ed36a001b">convert</a>(src.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().front().type());</div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;  dest+=<span class="stringliteral">&quot; &quot;</span>+op0+<span class="stringliteral">&quot;; &quot;</span>;</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;  dest+=op1;</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;  dest+=<span class="stringliteral">&quot; }&quot;</span>;</div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160; </div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;  <span class="keywordflow">return</span> dest;</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;}</div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160; </div>
-<div class="line"><a name="l00858"></a><span class="lineno"><a class="line" href="classexpr2ct.html#ac7e358e4f9f19f3012ed53e0b83e1784">  858</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#ac7e358e4f9f19f3012ed53e0b83e1784">expr2ct::convert_with</a>(</div>
-<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;  <span class="keywordtype">unsigned</span> precedence)</div>
-<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;{</div>
-<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()&lt;3)</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a46afef352efd4b60e1e534d519520db5">convert_norep</a>(src, precedence);</div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160; </div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;  <span class="keywordtype">unsigned</span> p0;</div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;old = <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(src).<a class="code" href="classwith__exprt.html#a2e69fd28b199ebe66bb1ab89a7da9e7a">old</a>();</div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;  std::string op0 = <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(old, p0);</div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160; </div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;  std::string dest;</div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160; </div>
-<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p0)</div>
-<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;  dest+=op0;</div>
-<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p0)</div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160; </div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;  dest+=<span class="stringliteral">&quot; WITH [&quot;</span>;</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160; </div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i=1; i&lt;src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size(); i+=2)</div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;  {</div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    std::string op1, op2;</div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;    <span class="keywordtype">unsigned</span> p1, p2;</div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160; </div>
-<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;    <span class="keywordflow">if</span>(i!=1)</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;      dest+=<span class="stringliteral">&quot;, &quot;</span>;</div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160; </div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;    <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[i].id()==ID_member_name)</div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    {</div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;component_name=</div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;        src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[i].get(ID_component_name);</div>
-<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160; </div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;full_type = <a class="code" href="classexpr2ct.html#aa3b47e23c9e2cf4a5b3ff9c1c684e4ca">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(old.type());</div>
-<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160; </div>
-<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_union_type=</div>
-<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;        <a class="code" href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a>(full_type);</div>
-<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160; </div>
-<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_union_typet::componentt</a> &amp;comp_expr=</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;        struct_union_type.<a class="code" href="classstruct__union__typet.html#aa4d97744163d87515d75598fb31412e1">get_component</a>(component_name);</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160; </div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;      assert(comp_expr.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>());</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;  <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    inc_struct_body || !inc_padding_components, <span class="stringliteral">&quot;inconsistent configuration&quot;</span>);</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160; </div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstruct__typet.html">struct_typet</a> &amp;struct_type=<a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(src);</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160; </div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;  std::string dest=qualifiers+<span class="stringliteral">&quot;struct&quot;</span>;</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160; </div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;tag=struct_type.<a class="code" href="classstruct__union__typet.html#a38532531d1afab4fd7053ade858178ab">get_tag</a>();</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;  <span class="keywordflow">if</span>(!tag.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;    dest+=<span class="stringliteral">&quot; &quot;</span>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(tag);</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160; </div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;  <span class="keywordflow">if</span>(inc_struct_body &amp;&amp; !struct_type.<a class="code" href="classstruct__union__typet.html#acf6d6c6bb45dd9586dae1584786e6c12">is_incomplete</a>())</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;  {</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    dest+=<span class="stringliteral">&quot; {&quot;</span>;</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160; </div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;    {</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;      <span class="comment">// Skip padding parameters unless we including them</span></div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_is_padding() &amp;&amp; !inc_padding_components)</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;      {</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;      }</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160; </div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;      dest+=<span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;      dest+=<a class="code" href="classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2">convert_rec</a>(</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type(),</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <a class="code" href="classc__qualifierst.html">c_qualifierst</a>(),</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;        <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name()));</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;      dest+=<span class="charliteral">&#39;;&#39;</span>;</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    }</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160; </div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    dest+=<span class="stringliteral">&quot; }&quot;</span>;</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  }</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160; </div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  dest+=declarator;</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160; </div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  <span class="keywordflow">return</span> dest;</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;}</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160; </div>
+<div class="line"><a name="l00716"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">  716</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">expr2ct::convert_array_type</a>(</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;src,</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;  <span class="keyword">const</span> <a class="code" href="classqualifierst.html">qualifierst</a> &amp;qualifiers,</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;  <span class="keyword">const</span> std::string &amp;declarator_str)</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;{</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">convert_array_type</a>(</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    src, qualifiers, declarator_str, <a class="code" href="classexpr2ct.html#a492ae94c455e53058af1ef5cc833a83b">configuration</a>.<a class="code" href="structexpr2c__configurationt.html#ad13d10f9355df436553a7b4eb0009725">include_array_size</a>);</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;}</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160; </div>
+<div class="line"><a name="l00733"></a><span class="lineno"><a class="line" href="classexpr2ct.html#acd0a7ec83917577d3e5a9a65c32ab2e3">  733</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">expr2ct::convert_array_type</a>(</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;src,</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;  <span class="keyword">const</span> <a class="code" href="classqualifierst.html">qualifierst</a> &amp;qualifiers,</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  <span class="keyword">const</span> std::string &amp;declarator_str,</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;  <span class="keywordtype">bool</span> inc_size_if_possible)</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;{</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;  <span class="comment">// The [...] gets attached to the declarator.</span></div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;  std::string array_suffix;</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160; </div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src).size().is_nil() || !inc_size_if_possible)</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    array_suffix=<span class="stringliteral">&quot;[]&quot;</span>;</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    array_suffix=<span class="stringliteral">&quot;[&quot;</span>+<a class="code" href="classexpr2ct.html#ac016add9a0d643ba311f449ed36a001b">convert</a>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src).size())+<span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160; </div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;  <span class="comment">// This won&#39;t really parse without declarator.</span></div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;  <span class="comment">// Note that qualifiers are passed down.</span></div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2">convert_rec</a>(</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src).element_type(),</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    qualifiers,</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    declarator_str + array_suffix);</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;}</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160; </div>
+<div class="line"><a name="l00755"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a159e51077d32a73c0e273e394cbebb16">  755</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a159e51077d32a73c0e273e394cbebb16">expr2ct::convert_typecast</a>(</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypecast__exprt.html">typecast_exprt</a> &amp;src,</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;  <span class="keywordtype">unsigned</span> &amp;precedence)</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;{</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=1)</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a46afef352efd4b60e1e534d519520db5">convert_norep</a>(src, precedence);</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160; </div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;  <span class="comment">// some special cases</span></div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160; </div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;to_type = src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;<a class="code" href="language__util_8cpp.html#ae0f4bc480749d46843bf822d619d1392">from_type</a> = src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160; </div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;  <span class="keywordflow">if</span>(to_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bool &amp;&amp;</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;     <a class="code" href="language__util_8cpp.html#ae0f4bc480749d46843bf822d619d1392">from_type</a>.id()==ID_bool)</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), precedence);</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160; </div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;  <span class="keywordflow">if</span>(to_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool &amp;&amp;</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;     <a class="code" href="language__util_8cpp.html#ae0f4bc480749d46843bf822d619d1392">from_type</a>.id()==ID_c_bool)</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), precedence);</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160; </div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;  std::string dest = <span class="stringliteral">&quot;(&quot;</span> + <a class="code" href="classexpr2ct.html#ac016add9a0d643ba311f449ed36a001b">convert</a>(to_type) + <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160; </div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;  <span class="keywordtype">unsigned</span> p;</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;  std::string tmp=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), p);</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160; </div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p)</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;  dest+=tmp;</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p)</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160; </div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;  <span class="keywordflow">return</span> dest;</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;}</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160; </div>
+<div class="line"><a name="l00789"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a821818ae653c02cdaf84b61e6f137695">  789</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a821818ae653c02cdaf84b61e6f137695">expr2ct::convert_trinary</a>(</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;  <span class="keyword">const</span> <a class="code" href="classternary__exprt.html">ternary_exprt</a> &amp;src,</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;  <span class="keyword">const</span> std::string &amp;symbol1,</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;  <span class="keyword">const</span> std::string &amp;symbol2,</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;  <span class="keywordtype">unsigned</span> precedence)</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;{</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op0=src.<a class="code" href="classternary__exprt.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>();</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op1=src.<a class="code" href="classternary__exprt.html#a45b09d80623454a1e7b85a995484a4dd">op1</a>();</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op2=src.<a class="code" href="classternary__exprt.html#a716fd9c320aac24015294f0f094a068d">op2</a>();</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160; </div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;  <span class="keywordtype">unsigned</span> p0, p1, p2;</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160; </div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;  std::string s_op0=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(op0, p0);</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;  std::string s_op1=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(op1, p1);</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;  std::string s_op2=<a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(op2, p2);</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160; </div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;  std::string dest;</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160; </div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p0)</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;  dest+=s_op0;</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p0)</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160; </div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;  dest+=symbol1;</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160; </div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p1)</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;  dest+=s_op1;</div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p1)</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160; </div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;  dest+=symbol2;</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;  dest+=<span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160; </div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p2)</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;  dest+=s_op2;</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;=p2)</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160; </div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;  <span class="keywordflow">return</span> dest;</div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;}</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160; </div>
+<div class="line"><a name="l00836"></a><span class="lineno"><a class="line" href="classexpr2ct.html#a30c4c868b660fb7ffc7bd1f992a6e51d">  836</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#a30c4c868b660fb7ffc7bd1f992a6e51d">expr2ct::convert_binding</a>(</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbinding__exprt.html">binding_exprt</a> &amp;src,</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;  <span class="keyword">const</span> std::string &amp;symbol,</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;  <span class="keywordtype">unsigned</span> precedence)</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;{</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;  <span class="comment">// our made-up syntax can only do one symbol</span></div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().size() != 1)</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a46afef352efd4b60e1e534d519520db5">convert_norep</a>(src, precedence);</div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160; </div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;  <span class="keywordtype">unsigned</span> p0, p1;</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160; </div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;  std::string op0 = <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().front(), p0);</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;  std::string op1 = <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(src.<a class="code" href="classbinding__exprt.html#a2b4b3083a57a5d0d14057ecdba159513">where</a>(), p1);</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160; </div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;  std::string dest=symbol+<span class="stringliteral">&quot; { &quot;</span>;</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;  dest += <a class="code" href="classexpr2ct.html#ac016add9a0d643ba311f449ed36a001b">convert</a>(src.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().front().type());</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;  dest+=<span class="stringliteral">&quot; &quot;</span>+op0+<span class="stringliteral">&quot;; &quot;</span>;</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;  dest+=op1;</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;  dest+=<span class="stringliteral">&quot; }&quot;</span>;</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160; </div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;  <span class="keywordflow">return</span> dest;</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;}</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160; </div>
+<div class="line"><a name="l00859"></a><span class="lineno"><a class="line" href="classexpr2ct.html#ac7e358e4f9f19f3012ed53e0b83e1784">  859</a></span>&#160;std::string <a class="code" href="classexpr2ct.html#ac7e358e4f9f19f3012ed53e0b83e1784">expr2ct::convert_with</a>(</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;  <span class="keywordtype">unsigned</span> precedence)</div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;{</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()&lt;3)</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr2ct.html#a46afef352efd4b60e1e534d519520db5">convert_norep</a>(src, precedence);</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160; </div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;  <span class="keywordtype">unsigned</span> p0;</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;old = <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(src).<a class="code" href="classwith__exprt.html#a2e69fd28b199ebe66bb1ab89a7da9e7a">old</a>();</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;  std::string op0 = <a class="code" href="classexpr2ct.html#aabbef5df7114f20765cd3da2f1be5e59">convert_with_precedence</a>(old, p0);</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160; </div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;  std::string dest;</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160; </div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p0)</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;    dest+=<span class="charliteral">&#39;(&#39;</span>;</div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;  dest+=op0;</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;  <span class="keywordflow">if</span>(precedence&gt;p0)</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    dest+=<span class="charliteral">&#39;)&#39;</span>;</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160; </div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;  dest+=<span class="stringliteral">&quot; WITH [&quot;</span>;</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160; </div>
+<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i=1; i&lt;src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size(); i+=2)</div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;  {</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;    std::string op1, op2;</div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;    <span class="keywordtype">unsigned</span> p1, p2;</div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160; </div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    <span class="keywordflow">if</span>(i!=1)</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;      dest+=<span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160; </div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[i].id()==ID_member_name)</div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;    {</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;component_name=</div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;        src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[i].get(ID_component_name);</div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160; </div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;full_type = <a class="code" href="classexpr2ct.html#aa3b47e23c9e2cf4a5b3ff9c1c684e4ca">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(old.type());</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160; </div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_union_type=</div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;        <a class="code" href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a>(full_type);</div>
+<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160; </div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_union_typet::componentt</a> &amp;comp_expr=</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;        struct_union_type.<a class="code" href="classstruct__union__typet.html#aa4d97744163d87515d75598fb31412e1">get_component</a>(component_name);</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(comp_expr.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>());</div>
 <div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160; </div>
 <div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;      <a class="code" href="classdstringt.html">irep_idt</a> display_component_name;</div>
 <div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160; </div>
@@ -1705,7 +1705,7 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;      <a class="code" href="classexpr2ct.html#a7416b37f22c275a46d1ebe7c8485d21c">get_shorthands</a>(src);</div>
 <div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160; </div>
 <div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160;      entry=<a class="code" href="classexpr2ct.html#ab6302ae69a942161ff5669b89c3ca678">shorthands</a>.find(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;      assert(entry!=<a class="code" href="classexpr2ct.html#ab6302ae69a942161ff5669b89c3ca678">shorthands</a>.end());</div>
+<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(entry != <a class="code" href="classexpr2ct.html#ab6302ae69a942161ff5669b89c3ca678">shorthands</a>.end());</div>
 <div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;    }</div>
 <div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160; </div>
 <div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;    dest=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(entry-&gt;second);</div>
@@ -4254,9 +4254,9 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="ttc" id="aclassexpr2ct_html_a0377f97ad450fd30dc7d6b4ec3d10395"><div class="ttname"><a href="classexpr2ct.html#a0377f97ad450fd30dc7d6b4ec3d10395">expr2ct::convert_nondet</a></div><div class="ttdeci">std::string convert_nondet(const exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01174">expr2c.cpp:1174</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a065e35f795f603264989b86afd525614"><div class="ttname"><a href="classexpr2ct.html#a065e35f795f603264989b86afd525614">expr2ct::convert_literal</a></div><div class="ttdeci">std::string convert_literal(const exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01209">expr2c.cpp:1209</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a0e54b41c0d31ed1edb1d07d485e4b39f"><div class="ttname"><a href="classexpr2ct.html#a0e54b41c0d31ed1edb1d07d485e4b39f">expr2ct::convert_code_continue</a></div><div class="ttdeci">std::string convert_code_continue(unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02804">expr2c.cpp:2804</a></div></div>
-<div class="ttc" id="aclassexpr2ct_html_a109b4c8b2d548f57b060d785c72f4d14"><div class="ttname"><a href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">expr2ct::convert_array_type</a></div><div class="ttdeci">virtual std::string convert_array_type(const typet &amp;src, const qualifierst &amp;qualifiers, const std::string &amp;declarator_str)</div><div class="ttdoc">To generate a C-like type declaration of an array.</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00715">expr2c.cpp:715</a></div></div>
+<div class="ttc" id="aclassexpr2ct_html_a109b4c8b2d548f57b060d785c72f4d14"><div class="ttname"><a href="classexpr2ct.html#a109b4c8b2d548f57b060d785c72f4d14">expr2ct::convert_array_type</a></div><div class="ttdeci">virtual std::string convert_array_type(const typet &amp;src, const qualifierst &amp;qualifiers, const std::string &amp;declarator_str)</div><div class="ttdoc">To generate a C-like type declaration of an array.</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00716">expr2c.cpp:716</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a11b3bc958bc031ca666266a0b69358da"><div class="ttname"><a href="classexpr2ct.html#a11b3bc958bc031ca666266a0b69358da">expr2ct::convert_code_switch_case</a></div><div class="ttdeci">std::string convert_code_switch_case(const code_switch_caset &amp;src, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l03400">expr2c.cpp:3400</a></div></div>
-<div class="ttc" id="aclassexpr2ct_html_a159e51077d32a73c0e273e394cbebb16"><div class="ttname"><a href="classexpr2ct.html#a159e51077d32a73c0e273e394cbebb16">expr2ct::convert_typecast</a></div><div class="ttdeci">std::string convert_typecast(const typecast_exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00754">expr2c.cpp:754</a></div></div>
+<div class="ttc" id="aclassexpr2ct_html_a159e51077d32a73c0e273e394cbebb16"><div class="ttname"><a href="classexpr2ct.html#a159e51077d32a73c0e273e394cbebb16">expr2ct::convert_typecast</a></div><div class="ttdeci">std::string convert_typecast(const typecast_exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00755">expr2c.cpp:755</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a1adefdb2956ee2e73259fb43ed248ac5"><div class="ttname"><a href="classexpr2ct.html#a1adefdb2956ee2e73259fb43ed248ac5">expr2ct::convert_comma</a></div><div class="ttdeci">std::string convert_comma(const exprt &amp;src, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01246">expr2c.cpp:1246</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a1cbb54f88ff46ac24720b6b0a3fbf5b9"><div class="ttname"><a href="classexpr2ct.html#a1cbb54f88ff46ac24720b6b0a3fbf5b9">expr2ct::convert_code_assert</a></div><div class="ttdeci">std::string convert_code_assert(const codet &amp;src, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l03355">expr2c.cpp:3355</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a22d2b02650c9be0f6f0da99201da84f2"><div class="ttname"><a href="classexpr2ct.html#a22d2b02650c9be0f6f0da99201da84f2">expr2ct::convert_union</a></div><div class="ttdeci">std::string convert_union(const exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02171">expr2c.cpp:2171</a></div></div>
@@ -4265,7 +4265,7 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="ttc" id="aclassexpr2ct_html_a2c28097c86773c128a989196f75d2c06"><div class="ttname"><a href="classexpr2ct.html#a2c28097c86773c128a989196f75d2c06">expr2ct::convert_code_switch</a></div><div class="ttdeci">std::string convert_code_switch(const codet &amp;src, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02761">expr2c.cpp:2761</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a2fccbce84dddcd7982f46aebbc9cc503"><div class="ttname"><a href="classexpr2ct.html#a2fccbce84dddcd7982f46aebbc9cc503">expr2ct::convert_initializer_list</a></div><div class="ttdeci">std::string convert_initializer_list(const exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02327">expr2c.cpp:2327</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a3015354dc4a690adfc6525e71b8c55e5"><div class="ttname"><a href="classexpr2ct.html#a3015354dc4a690adfc6525e71b8c55e5">expr2ct::convert_quantified_symbol</a></div><div class="ttdeci">std::string convert_quantified_symbol(const exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01687">expr2c.cpp:1687</a></div></div>
-<div class="ttc" id="aclassexpr2ct_html_a30c4c868b660fb7ffc7bd1f992a6e51d"><div class="ttname"><a href="classexpr2ct.html#a30c4c868b660fb7ffc7bd1f992a6e51d">expr2ct::convert_binding</a></div><div class="ttdeci">std::string convert_binding(const binding_exprt &amp;, const std::string &amp;symbol, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00835">expr2c.cpp:835</a></div></div>
+<div class="ttc" id="aclassexpr2ct_html_a30c4c868b660fb7ffc7bd1f992a6e51d"><div class="ttname"><a href="classexpr2ct.html#a30c4c868b660fb7ffc7bd1f992a6e51d">expr2ct::convert_binding</a></div><div class="ttdeci">std::string convert_binding(const binding_exprt &amp;, const std::string &amp;symbol, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00836">expr2c.cpp:836</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a32dec621ec733004a3155875e6f907ec"><div class="ttname"><a href="classexpr2ct.html#a32dec621ec733004a3155875e6f907ec">expr2ct::convert_function_application</a></div><div class="ttdeci">std::string convert_function_application(const function_application_exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02456">expr2c.cpp:2456</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a3300abe08f125e39c4c4b39bc18abd91"><div class="ttname"><a href="classexpr2ct.html#a3300abe08f125e39c4c4b39bc18abd91">expr2ct::convert_code_unlock</a></div><div class="ttdeci">std::string convert_code_unlock(const codet &amp;src, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l03134">expr2c.cpp:3134</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a3410b403ff2833eaf0df52a905c806a0"><div class="ttname"><a href="classexpr2ct.html#a3410b403ff2833eaf0df52a905c806a0">expr2ct::convert_code_decl_block</a></div><div class="ttdeci">std::string convert_code_decl_block(const codet &amp;src, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02931">expr2c.cpp:2931</a></div></div>
@@ -4301,7 +4301,7 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="ttc" id="aclassexpr2ct_html_a7e5cfeaefcb97b4160a899bb24675916"><div class="ttname"><a href="classexpr2ct.html#a7e5cfeaefcb97b4160a899bb24675916">expr2ct::convert_extractbits</a></div><div class="ttdeci">std::string convert_extractbits(const extractbits_exprt &amp;src, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l03490">expr2c.cpp:3490</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a7fd46343d1636b1c0e84cad6e4981dcc"><div class="ttname"><a href="classexpr2ct.html#a7fd46343d1636b1c0e84cad6e4981dcc">expr2ct::convert_struct</a></div><div class="ttdeci">virtual std::string convert_struct(const exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02035">expr2c.cpp:2035</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a81f0c03e9977eaa2bb161626a44193dc"><div class="ttname"><a href="classexpr2ct.html#a81f0c03e9977eaa2bb161626a44193dc">expr2ct::convert_function</a></div><div class="ttdeci">optionalt&lt; std::string &gt; convert_function(const exprt &amp;src)</div><div class="ttdoc">Returns a string if src is a function with a known conversion, else returns nullopt.</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l03974">expr2c.cpp:3974</a></div></div>
-<div class="ttc" id="aclassexpr2ct_html_a821818ae653c02cdaf84b61e6f137695"><div class="ttname"><a href="classexpr2ct.html#a821818ae653c02cdaf84b61e6f137695">expr2ct::convert_trinary</a></div><div class="ttdeci">std::string convert_trinary(const ternary_exprt &amp;src, const std::string &amp;symbol1, const std::string &amp;symbol2, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00788">expr2c.cpp:788</a></div></div>
+<div class="ttc" id="aclassexpr2ct_html_a821818ae653c02cdaf84b61e6f137695"><div class="ttname"><a href="classexpr2ct.html#a821818ae653c02cdaf84b61e6f137695">expr2ct::convert_trinary</a></div><div class="ttdeci">std::string convert_trinary(const ternary_exprt &amp;src, const std::string &amp;symbol1, const std::string &amp;symbol2, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00789">expr2c.cpp:789</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a84ea345ac4f8c3313b8a89abe95c292b"><div class="ttname"><a href="classexpr2ct.html#a84ea345ac4f8c3313b8a89abe95c292b">expr2ct::convert_prob_coin</a></div><div class="ttdeci">std::string convert_prob_coin(const exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01199">expr2c.cpp:1199</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a8642237ae2035e702c88141159d71ab3"><div class="ttname"><a href="classexpr2ct.html#a8642237ae2035e702c88141159d71ab3">expr2ct::convert_update</a></div><div class="ttdeci">std::string convert_update(const update_exprt &amp;, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00954">expr2c.cpp:954</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_a865202c7c261ebef79e039ca3b32991b"><div class="ttname"><a href="classexpr2ct.html#a865202c7c261ebef79e039ca3b32991b">expr2ct::convert_nondet_symbol</a></div><div class="ttdeci">std::string convert_nondet_symbol(const nondet_symbol_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01663">expr2c.cpp:1663</a></div></div>
@@ -4337,7 +4337,7 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="ttc" id="aclassexpr2ct_html_ac2a8c1dcc198d8bca8e0348823d0d444"><div class="ttname"><a href="classexpr2ct.html#ac2a8c1dcc198d8bca8e0348823d0d444">expr2ct::convert_code_return</a></div><div class="ttdeci">std::string convert_code_return(const codet &amp;src, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02719">expr2c.cpp:2719</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_ac32d4665a99d03e59d4ef33a18caaef0"><div class="ttname"><a href="classexpr2ct.html#ac32d4665a99d03e59d4ef33a18caaef0">expr2ct::convert_code_break</a></div><div class="ttdeci">std::string convert_code_break(unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l02752">expr2c.cpp:2752</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_ac63c4f965d62325ffa6cb05897d15898"><div class="ttname"><a href="classexpr2ct.html#ac63c4f965d62325ffa6cb05897d15898">expr2ct::convert_struct_type</a></div><div class="ttdeci">virtual std::string convert_struct_type(const typet &amp;src, const std::string &amp;qualifiers_str, const std::string &amp;declarator_str)</div><div class="ttdoc">To generate C-like string for defining the given struct.</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00638">expr2c.cpp:638</a></div></div>
-<div class="ttc" id="aclassexpr2ct_html_ac7e358e4f9f19f3012ed53e0b83e1784"><div class="ttname"><a href="classexpr2ct.html#ac7e358e4f9f19f3012ed53e0b83e1784">expr2ct::convert_with</a></div><div class="ttdeci">std::string convert_with(const exprt &amp;src, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00858">expr2c.cpp:858</a></div></div>
+<div class="ttc" id="aclassexpr2ct_html_ac7e358e4f9f19f3012ed53e0b83e1784"><div class="ttname"><a href="classexpr2ct.html#ac7e358e4f9f19f3012ed53e0b83e1784">expr2ct::convert_with</a></div><div class="ttdeci">std::string convert_with(const exprt &amp;src, unsigned precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l00859">expr2c.cpp:859</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_ac838d5206fd02acd1ab6d53ec70e9a34"><div class="ttname"><a href="classexpr2ct.html#ac838d5206fd02acd1ab6d53ec70e9a34">expr2ct::convert_code_frontend_assign</a></div><div class="ttdeci">std::string convert_code_frontend_assign(const code_frontend_assignt &amp;, unsigned indent)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l03113">expr2c.cpp:3113</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_ac98948c9633839094c677850b294392c"><div class="ttname"><a href="classexpr2ct.html#ac98948c9633839094c677850b294392c">expr2ct::convert_object_descriptor</a></div><div class="ttdeci">std::string convert_object_descriptor(const exprt &amp;src, unsigned &amp;precedence)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01698">expr2c.cpp:1698</a></div></div>
 <div class="ttc" id="aclassexpr2ct_html_aca797c5e529110fa58351e0697bec24b"><div class="ttname"><a href="classexpr2ct.html#aca797c5e529110fa58351e0697bec24b">expr2ct::convert_predicate_passive_symbol</a></div><div class="ttdeci">std::string convert_predicate_passive_symbol(const exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="expr2c_8cpp_source.html#l01681">expr2c.cpp:1681</a></div></div>
@@ -4507,6 +4507,7 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="ttc" id="apointer__predicates_8h_html_a7d09f325360eb12489ecdd12c34d8268"><div class="ttname"><a href="pointer__predicates_8h.html#a7d09f325360eb12489ecdd12c34d8268">SYMEX_DYNAMIC_PREFIX</a></div><div class="ttdeci">#define SYMEX_DYNAMIC_PREFIX</div><div class="ttdef"><b>Definition:</b> <a href="pointer__predicates_8h_source.html#l00017">pointer_predicates.h:17</a></div></div>
 <div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00510">invariant.h:510</a></div></div>
 <div class="ttc" id="astd__code_8h_html_a109d4f8a7fec974756216a8f50dcadb9"><div class="ttname"><a href="std__code_8h.html#a109d4f8a7fec974756216a8f50dcadb9">to_code_ifthenelse</a></div><div class="ttdeci">const code_ifthenelset &amp; to_code_ifthenelse(const codet &amp;code)</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00530">std_code.h:530</a></div></div>
@@ -4586,6 +4587,7 @@ $(document).ready(function(){initNavTree('expr2c_8cpp_source.html',''); initResi
 <div class="ttc" id="asuffix_8h_html_a01816fa76558ff033b634a5d15c52014"><div class="ttname"><a href="suffix_8h.html#a01816fa76558ff033b634a5d15c52014">has_suffix</a></div><div class="ttdeci">bool has_suffix(const std::string &amp;s, const std::string &amp;suffix)</div><div class="ttdef"><b>Definition:</b> <a href="suffix_8h_source.html#l00017">suffix.h:17</a></div></div>
 <div class="ttc" id="asymbol_8h_html"><div class="ttname"><a href="symbol_8h.html">symbol.h</a></div><div class="ttdoc">Symbol table entry.</div></div>
 <div class="ttc" id="autil_8cpp_html_a64961c7c96a166ee16517f63747c3496"><div class="ttname"><a href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">is_signed</a></div><div class="ttdeci">bool is_signed(const typet &amp;t)</div><div class="ttdoc">Convenience function – is the type signed?</div><div class="ttdef"><b>Definition:</b> <a href="util_8cpp_source.html#l00045">util.cpp:45</a></div></div>
+<div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

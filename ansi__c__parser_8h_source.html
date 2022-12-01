@@ -196,7 +196,7 @@ $(document).ready(function(){initNavTree('ansi__c__parser_8h_source.html',''); i
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
 <div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="classansi__c__parsert.html#ae321173fb902315736d904bf248ef991">  103</a></span>&#160;  <a class="code" href="classansi__c__scopet.html">scopet</a> &amp;<a class="code" href="classansi__c__parsert.html#ae321173fb902315736d904bf248ef991">current_scope</a>()</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    assert(!<a class="code" href="classansi__c__parsert.html#ad22bfef083a0b536cc70d8fa159a4cdb">scopes</a>.empty());</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classansi__c__parsert.html#ad22bfef083a0b536cc70d8fa159a4cdb">scopes</a>.empty());</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classansi__c__parsert.html#ad22bfef083a0b536cc70d8fa159a4cdb">scopes</a>.back();</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  }</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
@@ -210,7 +210,7 @@ $(document).ready(function(){initNavTree('ansi__c__parser_8h_source.html',''); i
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
 <div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="classansi__c__parsert.html#ade3366e548369bc6cac530712f27e977">  117</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classansi__c__parsert.html#ade3366e548369bc6cac530712f27e977">copy_item</a>(<span class="keyword">const</span> <a class="code" href="classansi__c__declarationt.html">ansi_c_declarationt</a> &amp;declaration)</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    assert(declaration.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_declaration);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(declaration.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_declaration);</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="classansi__c__parsert.html#a75a6dd29450a7b887e5516e0d5a87d08">parse_tree</a>.<a class="code" href="classansi__c__parse__treet.html#a79e1fa504193f461a286cea2285e6d3a">items</a>.push_back(declaration);</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  }</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
@@ -325,6 +325,7 @@ $(document).ready(function(){initNavTree('ansi__c__parser_8h_source.html',''); i
 <div class="ttc" id="acomplexity__violation_8h_html_ab4014469e424d10b34af7217a1e71696ab50339a10e1de285ac99d4c3990b8693"><div class="ttname"><a href="complexity__violation_8h.html#ab4014469e424d10b34af7217a1e71696ab50339a10e1de285ac99d4c3990b8693">complexity_violationt::NONE</a></div><div class="ttdeci">@ NONE</div></div>
 <div class="ttc" id="aconfig_8h_html"><div class="ttname"><a href="config_8h.html">config.h</a></div></div>
 <div class="ttc" id="aparser_8h_html"><div class="ttname"><a href="parser_8h.html">parser.h</a></div><div class="ttdoc">Parser utilities.</div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ab387c011f5197baecbafce33f6732826"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826">configt::ansi_ct::flavourt</a></div><div class="ttdeci">flavourt</div><div class="ttdef"><b>Definition:</b> <a href="config_8h_source.html#l00227">config.h:228</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

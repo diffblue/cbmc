@@ -237,13 +237,13 @@ $(document).ready(function(){initNavTree('cpp__declaration_8h_source.html',''); 
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
 <div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="cpp__declaration_8h.html#a0269a2549494a6f3b3cd4d1b17a22667">  146</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;<a class="code" href="cpp__declaration_8h.html#a0269a2549494a6f3b3cd4d1b17a22667">to_cpp_declaration</a>(<a class="code" href="classirept.html">irept</a> &amp;irep)</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;{</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  assert(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_cpp_declaration);</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_cpp_declaration);</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;<span class="keyword">&gt;</span>(irep);</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;}</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
 <div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="cpp__declaration_8h.html#a07b5843eb1a94903bb88d36c0e5028df">  152</a></span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;<a class="code" href="cpp__declaration_8h.html#a0269a2549494a6f3b3cd4d1b17a22667">to_cpp_declaration</a>(<span class="keyword">const</span> <a class="code" href="classirept.html">irept</a> &amp;irep)</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;{</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  assert(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_cpp_declaration);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_cpp_declaration);</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;<span class="keyword">&gt;</span>(irep);</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
@@ -297,6 +297,7 @@ $(document).ready(function(){initNavTree('cpp__declaration_8h_source.html',''); 
 <div class="ttc" id="acpp__storage__spec_8h_html"><div class="ttname"><a href="cpp__storage__spec_8h.html">cpp_storage_spec.h</a></div></div>
 <div class="ttc" id="acpp__template__args_8h_html"><div class="ttname"><a href="cpp__template__args_8h.html">cpp_template_args.h</a></div><div class="ttdoc">C++ Language Type Checking.</div></div>
 <div class="ttc" id="acpp__template__type_8h_html"><div class="ttname"><a href="cpp__template__type_8h.html">cpp_template_type.h</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

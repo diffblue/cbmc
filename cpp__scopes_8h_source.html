@@ -130,7 +130,7 @@ $(document).ready(function(){initNavTree('cpp__scopes_8h_source.html',''); initR
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;new_scope_name,</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50">cpp_idt::id_classt</a> id_class)</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    assert(!new_scope_name.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>());</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!new_scope_name.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>());</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="classcpp__scopet.html">cpp_scopet</a> &amp;n=<a class="code" href="classcpp__scopest.html#a2e03091e26ddba2cf418fd3d5b484920">current_scope_ptr</a>-&gt;<a class="code" href="classcpp__scopet.html#a08daee38ea7ecf12f298c5ff8c090592">new_scope</a>(new_scope_name);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    n.<a class="code" href="classcpp__idt.html#a6800db05ddda388fc01a0cee5538457f">id_class</a>=id_class;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classcpp__scopest.html#ab61ea261b1ffcca30d5aa21727bf7e27">id_map</a>[n.<a class="code" href="classcpp__idt.html#a085b2ee51c3439d7bc15b30658911228">identifier</a>]=&amp;n;</div>
@@ -172,7 +172,7 @@ $(document).ready(function(){initNavTree('cpp__scopes_8h_source.html',''); initR
 <div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classcpp__scopest.html#a95012e445a972571a19ae7229d695ea6">   80</a></span>&#160;  <a class="code" href="classcpp__scopet.html">cpp_scopet</a> &amp;<a class="code" href="classcpp__scopest.html#a95012e445a972571a19ae7229d695ea6">get_scope</a>(<span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier)</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  {</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="classcpp__idt.html">cpp_idt</a> &amp;n=<a class="code" href="classcpp__scopest.html#a6a1fb9e0b389badfff6904e240ffdaf4">get_id</a>(identifier);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    assert(n.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(n.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">return</span> (<a class="code" href="classcpp__scopet.html">cpp_scopet</a> &amp;)n;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
@@ -194,7 +194,7 @@ $(document).ready(function(){initNavTree('cpp__scopes_8h_source.html',''); initR
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
 <div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="classcpp__scopest.html#a039af38e03bd6a70fcbf92da5cf0a0e8">  103</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classcpp__scopest.html#a039af38e03bd6a70fcbf92da5cf0a0e8">go_to</a>(<a class="code" href="classcpp__idt.html">cpp_idt</a> &amp;<span class="keywordtype">id</span>)</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    assert(<span class="keywordtype">id</span>.is_scope);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<span class="keywordtype">id</span>.is_scope);</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classcpp__scopest.html#a2e03091e26ddba2cf418fd3d5b484920">current_scope_ptr</a>=<span class="keyword">static_cast&lt;</span><a class="code" href="classcpp__scopet.html">cpp_scopet</a>*<span class="keyword">&gt;</span>(&amp;id);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  }</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
@@ -285,6 +285,8 @@ $(document).ready(function(){initNavTree('cpp__scopes_8h_source.html',''); initR
 <div class="ttc" id="aclasssymbolt_html"><div class="ttname"><a href="classsymbolt.html">symbolt</a></div><div class="ttdoc">Symbol table entry.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00027">symbol.h:28</a></div></div>
 <div class="ttc" id="acpp__scope_8h_html"><div class="ttname"><a href="cpp__scope_8h.html">cpp_scope.h</a></div><div class="ttdoc">C++ Language Type Checking.</div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

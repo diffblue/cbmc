@@ -774,8 +774,8 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__class_8cpp_so
 <div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    if(s_it!=symbol_table.symbols.end())</div>
 <div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;      symbol_table.erase(s_it); <span class="comment">// erase, we stubbed it</span></div>
 <div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160; </div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    if(symbol_table.add(new_symbol))</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;      assert(false &amp;&amp; &quot;failed to add static field symbol&quot;);</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    const bool failed = symbol_table.add(new_symbol);</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    CHECK_RETURN_WITH_DIAGNOSTICS(!failed, &quot;failed to add static field symbol&quot;);</div>
 <div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;  }</div>
 <div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;  else</div>
 <div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;  {</div>

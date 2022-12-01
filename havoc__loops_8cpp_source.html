@@ -153,7 +153,7 @@ $(document).ready(function(){initNavTree('havoc__loops_8cpp_source.html',''); in
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> loop_head,</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keyword">const</span> <a class="code" href="classhavoc__loopst.html#a3207047ad9516c11e7de145d9d10dcff">loopt</a> &amp;loop)</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  assert(!loop.empty());</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!loop.empty());</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="comment">// first find out what can get changed in the loop</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <a class="code" href="classhavoc__loopst.html#ae0ce74e247c48e94125c1f29e1c38c62">assignst</a> assigns;</div>
@@ -263,6 +263,7 @@ $(document).ready(function(){initNavTree('havoc__loops_8cpp_source.html',''); in
 <div class="ttc" id="anatural__loops_8h_html"><div class="ttname"><a href="natural__loops_8h.html">natural_loops.h</a></div><div class="ttdoc">Compute natural loops in a goto_function.</div></div>
 <div class="ttc" id="aremove__skip_8cpp_html_aa6e82b3693efc89611c59d82db650af3"><div class="ttname"><a href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a></div><div class="ttdeci">void remove_skip(goto_programt &amp;goto_program, goto_programt::targett begin, goto_programt::targett end)</div><div class="ttdoc">remove unnecessary skip statements</div><div class="ttdef"><b>Definition:</b> <a href="remove__skip_8cpp_source.html#l00087">remove_skip.cpp:87</a></div></div>
 <div class="ttc" id="aremove__skip_8h_html"><div class="ttname"><a href="remove__skip_8h.html">remove_skip.h</a></div><div class="ttdoc">Program Transformation.</div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

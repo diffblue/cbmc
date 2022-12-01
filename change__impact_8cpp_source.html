@@ -455,17 +455,17 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordflow">switch</span>(d.second)</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    {</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      <span class="keywordflow">case</span> <a class="code" href="classunified__difft.html#adcc2e5817caaacd60ea4cc87124bdd2fac706ffd80b0ad0a4ef605c581e95252b">unified_difft::differencet::SAME</a>:</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        assert(o_it!=old_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end());</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        assert(n_it!=new_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end());</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(o_it != old_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(), <span class="stringliteral">&quot;within range&quot;</span>);</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(n_it != new_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(), <span class="stringliteral">&quot;within range&quot;</span>);</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        old_impact[o_it]|=<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a>;</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        ++o_it;</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        assert(n_it==d.first);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(n_it == d.first, <span class="stringliteral">&quot;start of hunk&quot;</span>);</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        new_impact[n_it]|=<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a>;</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        ++n_it;</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="keywordflow">case</span> <a class="code" href="classunified__difft.html#adcc2e5817caaacd60ea4cc87124bdd2fa63c2867fdcae0e8e8413d7ac21b69b59">unified_difft::differencet::DELETED</a>:</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        assert(o_it!=old_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end());</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        assert(o_it==d.first);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(o_it != old_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(), <span class="stringliteral">&quot;within range&quot;</span>);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(o_it == d.first, <span class="stringliteral">&quot;start of hunk&quot;</span>);</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        {</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;          <span class="keyword">const</span> <a class="code" href="classgrapht.html#a0be0a85d45281c563e89104c44ba552f">dependence_grapht::nodet</a> &amp;d_node=</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;            <a class="code" href="classchange__impactt.html#ac202d71d615c330f35c2b05a29568ef4">old_dep_graph</a>[<a class="code" href="classchange__impactt.html#ac202d71d615c330f35c2b05a29568ef4">old_dep_graph</a>[o_it].get_node_id()];</div>
@@ -483,8 +483,8 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        ++o_it;</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      <span class="keywordflow">case</span> <a class="code" href="classunified__difft.html#adcc2e5817caaacd60ea4cc87124bdd2fa24d459a81449d7210c8f9a86c2913034">unified_difft::differencet::NEW</a>:</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        assert(n_it!=new_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end());</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        assert(n_it==d.first);</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(n_it != new_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(), <span class="stringliteral">&quot;within range&quot;</span>);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(n_it == d.first, <span class="stringliteral">&quot;start of hunk&quot;</span>);</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        {</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;          <span class="keyword">const</span> <a class="code" href="classgrapht.html#a0be0a85d45281c563e89104c44ba552f">dependence_grapht::nodet</a> &amp;d_node=</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            <a class="code" href="classchange__impactt.html#a5c773fe4dc1d3f01be026706e9638ce3">new_dep_graph</a>[<a class="code" href="classchange__impactt.html#a5c773fe4dc1d3f01be026706e9638ce3">new_dep_graph</a>[n_it].get_node_id()];</div>
@@ -640,7 +640,7 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;        <a class="code" href="classchange__impactt.html#ae52c5c4b659a377bb15b08748d1a3def">ns_new</a>);</div>
 <div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;    {</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;      assert(oc_it-&gt;first==nc_it-&gt;first);</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(oc_it-&gt;first == nc_it-&gt;first, <span class="stringliteral">&quot;same instruction&quot;</span>);</div>
 <div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160; </div>
 <div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;      <a class="code" href="classchange__impactt.html#aafd8baba3335db08b96999de413ab437">output_change_impact</a>(</div>
 <div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        nc_it-&gt;first,</div>
@@ -664,7 +664,7 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;  goto_functionst::function_mapt::const_iterator f_it =</div>
 <div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(function_id);</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  assert(f_it!=goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end());</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(f_it != goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end());</div>
 <div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program=f_it-&gt;second.body;</div>
 <div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160; </div>
 <div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classchange__impactt.html#a5926b4eb9485c366a51e1124d04688ee">compact_output</a>)</div>
@@ -712,12 +712,12 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;  goto_functionst::function_mapt::const_iterator o_f_it =</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    o_goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(function_id);</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  assert(o_f_it!=o_goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end());</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(o_f_it != o_goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end());</div>
 <div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;old_goto_program=o_f_it-&gt;second.body;</div>
 <div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160; </div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;  goto_functionst::function_mapt::const_iterator f_it =</div>
 <div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    n_goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(function_id);</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  assert(f_it!=n_goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end());</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(f_it != n_goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end());</div>
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program=f_it-&gt;second.body;</div>
 <div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160; </div>
 <div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classchange__impactt.html#a5926b4eb9485c366a51e1124d04688ee">compact_output</a>)</div>
@@ -770,88 +770,90 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;    {</div>
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;      prefix=<span class="charliteral">&#39;D&#39;</span>;</div>
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160; </div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;      assert(old_mod_flags==<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a> ||</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;             old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda7f302f3597ad2d32e28ff150791fd184">DEL_DATA_DEP</a> ||</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;             old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9">DEL_CTRL_DEP</a>);</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;      ++o_target;</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    }</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda283c2b58366af4ef8d39965cd0626fe3">NEW_CTRL_DEP</a>)</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;    {</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;      prefix=<span class="charliteral">&#39;C&#39;</span>;</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160; </div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;      assert(old_mod_flags==<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a> ||</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;             old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda7f302f3597ad2d32e28ff150791fd184">DEL_DATA_DEP</a> ||</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;             old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9">DEL_CTRL_DEP</a>);</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;      ++o_target;</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;    }</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160; </div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    <a class="code" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">output_instruction</a>(prefix, goto_program, n_ns, target);</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;  }</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <span class="keywordflow">for</span>( ;</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;      o_target!=old_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;      ++o_target)</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  {</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    goto_program_change_impactt::const_iterator o_c_entry=</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;      o_c_i.find(o_target);</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> old_mod_flags = o_c_entry == o_c_i.end()</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;                                     ? <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span><span class="keyword">&gt;</span>(<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a>)</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;                                     : o_c_entry-&gt;second;</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160; </div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <span class="keywordtype">char</span> prefix = <span class="charliteral">&#39; &#39;</span>;</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <span class="comment">// syntactic changes are preferred over data/control-dependence</span></div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <span class="comment">// modifications</span></div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <span class="keywordflow">if</span>(old_mod_flags==<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a>)</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdabb7e2c181164506d26b60177c4640614">DELETED</a>)</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;      prefix=<span class="charliteral">&#39;-&#39;</span>;</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda29e5375ce802f6909491403be27d07e4">NEW</a>)</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda7f302f3597ad2d32e28ff150791fd184">DEL_DATA_DEP</a>)</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;      prefix=<span class="charliteral">&#39;d&#39;</span>;</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9">DEL_CTRL_DEP</a>)</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;      prefix=<span class="charliteral">&#39;c&#39;</span>;</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160; </div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    <a class="code" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">output_instruction</a>(prefix, goto_program, o_ns, o_target);</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;  }</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;}</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160; </div>
-<div class="line"><a name="l00730"></a><span class="lineno"><a class="line" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">  730</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">change_impactt::output_instruction</a>(</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;  <span class="keywordtype">char</span> prefix,</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program,</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;target)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classchange__impactt.html#a5926b4eb9485c366a51e1124d04688ee">compact_output</a>)</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;  {</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <span class="keywordflow">if</span>(prefix == <span class="charliteral">&#39; &#39;</span>)</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;file = target-&gt;source_location().get_file();</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;line = target-&gt;source_location().get_line();</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    <span class="keywordflow">if</span>(!file.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>() &amp;&amp; !line.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;      std::cout &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(file)</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;                &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(line) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;  }</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;  {</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    std::cout &lt;&lt; prefix;</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    target-&gt;output(std::cout);</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;  }</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;}</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160; </div>
-<div class="line"><a name="l00753"></a><span class="lineno"><a class="line" href="change__impact_8cpp.html#a9a06eb34110a1b46beb3b54e19e35b7b">  753</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="change__impact_8cpp.html#a9a06eb34110a1b46beb3b54e19e35b7b">change_impact</a>(</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;model_old,</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;model_new,</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;  <a class="code" href="change__impact_8h.html#acd8e2056e84714b311f3624b7296244e">impact_modet</a> impact_mode,</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;  <span class="keywordtype">bool</span> compact_output)</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;{</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  <a class="code" href="classchange__impactt.html">change_impactt</a> c(model_old, model_new, impact_mode, compact_output);</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;  c();</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;}</div>
-<div class="ttc" id="achange__impact_8cpp_html_a9a06eb34110a1b46beb3b54e19e35b7b"><div class="ttname"><a href="change__impact_8cpp.html#a9a06eb34110a1b46beb3b54e19e35b7b">change_impact</a></div><div class="ttdeci">void change_impact(const goto_modelt &amp;model_old, const goto_modelt &amp;model_new, impact_modet impact_mode, bool compact_output)</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00753">change_impact.cpp:753</a></div></div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;        old_mod_flags == <a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a> || old_mod_flags &amp; <a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda7f302f3597ad2d32e28ff150791fd184">DEL_DATA_DEP</a> ||</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;          old_mod_flags &amp; <a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9">DEL_CTRL_DEP</a>,</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;        <span class="stringliteral">&quot;expected kind of flag&quot;</span>);</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;      ++o_target;</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    }</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda283c2b58366af4ef8d39965cd0626fe3">NEW_CTRL_DEP</a>)</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    {</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;      prefix=<span class="charliteral">&#39;C&#39;</span>;</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160; </div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        old_mod_flags == <a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a> || old_mod_flags &amp; <a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda7f302f3597ad2d32e28ff150791fd184">DEL_DATA_DEP</a> ||</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;          old_mod_flags &amp; <a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9">DEL_CTRL_DEP</a>,</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        <span class="stringliteral">&quot;expected kind of flag&quot;</span>);</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;      ++o_target;</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;    }</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160; </div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    <a class="code" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">output_instruction</a>(prefix, goto_program, n_ns, target);</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;  }</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  <span class="keywordflow">for</span>( ;</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;      o_target!=old_goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;      ++o_target)</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  {</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    goto_program_change_impactt::const_iterator o_c_entry=</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;      o_c_i.find(o_target);</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> old_mod_flags = o_c_entry == o_c_i.end()</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;                                     ? <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span><span class="keyword">&gt;</span>(<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a>)</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;                                     : o_c_entry-&gt;second;</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160; </div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <span class="keywordtype">char</span> prefix = <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <span class="comment">// syntactic changes are preferred over data/control-dependence</span></div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;    <span class="comment">// modifications</span></div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    <span class="keywordflow">if</span>(old_mod_flags==<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf">SAME</a>)</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdabb7e2c181164506d26b60177c4640614">DELETED</a>)</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;      prefix=<span class="charliteral">&#39;-&#39;</span>;</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda29e5375ce802f6909491403be27d07e4">NEW</a>)</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda7f302f3597ad2d32e28ff150791fd184">DEL_DATA_DEP</a>)</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;      prefix=<span class="charliteral">&#39;d&#39;</span>;</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(old_mod_flags&amp;<a class="code" href="classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9">DEL_CTRL_DEP</a>)</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;      prefix=<span class="charliteral">&#39;c&#39;</span>;</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160; </div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    <a class="code" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">output_instruction</a>(prefix, goto_program, o_ns, o_target);</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;  }</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;}</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160; </div>
+<div class="line"><a name="l00732"></a><span class="lineno"><a class="line" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">  732</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">change_impactt::output_instruction</a>(</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="keywordtype">char</span> prefix,</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program,</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;target)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classchange__impactt.html#a5926b4eb9485c366a51e1124d04688ee">compact_output</a>)</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;  {</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    <span class="keywordflow">if</span>(prefix == <span class="charliteral">&#39; &#39;</span>)</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;file = target-&gt;source_location().get_file();</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;line = target-&gt;source_location().get_line();</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    <span class="keywordflow">if</span>(!file.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>() &amp;&amp; !line.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;      std::cout &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(file)</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;                &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(line) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;  }</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;  {</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    std::cout &lt;&lt; prefix;</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    target-&gt;output(std::cout);</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;  }</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;}</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160; </div>
+<div class="line"><a name="l00755"></a><span class="lineno"><a class="line" href="change__impact_8cpp.html#a9a06eb34110a1b46beb3b54e19e35b7b">  755</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="change__impact_8cpp.html#a9a06eb34110a1b46beb3b54e19e35b7b">change_impact</a>(</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;model_old,</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;model_new,</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;  <a class="code" href="change__impact_8h.html#acd8e2056e84714b311f3624b7296244e">impact_modet</a> impact_mode,</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  <span class="keywordtype">bool</span> compact_output)</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;{</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;  <a class="code" href="classchange__impactt.html">change_impactt</a> c(model_old, model_new, impact_mode, compact_output);</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;  c();</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;}</div>
+<div class="ttc" id="achange__impact_8cpp_html_a9a06eb34110a1b46beb3b54e19e35b7b"><div class="ttname"><a href="change__impact_8cpp.html#a9a06eb34110a1b46beb3b54e19e35b7b">change_impact</a></div><div class="ttdeci">void change_impact(const goto_modelt &amp;model_old, const goto_modelt &amp;model_new, impact_modet impact_mode, bool compact_output)</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00755">change_impact.cpp:755</a></div></div>
 <div class="ttc" id="achange__impact_8h_html"><div class="ttname"><a href="change__impact_8h.html">change_impact.h</a></div><div class="ttdoc">Data and control-dependencies of syntactic diff.</div></div>
 <div class="ttc" id="achange__impact_8h_html_acd8e2056e84714b311f3624b7296244e"><div class="ttname"><a href="change__impact_8h.html#acd8e2056e84714b311f3624b7296244e">impact_modet</a></div><div class="ttdeci">impact_modet</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8h_source.html#l00018">change_impact.h:18</a></div></div>
 <div class="ttc" id="achange__impact_8h_html_acd8e2056e84714b311f3624b7296244ea6328e5e3186c227a021ef2ff77e40197"><div class="ttname"><a href="change__impact_8h.html#acd8e2056e84714b311f3624b7296244ea6328e5e3186c227a021ef2ff77e40197">impact_modet::BOTH</a></div><div class="ttdeci">@ BOTH</div></div>
@@ -868,7 +870,7 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="ttc" id="aclasschange__impactt_html_a23e4a1c1401384e847bd4b9e3ec72a30"><div class="ttname"><a href="classchange__impactt.html#a23e4a1c1401384e847bd4b9e3ec72a30">change_impactt::unified_diff</a></div><div class="ttdeci">unified_difft unified_diff</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00223">change_impact.cpp:223</a></div></div>
 <div class="ttc" id="aclasschange__impactt_html_a28f53b69bb608679b02230add5c60372"><div class="ttname"><a href="classchange__impactt.html#a28f53b69bb608679b02230add5c60372">change_impactt::change_impact</a></div><div class="ttdeci">void change_impact(const irep_idt &amp;function_id)</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00316">change_impact.cpp:316</a></div></div>
 <div class="ttc" id="aclasschange__impactt_html_a4bc9c6e464668c69613ff56e3ec80e67"><div class="ttname"><a href="classchange__impactt.html#a4bc9c6e464668c69613ff56e3ec80e67">change_impactt::change_impactt</a></div><div class="ttdeci">change_impactt(const goto_modelt &amp;model_old, const goto_modelt &amp;model_new, impact_modet impact_mode, bool compact_output)</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00290">change_impact.cpp:290</a></div></div>
-<div class="ttc" id="aclasschange__impactt_html_a4e247146d860b5d3fb0cd220181091ec"><div class="ttname"><a href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">change_impactt::output_instruction</a></div><div class="ttdeci">void output_instruction(char prefix, const goto_programt &amp;goto_program, const namespacet &amp;ns, goto_programt::const_targett &amp;target) const</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00730">change_impact.cpp:730</a></div></div>
+<div class="ttc" id="aclasschange__impactt_html_a4e247146d860b5d3fb0cd220181091ec"><div class="ttname"><a href="classchange__impactt.html#a4e247146d860b5d3fb0cd220181091ec">change_impactt::output_instruction</a></div><div class="ttdeci">void output_instruction(char prefix, const goto_programt &amp;goto_program, const namespacet &amp;ns, goto_programt::const_targett &amp;target) const</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00732">change_impact.cpp:732</a></div></div>
 <div class="ttc" id="aclasschange__impactt_html_a5926b4eb9485c366a51e1124d04688ee"><div class="ttname"><a href="classchange__impactt.html#a5926b4eb9485c366a51e1124d04688ee">change_impactt::compact_output</a></div><div class="ttdeci">bool compact_output</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00216">change_impact.cpp:216</a></div></div>
 <div class="ttc" id="aclasschange__impactt_html_a5c773fe4dc1d3f01be026706e9638ce3"><div class="ttname"><a href="classchange__impactt.html#a5c773fe4dc1d3f01be026706e9638ce3">change_impactt::new_dep_graph</a></div><div class="ttdeci">dependence_grapht new_dep_graph</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00226">change_impact.cpp:226</a></div></div>
 <div class="ttc" id="aclasschange__impactt_html_a62cbfde0dadefa167db6089ad93ba798"><div class="ttname"><a href="classchange__impactt.html#a62cbfde0dadefa167db6089ad93ba798">change_impactt::propogate_dep_back</a></div><div class="ttdeci">void propogate_dep_back(const irep_idt &amp;function_id, const dependence_grapht::nodet &amp;d_node, const dependence_grapht &amp;dep_graph, goto_functions_change_impactt &amp;change_impact, bool del)</div><div class="ttdef"><b>Definition:</b> <a href="change__impact_8cpp_source.html#l00453">change_impact.cpp:453</a></div></div>
@@ -935,10 +937,13 @@ $(document).ready(function(){initNavTree('change__impact_8cpp_source.html',''); 
 <div class="ttc" id="airep_8h_html_a1ad4faefa9ca542d481e74be9cc01c2c"><div class="ttname"><a href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a></div><div class="ttdeci">dstringt irep_idt</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00037">irep.h:37</a></div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>
 <div class="ttc" id="aremove__skip_8cpp_html_aa6e82b3693efc89611c59d82db650af3"><div class="ttname"><a href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a></div><div class="ttdeci">void remove_skip(goto_programt &amp;goto_program, goto_programt::targett begin, goto_programt::targett end)</div><div class="ttdoc">remove unnecessary skip statements</div><div class="ttdef"><b>Definition:</b> <a href="remove__skip_8cpp_source.html#l00087">remove_skip.cpp:87</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00510">invariant.h:510</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 <div class="ttc" id="astructdep__nodet_html"><div class="ttname"><a href="structdep__nodet.html">dep_nodet</a></div><div class="ttdef"><b>Definition:</b> <a href="dependence__graph_8h_source.html#l00058">dependence_graph.h:59</a></div></div>
 <div class="ttc" id="aunified__diff_8h_html"><div class="ttname"><a href="unified__diff_8h.html">unified_diff.h</a></div><div class="ttdoc">Unified diff (using LCSS) of goto functions.</div></div>
+<div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

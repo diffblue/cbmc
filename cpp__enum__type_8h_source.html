@@ -153,13 +153,13 @@ $(document).ready(function(){initNavTree('cpp__enum__type_8h_source.html',''); i
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
 <div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="cpp__enum__type_8h.html#adc0bf7e24ff912ba4579fab850e55683">   62</a></span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classcpp__enum__typet.html">cpp_enum_typet</a> &amp;<a class="code" href="cpp__enum__type_8h.html#adc0bf7e24ff912ba4579fab850e55683">to_cpp_enum_type</a>(<span class="keyword">const</span> <a class="code" href="classirept.html">irept</a> &amp;irep)</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  assert(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_enum);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_c_enum);</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcpp__enum__typet.html">cpp_enum_typet</a> &amp;<span class="keyword">&gt;</span>(irep);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="cpp__enum__type_8h.html#aa18f9034e902606d8351041d8af1cf1f">   68</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="classcpp__enum__typet.html">cpp_enum_typet</a> &amp;<a class="code" href="cpp__enum__type_8h.html#adc0bf7e24ff912ba4579fab850e55683">to_cpp_enum_type</a>(<a class="code" href="classirept.html">irept</a> &amp;irep)</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  assert(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_enum);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(irep.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_c_enum);</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code" href="classcpp__enum__typet.html">cpp_enum_typet</a> &amp;<span class="keyword">&gt;</span>(irep);</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
@@ -185,6 +185,7 @@ $(document).ready(function(){initNavTree('cpp__enum__type_8h_source.html',''); i
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
 <div class="ttc" id="acpp__enum__type_8h_html_adc0bf7e24ff912ba4579fab850e55683"><div class="ttname"><a href="cpp__enum__type_8h.html#adc0bf7e24ff912ba4579fab850e55683">to_cpp_enum_type</a></div><div class="ttdeci">const cpp_enum_typet &amp; to_cpp_enum_type(const irept &amp;irep)</div><div class="ttdef"><b>Definition:</b> <a href="cpp__enum__type_8h_source.html#l00062">cpp_enum_type.h:62</a></div></div>
 <div class="ttc" id="acpp__name_8h_html"><div class="ttname"><a href="cpp__name_8h.html">cpp_name.h</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div><div class="ttdoc">Defines typet, type_with_subtypet and type_with_subtypest.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

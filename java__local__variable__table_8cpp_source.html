@@ -527,7 +527,7 @@ $(document).ready(function(){initNavTree('java__local__variable__table_8cpp_sour
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;      ++domit;</div>
 <div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;      ++repeats;</div>
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    }</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    assert(repeats&lt;=merge_vars.size());</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(repeats &lt;= merge_vars.size(), <span class="stringliteral">&quot;out of bounds&quot;</span>);</div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <span class="keywordflow">if</span>(repeats==merge_vars.size())</div>
 <div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      <span class="keywordflow">return</span> dom;</div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  }</div>

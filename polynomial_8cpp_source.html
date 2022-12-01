@@ -459,7 +459,7 @@ $(document).ready(function(){initNavTree('polynomial_8cpp_source.html',''); init
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    }</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    {</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;      assert(it-&gt;var==jt-&gt;var);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(it-&gt;var == jt-&gt;var, <span class="stringliteral">&quot;must match&quot;</span>);</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;      <span class="comment">// Variables are equal, compare exponents.</span></div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      <span class="keywordflow">if</span>(e1 &lt; e2)</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      {</div>
@@ -471,7 +471,7 @@ $(document).ready(function(){initNavTree('polynomial_8cpp_source.html',''); init
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      }</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;      {</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        assert(e1==e2);</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(e1 == e2, <span class="stringliteral">&quot;must match&quot;</span>);</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        <span class="comment">// v1==v2 &amp;&amp; e1 == e2.  Look at the next term in the power product.</span></div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        ++it;</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        ++jt;</div>
@@ -622,6 +622,7 @@ $(document).ready(function(){initNavTree('polynomial_8cpp_source.html',''); init
 <div class="ttc" id="astructmonomialt_1_1termt_html_af7f31a0408f3bc346c2c50c8319312ce"><div class="ttname"><a href="structmonomialt_1_1termt.html#af7f31a0408f3bc346c2c50c8319312ce">monomialt::termt::exp</a></div><div class="ttdeci">unsigned int exp</div><div class="ttdef"><b>Definition:</b> <a href="polynomial_8h_source.html#l00026">polynomial.h:26</a></div></div>
 <div class="ttc" id="autil_8cpp_html_a0d4714cfb438bd416ffc4c8cb1f66c57"><div class="ttname"><a href="util_8cpp.html#a0d4714cfb438bd416ffc4c8cb1f66c57">join_types</a></div><div class="ttdeci">typet join_types(const typet &amp;t1, const typet &amp;t2)</div><div class="ttdoc">Return the smallest type that both t1 and t2 can be cast to without losing information.</div><div class="ttdef"><b>Definition:</b> <a href="util_8cpp_source.html#l00070">util.cpp:70</a></div></div>
 <div class="ttc" id="autil_8h_html"><div class="ttname"><a href="util_8h.html">util.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
+<div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

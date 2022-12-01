@@ -1,7 +1,5 @@
 var NAVTREEINDEX127 =
 {
-"structsharing__mapt_1_1real__value__comparatort.html#aacd1edd2aa1a8519bc03f0c126dc0c8a":[6,0,1010,3,0],
-"structsharing__mapt_1_1real__value__comparatort.html#ab4a7deba7abb6b36b35c91c1e756dac4":[6,0,1010,3,2],
 "structsharing__mapt_1_1sharing__map__statst.html":[6,0,1010,4],
 "structsharing__mapt_1_1sharing__map__statst.html#a11ec7f7871bf752eef57cc4a24ec324e":[6,0,1010,4,2],
 "structsharing__mapt_1_1sharing__map__statst.html#aaa6b9b68c038c8c4af8dbcb083985620":[6,0,1010,4,1],
@@ -249,5 +247,7 @@ var NAVTREEINDEX127 =
 "structsmt__object__sizet.html#a13e3fa22ea44f2c8d6a499a2c69f84be":[6,0,1091,2],
 "structsmt__object__sizet.html#a1fec22afdf3773ece672e4f56ee1c6e3":[6,0,1091,1],
 "structsmt__object__sizet.html#a415400271414a89a9a7531259cd6ddc9":[6,0,1091,3],
-"structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5":[6,0,1091,0]
+"structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5":[6,0,1091,0],
+"structsolver__hardnesst.html":[6,0,1115],
+"structsolver__hardnesst.html#a226cbdfe5b27d59fc10c8f100646e148":[6,0,1115,17]
 };

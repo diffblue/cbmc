@@ -194,13 +194,13 @@ $(document).ready(function(){initNavTree('cpp__scope_8h_source.html',''); initRe
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
 <div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="classcpp__scopet.html#ad41f7dcc9433121270dbc1c63c06657f">  103</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classcpp__scopet.html#ad41f7dcc9433121270dbc1c63c06657f">add_secondary_scope</a>(<a class="code" href="classcpp__scopet.html">cpp_scopet</a> &amp;other)</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    assert(other.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(other.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classcpp__idt.html#ada9d00bf75ddfd94196ecb402fcbb40a">secondary_scopes</a>.push_back(&amp;other);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  }</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
 <div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="classcpp__scopet.html#a8fc871eea78c9964f33ad6985ef62163">  109</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classcpp__scopet.html#a8fc871eea78c9964f33ad6985ef62163">add_using_scope</a>(<a class="code" href="classcpp__scopet.html">cpp_scopet</a> &amp;other)</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    assert(other.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(other.<a class="code" href="classcpp__idt.html#a56842fd401acf1899dae983cba9d45cd">is_scope</a>);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="classcpp__idt.html#a2acb4c3120b29546fe269a5455171a8a">using_scopes</a>.push_back(&amp;other);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  }</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
@@ -268,6 +268,7 @@ $(document).ready(function(){initNavTree('cpp__scope_8h_source.html',''); initRe
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="acpp__id_8h_html"><div class="ttname"><a href="cpp__id_8h.html">cpp_id.h</a></div><div class="ttdoc">C++ Language Type Checking.</div></div>
 <div class="ttc" id="acpp__scope_8h_html_a2a3d3dbe5ba6d0c2b141dd3bbcf2d9e0"><div class="ttname"><a href="cpp__scope_8h.html#a2a3d3dbe5ba6d0c2b141dd3bbcf2d9e0">operator&lt;&lt;</a></div><div class="ttdeci">std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, cpp_scopet::lookup_kindt)</div><div class="ttdef"><b>Definition:</b> <a href="cpp__scope_8cpp_source.html#l00014">cpp_scope.cpp:14</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

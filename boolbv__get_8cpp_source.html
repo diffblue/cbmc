@@ -406,9 +406,9 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="comment">// get root</span></div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> number = <a class="code" href="classarrayst.html#a51808e843bf891753f8e49014dac39c9">arrays</a>.<a class="code" href="classunion__find.html#a9b52f160a057cde837a8ecfcce15b989">find_number</a>(*opt_num);</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    assert(number&lt;<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.size());</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(number &lt; <a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.size());</div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    index_mapt::const_iterator it=<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.find(number);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    assert(it!=<a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.end());</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(it != <a class="code" href="classarrayst.html#a1373da810da90a1fe7199f242731a308">index_map</a>.end());</div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarrayst.html#ac7868d6f14949469054dad3be4904938">index_sett</a> &amp;index_set=it-&gt;second;</div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordflow">for</span>(index_sett::const_iterator it1=</div>
@@ -483,25 +483,27 @@ $(document).ready(function(){initNavTree('boolbv__get_8cpp_source.html',''); ini
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  std::size_t offset,</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  std::size_t width)</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;{</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> value=0;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> weight=1;</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="keywordflow">for</span>(std::size_t bit_nr=offset; bit_nr&lt;offset+width; bit_nr++)</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  {</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    assert(bit_nr&lt;bv.size());</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#adf97d3193105345ee1332f2bf08ebaed">l_get</a>(bv[bit_nr]).<a class="code" href="classtvt.html#ae0303c2ab852fb3ac3d696ea25578a60">get_value</a>())</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faffe62c0c68be1431c8aacf617bb08c8c">tvt::tv_enumt::TV_FALSE</a>:   <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faf6c667a41be8a115e86241d8088859c5">tvt::tv_enumt::TV_TRUE</a>:    value+=weight; <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a>: <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;     <span class="keywordflow">default</span>: assert(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    }</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    weight*=2;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  }</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordflow">return</span> value;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;}</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(offset + width &lt;= bv.size());</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> value=0;</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> weight=1;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160; </div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <span class="keywordflow">for</span>(std::size_t bit_nr=offset; bit_nr&lt;offset+width; bit_nr++)</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  {</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#adf97d3193105345ee1332f2bf08ebaed">l_get</a>(bv[bit_nr]).<a class="code" href="classtvt.html#ae0303c2ab852fb3ac3d696ea25578a60">get_value</a>())</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    {</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faffe62c0c68be1431c8aacf617bb08c8c">tvt::tv_enumt::TV_FALSE</a>:   <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20faf6c667a41be8a115e86241d8088859c5">tvt::tv_enumt::TV_TRUE</a>:    value+=weight; <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;     <span class="keywordflow">case</span> <a class="code" href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a>: <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;     <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;       <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    }</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    weight*=2;</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  }</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  <span class="keywordflow">return</span> value;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a18174caf9f9c9856324582e7936b6318"><div class="ttname"><a href="arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a></div><div class="ttdeci">irep_idt make_bvrep(const std::size_t width, const std::function&lt; bool(std::size_t)&gt; f)</div><div class="ttdoc">construct a bit-vector representation from a functor</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00306">arith_tools.cpp:306</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
