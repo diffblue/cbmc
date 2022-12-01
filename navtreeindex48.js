@@ -1,15 +1,5 @@
 var NAVTREEINDEX48 =
 {
-"classmethod__bytecodet.html#afeb521e7447c6dbd717195702ef5c342":[6,0,788,7],
-"classmethod__handle__infot.html":[6,0,789],
-"classmethod__handle__infot.html#a15fb82ba2be2984a381a0bf1f7af4782":[6,0,789,1],
-"classmethod__handle__infot.html#a1b0b27be2bf57b41a186fc3d545e1d3c":[6,0,789,5],
-"classmethod__handle__infot.html#a3d31891c66099b1c898fca22d235f293":[6,0,789,3],
-"classmethod__handle__infot.html#a8565c48bf5efe5f307ea60d495d95c59":[6,0,789,4],
-"classmethod__handle__infot.html#abc71176b596ea5fc66e83282b6afae69":[6,0,789,2],
-"classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8c":[6,0,789,0],
-"classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8ca00467ddf17a0a921e76040eaf85c3f15":[6,0,789,0,7],
-"classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8ca0e558b044ac40b9e36686b88ad365f5c":[6,0,789,0,3],
 "classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8ca1b15fef43557f4a6b5486288915a168e":[6,0,789,0,1],
 "classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8ca2fc3edf2df39b83b274517ce3f0c8388":[6,0,789,0,0],
 "classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8ca56ae28af752d6b91086ad6ad3bed8342":[6,0,789,0,5],
@@ -249,5 +239,15 @@ var NAVTREEINDEX48 =
 "classmz__zip__archivet.html#a9aaae9fd669c8c0b42d630f616d0fcf0":[6,0,818,0],
 "classmz__zip__archivet.html#acf6894ab594c513b5ebee660c64dc83c":[6,0,818,2],
 "classname__and__type__infot.html":[6,0,822],
-"classname__and__type__infot.html#a88fd47b4bdf7ef57664ba4d0db6dbcd5":[6,0,822,3]
+"classname__and__type__infot.html#a88fd47b4bdf7ef57664ba4d0db6dbcd5":[6,0,822,3],
+"classname__and__type__infot.html#a993c3992ae1fe5931166e99b8da799a6":[6,0,822,0],
+"classname__and__type__infot.html#aae87c5b5810fae0a92d7e77a80579391":[6,0,822,1],
+"classname__and__type__infot.html#add3723eeed44517ef44672e3ad31477a":[6,0,822,2],
+"classname__and__type__infot.html#ae47f1aa79dd2deb117691484f65201f1":[6,0,822,4],
+"classnamed__term__exprt.html":[6,0,823],
+"classnamed__term__exprt.html#a1ac5860322f708d709513640dd0d7154":[6,0,823,1],
+"classnamed__term__exprt.html#a408217e4d7b3c69164db562231e4c225":[6,0,823,0],
+"classnamed__term__exprt.html#a80b597eb5fe3c114caa7f04d8c337f69":[6,0,823,3],
+"classnamed__term__exprt.html#ab4fe25a5947acb639867b67c4fe9ffcb":[6,0,823,2],
+"classnamed__term__exprt.html#afe0c94eda034a6cc01f94c64d4e15dd8":[6,0,823,4]
 };

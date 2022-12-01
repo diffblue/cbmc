@@ -1,15 +1,5 @@
 var NAVTREEINDEX49 =
 {
-"classname__and__type__infot.html#a993c3992ae1fe5931166e99b8da799a6":[6,0,822,0],
-"classname__and__type__infot.html#aae87c5b5810fae0a92d7e77a80579391":[6,0,822,1],
-"classname__and__type__infot.html#add3723eeed44517ef44672e3ad31477a":[6,0,822,2],
-"classname__and__type__infot.html#ae47f1aa79dd2deb117691484f65201f1":[6,0,822,4],
-"classnamed__term__exprt.html":[6,0,823],
-"classnamed__term__exprt.html#a1ac5860322f708d709513640dd0d7154":[6,0,823,1],
-"classnamed__term__exprt.html#a408217e4d7b3c69164db562231e4c225":[6,0,823,0],
-"classnamed__term__exprt.html#a80b597eb5fe3c114caa7f04d8c337f69":[6,0,823,3],
-"classnamed__term__exprt.html#ab4fe25a5947acb639867b67c4fe9ffcb":[6,0,823,2],
-"classnamed__term__exprt.html#afe0c94eda034a6cc01f94c64d4e15dd8":[6,0,823,4],
 "classnamespace__baset.html":[6,0,824],
 "classnamespace__baset.html#a0509ac32210c7c8e9a686126ff4cbca1":[6,0,824,6],
 "classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a":[6,0,824,1],
@@ -249,5 +239,15 @@ var NAVTREEINDEX49 =
 "classoptionst.html#ad6fe03db1b49c682d978ddf3458cd9e2":[6,0,857,11],
 "classoptionst.html#aed3e19b0f5f0805c8ce6195866f54f14":[6,0,857,7],
 "classoptionst.html#af086f9b8e13b882e827b63f2f7f56844":[6,0,857,5],
-"classoptionst.html#afc9ddd6e957e31d6bb27f619d07647e4":[6,0,857,1]
+"classoptionst.html#afc9ddd6e957e31d6bb27f619d07647e4":[6,0,857,1],
+"classor__exprt.html":[6,0,858],
+"classor__exprt.html#a4936f2140149d9d094f3241510e1fd5e":[6,0,858,1],
+"classor__exprt.html#a9f4e2d7287767ad01ab8b6a118401992":[6,0,858,3],
+"classor__exprt.html#aaf76d7e0a55f561df19b4270960caf95":[6,0,858,2],
+"classor__exprt.html#ab6f14250dd5e9fbb967a23930704480b":[6,0,858,0],
+"classosx__fat__readert.html":[6,0,859],
+"classosx__fat__readert.html#a163c8bbb7e3f83d38809c71306c87e90":[6,0,859,4],
+"classosx__fat__readert.html#a5bccca3be8587f98052348250c5bbd88":[6,0,859,0],
+"classosx__fat__readert.html#a68f74f384c9a8507a3bae6440c5bd102":[6,0,859,3],
+"classosx__fat__readert.html#aa0fb4ae32a47f886a2a6a1deff381d1c":[6,0,859,1]
 };

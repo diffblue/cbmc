@@ -96,7 +96,6 @@ var classgoto__symext =
     [ "_total_vccs", "classgoto__symext.html#a53c7781501310d8987eecae776eaafa5", null ],
     [ "atomic_section_counter", "classgoto__symext.html#a62361ea8698f78380445aecdeda117e4", null ],
     [ "complexity_module", "classgoto__symext.html#a1bfb069898d5ec9259ea9ed07a8e3326", null ],
-    [ "dynamic_counter", "classgoto__symext.html#aa382d3df2a390cf50917f653b82e0b18", null ],
     [ "guard_manager", "classgoto__symext.html#a6224080bc861386c7cdee881b8b1bb20", null ],
     [ "ignore_assertions", "classgoto__symext.html#a2e575b321b4c4f6b0d02a5f4a378bc9f", null ],
     [ "instruction_local_symbols", "classgoto__symext.html#ae4fc21352daf6b6b86b9026a5872f2ea", null ],
