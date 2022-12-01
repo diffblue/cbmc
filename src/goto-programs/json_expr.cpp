@@ -351,10 +351,11 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
 
     std::size_t index = 0;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      json_objectt e{{"index", json_numbert(std::to_string(index))},
-                     {"value", json(*it, ns, mode)}};
+      json_objectt e{
+        {"index", json_numbert(std::to_string(index))},
+        {"value", json(op, ns, mode)}};
       elements.push_back(std::move(e));
       index++;
     }

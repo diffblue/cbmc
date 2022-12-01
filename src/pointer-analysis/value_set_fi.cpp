@@ -550,14 +550,16 @@ void value_set_fit::get_value_set_rec(
       // find the pointer operand
       const exprt *ptr_operand=nullptr;
 
-      forall_operands(it, expr)
-        if(it->type().id()==ID_pointer)
+      for(const auto &op : expr.operands())
+      {
+        if(op.type().id() == ID_pointer)
         {
           if(ptr_operand==nullptr)
-            ptr_operand=&(*it);
+            ptr_operand = &op;
           else
             throw "more than one pointer operand in pointer arithmetic";
         }
+      }
 
       if(ptr_operand==nullptr)
         throw "pointer type sum expected to have pointer operand";
@@ -657,8 +659,8 @@ void value_set_fit::get_value_set_rec(
           expr.id()==ID_array)
   {
     // an array constructor, possibly containing addresses
-    forall_operands(it, expr)
-      get_value_set_rec(*it, dest, suffix, original_type, ns, recursion_set);
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, dest, suffix, original_type, ns, recursion_set);
   }
   else if(expr.id()==ID_dynamic_object)
   {
@@ -1085,9 +1087,9 @@ void value_set_fit::assign(
       else if(rhs.id()==ID_array ||
               rhs.id()==ID_constant)
       {
-        forall_operands(o_it, rhs)
+        for(const auto &op : rhs.operands())
         {
-          assign(lhs_index, *o_it, ns);
+          assign(lhs_index, op, ns);
         }
       }
       else if(rhs.id()==ID_with)

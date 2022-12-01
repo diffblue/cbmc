@@ -584,15 +584,15 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
   typet &type=static_cast<typet &>(expr.add(ID_type_arg));
   typecheck_type(type);
 
-  exprt &member=static_cast<exprt &>(expr.add(ID_designator));
+  const exprt &member = static_cast<const exprt &>(expr.add(ID_designator));
 
   exprt result=from_integer(0, size_type());
 
-  forall_operands(m_it, member)
+  for(const auto &op : member.operands())
   {
     type = follow(type);
 
-    if(m_it->id()==ID_member)
+    if(op.id() == ID_member)
     {
       if(type.id()!=ID_union && type.id()!=ID_struct)
       {
@@ -603,7 +603,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       }
 
       bool found=false;
-      irep_idt component_name=m_it->get(ID_component_name);
+      irep_idt component_name = op.get(ID_component_name);
 
       while(!found)
       {
@@ -689,7 +689,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         }
       }
     }
-    else if(m_it->id()==ID_index)
+    else if(op.id() == ID_index)
     {
       if(type.id()!=ID_array)
       {
@@ -698,7 +698,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         throw 0;
       }
 
-      exprt index = to_unary_expr(*m_it).op();
+      exprt index = to_unary_expr(op).op();
 
       // still need to typecheck index
       typecheck_expr(index);

@@ -463,9 +463,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
 
     // count the constants
     size_t count=0;
-    forall_operands(it, expr)
-      if(is_number(it->type()) && it->is_constant())
+    for(const auto &op : expr.operands())
+    {
+      if(is_number(op.type()) && op.is_constant())
         count++;
+    }
 
     // merge constants?
     if(count>=2)
@@ -640,14 +642,14 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
   {
     bool all_bool=true;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       if(
-        it->id() == ID_typecast &&
-        to_typecast_expr(*it).op().type().id() == ID_bool)
+        op.id() == ID_typecast &&
+        to_typecast_expr(op).op().type().id() == ID_bool)
       {
       }
-      else if(it->is_zero() || it->is_one())
+      else if(op.is_zero() || op.is_one())
       {
       }
       else
@@ -1152,9 +1154,9 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
     // count down
     mp_integer offset = *width;
 
-    forall_operands(it, expr.src())
+    for(const auto &op : expr.src().operands())
     {
-      auto op_width = pointer_offset_bits(it->type(), ns);
+      auto op_width = pointer_offset_bits(op.type(), ns);
 
       if(!op_width.has_value() || *op_width <= 0)
         return unchanged(expr);
@@ -1162,7 +1164,7 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
       if(*start < offset && offset <= *end + *op_width)
       {
         extractbits_exprt result = expr;
-        result.src() = *it;
+        result.src() = op;
         result.lower() =
           from_integer(*end - (offset - *op_width), expr.lower().type());
         result.upper() =

@@ -45,9 +45,9 @@ void acceleration_utilst::gather_rvalues(
   }
   else
   {
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      gather_rvalues(*it, rvalues);
+      gather_rvalues(op, rvalues);
     }
   }
 }
@@ -1188,9 +1188,9 @@ void acceleration_utilst::gather_array_accesses(
     arrays.insert(to_dereference_expr(e).pointer());
   }
 
-  forall_operands(it, e)
+  for(const auto &op : e.operands())
   {
-    gather_array_accesses(*it, arrays);
+    gather_array_accesses(op, arrays);
   }
 }
 

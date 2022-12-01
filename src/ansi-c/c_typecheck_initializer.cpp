@@ -775,9 +775,8 @@ designatort c_typecheck_baset::make_designator(
   typet type=src_type;
   designatort designator;
 
-  forall_operands(it, src)
+  for(const auto &d_op : src.operands())
   {
-    const exprt &d_op=*it;
     designatort::entryt entry(type);
     const typet &full_type=follow(entry.type);
 

@@ -713,10 +713,9 @@ void value_sett::get_value_set_rec(
     else
     {
       // we get the points-to for all operands, even integers
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        get_value_set_rec(
-          *it, pointer_expr_set, "", it->type(), ns);
+        get_value_set_rec(op, pointer_expr_set, "", op.type(), ns);
       }
     }
 
@@ -747,10 +746,9 @@ void value_sett::get_value_set_rec(
     object_mapt pointer_expr_set;
 
     // we get the points-to for all operands, even integers
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      get_value_set_rec(
-        *it, pointer_expr_set, "", it->type(), ns);
+      get_value_set_rec(op, pointer_expr_set, "", op.type(), ns);
     }
 
     for(object_map_dt::const_iterator
@@ -833,7 +831,7 @@ void value_sett::get_value_set_rec(
 
     // a struct constructor, which may contain addresses
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       const std::string &component_name =
         id2string(component_iter->get_name());
@@ -841,7 +839,7 @@ void value_sett::get_value_set_rec(
       {
         std::string remaining_suffix =
           strip_first_field_from_suffix(suffix, component_name);
-        get_value_set_rec(*it, dest, remaining_suffix, original_type, ns);
+        get_value_set_rec(op, dest, remaining_suffix, original_type, ns);
         found_component = true;
       }
       ++component_iter;
@@ -852,8 +850,8 @@ void value_sett::get_value_set_rec(
       // Struct field doesn't appear as expected -- this has probably been
       // cast from an incompatible type. Conservatively assume all fields may
       // be of interest.
-      forall_operands(it, expr)
-        get_value_set_rec(*it, dest, suffix, original_type, ns);
+      for(const auto &op : expr.operands())
+        get_value_set_rec(op, dest, suffix, original_type, ns);
     }
   }
   else if(expr.id() == ID_union)
@@ -922,8 +920,8 @@ void value_sett::get_value_set_rec(
     // Otherwise we're probably reinterpreting some other type -- try persisting
     // with the current suffix for want of a better idea.
 
-    forall_operands(it, expr)
-      get_value_set_rec(*it, dest, new_suffix, original_type, ns);
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, dest, new_suffix, original_type, ns);
   }
   else if(expr.id()==ID_array_of)
   {
@@ -1394,9 +1392,9 @@ void value_sett::assign(
       else if(rhs.id()==ID_array ||
               rhs.id()==ID_constant)
       {
-        forall_operands(o_it, rhs)
+        for(const auto &op : rhs.operands())
         {
-          assign(lhs_index, *o_it, ns, is_simplified, add_to_sets);
+          assign(lhs_index, op, ns, is_simplified, add_to_sets);
           add_to_sets=true;
         }
       }
@@ -1630,8 +1628,8 @@ void value_sett::apply_code_rec(
 
   if(statement==ID_block)
   {
-    forall_operands(it, code)
-      apply_code_rec(to_code(*it), ns);
+    for(const auto &op : code.operands())
+      apply_code_rec(to_code(op), ns);
   }
   else if(statement==ID_function_call)
   {
@@ -1753,8 +1751,8 @@ void value_sett::guard(
 {
   if(expr.id()==ID_and)
   {
-    forall_operands(it, expr)
-      guard(*it, ns);
+    for(const auto &op : expr.operands())
+      guard(op, ns);
   }
   else if(expr.id()==ID_equal)
   {

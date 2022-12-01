@@ -1711,8 +1711,8 @@ static void update_index_set(
     }
     else
     {
-      forall_operands(it, cur)
-        to_process.push_back(*it);
+      for(const auto &op : as_const(cur).operands())
+        to_process.push_back(op);
     }
   }
 }

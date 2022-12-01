@@ -402,13 +402,13 @@ void goto_program2codet::convert_assign_rec(
     const array_typet &type = to_array_type(assign.rhs().type());
 
     unsigned i=0;
-    forall_operands(it, assign.rhs())
+    for(const auto &op : assign.rhs().operands())
     {
       index_exprt index(
         assign.lhs(),
         from_integer(i++, type.index_type()),
         type.element_type());
-      convert_assign_rec(code_assignt(index, *it), dest);
+      convert_assign_rec(code_assignt(index, op), dest);
     }
   }
   else
@@ -1542,12 +1542,14 @@ void goto_program2codet::cleanup_code_block(
     else if(to_code(*it).get_statement()==ID_block)
     {
       bool has_decl=false;
-      forall_operands(it2, *it)
-        if(it2->id()==ID_code && to_code(*it2).get_statement()==ID_decl)
+      for(const auto &op : as_const(*it).operands())
+      {
+        if(op.id() == ID_code && to_code(op).get_statement() == ID_decl)
         {
           has_decl=true;
           break;
         }
+      }
 
       if(!has_decl)
       {
@@ -1617,9 +1619,11 @@ static bool has_labels(const codet &code)
   if(code.get_statement()==ID_label)
     return true;
 
-  forall_operands(it, code)
-    if(it->id()==ID_code && has_labels(to_code(*it)))
+  for(const auto &op : code.operands())
+  {
+    if(op.id() == ID_code && has_labels(to_code(op)))
       return true;
+  }
 
   return false;
 }
