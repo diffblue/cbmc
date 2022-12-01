@@ -220,6 +220,7 @@ void build_goto_trace(
   time_mapt time_map;
 
   mp_integer current_time=0;
+  const bool has_threads = target.has_threads();
 
   ssa_step_iteratort last_step_to_keep = target.SSA_steps.end();
   bool last_step_was_kept = false;
@@ -258,6 +259,9 @@ void build_goto_trace(
     else if(it->is_shared_read() || it->is_shared_write() ||
             it->is_atomic_end())
     {
+      if(!has_threads)
+        continue;
+
       mp_integer time_before=current_time;
 
       if(it->is_shared_read() || it->is_shared_write())

@@ -477,20 +477,10 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   }();
   if(!descriptor)
   {
-    if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr))
-    {
-      // Note this case is currently expected to be encountered during trace
-      // generation for -
-      //  * Steps which were removed via --slice-formula.
-      //  * Getting concurrency clock values.
-      // The below implementation which returns the given expression was chosen
-      // based on the implementation of `smt2_convt::get` in the non-incremental
-      // smt2 decision procedure.
-      log.warning()
-        << "`get` attempted for unknown symbol, with identifier - \n"
-        << symbol_expr->get_identifier() << messaget::eom;
-      return expr;
-    }
+    INVARIANT_WITH_DIAGNOSTICS(
+      !can_cast_expr<symbol_exprt>(expr),
+      "symbol expressions must have a known value",
+      irep_pretty_diagnosticst{expr});
     return build_expr_based_on_getting_operands(expr, *this);
   }
   if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
