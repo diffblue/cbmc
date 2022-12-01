@@ -151,17 +151,12 @@ smt_responset decision_procedure_test_environmentt::receive_response()
 
 static symbolt make_test_symbol(irep_idt id, typet type)
 {
-  symbolt new_symbol;
-  new_symbol.name = std::move(id);
-  new_symbol.type = std::move(type);
-  return new_symbol;
+  return symbolt{std::move(id), std::move(type), irep_idt{}};
 }
 
 static symbolt make_test_symbol(irep_idt id, exprt value)
 {
-  symbolt new_symbol;
-  new_symbol.name = std::move(id);
-  new_symbol.type = value.type();
+  symbolt new_symbol{std::move(id), value.type(), irep_idt{}};
   new_symbol.value = std::move(value);
   return new_symbol;
 }

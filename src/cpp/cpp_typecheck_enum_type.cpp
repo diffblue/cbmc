@@ -51,17 +51,15 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     exprt value_expr = from_integer(i, c_enum_type.underlying_type());
     value_expr.type()=enum_tag_type; // override type
 
-    symbolt symbol;
-
-    symbol.name=id2string(enum_symbol.name)+"::"+id2string(name);
+    symbolt symbol{
+      id2string(enum_symbol.name) + "::" + id2string(name),
+      enum_tag_type,
+      enum_symbol.mode};
     symbol.base_name=name;
     symbol.value=value_expr;
     symbol.location = static_cast<const source_locationt &>(
       component.find(ID_C_source_location));
-    symbol.mode = enum_symbol.mode;
     symbol.module=module;
-    symbol.type=enum_tag_type;
-    symbol.is_type=false;
     symbol.is_macro=true;
     symbol.is_file_local = true;
     symbol.is_thread_local = true;
@@ -167,17 +165,11 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       }
     }
 
-    symbolt symbol;
-
-    symbol.name=symbol_name;
+    type_symbolt symbol{symbol_name, type, ID_cpp};
     symbol.base_name=base_name;
     symbol.value.make_nil();
     symbol.location=type.source_location();
-    symbol.mode=ID_cpp;
     symbol.module=module;
-    symbol.type.swap(type);
-    symbol.is_type=true;
-    symbol.is_macro=false;
     symbol.pretty_name=pretty_name;
 
     // move early, must be visible before doing body

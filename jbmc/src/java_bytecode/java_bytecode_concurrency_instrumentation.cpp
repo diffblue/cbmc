@@ -47,17 +47,14 @@ static symbolt add_or_get_symbol(
   ns.lookup(name, psymbol);
   if(psymbol != nullptr)
     return *psymbol;
-  symbolt new_symbol;
-  new_symbol.name = name;
+  symbolt new_symbol{name, type, ID_java};
   new_symbol.pretty_name = name;
   new_symbol.base_name = base_name;
-  new_symbol.type = type;
   new_symbol.value = value;
   new_symbol.is_lvalue = true;
   new_symbol.is_state_var = true;
   new_symbol.is_static_lifetime = is_static_lifetime;
   new_symbol.is_thread_local = is_thread_local;
-  new_symbol.mode = ID_java;
   symbol_table.add(new_symbol);
   return new_symbol;
 }

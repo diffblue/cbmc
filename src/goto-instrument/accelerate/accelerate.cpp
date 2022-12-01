@@ -435,12 +435,10 @@ bool acceleratet::is_underapproximate(path_acceleratort &accelerator)
 
 symbolt acceleratet::make_symbol(std::string name, typet type)
 {
-  symbolt ret;
+  symbolt ret{name, std::move(type), irep_idt{}};
   ret.module="accelerate";
-  ret.name=name;
   ret.base_name=name;
   ret.pretty_name=name;
-  ret.type=type;
 
   symbol_table.add(ret);
 

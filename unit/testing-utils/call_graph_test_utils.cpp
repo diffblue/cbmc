@@ -14,10 +14,7 @@ symbolt
 create_void_function_symbol(const irep_idt &name, const codet &code)
 {
   const code_typet void_function_type({}, empty_typet());
-  symbolt function;
-  function.name = name;
-  function.type = void_function_type;
-  function.mode = ID_java;
+  symbolt function{name, void_function_type, ID_java};
   function.value = code;
   return function;
 }

@@ -455,17 +455,13 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   const auto long_type = signedbv_typet(64);
   array_typet array_type(int_type, from_integer(5, int_type));
 
-  symbolt a_symbol;
+  symbolt a_symbol{"a", array_type, irep_idt{}};
   a_symbol.base_name = "a";
-  a_symbol.name = "a";
-  a_symbol.type = array_type;
   a_symbol.is_lvalue = true;
   symbol_table.add(a_symbol);
 
-  symbolt i_symbol;
+  symbolt i_symbol{"i", int_type, irep_idt{}};
   i_symbol.base_name = "i";
-  i_symbol.name = "i";
-  i_symbol.type = int_type;
   i_symbol.is_lvalue = true;
   symbol_table.add(i_symbol);
 

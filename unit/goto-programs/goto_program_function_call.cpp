@@ -25,28 +25,19 @@ SCENARIO(
     const signedbv_typet type2(64);
     const code_typet code_type({}, type1);
 
-    symbolt var_symbol;
-    irep_idt var_symbol_name = "a";
-    var_symbol.name = var_symbol_name;
-    symbol_exprt var_a(var_symbol_name, type1);
+    symbolt var_symbol{"a", type1, irep_idt{}};
+    symbol_exprt var_a = var_symbol.symbol_expr();
 
-    symbolt var_symbol2;
-    irep_idt var_symbol_name2 = "b";
-    var_symbol2.name = var_symbol_name2;
-    symbol_exprt var_b(var_symbol_name2, type2);
+    symbolt var_symbol2{"b", type2, irep_idt{}};
+    symbol_exprt var_b = var_symbol2.symbol_expr();
 
-    symbolt fun_symbol;
-    irep_idt fun_symbol_name = "foo";
-    fun_symbol.name = fun_symbol_name;
-    fun_symbol.type = code_type;
-    symbol_exprt fun_foo(fun_symbol_name, code_type);
+    symbolt fun_symbol{"foo", code_type, irep_idt{}};
+    symbol_exprt fun_foo = fun_symbol.symbol_expr();
 
     goto_functiont goto_function;
     auto &instructions = goto_function.body.instructions;
     instructions.emplace_back(goto_program_instruction_typet::FUNCTION_CALL);
 
-    var_symbol.type = type1;
-    var_symbol2.type = type2;
     symbol_table.insert(var_symbol);
     symbol_table.insert(var_symbol2);
     symbol_table.insert(fun_symbol);

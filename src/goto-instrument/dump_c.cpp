@@ -91,14 +91,14 @@ void dump_ct::operator()(std::ostream &os)
       (symbol.type.id() == ID_union || symbol.type.id() == ID_struct) &&
       !symbol.is_type)
     {
-      type_symbolt ts{symbol.type};
-      ts.mode = symbol.mode;
+      std::string tag_name;
       if(mode == ID_C)
-        ts.name = "tag-" + type2name(symbol.type, ns);
+        tag_name = "tag-" + type2name(symbol.type, ns);
       else if(mode == ID_cpp)
-        ts.name = "tag-" + cpp_type2name(symbol.type);
+        tag_name = "tag-" + cpp_type2name(symbol.type);
       else
         UNREACHABLE;
+      type_symbolt ts{tag_name, symbol.type, symbol.mode};
       typet &type =
         copied_symbol_table.get_writeable_ref(named_symbol.first).type;
       if(ts.type.id() == ID_union)

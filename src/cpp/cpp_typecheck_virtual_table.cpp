@@ -68,15 +68,14 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     const symbolt &vt_symb_type =
       lookup("virtual_table::" + id2string(late_cast_symb.name));
 
-    symbolt vt_symb_var;
-    vt_symb_var.name=
-      id2string(vt_symb_type.name) + "@"+ id2string(symbol.name);
+    symbolt vt_symb_var{
+      id2string(vt_symb_type.name) + "@" + id2string(symbol.name),
+      struct_tag_typet(vt_symb_type.name),
+      symbol.mode};
     vt_symb_var.base_name=
       id2string(vt_symb_type.base_name) + "@" + id2string(symbol.base_name);
-    vt_symb_var.mode = symbol.mode;
     vt_symb_var.module=module;
     vt_symb_var.location=vt_symb_type.location;
-    vt_symb_var.type = struct_tag_typet(vt_symb_type.name);
     vt_symb_var.is_lvalue=true;
     vt_symb_var.is_static_lifetime=true;
 

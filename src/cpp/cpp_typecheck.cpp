@@ -199,16 +199,13 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   dynamic_initializations.clear();
 
   // Create the dynamic initialization procedure
-  symbolt init_symbol;
-
-  init_symbol.name="#cpp_dynamic_initialization#"+id2string(module);
+  symbolt init_symbol{
+    "#cpp_dynamic_initialization#" + id2string(module),
+    code_typet({}, typet(ID_constructor)),
+    ID_cpp};
   init_symbol.base_name="#cpp_dynamic_initialization#"+id2string(module);
   init_symbol.value.swap(init_block);
-  init_symbol.mode=ID_cpp;
   init_symbol.module=module;
-  init_symbol.type = code_typet({}, typet(ID_constructor));
-  init_symbol.is_type=false;
-  init_symbol.is_macro=false;
 
   symbol_table.insert(std::move(init_symbol));
 

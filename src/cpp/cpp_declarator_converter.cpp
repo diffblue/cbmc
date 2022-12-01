@@ -443,18 +443,17 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 {
   irep_idt pretty_name=get_pretty_name();
 
-  symbolt symbol;
-
-  symbol.name=final_identifier;
+  symbolt symbol{
+    final_identifier,
+    final_type,
+    linkage_spec == ID_auto ? ID_cpp : linkage_spec};
   symbol.base_name=base_name;
   symbol.value=declarator.value();
   symbol.location=declarator.name().source_location();
   symbol.is_extern = storage_spec.is_extern();
   symbol.is_parameter = declarator.get_is_parameter();
   symbol.is_weak = storage_spec.is_weak();
-  symbol.mode=linkage_spec==ID_auto?ID_cpp:linkage_spec;
   symbol.module=cpp_typecheck.module;
-  symbol.type=final_type;
   symbol.is_type=is_typedef;
   symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;

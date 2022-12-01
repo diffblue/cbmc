@@ -1480,10 +1480,8 @@ void goto_convertt::do_function_call_symbol(
 
     if(!symbol_table.has_symbol(name))
     {
-      symbolt new_symbol;
+      symbolt new_symbol{name, f_type, mode};
       new_symbol.base_name=name;
-      new_symbol.name=name;
-      new_symbol.type=f_type;
       new_symbol.location=function.source_location();
       symbol_table.add(new_symbol);
     }

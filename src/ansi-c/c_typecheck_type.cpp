@@ -783,9 +783,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     assert(have_body);
 
     // produce symbol
-    symbolt compound_symbol;
-    compound_symbol.is_type=true;
-    compound_symbol.type=type;
+    type_symbolt compound_symbol{irep_idt{}, type, mode};
     compound_symbol.location=type.source_location();
 
     typecheck_compound_body(to_struct_union_type(compound_symbol.type));
@@ -819,11 +817,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       type.remove(ID_tag);
       type.set(ID_tag, base_name);
 
-      symbolt compound_symbol;
-      compound_symbol.is_type=true;
-      compound_symbol.name=identifier;
+      type_symbolt compound_symbol{identifier, type, mode};
       compound_symbol.base_name=base_name;
-      compound_symbol.type=type;
       compound_symbol.location=type.source_location();
       compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
 
@@ -1366,14 +1361,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   irep_idt identifier=tag.get(ID_identifier);
 
   // Put into symbol table
-  symbolt enum_tag_symbol;
-
-  enum_tag_symbol.is_type=true;
-  enum_tag_symbol.type=type;
+  type_symbolt enum_tag_symbol{identifier, type, mode};
   enum_tag_symbol.location=source_location;
   enum_tag_symbol.is_file_local=true;
   enum_tag_symbol.base_name=base_name;
-  enum_tag_symbol.name=identifier;
 
   // throw in the enum members as 'body'
   irept::subt &body=enum_tag_symbol.type.add(ID_body).get_sub();
@@ -1476,14 +1467,10 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     new_type.add(ID_tag)=tag;
     new_type.make_incomplete();
 
-    symbolt enum_tag_symbol;
-
-    enum_tag_symbol.is_type=true;
-    enum_tag_symbol.type=new_type;
+    type_symbolt enum_tag_symbol{identifier, new_type, mode};
     enum_tag_symbol.location=source_location;
     enum_tag_symbol.is_file_local=true;
     enum_tag_symbol.base_name=base_name;
-    enum_tag_symbol.name=identifier;
 
     symbolt *new_symbol;
     move_symbol(enum_tag_symbol, new_symbol);

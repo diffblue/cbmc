@@ -1868,10 +1868,8 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           base_name="nondet_"+std::to_string(count);
         }
 
-        symbolt symbol;
+        symbolt symbol{base_name, code_typet({}, expr.type()), ID_C};
         symbol.base_name=base_name;
-        symbol.name=base_name;
-        symbol.type = code_typet({}, expr.type());
         id=symbol.name;
 
         symbol_table.insert(std::move(symbol));

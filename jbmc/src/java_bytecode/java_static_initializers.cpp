@@ -120,18 +120,15 @@ static symbolt add_new_variable_symbol(
   const bool is_thread_local,
   const bool is_static_lifetime)
 {
-  symbolt new_symbol;
-  new_symbol.name = name;
+  symbolt new_symbol{name, type, ID_java};
   new_symbol.pretty_name = name;
   new_symbol.base_name = name;
-  new_symbol.type = type;
   new_symbol.type.set(ID_C_no_nondet_initialization, true);
   new_symbol.value = value;
   new_symbol.is_lvalue = true;
   new_symbol.is_state_var = true;
   new_symbol.is_static_lifetime = is_static_lifetime;
   new_symbol.is_thread_local = is_thread_local;
-  new_symbol.mode = ID_java;
   symbol_table.add(new_symbol);
   return new_symbol;
 }
@@ -336,16 +333,14 @@ static void create_function_symbol(
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
-  symbolt function_symbol;
-  const java_method_typet function_type({}, java_void_type());
+  symbolt function_symbol{
+    function_name, java_method_typet({}, java_void_type()), ID_java};
   function_symbol.name = function_name;
   function_symbol.pretty_name = function_symbol.name;
   function_symbol.base_name = function_base_name;
-  function_symbol.type = function_type;
   // This provides a back-link from a method to its associated class, as is done
   // for java_bytecode_convert_methodt::convert.
   set_declaring_class(function_symbol, class_name);
-  function_symbol.mode = ID_java;
   bool failed = symbol_table.add(function_symbol);
   INVARIANT(!failed, id2string(function_base_name) + " symbol should be fresh");
 
@@ -969,14 +964,10 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
       "a class cannot be both incomplete, and so have stub static fields, and "
       "also define a static initializer");
 
-    const java_method_typet thunk_type({}, java_void_type());
-
-    symbolt static_init_symbol;
-    static_init_symbol.name = static_init_name;
+    symbolt static_init_symbol{
+      static_init_name, java_method_typet({}, java_void_type()), ID_java};
     static_init_symbol.pretty_name = static_init_name;
     static_init_symbol.base_name = "clinit():V";
-    static_init_symbol.mode = ID_java;
-    static_init_symbol.type = thunk_type;
     // This provides a back-link from a method to its associated class, as is
     // done for java_bytecode_convert_methodt::convert.
     set_declaring_class(static_init_symbol, it->first);

@@ -547,11 +547,8 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   code_typet symbol_type=new_type;
   symbol_type.return_type()=void_type();
 
-  symbolt symbol;
+  symbolt symbol{ID_gcc_builtin_va_arg, symbol_type, ID_C};
   symbol.base_name=ID_gcc_builtin_va_arg;
-  symbol.name=ID_gcc_builtin_va_arg;
-  symbol.type=symbol_type;
-  symbol.mode = ID_C;
 
   symbol_table.insert(std::move(symbol));
 }
@@ -2175,13 +2172,10 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
             symbol_table.add(new_symbol);
           }
 
-          symbolt new_symbol;
-
-          new_symbol.name = identifier_with_type;
+          symbolt new_symbol{
+            identifier_with_type, gcc_polymorphic->type(), ID_C};
           new_symbol.base_name = identifier_with_type;
           new_symbol.location = f_op.source_location();
-          new_symbol.type = gcc_polymorphic->type();
-          new_symbol.mode = ID_C;
           code_blockt implementation =
             instantiate_gcc_polymorphic_builtin(identifier, *gcc_polymorphic);
           typet parent_return_type = return_type;
@@ -2213,12 +2207,10 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
           guessed_return_type = pointer_type(void_type()); // void *
         }
 
-        symbolt new_symbol;
-
-        new_symbol.name=identifier;
+        symbolt new_symbol{
+          identifier, code_typet({}, guessed_return_type), mode};
         new_symbol.base_name=identifier;
         new_symbol.location=expr.source_location();
-        new_symbol.type = code_typet({}, guessed_return_type);
         new_symbol.type.set(ID_C_incomplete, true);
 
         // TODO: should also guess some argument types

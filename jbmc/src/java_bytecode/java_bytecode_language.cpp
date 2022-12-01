@@ -528,15 +528,13 @@ static symbol_exprt get_or_create_class_literal_symbol(
     java_lang_Class);
   if(!symbol_table.has_symbol(symbol_expr.get_identifier()))
   {
-    symbolt new_class_symbol;
-    new_class_symbol.name = symbol_expr.get_identifier();
-    new_class_symbol.type = symbol_expr.type();
+    symbolt new_class_symbol{
+      symbol_expr.get_identifier(), symbol_expr.type(), ID_java};
     INVARIANT(
       has_prefix(id2string(new_class_symbol.name), "java::"),
       "class identifier should have 'java::' prefix");
     new_class_symbol.base_name =
       id2string(new_class_symbol.name).substr(6);
-    new_class_symbol.mode = ID_java;
     new_class_symbol.is_lvalue = true;
     new_class_symbol.is_state_var = true;
     new_class_symbol.is_static_lifetime = true;
@@ -651,13 +649,11 @@ static void create_stub_global_symbol(
   const irep_idt &class_id,
   bool force_nondet_init)
 {
-  symbolt new_symbol;
+  symbolt new_symbol{symbol_id, symbol_type, ID_java};
   new_symbol.is_static_lifetime = true;
   new_symbol.is_lvalue = true;
   new_symbol.is_state_var = true;
-  new_symbol.name = symbol_id;
   new_symbol.base_name = symbol_basename;
-  new_symbol.type = symbol_type;
   set_declaring_class(new_symbol, class_id);
   // Public access is a guess; it encourages merging like-typed static fields,
   // whereas a more restricted visbility would encourage separating them.
@@ -666,8 +662,6 @@ static void create_stub_global_symbol(
   // We set the field as final to avoid assuming they can be overridden.
   new_symbol.type.set(ID_C_constant, true);
   new_symbol.pretty_name = new_symbol.name;
-  new_symbol.mode = ID_java;
-  new_symbol.is_type = false;
   // If pointer-typed, initialise to null and a static initialiser will be
   // created to initialise on first reference. If primitive-typed, specify
   // nondeterministic initialisation by setting a nil value.

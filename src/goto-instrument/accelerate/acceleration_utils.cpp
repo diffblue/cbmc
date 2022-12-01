@@ -1248,12 +1248,10 @@ symbolt acceleration_utilst::fresh_symbol(std::string base, typet type)
   static int num_symbols=0;
 
   std::string name=base + "_" + std::to_string(num_symbols++);
-  symbolt ret;
+  symbolt ret{name, std::move(type), irep_idt{}};
   ret.module="scratch";
-  ret.name=name;
   ret.base_name=name;
   ret.pretty_name=name;
-  ret.type=type;
 
   symbol_table.add(ret);
 

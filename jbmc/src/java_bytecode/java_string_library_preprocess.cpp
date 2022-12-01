@@ -221,8 +221,7 @@ void java_string_library_preprocesst::add_string_type(
   symbol_table_baset &symbol_table)
 {
   irep_idt class_symbol_name = "java::" + id2string(class_name);
-  symbolt tmp_string_symbol;
-  tmp_string_symbol.name = class_symbol_name;
+  type_symbolt tmp_string_symbol{class_symbol_name, typet{}, ID_java};
   symbolt *string_symbol = nullptr;
   bool already_exists = symbol_table.move(tmp_string_symbol, string_symbol);
 
@@ -250,8 +249,6 @@ void java_string_library_preprocesst::add_string_type(
     string_symbol->base_name = id2string(class_name);
     string_symbol->pretty_name = id2string(class_name);
     string_symbol->type = new_string_type;
-    string_symbol->is_type = true;
-    string_symbol->mode = ID_java;
   }
 
   auto &string_type = to_java_class_type(string_symbol->type);
