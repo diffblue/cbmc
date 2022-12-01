@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/validate_types.h" name="/home/runner/work/cbmc/cbmc/src/util/validate_types.h">
-<area shape="rect" id="node1" title=" " alt="" coords="8984,5,9168,61"/>
-<area shape="rect" id="node2" href="$expr_8h.html" title=" " alt="" coords="5583,213,5767,255"/>
-<area shape="rect" id="node58" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="8984,117,9168,158"/>
-<area shape="rect" id="node60" href="$validate__types_8cpp.html" title=" " alt="" coords="9192,109,9376,165"/>
-<area shape="rect" id="node3" href="$guard__expr_8h.html" title="Guard Data Structure." alt="" coords="8923,303,9109,359"/>
-<area shape="rect" id="node4" href="$invariant__set_8h.html" title="Value Set." alt="" coords="9134,310,9381,351"/>
-<area shape="rect" id="node5" href="$anonymous__member_8h.html" title="C Language Type Checking." alt="" coords="9405,303,9611,359"/>
-<area shape="rect" id="node6" href="$ansi__c__convert__type_8h.html" title="ANSI&#45;C Language Conversion." alt="" coords="9636,303,9820,359"/>
-<area shape="rect" id="node7" href="$convert__character__literal_8h.html" title="C++ Language Conversion." alt="" coords="9844,303,10044,359"/>
-<area shape="rect" id="node8" href="$convert__float__literal_8h.html" title="C Language Conversion." alt="" coords="5,303,189,359"/>
-<area shape="rect" id="node9" href="$convert__integer__literal_8h.html" title="C++ Language Conversion." alt="" coords="214,303,399,359"/>
-<area shape="rect" id="node10" href="$convert__string__literal_8h.html" title="C/C++ Language Conversion." alt="" coords="424,303,608,359"/>
-<area shape="rect" id="node11" href="$cpp__declarator_8h.html" title="C++ Language Type Checking." alt="" coords="541,421,763,463"/>
-<area shape="rect" id="node12" href="$cpp__id_8h.html" title="C++ Language Type Checking." alt="" coords="952,310,1136,351"/>
-<area shape="rect" id="node13" href="$cpp__name_8h.html" title=" " alt="" coords="683,310,877,351"/>
-<area shape="rect" id="node14" href="$cpp__namespace__spec_8h.html" title="C++ Language Type Checking." alt="" coords="793,414,1013,470"/>
-<area shape="rect" id="node15" href="$cpp__template__args_8h.html" title="C++ Language Type Checking." alt="" coords="1161,303,1365,359"/>
-<area shape="rect" id="node16" href="$template__map_8h.html" title="C++ Language Type Checking." alt="" coords="1221,421,1443,463"/>
-<area shape="rect" id="node17" href="$cpp__template__parameter_8h.html" title=" " alt="" coords="1441,303,1645,359"/>
-<area shape="rect" id="node18" href="$cpp__token_8h.html" title="C++ Parser: Token." alt="" coords="1669,310,1862,351"/>
-<area shape="rect" id="node19" href="$cpp__typecheck__fargs_8h.html" title="C++ Language Type Checking." alt="" coords="1886,303,2098,359"/>
-<area shape="rect" id="node20" href="$polynomial_8h.html" title="Loop Acceleration." alt="" coords="2122,303,2315,359"/>
-<area shape="rect" id="node21" href="$havoc__utils_8h.html" title="Utilities for building havoc code for expressions." alt="" coords="2339,303,2533,359"/>
-<area shape="rect" id="node22" href="$expr__enumerator_8h.html" title="Enumerator Interface." alt="" coords="2557,303,2785,359"/>
-<area shape="rect" id="node23" href="$pointer__arithmetic_8h.html" title=" " alt="" coords="2809,303,2993,359"/>
-<area shape="rect" id="node24" href="$printf__formatter_8h.html" title="printf Formatting" alt="" coords="3017,303,3201,359"/>
-<area shape="rect" id="node25" href="$remove__const__function__pointers_8h.html" title="Goto Programs." alt="" coords="3225,303,3476,359"/>
-<area shape="rect" id="node26" href="$expr__skeleton_8h.html" title="Expression skeleton." alt="" coords="3501,303,3699,359"/>
-<area shape="rect" id="node27" href="$goto__symex__is__constant_8h.html" title="GOTO Symex constant propagation." alt="" coords="3723,303,3922,359"/>
-<area shape="rect" id="node28" href="$symex__assign_8h.html" title="Symbolic Execution of assignments." alt="" coords="3946,303,4161,359"/>
-<area shape="rect" id="node29" href="$json__symbol_8cpp.html" title=" " alt="" coords="10068,303,10268,359"/>
-<area shape="rect" id="node30" href="$language_8cpp.html" title="Abstract interface to support a programming language." alt="" coords="4185,310,4412,351"/>
-<area shape="rect" id="node31" href="$add__failed__symbols_8h.html" title="Pointer Dereferencing." alt="" coords="4437,303,4630,359"/>
-<area shape="rect" id="node32" href="$object__numbering_8h.html" title="Object Numbering." alt="" coords="4654,303,4847,359"/>
-<area shape="rect" id="node33" href="$boolbv_8h.html" title=" " alt="" coords="4871,303,5073,359"/>
-<area shape="rect" id="node34" href="$equality_8h.html" title=" " alt="" coords="5153,414,5354,470"/>
-<area shape="rect" id="node35" href="$pointer__logic_8h.html" title="Pointer Logic." alt="" coords="5357,303,5558,359"/>
-<area shape="rect" id="node36" href="$bdd__expr_8h.html" title="Conversion between exprt and miniBDD." alt="" coords="5583,303,5767,359"/>
-<area shape="rect" id="node37" href="$cover__goals_8h.html" title="Cover a set of goals incrementally." alt="" coords="5791,303,5975,359"/>
-<area shape="rect" id="node38" href="$prop__conv__solver_8h.html" title=" " alt="" coords="5097,303,5281,359"/>
-<area shape="rect" id="node39" href="$qdimacs__core_8h.html" title=" " alt="" coords="5999,303,6183,359"/>
-<area shape="rect" id="node40" href="$construct__value__expr__from__smt_8h.html" title=" " alt="" coords="6813,407,6997,477"/>
-<area shape="rect" id="node41" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="6393,525,6623,596"/>
-<area shape="rect" id="node42" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="7022,407,7218,477"/>
-<area shape="rect" id="node43" href="$object__tracking_8h.html" title="Data structures and algorithms used by smt2_incremental_decision_proceduret to track data about the o..." alt="" coords="6207,303,6430,359"/>
-<area shape="rect" id="node44" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="6261,407,6445,477"/>
-<area shape="rect" id="node45" href="$equation__symbol__mapping_8h.html" title=" " alt="" coords="7179,303,7394,359"/>
-<area shape="rect" id="node46" href="$array__name_8cpp.html" title="Misc Utilities." alt="" coords="6571,421,6789,463"/>
-<area shape="rect" id="node47" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="6915,310,7103,351"/>
-<area shape="rect" id="node48" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="7242,421,7430,463"/>
-<area shape="rect" id="node49" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="7419,310,7627,351"/>
-<area shape="rect" id="node50" href="$parser_8h.html" title="Parser utilities." alt="" coords="7651,310,7835,351"/>
-<area shape="rect" id="node51" href="$pointer__offset__sum_8h.html" title="Pointer Dereferencing." alt="" coords="7859,303,8043,359"/>
-<area shape="rect" id="node52" href="$ref__expr__set_8h.html" title="Value Set." alt="" coords="8067,310,8274,351"/>
-<area shape="rect" id="node53" href="$replace__expr_8h.html" title=" " alt="" coords="8299,303,8483,359"/>
-<area shape="rect" id="node54" href="$replace__symbol_8h.html" title=" " alt="" coords="8507,303,8691,359"/>
-<area shape="rect" id="node55" href="$simplify__expr__class_8h.html" title=" " alt="" coords="10292,303,10476,359"/>
-<area shape="rect" id="node56" href="$simplify__utils_8h.html" title=" " alt="" coords="8715,303,8899,359"/>
-<area shape="rect" id="node57" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="6555,310,6739,351"/>
-<area shape="rect" id="node59" href="$c__qualifiers_8cpp.html" title=" " alt="" coords="9164,213,9396,255"/>
+<area shape="rect" id="node1" title=" " alt="" coords="7781,5,7965,61"/>
+<area shape="rect" id="node2" href="$expr_8h.html" title=" " alt="" coords="5477,213,5661,255"/>
+<area shape="rect" id="node57" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="7781,117,7965,158"/>
+<area shape="rect" id="node60" href="$validate__types_8cpp.html" title=" " alt="" coords="7989,109,8173,165"/>
+<area shape="rect" id="node3" href="$guard__expr_8h.html" title="Guard Data Structure." alt="" coords="8713,303,8899,359"/>
+<area shape="rect" id="node4" href="$invariant__set_8h.html" title="Value Set." alt="" coords="8924,310,9171,351"/>
+<area shape="rect" id="node5" href="$anonymous__member_8h.html" title="C Language Type Checking." alt="" coords="9195,303,9401,359"/>
+<area shape="rect" id="node6" href="$convert__character__literal_8h.html" title="C++ Language Conversion." alt="" coords="9426,303,9626,359"/>
+<area shape="rect" id="node7" href="$convert__float__literal_8h.html" title="C Language Conversion." alt="" coords="9650,303,9834,359"/>
+<area shape="rect" id="node8" href="$convert__integer__literal_8h.html" title="C++ Language Conversion." alt="" coords="5,303,191,359"/>
+<area shape="rect" id="node9" href="$convert__string__literal_8h.html" title="C/C++ Language Conversion." alt="" coords="215,303,399,359"/>
+<area shape="rect" id="node10" href="$cpp__declarator_8h.html" title="C++ Language Type Checking." alt="" coords="332,421,555,463"/>
+<area shape="rect" id="node11" href="$cpp__id_8h.html" title="C++ Language Type Checking." alt="" coords="743,310,927,351"/>
+<area shape="rect" id="node12" href="$cpp__name_8h.html" title=" " alt="" coords="474,310,669,351"/>
+<area shape="rect" id="node13" href="$cpp__namespace__spec_8h.html" title="C++ Language Type Checking." alt="" coords="584,414,804,470"/>
+<area shape="rect" id="node14" href="$cpp__template__args_8h.html" title="C++ Language Type Checking." alt="" coords="1003,303,1207,359"/>
+<area shape="rect" id="node15" href="$template__map_8h.html" title="C++ Language Type Checking." alt="" coords="923,421,1145,463"/>
+<area shape="rect" id="node16" href="$cpp__template__parameter_8h.html" title=" " alt="" coords="1231,303,1435,359"/>
+<area shape="rect" id="node17" href="$cpp__token_8h.html" title="C++ Parser: Token." alt="" coords="1459,310,1652,351"/>
+<area shape="rect" id="node18" href="$cpp__typecheck__fargs_8h.html" title="C++ Language Type Checking." alt="" coords="1676,303,1888,359"/>
+<area shape="rect" id="node19" href="$polynomial_8h.html" title="Loop Acceleration." alt="" coords="1912,303,2105,359"/>
+<area shape="rect" id="node20" href="$havoc__utils_8h.html" title="Utilities for building havoc code for expressions." alt="" coords="2129,303,2323,359"/>
+<area shape="rect" id="node21" href="$expr__enumerator_8h.html" title="Enumerator Interface." alt="" coords="2347,303,2575,359"/>
+<area shape="rect" id="node22" href="$pointer__arithmetic_8h.html" title=" " alt="" coords="2599,303,2783,359"/>
+<area shape="rect" id="node23" href="$printf__formatter_8h.html" title="printf Formatting" alt="" coords="2807,303,2991,359"/>
+<area shape="rect" id="node24" href="$remove__const__function__pointers_8h.html" title="Goto Programs." alt="" coords="3015,303,3266,359"/>
+<area shape="rect" id="node25" href="$expr__skeleton_8h.html" title="Expression skeleton." alt="" coords="3291,303,3489,359"/>
+<area shape="rect" id="node26" href="$goto__symex__is__constant_8h.html" title="GOTO Symex constant propagation." alt="" coords="3513,303,3712,359"/>
+<area shape="rect" id="node27" href="$symex__assign_8h.html" title="Symbolic Execution of assignments." alt="" coords="3736,303,3951,359"/>
+<area shape="rect" id="node28" href="$json__symbol_8cpp.html" title=" " alt="" coords="9858,303,10058,359"/>
+<area shape="rect" id="node29" href="$language_8cpp.html" title="Abstract interface to support a programming language." alt="" coords="3975,310,4202,351"/>
+<area shape="rect" id="node30" href="$add__failed__symbols_8h.html" title="Pointer Dereferencing." alt="" coords="4227,303,4420,359"/>
+<area shape="rect" id="node31" href="$object__numbering_8h.html" title="Object Numbering." alt="" coords="4444,303,4637,359"/>
+<area shape="rect" id="node32" href="$boolbv_8h.html" title=" " alt="" coords="4661,303,4863,359"/>
+<area shape="rect" id="node33" href="$equality_8h.html" title=" " alt="" coords="4864,414,5065,470"/>
+<area shape="rect" id="node34" href="$pointer__logic_8h.html" title="Pointer Logic." alt="" coords="5147,303,5348,359"/>
+<area shape="rect" id="node35" href="$bdd__expr_8h.html" title="Conversion between exprt and miniBDD." alt="" coords="5373,303,5557,359"/>
+<area shape="rect" id="node36" href="$cover__goals_8h.html" title="Cover a set of goals incrementally." alt="" coords="5581,303,5765,359"/>
+<area shape="rect" id="node37" href="$prop__conv__solver_8h.html" title=" " alt="" coords="4938,303,5122,359"/>
+<area shape="rect" id="node38" href="$qdimacs__core_8h.html" title=" " alt="" coords="5789,303,5973,359"/>
+<area shape="rect" id="node39" href="$construct__value__expr__from__smt_8h.html" title=" " alt="" coords="5979,407,6163,477"/>
+<area shape="rect" id="node40" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="6061,525,6290,596"/>
+<area shape="rect" id="node41" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="6689,407,6885,477"/>
+<area shape="rect" id="node42" href="$object__tracking_8h.html" title="Data structures and algorithms used by smt2_incremental_decision_proceduret to track data about the o..." alt="" coords="6148,303,6371,359"/>
+<area shape="rect" id="node43" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="6187,407,6371,477"/>
+<area shape="rect" id="node44" href="$equation__symbol__mapping_8h.html" title=" " alt="" coords="6969,303,7184,359"/>
+<area shape="rect" id="node45" href="$array__name_8cpp.html" title="Misc Utilities." alt="" coords="6446,421,6665,463"/>
+<area shape="rect" id="node46" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="6705,310,6893,351"/>
+<area shape="rect" id="node47" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="6909,421,7097,463"/>
+<area shape="rect" id="node48" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="7209,310,7417,351"/>
+<area shape="rect" id="node49" href="$parser_8h.html" title="Parser utilities." alt="" coords="7441,310,7625,351"/>
+<area shape="rect" id="node50" href="$pointer__offset__sum_8h.html" title="Pointer Dereferencing." alt="" coords="7649,303,7833,359"/>
+<area shape="rect" id="node51" href="$ref__expr__set_8h.html" title="Value Set." alt="" coords="7857,310,8064,351"/>
+<area shape="rect" id="node52" href="$replace__expr_8h.html" title=" " alt="" coords="8089,303,8273,359"/>
+<area shape="rect" id="node53" href="$replace__symbol_8h.html" title=" " alt="" coords="8297,303,8481,359"/>
+<area shape="rect" id="node54" href="$simplify__expr__class_8h.html" title=" " alt="" coords="10082,303,10266,359"/>
+<area shape="rect" id="node55" href="$simplify__utils_8h.html" title=" " alt="" coords="8505,303,8689,359"/>
+<area shape="rect" id="node56" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="6395,310,6579,351"/>
+<area shape="rect" id="node58" href="$c__qualifiers_8cpp.html" title=" " alt="" coords="8033,213,8265,255"/>
+<area shape="rect" id="node59" href="$designator_8h.html" title="ANSI&#45;C Language Type Checking." alt="" coords="7697,213,7907,255"/>
 </map>

@@ -147,6 +147,9 @@ var hierarchy =
     [ "smt_bit_vector_theoryt::andt", "structsmt__bit__vector__theoryt_1_1andt.html", null ],
     [ "smt_core_theoryt::andt", "structsmt__core__theoryt_1_1andt.html", null ],
     [ "java_bytecode_parse_treet::annotationt", "structjava__bytecode__parse__treet_1_1annotationt.html", null ],
+    [ "ansi_c_convert_typet", "classansi__c__convert__typet.html", [
+      [ "cpp_convert_typet", "classcpp__convert__typet.html", null ]
+    ] ],
     [ "ansi_c_identifiert", "classansi__c__identifiert.html", null ],
     [ "ansi_c_parse_treet", "classansi__c__parse__treet.html", null ],
     [ "ansi_c_scopet", "classansi__c__scopet.html", null ],
@@ -1059,9 +1062,6 @@ var hierarchy =
       [ "ui_message_handlert", "classui__message__handlert.html", null ]
     ] ],
     [ "messaget", "classmessaget.html", [
-      [ "ansi_c_convert_typet", "classansi__c__convert__typet.html", [
-        [ "cpp_convert_typet", "classcpp__convert__typet.html", null ]
-      ] ],
       [ "goto_convertt", "classgoto__convertt.html", [
         [ "cleanert", "classcleanert.html", null ],
         [ "goto_convert_functionst", "classgoto__convert__functionst.html", null ]
