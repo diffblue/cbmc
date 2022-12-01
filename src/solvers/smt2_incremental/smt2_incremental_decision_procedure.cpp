@@ -411,6 +411,29 @@ exprt smt2_incremental_decision_proceduret::get_expr(
     get_value_response->pairs()[0].get().value(), type);
 }
 
+// This is a fall back which builds resulting expression based on getting the
+// values of its operands. It is used during trace building in the case where
+// certain kinds of expression appear on the left hand side of an
+// assignment. For example in the following trace assignment -
+//   `byte_extract_little_endian(x, offset) = 1`
+// `::get` will be called on `byte_extract_little_endian(x, offset)` and
+// we build a resulting expression where `x` and `offset` are substituted
+// with their values.
+static exprt build_expr_based_on_getting_operands(
+  const exprt &expr,
+  const stack_decision_proceduret &decision_procedure)
+{
+  exprt copy = expr;
+  for(auto &op : copy.operands())
+  {
+    exprt eval_op = decision_procedure.get(op);
+    if(eval_op.is_nil())
+      return nil_exprt{};
+    op = std::move(eval_op);
+  }
+  return copy;
+}
+
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
@@ -468,15 +491,7 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         << symbol_expr->get_identifier() << messaget::eom;
       return expr;
     }
-    exprt copy = expr;
-    for(auto &op : copy.operands())
-    {
-      exprt eval_op = get(op);
-      if(eval_op.is_nil())
-        return nil_exprt{};
-      op = std::move(eval_op);
-    }
-    return copy;
+    return build_expr_based_on_getting_operands(expr, *this);
   }
   if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
   {
