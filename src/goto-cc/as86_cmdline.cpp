@@ -11,9 +11,10 @@ Author: Michael Tautschnig
 
 #include "as86_cmdline.h"
 
-#include <iostream>
-
+#include <util/invariant.h>
 #include <util/prefix.h>
+
+#include <iostream>
 
 // non-as86 options
 const char *goto_as86_options_with_argument[]=
@@ -56,7 +57,7 @@ const char *as86_options_with_argument[]=
 
 bool as86_cmdlinet::parse(int argc, const char **argv)
 {
-  assert(argc>0);
+  PRECONDITION(argc > 0);
   add_arg(argv[0]);
 
   for(int i=1; i<argc; i++)

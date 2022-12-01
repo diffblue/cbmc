@@ -11,9 +11,10 @@ Author: Michael Tautschnig
 
 #include "bcc_cmdline.h"
 
-#include <iostream>
-
+#include <util/invariant.h>
 #include <util/prefix.h>
+
+#include <iostream>
 
 // non-bcc options
 const char *goto_bcc_options_with_argument[]=
@@ -68,7 +69,7 @@ const char *bcc_options_with_argument[]=
 
 bool bcc_cmdlinet::parse(int argc, const char **argv)
 {
-  assert(argc>0);
+  PRECONDITION(argc > 0);
   add_arg(argv[0]);
 
   for(int i=1; i<argc; i++)
