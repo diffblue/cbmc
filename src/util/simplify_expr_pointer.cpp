@@ -594,7 +594,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
 
       // this is for the benefit of symex
       return make_boolean_expr(
-        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX));
+        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "::"));
     }
     else if(op_object.id() == ID_string_constant)
     {

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
-#define SYMEX_DYNAMIC_PREFIX "symex_dynamic::"
+#define SYMEX_DYNAMIC_PREFIX "symex_dynamic"
 
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &);
