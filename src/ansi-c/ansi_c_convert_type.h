@@ -12,15 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 #define CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 
-#include <list>
-
-#include <util/expr.h>
-#include <util/message.h>
+#include <util/std_expr.h>
 
 #include "c_qualifiers.h"
 #include "c_storage_spec.h"
 
-class ansi_c_convert_typet:public messaget
+#include <list>
+
+class message_handlert;
+
+class ansi_c_convert_typet
 {
 public:
   unsigned unsigned_cnt, signed_cnt, char_cnt,
@@ -62,9 +63,9 @@ public:
 
   std::list<typet> other;
 
-  explicit ansi_c_convert_typet(message_handlert &_message_handler):
-    messaget(_message_handler)
-    // class members are initialized by calling read()
+  explicit ansi_c_convert_typet(message_handlert &_message_handler)
+    : message_handler(_message_handler)
+  // class members are initialized by calling read()
   {
   }
 
@@ -98,6 +99,8 @@ public:
   }
 
 protected:
+  message_handlert &message_handler;
+
   virtual void read_rec(const typet &type);
   virtual void build_type_with_subtype(typet &type) const;
   virtual void set_attributes(typet &type) const;
