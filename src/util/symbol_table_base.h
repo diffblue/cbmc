@@ -109,6 +109,33 @@ public:
     return *symbol;
   }
 
+  /// Collect all symbols the name of which matches \p id or the base name of
+  /// which matches \p id.
+  std::list<symbolst::const_iterator>
+  match_name_or_base_name(const irep_idt &id) const
+  {
+    std::list<symbolst::const_iterator> results;
+
+    auto name_it = symbols.find(id);
+    if(name_it != symbols.end())
+      results.push_back(name_it);
+
+    auto base_name_it_pair = symbol_base_map.equal_range(id);
+    for(auto base_name_it = base_name_it_pair.first;
+        base_name_it != base_name_it_pair.second;
+        ++base_name_it)
+    {
+      name_it = symbols.find(base_name_it->second);
+      CHECK_RETURN(name_it != symbols.end());
+      // don't add entries where name and base name match as this amounts to the
+      // case already covered above
+      if(base_name_it->first != base_name_it->second)
+        results.push_back(name_it);
+    }
+
+    return results;
+  }
+
   /// Find a symbol in the symbol table for read-write access.
   /// \param name: The name of the symbol to look for
   /// \return A pointer to the found symbol if it exists, nullptr otherwise.

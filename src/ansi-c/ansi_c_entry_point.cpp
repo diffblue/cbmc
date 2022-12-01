@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
-#include <util/range.h>
 #include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_functions.h>
@@ -118,20 +117,14 @@ bool ansi_c_entry_point(
   // find main symbol, if any is given
   if(config.main.has_value())
   {
-    std::list<irep_idt> matches;
+    auto matches = symbol_table.match_name_or_base_name(*config.main);
 
-    for(const auto &symbol_name_entry :
-        equal_range(symbol_table.symbol_base_map, config.main.value()))
+    for(auto it = matches.begin(); it != matches.end();) // no ++it
     {
-      // look it up
-      symbol_table_baset::symbolst::const_iterator s_it =
-        symbol_table.symbols.find(symbol_name_entry.second);
-
-      if(s_it==symbol_table.symbols.end())
-        continue;
-
-      if(s_it->second.type.id() == ID_code && !s_it->second.is_property)
-        matches.push_back(symbol_name_entry.second);
+      if((*it)->second.type.id() != ID_code || (*it)->second.is_property)
+        it = matches.erase(it);
+      else
+        ++it;
     }
 
     if(matches.empty())
@@ -150,7 +143,7 @@ bool ansi_c_entry_point(
       return true;
     }
 
-    main_symbol=matches.front();
+    main_symbol = matches.front()->first;
   }
   else
     main_symbol=ID_main;

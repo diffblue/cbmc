@@ -40,17 +40,20 @@ static bool generate_entry_point_for_function(
 {
   const irep_idt &entry_function_name = options.get_option("function");
   CHECK_RETURN(!entry_function_name.empty());
-  auto const entry_function_sym = symbol_table.lookup(entry_function_name);
-  if(entry_function_sym == nullptr)
+  auto matches = symbol_table.match_name_or_base_name(entry_function_name);
+  // it's ok if this is ambiguous at this point, we just need to get a mode, the
+  // actual entry point generator will take care of resolving (or rejecting)
+  // ambiguity
+  if(matches.empty())
   {
     throw invalid_command_line_argument_exceptiont{
-      // NOLINTNEXTLINE(whitespace/braces)
-      std::string{"couldn't find function with name '"} +
+      std::string("couldn't find entry with name '") +
         id2string(entry_function_name) + "' in symbol table",
       "--function"};
   }
-  PRECONDITION(!entry_function_sym->mode.empty());
-  auto const entry_language = get_language_from_mode(entry_function_sym->mode);
+  const auto &entry_point_mode = matches.front()->second.mode;
+  PRECONDITION(!entry_point_mode.empty());
+  auto const entry_language = get_language_from_mode(entry_point_mode);
   CHECK_RETURN(entry_language != nullptr);
   entry_language->set_message_handler(message_handler);
   entry_language->set_language_options(options);
