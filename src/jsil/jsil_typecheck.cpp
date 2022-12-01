@@ -167,8 +167,9 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else
   {
-    // expressions are expected not to have type set just yet
-    assert(expr.type().is_nil() || expr.type().id().empty());
+    DATA_INVARIANT(
+      expr.type().is_nil() || expr.type().id().empty(),
+      "expressions are expected not to have type set just yet");
 
     if(expr.id()==ID_null ||
         expr.id()=="undefined" ||
@@ -273,7 +274,7 @@ void jsil_typecheckt::typecheck_expr_side_effect_throw(
   side_effect_expr_throwt &expr)
 {
   irept &excep_list=expr.add(ID_exception_list);
-  assert(excep_list.id()==ID_symbol);
+  PRECONDITION(excep_list.id() == ID_symbol);
   symbol_exprt &s=static_cast<symbol_exprt &>(excep_list);
   typecheck_symbol_expr(s);
 }
@@ -622,7 +623,7 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
     else
     {
       // symbol already exists
-      assert(!s_it->second.is_type);
+      DATA_INVARIANT(!s_it->second.is_type, "non-type symbol expected");
 
       const symbolt &symbol=s_it->second;
 
@@ -837,7 +838,7 @@ void jsil_typecheckt::typecheck_assign(code_assignt &code)
 /// \par parameters: any symbol
 void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
-  assert(!symbol.is_type);
+  PRECONDITION(!symbol.is_type);
 
   // Using is_extern to check if symbol was already typechecked
   if(symbol.is_extern)
