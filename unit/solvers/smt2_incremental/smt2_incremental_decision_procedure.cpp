@@ -544,13 +544,26 @@ TEST_CASE(
     }
     SECTION("Invariant violated due to expression in unexpected form.")
     {
-      const mult_exprt unexpected{foo.symbol_expr(), from_integer(2, foo.type)};
-      const cbmc_invariants_should_throwt invariants_throw;
-      REQUIRE_THROWS_MATCHES(
-        test.procedure.get(unexpected),
-        invariant_failedt,
-        invariant_failure_containing(
-          "Unhandled expressions are expected to be symbols"));
+      const auto offset = from_integer(2, signedbv_typet{64});
+      const byte_extract_exprt byte_extract_expr{
+        ID_byte_extract_little_endian,
+        foo.symbol_expr(),
+        offset,
+        8,
+        unsignedbv_typet{8}};
+      test.mock_responses.push_back(
+        smt_get_value_responset{{{foo_term, term_42}}});
+      test.mock_responses.push_back(smt_get_value_responset{
+        {{smt_bit_vector_constant_termt{2, 64},
+          smt_bit_vector_constant_termt{2, 64}}}});
+      REQUIRE(
+        test.procedure.get(byte_extract_expr) ==
+        byte_extract_exprt{
+          ID_byte_extract_little_endian,
+          expr_42,
+          offset,
+          8,
+          unsignedbv_typet{8}});
     }
     SECTION("Error handling of mismatched response.")
     {
