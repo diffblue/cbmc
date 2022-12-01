@@ -1,5 +1,15 @@
 var NAVTREEINDEX53 =
 {
+"classrange__typet.html#ae83d9e06a61d345bd9f108495dc4091d":[6,0,927,1],
+"classrational__typet.html":[6,0,929],
+"classrational__typet.html#a97972d4b7406b74c298d1bd535ff95da":[6,0,929,0],
+"classrationalt.html":[6,0,930],
+"classrationalt.html#a05234bcb7d150c1f394dddd52bfc9a77":[6,0,930,15],
+"classrationalt.html#a152b4a1961d29d2a0d6d129914ef52b8":[6,0,930,2],
+"classrationalt.html#a18152e45b41ac1e68b02753267edfde9":[6,0,930,20],
+"classrationalt.html#a1cfc342c8142492e5986559ff597999e":[6,0,930,7],
+"classrationalt.html#a212b27321528973aef0d5a08c811e6f8":[6,0,930,12],
+"classrationalt.html#a3011d7db290881f5b5c57d0246eff01f":[6,0,930,3],
 "classrationalt.html#a33f62e5ac12f874e1d23e4173e8f636e":[6,0,930,17],
 "classrationalt.html#a35b2cc2cc20f0c4763f3d410b9f2842b":[6,0,930,21],
 "classrationalt.html#a39adc1233459ff0aadbf0f6cb0c9d81b":[6,0,930,4],
@@ -239,15 +249,5 @@ var NAVTREEINDEX53 =
 "classremove__const__function__pointerst.html#afbaea18e33b16d143e2279b12ad53c7a":[6,0,954,7],
 "classremove__exceptionst.html":[6,0,955],
 "classremove__exceptionst.html#a0999c67a2187e358d68b9b3dc04eb66a":[6,0,955,15],
-"classremove__exceptionst.html#a134d64efc8b393cd4e5dea7cd3e4721f":[6,0,955,2],
-"classremove__exceptionst.html#a5275725cdeebbd29f949f25a12fc719b":[6,0,955,16],
-"classremove__exceptionst.html#a58bb1e69810d7c5dff4fc3567e5e59ec":[6,0,955,8],
-"classremove__exceptionst.html#a59516ec32f2b39cdf8e09cb0a2f87b0c":[6,0,955,5],
-"classremove__exceptionst.html#a6bc571b801494b1a4c929704b4cebf1a":[6,0,955,17],
-"classremove__exceptionst.html#a7be58d5cf0f35d866d58323155cc0710":[6,0,955,13],
-"classremove__exceptionst.html#a94538ebe2f2775750234585a52f63e91":[6,0,955,9],
-"classremove__exceptionst.html#a94e6587f5091fe899fc6abec2ed81845":[6,0,955,3],
-"classremove__exceptionst.html#a94e6587f5091fe899fc6abec2ed81845a2680b70d32535775cb07ae92e5f03b68":[6,0,955,3,1],
-"classremove__exceptionst.html#a94e6587f5091fe899fc6abec2ed81845a6e75882e602c756a8c18018c52f41c1d":[6,0,955,3,0],
-"classremove__exceptionst.html#a94e6587f5091fe899fc6abec2ed81845ae088436f711477c711ec9e794901603e":[6,0,955,3,2]
+"classremove__exceptionst.html#a134d64efc8b393cd4e5dea7cd3e4721f":[6,0,955,2]
 };

@@ -1,5 +1,11 @@
 var NAVTREEINDEX71 =
 {
+"contracts-decreases.html#autotoc_md71":[1,0,6,1],
+"contracts-decreases.html#autotoc_md72":[1,0,6,2],
+"contracts-dev-arch.html":[1,1,1],
+"contracts-dev-arch.html#autotoc_md28":[1,1,1,0],
+"contracts-dev-spec-codegen.html":[1,1,0,2],
+"contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-assigns":[1,1,0,2,0],
 "contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-frees":[1,1,0,2,1],
 "contracts-dev-spec-contract-checking-rec.html":[1,1,0,7],
 "contracts-dev-spec-contract-checking.html":[1,1,0,6],
@@ -243,11 +249,5 @@ var NAVTREEINDEX71 =
 "convert__float__literal_8h.html":[7,0,2,1,1,3],
 "convert__float__literal_8h.html#a60068f40e48b4ff98b542c20e0bfca58":[7,0,2,1,1,3,0],
 "convert__float__literal_8h_source.html":[7,0,2,1,1,3],
-"convert__int__literal_8cpp.html":[7,0,2,25,0,4],
-"convert__int__literal_8cpp.html#a05b33711ac2181f80ff3a197d2b2e40e":[7,0,2,25,0,4,11],
-"convert__int__literal_8cpp.html#a0e8ad9cd668d2d104bf429371dd84ceb":[7,0,2,25,0,4,7],
-"convert__int__literal_8cpp.html#a28058f70322c00eacb48599400efaa2d":[7,0,2,25,0,4,0],
-"convert__int__literal_8cpp.html#a36f8551dca5ec343f64b2346f2475f5c":[7,0,2,25,0,4,13],
-"convert__int__literal_8cpp.html#a90f4b546b807f94de58c5a76f2e7ce9a":[7,0,2,25,0,4,5],
-"convert__int__literal_8cpp.html#a9790e5175d14d017c55b938e59276307":[7,0,2,25,0,4,8]
+"convert__int__literal_8cpp.html":[7,0,2,25,0,4]
 };

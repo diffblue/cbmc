@@ -1,5 +1,8 @@
 var NAVTREEINDEX10 =
 {
+"classansi__c__declarationt.html#af9f0043c003d985a0e9a187aa5b26b4c":[6,0,61,21],
+"classansi__c__declarationt.html#afe23c0af48a4c9527773b6fdefbf40aa":[6,0,61,29],
+"classansi__c__declaratort.html":[6,0,62],
 "classansi__c__declaratort.html#a2c3670c3cc8020b2fccadb247454200f":[6,0,62,6],
 "classansi__c__declaratort.html#a3481c8c265121d926b388b53401b9d8b":[6,0,62,7],
 "classansi__c__declaratort.html#a42b50141fb9f824df462856599b434d9":[6,0,62,0],
@@ -246,8 +249,5 @@ var NAVTREEINDEX10 =
 "classascii__encoding__targett.html#a4b6fddb3e0c22844ac48964d0b0b3910":[6,0,83,7],
 "classascii__encoding__targett.html#a544ecc38057a73b0a6f67b0ad154e407":[6,0,83,6],
 "classascii__encoding__targett.html#a922972bbfa8a998d01733f9e533e8276":[6,0,83,2],
-"classascii__encoding__targett.html#a922972bbfa8a998d01733f9e533e8276":[6,0,83,3],
-"classascii__encoding__targett.html#adf18ae3d1b29f9499257ac20e8b68b4c":[6,0,83,0],
-"classascii__encoding__targett.html#adf18ae3d1b29f9499257ac20e8b68b4c":[6,0,83,1],
-"classascii__encoding__targett.html#aee2b757f1fa214443852056478f321e2":[6,0,83,4]
+"classascii__encoding__targett.html#a922972bbfa8a998d01733f9e533e8276":[6,0,83,3]
 };

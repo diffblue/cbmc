@@ -12,7 +12,14 @@
 <h1>DESCRIPTION</h1>
 <p>This utility is to compile a <strong>cbmc</strong>(1) symbols table (in JSON format) into a GOTO binary. This is to support integration of external language frontends, such as Ada (using GNAT2GOTO: https://github.com/diffblue/gnat2goto) or Rust (using Kani: https://github.com/model-checking/kani).</p>
 <h1>OPTIONS</h1>
-<p><strong>--out</strong> <em>outfile</em> Specify the filename of the resulting binary (default: a.out)</p>
+<dl>
+<dt><strong>--out</strong> <em>outfile</em></dt>
+<dd><p>Specify the filename of the resulting binary (default: a.out)</p>
+</dd>
+<dt><strong>--verbosity</strong> #</dt>
+<dd><p>verbosity level</p>
+</dd>
+</dl>
 <h1>ENVIRONMENT</h1>
 <p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
 <h1>BUGS</h1>
