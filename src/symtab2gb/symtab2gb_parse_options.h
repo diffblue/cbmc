@@ -17,6 +17,7 @@ Author: Diffblue Ltd.
 
 #define SYMTAB2GB_OPTIONS                                                      \
   "(" SYMTAB2GB_OUT_FILE_OPT "):"                                              \
+  "(verbosity):"                                                               \
 // end options
 
 // clang-format on
