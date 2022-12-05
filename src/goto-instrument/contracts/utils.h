@@ -17,6 +17,9 @@ Date: September 2021
 
 #include <goto-programs/goto_convert_class.h>
 
+#define IN_BASE_CASE "__in_base_case"
+#define ENTERED_LOOP "__entered_loop"
+
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
 ///        i.e. if all dereferences within an expression are valid
@@ -204,5 +207,14 @@ void generate_history_variables_initialization(
   exprt &clause,
   const irep_idt &mode,
   goto_programt &program);
+
+/// Return true if `target` is the loop end of some transformed code.
+bool is_transformed_loop_end(const goto_programt::const_targett &target);
+
+/// Return true if `target` is an assignment to an instrumented variable with
+/// name `var_name`.
+bool is_assignment_to_instrumented_variable(
+  const goto_programt::const_targett &target,
+  std::string var_name);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

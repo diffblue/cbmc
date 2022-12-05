@@ -13,6 +13,7 @@ target_link_libraries(goto-instrument-lib
     linking
     big-int
     goto-programs
+    goto-checker
     goto-symex
     assembler
     pointer-analysis

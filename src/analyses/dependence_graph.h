@@ -67,6 +67,7 @@ class dep_graph_domaint:public ai_domain_baset
 {
 public:
   typedef grapht<dep_nodet>::node_indext node_indext;
+  typedef std::set<goto_programt::const_targett> depst;
 
   explicit dep_graph_domaint(node_indext id)
     : has_values(false), node_id(id), has_changed(false)
@@ -167,12 +168,19 @@ public:
   void populate_dep_graph(
     dependence_grapht &, goto_programt::const_targett) const;
 
+  depst get_control_deps() const
+  {
+    return control_deps;
+  }
+  depst get_data_deps() const
+  {
+    return data_deps;
+  }
+
 private:
   tvt has_values;
   node_indext node_id;
   bool has_changed;
-
-  typedef std::set<goto_programt::const_targett> depst;
 
   // Set of locations with control instructions on which the instruction at this
   // location has a control dependency on
@@ -279,7 +287,16 @@ public:
     return rd;
   }
 
+  /// Decide whether the instruction `to` is flow dependent on `from`.
+  bool is_flow_dependent(
+    const goto_programt::const_targett &from,
+    const goto_programt::const_targett &to);
+
 protected:
+  bool is_flow_dependent(
+    const dep_graph_domaint &from,
+    const dep_graph_domaint &to,
+    std::set<node_indext> &visited);
   friend dep_graph_domain_factoryt;
   friend dep_graph_domaint;
   const namespacet &ns;

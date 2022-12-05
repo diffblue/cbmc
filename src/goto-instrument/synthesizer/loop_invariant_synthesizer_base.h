@@ -16,7 +16,8 @@ Author: Qinheping Hu
 
 #include "synthesizer_utils.h"
 
-#define OPT_SYNTHESIZE_LOOP_INVARIANTS "(synthesize-loop-invariants)"
+#define FLAG_SYNTHESIZE_LOOP_INVARIANTS "synthesize-loop-invariants"
+#define OPT_SYNTHESIZE_LOOP_INVARIANTS "(" FLAG_SYNTHESIZE_LOOP_INVARIANTS ")"
 #define HELP_LOOP_INVARIANT_SYNTHESIZER                                        \
   " --synthesize-loop-invariants\n"                                            \
   "                              synthesize and apply loop invariants\n"
@@ -32,7 +33,7 @@ class messaget;
 class loop_invariant_synthesizer_baset
 {
 public:
-  loop_invariant_synthesizer_baset(const goto_modelt &goto_model, messaget &log)
+  loop_invariant_synthesizer_baset(goto_modelt &goto_model, messaget &log)
     : goto_model(goto_model), log(log)
   {
   }
@@ -48,7 +49,7 @@ public:
   virtual exprt synthesize(loop_idt) = 0;
 
 protected:
-  const goto_modelt &goto_model;
+  goto_modelt &goto_model;
   messaget &log;
 };
 

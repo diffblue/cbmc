@@ -1,6 +1,6 @@
 CORE
 main.c
---synthesize-loop-invariants --apply-loop-contracts
+--synthesize-loop-invariants
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.\d+\] line 10 Check loop invariant before entry: SUCCESS$

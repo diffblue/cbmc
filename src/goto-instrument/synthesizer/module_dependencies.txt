@@ -1,8 +1,14 @@
 analyses
 ansi-c
+assembler
+contracts
+cpp
+goto-checker
 goto-instrument/contracts
 goto-instrument/synthesizer
 goto-instrument
 goto-programs
 langapi
+pointer-analysis
+solvers
 util

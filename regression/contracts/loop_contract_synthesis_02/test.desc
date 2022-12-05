@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check --synthesize-loop-invariants
+^EXIT=0$
+^SIGNAL=0$
+^\[main.pointer\_dereference.\d+\] .* SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test shows that loop invariant with form of range predicates can be correctly
+synthesized for programs with only pointer checks but no other assertions.

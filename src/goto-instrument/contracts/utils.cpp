@@ -442,3 +442,36 @@ void generate_history_variables_initialization(
   // Add all the history variable initialization instructions
   program.destructive_append(history);
 }
+
+bool is_transformed_loop_end(const goto_programt::const_targett &target)
+{
+  // The end of the loop end of transformed loop is
+  // ASSIGN entered_loop = true
+  if(!target->is_assign())
+    return false;
+
+  return from_expr(target->assign_lhs()).find("__entered_loop") !=
+           std::string::npos &&
+         target->assign_rhs() == true_exprt();
+}
+
+bool is_assignment_to_instrumented_variable(
+  const goto_programt::const_targett &target,
+  std::string var_name)
+{
+  INVARIANT(
+    var_name == IN_BASE_CASE || var_name == ENTERED_LOOP,
+    "var_name is not of instrumented variables.");
+
+  if(!target->is_assign())
+    return false;
+
+  if(can_cast_expr<symbol_exprt>(target->assign_lhs()))
+  {
+    const auto &lhs = to_symbol_expr(target->assign_lhs());
+    return id2string(lhs.get_identifier()).find("::" + var_name) !=
+           std::string::npos;
+  }
+
+  return false;
+}

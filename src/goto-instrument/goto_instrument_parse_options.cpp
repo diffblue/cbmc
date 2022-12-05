@@ -1148,16 +1148,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  if(cmdline.isset("synthesize-loop-invariants"))
-  {
-    log.warning() << "Loop invariant synthesizer is still work in progress. "
-                     "It only generates TRUE as invariants."
-                  << messaget::eom;
-
-    // Synthesize loop invariants and annotate them into `goto_model`
-    enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
-    annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
-  }
 
   bool use_dfcc = cmdline.isset(FLAG_DFCC);
   if(use_dfcc)
@@ -1431,6 +1421,33 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // add generic checks, if needed
   goto_check_c(options, goto_model, ui_message_handler);
   transform_assertions_assumptions(options, goto_model);
+
+  if(cmdline.isset(FLAG_SYNTHESIZE_LOOP_INVARIANTS))
+  {
+    if(cmdline.isset(FLAG_LOOP_CONTRACTS))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Incompatible options detected",
+        "--" FLAG_SYNTHESIZE_LOOP_INVARIANTS " and --" FLAG_LOOP_CONTRACTS,
+        "Use either --" FLAG_SYNTHESIZE_LOOP_INVARIANTS
+        " or --" FLAG_LOOP_CONTRACTS);
+    }
+
+    log.warning() << "Loop invariant synthesizer is still work in progress. "
+                     "It only generates TRUE as invariants."
+                  << messaget::eom;
+
+    // Synthesize loop invariants and annotate them into `goto_model`
+    enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
+    annotate_invariants(synthesizer.synthesize_all(), goto_model);
+
+    // Apply loop contracts.
+    std::set<std::string> to_exclude_from_nondet_static(
+      cmdline.get_values("nondet-static-exclude").begin(),
+      cmdline.get_values("nondet-static-exclude").end());
+    code_contractst contracts(goto_model, log);
+    contracts.apply_loop_contracts(to_exclude_from_nondet_static);
+  }
 
   // check for uninitalized local variables
   if(cmdline.isset("uninitialized-check"))

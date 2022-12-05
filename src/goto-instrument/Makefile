@@ -82,6 +82,7 @@ SRC = accelerate/accelerate.cpp \
       splice_call.cpp \
       stack_depth.cpp \
       synthesizer/enumerative_loop_invariant_synthesizer.cpp \
+      synthesizer/cegis_verifier.cpp \
       synthesizer/expr_enumerator.cpp \
       synthesizer/synthesizer_utils.cpp \
       thread_instrumentation.cpp \
@@ -106,6 +107,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
+      ../goto-checker/goto-checker$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \

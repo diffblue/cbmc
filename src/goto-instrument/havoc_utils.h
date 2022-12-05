@@ -17,11 +17,14 @@ Date: July 2021
 #include <util/expr.h>
 #include <util/expr_util.h>
 
+#include <goto-programs/goto_program.h>
+
 #include <set>
 
-class goto_programt;
-
 typedef std::set<exprt> assignst;
+
+/// Return true if `instruction` is a loop havoc instruction.
+bool is_loop_havoc(const goto_programt::instructiont &instruction);
 
 /// \brief A class containing utility functions for havocing expressions.
 class havoc_utils_is_constantt : public is_constantt

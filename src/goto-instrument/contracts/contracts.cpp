@@ -142,7 +142,7 @@ void code_contractst::check_apply_loop_contracts(
   // i.e., the loop guard was satisfied.
   const auto entered_loop =
     new_tmp_symbol(
-      bool_typet(), loop_head_location, mode, symbol_table, "__entered_loop")
+      bool_typet(), loop_head_location, mode, symbol_table, ENTERED_LOOP)
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(entered_loop, loop_head_location));
@@ -173,7 +173,7 @@ void code_contractst::check_apply_loop_contracts(
   // instrumentation of the loop.
   const auto in_base_case =
     new_tmp_symbol(
-      bool_typet(), loop_head_location, mode, symbol_table, "__in_base_case")
+      bool_typet(), loop_head_location, mode, symbol_table, IN_BASE_CASE)
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(in_base_case, loop_head_location));
@@ -294,6 +294,12 @@ void code_contractst::check_apply_loop_contracts(
   // Generate havocing code for assignment targets.
   havoc_assigns_targetst havoc_gen(to_havoc, ns);
   havoc_gen.append_full_havoc_code(loop_head_location, pre_loop_head_instrs);
+  // Add loop number to the havoc_code
+  for(auto &havoc_instr : pre_loop_head_instrs.instructions)
+  {
+    if(is_loop_havoc(havoc_instr))
+      havoc_instr.loop_number = loop_end->loop_number;
+  }
 
   // Insert the second block of pre_loop_head_instrs: the havocing code.
   // We do not `add_pragma_disable_assigns_check`,

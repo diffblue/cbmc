@@ -16,7 +16,14 @@ Date: July 2021
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
-#include <goto-programs/goto_program.h>
+#define IS_LOOP_HAVOC "Loop havocing instrumented by applying loop contracts."
+
+bool is_loop_havoc(const goto_programt::instructiont &instruction)
+{
+  if(id2string(instruction.source_location().get_comment()) == IS_LOOP_HAVOC)
+    return true;
+  return false;
+}
 
 void havoc_utilst::append_full_havoc_code(
   const source_locationt location,
@@ -52,6 +59,8 @@ void havoc_utilst::append_object_havoc_code_for_expr(
   havoc.add_source_location() = location;
   havoc.add_to_operands(expr);
   dest.add(goto_programt::make_other(havoc, location));
+  dest.instructions.back().source_location_nonconst().set_comment(
+    IS_LOOP_HAVOC);
 }
 
 void havoc_utilst::append_scalar_havoc_code_for_expr(
@@ -62,4 +71,6 @@ void havoc_utilst::append_scalar_havoc_code_for_expr(
   side_effect_expr_nondett rhs(expr.type(), location);
   dest.add(goto_programt::make_assignment(
     code_assignt{expr, std::move(rhs), location}, location));
+  dest.instructions.back().source_location_nonconst().set_comment(
+    IS_LOOP_HAVOC);
 }

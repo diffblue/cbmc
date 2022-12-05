@@ -78,7 +78,8 @@ goto-harness.dir: util.dir goto-programs.dir langapi.dir linking.dir \
                   goto-instrument.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
-                     goto-symex.dir linking.dir analyses.dir solvers.dir
+                     goto-symex.dir linking.dir analyses.dir solvers.dir \
+                     goto-checker.dir
 
 goto-checker.dir: solvers.dir goto-symex.dir goto-programs.dir
 

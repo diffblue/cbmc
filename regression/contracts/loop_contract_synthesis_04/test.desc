@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check --synthesize-loop-invariants
+^EXIT=0$
+^SIGNAL=0$
+^\[main.pointer\_dereference.\d+\] .* SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test shows that the loop-invariant synthesizer can enumerate
+strengthening clauses for invariant-not-preserved violation.

@@ -9,6 +9,9 @@ Author: Qinheping Hu
 #ifndef CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
 
+#include <util/pointer_expr.h>
+
+#include <goto-programs/goto_model.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/loop_ids.h>
 
@@ -50,7 +53,23 @@ get_loop_head(const unsigned int loop_number, goto_functiont &function);
 /// loops. Corresponding loops are specified by keys of `invariant_map`
 void annotate_invariants(
   const invariant_mapt &invariant_map,
-  goto_modelt &goto_model,
-  messaget &log);
+  goto_modelt &goto_model);
+
+/// Decide whether the target instruction is in the body of the transformed loop
+/// specified by `loop_id`.
+bool is_instruction_in_transfomed_loop(
+  const loop_idt &loop_id,
+  const goto_functiont &function,
+  unsigned location_number_of_target);
+
+/// convert hex string to size_t.
+std::size_t hex_to_size_t(const std::string &hex_str);
+
+///  Combine invariant of form
+///   (in_inv || !guard) && (!guard -> pos_inv)
+invariant_mapt combine_in_and_post_invariant_clauses(
+  const invariant_mapt &in_clauses,
+  const invariant_mapt &post_clauses,
+  const invariant_mapt &neg_guards);
 
 #endif // CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H

@@ -31,12 +31,26 @@ struct loop_idt
   {
   }
 
+  loop_idt() : function_id(""), loop_number()
+  {
+  }
+
+  loop_idt(const loop_idt &other)
+    : function_id(other.function_id), loop_number(other.loop_number)
+  {
+  }
+
   irep_idt function_id;
-  unsigned int loop_number;
+  optionalt<unsigned int> loop_number;
 
   bool operator==(const loop_idt &o) const
   {
     return function_id == o.function_id && loop_number == o.loop_number;
+  }
+
+  bool operator!=(const loop_idt &o) const
+  {
+    return !operator==(o);
   }
 
   bool operator<(const loop_idt &o) const
