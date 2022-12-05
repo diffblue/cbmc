@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.c
 --trace
 ^VERIFICATION FAILED$

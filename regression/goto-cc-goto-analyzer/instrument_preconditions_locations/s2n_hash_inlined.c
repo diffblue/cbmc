@@ -17,6 +17,7 @@ struct s2n_evp_digest
   const void *ctx;
 };
 union s2n_hash_low_level_digest {
+  void *dummy; // for MSVC compatibility
 };
 struct s2n_hash_evp_digest
 {

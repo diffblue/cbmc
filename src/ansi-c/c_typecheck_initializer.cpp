@@ -276,7 +276,9 @@ void c_typecheck_baset::designator_enter(
       DATA_INVARIANT(
         c.type().id() != ID_code, "struct member must not be of code type");
 
-      if(!c.get_is_padding())
+      if(
+        !c.get_is_padding() &&
+        (c.type().id() != ID_c_bit_field || !c.get_anonymous()))
       {
         entry.subtype = c.type();
         break;
@@ -739,13 +741,12 @@ void c_typecheck_baset::increment_designator(designatort &designator)
       DATA_INVARIANT(
         components.size() == entry.size, "matching component numbers");
 
-      // we skip over any padding or code
-      // we also skip over anonymous members
+      // we skip over any padding
+      // we also skip over anonymous members that are bit fields
       while(entry.index < entry.size &&
             (components[entry.index].get_is_padding() ||
              (components[entry.index].get_anonymous() &&
-              components[entry.index].type().id() != ID_struct_tag &&
-              components[entry.index].type().id() != ID_union_tag)))
+              components[entry.index].type().id() == ID_c_bit_field)))
       {
         entry.index++;
       }
@@ -843,8 +844,9 @@ designatort c_typecheck_baset::make_designator(
       }
       else
       {
-        // We will search for anonymous members,
-        // in a loop. This isn't supported by gcc, but icc does allow it.
+        // We will search for anonymous members, in a loop. This isn't supported
+        // by GCC (unless the anonymous member is within an unnamed union or
+        // struct), but Visual Studio does allow it.
 
         bool found=false, repeat;
         typet tmp_type=entry.type;
@@ -870,6 +872,9 @@ designatort c_typecheck_baset::make_designator(
               c.get_anonymous() &&
               (c.type().id() == ID_struct_tag ||
                c.type().id() == ID_union_tag) &&
+              (config.ansi_c.mode ==
+                 configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+               follow(c.type()).find(ID_tag).is_nil()) &&
               has_component_rec(c.type(), component_name, *this))
             {
               entry.index=number;
