@@ -788,10 +788,9 @@ exprt bv_pointers_widet::bv_get_rec(
 
   constant_exprt result(bvrep, type);
 
-  pointer_logict::pointert pointer;
-  pointer.object =
-    numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
-  pointer.offset = binary2integer(value_offset, true);
+  pointer_logict::pointert pointer{
+    numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
+    binary2integer(value_offset, true)};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};

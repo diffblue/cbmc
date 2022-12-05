@@ -29,10 +29,6 @@ public:
   {
     mp_integer object, offset;
 
-    pointert()
-    {
-    }
-
     pointert(mp_integer _obj, mp_integer _off)
       : object(std::move(_obj)), offset(std::move(_off))
     {
