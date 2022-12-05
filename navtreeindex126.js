@@ -1,5 +1,6 @@
 var NAVTREEINDEX126 =
 {
+"structmz__zip__archive__file__stat.html#a0303a6779c89c31eecf62b4744913272":[6,0,816,6],
 "structmz__zip__archive__file__stat.html#a0cfb77699313b855dcd1b5bed9dfb93a":[6,0,816,18],
 "structmz__zip__archive__file__stat.html#a18d1f5f9b03e906c40ecd707610a5869":[6,0,816,15],
 "structmz__zip__archive__file__stat.html#a3038faf9c1f24f2bf48eab9cc2b8ce8c":[6,0,816,17],
@@ -248,6 +249,5 @@ var NAVTREEINDEX126 =
 "structsharing__mapt_1_1noop__value__comparatort.html#a4acc47b49ef08b43bcd9a15c6a2f54ac":[6,0,1010,2,0],
 "structsharing__mapt_1_1real__value__comparatort.html":[6,0,1010,3],
 "structsharing__mapt_1_1real__value__comparatort.html#a778c4dd17de23128f59a765a856f9838":[6,0,1010,3,1],
-"structsharing__mapt_1_1real__value__comparatort.html#aacd1edd2aa1a8519bc03f0c126dc0c8a":[6,0,1010,3,0],
-"structsharing__mapt_1_1real__value__comparatort.html#ab4a7deba7abb6b36b35c91c1e756dac4":[6,0,1010,3,2]
+"structsharing__mapt_1_1real__value__comparatort.html#aacd1edd2aa1a8519bc03f0c126dc0c8a":[6,0,1010,3,0]
 };
