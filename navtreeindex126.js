@@ -119,10 +119,9 @@ var NAVTREEINDEX126 =
 "structpointer__arithmetict.html#ae4df252f43f43855a258dc1a3456af84":[6,0,882,4],
 "structpointer__arithmetict.html#af26f37bf622b05608b742f0241c078f8":[6,0,882,0],
 "structpointer__logict_1_1pointert.html":[6,0,884,0],
-"structpointer__logict_1_1pointert.html#a452466061848470da20c929f2a76b2a3":[6,0,884,0,3],
-"structpointer__logict_1_1pointert.html#a802756de9029537b2be91ee1e65a918f":[6,0,884,0,2],
-"structpointer__logict_1_1pointert.html#ad664b1606c0ac836f88656cc4c1771bc":[6,0,884,0,0],
-"structpointer__logict_1_1pointert.html#ae456bf2a7f4f51a9f83ba247e72ad89e":[6,0,884,0,1],
+"structpointer__logict_1_1pointert.html#a452466061848470da20c929f2a76b2a3":[6,0,884,0,2],
+"structpointer__logict_1_1pointert.html#a802756de9029537b2be91ee1e65a918f":[6,0,884,0,1],
+"structpointer__logict_1_1pointert.html#ae456bf2a7f4f51a9f83ba247e72ad89e":[6,0,884,0,0],
 "structpolynomial__acceleratort_1_1polynomial__array__assignment.html":[6,0,889,0],
 "structpolynomial__acceleratort_1_1polynomial__array__assignment.html#a34a61562bc3324952b4b82d002557ee9":[6,0,889,0,0],
 "structpolynomial__acceleratort_1_1polynomial__array__assignment.html#a66b5202f49880a1b5afb6406e39d043f":[6,0,889,0,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX126 =
 "structsharing__mapt_1_1noop__value__comparatort.html#a4acc47b49ef08b43bcd9a15c6a2f54ac":[6,0,1010,2,0],
 "structsharing__mapt_1_1real__value__comparatort.html":[6,0,1010,3],
 "structsharing__mapt_1_1real__value__comparatort.html#a778c4dd17de23128f59a765a856f9838":[6,0,1010,3,1],
-"structsharing__mapt_1_1real__value__comparatort.html#aacd1edd2aa1a8519bc03f0c126dc0c8a":[6,0,1010,3,0]
+"structsharing__mapt_1_1real__value__comparatort.html#aacd1edd2aa1a8519bc03f0c126dc0c8a":[6,0,1010,3,0],
+"structsharing__mapt_1_1real__value__comparatort.html#ab4a7deba7abb6b36b35c91c1e756dac4":[6,0,1010,3,2]
 };
