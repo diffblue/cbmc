@@ -141,19 +141,18 @@ exprt goto_symext::address_arithmetic(
       result = index_exprt(result, from_integer(0, c_index_type()));
 
     // handle field-sensitive SSA symbol
-    mp_integer offset=0;
+    std::optional<bytest> offset_opt;
     if(is_ssa_expr(expr))
     {
-      auto offset_opt = compute_pointer_offset(expr, ns);
+      offset_opt = compute_pointer_offset(expr, ns);
       PRECONDITION(offset_opt.has_value());
-      offset = *offset_opt;
     }
 
-    if(offset>0)
+    if(offset_opt.has_value() && *offset_opt > bytest{0})
     {
       const byte_extract_exprt be = make_byte_extract(
         to_ssa_expr(expr).get_l1_object(),
-        from_integer(offset, c_index_type()),
+        from_integer(*offset_opt, c_index_type()),
         expr.type());
 
       result = address_arithmetic(be, state, keep_array);

@@ -186,7 +186,7 @@ void print_global_state_size(const goto_modelt &goto_model)
     }
   }
 
-  mp_integer total_size = 0;
+  bitst total_size{0};
 
   for(const auto &symbol_entry : goto_model.symbol_table.symbols)
   {
@@ -201,7 +201,7 @@ void print_global_state_size(const goto_modelt &goto_model)
     }
 
     const auto bits = pointer_offset_bits(symbol.type, ns);
-    if(bits.has_value() && bits.value() > 0)
+    if(bits.has_value() && bits.value() > bitst{0})
       total_size += bits.value();
   }
 

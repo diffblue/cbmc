@@ -100,7 +100,7 @@ void output_vcd(
 
         const auto width = pointer_offset_bits(type, ns);
 
-        if(width.has_value() && (*width) >= 1)
+        if(width.has_value() && (*width) >= bitst{1})
           out << "$var reg " << (*width) << " V" << number << " " << identifier
               << " $end"
               << "\n";
