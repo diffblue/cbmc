@@ -103,13 +103,11 @@ static void add_main_function_block_call(
   PRECONDITION(1u == function_type.parameters().size());
   const code_typet::parametert &data_block_interface =
     function_type.parameters().front();
-  symbolt instance_data_block;
-  instance_data_block.name =
-    id2string(data_block_interface.get_base_name()) + DB_ENTRY_POINT_POSTFIX;
-  instance_data_block.type =
-    to_type_with_subtype(data_block_interface.type()).subtype();
+  symbolt instance_data_block{
+    id2string(data_block_interface.get_base_name()) + DB_ENTRY_POINT_POSTFIX,
+    to_type_with_subtype(data_block_interface.type()).subtype(),
+    ID_statement_list};
   instance_data_block.is_static_lifetime = true;
-  instance_data_block.mode = ID_statement_list;
   symbol_table.add(instance_data_block);
   const address_of_exprt data_block_ref{instance_data_block.symbol_expr()};
 
@@ -124,10 +122,8 @@ static void add_main_function_block_call(
 static void
 generate_statement_list_init_function(symbol_table_baset &symbol_table)
 {
-  symbolt init;
-  init.name = INITIALIZE_FUNCTION;
-  init.mode = ID_statement_list;
-  init.type = code_typet({}, empty_typet{});
+  symbolt init{
+    INITIALIZE_FUNCTION, code_typet({}, empty_typet{}), ID_statement_list};
 
   code_blockt dest;
   dest.add(code_labelt(CPROVER_HIDE, code_skipt()));
@@ -146,9 +142,7 @@ generate_statement_list_init_function(symbol_table_baset &symbol_table)
 /// \param [out] symbol_table: Symbol table that should contain the symbol.
 static void generate_rounding_mode(symbol_table_baset &symbol_table)
 {
-  symbolt rounding_mode;
-  rounding_mode.name = rounding_mode_identifier();
-  rounding_mode.type = signed_int_type();
+  symbolt rounding_mode{rounding_mode_identifier(), signed_int_type(), ID_C};
   rounding_mode.is_thread_local = true;
   rounding_mode.is_static_lifetime = true;
   const constant_exprt rounding_val{
@@ -179,12 +173,10 @@ bool generate_statement_list_start_function(
   add_main_function_block_call(start_function_body, symbol_table, main);
 
   // Add the start symbol.
-  symbolt start_symbol;
-  start_symbol.name = goto_functionst::entry_point();
+  symbolt start_symbol{
+    goto_functionst::entry_point(), code_typet{{}, empty_typet{}}, main.mode};
   start_symbol.base_name = goto_functionst::entry_point();
-  start_symbol.type = code_typet({}, empty_typet{});
   start_symbol.value.swap(start_function_body);
-  start_symbol.mode = main.mode;
 
   if(!symbol_table.insert(std::move(start_symbol)).second)
   {

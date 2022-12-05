@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
-#include <util/range.h>
 #include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_functions.h>
@@ -118,20 +117,14 @@ bool ansi_c_entry_point(
   // find main symbol, if any is given
   if(config.main.has_value())
   {
-    std::list<irep_idt> matches;
+    auto matches = symbol_table.match_name_or_base_name(*config.main);
 
-    for(const auto &symbol_name_entry :
-        equal_range(symbol_table.symbol_base_map, config.main.value()))
+    for(auto it = matches.begin(); it != matches.end();) // no ++it
     {
-      // look it up
-      symbol_table_baset::symbolst::const_iterator s_it =
-        symbol_table.symbols.find(symbol_name_entry.second);
-
-      if(s_it==symbol_table.symbols.end())
-        continue;
-
-      if(s_it->second.type.id() == ID_code && !s_it->second.is_property)
-        matches.push_back(symbol_name_entry.second);
+      if((*it)->second.type.id() != ID_code || (*it)->second.is_property)
+        it = matches.erase(it);
+      else
+        ++it;
     }
 
     if(matches.empty())
@@ -150,7 +143,7 @@ bool ansi_c_entry_point(
       return true;
     }
 
-    main_symbol=matches.front();
+    main_symbol = matches.front()->first;
   }
   else
     main_symbol=ID_main;
@@ -262,14 +255,10 @@ bool generate_ansi_c_start_function(
       namespacet ns(symbol_table);
 
       {
-        symbolt argc_symbol;
-
+        symbolt argc_symbol{"argc'", signed_int_type(), ID_C};
         argc_symbol.base_name = "argc'";
-        argc_symbol.name = "argc'";
-        argc_symbol.type = signed_int_type();
         argc_symbol.is_static_lifetime = true;
         argc_symbol.is_lvalue = true;
-        argc_symbol.mode = ID_C;
 
         auto r = symbol_table.insert(argc_symbol);
         if(!r.second && r.first != argc_symbol)
@@ -291,14 +280,10 @@ bool generate_ansi_c_start_function(
         const plus_exprt size_expr(argc_symbol.symbol_expr(), one_expr);
         const array_typet argv_type(pointer_type(char_type()), size_expr);
 
-        symbolt argv_symbol;
-
+        symbolt argv_symbol{"argv'", argv_type, ID_C};
         argv_symbol.base_name = "argv'";
-        argv_symbol.name = "argv'";
-        argv_symbol.type = argv_type;
         argv_symbol.is_static_lifetime = true;
         argv_symbol.is_lvalue = true;
-        argv_symbol.mode = ID_C;
 
         auto r = symbol_table.insert(argv_symbol);
         if(!r.second && r.first != argv_symbol)
@@ -344,12 +329,9 @@ bool generate_ansi_c_start_function(
       if(parameters.size()==3)
       {
         {
-          symbolt envp_size_symbol;
+          symbolt envp_size_symbol{"envp_size'", size_type(), ID_C};
           envp_size_symbol.base_name = "envp_size'";
-          envp_size_symbol.name = "envp_size'";
-          envp_size_symbol.type = size_type();
           envp_size_symbol.is_static_lifetime = true;
-          envp_size_symbol.mode = ID_C;
 
           if(!symbol_table.insert(std::move(envp_size_symbol)).second)
           {
@@ -363,13 +345,13 @@ bool generate_ansi_c_start_function(
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         {
-          symbolt envp_symbol;
+          symbolt envp_symbol{
+            "envp'",
+            array_typet(
+              pointer_type(char_type()), envp_size_symbol.symbol_expr()),
+            ID_C};
           envp_symbol.base_name = "envp'";
-          envp_symbol.name = "envp'";
-          envp_symbol.type = array_typet(
-            pointer_type(char_type()), envp_size_symbol.symbol_expr());
           envp_symbol.is_static_lifetime = true;
-          envp_symbol.mode = ID_C;
 
           if(!symbol_table.insert(std::move(envp_symbol)).second)
           {
@@ -550,13 +532,10 @@ bool generate_ansi_c_start_function(
   }
 
   // add the entry point symbol
-  symbolt new_symbol;
-
-  new_symbol.name=goto_functionst::entry_point();
+  symbolt new_symbol{
+    goto_functionst::entry_point(), code_typet{{}, void_type()}, symbol.mode};
   new_symbol.base_name = goto_functionst::entry_point();
-  new_symbol.type = code_typet({}, void_type());
   new_symbol.value.swap(init_code);
-  new_symbol.mode=symbol.mode;
 
   if(!symbol_table.insert(std::move(new_symbol)).second)
   {

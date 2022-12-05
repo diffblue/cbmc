@@ -67,8 +67,7 @@ public:
         continue;
 
       const irep_idt mangled = mangle_fun(sym, extra_info);
-      symbolt new_sym;
-      new_sym = sym;
+      symbolt new_sym = sym;
       new_sym.name = mangled;
       new_sym.base_name = mangled;
       if(new_sym.pretty_name.empty())

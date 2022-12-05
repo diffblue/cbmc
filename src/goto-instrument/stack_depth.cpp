@@ -29,14 +29,11 @@ static symbol_exprt add_stack_depth_symbol(
   const irep_idt identifier="$stack_depth";
   typet type = size_type();
 
-  symbolt new_symbol;
-  new_symbol.name=identifier;
+  symbolt new_symbol{identifier, type, ID_C};
   new_symbol.base_name=identifier;
   new_symbol.pretty_name=identifier;
-  new_symbol.type=type;
   new_symbol.is_static_lifetime=true;
   new_symbol.value=from_integer(0, type);
-  new_symbol.mode=ID_C;
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
 
@@ -65,7 +62,7 @@ static void stack_depth(
   const std::size_t i_depth,
   const exprt &max_depth)
 {
-  assert(!goto_program.instructions.empty());
+  PRECONDITION(!goto_program.instructions.empty());
 
   goto_programt::targett first=goto_program.instructions.begin();
 
@@ -84,7 +81,7 @@ static void stack_depth(
       first->source_location()));
 
   goto_programt::targett last=--goto_program.instructions.end();
-  assert(last->is_end_function());
+  DATA_INVARIANT(last->is_end_function(), "must be end of function");
 
   goto_programt::instructiont minus_ins = goto_programt::make_assignment(
     code_assignt(symbol, minus_exprt(symbol, from_integer(1, symbol.type()))),

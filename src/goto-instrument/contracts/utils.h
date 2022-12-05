@@ -27,7 +27,7 @@ class havoc_if_validt : public havoc_utilst
 {
 public:
   havoc_if_validt(const assignst &mod, const namespacet &ns)
-    : havoc_utilst(mod), ns(ns)
+    : havoc_utilst(mod, ns), ns(ns)
   {
   }
 
@@ -65,8 +65,8 @@ public:
 ///
 /// This function generates a formula:
 ///
-///   good_pointer_def(pexpr_1, ns) &&
-///   good_pointer_def(pexpr_2, n2) &&
+///   r_ok_exprt(pexpr_1, sizeof(*pexpr_1)) &&
+///   r_ok_exprt(pexpr_2, sizeof(*pexpr_1)) &&
 ///   ...
 ///
 /// over all dereferenced pointer expressions *(pexpr_1), *(pexpr_2), ...
@@ -178,7 +178,7 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
 /// with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant `i`,
 /// then replace it by the entire underlying object. Otherwise, e.g. for a[i] or
 /// *(b+i) when `i` is a known constant, keep the expression in the result.
-void widen_assigns(assignst &assigns);
+void widen_assigns(assignst &assigns, const namespacet &ns);
 
 /// This function recursively searches \p expression to find nested or
 /// non-nested quantified expressions. When a quantified expression is found,

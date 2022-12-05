@@ -438,15 +438,15 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     mp_integer size=0;
     std::size_t count=0;
 
-    forall_operands(it, plus_expr)
+    for(const auto &op : plus_expr.operands())
     {
-      if(it->type().id()==ID_pointer)
+      if(op.type().id() == ID_pointer)
       {
         count++;
-        bv=convert_bv(*it);
+        bv = convert_bv(op);
         CHECK_RETURN(bv.size()==bits);
 
-        typet pointer_base_type = to_pointer_type(it->type()).base_type();
+        typet pointer_base_type = to_pointer_type(op.type()).base_type();
 
         if(pointer_base_type.id() == ID_empty)
         {
@@ -470,22 +470,23 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const std::size_t offset_bits = get_offset_width(type);
     bvt sum = bv_utils.build_constant(0, offset_bits);
 
-    forall_operands(it, plus_expr)
+    for(const auto &operand : plus_expr.operands())
     {
-      if(it->type().id()==ID_pointer)
+      if(operand.type().id() == ID_pointer)
         continue;
 
-      if(it->type().id()!=ID_unsignedbv &&
-         it->type().id()!=ID_signedbv)
+      if(
+        operand.type().id() != ID_unsignedbv &&
+        operand.type().id() != ID_signedbv)
       {
         return conversion_failed(plus_expr);
       }
 
-      bv_utilst::representationt rep=
-        it->type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
-                                     bv_utilst::representationt::UNSIGNED;
+      bv_utilst::representationt rep = operand.type().id() == ID_signedbv
+                                         ? bv_utilst::representationt::SIGNED
+                                         : bv_utilst::representationt::UNSIGNED;
 
-      bvt op=convert_bv(*it);
+      bvt op = convert_bv(operand);
       CHECK_RETURN(!op.empty());
 
       op = bv_utils.extension(op, offset_bits, rep);
@@ -624,11 +625,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     const exprt same_object = ::same_object(minus_expr.lhs(), minus_expr.rhs());
     const literalt same_object_lit = convert(same_object);
 
-    // compute the object size (again, possibly using cached results)
-    const exprt object_size = ::object_size(minus_expr.lhs());
-    const bvt object_size_bv =
-      bv_utils.zero_extension(convert_bv(object_size), width);
-
     bvt bv = prop.new_variables(width);
 
     if(!same_object_lit.is_false())
@@ -638,26 +634,10 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       const bvt lhs_offset =
         bv_utils.sign_extension(offset_literals(lhs, lhs_pt), width);
 
-      const literalt lhs_in_bounds = prop.land(
-        !bv_utils.sign_bit(lhs_offset),
-        bv_utils.rel(
-          lhs_offset,
-          ID_le,
-          object_size_bv,
-          bv_utilst::representationt::UNSIGNED));
-
       const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
       const bvt &rhs = convert_bv(minus_expr.rhs());
       const bvt rhs_offset =
         bv_utils.sign_extension(offset_literals(rhs, rhs_pt), width);
-
-      const literalt rhs_in_bounds = prop.land(
-        !bv_utils.sign_bit(rhs_offset),
-        bv_utils.rel(
-          rhs_offset,
-          ID_le,
-          object_size_bv,
-          bv_utilst::representationt::UNSIGNED));
 
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
 
@@ -678,9 +658,39 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
         }
       }
 
+      // test for null object (integer constants)
+      const exprt null_object = ::null_object(minus_expr.lhs());
+      literalt in_bounds = convert(null_object);
+
+      if(!in_bounds.is_true())
+      {
+        // compute the object size (again, possibly using cached results)
+        const exprt object_size = ::object_size(minus_expr.lhs());
+        const bvt object_size_bv =
+          bv_utils.zero_extension(convert_bv(object_size), width);
+
+        const literalt lhs_in_bounds = prop.land(
+          !bv_utils.sign_bit(lhs_offset),
+          bv_utils.rel(
+            lhs_offset,
+            ID_le,
+            object_size_bv,
+            bv_utilst::representationt::UNSIGNED));
+
+        const literalt rhs_in_bounds = prop.land(
+          !bv_utils.sign_bit(rhs_offset),
+          bv_utils.rel(
+            rhs_offset,
+            ID_le,
+            object_size_bv,
+            bv_utilst::representationt::UNSIGNED));
+
+        in_bounds =
+          prop.lor(in_bounds, prop.land(lhs_in_bounds, rhs_in_bounds));
+      }
+
       prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_lit, prop.land(lhs_in_bounds, rhs_in_bounds)),
-        bv_utils.equal(difference, bv)));
+        prop.land(same_object_lit, in_bounds), bv_utils.equal(difference, bv)));
     }
 
     return bv;
@@ -794,10 +804,9 @@ exprt bv_pointerst::bv_get_rec(
 
   constant_exprt result(bvrep, type);
 
-  pointer_logict::pointert pointer;
-  pointer.object =
-    numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
-  pointer.offset=binary2integer(value_offset, true);
+  pointer_logict::pointert pointer{
+    numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
+    binary2integer(value_offset, true)};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};

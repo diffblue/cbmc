@@ -180,7 +180,6 @@ public:
   NODISCARD resultt<> simplify_object_size(const object_size_exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const unary_exprt &);
   NODISCARD resultt<> simplify_is_invalid_pointer(const unary_exprt &);
-  NODISCARD resultt<> simplify_good_pointer(const unary_exprt &);
   NODISCARD resultt<> simplify_object(const exprt &);
   NODISCARD resultt<> simplify_unary_minus(const unary_minus_exprt &);
   NODISCARD resultt<> simplify_unary_plus(const unary_plus_exprt &);

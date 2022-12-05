@@ -537,8 +537,10 @@ void ci_lazy_methodst::gather_needed_globals(
     }
   }
   else
-    forall_operands(opit, e)
-      gather_needed_globals(*opit, symbol_table, needed);
+  {
+    for(const auto &op : e.operands())
+      gather_needed_globals(op, symbol_table, needed);
+  }
 }
 
 /// Find a virtual callee, if one is defined and the callee type is known to

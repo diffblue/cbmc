@@ -245,7 +245,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     expr.type()=bool_typet();
     auto &subtypes =
       (static_cast<type_with_subtypest &>(expr.add(ID_type_arg))).subtypes();
-    assert(subtypes.size()==2);
+    PRECONDITION(subtypes.size() == 2);
     typecheck_type(subtypes[0]);
     typecheck_type(subtypes[1]);
     source_locationt source_location=expr.source_location();
@@ -547,11 +547,8 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   code_typet symbol_type=new_type;
   symbol_type.return_type()=void_type();
 
-  symbolt symbol;
+  symbolt symbol{ID_gcc_builtin_va_arg, symbol_type, ID_C};
   symbol.base_name=ID_gcc_builtin_va_arg;
-  symbol.name=ID_gcc_builtin_va_arg;
-  symbol.type=symbol_type;
-  symbol.mode = ID_C;
 
   symbol_table.insert(std::move(symbol));
 }
@@ -587,15 +584,15 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
   typet &type=static_cast<typet &>(expr.add(ID_type_arg));
   typecheck_type(type);
 
-  exprt &member=static_cast<exprt &>(expr.add(ID_designator));
+  const exprt &member = static_cast<const exprt &>(expr.add(ID_designator));
 
   exprt result=from_integer(0, size_type());
 
-  forall_operands(m_it, member)
+  for(const auto &op : member.operands())
   {
     type = follow(type);
 
-    if(m_it->id()==ID_member)
+    if(op.id() == ID_member)
     {
       if(type.id()!=ID_union && type.id()!=ID_struct)
       {
@@ -606,11 +603,11 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       }
 
       bool found=false;
-      irep_idt component_name=m_it->get(ID_component_name);
+      irep_idt component_name = op.get(ID_component_name);
 
       while(!found)
       {
-        assert(type.id()==ID_union || type.id()==ID_struct);
+        PRECONDITION(type.id() == ID_union || type.id() == ID_struct);
 
         const struct_union_typet &struct_union_type=
           to_struct_union_type(type);
@@ -674,7 +671,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
                 typet tmp = follow(c.type());
                 type=tmp;
-                assert(type.id()==ID_union || type.id()==ID_struct);
+                CHECK_RETURN(type.id() == ID_union || type.id() == ID_struct);
                 found2=true;
                 break; // we run into another iteration of the outer loop
               }
@@ -692,7 +689,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         }
       }
     }
-    else if(m_it->id()==ID_index)
+    else if(op.id() == ID_index)
     {
       if(type.id()!=ID_array)
       {
@@ -701,7 +698,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         throw 0;
       }
 
-      exprt index = to_unary_expr(*m_it).op();
+      exprt index = to_unary_expr(op).op();
 
       // still need to typecheck index
       typecheck_expr(index);
@@ -925,7 +922,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
   if(last_statement==ID_expression)
   {
-    assert(last.operands().size()==1);
+    PRECONDITION(last.operands().size() == 1);
     exprt &op=last.op0();
 
     // arrays here turn into pointers (array decay)
@@ -1574,7 +1571,7 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
 
-  assert(operands.size()==3);
+  PRECONDITION(operands.size() == 3);
 
   // copy (save) original types
   const typet o_type0=operands[0].type();
@@ -1791,7 +1788,7 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
     expr.id(ID_index);
     expr.type() = to_array_type(op_type).element_type();
     expr.copy_to_operands(from_integer(0, c_index_type()));
-    assert(expr.operands().size()==2);
+    CHECK_RETURN(expr.operands().size() == 2);
   }
   else if(op_type.id()==ID_pointer)
   {
@@ -2175,13 +2172,10 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
             symbol_table.add(new_symbol);
           }
 
-          symbolt new_symbol;
-
-          new_symbol.name = identifier_with_type;
+          symbolt new_symbol{
+            identifier_with_type, gcc_polymorphic->type(), ID_C};
           new_symbol.base_name = identifier_with_type;
           new_symbol.location = f_op.source_location();
-          new_symbol.type = gcc_polymorphic->type();
-          new_symbol.mode = ID_C;
           code_blockt implementation =
             instantiate_gcc_polymorphic_builtin(identifier, *gcc_polymorphic);
           typet parent_return_type = return_type;
@@ -2213,12 +2207,10 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
           guessed_return_type = pointer_type(void_type()); // void *
         }
 
-        symbolt new_symbol;
-
-        new_symbol.name=identifier;
+        symbolt new_symbol{
+          identifier, code_typet({}, guessed_return_type), mode};
         new_symbol.base_name=identifier;
         new_symbol.location=expr.source_location();
-        new_symbol.type = code_typet({}, guessed_return_type);
         new_symbol.type.set(ID_C_incomplete, true);
 
         // TODO: should also guess some argument types
@@ -4037,7 +4029,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 {
-  assert(expr.id()==ID_shl || expr.id()==ID_shr);
+  PRECONDITION(expr.id() == ID_shl || expr.id() == ID_shr);
 
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
@@ -4467,13 +4459,11 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 class is_compile_time_constantt : public is_constantt
 {
 public:
-  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
+  explicit is_compile_time_constantt(const namespacet &ns) : is_constantt(ns)
   {
   }
 
 protected:
-  const namespacet &ns;
-
   bool is_constant(const exprt &e) const override
   {
     if(e.id() == ID_infinity)

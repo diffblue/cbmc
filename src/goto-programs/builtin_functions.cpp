@@ -431,8 +431,9 @@ void goto_convertt::do_cpp_new(
     const typet &return_type=
       code_type.return_type();
 
-    assert(code_type.parameters().size()==1 ||
-           code_type.parameters().size()==2);
+    DATA_INVARIANT(
+      code_type.parameters().size() == 1 || code_type.parameters().size() == 2,
+      "new has one or two parameters");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -462,8 +463,9 @@ void goto_convertt::do_cpp_new(
 
     const typet &return_type=code_type.return_type();
 
-    assert(code_type.parameters().size()==2 ||
-           code_type.parameters().size()==3);
+    DATA_INVARIANT(
+      code_type.parameters().size() == 2 || code_type.parameters().size() == 3,
+      "placement new has two or three parameters");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -1480,10 +1482,8 @@ void goto_convertt::do_function_call_symbol(
 
     if(!symbol_table.has_symbol(name))
     {
-      symbolt new_symbol;
+      symbolt new_symbol{name, f_type, mode};
       new_symbol.base_name=name;
-      new_symbol.name=name;
-      new_symbol.type=f_type;
       new_symbol.location=function.source_location();
       symbol_table.add(new_symbol);
     }

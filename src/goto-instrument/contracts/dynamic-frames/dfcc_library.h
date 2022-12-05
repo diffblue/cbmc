@@ -239,8 +239,9 @@ public:
   /// __CPROVER_object_from
   /// __CPROVER_assignable
   /// __CPROVER_freeable
-  /// To make sure they cannot be used in a proof unexpectedly
-  /// without causing verification errors.
+  /// An error will be triggered in case calls to these functions occur outside
+  /// of a contrat clause and were hence not mapped to their library
+  /// implementation.
   void inhibit_front_end_builtins();
 
   /// Sets the given hide flag on all instructions of all library functions

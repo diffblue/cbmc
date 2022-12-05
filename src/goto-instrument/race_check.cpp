@@ -76,10 +76,9 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
 
   w_guards.push_back(identifier);
 
-  symbolt new_symbol;
-  new_symbol.name=identifier;
+  symbolt new_symbol{
+    identifier, bool_typet(), symbol_table.lookup_ref(object).mode};
   new_symbol.base_name=identifier;
-  new_symbol.type=bool_typet();
   new_symbol.is_static_lifetime=true;
   new_symbol.value=false_exprt();
 
@@ -130,7 +129,7 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
     identifier == "stdout" || identifier == "stderr" ||
     identifier == "sys_nerr" ||
     has_prefix(id2string(identifier), "symex::invalid_object") ||
-    has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"))
+    has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);

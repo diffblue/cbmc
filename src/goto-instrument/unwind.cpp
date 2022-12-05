@@ -28,8 +28,8 @@ void goto_unwindt::copy_segment(
   const goto_programt::const_targett end, // exclusive
   goto_programt &goto_program) // result
 {
-  assert(start->location_number<end->location_number);
-  assert(goto_program.empty());
+  PRECONDITION(start->location_number < end->location_number);
+  PRECONDITION(goto_program.empty());
 
   // build map for branch targets inside the loop
   typedef std::map<goto_programt::const_targett, unsigned> target_mapt;
@@ -43,7 +43,7 @@ void goto_unwindt::copy_segment(
   // make a copy
   std::vector<goto_programt::targett> target_vector;
   target_vector.reserve(target_map.size());
-  assert(target_vector.empty());
+  CHECK_RETURN(target_vector.empty());
 
   for(goto_programt::const_targett t=start; t!=end; t++)
   {
@@ -54,7 +54,7 @@ void goto_unwindt::copy_segment(
     target_vector.push_back(t_new); // store copied instruction
   }
 
-  assert(goto_program.instructions.size()==target_vector.size());
+  CHECK_RETURN(goto_program.instructions.size() == target_vector.size());
 
   // adjust intra-segment gotos
   for(std::size_t target_index = 0; target_index < target_vector.size();
@@ -73,7 +73,7 @@ void goto_unwindt::copy_segment(
     {
       unsigned j=m_it->second;
 
-      assert(j<target_vector.size());
+      DATA_INVARIANT(j < target_vector.size(), "in bounds");
       t->set_target(target_vector[j]);
     }
   }
@@ -107,8 +107,8 @@ void goto_unwindt::unwind(
   const unwind_strategyt unwind_strategy,
   std::vector<goto_programt::targett> &iteration_points)
 {
-  assert(iteration_points.empty());
-  assert(loop_head->location_number<loop_exit->location_number);
+  PRECONDITION(iteration_points.empty());
+  PRECONDITION(loop_head->location_number < loop_exit->location_number);
 
   // rest program after unwound part
   goto_programt rest_program;
@@ -135,7 +135,7 @@ void goto_unwindt::unwind(
 
     goto_programt::const_targett t=loop_exit;
     t--;
-    assert(t->is_backwards_goto());
+    DATA_INVARIANT(t->is_backwards_goto(), "must be backwards goto");
 
     exprt exit_cond = false_exprt(); // default is false
 
@@ -175,7 +175,7 @@ void goto_unwindt::unwind(
 
   }
 
-  assert(!rest_program.empty());
+  CHECK_RETURN(!rest_program.empty());
 
   // to be filled with copies of the loop body
   goto_programt copies;
@@ -234,7 +234,7 @@ void goto_unwindt::unwind(
     {
       goto_programt tmp_program;
       copy_segment(loop_head, loop_exit, tmp_program);
-      assert(!tmp_program.instructions.empty());
+      CHECK_RETURN(!tmp_program.instructions.empty());
 
       iteration_points[i]=--tmp_program.instructions.end();
 
@@ -312,7 +312,7 @@ void goto_unwindt::unwind(
     goto_programt::const_targett loop_head=i_it->get_target();
     goto_programt::const_targett loop_exit=i_it;
     loop_exit++;
-    assert(loop_exit!=goto_program.instructions.end());
+    CHECK_RETURN(loop_exit != goto_program.instructions.end());
 
     unwind(
       function_id, goto_program, loop_head, loop_exit, *limit, unwind_strategy);

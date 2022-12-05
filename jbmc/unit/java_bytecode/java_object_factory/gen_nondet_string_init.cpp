@@ -36,10 +36,7 @@ SCENARIO(
     java_class_typet jlo_class_type;
     jlo_class_type.set_tag("java.lang.Object");
     jlo_class_type.set_name("java::java.lang.Object");
-    symbolt jlo_sym;
-    jlo_sym.name = "java::java.lang.Object";
-    jlo_sym.type = jlo_class_type;
-    jlo_sym.is_type = true;
+    type_symbolt jlo_sym{"java::java.lang.Object", jlo_class_type, ID_java};
     java_root_class(jlo_sym);
     bool failed = symbol_table.add(jlo_sym);
     CHECK_RETURN(!failed);

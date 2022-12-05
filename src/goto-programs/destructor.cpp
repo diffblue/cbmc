@@ -27,11 +27,11 @@ code_function_callt get_destructor(
   {
     const exprt &methods=static_cast<const exprt&>(type.find(ID_methods));
 
-    forall_operands(it, methods)
+    for(const auto &op : methods.operands())
     {
-      if(it->type().id()==ID_code)
+      if(op.type().id() == ID_code)
       {
-        const code_typet &code_type=to_code_type(it->type());
+        const code_typet &code_type = to_code_type(op.type());
 
         if(code_type.return_type().id()==ID_destructor &&
            code_type.parameters().size()==1)
@@ -42,7 +42,7 @@ code_function_callt get_destructor(
             arg_type.id() == ID_pointer &&
             ns.follow(to_pointer_type(arg_type).base_type()) == type)
           {
-            const symbol_exprt symbol_expr(it->get(ID_name), it->type());
+            const symbol_exprt symbol_expr(op.get(ID_name), op.type());
             return code_function_callt(symbol_expr);
           }
         }

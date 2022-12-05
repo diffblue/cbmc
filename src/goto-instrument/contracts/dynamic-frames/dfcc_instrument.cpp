@@ -22,9 +22,11 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <goto-programs/remove_skip.h>
 
 #include <ansi-c/c_expr.h>
+#include <ansi-c/c_object_factory_parameters.h>
 #include <goto-instrument/contracts/cfg_info.h>
 #include <goto-instrument/contracts/contracts.h>
 #include <goto-instrument/contracts/utils.h>
+#include <goto-instrument/generate_function_bodies.h>
 #include <langapi/language_util.h>
 
 #include "dfcc_is_freeable.h"
@@ -32,6 +34,8 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc_library.h"
 #include "dfcc_obeys_contract.h"
 #include "dfcc_utils.h"
+
+#include <memory>
 
 std::set<irep_idt> dfcc_instrumentt::function_cache;
 
@@ -340,10 +344,13 @@ void dfcc_instrumentt::instrument_function_body(
 
   if(!goto_function.body_available())
   {
-    log.warning() << "DFCC instrumentation: '" << function_id
-                  << "' body is not available. Results may be unsound if the "
-                     "actual function has side effects."
-                  << messaget::eom;
+    // generate a default body `assert(false);assume(false);`
+    std::string options = "assert-false-assume-false";
+    c_object_factory_parameterst object_factory_params;
+    auto generate_function_bodies = generate_function_bodies_factory(
+      options, object_factory_params, goto_model.symbol_table, message_handler);
+    generate_function_bodies->generate_function_body(
+      goto_function, goto_model.symbol_table, function_id);
     return;
   }
 

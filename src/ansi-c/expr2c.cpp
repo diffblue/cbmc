@@ -668,7 +668,8 @@ std::string expr2ct::convert_struct_type(
   // Either we are including the body (in which case it makes sense to include
   // or exclude the parameters) or there is no body so therefore we definitely
   // shouldn't be including the parameters
-  assert(inc_struct_body || !inc_padding_components);
+  INVARIANT(
+    inc_struct_body || !inc_padding_components, "inconsistent configuration");
 
   const struct_typet &struct_type=to_struct_type(src);
 
@@ -896,8 +897,7 @@ std::string expr2ct::convert_with(
 
       const struct_union_typet::componentt &comp_expr=
         struct_union_type.get_component(component_name);
-
-      assert(comp_expr.is_not_nil());
+      CHECK_RETURN(comp_expr.is_not_nil());
 
       irep_idt display_component_name;
 
@@ -973,8 +973,8 @@ expr2ct::convert_update(const update_exprt &src, unsigned precedence)
 
   const exprt &designator = src.op1();
 
-  forall_operands(it, designator)
-    dest+=convert(*it);
+  for(const auto &op : designator.operands())
+    dest += convert(op);
 
   dest+=", ";
 
@@ -1000,10 +1000,10 @@ std::string expr2ct::convert_cond(
 
   std::string dest="cond {\n";
 
-  forall_operands(it, src)
+  for(const auto &operand : src.operands())
   {
     unsigned p;
-    std::string op=convert_with_precedence(*it, p);
+    std::string op = convert_with_precedence(operand, p);
 
     if(condition)
       dest+="  ";
@@ -1087,7 +1087,7 @@ std::string expr2ct::convert_multi_ary(
   std::string dest;
   bool first=true;
 
-  forall_operands(it, src)
+  for(const auto &operand : src.operands())
   {
     if(first)
       first=false;
@@ -1100,7 +1100,7 @@ std::string expr2ct::convert_multi_ary(
     }
 
     unsigned p;
-    std::string op=convert_with_precedence(*it, p);
+    std::string op = convert_with_precedence(operand, p);
 
     // In pointer arithmetic, x+(y-z) is unfortunately
     // not the same as (x+y)-z, even though + and -
@@ -1109,10 +1109,9 @@ std::string expr2ct::convert_multi_ary(
     // the same as x*(y/z), but * and / have the same
     // precedence.
 
-    bool use_parentheses=
-      precedence>p ||
-      (precedence==p && full_parentheses) ||
-      (precedence==p && src.id()!=it->id());
+    bool use_parentheses = precedence > p ||
+                           (precedence == p && full_parentheses) ||
+                           (precedence == p && src.id() != operand.id());
 
     if(use_parentheses)
       dest+='(';
@@ -1642,13 +1641,13 @@ std::string expr2ct::convert_symbol(const exprt &src)
       get_shorthands(src);
 
       entry=shorthands.find(id);
-      assert(entry!=shorthands.end());
+      CHECK_RETURN(entry != shorthands.end());
     }
 
     dest=id2string(entry->second);
 
     #if 0
-    if(has_prefix(id2string(id), SYMEX_DYNAMIC_PREFIX "dynamic_object"))
+    if(has_prefix(id2string(id), SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
     {
       if(sizeof_nesting++ == 0)
         dest+=" /*"+convert(src.type());
@@ -2137,7 +2136,7 @@ std::string expr2ct::convert_vector(
   bool newline=false;
   size_t last_size=0;
 
-  forall_operands(it, src)
+  for(const auto &op : src.operands())
   {
     if(first)
       first=false;
@@ -2151,7 +2150,7 @@ std::string expr2ct::convert_vector(
         dest+=' ';
     }
 
-    std::string tmp=convert(*it);
+    std::string tmp = convert(op);
 
     if(last_size+40<dest.size())
     {
@@ -2199,9 +2198,11 @@ std::string expr2ct::convert_array(const exprt &src)
 
   bool all_constant=true;
 
-  forall_operands(it, src)
-    if(!it->is_constant())
+  for(const auto &op : src.operands())
+  {
+    if(!op.is_constant())
       all_constant=false;
+  }
 
   if(
     src.get_bool(ID_C_string_constant) && all_constant &&
@@ -2525,10 +2526,10 @@ std::string expr2ct::convert_overflow(
     dest += convert(to_multi_ary_expr(src).op0().type());
   }
 
-  forall_operands(it, src)
+  for(const auto &op : src.operands())
   {
     unsigned p;
-    std::string arg_str=convert_with_precedence(*it, p);
+    std::string arg_str = convert_with_precedence(op, p);
 
     dest+=", ";
     // TODO: ggf. Klammern je nach p
@@ -2788,8 +2789,8 @@ std::string expr2ct::convert_code_switch(
     }
     else
     {
-      forall_operands(it2, op)
-        dest+=convert_code(to_code(*it2), indent+2);
+      for(const auto &operand : op.operands())
+        dest += convert_code(to_code(operand), indent + 2);
     }
   }
 
@@ -2933,9 +2934,9 @@ std::string expr2ct::convert_code_decl_block(
 {
   std::string dest;
 
-  forall_operands(it, src)
+  for(const auto &op : src.operands())
   {
-    dest+=convert_code(to_code(*it), indent);
+    dest += convert_code(to_code(op), indent);
     dest+="\n";
   }
 
@@ -4001,7 +4002,6 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_gcc_builtin_va_arg, "gcc_builtin_va_arg"},
     {ID_get_may, CPROVER_PREFIX "get_may"},
     {ID_get_must, CPROVER_PREFIX "get_must"},
-    {ID_good_pointer, "GOOD_POINTER"},
     {ID_ieee_float_equal, "IEEE_FLOAT_EQUAL"},
     {ID_ieee_float_notequal, "IEEE_FLOAT_NOTEQUAL"},
     {ID_infinity, "INFINITY"},

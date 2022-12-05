@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.c
 
 function 'memcpy' is not declared
@@ -8,3 +8,6 @@ parameter "memcpy::dst" type mismatch
 --
 ^warning: ignoring
 Invariant check failed
+--
+This test requires support for empty structs, which aren't supported by Visual
+Studio.

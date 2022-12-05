@@ -80,15 +80,12 @@ void uninitializedt::add_assertions(
   {
     const symbolt &symbol=ns.lookup(*it);
 
-    symbolt new_symbol;
-    new_symbol.name=id2string(symbol.name)+"#initialized";
-    new_symbol.type=bool_typet();
+    symbolt new_symbol{
+      id2string(symbol.name) + "#initialized", bool_typet(), symbol.mode};
     new_symbol.base_name=id2string(symbol.base_name)+"#initialized";
     new_symbol.location=symbol.location;
-    new_symbol.mode=symbol.mode;
     new_symbol.module=symbol.module;
     new_symbol.is_thread_local=true;
-    new_symbol.is_static_lifetime=false;
     new_symbol.is_file_local=true;
     new_symbol.is_lvalue=true;
 
@@ -145,7 +142,8 @@ void uninitializedt::add_assertions(
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
-            assert(tracking.find(identifier)!=tracking.end());
+            INVARIANT(
+              tracking.find(identifier) != tracking.end(), "not tracked");
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
 
             // insert assertion

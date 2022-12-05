@@ -70,9 +70,9 @@ static bool find_symbols(
     }
   }
 
-  forall_operands(it, src)
+  for(const auto &src_op : src.operands())
   {
-    if(!find_symbols(kind, *it, op, bindings))
+    if(!find_symbols(kind, src_op, op, bindings))
       return false;
   }
 

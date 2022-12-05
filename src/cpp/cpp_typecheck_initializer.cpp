@@ -269,7 +269,7 @@ void cpp_typecheckt::zero_initializer(
 
     for(const auto &component : union_type.components())
     {
-      assert(component.type().is_not_nil());
+      DATA_INVARIANT(component.type().is_not_nil(), "missing component type");
 
       if(component.type().id()==ID_code)
         continue;

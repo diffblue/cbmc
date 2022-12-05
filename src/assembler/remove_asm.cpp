@@ -124,13 +124,8 @@ void remove_asmt::gcc_asm_function_call(
   // do we have it?
   if(!symbol_table.has_symbol(function_identifier))
   {
-    symbolt symbol;
-
-    symbol.name = function_identifier;
-    symbol.type = fkt_type;
+    symbolt symbol{function_identifier, fkt_type, ID_C};
     symbol.base_name = function_base_name;
-    symbol.value = nil_exprt();
-    symbol.mode = ID_C;
 
     symbol_table.add(symbol);
 
@@ -182,13 +177,8 @@ void remove_asmt::msc_asm_function_call(
   // do we have it?
   if(!symbol_table.has_symbol(function_identifier))
   {
-    symbolt symbol;
-
-    symbol.name = function_identifier;
-    symbol.type = fkt_type;
+    symbolt symbol{function_identifier, fkt_type, ID_C};
     symbol.base_name = function_base_name;
-    symbol.value = nil_exprt();
-    symbol.mode = ID_C;
 
     symbol_table.add(symbol);
 

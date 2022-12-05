@@ -53,10 +53,9 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
 
     typet int_type = signed_int_type();
 
-    symbolt x_symbol;
-    x_symbol.name = id2string(goto_functionst::entry_point()) + "::x";
+    symbolt x_symbol{
+      id2string(goto_functionst::entry_point()) + "::x", int_type, ID_C};
     x_symbol.base_name = "x";
-    x_symbol.type = int_type;
     x_symbol.is_lvalue = true;
     x_symbol.is_state_var = true;
     x_symbol.is_thread_local = true;

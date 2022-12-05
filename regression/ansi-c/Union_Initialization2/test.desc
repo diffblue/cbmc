@@ -1,7 +1,7 @@
 CORE
 main.c
 
-union member designator found for empty union
+(union member designator found for empty union|C requires that a struct or union has at least one member)
 ^SIGNAL=0$
 ^EXIT=(1|64)$
 --

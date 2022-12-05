@@ -158,7 +158,7 @@ void value_set_fit::flatten_rec(
   #endif
 
   std::string identifier = id2string(e.identifier);
-  assert(seen.find(identifier + e.suffix)==seen.end());
+  CHECK_RETURN(seen.find(identifier + e.suffix) == seen.end());
 
   bool generalize_index = false;
 
@@ -303,7 +303,7 @@ value_set_fit::get_value_set(const exprt &expr, const namespacet &ns) const
     const exprt &object = object_numbering[object_entry.first];
     if(object.type().id()=="#REF#")
     {
-      assert(object.id()==ID_symbol);
+      DATA_INVARIANT(object.id() == ID_symbol, "reference to symbol required");
 
       const irep_idt &ident = object.get(ID_identifier);
       valuest::const_iterator v_it = values.find(ident);
@@ -550,14 +550,16 @@ void value_set_fit::get_value_set_rec(
       // find the pointer operand
       const exprt *ptr_operand=nullptr;
 
-      forall_operands(it, expr)
-        if(it->type().id()==ID_pointer)
+      for(const auto &op : expr.operands())
+      {
+        if(op.type().id() == ID_pointer)
         {
           if(ptr_operand==nullptr)
-            ptr_operand=&(*it);
+            ptr_operand = &op;
           else
             throw "more than one pointer operand in pointer arithmetic";
         }
+      }
 
       if(ptr_operand==nullptr)
         throw "pointer type sum expected to have pointer operand";
@@ -630,7 +632,7 @@ void value_set_fit::get_value_set_rec(
             statement==ID_cpp_new_array)
     {
       PRECONDITION(suffix.empty());
-      assert(expr.type().id()==ID_pointer);
+      PRECONDITION(expr.type().id() == ID_pointer);
 
       dynamic_object_exprt dynamic_object(
         to_pointer_type(expr.type()).base_type());
@@ -657,8 +659,8 @@ void value_set_fit::get_value_set_rec(
           expr.id()==ID_array)
   {
     // an array constructor, possibly containing addresses
-    forall_operands(it, expr)
-      get_value_set_rec(*it, dest, suffix, original_type, ns, recursion_set);
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, dest, suffix, original_type, ns, recursion_set);
   }
   else if(expr.id()==ID_dynamic_object)
   {
@@ -690,7 +692,7 @@ void value_set_fit::dereference_rec(
   // remove pointer typecasts
   if(src.id()==ID_typecast)
   {
-    assert(src.type().id()==ID_pointer);
+    PRECONDITION(src.type().id() == ID_pointer);
 
     dereference_rec(to_typecast_expr(src).op(), dest);
   }
@@ -1018,7 +1020,8 @@ void value_set_fit::assign(
         if(rhs.id()==ID_struct ||
            rhs.id()==ID_constant)
         {
-          assert(no<rhs.operands().size());
+          DATA_INVARIANT(
+            no < rhs.operands().size(), "component index must be in bounds");
           rhs_member=rhs.operands()[no];
         }
         else if(rhs.id()==ID_with)
@@ -1085,9 +1088,9 @@ void value_set_fit::assign(
       else if(rhs.id()==ID_array ||
               rhs.id()==ID_constant)
       {
-        forall_operands(o_it, rhs)
+        for(const auto &op : rhs.operands())
         {
-          assign(lhs_index, *o_it, ns);
+          assign(lhs_index, op, ns);
         }
       }
       else if(rhs.id()==ID_with)

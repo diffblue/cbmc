@@ -16,6 +16,7 @@ Date: September 2021
 #include <util/mathematical_expr.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
@@ -85,9 +86,13 @@ exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
 {
   exprt::operandst validity_checks;
 
-  if(expr.id() == ID_dereference)
-    validity_checks.push_back(
-      good_pointer_def(to_dereference_expr(expr).pointer(), ns));
+  if(auto deref = expr_try_dynamic_cast<dereference_exprt>(expr))
+  {
+    const auto size_of_expr_opt = size_of_expr(expr.type(), ns);
+    CHECK_RETURN(size_of_expr_opt.has_value());
+
+    validity_checks.push_back(r_ok_exprt{deref->pointer(), *size_of_expr_opt});
+  }
 
   for(const auto &op : expr.operands())
     validity_checks.push_back(all_dereferences_are_valid(op, ns));
@@ -247,11 +252,11 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
          std::string::npos;
 }
 
-void widen_assigns(assignst &assigns)
+void widen_assigns(assignst &assigns, const namespacet &ns)
 {
   assignst result;
 
-  havoc_utils_is_constantt is_constant(assigns);
+  havoc_utils_is_constantt is_constant(assigns, ns);
 
   for(const auto &e : assigns)
   {

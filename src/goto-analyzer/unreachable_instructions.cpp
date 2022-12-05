@@ -140,12 +140,12 @@ static void add_to_json(
     std::string s=oss.str();
 
     std::string::size_type n=s.find('\n');
-    assert(n!=std::string::npos);
+    CHECK_RETURN(n != std::string::npos);
     s.erase(0, n+1);
     n=s.find_first_not_of(' ');
-    assert(n!=std::string::npos);
+    CHECK_RETURN(n != std::string::npos);
     s.erase(0, n);
-    assert(!s.empty());
+    CHECK_RETURN(!s.empty());
     s.erase(s.size()-1);
 
     // print info for file actually with full path

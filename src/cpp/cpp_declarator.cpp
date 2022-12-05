@@ -50,7 +50,7 @@ typet cpp_declaratort::merge_type(const typet &declaration_type) const
     }
     else
     {
-      assert(!t.id().empty());
+      DATA_INVARIANT(!t.id().empty(), "empty type");
       p = &t.add_subtype();
     }
   }

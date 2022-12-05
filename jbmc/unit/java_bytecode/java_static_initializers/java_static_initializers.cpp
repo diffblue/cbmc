@@ -76,8 +76,7 @@ SCENARIO("get_user_specified_clinit_body", "[core][java_static_initializers]")
     "A class which has no entry in the JSON object but a clinit defined "
     "in the symbol table")
   {
-    symbolt clinit_symbol;
-    clinit_symbol.name = "java::TestClass.<clinit>:()V";
+    symbolt clinit_symbol{"java::TestClass.<clinit>:()V", typet{}, ID_java};
     symbol_table.insert(clinit_symbol);
 
     const code_blockt clinit_body = get_user_specified_clinit_body(
@@ -146,29 +145,24 @@ SCENARIO("get_user_specified_clinit_body", "[core][java_static_initializers]")
       return entry;
     }();
     class_to_declared_symbols.emplace("java::TestClass", [] {
-      symbolt field_symbol;
+      symbolt field_symbol{"field_name_for_codet", java_int_type(), ID_java};
       field_symbol.base_name = "field_name";
-      field_symbol.name = "field_name_for_codet";
-      field_symbol.type = java_int_type();
       field_symbol.is_static_lifetime = true;
       return field_symbol;
     }());
     symbol_table.insert([] {
-      symbolt clinit_symbol;
-      clinit_symbol.name = "java::TestClass.<clinit>:()V";
+      symbolt clinit_symbol{"java::TestClass.<clinit>:()V", typet{}, ID_java};
       set_declaring_class(clinit_symbol, "java::TestClass");
       return clinit_symbol;
     }());
-    symbol_table.insert([] {
-      symbolt test_class_symbol;
-      test_class_symbol.name = "java::TestClass";
-      test_class_symbol.type = [] {
+    symbol_table.insert(symbolt{
+      "java::TestClass",
+      [] {
         java_class_typet type;
         type.components().emplace_back("field_name", java_int_type());
         return type;
-      }();
-      return test_class_symbol;
-    }());
+      }(),
+      ID_java});
     const auto clinit_body = get_user_specified_clinit_body(
       "java::TestClass",
       static_values_json,

@@ -166,15 +166,11 @@ void cpp_typecheckt::typecheck_class_template(
 
   // it's not there yet
 
-  symbolt symbol;
-
-  symbol.name=symbol_name;
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
   symbol.base_name=base_name;
   symbol.location=cpp_name.source_location();
-  symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.type.swap(declaration);
-  symbol.is_macro=false;
   symbol.value = exprt(ID_template_decls);
 
   symbol.pretty_name=
@@ -208,7 +204,7 @@ void cpp_typecheckt::typecheck_class_template(
 void cpp_typecheckt::typecheck_function_template(
   cpp_declarationt &declaration)
 {
-  assert(declaration.declarators().size()==1);
+  PRECONDITION(declaration.declarators().size() == 1);
 
   cpp_declaratort &declarator=declaration.declarators()[0];
   const cpp_namet &cpp_name = declarator.name();
@@ -274,14 +270,10 @@ void cpp_typecheckt::typecheck_function_template(
     return;
   }
 
-  symbolt symbol;
-  symbol.name=symbol_name;
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
   symbol.base_name=base_name;
   symbol.location=cpp_name.source_location();
-  symbol.mode=ID_cpp;
   symbol.module=module;
-  symbol.value.make_nil();
-
   symbol.type.swap(declaration);
   symbol.pretty_name=
     cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
@@ -312,13 +304,12 @@ void cpp_typecheckt::typecheck_function_template(
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
-  assert(declaration.declarators().size()==1);
+  PRECONDITION(declaration.declarators().size() == 1);
 
   cpp_declaratort &declarator=declaration.declarators()[0];
   const cpp_namet &cpp_name = declarator.name();
 
-  assert(cpp_name.is_qualified() ||
-         cpp_name.has_template_args());
+  PRECONDITION(cpp_name.is_qualified() || cpp_name.has_template_args());
 
   // must be of the form: name1<template_args>::name2
   // or:                  name1<template_args>::operator X
@@ -503,7 +494,7 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   typet &type=declaration.type();
 
-  assert(type.id()==ID_struct);
+  PRECONDITION(type.id() == ID_struct);
 
   cpp_namet &cpp_name=
     static_cast<cpp_namet &>(type.add(ID_tag));
@@ -573,7 +564,7 @@ void cpp_typecheckt::convert_class_template_specialization(
   symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find((*id_set.begin())->identifier);
 
-  assert(s_it!=symbol_table.symbols.end());
+  CHECK_RETURN(s_it != symbol_table.symbols.end());
 
   const symbolt &template_symbol=s_it->second;
 
@@ -627,14 +618,14 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     throw 0;
   }
 
-  assert(declaration.declarators().size()==1);
+  PRECONDITION(declaration.declarators().size() == 1);
   cpp_declaratort declarator=declaration.declarators().front();
   cpp_namet &cpp_name=declarator.name();
 
   // There is specialization (instantiation with template arguments)
   // but also function overloading (no template arguments)
 
-  assert(!cpp_name.get_sub().empty());
+  PRECONDITION(!cpp_name.get_sub().empty());
 
   if(cpp_name.get_sub().back().id()==ID_template_args)
   {
@@ -710,7 +701,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
 {
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
 
-  assert(type.id()==ID_template);
+  PRECONDITION(type.id() == ID_template);
 
   std::string id_suffix="template::"+std::to_string(template_counter++);
 
@@ -739,7 +730,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     cpp_declarator_convertert cpp_declarator_converter(*this);
 
     // there must be _one_ declarator
-    assert(declaration.declarators().size()==1);
+    PRECONDITION(declaration.declarators().size() == 1);
 
     cpp_declaratort &declarator=declaration.declarators().front();
 
@@ -831,7 +822,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // old stuff
   PRECONDITION(template_args.id() != ID_already_typechecked);
 
-  assert(template_symbol.type.get_bool(ID_is_template));
+  PRECONDITION(template_symbol.type.get_bool(ID_is_template));
 
   const template_typet &template_type=
     to_cpp_declaration(template_symbol.type).template_type();
@@ -888,7 +879,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       cpp_scopes.go_to(*template_scope);
     }
 
-    assert(i<args.size());
+    DATA_INVARIANT(i < args.size(), "i must be in bounds");
 
     exprt &arg=args[i];
 
@@ -959,7 +950,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   template_map.swap(old_template_map);
 
   // now the numbers should match
-  assert(args.size()==parameters.size());
+  DATA_INVARIANT(
+    args.size() == parameters.size(),
+    "argument and parameter numbers must match");
 
   return result;
 }
@@ -967,7 +960,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 void cpp_typecheckt::convert_template_declaration(
   cpp_declarationt &declaration)
 {
-  assert(declaration.is_template());
+  PRECONDITION(declaration.is_template());
 
   if(declaration.member_spec().is_virtual())
   {
@@ -1048,7 +1041,8 @@ void cpp_typecheckt::convert_template_declaration(
     // Explicit qualification is forbidden for function templates,
     // which we can use to distinguish them.
 
-    assert(declaration.declarators().size()>=1);
+    DATA_INVARIANT(
+      declaration.declarators().size() >= 1, "declarator required");
 
     cpp_declaratort &declarator=declaration.declarators()[0];
     const cpp_namet &cpp_name = declarator.name();

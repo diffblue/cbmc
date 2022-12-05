@@ -2568,10 +2568,10 @@ gcc_local_label_statement:
           statement($$, ID_gcc_local_label);
           
           // put these into the scope
-          forall_operands(it, parser_stack($2))
+          for(const auto &op : as_const(parser_stack($2)).operands())
           {
             // labels have a separate name space
-            irep_idt base_name=it->get(ID_identifier);
+            irep_idt base_name = op.get(ID_identifier);
             irep_idt id="label-"+id2string(base_name);
             ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
             i.id_class=ansi_c_id_classt::ANSI_C_LOCAL_LABEL;
@@ -2919,7 +2919,9 @@ function_definition:
           ansi_c_declarationt &ansi_c_declaration=
             to_ansi_c_declaration(parser_stack($$));
             
-          assert(ansi_c_declaration.declarators().size()==1);
+          INVARIANT(
+            ansi_c_declaration.declarators().size()==1,
+            "exactly one declarator");
           ansi_c_declaration.add_initializer(parser_stack($2));
           
           // Kill the scope that 'function_head' creates.

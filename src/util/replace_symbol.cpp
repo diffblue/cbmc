@@ -177,9 +177,11 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
       return replaces_symbol(identifier);
   }
 
-  forall_operands(it, dest)
-    if(have_to_replace(*it))
+  for(const auto &op : dest.operands())
+  {
+    if(have_to_replace(op))
       return true;
+  }
 
   const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
 

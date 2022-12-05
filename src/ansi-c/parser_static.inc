@@ -185,7 +185,7 @@ static void make_subtype(typet &dest, typet &src)
   std::cout << "S: " << src.pretty() << '\n';
   #endif
 
-  assert(src.id()==ID_array ||
+  PRECONDITION(src.id()==ID_array ||
          src.id()==ID_frontend_pointer ||
          src.id()==ID_code ||
          src.id()==ID_merged_type ||
@@ -221,9 +221,9 @@ static void make_subtype(typet &dest, typet &src)
         break;
       }
       else if(p->is_nil())
-        assert(false);
+        UNREACHABLE;
       else if(p->id().empty())
-        assert(false);
+        UNREACHABLE;
       else
       {
         // *p is now type or symbol
@@ -246,9 +246,9 @@ static void make_subtype(typet &dest, typet &src)
             p=&merged_type.last_type();
           }
           else if(p->id().empty())
-            assert(false);
+            UNREACHABLE;
           else if(p->is_nil())
-            assert(false);
+            UNREACHABLE;
           else
             p=&p->add_subtype();
         }
@@ -403,7 +403,7 @@ static void adjust_KnR_parameters(
 
   Forall_operands(d_it, declarations)
   {
-    assert(d_it->id()==ID_declaration);
+    DATA_INVARIANT(d_it->id()==ID_declaration, "expected declaration");
     ansi_c_declarationt &declaration=
       to_ansi_c_declaration(static_cast<exprt &>(*d_it));
 

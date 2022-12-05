@@ -75,9 +75,11 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
       return true;
   }
 
-  forall_operands(it, expr)
-    if(have_to_adjust_float_expressions(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(have_to_adjust_float_expressions(op))
       return true;
+  }
 
   return false;
 }

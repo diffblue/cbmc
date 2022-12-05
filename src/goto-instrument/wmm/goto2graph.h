@@ -409,10 +409,10 @@ public:
   /* sets rendering options */
   void set_rendering_options(bool aligned, bool file, bool function)
   {
+    PRECONDITION(!file || !function);
     render_po_aligned = aligned;
     render_by_file = file;
     render_by_function = function;
-    assert(!render_by_file || !render_by_function);
   }
 
   /* prints outputs:

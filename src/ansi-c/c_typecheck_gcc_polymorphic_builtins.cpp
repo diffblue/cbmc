@@ -612,11 +612,8 @@ static symbolt result_symbol(
   const source_locationt &source_location,
   symbol_table_baset &symbol_table)
 {
-  symbolt symbol;
-  symbol.name = id2string(identifier) + "::1::result";
+  symbolt symbol{id2string(identifier) + "::1::result", type, ID_C};
   symbol.base_name = "result";
-  symbol.type = type;
-  symbol.mode = ID_C;
   symbol.location = source_location;
   symbol.is_file_local = true;
   symbol.is_lvalue = true;

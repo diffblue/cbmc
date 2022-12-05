@@ -228,9 +228,11 @@ bool check_renaming_l1(const exprt &expr)
   }
   else
   {
-    forall_operands(it, expr)
-      if(check_renaming_l1(*it))
+    for(const auto &op : expr.operands())
+    {
+      if(check_renaming_l1(op))
         return true;
+    }
   }
 
   return false;
@@ -271,9 +273,11 @@ bool check_renaming(const exprt &expr)
   }
   else
   {
-    forall_operands(it, expr)
-      if(check_renaming(*it))
+    for(const auto &op : expr.operands())
+    {
+      if(check_renaming(op))
         return true;
+    }
   }
 
   return false;

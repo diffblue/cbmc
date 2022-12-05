@@ -168,7 +168,7 @@ void _rw_set_loct::read_write_rec(
   }
   else if(expr.id()==ID_address_of)
   {
-    assert(expr.operands().size()==1);
+    PRECONDITION(expr.operands().size() == 1);
   }
   else if(expr.id()==ID_if)
   {
@@ -185,8 +185,8 @@ void _rw_set_loct::read_write_rec(
   }
   else
   {
-    forall_operands(it, expr)
-      read_write_rec(*it, r, w, suffix, guard_conjuncts);
+    for(const auto &op : expr.operands())
+      read_write_rec(op, r, w, suffix, guard_conjuncts);
   }
 }
 

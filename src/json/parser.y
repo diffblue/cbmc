@@ -26,10 +26,10 @@ extern int yyjsonleng; // really an int, not a size_t
 
 static std::string convert_TOK_STRING()
 {
-  assert(yyjsontext[0]=='"');
+  PRECONDITION(yyjsontext[0]=='"');
   std::size_t len=yyjsonleng;
-  assert(len>=2);
-  assert(yyjsontext[len-1]=='"');
+  PRECONDITION(len>=2);
+  PRECONDITION(yyjsontext[len-1]=='"');
   std::string result;
   result.reserve(len);
   for(char *p=yyjsontext+1; *p!='"' && *p!=0; p++)
@@ -52,7 +52,9 @@ static std::string convert_TOK_STRING()
         // Character in hexadecimal Unicode representation, in the format
         // \uABCD, i.e. the following four digits are part of this character.
         char *last_hex_digit = p + 4;
-        assert(last_hex_digit < yyjsontext + len - 1);
+        INVARIANT(
+          last_hex_digit < yyjsontext + len - 1,
+          "all digits are in bounds");
         std::string hex(++p, 4);
         result += codepoint_hex_to_utf8(hex);
         p = last_hex_digit;

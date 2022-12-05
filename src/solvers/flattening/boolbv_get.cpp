@@ -297,16 +297,11 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
   exprt size=simplify_expr(get(size_expr), ns);
 
   // get the numeric value, unless it's infinity
-  mp_integer size_mpint = 0;
+  const auto size_opt = numeric_cast<mp_integer>(size);
 
-  if(size.is_not_nil() && size.id() != ID_infinity)
-  {
-    const auto size_opt = numeric_cast<mp_integer>(size);
-    if(size_opt.has_value() && *size_opt >= 0)
-      size_mpint = *size_opt;
-  }
-
-  // search array indices
+  // search array indices, and only use those applicable to a particular model
+  // (array theory may have seen other indices, which might only be live under a
+  // different model)
 
   typedef std::map<mp_integer, exprt> valuest;
   valuest values;
@@ -317,9 +312,9 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
     // get root
     const auto number = arrays.find_number(*opt_num);
 
-    assert(number<index_map.size());
+    CHECK_RETURN(number < index_map.size());
     index_mapt::const_iterator it=index_map.find(number);
-    assert(it!=index_map.end());
+    CHECK_RETURN(it != index_map.end());
     const index_sett &index_set=it->second;
 
     for(index_sett::const_iterator it1=
@@ -336,7 +331,9 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
       {
         const auto index_mpint = numeric_cast<mp_integer>(index_value);
 
-        if(index_mpint.has_value())
+        if(
+          index_mpint.has_value() && *index_mpint >= 0 &&
+          (!size_opt.has_value() || *index_mpint < *size_opt))
         {
           if(value.is_nil())
             values[*index_mpint] =
@@ -350,7 +347,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 
   exprt result;
 
-  if(values.size() != size_mpint)
+  if(!size_opt.has_value() || values.size() != *size_opt)
   {
     result = array_list_exprt({}, to_array_type(type));
 
@@ -370,7 +367,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
     result=exprt(ID_array, type);
 
     // allocate operands
-    std::size_t size_int = numeric_cast_v<std::size_t>(size_mpint);
+    std::size_t size_int = numeric_cast_v<std::size_t>(*size_opt);
     result.operands().resize(size_int, exprt{ID_unknown});
 
     // search uninterpreted functions
@@ -378,9 +375,10 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
     for(valuest::iterator it=values.begin();
         it!=values.end();
         it++)
-      if(it->first>=0 && it->first<size_mpint)
-        result.operands()[numeric_cast_v<std::size_t>(it->first)].swap(
-          it->second);
+    {
+      result.operands()[numeric_cast_v<std::size_t>(it->first)].swap(
+        it->second);
+    }
   }
 
   return result;
@@ -391,18 +389,20 @@ mp_integer boolbvt::get_value(
   std::size_t offset,
   std::size_t width)
 {
+  PRECONDITION(offset + width <= bv.size());
+
   mp_integer value=0;
   mp_integer weight=1;
 
   for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
-    assert(bit_nr<bv.size());
     switch(prop.l_get(bv[bit_nr]).get_value())
     {
      case tvt::tv_enumt::TV_FALSE:   break;
      case tvt::tv_enumt::TV_TRUE:    value+=weight; break;
      case tvt::tv_enumt::TV_UNKNOWN: break;
-     default: assert(false);
+     default:
+       UNREACHABLE;
     }
 
     weight*=2;

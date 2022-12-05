@@ -161,7 +161,7 @@ public:
 
   node_indext get_node_id() const
   {
-    assert(node_id!=std::numeric_limits<node_indext>::max());
+    PRECONDITION(node_id != std::numeric_limits<node_indext>::max());
     return node_id;
   }
 

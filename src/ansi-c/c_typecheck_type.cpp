@@ -35,9 +35,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
 {
   // we first convert, and then check
   {
-    ansi_c_convert_typet ansi_c_convert_type(get_message_handler());
-
-    ansi_c_convert_type.read(type);
+    ansi_c_convert_typet ansi_c_convert_type{get_message_handler(), type};
     ansi_c_convert_type.write(type);
   }
 
@@ -136,8 +134,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
       underlying_type =
         follow_tag(to_c_enum_tag_type(underlying_type)).underlying_type();
 
-      assert(underlying_type.id()==ID_signedbv ||
-             underlying_type.id()==ID_unsignedbv);
+      DATA_INVARIANT(
+        underlying_type.id() == ID_signedbv ||
+          underlying_type.id() == ID_unsignedbv,
+        "underlying type must be bitvector");
     }
 
     if(underlying_type.id()==ID_signedbv ||
@@ -200,7 +200,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
         }
         else
         {
-          assert(config.ansi_c.long_long_int_width==64);
+          PRECONDITION(config.ansi_c.long_long_int_width == 64);
 
           if(is_signed)
             result=signed_long_long_int_type();
@@ -782,12 +782,10 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   if(type.find(ID_tag).is_nil())
   {
     // Anonymous? Must come with body.
-    assert(have_body);
+    PRECONDITION(have_body);
 
     // produce symbol
-    symbolt compound_symbol;
-    compound_symbol.is_type=true;
-    compound_symbol.type=type;
+    type_symbolt compound_symbol{irep_idt{}, type, mode};
     compound_symbol.location=type.source_location();
 
     typecheck_compound_body(to_struct_union_type(compound_symbol.type));
@@ -821,11 +819,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       type.remove(ID_tag);
       type.set(ID_tag, base_name);
 
-      symbolt compound_symbol;
-      compound_symbol.is_type=true;
-      compound_symbol.name=identifier;
+      type_symbolt compound_symbol{identifier, type, mode};
       compound_symbol.base_name=base_name;
-      compound_symbol.type=type;
       compound_symbol.location=type.source_location();
       compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
 
@@ -911,7 +906,7 @@ void c_typecheck_baset::typecheck_compound_body(
   for(auto &decl : old_components)
   {
     // the arguments are member declarations or static assertions
-    assert(decl.id()==ID_declaration);
+    PRECONDITION(decl.id() == ID_declaration);
 
     ansi_c_declarationt &declaration=
       to_ansi_c_declaration(static_cast<exprt &>(decl));
@@ -921,8 +916,8 @@ void c_typecheck_baset::typecheck_compound_body(
       struct_union_typet::componentt new_component;
       new_component.id(ID_static_assert);
       new_component.add_source_location()=declaration.source_location();
+      PRECONDITION(declaration.operands().size() == 2);
       new_component.operands().swap(declaration.operands());
-      assert(new_component.operands().size()==2);
       components.push_back(new_component);
     }
     else
@@ -946,6 +941,55 @@ void c_typecheck_baset::typecheck_compound_body(
         new_component.set_pretty_name(declarator.get_base_name());
 
         typecheck_type(new_component.type());
+
+        // the rules for anonymous members depend on the type and the compiler,
+        // just bit fields are accepted everywhere
+        if(
+          new_component.get_name().empty() &&
+          new_component.type().id() != ID_c_bit_field)
+        {
+          if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+          {
+            // Visual Studio rejects anything other than a struct or union
+            // declaration, but also accepts those when they introduce a tag
+            if(
+              new_component.type().id() != ID_struct_tag &&
+              new_component.type().id() != ID_union_tag)
+            {
+              throw invalid_source_file_exceptiont{
+                "no members defined", source_location};
+            }
+          }
+          else
+          {
+            // GCC and Clang ignore anything other than an untagged struct or
+            // union; we could print a warning, but there isn't any ambiguity in
+            // semantics here. Printing a warning could elevate this to an error
+            // when compiling code with goto-cc with -Werror.
+            // Note that our type checking always creates a struct_tag/union_tag
+            // type, but only named struct/union types have an ID_tag member.
+            if(
+              new_component.type().id() == ID_struct_tag &&
+              follow_tag(to_struct_tag_type(new_component.type()))
+                .find(ID_tag)
+                .is_nil())
+            {
+              // ok, anonymous struct
+            }
+            else if(
+              new_component.type().id() == ID_union_tag &&
+              follow_tag(to_union_tag_type(new_component.type()))
+                .find(ID_tag)
+                .is_nil())
+            {
+              // ok, anonymous union
+            }
+            else
+            {
+              continue;
+            }
+          }
+        }
 
         if(!is_complete_type(new_component.type()) &&
            (new_component.type().id()!=ID_array ||
@@ -1046,20 +1090,6 @@ void c_typecheck_baset::typecheck_compound_body(
   else if(type.id()==ID_union)
     add_padding(to_union_type(type), *this);
 
-  // Now remove zero-width bit-fields, these are just
-  // for adjusting alignment.
-  for(struct_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
-      ) // blank
-  {
-    if(it->type().id()==ID_c_bit_field &&
-       to_c_bit_field_type(it->type()).get_width()==0)
-      it=components.erase(it);
-    else
-      it++;
-  }
-
   // finally, check _Static_assert inside the compound
   for(struct_union_typet::componentst::iterator
       it=components.begin();
@@ -1096,6 +1126,17 @@ void c_typecheck_baset::typecheck_compound_body(
     }
     else
       it++;
+  }
+
+  // Visual Studio strictly follows the C standard and does not permit empty
+  // struct/union declarations
+  if(
+    components.empty() &&
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    throw invalid_source_file_exceptiont{
+      "C requires that a struct or union has at least one member",
+      type.source_location()};
   }
 }
 
@@ -1368,14 +1409,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   irep_idt identifier=tag.get(ID_identifier);
 
   // Put into symbol table
-  symbolt enum_tag_symbol;
-
-  enum_tag_symbol.is_type=true;
-  enum_tag_symbol.type=type;
+  type_symbolt enum_tag_symbol{identifier, type, mode};
   enum_tag_symbol.location=source_location;
   enum_tag_symbol.is_file_local=true;
   enum_tag_symbol.base_name=base_name;
-  enum_tag_symbol.name=identifier;
 
   // throw in the enum members as 'body'
   irept::subt &body=enum_tag_symbol.type.add(ID_body).get_sub();
@@ -1478,14 +1515,10 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     new_type.add(ID_tag)=tag;
     new_type.make_incomplete();
 
-    symbolt enum_tag_symbol;
-
-    enum_tag_symbol.is_type=true;
-    enum_tag_symbol.type=new_type;
+    type_symbolt enum_tag_symbol{identifier, new_type, mode};
     enum_tag_symbol.location=source_location;
     enum_tag_symbol.is_file_local=true;
     enum_tag_symbol.base_name=base_name;
-    enum_tag_symbol.name=identifier;
 
     symbolt *new_symbol;
     move_symbol(enum_tag_symbol, new_symbol);

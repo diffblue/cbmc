@@ -32,18 +32,18 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
     // make it free variables
     bv = prop.new_variables(width);
 
-    forall_operands(it, expr)
+    for(const auto &operand : expr.operands())
     {
       if(condition)
       {
-        cond_literal=convert(*it);
+        cond_literal = convert(operand);
         cond_literal=prop.land(!previous_cond, cond_literal);
 
         previous_cond=prop.lor(previous_cond, cond_literal);
       }
       else
       {
-        const bvt &op = convert_bv(*it, bv.size());
+        const bvt &op = convert_bv(operand, bv.size());
 
         literalt value_literal=bv_utils.equal(bv, op);
 

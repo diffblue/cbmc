@@ -226,7 +226,7 @@ void dep_graph_domaint::transform(
   locationt to{trace_to->current_location()};
 
   dependence_grapht *dep_graph=dynamic_cast<dependence_grapht*>(&ai);
-  assert(dep_graph!=nullptr);
+  CHECK_RETURN(dep_graph != nullptr);
 
   // We do not propagate control dependencies on function calls, i.e., only the
   // entry point of a function should have a control dependency on the call
@@ -372,9 +372,9 @@ void dependence_grapht::add_dep(
   goto_programt::const_targett to)
 {
   const node_indext n_from = (*this)[from].get_node_id();
-  assert(n_from<size());
+  CHECK_RETURN(n_from < size());
   const node_indext n_to = (*this)[to].get_node_id();
-  assert(n_to<size());
+  CHECK_RETURN(n_to < size());
 
   // add_edge is redundant as the subsequent operations also insert
   // entries into the edge maps (implicitly)

@@ -169,9 +169,9 @@ const source_locationt &exprt::find_source_location() const
   if(l.is_not_nil())
     return l;
 
-  forall_operands(it, (*this))
+  for(const auto &op : operands())
   {
-    const source_locationt &op_l = it->find_source_location();
+    const source_locationt &op_l = op.find_source_location();
     if(op_l.is_not_nil())
       return op_l;
   }

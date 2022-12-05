@@ -110,7 +110,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
       "pointer handling for concurrency is unsound");
 
   // Update constant propagation map -- the RHS is L2
-  if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
+  if(!is_shared && record_value && goto_symex_is_constantt(ns)(rhs))
   {
     const auto propagation_entry = propagation.find(l1_identifier);
     if(!propagation_entry.has_value())

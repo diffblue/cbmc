@@ -150,8 +150,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   const cpp_template_args_tct &specialization_template_args,
   const cpp_template_args_tct &full_template_args)
 {
-  // we should never get 'unassigned' here
-  assert(!full_template_args.has_unassigned());
+  PRECONDITION(!full_template_args.has_unassigned());
 
   // do we have args?
   if(full_template_args.arguments().empty())
@@ -183,11 +182,9 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 
   // Create as incomplete struct, but mark as
   // "template_class_instance", to be elaborated later.
-  symbolt new_symbol;
-  new_symbol.name=identifier;
+  type_symbolt new_symbol{identifier, struct_typet(), template_symbol.mode};
   new_symbol.pretty_name=template_symbol.pretty_name;
   new_symbol.location=template_symbol.location;
-  new_symbol.type = struct_typet();
   to_struct_type(new_symbol.type).make_incomplete();
   new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
   if(template_symbol.type.get_bool(ID_C_class))
@@ -198,9 +195,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
     ID_specialization_template_args, specialization_template_args);
   new_symbol.type.set(ID_full_template_args, full_template_args);
   new_symbol.type.set(ID_identifier, template_symbol.name);
-  new_symbol.mode=template_symbol.mode;
   new_symbol.base_name=template_symbol.base_name;
-  new_symbol.is_type=true;
 
   symbolt *s_ptr;
   symbol_table.move(new_symbol, s_ptr);
@@ -282,8 +277,11 @@ const symbolt &cpp_typecheckt::instantiate_template(
   bool specialization_given=specialization.is_not_nil();
 
   // we should never get 'unassigned' here
-  assert(!specialization_template_args.has_unassigned());
-  assert(!full_template_args.has_unassigned());
+  DATA_INVARIANT(
+    !specialization_template_args.has_unassigned(),
+    "should never get 'unassigned' here");
+  DATA_INVARIANT(
+    !full_template_args.has_unassigned(), "should never get 'unassigned' here");
 
 #ifdef DEBUG
   std::cout << "A: <";
@@ -367,8 +365,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
       // It has already been instantiated!
       const cpp_idt &cpp_id = **id_set.begin();
 
-      assert(cpp_id.id_class == cpp_idt::id_classt::CLASS ||
-             cpp_id.id_class == cpp_idt::id_classt::SYMBOL);
+      DATA_INVARIANT(
+        cpp_id.id_class == cpp_idt::id_classt::CLASS ||
+          cpp_id.id_class == cpp_idt::id_classt::SYMBOL,
+        "id must be class or symbol");
 
       const symbolt &symb=lookup(cpp_id.identifier);
 
@@ -481,7 +481,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   {
     symbolt &symb = symbol_table.get_writeable_ref(class_name);
 
-    assert(new_decl.declarators().size() == 1);
+    PRECONDITION(new_decl.declarators().size() == 1);
 
     if(new_decl.member_spec().is_virtual())
     {
@@ -512,8 +512,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     bool is_static=new_decl.storage_spec().is_static();
     irep_idt access = new_decl.get(ID_C_access);
 
-    assert(!access.empty());
-    assert(symb.type.id()==ID_struct);
+    CHECK_RETURN(!access.empty());
+    PRECONDITION(symb.type.id() == ID_struct);
 
     typecheck_compound_declarator(
       symb,
@@ -531,7 +531,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // not a class template, not a class template method,
   // it must be a function template!
 
-  assert(new_decl.declarators().size()==1);
+  PRECONDITION(new_decl.declarators().size() == 1);
 
   convert_non_template_declaration(new_decl);
 

@@ -100,7 +100,7 @@ void constant_propagator_domaint::assign_rec(
     exprt tmp = rhs;
     partial_evaluate(dest_values, tmp, ns);
 
-    if(dest_values.is_constant(tmp))
+    if(dest_values.is_constant(tmp, ns))
     {
       DATA_INVARIANT(
         ns.lookup(s).type == tmp.type(),
@@ -324,9 +324,9 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     {
       change_this_time = false;
 
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        change_this_time |= two_way_propagate_rec(*it, ns, cp);
+        change_this_time |= two_way_propagate_rec(op, ns, cp);
         if(change_this_time)
           change = true;
       }
@@ -393,7 +393,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     // two-way propagation
     valuest copy_values=values;
     assign_rec(copy_values, lhs, rhs, ns, cp, false);
-    if(!values.is_constant(rhs) || values.is_constant(lhs))
+    if(!values.is_constant(rhs, ns) || values.is_constant(lhs, ns))
       assign_rec(values, rhs, lhs, ns, cp, false);
     change = values.meet(copy_values, ns);
   }
@@ -419,9 +419,10 @@ bool constant_propagator_domaint::ai_simplify(
 class constant_propagator_is_constantt : public is_constantt
 {
 public:
-  explicit constant_propagator_is_constantt(
-    const replace_symbolt &replace_const)
-    : replace_const(replace_const)
+  constant_propagator_is_constantt(
+    const replace_symbolt &replace_const,
+    const namespacet &ns)
+    : is_constantt(ns), replace_const(replace_const)
   {
   }
 
@@ -442,14 +443,18 @@ protected:
   const replace_symbolt &replace_const;
 };
 
-bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
+bool constant_propagator_domaint::valuest::is_constant(
+  const exprt &expr,
+  const namespacet &ns) const
 {
-  return constant_propagator_is_constantt(replace_const)(expr);
+  return constant_propagator_is_constantt(replace_const, ns)(expr);
 }
 
-bool constant_propagator_domaint::valuest::is_constant(const irep_idt &id) const
+bool constant_propagator_domaint::valuest::is_constant(
+  const irep_idt &id,
+  const namespacet &ns) const
 {
-  return constant_propagator_is_constantt(replace_const).is_constant(id);
+  return constant_propagator_is_constantt(replace_const, ns).is_constant(id);
 }
 
 /// Do not call this when iterating over replace_const.expr_map!
@@ -657,7 +662,7 @@ bool constant_propagator_domaint::partial_evaluate(
   // if the current rounding mode is top we can
   // still get a non-top result by trying all rounding
   // modes and checking if the results are all the same
-  if(!known_values.is_constant(rounding_mode_identifier()))
+  if(!known_values.is_constant(rounding_mode_identifier(), ns))
     return partial_evaluate_with_all_rounding_modes(known_values, expr, ns);
 
   return replace_constants_and_simplify(known_values, expr, ns);

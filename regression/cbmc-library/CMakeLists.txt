@@ -6,7 +6,7 @@ else()
 add_test_pl_profile(
     "cbmc-library"
     "$<TARGET_FILE:cbmc>"
-    "-C;-X;unix"
+    "-C;-X;unix;-X;gcc-only"
     "CORE"
 )
 endif()

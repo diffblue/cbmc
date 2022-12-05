@@ -292,10 +292,7 @@ symbolt synthetic_class_symbol(
     }
   }
 
-  symbolt synthetic_class_symbol = type_symbolt{synthetic_class_type};
-  synthetic_class_symbol.name = synthetic_class_name;
-  synthetic_class_symbol.mode = ID_java;
-  return synthetic_class_symbol;
+  return type_symbolt{synthetic_class_name, synthetic_class_type, ID_java};
 }
 
 static symbolt constructor_symbol(
@@ -303,12 +300,10 @@ static symbolt constructor_symbol(
   const irep_idt &synthetic_class_name,
   java_method_typet constructor_type) // dynamic_method_type
 {
-  symbolt constructor_symbol;
   irep_idt constructor_name = id2string(synthetic_class_name) + ".<init>";
-  constructor_symbol.name = constructor_name;
+  symbolt constructor_symbol{constructor_name, typet{}, ID_java};
   constructor_symbol.pretty_name = constructor_symbol.name;
   constructor_symbol.base_name = "<init>";
-  constructor_symbol.mode = ID_java;
 
   synthetic_methods[constructor_name] =
     synthetic_method_typet::INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR;
@@ -349,14 +344,12 @@ static symbolt implemented_method_symbol(
     id2string(method_to_implement.get_base_name()) + ":" +
     id2string(method_to_implement.get_descriptor());
 
-  symbolt implemented_method_symbol;
-  implemented_method_symbol.name = implemented_method_name;
+  symbolt implemented_method_symbol{
+    implemented_method_name, method_to_implement.type(), ID_java};
   synthetic_methods[implemented_method_symbol.name] =
     synthetic_method_typet::INVOKEDYNAMIC_METHOD;
   implemented_method_symbol.pretty_name = implemented_method_symbol.name;
   implemented_method_symbol.base_name = method_to_implement.get_base_name();
-  implemented_method_symbol.mode = ID_java;
-  implemented_method_symbol.type = method_to_implement.type();
   auto &implemented_method_type = to_code_type(implemented_method_symbol.type);
   implemented_method_type.parameters()[0].type() =
     java_reference_type(struct_tag_typet(synthetic_class_name));

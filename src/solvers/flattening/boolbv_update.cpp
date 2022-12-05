@@ -50,7 +50,7 @@ void boolbvt::convert_update_rec(
     // update
     for(std::size_t i=0; i<new_value_width; i++)
     {
-      assert(offset+i<bv.size());
+      DATA_INVARIANT(offset + i < bv.size(), "update must be in bounds");
       bv[offset+i]=new_value_bv[i];
     }
 
@@ -98,7 +98,7 @@ void boolbvt::convert_update_rec(
       for(std::size_t j=0; j<element_size; j++)
       {
         std::size_t idx=new_offset+j;
-        assert(idx<bv.size());
+        DATA_INVARIANT(idx < bv.size(), "index must be in bounds");
         bv[idx]=prop.lselect(equal, tmp_bv[idx], bv[idx]);
       }
     }

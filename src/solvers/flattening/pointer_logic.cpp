@@ -28,7 +28,7 @@ bool pointer_logict::is_dynamic_object(const exprt &expr) const
          (expr.id() == ID_symbol &&
           has_prefix(
             id2string(to_symbol_expr(expr).get_identifier()),
-            SYMEX_DYNAMIC_PREFIX));
+            SYMEX_DYNAMIC_PREFIX "::"));
 }
 
 void pointer_logict::get_dynamic_objects(std::vector<mp_integer> &o) const

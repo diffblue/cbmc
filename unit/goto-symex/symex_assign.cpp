@@ -26,9 +26,7 @@ static void add_to_symbol_table(
   symbol_tablet &symbol_table,
   const symbol_exprt &symbol_expr)
 {
-  symbolt symbol;
-  symbol.name = symbol_expr.get_identifier();
-  symbol.type = symbol_expr.type();
+  symbolt symbol{symbol_expr.get_identifier(), symbol_expr.type(), irep_idt{}};
   symbol.value = symbol_expr;
   symbol.is_thread_local = true;
   symbol_table.insert(symbol);

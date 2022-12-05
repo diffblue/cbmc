@@ -25,9 +25,8 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
     const symbol_exprt symbol_nonshared{"foo", int_type};
     ssa_exprt ssa{symbol_nonshared};
     symbol_table.insert([&] {
-      symbolt symbol;
-      symbol.name = symbol_nonshared.get_identifier();
-      symbol.type = symbol_nonshared.type();
+      symbolt symbol{
+        symbol_nonshared.get_identifier(), symbol_nonshared.type(), irep_idt{}};
       symbol.value = symbol_nonshared;
       symbol.is_thread_local = true;
       return symbol;

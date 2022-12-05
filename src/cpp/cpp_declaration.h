@@ -145,13 +145,13 @@ public:
 
 inline cpp_declarationt &to_cpp_declaration(irept &irep)
 {
-  assert(irep.id()==ID_cpp_declaration);
+  PRECONDITION(irep.id() == ID_cpp_declaration);
   return static_cast<cpp_declarationt &>(irep);
 }
 
 inline const cpp_declarationt &to_cpp_declaration(const irept &irep)
 {
-  assert(irep.id()==ID_cpp_declaration);
+  PRECONDITION(irep.id() == ID_cpp_declaration);
   return static_cast<const cpp_declarationt &>(irep);
 }
 

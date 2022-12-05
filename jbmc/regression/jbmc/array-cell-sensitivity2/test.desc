@@ -1,13 +1,13 @@
 CORE
 Test
 --function Test.main --show-vcc
-symex_dynamic::dynamic_object6#3\.\.data =
-symex_dynamic::dynamic_object3#3\.\.data =
+symex_dynamic::dynamic_object\$3#3\.\.data =
+symex_dynamic::dynamic_object\$1#3\.\.data =
 ^EXIT=0$
 ^SIGNAL=0$
 --
-symex_dynamic::dynamic_object6#3\.\.data = symex_dynamic::dynamic_object6#3\.data
-symex_dynamic::dynamic_object3#3\.\.data = symex_dynamic::dynamic_object3#3\.data
+symex_dynamic::dynamic_object\$3#3\.\.data = symex_dynamic::dynamic_object\$3#3\.data
+symex_dynamic::dynamic_object\$1#3\.\.data = symex_dynamic::dynamic_object\$1#3\.data
 --
 This checks that a write using a mix of field and array accessors uses a field-sensitive
 symbol (the data field of the possible ultimate target objects) rather than using

@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/invariant.h>
+#include <util/message.h>
 #include <util/std_types.h>
 
 #include <ansi-c/ansi_c_convert_type.h>
@@ -32,21 +33,16 @@ public:
   void write(typet &type) override;
 
   cpp_convert_typet(message_handlert &message_handler, const typet &type)
-    : ansi_c_convert_typet(message_handler)
+    : ansi_c_convert_typet(message_handler),
+      wchar_t_count(0),
+      char16_t_count(0),
+      char32_t_count(0)
   {
-    read(type);
+    source_location = type.source_location();
+    read_rec(type);
   }
 
 protected:
-  void clear() override
-  {
-    wchar_t_count = 0;
-    char16_t_count = 0;
-    char32_t_count = 0;
-
-    ansi_c_convert_typet::clear();
-  }
-
   void read_rec(const typet &type) override;
   void read_function_type(const typet &type);
   void read_template(const typet &type);
@@ -86,7 +82,7 @@ void cpp_convert_typet::read_rec(const typet &type)
   {
     other.push_back(type);
     cpp_convert_plain_type(
-      to_array_type(other.back()).element_type(), get_message_handler());
+      to_array_type(other.back()).element_type(), message_handler);
   }
   else if(type.id()==ID_template)
   {
@@ -125,8 +121,7 @@ void cpp_convert_typet::read_template(const typet &type)
   other.push_back(type);
   typet &t=other.back();
 
-  cpp_convert_plain_type(
-    to_type_with_subtype(t).subtype(), get_message_handler());
+  cpp_convert_plain_type(to_type_with_subtype(t).subtype(), message_handler);
 
   irept &arguments=t.add(ID_arguments);
 
@@ -142,7 +137,7 @@ void cpp_convert_typet::read_template(const typet &type)
     }
     else
     {
-      cpp_convert_plain_type(decl.type(), get_message_handler());
+      cpp_convert_plain_type(decl.type(), message_handler);
     }
 
     // TODO: initializer
@@ -163,7 +158,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
   t.remove_subtype();
 
   if(return_type.is_not_nil())
-    cpp_convert_plain_type(return_type, get_message_handler());
+    cpp_convert_plain_type(return_type, message_handler);
 
   // take care of parameter types
   code_typet::parameterst &parameters = t.parameters();
@@ -182,10 +177,11 @@ void cpp_convert_typet::read_function_type(const typet &type)
       cpp_declarationt &declaration=to_cpp_declaration(parameter_expr);
       source_locationt type_location=declaration.type().source_location();
 
-      cpp_convert_plain_type(declaration.type(), get_message_handler());
+      cpp_convert_plain_type(declaration.type(), message_handler);
 
-      // there should be only one declarator
-      assert(declaration.declarators().size()==1);
+      DATA_INVARIANT(
+        declaration.declarators().size() == 1,
+        "there should be only one declarator");
 
       cpp_declaratort &declarator=
         declaration.declarators().front();
@@ -217,7 +213,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
         else if(cpp_name.is_simple_name())
         {
           irep_idt base_name=cpp_name.get_base_name();
-          assert(!base_name.empty());
+          CHECK_RETURN(!base_name.empty());
           new_parameter.set_identifier(base_name);
           new_parameter.set_base_name(base_name);
           new_parameter.add_source_location()=cpp_name.source_location();
@@ -252,8 +248,9 @@ void cpp_convert_typet::write(typet &type)
   {
     if(wchar_t_count || char16_t_count || char32_t_count)
     {
-      error().source_location = source_location;
-      error() << "illegal type modifier for defined type" << eom;
+      messaget log{message_handler};
+      log.error().source_location = source_location;
+      log.error() << "illegal type modifier for defined type" << messaget::eom;
       throw 0;
     }
 
