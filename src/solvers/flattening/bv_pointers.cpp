@@ -625,11 +625,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     const exprt same_object = ::same_object(minus_expr.lhs(), minus_expr.rhs());
     const literalt same_object_lit = convert(same_object);
 
-    // compute the object size (again, possibly using cached results)
-    const exprt object_size = ::object_size(minus_expr.lhs());
-    const bvt object_size_bv =
-      bv_utils.zero_extension(convert_bv(object_size), width);
-
     bvt bv = prop.new_variables(width);
 
     if(!same_object_lit.is_false())
@@ -639,26 +634,10 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       const bvt lhs_offset =
         bv_utils.sign_extension(offset_literals(lhs, lhs_pt), width);
 
-      const literalt lhs_in_bounds = prop.land(
-        !bv_utils.sign_bit(lhs_offset),
-        bv_utils.rel(
-          lhs_offset,
-          ID_le,
-          object_size_bv,
-          bv_utilst::representationt::UNSIGNED));
-
       const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
       const bvt &rhs = convert_bv(minus_expr.rhs());
       const bvt rhs_offset =
         bv_utils.sign_extension(offset_literals(rhs, rhs_pt), width);
-
-      const literalt rhs_in_bounds = prop.land(
-        !bv_utils.sign_bit(rhs_offset),
-        bv_utils.rel(
-          rhs_offset,
-          ID_le,
-          object_size_bv,
-          bv_utilst::representationt::UNSIGNED));
 
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
 
@@ -679,9 +658,39 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
         }
       }
 
+      // test for null object (integer constants)
+      const exprt null_object = ::null_object(minus_expr.lhs());
+      literalt in_bounds = convert(null_object);
+
+      if(!in_bounds.is_true())
+      {
+        // compute the object size (again, possibly using cached results)
+        const exprt object_size = ::object_size(minus_expr.lhs());
+        const bvt object_size_bv =
+          bv_utils.zero_extension(convert_bv(object_size), width);
+
+        const literalt lhs_in_bounds = prop.land(
+          !bv_utils.sign_bit(lhs_offset),
+          bv_utils.rel(
+            lhs_offset,
+            ID_le,
+            object_size_bv,
+            bv_utilst::representationt::UNSIGNED));
+
+        const literalt rhs_in_bounds = prop.land(
+          !bv_utils.sign_bit(rhs_offset),
+          bv_utils.rel(
+            rhs_offset,
+            ID_le,
+            object_size_bv,
+            bv_utilst::representationt::UNSIGNED));
+
+        in_bounds =
+          prop.lor(in_bounds, prop.land(lhs_in_bounds, rhs_in_bounds));
+      }
+
       prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_lit, prop.land(lhs_in_bounds, rhs_in_bounds)),
-        bv_utils.equal(difference, bv)));
+        prop.land(same_object_lit, in_bounds), bv_utils.equal(difference, bv)));
     }
 
     return bv;
