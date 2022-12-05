@@ -1727,7 +1727,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
         const auto update_size = pointer_offset_bits(bu.value().type(), ns);
         if(
           update_size.has_value() &&
-          *offset >= *update_offset * bu.get_bits_per_byte() + *update_size)
+          *offset * expr.get_bits_per_byte() >=
+            *update_offset * bu.get_bits_per_byte() + *update_size)
         {
           auto tmp = expr;
           tmp.op() = bu.op();
