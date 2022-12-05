@@ -500,11 +500,10 @@ void goto_symext::symex_goto(statet &state)
       guardt guard{true_exprt{}, guard_manager};
 
       log.conditional_output(
-        log.debug(),
-        [this, &new_lhs](messaget::mstreamt &mstream) {
-          mstream << "Assignment to " << new_lhs.get_identifier()
-                  << " [" << pointer_offset_bits(new_lhs.type(), ns).value_or(0) << " bits]"
-                  << messaget::eom;
+        log.debug(), [this, &new_lhs](messaget::mstreamt &mstream) {
+          mstream << "Assignment to " << new_lhs.get_identifier() << " ["
+                  << pointer_offset_bits(new_lhs.type(), ns).value_or(bitst{0})
+                  << " bits]" << messaget::eom;
         });
 
       target.assignment(
@@ -842,8 +841,8 @@ static void merge_names(
   log.conditional_output(
     log.debug(), [ns, &new_lhs](messaget::mstreamt &mstream) {
       mstream << "Assignment to " << new_lhs.get_identifier() << " ["
-              << pointer_offset_bits(new_lhs.type(), ns).value_or(0) << " bits]"
-              << messaget::eom;
+              << pointer_offset_bits(new_lhs.type(), ns).value_or(bitst{0})
+              << " bits]" << messaget::eom;
     });
 
   target.assignment(

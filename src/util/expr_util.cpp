@@ -268,11 +268,11 @@ bool can_forward_propagatet::is_constant(const exprt &expr) const
     if(!extract_bits.has_value())
       return false;
 
-    const mp_integer offset_bits =
+    const bitst offset_bits{
       numeric_cast_v<mp_integer>(to_constant_expr(be->offset())) *
-      be->get_bits_per_byte();
+      be->get_bits_per_byte()};
 
-    return offset_bits >= 0 && offset_bits + *extract_bits <= *op_bits;
+    return offset_bits >= bitst{0} && offset_bits + *extract_bits <= *op_bits;
   }
   else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
   {
@@ -287,12 +287,12 @@ bool can_forward_propagatet::is_constant(const exprt &expr) const
     if(!src_bits.has_value())
       return false;
 
-    const mp_integer lower_bound =
-      numeric_cast_v<mp_integer>(to_constant_expr(eb->lower()));
-    const mp_integer upper_bound =
-      numeric_cast_v<mp_integer>(to_constant_expr(eb->upper()));
+    const bitst lower_bound =
+      numeric_cast_v<bitst>(to_constant_expr(eb->lower()));
+    const bitst upper_bound =
+      numeric_cast_v<bitst>(to_constant_expr(eb->upper()));
 
-    return lower_bound >= 0 && lower_bound <= upper_bound &&
+    return lower_bound >= bitst{0} && lower_bound <= upper_bound &&
            upper_bound < src_bits;
   }
   else

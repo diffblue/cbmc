@@ -43,12 +43,11 @@ public:
   };
 
   cext(
-    const std::unordered_map<exprt, mp_integer, irep_hash> &object_sizes,
+    const std::unordered_map<exprt, bytest, irep_hash> &object_sizes,
     const std::unordered_map<exprt, mp_integer, irep_hash> &havoced_values,
-    const std::unordered_map<exprt, mp_integer, irep_hash>
-      &havoced_pointer_offsets,
+    const std::unordered_map<exprt, bytest, irep_hash> &havoced_pointer_offsets,
     const std::unordered_map<exprt, mp_integer, irep_hash> &loop_entry_values,
-    const std::unordered_map<exprt, mp_integer, irep_hash> &loop_entry_offsets,
+    const std::unordered_map<exprt, bytest, irep_hash> &loop_entry_offsets,
     const std::set<exprt> &live_variables)
     : object_sizes(object_sizes),
       havoced_values(havoced_values),
@@ -75,17 +74,17 @@ public:
   // and pointer offsets.
 
   // __CPROVER_OBJECT_SIZE
-  std::unordered_map<exprt, mp_integer, irep_hash> object_sizes;
+  std::unordered_map<exprt, bytest, irep_hash> object_sizes;
   // all the valuation of havoced variables with primitive type.
   std::unordered_map<exprt, mp_integer, irep_hash> havoced_values;
   // __CPROVER_POINTER_OFFSET
-  std::unordered_map<exprt, mp_integer, irep_hash> havoced_pointer_offsets;
+  std::unordered_map<exprt, bytest, irep_hash> havoced_pointer_offsets;
 
   // We also collect loop-entry evaluations of havoced variables.
   // __CPROVER_loop_entry
   std::unordered_map<exprt, mp_integer, irep_hash> loop_entry_values;
   // __CPROVER_POINTER_OFFSET(__CPROVER_loop_entry( ))
-  std::unordered_map<exprt, mp_integer, irep_hash> loop_entry_offsets;
+  std::unordered_map<exprt, bytest, irep_hash> loop_entry_offsets;
 
   // Set of live variables upon loop head.
   std::set<exprt> live_variables;

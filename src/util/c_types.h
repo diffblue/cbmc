@@ -160,7 +160,7 @@ public:
   /// \param ns: Namespace to resolve tag types.
   /// \return Pair of a componentt pointing to the maximum fixed bit-width
   ///   member of the union type and the bit width of that member.
-  std::optional<std::pair<struct_union_typet::componentt, mp_integer>>
+  std::optional<std::pair<struct_union_typet::componentt, bitst>>
   find_widest_union_component(const namespacet &ns) const;
 };
 

@@ -186,11 +186,10 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
     if(target_size.has_value())
     {
-      mp_integer target_bits = target_size.value() * config.ansi_c.char_width;
+      bitst target_bits = bytes_to_bits(*target_size, config.ansi_c.char_width);
       const auto bits = expr2bits(op, true, ns);
 
-      if(bits.has_value() &&
-         mp_integer(bits->size())>=target_bits)
+      if(bits.has_value() && bitst{bits->size()} >= target_bits)
       {
         std::string bits_cut =
           std::string(*bits, 0, numeric_cast_v<std::size_t>(target_bits));
@@ -221,7 +220,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     // type and offset with respect to x.
     if(op_type.id() == ID_struct)
     {
-      std::optional<mp_integer> requested_offset =
+      const auto requested_offset =
         member_offset(to_struct_type(op_type), component_name, ns);
       if(requested_offset.has_value())
       {

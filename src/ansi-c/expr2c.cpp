@@ -3726,8 +3726,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_bswap)
     return convert_function(
       src,
-      "__builtin_bswap" + integer2string(*pointer_offset_bits(
-                            to_unary_expr(src).op().type(), ns)));
+      "__builtin_bswap" +
+        integer2string(
+          pointer_offset_bits(to_unary_expr(src).op().type(), ns)->get()));
 
   else if(has_prefix(src.id_string(), "byte_extract"))
     return convert_byte_extract(to_byte_extract_expr(src), precedence = 16);
