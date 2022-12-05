@@ -34,7 +34,7 @@ gdb_value_extractort::gdb_value_extractort(
 
 gdb_value_extractort::memory_scopet::memory_scopet(
   const memory_addresst &begin,
-  const mp_integer &byte_size,
+  const bytest &byte_size,
   const irep_idt &name)
   : begin_int(safe_string2size_t(begin.address_string, 0)),
     byte_size(byte_size),
@@ -48,13 +48,14 @@ size_t gdb_value_extractort::memory_scopet::address2size_t(
   return safe_string2size_t(point.address_string, 0);
 }
 
-mp_integer gdb_value_extractort::memory_scopet::distance(
+bytest gdb_value_extractort::memory_scopet::distance(
   const memory_addresst &point,
-  mp_integer member_size) const
+  bytest member_size) const
 {
   auto point_int = address2size_t(point);
   CHECK_RETURN(check_containment(point_int));
-  return (point_int - begin_int) / member_size;
+  return bytest{
+    (point_int - begin_int) / numeric_cast_v<std::size_t>(member_size)};
 }
 
 std::vector<gdb_value_extractort::memory_scopet>::iterator
@@ -77,18 +78,18 @@ gdb_value_extractort::find_dynamic_allocation(const memory_addresst &point)
     });
 }
 
-mp_integer gdb_value_extractort::get_malloc_size(irep_idt name)
+bytest gdb_value_extractort::get_malloc_size(irep_idt name)
 {
   const auto scope_it = find_dynamic_allocation(name);
   if(scope_it == dynamically_allocated.end())
-    return 1;
+    return bytest{1};
   else
     return scope_it->size();
 }
 
 std::optional<std::string> gdb_value_extractort::get_malloc_pointee(
   const memory_addresst &point,
-  mp_integer member_size)
+  const bytest &member_size)
 {
   const auto scope_it = find_dynamic_allocation(point);
   if(scope_it == dynamically_allocated.end())
@@ -96,14 +97,16 @@ std::optional<std::string> gdb_value_extractort::get_malloc_pointee(
 
   const auto pointer_distance = scope_it->distance(point, member_size);
   return id2string(scope_it->id()) +
-         (pointer_distance > 0 ? "+" + integer2string(pointer_distance) : "");
+         (pointer_distance > bytest{0}
+            ? "+" + integer2string(pointer_distance.get())
+            : "");
 }
 
-mp_integer gdb_value_extractort::get_type_size(const typet &type) const
+bytest gdb_value_extractort::get_type_size(const typet &type) const
 {
   const auto maybe_size = pointer_offset_bits(type, ns);
   CHECK_RETURN(maybe_size.has_value());
-  return *maybe_size / CHAR_BIT;
+  return bits_to_bytes_trunc(*maybe_size, CHAR_BIT);
 }
 
 void gdb_value_extractort::analyze_symbols(
@@ -134,7 +137,7 @@ void gdb_value_extractort::analyze_symbols(
 
       if(symbol_size > 1)
         dynamically_allocated.emplace_back(
-          symbol_value.address, symbol_size, id);
+          symbol_value.address, bytest{symbol_size}, id);
       memory_map[id] = symbol_value;
     }
   }
@@ -312,7 +315,8 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
     return index_exprt{
       struct_symbol_expr,
       from_integer(
-        member_offset / get_type_size(to_pointer_type(expr.type()).base_type()),
+        bytest{member_offset} /
+          get_type_size(to_pointer_type(expr.type()).base_type()),
         c_index_type())};
   }
   if(struct_symbol->type.id() == ID_pointer)
@@ -325,7 +329,7 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
 
   const auto maybe_member_expr = get_subexpression_at_offset(
     struct_symbol_expr,
-    member_offset,
+    bytest{member_offset},
     to_pointer_type(expr.type()).base_type(),
     ns);
   DATA_INVARIANT(
@@ -396,10 +400,10 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
     // expected positions. Since the allocated size is an over-approximation we
     // may end up querying past the allocated bounds and building a larger array
     // with meaningless values.
-    mp_integer allocated_size = get_malloc_size(c_converter.convert(expr));
+    bytest allocated_size = get_malloc_size(c_converter.convert(expr));
     // get the sizeof(target_type) and thus the number of elements
     const auto number_of_elements = allocated_size / get_type_size(target_type);
-    if(allocated_size != 1 && number_of_elements > 1)
+    if(allocated_size != bytest{1} && number_of_elements > 1)
     {
       array_exprt::operandst elements;
       // build the operands by querying for an index expression
@@ -554,7 +558,10 @@ exprt gdb_value_extractort::get_pointer_value(
     if(target_expr.type().id() == ID_array)
     {
       const auto result_indexed_expr = get_subexpression_at_offset(
-        target_expr, 0, to_pointer_type(zero_expr.type()).base_type(), ns);
+        target_expr,
+        bytest{0},
+        to_pointer_type(zero_expr.type()).base_type(),
+        ns);
       CHECK_RETURN(result_indexed_expr.has_value());
       if(result_indexed_expr->type() == zero_expr.type())
         return *result_indexed_expr;

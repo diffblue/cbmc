@@ -59,8 +59,8 @@ void configt::ansi_ct::set_LP64()
   char_is_unsigned=false;
   wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
-  alignment=1;
-  memory_operand_size=int_width/8;
+  alignment = bytest{1};
+  memory_operand_size = bytest{int_width / 8};
 }
 
 /// int=64, long=64, pointer=64
@@ -83,8 +83,8 @@ void configt::ansi_ct::set_ILP64()
   char_is_unsigned=false;
   wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
-  alignment=1;
-  memory_operand_size=int_width/8;
+  alignment = bytest{1};
+  memory_operand_size = bytest{int_width / 8};
 }
 
 /// int=32, long=32, pointer=64
@@ -103,8 +103,8 @@ void configt::ansi_ct::set_LLP64()
   char_is_unsigned=false;
   wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
-  alignment=1;
-  memory_operand_size=int_width/8;
+  alignment = bytest{1};
+  memory_operand_size = bytest{int_width / 8};
 }
 
 /// int=32, long=32, pointer=32
@@ -123,8 +123,8 @@ void configt::ansi_ct::set_ILP32()
   char_is_unsigned=false;
   wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
-  alignment=1;
-  memory_operand_size=int_width/8;
+  alignment = bytest{1};
+  memory_operand_size = bytest{int_width / 8};
 }
 
 /// int=16, long=32, pointer=32
@@ -143,8 +143,8 @@ void configt::ansi_ct::set_LP32()
   char_is_unsigned=false;
   wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
-  alignment=1;
-  memory_operand_size=int_width/8;
+  alignment = bytest{1};
+  memory_operand_size = bytest{int_width / 8};
 }
 
 void configt::ansi_ct::set_arch_spec_i386()
@@ -1378,9 +1378,10 @@ void configt::set_from_symbol_table(const symbol_table_baset &symbol_table)
   // ts_18661_3_Floatn_types, __float128_is_keyword, float16_type, bf16_type,
   // fp16_type are not architectural features, and thus not stored in namespace
 
-  ansi_c.alignment=unsigned_from_ns(ns, "alignment");
+  ansi_c.alignment = bytest{unsigned_from_ns(ns, "alignment")};
 
-  ansi_c.memory_operand_size=unsigned_from_ns(ns, "memory_operand_size");
+  ansi_c.memory_operand_size =
+    bytest{unsigned_from_ns(ns, "memory_operand_size")};
 
   ansi_c.endianness=(ansi_ct::endiannesst)unsigned_from_ns(ns, "endianness");
 

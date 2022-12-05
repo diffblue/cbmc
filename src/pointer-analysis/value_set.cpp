@@ -348,7 +348,7 @@ bool value_sett::eval_pointer_offset(
       get_value_set(to_pointer_offset_expr(expr).pointer(), ns, true);
 
     exprt new_expr;
-    mp_integer previous_offset=0;
+    bytest previous_offset{0};
 
     const object_map_dt &object_map=reference_set.read();
     for(object_map_dt::const_iterator
@@ -626,7 +626,7 @@ void value_sett::get_value_set_rec(
       insert(
         dest,
         exprt(ID_null_object, to_pointer_type(expr.type()).base_type()),
-        mp_integer{0});
+        bytest{0});
     }
     else if(
       expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv)
@@ -658,7 +658,7 @@ void value_sett::get_value_set_rec(
 
       if(op.is_zero())
       {
-        insert(dest, exprt(ID_null_object, empty_typet{}), mp_integer{0});
+        insert(dest, exprt(ID_null_object, empty_typet{}), bytest{0});
       }
       else
       {
@@ -746,13 +746,13 @@ void value_sett::get_value_set_rec(
 
         auto size = pointer_offset_size(pointer_base_type, ns);
 
-        if(!size.has_value() || (*size) == 0)
+        if(!size.has_value() || (*size) == bytest{0})
         {
           i.reset();
         }
         else
         {
-          *i *= *size;
+          *i *= size->get();
 
           if(expr.id()==ID_minus)
           {
@@ -794,7 +794,7 @@ void value_sett::get_value_set_rec(
 
       // adjust by offset
       if(offset && i.has_value())
-        *offset += *i;
+        *offset += bytest{*i};
       else
         offset.reset();
 
@@ -874,7 +874,7 @@ void value_sett::get_value_set_rec(
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, mp_integer{0});
+      insert(dest, dynamic_object, bytest{0});
     }
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
@@ -887,7 +887,7 @@ void value_sett::get_value_set_rec(
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, mp_integer{0});
+      insert(dest, dynamic_object, bytest{0});
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
@@ -1124,7 +1124,7 @@ void value_sett::get_value_set_rec(
       if(eval_pointer_offset(offset, ns))
         simplify(offset, ns);
 
-      const auto offset_int = numeric_cast<mp_integer>(offset);
+      const auto offset_int = numeric_cast<bytest>(offset);
       const auto type_size = pointer_offset_size(expr.type(), ns);
 
       const struct_typet &struct_type =
@@ -1339,7 +1339,7 @@ void value_sett::get_reference_set_rec(
       to_array_type(expr.type()).element_type().id() == ID_array)
       insert(dest, expr);
     else
-      insert(dest, expr, mp_integer{0});
+      insert(dest, expr, bytest{0});
 
     return;
   }
@@ -1368,7 +1368,7 @@ void value_sett::get_reference_set_rec(
 
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
-    const exprt &offset=index_expr.index();
+    const exprt &index = index_expr.index();
 
     DATA_INVARIANT(
       array.type().id() == ID_array, "index takes array-typed operand");
@@ -1396,19 +1396,19 @@ void value_sett::get_reference_set_rec(
           from_integer(0, c_index_type()));
 
         offsett o = a_it->second;
-        const auto i = numeric_cast<mp_integer>(offset);
+        const auto i = numeric_cast<mp_integer>(index);
 
-        if(offset.is_zero())
+        if(index.is_zero())
         {
         }
         else if(i.has_value() && o)
         {
           auto size = pointer_offset_size(array_type.element_type(), ns);
 
-          if(!size.has_value() || *size == 0)
+          if(!size.has_value() || *size == bytest{0})
             o.reset();
           else
-            *o = *i * (*size);
+            *o = bytest{*i * (*size)};
         }
         else
           o.reset();

@@ -54,6 +54,28 @@ struct numeric_castt<mp_integer> final
   }
 };
 
+template <typename Tag>
+struct numeric_castt<named_mp_integert<Tag>> final
+{
+  std::optional<named_mp_integert<Tag>> operator()(const exprt &expr) const
+  {
+    if(expr.id() != ID_constant)
+      return {};
+    else
+      return operator()(to_constant_expr(expr));
+  }
+
+  std::optional<named_mp_integert<Tag>>
+  operator()(const constant_exprt &expr) const
+  {
+    mp_integer out;
+    if(to_integer(expr, out))
+      return {};
+    else
+      return named_mp_integert<Tag>{out};
+  }
+};
+
 /// Convert mp_integer or expr to any integral type
 template <typename T>
 struct numeric_castt<T,
@@ -139,6 +161,14 @@ Target numeric_cast_v(const mp_integer &arg)
   return *maybe;
 }
 
+template <typename Target, typename Tag>
+Target numeric_cast_v(const named_mp_integert<Tag> &arg)
+{
+  const auto maybe = numeric_castt<Target>{}(arg.get());
+  INVARIANT(maybe, "bits should be convertible to target integral type");
+  return *maybe;
+}
+
 /// Convert an expression to integral type Target
 /// An invariant will fail if the conversion is not possible.
 /// \tparam Target: type to convert to
@@ -157,6 +187,12 @@ Target numeric_cast_v(const constant_exprt &arg)
 
 // PRECONDITION(false) in case of unsupported type
 constant_exprt from_integer(const mp_integer &int_value, const typet &type);
+template <typename Tag>
+inline constant_exprt
+from_integer(const named_mp_integert<Tag> &int_value, const typet &type)
+{
+  return from_integer(int_value.get(), type);
+}
 
 // ceil(log2(size))
 std::size_t address_bits(const mp_integer &size);

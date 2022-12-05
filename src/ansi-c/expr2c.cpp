@@ -3502,7 +3502,7 @@ expr2ct::convert_extractbits(const extractbits_exprt &src, unsigned precedence)
   {
     auto upper = plus_exprt{
       src.index(),
-      from_integer(expr_width_opt.value() - 1, src.index().type())};
+      from_integer(expr_width_opt.value() - bitst{1}, src.index().type())};
     dest += convert_with_precedence(upper, precedence);
   }
   else
@@ -3738,8 +3738,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_bswap)
     return convert_function(
       src,
-      "__builtin_bswap" + integer2string(*pointer_offset_bits(
-                            to_unary_expr(src).op().type(), ns)));
+      "__builtin_bswap" +
+        integer2string(
+          pointer_offset_bits(to_unary_expr(src).op().type(), ns)->get()));
 
   else if(src.id().starts_with("byte_extract"))
     return convert_byte_extract(to_byte_extract_expr(src), precedence = 16);

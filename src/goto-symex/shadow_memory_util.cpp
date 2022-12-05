@@ -989,8 +989,7 @@ normalize(const object_descriptor_exprt &expr, const namespacet &ns)
   }
 
   object_descriptor_exprt result = expr;
-  mp_integer offset =
-    numeric_cast_v<mp_integer>(to_constant_expr(expr.offset()));
+  bytest offset = numeric_cast_v<bytest>(to_constant_expr(expr.offset()));
   exprt object = expr.object();
 
   while(true)

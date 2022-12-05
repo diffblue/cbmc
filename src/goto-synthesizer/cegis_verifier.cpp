@@ -365,13 +365,13 @@ cext cegis_verifiert::build_cex(
   const source_locationt &loop_entry_loc)
 {
   // Valuations of havoced variables right after havoc instructions.
-  std::unordered_map<exprt, mp_integer, irep_hash> object_sizes;
+  std::unordered_map<exprt, bytest, irep_hash> object_sizes;
   std::unordered_map<exprt, mp_integer, irep_hash> havoced_values;
-  std::unordered_map<exprt, mp_integer, irep_hash> havoced_pointer_offsets;
+  std::unordered_map<exprt, bytest, irep_hash> havoced_pointer_offsets;
 
   // Loop-entry valuations of havoced variables.
   std::unordered_map<exprt, mp_integer, irep_hash> loop_entry_values;
-  std::unordered_map<exprt, mp_integer, irep_hash> loop_entry_offsets;
+  std::unordered_map<exprt, bytest, irep_hash> loop_entry_offsets;
 
   // Live variables upon the loop head.
   std::set<exprt> live_variables;
@@ -437,8 +437,8 @@ cext cegis_verifiert::build_cex(
               step.full_lhs_value.get_string(ID_value), width, is_signed);
           }
 
-          // Store the value into the the map for havoced value if this step
-          // is a loop havocing instruction.
+          // Store the value into the map for havoced value if this step is a
+          // loop havocing instruction.
           if(loop_havoc_set.count(step.pc))
           {
             havoced_values[step.full_lhs] = bvrep2integer(
@@ -458,12 +458,7 @@ cext cegis_verifiert::build_cex(
               step.full_lhs_value);
 
           pointer_arithmetict pointer_arithmetic(
-            pointer_constant_expr->symbolic_pointer());
-          if(pointer_constant_expr->symbolic_pointer().id() == ID_typecast)
-          {
-            pointer_arithmetic = pointer_arithmetict(
-              pointer_constant_expr->symbolic_pointer().operands()[0]);
-          }
+            skip_typecast(pointer_constant_expr->symbolic_pointer()));
 
           // Extract object size.
           exprt &underlying_array = pointer_arithmetic.pointer;
@@ -480,33 +475,33 @@ cext cegis_verifiert::build_cex(
             }
             UNREACHABLE;
           }
-          mp_integer object_size =
+          bytest object_size =
             pointer_offset_size(to_array_type(underlying_array.type()), ns)
               .value();
-          object_sizes[step.full_lhs] = object_size;
+          object_sizes.emplace(step.full_lhs, object_size);
 
           // Extract offsets.
-          mp_integer offset = 0;
+          bytest offset{0};
           if(pointer_arithmetic.offset.is_not_nil())
           {
             constant_exprt offset_expr =
               expr_dynamic_cast<constant_exprt>(pointer_arithmetic.offset);
-            offset = bvrep2integer(
-              offset_expr.get_value(), size_type().get_width(), false);
+            offset = bytest{bvrep2integer(
+              offset_expr.get_value(), size_type().get_width(), false)};
           }
 
           // Store the offset into the map for loop_entry if we haven't
           // entered the loop.
           if(!entered_loop)
           {
-            loop_entry_offsets[step.full_lhs] = offset;
+            loop_entry_offsets.emplace(step.full_lhs, offset);
           }
 
-          // Store the offset into the the map for havoced offset if this step
-          // is a loop havocing instruction.
+          // Store the offset into the map for havoced offset if this step is a
+          // loop havocing instruction.
           if(loop_havoc_set.count(step.pc))
           {
-            havoced_pointer_offsets[step.full_lhs] = offset;
+            havoced_pointer_offsets.emplace(step.full_lhs, offset);
           }
         }
       }

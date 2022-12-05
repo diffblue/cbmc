@@ -18,7 +18,7 @@ void endianness_map_widet::build_little_endian(const typet &src)
   {
     auto s = pointer_offset_bits(src, ns);
     CHECK_RETURN(s.has_value());
-    s.value() = s.value() * 2;
+    s.value() = bitst{s.value() * 2};
 
     const std::size_t new_size = map.size() + numeric_cast_v<std::size_t>(*s);
     map.reserve(new_size);
