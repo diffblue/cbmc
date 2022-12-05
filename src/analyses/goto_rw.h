@@ -76,15 +76,15 @@ public:
     return *this == unknown();
   }
 
-  static range_spect to_range_spect(const mp_integer &size)
+  static range_spect to_range_spect(const bitst &size)
   {
     // The size need not fit into the analysis platform's width of a signed long
     // (as an example, it could be an unsigned size_t max, or perhaps the source
     // platform has much wider types than the analysis platform.
-    if(!size.is_long())
+    if(!size.get().is_long())
       return range_spect::unknown();
 
-    mp_integer::llong_t ll = size.to_long();
+    mp_integer::llong_t ll = size.get().to_long();
     if(
       ll > std::numeric_limits<range_spect::value_type>::max() ||
       ll < std::numeric_limits<range_spect::value_type>::min())
@@ -128,7 +128,7 @@ public:
   {
     if(is_unknown() || other.is_unknown())
       return range_spect::unknown();
-    return range_spect::to_range_spect(mp_integer{v} + mp_integer{other.v});
+    return range_spect::to_range_spect(bitst{v} + bitst{other.v});
   }
 
   range_spect &operator+=(const range_spect &other)
@@ -142,7 +142,7 @@ public:
   {
     if(is_unknown() || other.is_unknown())
       return range_spect::unknown();
-    return range_spect::to_range_spect(mp_integer{v} - mp_integer{other.v});
+    return range_spect::to_range_spect(bitst{v} - bitst{other.v});
   }
 
   range_spect &operator-=(const range_spect &other)
@@ -156,7 +156,8 @@ public:
   {
     if(is_unknown() || other.is_unknown())
       return range_spect::unknown();
-    return range_spect::to_range_spect(mp_integer{v} * mp_integer{other.v});
+    return range_spect::to_range_spect(
+      bitst{mp_integer{v} * mp_integer{other.v}});
   }
 
 private:

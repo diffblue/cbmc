@@ -344,7 +344,7 @@ bool value_sett::eval_pointer_offset(
       get_value_set(to_pointer_offset_expr(expr).pointer(), ns, true);
 
     exprt new_expr;
-    mp_integer previous_offset=0;
+    bytest previous_offset{0};
 
     const object_map_dt &object_map=reference_set.read();
     for(object_map_dt::const_iterator
@@ -362,8 +362,7 @@ bool value_sett::eval_pointer_offset(
         if(!ptr_offset.has_value())
           return false;
 
-        *ptr_offset +=
-          numeric_cast_v<mp_integer>(to_constant_expr(*it->second));
+        *ptr_offset += numeric_cast_v<bytest>(to_constant_expr(*it->second));
 
         if(mod && *ptr_offset != previous_offset)
           return false;
@@ -747,7 +746,7 @@ void value_sett::get_value_set_rec(
 
         auto size = pointer_offset_size(pointer_base_type, ns);
 
-        if(!size.has_value() || (*size) == 0)
+        if(!size.has_value() || (*size) == bytest{0})
         {
           additional_offset.reset();
         }
@@ -1139,7 +1138,7 @@ void value_sett::get_value_set_rec(
       if(eval_pointer_offset(offset, ns))
         simplify(offset, ns);
 
-      const auto offset_int = numeric_cast<mp_integer>(offset);
+      const auto offset_int = numeric_cast<bytest>(offset);
       const auto type_size = pointer_offset_size(expr.type(), ns);
 
       const struct_typet &struct_type =
@@ -1411,7 +1410,7 @@ void value_sett::get_reference_set_rec(
         {
           auto size = pointer_offset_size(array_type.element_type(), ns);
 
-          if(!size.has_value() || *size == 0)
+          if(!size.has_value() || *size == bytest{0})
             o.reset();
           else
           {

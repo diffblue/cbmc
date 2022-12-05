@@ -76,7 +76,7 @@ static std::string pointer_offset_bits_as_string(
 {
   auto bits = pointer_offset_bits(type, ns);
   CHECK_RETURN(bits.has_value());
-  return integer2string(*bits);
+  return integer2string(bits->get());
 }
 
 static std::string type2name(

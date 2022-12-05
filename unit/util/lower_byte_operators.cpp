@@ -325,7 +325,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
             REQUIRE(type_bits_2);
 
             // for now only extract within bounds
-            if(*type_bits_2 + 16 > *type_bits)
+            if(*type_bits_2 + bitst{16} > *type_bits)
               continue;
 
             const auto type_bits_2_int =
@@ -480,7 +480,7 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
             REQUIRE(type_bits_2);
 
             // for now only update within bounds
-            if(*type_bits_2 + 16 > *type_bits)
+            if(*type_bits_2 + bitst{16} > *type_bits)
               continue;
 
             const auto type_bits_2_int =

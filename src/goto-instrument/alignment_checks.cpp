@@ -36,7 +36,7 @@ void print_struct_alignment_problems(
           it_mem != components.end();
           it_mem++)
       {
-        mp_integer cumulated_length = 0;
+        bytest cumulated_length{0};
         bool first_time_seen_from = true;
 
         // if the instruction cannot be aligned to the address,
