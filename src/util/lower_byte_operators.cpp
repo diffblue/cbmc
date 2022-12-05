@@ -980,7 +980,7 @@ static exprt unpack_rec(
         member,
         little_endian,
         offset_bytes,
-        widest_member->second,
+        (widest_member->second + bits_per_byte - 1) / bits_per_byte,
         bits_per_byte,
         ns,
         true);
