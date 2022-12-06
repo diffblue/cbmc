@@ -316,7 +316,18 @@ exprt binary_functional_enumeratort::instantiate(const expr_listt &exprs) const
     exprs.size() == 2,
     "number of arguments should be 2: " + integer2string(exprs.size()));
   if(op_id == ID_equal)
+  {
+    if(exprs.front().type() != exprs.back().type())
+      return true_exprt();
+
     return equal_exprt(exprs.front(), exprs.back());
+  }
+  if(op_id == ID_notequal)
+  {
+    if(exprs.front().type() != exprs.back().type())
+      return true_exprt();
+    return notequal_exprt(exprs.front(), exprs.back());
+  }
   if(op_id == ID_le)
     return less_than_or_equal_exprt(exprs.front(), exprs.back());
   if(op_id == ID_lt)
@@ -333,8 +344,6 @@ exprt binary_functional_enumeratort::instantiate(const expr_listt &exprs) const
     return plus_exprt(exprs.front(), exprs.back());
   if(op_id == ID_minus)
     return minus_exprt(exprs.front(), exprs.back());
-  if(op_id == ID_notequal)
-    return notequal_exprt(exprs.front(), exprs.back());
   return binary_exprt(exprs.front(), op_id, exprs.back());
 }
 

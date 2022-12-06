@@ -48,8 +48,14 @@ std::vector<exprt> construct_terminals(std::set<symbol_exprt> symbols)
       // For a variable v with primitive type, we add
       // v, __CPROVER_loop_entry(v)
       // into the result.
+      result.push_back(typecast_exprt(e, size_type()));
+      result.push_back(
+        typecast_exprt(unary_exprt(ID_loop_entry, e, e.type()), size_type()));
+    }
+    if((e.type().id() == ID_signedbv))
+    {
       result.push_back(e);
-      result.push_back(unary_exprt(ID_loop_entry, e, size_type()));
+      result.push_back(unary_exprt(ID_loop_entry, e, e.type()));
     }
     if((e.type().id() == ID_pointer))
     {
@@ -62,7 +68,8 @@ std::vector<exprt> construct_terminals(std::set<symbol_exprt> symbols)
         unary_exprt(ID_loop_entry, e, e.type()), size_type()));
     }
   }
-  result.push_back(from_integer(1, size_type()));
+  result.push_back(from_integer(1, unsigned_int_type()));
+  result.push_back(from_integer(1, unsigned_long_int_type()));
   return result;
 }
 

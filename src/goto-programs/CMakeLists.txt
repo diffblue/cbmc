@@ -3,4 +3,4 @@ add_library(goto-programs ${sources})
 
 generic_includes(goto-programs)
 
-target_link_libraries(goto-programs util assembler langapi analyses linking ansi-c)
+target_link_libraries(goto-programs util assembler langapi analyses linking ansi-c json)

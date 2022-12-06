@@ -1433,10 +1433,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         " or --" FLAG_LOOP_CONTRACTS);
     }
 
-    log.warning() << "Loop invariant synthesizer is still work in progress. "
-                     "It only generates TRUE as invariants."
-                  << messaget::eom;
-
     // Synthesize loop invariants and annotate them into `goto_model`
     enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
     annotate_invariants(synthesizer.synthesize_all(), goto_model);
