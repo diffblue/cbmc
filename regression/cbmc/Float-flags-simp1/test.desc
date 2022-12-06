@@ -1,6 +1,6 @@
-CORE
+CORE broken-cprover-smt-backend
 main.c
---floatbv --no-simplify
+--floatbv
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
