@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"ansi__c__entry__point_8h.html#a02cf3646d20c33e7f0c5a34cf8af95ae":[7,0,2,1,9,1],
 "ansi__c__entry__point_8h.html#acca69b0d7e6aa840b737d24b97c72a29":[7,0,2,1,9,0],
 "ansi__c__entry__point_8h_source.html":[7,0,2,1,9],
 "ansi__c__internal__additions_8cpp.html":[7,0,2,1,10],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "assignments__from__json_8cpp.html#a323f0fcacbf786b74ade3e2aef34b5c4":[7,0,1,0,1,0,11],
 "assignments__from__json_8cpp.html#a3b676c4ba71977f626c51ced8aa075a8":[7,0,1,0,1,0,4],
 "assignments__from__json_8cpp.html#a46ea9983ba2ce9c9013d0a9e9985772a":[7,0,1,0,1,0,12],
-"assignments__from__json_8cpp.html#a4969415db571496d7312dce2df54b75d":[7,0,1,0,1,0,3],
-"assignments__from__json_8cpp.html#a5c76aa6635d3a662f9f2ba10d5347738":[7,0,1,0,1,0,13]
+"assignments__from__json_8cpp.html#a4969415db571496d7312dce2df54b75d":[7,0,1,0,1,0,3]
 };
