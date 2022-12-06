@@ -1,6 +1,5 @@
 var NAVTREEINDEX98 =
 {
-"goto__program_8cpp.html":[7,0,2,14,46],
 "goto__program_8cpp.html#a05347f45452007ecfae3f2bd335f278d":[7,0,2,14,46,8],
 "goto__program_8cpp.html#a4c175287486eefd35b86b2910abdf5a8":[7,0,2,14,46,2],
 "goto__program_8cpp.html#a66372d1a3f3860e0d156d7cd6c5ef740":[7,0,2,14,46,0],
@@ -167,9 +166,9 @@ var NAVTREEINDEX98 =
 "group__dfcc-module.html#gaf3830cbcefce961b35b7685ec749073e":[7,0,2,13,1,1,0,0],
 "group__dfcc-module.html#gaf3830cbcefce961b35b7685ec749073e":[7,0,2,13,1,1,1,6],
 "group__dfcc-module.html#gaf3830cbcefce961b35b7685ec749073e":[4,12,0,2],
+"group__dfcc-module.html#gafdbf369497f3ee91c04204da63eefd86":[4,12,0,3],
 "group__dfcc-module.html#gafdbf369497f3ee91c04204da63eefd86":[7,0,2,13,1,1,1,7],
 "group__dfcc-module.html#gafdbf369497f3ee91c04204da63eefd86":[7,0,2,13,1,1,0,1],
-"group__dfcc-module.html#gafdbf369497f3ee91c04204da63eefd86":[4,12,0,3],
 "group__goto-analyzer.html":[4,7],
 "group__goto-cc.html":[4,8],
 "group__goto-checker.html":[4,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX98 =
 "hardness__collector_8h.html":[7,0,2,24,14],
 "hardness__collector_8h_source.html":[7,0,2,24,14],
 "havoc__assigns__clause__targets_8cpp.html":[7,0,2,13,1,5],
-"havoc__assigns__clause__targets_8cpp_source.html":[7,0,2,13,1,5]
+"havoc__assigns__clause__targets_8cpp_source.html":[7,0,2,13,1,5],
+"havoc__assigns__clause__targets_8h.html":[7,0,2,13,1,6]
 };
