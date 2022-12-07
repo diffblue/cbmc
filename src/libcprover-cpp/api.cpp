@@ -31,6 +31,11 @@
 
 extern configt config;
 
+std::unique_ptr<std::string> api_sessiont::get_api_version() const
+{
+  return util_make_unique<std::string>(std::string{"0.1"});
+}
+
 struct api_session_implementationt
 {
   std::unique_ptr<goto_modelt> model;
@@ -112,13 +117,14 @@ void api_sessiont::set_message_callback(
     util_make_unique<api_message_handlert>(callback, context);
 }
 
-void api_sessiont::load_model_from_files(const std::vector<std::string> &files)
+void api_sessiont::load_model_from_files(
+  const std::vector<std::string> &files) const
 {
   implementation->model = util_make_unique<goto_modelt>(initialize_goto_model(
     files, *implementation->message_handler, *implementation->options));
 }
 
-void api_sessiont::verify_model()
+void api_sessiont::verify_model() const
 {
   PRECONDITION(implementation->model);
 
@@ -162,7 +168,7 @@ void api_sessiont::verify_model()
   verifier.report();
 }
 
-void api_sessiont::drop_unused_functions()
+void api_sessiont::drop_unused_functions() const
 {
   INVARIANT(
     implementation->model != nullptr,
@@ -177,7 +183,7 @@ void api_sessiont::drop_unused_functions()
     *implementation->model, *implementation->message_handler);
 }
 
-void api_sessiont::validate_goto_model()
+void api_sessiont::validate_goto_model() const
 {
   INVARIANT(
     implementation->model != nullptr,
