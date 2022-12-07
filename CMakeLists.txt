@@ -215,6 +215,7 @@ cprover_default_properties(
     cbmc
     cbmc-lib
     cpp
+    cprover-api-cpp
     cprover
     cprover-lib
     crangler
