@@ -1,6 +1,5 @@
 var NAVTREEINDEX11 =
 {
-"classas__modet.html#a585fa8238e8963c68f8b19e39884a6b2":[7,0,84,7],
 "classas__modet.html#a6ce9d5d828f649479e85e0ab91b6128d":[7,0,84,6],
 "classas__modet.html#a81f0723c82efd25ccf674a8eb412f5aa":[7,0,84,1],
 "classas__modet.html#a9bce791330a8e3308cb13557da0ee5b0":[7,0,84,5],
@@ -249,5 +248,6 @@ var NAVTREEINDEX11 =
 "classbitvector__typet.html#a9d1569e5c1963755db8f5e10c5188178":[7,0,114,1],
 "classbitvector__typet.html#afd4cd55038937cd22d6392a7efa2e92b":[7,0,114,0],
 "classbitxor__exprt.html":[7,0,115],
-"classbitxor__exprt.html#ab70de7370c5361b33c5c04f5ac4471fb":[7,0,115,0]
+"classbitxor__exprt.html#ab70de7370c5361b33c5c04f5ac4471fb":[7,0,115,0],
+"classbool__typet.html":[7,0,116]
 };
