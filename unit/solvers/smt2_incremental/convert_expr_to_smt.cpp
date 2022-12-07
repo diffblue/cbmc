@@ -1209,10 +1209,11 @@ TEST_CASE(
           symbol_exprt{"foo", make_type(8)},
           symbol_exprt{"bar", make_type(32)});
         INFO("Input expr: " + input.pretty(2, 0));
-        const smt_termt expected_result = make_shift_term(
-          make_extension(24)(
-            smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
-          smt_identifier_termt{"bar", smt_bit_vector_sortt{32}});
+        const smt_termt expected_result =
+          smt_bit_vector_theoryt::extract(7, 0)(make_shift_term(
+            make_extension(24)(
+              smt_identifier_termt{"foo", smt_bit_vector_sortt{8}}),
+            smt_identifier_termt{"bar", smt_bit_vector_sortt{32}}));
         CHECK(test.convert(input) == expected_result);
       }
     }
