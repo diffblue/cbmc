@@ -1,5 +1,7 @@
 var NAVTREEINDEX126 =
 {
+"structmz__stream__s.html#abbd8109a7f88713f39b9e3046a223ef2":[7,0,816,12],
+"structmz__stream__s.html#abfa083eb7707360c33389ec12fadf376":[7,0,816,10],
 "structmz__stream__s.html#ad4095b25455e382787dc06d20157e05f":[7,0,816,4],
 "structmz__stream__s.html#ae4fc708fffee7b10a4586964401613fb":[7,0,816,8],
 "structmz__zip__archive.html":[7,0,817],
@@ -247,7 +249,5 @@ var NAVTREEINDEX126 =
 "structrequire__parse__tree_1_1expected__instructiont.html#a30184c6c3612e6bde9ec37f0280a14fe":[7,0,2,0,0],
 "structrequire__parse__tree_1_1expected__instructiont.html#a51d90caccd2b9c0873ca51854b6572df":[7,0,2,0,1],
 "structrequire__parse__tree_1_1expected__instructiont.html#a58f319a751e9b70845b92226ae77db39":[7,0,2,0,2],
-"structrequire__type_1_1expected__type__argumentt.html":[7,0,3,0],
-"structrequire__type_1_1expected__type__argumentt.html#ac62d25cd0656176d868c3427ec8ece3c":[7,0,3,0,1],
-"structrequire__type_1_1expected__type__argumentt.html#adc21130d2ea23a429a5bb488d28e4f06":[7,0,3,0,0]
+"structrequire__type_1_1expected__type__argumentt.html":[7,0,3,0]
 };
