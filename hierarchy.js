@@ -154,6 +154,8 @@ var hierarchy =
     [ "ansi_c_parse_treet", "classansi__c__parse__treet.html", null ],
     [ "ansi_c_scopet", "classansi__c__scopet.html", null ],
     [ "configt::ansi_ct", "structconfigt_1_1ansi__ct.html", null ],
+    [ "api_optionst", "classapi__optionst.html", null ],
+    [ "api_sessiont", "structapi__sessiont.html", null ],
     [ "bv_refinementt::approximationt", "structbv__refinementt_1_1approximationt.html", null ],
     [ "goto_cc_cmdlinet::argt", "structgoto__cc__cmdlinet_1_1argt.html", null ],
     [ "smt_bit_vector_theoryt::arithmetic_shift_rightt", "structsmt__bit__vector__theoryt_1_1arithmetic__shift__rightt.html", null ],

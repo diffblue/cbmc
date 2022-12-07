@@ -622,7 +622,7 @@ Flattening and Lowering</h2>
 <h2><a class="anchor" id="verification_condition_subsection"></a>
 Verification Condition</h2>
 <p>In the CPROVER framework, the term <b>verification condition</b> is used in a somewhat non-standard way. Let a program and a set of assertions be given. We transform the program into an (acyclic) SSA (i.e., an SSA with all loops unrolled a finite number of times) and turn it into a logical formula, as described above. Note that in this case, the formula will also contain information about what the program does after the assertion is reached: this part of the formula, is, in fact, irrelevant for deciding whether the program can satisfy the assertion or not. The <em>verification condition</em> is the part of the formula that only covers the program execution until the line that checks the assertion has been executed, with everything that comes after it removed.</p>
-<p>Last modified: 2022-12-06 15:21:15 +0100 </p>
+<p>Last modified: 2022-12-07 11:58:19 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

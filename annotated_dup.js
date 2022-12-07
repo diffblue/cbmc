@@ -86,6 +86,8 @@ var annotated_dup =
     [ "ansi_c_parsert", "classansi__c__parsert.html", "classansi__c__parsert" ],
     [ "ansi_c_scopet", "classansi__c__scopet.html", "classansi__c__scopet" ],
     [ "ansi_c_typecheckt", "classansi__c__typecheckt.html", "classansi__c__typecheckt" ],
+    [ "api_optionst", "classapi__optionst.html", "classapi__optionst" ],
+    [ "api_sessiont", "structapi__sessiont.html", "structapi__sessiont" ],
     [ "armcc_cmdlinet", "classarmcc__cmdlinet.html", "classarmcc__cmdlinet" ],
     [ "armcc_modet", "classarmcc__modet.html", "classarmcc__modet" ],
     [ "array_aggregate_typet", "structarray__aggregate__typet.html", "structarray__aggregate__typet" ],

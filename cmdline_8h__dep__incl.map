@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/cmdline.h" name="/home/runner/work/cbmc/cbmc/src/util/cmdline.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5056,5,5240,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5119,5,5303,47"/>
 <area shape="rect" id="node2" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="5,206,232,247"/>
-<area shape="rect" id="node3" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="3944,102,4163,143"/>
+<area shape="rect" id="node3" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="3891,102,4109,143"/>
 <area shape="rect" id="node4" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="256,199,440,255"/>
-<area shape="rect" id="node5" href="$goto__cc__cmdline_8h.html" title="Command line interpretation for goto&#45;cc." alt="" coords="1417,95,1601,151"/>
-<area shape="rect" id="node23" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="2529,206,2751,247"/>
-<area shape="rect" id="node29" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="4187,95,4371,151"/>
-<area shape="rect" id="node30" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="4395,95,4579,151"/>
-<area shape="rect" id="node31" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="4603,95,4797,151"/>
-<area shape="rect" id="node32" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="4821,95,5014,151"/>
-<area shape="rect" id="node33" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="5039,95,5257,151"/>
-<area shape="rect" id="node34" href="$path__storage_8cpp.html" title=" " alt="" coords="5282,95,5481,151"/>
-<area shape="rect" id="node35" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="5505,102,5743,143"/>
-<area shape="rect" id="node36" href="$cmdline_8cpp.html" title=" " alt="" coords="5768,102,5960,143"/>
-<area shape="rect" id="node37" href="$config_8cpp.html" title=" " alt="" coords="5984,102,6168,143"/>
-<area shape="rect" id="node38" href="$object__factory__parameters_8cpp.html" title=" " alt="" coords="6192,95,6376,151"/>
-<area shape="rect" id="node39" href="$parse__options_8cpp.html" title=" " alt="" coords="2985,206,3215,247"/>
-<area shape="rect" id="node40" href="$parse__options_8h.html" title=" " alt="" coords="3704,102,3920,143"/>
-<area shape="rect" id="node53" href="$ui__message_8cpp.html" title=" " alt="" coords="6400,102,6619,143"/>
-<area shape="rect" id="node54" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="6643,95,6827,151"/>
-<area shape="rect" id="node55" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="6851,95,7069,151"/>
-<area shape="rect" id="node56" href="$java__object__factory__parameters_8cpp.html" title=" " alt="" coords="7094,95,7357,151"/>
-<area shape="rect" id="node57" href="$free__form__cmdline_8h.html" title=" " alt="" coords="7381,95,7565,151"/>
-<area shape="rect" id="node60" href="$get__goto__model__from__c_8cpp.html" title=" " alt="" coords="7589,95,7800,151"/>
-<area shape="rect" id="node6" href="$armcc__cmdline_8h.html" title="A special command line object to mimic ARM&#39;s armcc." alt="" coords="1645,199,1829,255"/>
-<area shape="rect" id="node10" href="$as86__cmdline_8h.html" title="A special command line object for as86 (of Bruce&#39;s C Compiler) Author: Michael Tautschnig Date: July ..." alt="" coords="939,199,1123,255"/>
-<area shape="rect" id="node12" href="$as__cmdline_8h.html" title="A special command line object for GNU Assembler Author: Michael Tautschnig Date: July 2016." alt="" coords="1147,206,1373,247"/>
-<area shape="rect" id="node14" href="$bcc__cmdline_8h.html" title="A special command line object for Bruce&#39;s C Compiler Author: Michael Tautschnig Date: July 2016." alt="" coords="1904,199,2088,255"/>
-<area shape="rect" id="node16" href="$gcc__cmdline_8h.html" title="A special command line object for the gcc&#45;like options." alt="" coords="2320,199,2504,255"/>
-<area shape="rect" id="node19" href="$goto__cc__cmdline_8cpp.html" title="Command line interpretation for goto&#45;cc." alt="" coords="515,199,699,255"/>
-<area shape="rect" id="node20" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="2776,199,2960,255"/>
-<area shape="rect" id="node21" href="$ld__cmdline_8h.html" title="A special command line object for the ld&#45;like options." alt="" coords="1398,206,1621,247"/>
-<area shape="rect" id="node24" href="$ms__cl__cmdline_8h.html" title="A special command line object for the gcc&#45;like options." alt="" coords="2112,199,2296,255"/>
-<area shape="rect" id="node27" href="$ms__link__cmdline_8h.html" title="A special command line object for LINK options." alt="" coords="357,303,547,359"/>
-<area shape="rect" id="node28" href="$ms__link__mode_8cpp.html" title="Visual Studio Link Mode." alt="" coords="723,199,914,255"/>
-<area shape="rect" id="node7" href="$armcc__cmdline_8cpp.html" title="A special command line object to mimic ARM&#39;s armcc." alt="" coords="1721,303,1905,359"/>
-<area shape="rect" id="node8" href="$armcc__mode_8h.html" title="Base class for command line interpretation for CL." alt="" coords="1513,303,1697,359"/>
-<area shape="rect" id="node9" href="$goto__cc__main_8cpp.html" title="GOTO&#45;CC Main Module." alt="" coords="1513,407,1697,463"/>
-<area shape="rect" id="node11" href="$as86__cmdline_8cpp.html" title="A special command line object for as86 (of Bruce&#39;s C Compiler)" alt="" coords="572,303,756,359"/>
-<area shape="rect" id="node13" href="$as__cmdline_8cpp.html" title="A special command line object for GNU Assembler." alt="" coords="831,310,1073,351"/>
-<area shape="rect" id="node15" href="$bcc__cmdline_8cpp.html" title="A special command line object for Bruce&#39;s C Compiler." alt="" coords="1929,303,2113,359"/>
-<area shape="rect" id="node17" href="$cw__mode_8h.html" title="Base class for command line interpretation." alt="" coords="2914,310,3129,351"/>
-<area shape="rect" id="node18" href="$gcc__cmdline_8cpp.html" title="A special command line object for the gcc&#45;like options." alt="" coords="2655,303,2839,359"/>
-<area shape="rect" id="node22" href="$ld__cmdline_8cpp.html" title="A special command line object for the ld&#45;like options." alt="" coords="1199,310,1438,351"/>
-<area shape="rect" id="node25" href="$ms__cl__cmdline_8cpp.html" title="A special command line object for the CL options." alt="" coords="2188,303,2372,359"/>
-<area shape="rect" id="node26" href="$ms__cl__mode_8h.html" title="Visual Studio CL Mode." alt="" coords="2447,303,2631,359"/>
-<area shape="rect" id="node41" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="5401,199,5607,255"/>
-<area shape="rect" id="node42" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="5631,199,5822,255"/>
-<area shape="rect" id="node43" href="$crangler__parse__options_8h.html" title="CRANGLER Command Line Option Processing." alt="" coords="5846,199,6045,255"/>
-<area shape="rect" id="node44" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="3239,199,3467,255"/>
-<area shape="rect" id="node45" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="3492,199,3676,255"/>
-<area shape="rect" id="node46" href="$goto__harness__parse__options_8h.html" title=" " alt="" coords="3701,199,3923,255"/>
-<area shape="rect" id="node47" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3948,199,4191,255"/>
-<area shape="rect" id="node48" href="$memory__analyzer__parse__options_8h.html" title="This code does the command line parsing for the memory&#45;analyzer tool." alt="" coords="4215,199,4470,255"/>
-<area shape="rect" id="node49" href="$symtab2gb__parse__options_8h.html" title=" " alt="" coords="4494,199,4733,255"/>
-<area shape="rect" id="node50" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="4757,199,4953,255"/>
-<area shape="rect" id="node51" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="4977,199,5169,255"/>
-<area shape="rect" id="node52" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="5193,199,5377,255"/>
-<area shape="rect" id="node58" href="$load__java__class_8cpp.html" title=" " alt="" coords="7480,199,7688,255"/>
-<area shape="rect" id="node59" href="$free__form__cmdline_8cpp.html" title=" " alt="" coords="7272,199,7456,255"/>
+<area shape="rect" id="node5" href="$goto__cc__cmdline_8h.html" title="Command line interpretation for goto&#45;cc." alt="" coords="1593,95,1777,151"/>
+<area shape="rect" id="node23" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="2475,206,2698,247"/>
+<area shape="rect" id="node28" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="4133,95,4317,151"/>
+<area shape="rect" id="node29" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="4341,95,4525,151"/>
+<area shape="rect" id="node30" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="4550,95,4743,151"/>
+<area shape="rect" id="node31" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="4767,95,4961,151"/>
+<area shape="rect" id="node32" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="4985,95,5204,151"/>
+<area shape="rect" id="node33" href="$path__storage_8cpp.html" title=" " alt="" coords="5229,95,5427,151"/>
+<area shape="rect" id="node34" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="5451,102,5690,143"/>
+<area shape="rect" id="node35" href="$api_8cpp.html" title=" " alt="" coords="5715,95,5899,151"/>
+<area shape="rect" id="node36" href="$cmdline_8cpp.html" title=" " alt="" coords="5923,102,6115,143"/>
+<area shape="rect" id="node37" href="$config_8cpp.html" title=" " alt="" coords="6139,102,6323,143"/>
+<area shape="rect" id="node38" href="$object__factory__parameters_8cpp.html" title=" " alt="" coords="6347,95,6531,151"/>
+<area shape="rect" id="node39" href="$parse__options_8cpp.html" title=" " alt="" coords="2931,206,3162,247"/>
+<area shape="rect" id="node40" href="$parse__options_8h.html" title=" " alt="" coords="3651,102,3867,143"/>
+<area shape="rect" id="node53" href="$ui__message_8cpp.html" title=" " alt="" coords="6555,102,6773,143"/>
+<area shape="rect" id="node54" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="6797,95,6981,151"/>
+<area shape="rect" id="node55" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="7005,95,7224,151"/>
+<area shape="rect" id="node56" href="$java__object__factory__parameters_8cpp.html" title=" " alt="" coords="7249,95,7511,151"/>
+<area shape="rect" id="node57" href="$free__form__cmdline_8h.html" title=" " alt="" coords="7536,95,7720,151"/>
+<area shape="rect" id="node60" href="$get__goto__model__from__c_8cpp.html" title=" " alt="" coords="7744,95,7955,151"/>
+<area shape="rect" id="node6" href="$armcc__cmdline_8h.html" title="A special command line object to mimic ARM&#39;s armcc." alt="" coords="2217,199,2401,255"/>
+<area shape="rect" id="node10" href="$as86__cmdline_8h.html" title="A special command line object for as86 (of Bruce&#39;s C Compiler) Author: Michael Tautschnig Date: July ..." alt="" coords="1385,199,1569,255"/>
+<area shape="rect" id="node12" href="$as__cmdline_8h.html" title="A special command line object for GNU Assembler Author: Michael Tautschnig Date: July 2016." alt="" coords="464,206,691,247"/>
+<area shape="rect" id="node14" href="$bcc__cmdline_8h.html" title="A special command line object for Bruce&#39;s C Compiler Author: Michael Tautschnig Date: July 2016." alt="" coords="2009,199,2193,255"/>
+<area shape="rect" id="node16" href="$gcc__cmdline_8h.html" title="A special command line object for the gcc&#45;like options." alt="" coords="1593,199,1777,255"/>
+<area shape="rect" id="node19" href="$goto__cc__cmdline_8cpp.html" title="Command line interpretation for goto&#45;cc." alt="" coords="715,199,899,255"/>
+<area shape="rect" id="node20" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="2723,199,2907,255"/>
+<area shape="rect" id="node21" href="$ld__cmdline_8h.html" title="A special command line object for the ld&#45;like options." alt="" coords="1138,206,1361,247"/>
+<area shape="rect" id="node24" href="$ms__cl__cmdline_8h.html" title="A special command line object for the gcc&#45;like options." alt="" coords="1801,199,1985,255"/>
+<area shape="rect" id="node26" href="$ms__link__cmdline_8h.html" title="A special command line object for LINK options." alt="" coords="2763,303,2954,359"/>
+<area shape="rect" id="node27" href="$ms__link__mode_8cpp.html" title="Visual Studio Link Mode." alt="" coords="923,199,1114,255"/>
+<area shape="rect" id="node7" href="$armcc__cmdline_8cpp.html" title="A special command line object to mimic ARM&#39;s armcc." alt="" coords="2347,303,2531,359"/>
+<area shape="rect" id="node8" href="$armcc__mode_8h.html" title="Base class for command line interpretation for CL." alt="" coords="2555,303,2739,359"/>
+<area shape="rect" id="node9" href="$goto__cc__main_8cpp.html" title="GOTO&#45;CC Main Module." alt="" coords="1675,407,1859,463"/>
+<area shape="rect" id="node11" href="$as86__cmdline_8cpp.html" title="A special command line object for as86 (of Bruce&#39;s C Compiler)" alt="" coords="1072,303,1256,359"/>
+<area shape="rect" id="node13" href="$as__cmdline_8cpp.html" title="A special command line object for GNU Assembler." alt="" coords="390,310,631,351"/>
+<area shape="rect" id="node15" href="$bcc__cmdline_8cpp.html" title="A special command line object for Bruce&#39;s C Compiler." alt="" coords="2037,303,2221,359"/>
+<area shape="rect" id="node17" href="$cw__mode_8h.html" title="Base class for command line interpretation." alt="" coords="1489,310,1703,351"/>
+<area shape="rect" id="node18" href="$gcc__cmdline_8cpp.html" title="A special command line object for the gcc&#45;like options." alt="" coords="1280,303,1464,359"/>
+<area shape="rect" id="node22" href="$ld__cmdline_8cpp.html" title="A special command line object for the ld&#45;like options." alt="" coords="707,310,946,351"/>
+<area shape="rect" id="node25" href="$ms__cl__cmdline_8cpp.html" title="A special command line object for the CL options." alt="" coords="1829,303,2013,359"/>
+<area shape="rect" id="node41" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="5348,199,5553,255"/>
+<area shape="rect" id="node42" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="5578,199,5769,255"/>
+<area shape="rect" id="node43" href="$crangler__parse__options_8h.html" title="CRANGLER Command Line Option Processing." alt="" coords="5793,199,5991,255"/>
+<area shape="rect" id="node44" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="3186,199,3414,255"/>
+<area shape="rect" id="node45" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="3439,199,3623,255"/>
+<area shape="rect" id="node46" href="$goto__harness__parse__options_8h.html" title=" " alt="" coords="3647,199,3870,255"/>
+<area shape="rect" id="node47" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3895,199,4137,255"/>
+<area shape="rect" id="node48" href="$memory__analyzer__parse__options_8h.html" title="This code does the command line parsing for the memory&#45;analyzer tool." alt="" coords="4162,199,4417,255"/>
+<area shape="rect" id="node49" href="$symtab2gb__parse__options_8h.html" title=" " alt="" coords="4441,199,4679,255"/>
+<area shape="rect" id="node50" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="4703,199,4899,255"/>
+<area shape="rect" id="node51" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="4924,199,5116,255"/>
+<area shape="rect" id="node52" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="5140,199,5324,255"/>
+<area shape="rect" id="node58" href="$load__java__class_8cpp.html" title=" " alt="" coords="7635,199,7843,255"/>
+<area shape="rect" id="node59" href="$free__form__cmdline_8cpp.html" title=" " alt="" coords="7427,199,7611,255"/>
 </map>

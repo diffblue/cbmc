@@ -243,8 +243,8 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "object_factory_parameters.h", "object__factory__parameters_8h.html", "object__factory__parameters_8h" ],
     [ "optional.h", "optional_8h.html", "optional_8h" ],
     [ "optional_utils.h", "optional__utils_8h.html", "optional__utils_8h" ],
-    [ "options.cpp", "options_8cpp.html", null ],
-    [ "options.h", "options_8h.html", [
+    [ "options.cpp", "util_2options_8cpp.html", null ],
+    [ "options.h", "util_2options_8h.html", [
       [ "optionst", "classoptionst.html", "classoptionst" ]
     ] ],
     [ "parse_options.cpp", "parse__options_8cpp.html", "parse__options_8cpp" ],
