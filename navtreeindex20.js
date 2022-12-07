@@ -1,5 +1,6 @@
 var NAVTREEINDEX20 =
 {
+"classcopy__on__write__pointeet.html#acb475cf205092d0d303e0e3b0ed5272b":[7,0,265,6],
 "classcopy__on__write__pointeet.html#ad309bdb7ab9212c0926a87365f1c53a9":[7,0,265,8],
 "classcopy__on__write__pointeet.html#add899a54738ad27487b27af1346c0793":[7,0,265,2],
 "classcopy__on__write__pointeet.html#ae2ab1eb09bc4d5cea43a83b319a26dbc":[7,0,265,10],
@@ -248,6 +249,5 @@ var NAVTREEINDEX20 =
 "classcpp__enum__typet.html#ae5768e7375e87c51fd7c0d1ba4878079":[7,0,293,3],
 "classcpp__enum__typet.html#aed8cf2d4d4d5360a9183fa7ff0f0d280":[7,0,293,4],
 "classcpp__idt.html":[7,0,294],
-"classcpp__idt.html#a02f96b03a4486e7824a2710545594e25":[7,0,294,0],
-"classcpp__idt.html#a085b2ee51c3439d7bc15b30658911228":[7,0,294,18]
+"classcpp__idt.html#a02f96b03a4486e7824a2710545594e25":[7,0,294,0]
 };
