@@ -19,7 +19,6 @@ var classansi__c__declarationt =
     [ "get_is_static_assert", "classansi__c__declarationt.html#aecf355c833b5cb9a048f072e699a60dc", null ],
     [ "get_is_thread_local", "classansi__c__declarationt.html#ad4cb421801d222f5404200df9a070980", null ],
     [ "get_is_typedef", "classansi__c__declarationt.html#ada48d03cafa6f237d242bdd42316dae7", null ],
-    [ "get_is_used", "classansi__c__declarationt.html#ae6f5b4c2129d7a42d6100ba49d7a53dc", null ],
     [ "get_is_weak", "classansi__c__declarationt.html#ae1b87daa01e002df6b139e5dd8ef524d", null ],
     [ "output", "classansi__c__declarationt.html#af9f0043c003d985a0e9a187aa5b26b4c", null ],
     [ "set_is_enum_constant", "classansi__c__declarationt.html#a06d32d7ba57261e19535263e3f3a8140", null ],
@@ -33,7 +32,6 @@ var classansi__c__declarationt =
     [ "set_is_static_assert", "classansi__c__declarationt.html#a80e1268c15ee210cc37422f816a17626", null ],
     [ "set_is_thread_local", "classansi__c__declarationt.html#a0240f7a138b6a256322977ac6db5945f", null ],
     [ "set_is_typedef", "classansi__c__declarationt.html#aebe33060f62c5f9f80b5775e81c27707", null ],
-    [ "set_is_used", "classansi__c__declarationt.html#ad812d7ac432f509e15ef7718ab8353c0", null ],
     [ "set_is_weak", "classansi__c__declarationt.html#a47dd58a1d85939d83f5b61bd3203e121", null ],
     [ "to_symbol", "classansi__c__declarationt.html#ab26a8d23510af881fed48d7b0b9a6146", null ]
 ];
