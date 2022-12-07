@@ -3763,10 +3763,12 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   else if(code_type.is_KnR())
   {
     // We are generous on KnR; any number is ok.
-    // We will in missing ones with "NIL".
-
-    while(parameters.size() > arguments.size())
-      arguments.push_back(nil_exprt());
+    // We will fill in missing ones with "nondet".
+    for(std::size_t i = arguments.size(); i < parameters.size(); ++i)
+    {
+      arguments.push_back(
+        side_effect_expr_nondett{parameters[i].type(), expr.source_location()});
+    }
   }
   else if(code_type.has_ellipsis())
   {
