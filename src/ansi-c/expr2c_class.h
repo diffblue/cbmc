@@ -28,6 +28,7 @@ class qualifierst;
 class namespacet;
 class r_or_w_ok_exprt;
 class pointer_in_range_exprt;
+class r_or_w_ok_exprt;
 
 class expr2ct
 {
