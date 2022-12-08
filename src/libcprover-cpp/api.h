@@ -10,9 +10,15 @@
 // Forward declaration of API dependencies
 class goto_modelt;
 class message_handlert;
-class optionst;
 
-#include "options.h"
+// There has been a design decision to allow users to include all of
+// the API headers by just including `api.h`, so we want to have an
+// include for all the API headers below. If we get any auxiliary
+// development tools complaining about the includes, please use
+// a pragma like below to silence the warning (at least as long
+// as the design principle is to be followed.)
+
+#include "options.h" // IWYU pragma: keep
 
 // An object in the pattern of Session Facade - owning all of the memory
 // the API is using and being responsible for the management of that.
