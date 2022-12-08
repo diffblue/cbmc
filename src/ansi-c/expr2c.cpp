@@ -3572,8 +3572,48 @@ std::string expr2ct::convert_r_or_w_ok(const r_or_w_ok_exprt &src)
   return dest;
 }
 
+std::string
+expr2ct::convert_prophecy_r_or_w_ok(const prophecy_r_or_w_ok_exprt &src)
+{
+  // we hide prophecy expressions in C-style output
+  std::string dest = src.id() == ID_prophecy_r_ok   ? "R_OK"
+                     : src.id() == ID_prophecy_w_ok ? "W_OK"
+                                                    : "RW_OK";
+
+  dest += '(';
+
+  unsigned p;
+  dest += convert_with_precedence(src.pointer(), p);
+  dest += ", ";
+  dest += convert_with_precedence(src.size(), p);
+
+  dest += ')';
+
+  return dest;
+}
+
 std::string expr2ct::convert_pointer_in_range(const pointer_in_range_exprt &src)
 {
+  std::string dest = CPROVER_PREFIX "pointer_in_range";
+
+  dest += '(';
+
+  unsigned p;
+  dest += convert_with_precedence(src.lower_bound(), p);
+  dest += ", ";
+  dest += convert_with_precedence(src.pointer(), p);
+  dest += ", ";
+  dest += convert_with_precedence(src.upper_bound(), p);
+
+  dest += ')';
+
+  return dest;
+}
+
+std::string expr2ct::convert_prophecy_pointer_in_range(
+  const prophecy_pointer_in_range_exprt &src)
+{
+  // we hide prophecy expressions in C-style output
   std::string dest = CPROVER_PREFIX "pointer_in_range";
 
   dest += '(';
@@ -4002,8 +4042,21 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id() == ID_r_ok || src.id() == ID_w_ok || src.id() == ID_rw_ok)
     return convert_r_or_w_ok(to_r_or_w_ok_expr(src));
 
+  else if(
+    auto prophecy_r_or_w_ok =
+      expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(src))
+  {
+    return convert_prophecy_r_or_w_ok(*prophecy_r_or_w_ok);
+  }
+
   else if(src.id() == ID_pointer_in_range)
     return convert_pointer_in_range(to_pointer_in_range_expr(src));
+
+  else if(src.id() == ID_prophecy_pointer_in_range)
+  {
+    return convert_prophecy_pointer_in_range(
+      to_prophecy_pointer_in_range_expr(src));
+  }
 
   auto function_string_opt = convert_function(src);
   if(function_string_opt.has_value())

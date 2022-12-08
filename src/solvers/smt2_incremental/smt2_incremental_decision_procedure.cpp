@@ -8,6 +8,7 @@
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
@@ -258,6 +259,25 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
   solver_process->send(is_dynamic_object_function.declaration);
 }
 
+static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
+{
+  expr.visit_pre([&ns](exprt &expr) {
+    if(
+      auto prophecy_r_or_w_ok =
+        expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+    {
+      expr = simplify_expr(prophecy_r_or_w_ok->lower(ns), ns);
+    }
+    else if(
+      auto prophecy_pointer_in_range =
+        expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
+    {
+      expr = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
+    }
+  });
+  return expr;
+}
+
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   const exprt &in_expr)
 {
@@ -268,7 +288,8 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
     return;
   }
 
-  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+  const exprt lowered_expr =
+    lower_byte_operators(lower_rw_ok_pointer_in_range(in_expr, ns), ns);
 
   define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
@@ -514,7 +535,8 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt &in_expr,
   bool value)
 {
-  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+  const exprt lowered_expr =
+    lower_byte_operators(lower_rw_ok_pointer_in_range(in_expr, ns), ns);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "

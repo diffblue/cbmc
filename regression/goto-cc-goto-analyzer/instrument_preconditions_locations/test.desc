@@ -4,7 +4,7 @@ test.c
 ^EXIT=0$
 ^SIGNAL=0$
 Checking assertions
-^\[EVP_MD_CTX_free.precondition_instance.1\] line \d+ free argument must be NULL or valid pointer: SUCCESS
+^\[free.precondition.1\] line \d+ free argument must be NULL or valid pointer: SUCCESS
 --
 Invariant check failed
 --

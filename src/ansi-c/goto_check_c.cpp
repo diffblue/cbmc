@@ -1444,6 +1444,8 @@ void goto_check_ct::pointer_primitive_check(
   const exprt pointer =
     (expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok)
       ? to_r_or_w_ok_expr(expr).pointer()
+    : can_cast_expr<prophecy_r_or_w_ok_exprt>(expr)
+      ? to_prophecy_r_or_w_ok_expr(expr).pointer()
       : to_unary_expr(expr).op();
 
   CHECK_RETURN(pointer.type().id() == ID_pointer);
@@ -1484,6 +1486,7 @@ bool goto_check_ct::requires_pointer_primitive_check(const exprt &expr)
   // will equally be non-deterministic.
   return can_cast_expr<object_size_exprt>(expr) || expr.id() == ID_r_ok ||
          expr.id() == ID_w_ok || expr.id() == ID_rw_ok ||
+         can_cast_expr<prophecy_r_or_w_ok_exprt>(expr) ||
          expr.id() == ID_is_dynamic_object;
 }
 

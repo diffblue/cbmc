@@ -28,7 +28,8 @@ class qualifierst;
 class namespacet;
 class r_or_w_ok_exprt;
 class pointer_in_range_exprt;
-class r_or_w_ok_exprt;
+class prophecy_r_or_w_ok_exprt;
+class prophecy_pointer_in_range_exprt;
 
 class expr2ct
 {
@@ -286,7 +287,10 @@ protected:
   std::string convert_bitreverse(const bitreverse_exprt &src);
 
   std::string convert_r_or_w_ok(const r_or_w_ok_exprt &src);
+  std::string convert_prophecy_r_or_w_ok(const prophecy_r_or_w_ok_exprt &src);
   std::string convert_pointer_in_range(const pointer_in_range_exprt &src);
+  std::string
+  convert_prophecy_pointer_in_range(const prophecy_pointer_in_range_exprt &src);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

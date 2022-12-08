@@ -692,3 +692,23 @@ simplify_exprt::simplify_object_size(const object_size_exprt &expr)
   else
     return std::move(new_expr);
 }
+
+simplify_exprt::resultt<> simplify_exprt::simplify_prophecy_r_or_w_ok(
+  const prophecy_r_or_w_ok_exprt &expr)
+{
+  exprt new_expr = simplify_rec(expr.lower(ns));
+  if(!new_expr.is_constant())
+    return unchanged(expr);
+  else
+    return std::move(new_expr);
+}
+
+simplify_exprt::resultt<> simplify_exprt::simplify_prophecy_pointer_in_range(
+  const prophecy_pointer_in_range_exprt &expr)
+{
+  exprt new_expr = simplify_rec(expr.lower(ns));
+  if(!new_expr.is_constant())
+    return unchanged(expr);
+  else
+    return std::move(new_expr);
+}

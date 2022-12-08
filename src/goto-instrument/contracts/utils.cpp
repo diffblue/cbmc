@@ -177,7 +177,11 @@ exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
     const auto size_of_expr_opt = size_of_expr(expr.type(), ns);
     CHECK_RETURN(size_of_expr_opt.has_value());
 
-    validity_checks.push_back(r_ok_exprt{deref->pointer(), *size_of_expr_opt});
+    symbol_exprt deallocated =
+      ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr();
+    symbol_exprt dead = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+    validity_checks.push_back(prophecy_r_ok_exprt{
+      deref->pointer(), *size_of_expr_opt, deallocated, dead});
   }
 
   for(const auto &op : expr.operands())

@@ -1464,6 +1464,24 @@ static smt_termt convert_expr_to_smt(
     count_trailing_zeros.pretty());
 }
 
+static smt_termt convert_expr_to_smt(
+  const prophecy_r_or_w_ok_exprt &prophecy_r_or_w_ok,
+  const sub_expression_mapt &converted)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for r/w/rw ok expression: " +
+    prophecy_r_or_w_ok.pretty());
+}
+
+static smt_termt convert_expr_to_smt(
+  const prophecy_pointer_in_range_exprt &prophecy_pointer_in_range,
+  const sub_expression_mapt &converted)
+{
+  UNIMPLEMENTED_FEATURE(
+    "Generation of SMT formula for pointer-in-range expression: " +
+    prophecy_pointer_in_range.pretty());
+}
+
 static smt_termt dispatch_expr_to_smt_conversion(
   const exprt &expr,
   const sub_expression_mapt &converted,
@@ -1798,6 +1816,18 @@ static smt_termt dispatch_expr_to_smt_conversion(
       expr_try_dynamic_cast<count_trailing_zeros_exprt>(expr))
   {
     return convert_expr_to_smt(*count_trailing_zeros, converted);
+  }
+  if(
+    const auto prophecy_r_or_w_ok =
+      expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+  {
+    return convert_expr_to_smt(*prophecy_r_or_w_ok, converted);
+  }
+  if(
+    const auto prophecy_pointer_in_range =
+      expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
+  {
+    return convert_expr_to_smt(*prophecy_pointer_in_range, converted);
   }
 
   UNIMPLEMENTED_FEATURE(
