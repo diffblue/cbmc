@@ -29,6 +29,7 @@ class message_handlert;
 class dfcc_libraryt;
 class dfcc_utilst;
 class dfcc_instrumentt;
+class dfcc_lift_memory_predicatest;
 class dfcc_spec_functionst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
@@ -70,6 +71,7 @@ public:
     dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_instrumentt &instrument,
+    dfcc_lift_memory_predicatest &memory_predicates,
     dfcc_spec_functionst &spec_functions);
 
   /// Adds instructions in `dest` modeling contract checking, assuming
@@ -119,6 +121,7 @@ protected:
   dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
+  dfcc_lift_memory_predicatest &memory_predicates;
   dfcc_spec_functionst &spec_functions;
   namespacet ns;
 

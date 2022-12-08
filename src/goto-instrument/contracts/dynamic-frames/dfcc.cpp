@@ -45,6 +45,8 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <langapi/mode.h>
 #include <linking/static_lifetime_init.h>
 
+#include "dfcc_lift_memory_predicates.h"
+
 void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
@@ -122,6 +124,7 @@ dfcct::dfcct(
     library(goto_model, utils, message_handler),
     ns(goto_model.symbol_table),
     instrument(goto_model, message_handler, utils, library),
+    memory_predicates(goto_model, utils, library, instrument, message_handler),
     spec_functions(goto_model, message_handler, utils, library, instrument),
     contract_handler(
       goto_model,
@@ -129,6 +132,7 @@ dfcct::dfcct(
       utils,
       library,
       instrument,
+      memory_predicates,
       spec_functions),
     swap_and_wrap(
       goto_model,
@@ -267,6 +271,18 @@ void dfcct::instrument_harness_function()
     harness_id, function_pointer_contracts);
 
   other_symbols.erase(harness_id);
+}
+
+void dfcct::lift_memory_predicates()
+{
+  std::set<irep_idt> predicates =
+    memory_predicates.lift_predicates(function_pointer_contracts);
+  for(const auto &predicate : predicates)
+  {
+    log.debug() << "Memory predicate" << predicate << messaget::eom;
+    if(other_symbols.find(predicate) != other_symbols.end())
+      other_symbols.erase(predicate);
+  }
 }
 
 void dfcct::wrap_checked_function()
@@ -415,6 +431,7 @@ void dfcct::transform_goto_model()
 {
   check_transform_goto_model_preconditions();
   link_model_and_load_dfcc_library();
+  lift_memory_predicates();
   instrument_harness_function();
   wrap_checked_function();
   wrap_replaced_functions();

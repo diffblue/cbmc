@@ -13,7 +13,8 @@ extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_new_object;
 extern __CPROVER_bool __CPROVER_malloc_is_new_array;
 int __builtin_clzll(unsigned long long);
-__CPROVER_bool __VERIFIER_nondet_CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_size_t __VERIFIER_nondet_size();
 
 /// \brief A conditionally writable range of bytes.
 typedef struct
@@ -1052,7 +1053,7 @@ SET_DEALLOCATE_FREEABLE_LOOP:
     // and we attempt to free again one of the already freed pointers,
     // the r_ok condition above will fail, preventing us to deallocate
     // the same pointer twice
-    if((ptr != 0) & preconditions & __VERIFIER_nondet_CPROVER_bool())
+    if((ptr != 0) & preconditions & __VERIFIER_nondet___CPROVER_bool())
     {
       __CPROVER_contracts_free(ptr, 0);
       __CPROVER_contracts_write_set_record_deallocated(set, ptr);
@@ -1190,9 +1191,14 @@ __CPROVER_HIDE:;
         (write_set->assert_ensures_ctx == 0),
       "only one context flag at a time");
 #endif
+    // fail if size is too big
+    if(size >= __CPROVER_max_malloc_size)
+      return 0;
+
     // pass a null write set pointer to the instrumented malloc
     void *ptr = __CPROVER_contracts_malloc(size, 0);
     *elem = ptr;
+    // malloc can also return a NULL pointer if failure modes are active
     if(!ptr)
       return 0;
       // record fresh object in the object set
@@ -1219,6 +1225,9 @@ __CPROVER_HIDE:;
         (write_set->assert_ensures_ctx == 0),
       "only one context flag at a time");
 #endif
+    // fail if size is too big
+    if(size >= __CPROVER_max_malloc_size)
+      return 0;
     void *ptr = __CPROVER_contracts_malloc(size, 0);
     *elem = ptr;
     if(!ptr)
@@ -1446,21 +1455,13 @@ __CPROVER_HIDE:;
     "__CPROVER_obeys_contract is used only in requires or ensures clauses");
   if((set->assume_requires_ctx == 1) | (set->assume_ensures_ctx == 1))
   {
-    // In assumption contexts, flip a coin to decide wehter the predicate
-    // shall hold or not
-    if(__VERIFIER_nondet_CPROVER_bool())
-    {
-      // if it must hold, assign the function pointer to the contract function
-      *function_pointer = contract;
-      return 1;
-    }
-    else
-    {
-      // if it must not hold do not modify the pointer value
-      // function_pointer will keep whatever bit pattern and value set it had
-      // before evaluating the predicate
+    // decide if predicate must hold
+    if(__VERIFIER_nondet___CPROVER_bool())
       return 0;
-    }
+
+    // must hold, assign the function pointer to the contract function
+    *function_pointer = contract;
+    return 1;
   }
   else
   {

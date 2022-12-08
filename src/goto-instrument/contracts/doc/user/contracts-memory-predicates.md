@@ -120,6 +120,94 @@ int foo()
 }
 ```
 
+## User defined memory predicates
+
+Users can write their own memory predicates based on the core predicates described above.
+`__CPROVER_is_fresh` allows to specify pointer validity and separation.
+For instance, one could write a predicate defining linked lists of at most `len`
+elements as follows:
+
+```c
+typedef struct list_t
+{
+  int value;
+  struct list_t *next;
+} list_t;
+
+// true iff list of len nodes with values in [-10,10]
+bool is_list(list_t *l, size_t len)
+{
+  if(len == 0)
+    return l == NULL;
+  else
+    return __CPROVER_is_fresh(l, sizeof(*l)) && -10 <= l->value &&
+           l->value <= 10 && is_list(l->next, len - 1);
+}
+```
+
+One can also simply describe finite nested structures:
+
+```c
+typedef struct buffer_t
+{
+  size_t size;
+  char *arr;
+  char *cursor;
+} buffer_t;
+
+typedef struct double_buffer_t
+{
+  buffer_t *first;
+  buffer_t *second;
+} double_buffer_t;
+
+bool is_sized_array(char *arr, size_t size)
+{
+  return __CPROVER_is_fresh(arr, size);
+}
+
+bool is_buffer(buffer_t *b)
+{
+  return __CPROVER_is_fresh(b, sizeof(*b)) && (0 < b->size && b->size <= 10) &&
+         is_sized_array(b->arr, b->size) &&
+}
+
+bool is_double_buffer(double_buffer_t *b)
+{
+  return __CPROVER_is_fresh(b, sizeof(*b)) && is_buffer(b->first) &&
+         is_buffer(b->second);
+}
+```
+
+And one can then use these predicates in requires or ensures clauses for function
+contracts.
+
+```c
+int foo(list_t *l, double_buffer_t *b)
+  // clang-format off
+  __CPROVER_requires(is_list(l, 3))
+  __CPROVER_requires(is_double_buffer(b))
+  __CPROVER_ensures(-28 <= __CPROVER_return_value &&
+                    __CPROVER_return_value <= 50)
+// clang-format on
+{
+  // access the assumed data structure
+  return l->value + l->next->value + l->next->next->value + b->first->size +
+         b->second->size;
+}
+```
+
+### Limitations
+
+The main limitation with user defined predicates are:
+- their evaluation must terminate;
+- self-recursive predicates are supported, but mutually recursive predicates are
+  not supported for the moment.
+
+For instance, in the `is_list` example above, recursion is bounded by the use of
+the explicit `len` parameter. The `is_double_buffer` predicate also describes
+a bounded structure.
+
 ## Additional Resources
 
 - @ref contracts-functions

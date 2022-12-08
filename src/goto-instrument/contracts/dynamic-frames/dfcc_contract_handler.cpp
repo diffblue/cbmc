@@ -12,7 +12,6 @@ Date: August 2022
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
-// #include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -44,6 +43,7 @@ dfcc_contract_handlert::dfcc_contract_handlert(
   dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_instrumentt &instrument,
+  dfcc_lift_memory_predicatest &memory_predicates,
   dfcc_spec_functionst &spec_functions)
   : goto_model(goto_model),
     message_handler(message_handler),
@@ -51,6 +51,7 @@ dfcc_contract_handlert::dfcc_contract_handlert(
     utils(utils),
     library(library),
     instrument(instrument),
+    memory_predicates(memory_predicates),
     spec_functions(spec_functions),
     ns(goto_model.symbol_table)
 {
@@ -104,7 +105,8 @@ void dfcc_contract_handlert::add_contract_instructions(
     message_handler,
     utils,
     library,
-    instrument)
+    instrument,
+    memory_predicates)
     .add_to_dest(dest, function_pointer_contracts);
 }
 
