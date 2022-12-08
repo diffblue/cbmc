@@ -15,5 +15,6 @@ var contracts_dev_spec_dfcc_instrument =
     ] ],
     [ "Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates", "contracts-dev-spec-is-freeable.html", null ],
     [ "Rewriting Calls to the __CPROVER_is_fresh Predicate", "contracts-dev-spec-is-fresh.html", null ],
-    [ "Rewriting Calls to the __CPROVER_obeys_contract Predicate", "contracts-dev-spec-obeys-contract.html", null ]
+    [ "Rewriting Calls to the __CPROVER_obeys_contract Predicate", "contracts-dev-spec-obeys-contract.html", null ],
+    [ "Rewriting Calls to the __CPROVER_pointer_in_range_dfcc Predicate", "contracts-dev-spec-pointer-in-range.html", null ]
 ];

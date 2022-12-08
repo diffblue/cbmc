@@ -89,6 +89,7 @@ var cprover__builtin__headers_8h =
     [ "__CPROVER_overflow_shl", "cprover__builtin__headers_8h.html#af2f5e1cd6f08e14da55179b825b0b27a", null ],
     [ "__CPROVER_overflow_unary_minus", "cprover__builtin__headers_8h.html#a5ffa489d4c2aa6bba33411556a6b60f4", null ],
     [ "__CPROVER_pointer_in_range", "cprover__builtin__headers_8h.html#a1b20b799960319368a2fa329aaf5f676", null ],
+    [ "__CPROVER_pointer_in_range_dfcc", "cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a", null ],
     [ "__CPROVER_POINTER_OBJECT", "cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13", null ],
     [ "__CPROVER_POINTER_OFFSET", "cprover__builtin__headers_8h.html#af66015ac3e467377c4ad94c0fcc4cb97", null ],
     [ "__CPROVER_postcondition", "cprover__builtin__headers_8h.html#af715a76d1c5d74ffa5f3c440426b789c", null ],

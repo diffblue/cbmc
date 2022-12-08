@@ -11,6 +11,10 @@ var contracts_dev_spec =
       [ "Generating Havoc Functions from Assigns Clause Functions", "contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-havoc", null ],
       [ "Rewriting Frees Clause Functions", "contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-frees", null ]
     ] ],
+    [ "Rewriting User-Defined Memory Predicates", "contracts-dev-spec-memory-predicates-rewriting.html", [
+      [ "Collecting user-defined memory predicates", "contracts-dev-spec-memory-predicates-rewriting.html#contracts-dev-spec-memory-predicate-collect", null ],
+      [ "Rewriting user-defined memory predicates", "contracts-dev-spec-memory-predicates-rewriting.html#contracts-dev-spec-memory-predicate-rewrite", null ]
+    ] ],
     [ "Dynamic Frame Condition Checking", "contracts-dev-spec-dfcc.html", "contracts-dev-spec-dfcc" ],
     [ "Proof Harness Intrumentation", "contracts-dev-spec-harness.html", null ],
     [ "Checking a Contract Against a Function", "contracts-dev-spec-contract-checking.html", [

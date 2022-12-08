@@ -93,31 +93,31 @@ $(document).ready(function(){initNavTree('contracts-function-pointer-predicates.
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md81">Syntax</a><ul><li class="level2"><a href="#autotoc_md82">Parameters</a></li>
-<li class="level2"><a href="#autotoc_md83">Return Value</a></li>
+<ul><li class="level1"><a href="#autotoc_md83">Syntax</a><ul><li class="level2"><a href="#autotoc_md84">Parameters</a></li>
+<li class="level2"><a href="#autotoc_md85">Return Value</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md84">Semantics</a><ul><li class="level2"><a href="#autotoc_md85">Enforcement</a></li>
-<li class="level2"><a href="#autotoc_md86">Replacement</a></li>
+<li class="level1"><a href="#autotoc_md86">Semantics</a><ul><li class="level2"><a href="#autotoc_md87">Enforcement</a></li>
+<li class="level2"><a href="#autotoc_md88">Replacement</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md87">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md89">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_user_contracts_function_pointer_predicates"></a> Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md81"></a>
+<h1><a class="anchor" id="autotoc_md83"></a>
 Syntax</h1>
 <p>The function contract language offers the following predicate to specify preconditions and postconditions about function pointers in <em>requires clauses</em> and <em>ensures clauses</em>.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code" href="cprover__builtin__headers_8h.html#afb98fc4ff28173835ed64fa8192343d2">__CPROVER_obeys_contract</a>(<span class="keywordtype">void</span> (*f)(<span class="keywordtype">void</span>), <span class="keywordtype">void</span> (*c)(<span class="keywordtype">void</span>));</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_afb98fc4ff28173835ed64fa8192343d2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#afb98fc4ff28173835ed64fa8192343d2">__CPROVER_obeys_contract</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_obeys_contract(void(*)(void), void(*)(void))</div></div>
 </div><!-- fragment --><p>Informally, this predicate holds iff function pointer <code>f</code> is known to satisfy contract <code>c</code>.</p>
-<h2><a class="anchor" id="autotoc_md82"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Parameters</h2>
 <p>The predicate <code>__CPROVER_obeys_contract</code> takes two function pointers as arguments. The first function pointer must be an lvalue, the second parameter must be a pointer to a pure contract symbol.</p>
-<h2><a class="anchor" id="autotoc_md83"></a>
+<h2><a class="anchor" id="autotoc_md85"></a>
 Return Value</h2>
 <p>It returns a <code>bool</code> value, indicating whether the function pointer is known to satisfy contract <code>c</code>.</p>
-<h1><a class="anchor" id="autotoc_md84"></a>
+<h1><a class="anchor" id="autotoc_md86"></a>
 Semantics</h1>
 <p>To illustrate the semantics of the predicate, let's consider the example below.</p>
 <p>The <code>arr_fun_contract</code> specifies the class of functions that take a non-<code>NULL</code> array <code>arr</code> of size <code>size</code> as input and initialise its first element to zero.</p>
@@ -161,7 +161,7 @@ Semantics</h1>
 <div class="line">}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ad4e9673ed79a6d8ff4af6cf12d95c29f"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size)</div></div>
 <div class="ttc" id="afile__converter_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="file__converter_8cpp_source.html#l00041">file_converter.cpp:41</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md85"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md87"></a>
 Enforcement</h2>
 <p>To check that <code>foo</code> satisfies its contract, we compile, instrument and analyse the program as follows:</p>
 <div class="fragment"><div class="line">goto-cc fptr.c</div>
@@ -188,7 +188,7 @@ Enforcement</h2>
 <div class="line"> </div>
 <div class="line">** 0 of 72 failed (1 iterations)</div>
 <div class="line">VERIFICATION SUCCESSFUL</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md86"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md88"></a>
 Replacement</h2>
 <p>Let's now consider an extended example with two new functions:</p><ul>
 <li>The function <code>get_arr_fun</code> returns a pointer to a function satisfying <code>arr_fun_contract</code>;</li>
@@ -282,7 +282,7 @@ Replacement</h2>
 <div class="line">** 0 of 80 failed (1 iterations)</div>
 <div class="line">VERIFICATION SUCCESSFUL</div>
 </div><!-- fragment --><p>Proving that <code>bar</code> satisfies its contract.</p>
-<h1><a class="anchor" id="autotoc_md87"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
@@ -309,6 +309,7 @@ Additional Resources</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="contracts-mainpage.html">Code Contracts in CBMC</a></li><li class="navelem"><a class="el" href="contracts-user.html">Code Contracts User Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

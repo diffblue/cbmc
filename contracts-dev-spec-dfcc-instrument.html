@@ -213,6 +213,7 @@ Instrumenting CALL Instructions</h2>
 </div><!-- fragment --><p>Calls to <code>__CPROVER_was_freed</code> or <code>__CPROVER_is_freeable</code> are rewritten as described in <a class="el" href="contracts-dev-spec-is-freeable.html">Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates</a></p>
 <p>Calls to <code>__CPROVER_is_fresh</code> are rewritten as described in <a class="el" href="contracts-dev-spec-is-fresh.html">Rewriting Calls to the __CPROVER_is_fresh Predicate</a></p>
 <p>Calls to <code>__CPROVER_obeys_contract</code> are rewritten as described in <a class="el" href="contracts-dev-spec-obeys-contract.html">Rewriting Calls to the __CPROVER_obeys_contract Predicate</a></p>
+<p>Calls to <code>__CPROVER_pointer_in_range_dfcc</code> are rewritten as described in <a class="el" href="contracts-dev-spec-pointer-in-range.html">Rewriting Calls to the __CPROVER_pointer_in_range_dfcc Predicate</a></p>
 <p>For all other function or function pointer calls, we proceed as follows.</p>
 <p>If the function call has an LHS (i.e. its result is assigned to a return value variable), the LHS gets checked like for an assignment, and we pass the write set as an extra parameter to the function (remember that all functions of the goto models are extended with write_set parameters by the transformation).</p>
 <div class="fragment"><div class="line"><span class="comment">// If the LHS exists</span></div>

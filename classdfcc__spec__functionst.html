@@ -124,24 +124,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aee89c7ad74728f279407a672d8393ec7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">to_spec_frees_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:aee89c7ad74728f279407a672d8393ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms (in place) a function.  <a href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">More...</a><br /></td></tr>
 <tr class="separator:aee89c7ad74728f279407a672d8393ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad259b03730c1fa481da96ea034ae8207"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#ad259b03730c1fa481da96ea034ae8207">collect_spec_assigns_functions</a> (const std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;candidates)</td></tr>
-<tr class="memdesc:ad259b03730c1fa481da96ea034ae8207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the subset of <code>candidates</code> that call built-ins <code>assignable</code>, <code>object_from</code>, <code>object_upto</code>, <code>object_whole</code> directly or indirectly.  <a href="classdfcc__spec__functionst.html#ad259b03730c1fa481da96ea034ae8207">More...</a><br /></td></tr>
-<tr class="separator:ad259b03730c1fa481da96ea034ae8207"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f85de2a6c7b7f1fdc1f6e5e14685ee5"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a0f85de2a6c7b7f1fdc1f6e5e14685ee5">collect_spec_frees_functions</a> (const std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;candidates)</td></tr>
-<tr class="memdesc:a0f85de2a6c7b7f1fdc1f6e5e14685ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the subset of <code>candidates</code> that call the built-in <code>freeable</code> directly or indirectly.  <a href="classdfcc__spec__functionst.html#a0f85de2a6c7b7f1fdc1f6e5e14685ee5">More...</a><br /></td></tr>
-<tr class="separator:a0f85de2a6c7b7f1fdc1f6e5e14685ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:aa5feac9ec8c880aa8c4d0d548bd84245"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#aa5feac9ec8c880aa8c4d0d548bd84245">get_target_type</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:aa5feac9ec8c880aa8c4d0d548bd84245"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the type of an assigns clause target expression The expression must be of the form: <code>expr = cast(address_of(target), empty*)</code>  <a href="classdfcc__spec__functionst.html#aa5feac9ec8c880aa8c4d0d548bd84245">More...</a><br /></td></tr>
 <tr class="separator:aa5feac9ec8c880aa8c4d0d548bd84245"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07f2d4edd6f68685557ee4598f09a411"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a07f2d4edd6f68685557ee4598f09a411">collect_functions_that_call</a> (const std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;candidates, const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;dest)</td></tr>
-<tr class="memdesc:a07f2d4edd6f68685557ee4598f09a411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect functions that call one of the given <code>functions</code> directly or indirectly into <code>dest</code>.  <a href="classdfcc__spec__functionst.html#a07f2d4edd6f68685557ee4598f09a411">More...</a><br /></td></tr>
-<tr class="separator:a07f2d4edd6f68685557ee4598f09a411"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ea23b734f60b960d55230d08d46e32d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a3ea23b734f60b960d55230d08d46e32d">insert_if_calls</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;functions, std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;dest)</td></tr>
-<tr class="memdesc:a3ea23b734f60b960d55230d08d46e32d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds <code>function_id</code> to <code>dest</code> if a call to a function that's either in <code>functions</code> or in <code>dest</code> is found in <code>goto_program</code>.  <a href="classdfcc__spec__functionst.html#a3ea23b734f60b960d55230d08d46e32d">More...</a><br /></td></tr>
-<tr class="separator:a3ea23b734f60b960d55230d08d46e32d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -221,97 +209,6 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a07f2d4edd6f68685557ee4598f09a411"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a07f2d4edd6f68685557ee4598f09a411">&#9670;&nbsp;</a></span>collect_functions_that_call()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dfcc_spec_functionst::collect_functions_that_call </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>candidates</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>functions</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Collect functions that call one of the given <code>functions</code> directly or indirectly into <code>dest</code>. </p>
-<p>May miss functions if function pointers calls are not already removed. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00060">60</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ad259b03730c1fa481da96ea034ae8207"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad259b03730c1fa481da96ea034ae8207">&#9670;&nbsp;</a></span>collect_spec_assigns_functions()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; dfcc_spec_functionst::collect_spec_assigns_functions </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>candidates</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the subset of <code>candidates</code> that call built-ins <code>assignable</code>, <code>object_from</code>, <code>object_upto</code>, <code>object_whole</code> directly or indirectly. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00038">38</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a0f85de2a6c7b7f1fdc1f6e5e14685ee5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f85de2a6c7b7f1fdc1f6e5e14685ee5">&#9670;&nbsp;</a></span>collect_spec_frees_functions()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; dfcc_spec_functionst::collect_spec_frees_functions </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>candidates</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the subset of <code>candidates</code> that call the built-in <code>freeable</code> directly or indirectly. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00051">51</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a4aa878468b43f3e46395eeccfd1a24ca"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4aa878468b43f3e46395eeccfd1a24ca">&#9670;&nbsp;</a></span>generate_havoc_function()</h2>
 
@@ -358,7 +255,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00115">115</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00048">48</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,61 +285,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Extracts the type of an assigns clause target expression The expression must be of the form: <code>expr = cast(address_of(target), empty*)</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00105">105</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a3ea23b734f60b960d55230d08d46e32d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ea23b734f60b960d55230d08d46e32d">&#9670;&nbsp;</a></span>insert_if_calls()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool dfcc_spec_functionst::insert_if_calls </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>function_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_program</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>functions</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Adds <code>function_id</code> to <code>dest</code> if a call to a function that's either in <code>functions</code> or in <code>dest</code> is found in <code>goto_program</code>. </p>
-<dl class="section return"><dt>Returns</dt><dd>true if <code>function_id</code> was added to <code>dest</code>, false otherwise. </dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>dest does not already contain <code>function_id</code> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00081">81</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00038">38</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -492,7 +335,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00297">297</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00230">230</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -543,7 +386,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00369">369</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00302">302</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -568,7 +411,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00148">148</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00137">137</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -592,7 +435,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00153">153</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00142">142</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -616,7 +459,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00152">152</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00141">141</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -640,7 +483,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00150">150</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00139">139</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -664,7 +507,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00149">149</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00138">138</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -688,7 +531,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00154">154</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00143">143</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -712,7 +555,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00151">151</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00140">140</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>

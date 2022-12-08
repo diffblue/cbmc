@@ -25,9 +25,17 @@ var dir_c09e2f4c4cbc9b698baa471c135538ab =
     ] ],
     [ "dfcc_library.cpp", "dfcc__library_8cpp.html", "dfcc__library_8cpp" ],
     [ "dfcc_library.h", "dfcc__library_8h.html", "dfcc__library_8h" ],
+    [ "dfcc_lift_memory_predicates.cpp", "dfcc__lift__memory__predicates_8cpp.html", "dfcc__lift__memory__predicates_8cpp" ],
+    [ "dfcc_lift_memory_predicates.h", "dfcc__lift__memory__predicates_8h.html", [
+      [ "dfcc_lift_memory_predicatest", "classdfcc__lift__memory__predicatest.html", "classdfcc__lift__memory__predicatest" ]
+    ] ],
     [ "dfcc_obeys_contract.cpp", "dfcc__obeys__contract_8cpp.html", null ],
     [ "dfcc_obeys_contract.h", "dfcc__obeys__contract_8h.html", [
       [ "dfcc_obeys_contractt", "classdfcc__obeys__contractt.html", "classdfcc__obeys__contractt" ]
+    ] ],
+    [ "dfcc_pointer_in_range.cpp", "dfcc__pointer__in__range_8cpp.html", null ],
+    [ "dfcc_pointer_in_range.h", "dfcc__pointer__in__range_8h.html", [
+      [ "dfcc_pointer_in_ranget", "classdfcc__pointer__in__ranget.html", "classdfcc__pointer__in__ranget" ]
     ] ],
     [ "dfcc_spec_functions.cpp", "dfcc__spec__functions_8cpp.html", null ],
     [ "dfcc_spec_functions.h", "dfcc__spec__functions_8h.html", [

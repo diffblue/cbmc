@@ -1,12 +1,8 @@
 var classdfcc__spec__functionst =
 [
     [ "dfcc_spec_functionst", "classdfcc__spec__functionst.html#a046b311ef577665ffd0b0172c1401a57", null ],
-    [ "collect_functions_that_call", "classdfcc__spec__functionst.html#a07f2d4edd6f68685557ee4598f09a411", null ],
-    [ "collect_spec_assigns_functions", "classdfcc__spec__functionst.html#ad259b03730c1fa481da96ea034ae8207", null ],
-    [ "collect_spec_frees_functions", "classdfcc__spec__functionst.html#a0f85de2a6c7b7f1fdc1f6e5e14685ee5", null ],
     [ "generate_havoc_function", "classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca", null ],
     [ "get_target_type", "classdfcc__spec__functionst.html#aa5feac9ec8c880aa8c4d0d548bd84245", null ],
-    [ "insert_if_calls", "classdfcc__spec__functionst.html#a3ea23b734f60b960d55230d08d46e32d", null ],
     [ "to_spec_assigns_function", "classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d", null ],
     [ "to_spec_frees_function", "classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7", null ],
     [ "goto_model", "classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b", null ],

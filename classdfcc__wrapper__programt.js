@@ -1,6 +1,6 @@
 var classdfcc__wrapper__programt =
 [
-    [ "dfcc_wrapper_programt", "classdfcc__wrapper__programt.html#a1a750019d51aec0b1c72de4121128d8c", null ],
+    [ "dfcc_wrapper_programt", "classdfcc__wrapper__programt.html#a309c0ed2c953c27235601a534deab5bc", null ],
     [ "add_to_dest", "classdfcc__wrapper__programt.html#ad9426bb3f42eb72aed8ddae689691b5f", null ],
     [ "add_to_dest", "classdfcc__wrapper__programt.html#aa0f4800b4d90ddf2bc6b12b6adb0005b", null ],
     [ "encode_checked_function_call", "classdfcc__wrapper__programt.html#a5d038aee988318a10316f4e0cfad0645", null ],
@@ -36,6 +36,7 @@ var classdfcc__wrapper__programt =
     [ "link_deallocated_contract", "classdfcc__wrapper__programt.html#afafbf21ca3ab39c2829868e26a884095", null ],
     [ "link_is_fresh", "classdfcc__wrapper__programt.html#a8ee1a855067bb3c71a02e630555cfda4", null ],
     [ "log", "classdfcc__wrapper__programt.html#afc7526363b1dda9c98a244f39baa587d", null ],
+    [ "memory_predicates", "classdfcc__wrapper__programt.html#a97ce750519efa7519701e44efc1f7543", null ],
     [ "message_handler", "classdfcc__wrapper__programt.html#a3d3dcafc5fce547557f2a4d2653ef1f0", null ],
     [ "ns", "classdfcc__wrapper__programt.html#a070bd318dbc492c1efcaee9d6689de8a", null ],
     [ "postamble", "classdfcc__wrapper__programt.html#a8ee883c7b21fd9a489c2f2fbc7d178a7", null ],
