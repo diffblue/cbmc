@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class annotated_pointer_constant_exprt;
 class qualifierst;
 class namespacet;
+class r_or_w_ok_exprt;
 
 class expr2ct
 {
@@ -281,6 +282,8 @@ protected:
 
   std::string convert_conditional_target_group(const exprt &src);
   std::string convert_bitreverse(const bitreverse_exprt &src);
+
+  std::string convert_r_or_w_ok(const r_or_w_ok_exprt &src);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H
