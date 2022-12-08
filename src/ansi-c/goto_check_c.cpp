@@ -228,7 +228,6 @@ protected:
   void conversion_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
   void nan_check(const exprt &, const guardt &);
-  optionalt<exprt> expand_pointer_checks(exprt);
 
   std::string array_name(const exprt &);
 
@@ -1995,62 +1994,6 @@ void goto_check_ct::check(const exprt &expr)
   check_rec(expr, identity);
 }
 
-/// expand the r_ok, w_ok, rw_ok, pointer_in_range predicates
-optionalt<exprt> goto_check_ct::expand_pointer_checks(exprt expr)
-{
-  bool modified = false;
-
-  for(auto &op : expr.operands())
-  {
-    auto op_result = expand_pointer_checks(op);
-    if(op_result.has_value())
-    {
-      op = *op_result;
-      modified = true;
-    }
-  }
-
-  if(expr.id() == ID_r_ok || expr.id() == ID_w_ok || expr.id() == ID_rw_ok)
-  {
-    // these get an address as first argument and a size as second
-    DATA_INVARIANT(
-      expr.operands().size() == 2, "r/w_ok must have two operands");
-
-    const auto conditions = get_pointer_dereferenceable_conditions(
-      to_r_or_w_ok_expr(expr).pointer(), to_r_or_w_ok_expr(expr).size());
-
-    exprt::operandst conjuncts;
-
-    for(const auto &c : conditions)
-      conjuncts.push_back(c.assertion);
-
-    exprt c = conjunction(conjuncts);
-    if(enable_simplify)
-      simplify(c, ns);
-    return c;
-  }
-  else if(expr.id() == ID_pointer_in_range)
-  {
-    const auto &pointer_in_range_expr = to_pointer_in_range_expr(expr);
-
-    auto expanded = pointer_in_range_expr.lower();
-
-    // rec. call
-    auto expanded_rec_opt = expand_pointer_checks(expanded);
-    if(expanded_rec_opt.has_value())
-      expanded = *expanded_rec_opt;
-
-    if(enable_simplify)
-      simplify(expanded, ns);
-
-    return expanded;
-  }
-  else if(modified)
-    return std::move(expr);
-  else
-    return {};
-}
-
 void goto_check_ct::memory_leak_check(const irep_idt &function_id)
 {
   const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
@@ -2269,8 +2212,6 @@ void goto_check_ct::goto_check(
         memory_leak_check(function_identifier);
       }
     }
-
-    i.transform([this](exprt expr) { return expand_pointer_checks(expr); });
 
     for(auto &instruction : new_code.instructions)
     {
