@@ -17,92 +17,93 @@ Author: Daniel Kroening, kroening@kroening.com
 
 const char gcc_builtin_headers_types[] =
   "#line 1 \"gcc_builtin_headers_types.h\"\n"
-#include "gcc_builtin_headers_types.inc" // IWYU pragma: keep
-  ;                                      // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_types.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_generic[] =
   "#line 1 \"gcc_builtin_headers_generic.h\"\n"
-#include "gcc_builtin_headers_generic.inc" // IWYU pragma: keep
-  ;                                        // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_generic.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_math[] =
   "#line 1 \"gcc_builtin_headers_math.h\"\n"
-#include "gcc_builtin_headers_math.inc" // IWYU pragma: keep
-  ;                                     // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_math.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_mem_string[] =
   "#line 1 \"gcc_builtin_headers_mem_string.h\"\n"
-#include "gcc_builtin_headers_mem_string.inc" // IWYU pragma: keep
-  ;                                           // NOLINT(whitespace/semicolon)
+// NOLINTNEXTLINE(whitespace/line_length)
+#include "compiler_headers/gcc_builtin_headers_mem_string.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_omp[] = "#line 1 \"gcc_builtin_headers_omp.h\"\n"
-#include "gcc_builtin_headers_omp.inc" // IWYU pragma: keep
-  ;                                    // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_omp.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_tm[] = "#line 1 \"gcc_builtin_headers_tm.h\"\n"
-#include "gcc_builtin_headers_tm.inc" // IWYU pragma: keep
-  ;                                   // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_tm.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_ubsan[] =
   "#line 1 \"gcc_builtin_headers_ubsan.h\"\n"
-#include "gcc_builtin_headers_ubsan.inc" // IWYU pragma: keep
-  ;                                      // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_ubsan.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_ia32[] =
   "#line 1 \"gcc_builtin_headers_ia32.h\"\n"
-#include "gcc_builtin_headers_ia32.inc" // IWYU pragma: keep
-  ;                                     // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_ia32.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_2[] =
-#include "gcc_builtin_headers_ia32-2.inc" // IWYU pragma: keep
-  ;                                       // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_ia32-2.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_3[] =
-#include "gcc_builtin_headers_ia32-3.inc" // IWYU pragma: keep
-  ;                                       // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_ia32-3.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_4[] =
-#include "gcc_builtin_headers_ia32-4.inc" // IWYU pragma: keep
-  ;                                       // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_ia32-4.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_5[] =
-#include "gcc_builtin_headers_ia32-5.inc" // IWYU pragma: keep
-  ;                                       // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_ia32-5.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[] =
   "#line 1 \"gcc_builtin_headers_alpha.h\"\n"
-#include "gcc_builtin_headers_alpha.inc" // IWYU pragma: keep
-  ;                                      // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_alpha.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_arm[] = "#line 1 \"gcc_builtin_headers_arm.h\"\n"
-#include "gcc_builtin_headers_arm.inc" // IWYU pragma: keep
-  ;                                    // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_arm.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_mips[] =
   "#line 1 \"gcc_builtin_headers_mips.h\"\n"
-#include "gcc_builtin_headers_mips.inc" // IWYU pragma: keep
-  ;                                     // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_mips.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_power[] =
   "#line 1 \"gcc_builtin_headers_power.h\"\n"
-#include "gcc_builtin_headers_power.inc" // IWYU pragma: keep
-  ;                                      // NOLINT(whitespace/semicolon)
+#include "compiler_headers/gcc_builtin_headers_power.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char arm_builtin_headers[] = "#line 1 \"arm_builtin_headers.h\"\n"
-#include "arm_builtin_headers.inc" // IWYU pragma: keep
-  ;                                // NOLINT(whitespace/semicolon)
+#include "compiler_headers/arm_builtin_headers.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char cw_builtin_headers[] = "#line 1 \"cw_builtin_headers.h\"\n"
-#include "cw_builtin_headers.inc" // IWYU pragma: keep
-  ;                               // NOLINT(whitespace/semicolon)
+#include "compiler_headers/cw_builtin_headers.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char clang_builtin_headers[] = "#line 1 \"clang_builtin_headers.h\"\n"
-#include "clang_builtin_headers.inc" // IWYU pragma: keep
-  ;                                  // NOLINT(whitespace/semicolon)
+#include "compiler_headers/clang_builtin_headers.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char cprover_builtin_headers[] = "#line 1 \"cprover_builtin_headers.h\"\n"
 #include "cprover_builtin_headers.inc" // IWYU pragma: keep
   ;                                    // NOLINT(whitespace/semicolon)
 
 const char windows_builtin_headers[] = "#line 1 \"windows_builtin_headers.h\"\n"
-#include "windows_builtin_headers.inc" // IWYU pragma: keep
-  ;                                    // NOLINT(whitespace/semicolon)
+#include "compiler_headers/windows_builtin_headers.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 static std::string architecture_string(const std::string &value, const char *s)
 {

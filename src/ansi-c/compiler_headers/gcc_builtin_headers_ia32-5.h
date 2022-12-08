@@ -167,7 +167,7 @@ __gcc_v16hi __builtin_ia32_vpopcountw_v16hi_mask(__gcc_v16hi, __gcc_v16hi, unsig
 __gcc_v8hi __builtin_ia32_vpopcountw_v8hi(__gcc_v8hi);
 __gcc_v8hi __builtin_ia32_vpopcountw_v8hi_mask(__gcc_v8hi, __gcc_v8hi, unsigned char);
 unsigned long long __builtin_ia32_vpshufbitqmb512_mask(__gcc_v64qi, __gcc_v64qi, unsigned long long);
-unsigned __builtin_ia32_vpshufbitqmb256_mask(__gcc_v32qi, __gcc_v32qi, unsigned);
+unsigned int __builtin_ia32_vpshufbitqmb256_mask(__gcc_v32qi, __gcc_v32qi, unsigned int);
 unsigned short __builtin_ia32_vpshufbitqmb128_mask(__gcc_v16qi, __gcc_v16qi, unsigned short);
 __gcc_v16qi __builtin_ia32_vaesdec_v16qi(__gcc_v16qi, __gcc_v16qi);
 __gcc_v32qi __builtin_ia32_vaesdec_v32qi(__gcc_v32qi, __gcc_v32qi);
@@ -260,16 +260,16 @@ __gcc_v2df __builtin_ia32_reducesd_mask_round(__gcc_v2df, __gcc_v2df, int, __gcc
 __gcc_v4sf __builtin_ia32_reducess_mask_round(__gcc_v4sf, __gcc_v4sf, int, __gcc_v4sf, unsigned char, int);
 __gcc_v2df __builtin_ia32_rangesd128_mask_round(__gcc_v2df, __gcc_v2df, int, __gcc_v2df, unsigned char, int);
 __gcc_v4sf __builtin_ia32_rangess128_mask_round(__gcc_v4sf, __gcc_v4sf, int, __gcc_v4sf, unsigned char, int);
-unsigned __builtin_ia32_rdsspd();
-unsigned long long __builtin_ia32_rdsspq();
-void __builtin_ia32_incsspd(unsigned);
-void __builtin_ia32_incsspq(unsigned long long);
-void __builtin_ia32_saveprevssp();
+unsigned int __builtin_ia32_rdsspd();
+unsigned long long int __builtin_ia32_rdsspq();
+void __builtin_ia32_incsspd(unsigned int);
+void __builtin_ia32_incsspq(unsigned long long int);
+void __builtin_ia32_saveprevssp(void);
 void __builtin_ia32_rstorssp(void*);
-void __builtin_ia32_wrssd(unsigned, void*);
-void __builtin_ia32_wrssq(unsigned long long, void*);
-void __builtin_ia32_wrussd(unsigned, void*);
-void __builtin_ia32_wrussq(unsigned long long, void*);
-void __builtin_ia32_setssbsy();
+void __builtin_ia32_wrssd(unsigned int, void*);
+void __builtin_ia32_wrssq(unsigned long long int, void*);
+void __builtin_ia32_wrussd(unsigned int, void*);
+void __builtin_ia32_wrussq(unsigned long long int, void*);
+void __builtin_ia32_setssbsy(void);
 void __builtin_ia32_clrssbsy(void*);
 // clang-format on
