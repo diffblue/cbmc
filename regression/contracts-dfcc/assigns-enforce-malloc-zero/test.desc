@@ -1,11 +1,14 @@
 CORE
 main.c
---dfcc main --enforce-contract foo _ --malloc-may-fail --malloc-fail-null
-^\[foo.assigns.\d+\] line 19 Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo
+^\[foo.assigns.\d+\] line \d+ Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that \*out is assignable: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-This test checks that objects of size zero or __CPROVER_max_malloc_size
-do not cause spurious falsifications in assigns clause instrumentation
-in contract enforcement mode.
+This test checks assuming is_fresh(ptr, size) with a non-deterministic size
+does not result in spurious falsifications when checking assigns clauses.
+An implicit strict upper bound of __CPROVER_max_malloc_size is imposed on the size by
+__CPROVER_is_fresh which guarantees the absence of pointer overflow when computing
+the address `ptr + size`.

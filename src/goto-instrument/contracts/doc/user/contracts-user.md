@@ -11,6 +11,7 @@ The individual types of clauses for contracts are documented here:
 - @subpage contracts-loop-invariants
 - @subpage contracts-decreases
 - @subpage contracts-memory-predicates
+- @subpage contracts-function-pointer-predicates
 - @subpage contracts-history-variables
 - @subpage contracts-quantifiers
 - @subpage contracts-user-cli

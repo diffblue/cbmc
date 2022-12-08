@@ -30,6 +30,7 @@ class messaget;
 class message_handlert;
 class dfcc_instrumentt;
 class dfcc_libraryt;
+class dfcc_lift_memory_predicatest;
 class dfcc_utilst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
@@ -108,6 +109,9 @@ public:
   /// \param utils utility functions for contracts transformation
   /// \param library the contracts instrumentation library
   /// \param instrument the instrumenter class for goto functions/goto programs
+  /// \param memory_predicates handler for user-defed memory predicates, used to
+  /// adjust call parameters for user defined predicates used in requires and
+  /// ensures clauses.
   dfcc_wrapper_programt(
     const dfcc_contract_modet contract_mode,
     const symbolt &wrapper_symbol,
@@ -118,7 +122,8 @@ public:
     message_handlert &message_handler,
     dfcc_utilst &utils,
     dfcc_libraryt &library,
-    dfcc_instrumentt &instrument);
+    dfcc_instrumentt &instrument,
+    dfcc_lift_memory_predicatest &memory_predicates);
 
   /// Adds the whole program to `dest` and the discovered function pointer
   /// contracts `dest_fp_contracts`.
@@ -173,6 +178,7 @@ protected:
   dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
+  dfcc_lift_memory_predicatest &memory_predicates;
   namespacet ns;
   goto_convertt converter;
 

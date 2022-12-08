@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This tests shows how assuming that a pointer is fresh with a nondeterministic
+size implicitly assumes that the size is strictly less than the max malloc
+size. This is in order to ensure that the internal representation used for
+assignable address ranges cannot suffer pointer overflows.

@@ -20,8 +20,10 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_utils.cpp \
       contracts/dynamic-frames/dfcc_library.cpp \
       contracts/dynamic-frames/dfcc_is_fresh.cpp \
+      contracts/dynamic-frames/dfcc_pointer_in_range.cpp \
       contracts/dynamic-frames/dfcc_is_freeable.cpp \
       contracts/dynamic-frames/dfcc_obeys_contract.cpp \
+      contracts/dynamic-frames/dfcc_lift_memory_predicates.cpp \
       contracts/dynamic-frames/dfcc_instrument.cpp \
       contracts/dynamic-frames/dfcc_spec_functions.cpp \
       contracts/dynamic-frames/dfcc_contract_functions.cpp \

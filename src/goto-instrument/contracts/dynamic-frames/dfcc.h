@@ -35,6 +35,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_contract_handler.h"
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
+#include "dfcc_lift_memory_predicates.h"
 #include "dfcc_spec_functions.h"
 #include "dfcc_swap_and_wrap.h"
 #include "dfcc_utils.h"
@@ -198,6 +199,7 @@ protected:
   dfcc_libraryt library;
   namespacet ns;
   dfcc_instrumentt instrument;
+  dfcc_lift_memory_predicatest memory_predicates;
   dfcc_spec_functionst spec_functions;
   dfcc_contract_handlert contract_handler;
   dfcc_swap_and_wrapt swap_and_wrap;
@@ -235,6 +237,7 @@ protected:
 
   void link_model_and_load_dfcc_library();
   void instrument_harness_function();
+  void lift_memory_predicates();
   void wrap_checked_function();
   void wrap_replaced_functions();
   void wrap_discovered_function_pointer_contracts();

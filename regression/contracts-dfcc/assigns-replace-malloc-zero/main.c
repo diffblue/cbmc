@@ -1,37 +1,41 @@
+#include <stdbool.h>
 #include <stdlib.h>
 
-// returns the index at which the write was performed if any
-// -1 otherwise
-int foo(char *a, int size)
+bool foo(char *a, size_t size, size_t *out)
   // clang-format off
-__CPROVER_requires(0 <= size && size <= __CPROVER_max_malloc_size)
-__CPROVER_requires(a == NULL || __CPROVER_rw_ok(a, size))
-__CPROVER_assigns(__CPROVER_object_whole(a))
-__CPROVER_ensures(
-    a && __CPROVER_return_value >= 0 ==> a[__CPROVER_return_value] == 0)
+  __CPROVER_requires(a == NULL || __CPROVER_is_fresh(a, size))
+  __CPROVER_requires(__CPROVER_is_fresh(out, sizeof(*out)))
+  __CPROVER_assigns(a: __CPROVER_object_from(a), *out)
+  __CPROVER_ensures(
+    a && __CPROVER_return_value ==>
+      (0 <= *out && *out < size &&
+      a[*out] == 0)
+  )
 // clang-format on
 {
-  if(!a)
-    return -1;
-  int i;
-  if(0 <= i && i < size)
+  size_t i;
+  if(a && 0 <= i && i < size)
   {
     a[i] = 0;
-    return i;
+    *out = i;
+    return true;
   }
-  return -1;
+  return false;
 }
 
-int main()
+int nondet_int();
+
+void bar(int size)
 {
-  int size;
-  if(size < 0)
-    size = 0;
-  if(size > __CPROVER_max_malloc_size)
-    size = __CPROVER_max_malloc_size;
-  char *a = malloc(size * sizeof(*a));
-  int res = foo(a, size);
-  if(a && res >= 0)
-    __CPROVER_assert(a[res] == 0, "expecting SUCCESS");
-  return 0;
+  size_t out;
+  char *a = malloc(size);
+  bool res = foo(a, size, &out);
+  if(a && res)
+    __CPROVER_assert(a[out] == 0, "expecting SUCCESS");
+}
+
+void main()
+{
+  size_t size;
+  bar(size);
 }

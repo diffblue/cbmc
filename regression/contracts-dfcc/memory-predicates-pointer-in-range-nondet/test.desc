@@ -1,0 +1,10 @@
+CORE
+main.c
+--restrict-function-pointer foo.CALL/return_0,return_1 --nondet-static-exclude vtable_0 --nondet-static-exclude vtable_1 --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Demonstrates the use of __CPROVER_pointer_in_range_dfcc to define nondeterministic
+pointers to one or more targets.

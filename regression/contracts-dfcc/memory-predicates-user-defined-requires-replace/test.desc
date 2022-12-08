@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo --replace-call-with-contract bar --replace-call-with-contract baz _ --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that user defined predicates assumed in requires clauses for checked
+contracts build a state such that the same predicates used in requires clauses
+for function calls replaced by their contracts hold.
