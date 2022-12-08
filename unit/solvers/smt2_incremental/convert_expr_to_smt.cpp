@@ -1633,7 +1633,7 @@ TEST_CASE("pointer_offset_exprt to SMT conversion", "[core][smt2_incremental]")
   {
     const auto converted = test.convert(pointer_offset);
     const auto expected =
-      smt_bit_vector_theoryt::zero_extend(8)(smt_bit_vector_theoryt::extract(
+      smt_bit_vector_theoryt::sign_extend(8)(smt_bit_vector_theoryt::extract(
         55, 0)(smt_identifier_termt("foo", smt_bit_vector_sortt(64))));
     CHECK(converted == expected);
   }
