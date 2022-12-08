@@ -1292,6 +1292,51 @@ __CPROVER_HIDE:;
   }
 }
 
+__CPROVER_bool __CPROVER_contracts_pointer_in_range_dfcc(
+  void *lb,
+  void **ptr,
+  void *ub,
+  __CPROVER_contracts_write_set_ptr_t write_set)
+{
+__CPROVER_HIDE:;
+  __CPROVER_assert(
+    (write_set != 0) & ((write_set->assume_requires_ctx == 1) |
+                        (write_set->assert_requires_ctx == 1) |
+                        (write_set->assume_ensures_ctx == 1) |
+                        (write_set->assert_ensures_ctx == 1)),
+    "__CPROVER_pointer_in_range_dfcc is used only in requires or ensures "
+    "clauses");
+  __CPROVER_assert(__CPROVER_r_ok(lb, 0), "lb pointer must be valid");
+  __CPROVER_assert(__CPROVER_r_ok(ub, 0), "ub pointer must be valid");
+  __CPROVER_assert(
+    __CPROVER_same_object(lb, ub),
+    "lb and ub pointers must have the same object");
+  __CPROVER_ssize_t lb_offset = __CPROVER_POINTER_OFFSET(lb);
+  __CPROVER_ssize_t ub_offset = __CPROVER_POINTER_OFFSET(ub);
+  __CPROVER_assert(
+    lb_offset <= ub_offset, "lb and ub pointers must be ordered");
+  if(write_set->assume_requires_ctx | write_set->assume_ensures_ctx)
+  {
+    if(__VERIFIER_nondet___CPROVER_bool())
+      return 0;
+
+    // add nondet offset
+    __CPROVER_size_t offset = __VERIFIER_nondet_size();
+
+    // this cast is safe because we prove that ub and lb are ordered
+    __CPROVER_size_t max_offset = (__CPROVER_size_t)(ub_offset - lb_offset);
+    __CPROVER_assume(offset <= max_offset);
+    *ptr = (char *)lb + offset;
+    return 1;
+  }
+  else /* write_set->assert_requires_ctx | write_set->assert_ensures_ctx */
+  {
+    __CPROVER_ssize_t offset = __CPROVER_POINTER_OFFSET(*ptr);
+    return __CPROVER_same_object(lb, *ptr) && lb_offset <= offset &&
+           offset <= ub_offset;
+  }
+}
+
 /// \brief Returns the start address of the conditional address range found at
 /// index \p idx in  \p set->contract_assigns.
 void *__CPROVER_contracts_write_set_havoc_get_assignable_target(

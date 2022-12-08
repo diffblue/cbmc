@@ -171,7 +171,8 @@ Calls to `__CPROVER_is_fresh` are rewritten as described in
 Calls to `__CPROVER_obeys_contract` are rewritten as described in
 @subpage contracts-dev-spec-obeys-contract
 
-Calls to `__CPROVER_obeys_contract` are rewritten as described in @subpage contracts-dev-spec-obeys-contract
+Calls to `__CPROVER_pointer_in_range_dfcc` are rewritten as described in
+@subpage contracts-dev-spec-pointer-in-range
 
 For all other function or function pointer calls, we proceed as follows.
 

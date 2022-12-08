@@ -12,6 +12,10 @@ predicates:
 // other __CPROVER_is_fresh occurrences in the contract's pre and post conditions
 __CPROVER_bool __CPROVER_is_fresh(void *ptr, size_t size);
 
+// Holds iff ptr is a valid pointer pointing between lb and ub pointers.
+// \pre lb and ub must be valid pointers pointing in the same object.
+__CPROVER_bool __CPROVER_pointer_in_range_dfcc(void *lb, void *ptr, void *ub);
+
 // Holds iff the function pointer \p fptr points to a function satisfying
 // \p contract.
 __CPROVER_bool __CPROVER_obeys_contract(void (*fptr)(void), void (*contract)(void));

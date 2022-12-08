@@ -2334,6 +2334,29 @@ exprt c_typecheck_baset::do_special_functions(
     // returning nil leaves the call expression in place
     return nil_exprt();
   }
+  else if(identifier == CPROVER_PREFIX "pointer_in_range_dfcc")
+  {
+    // same as pointer_in_range with experimental support for DFCC contracts
+    // -- do not use
+    if(expr.arguments().size() != 3)
+    {
+      throw invalid_source_file_exceptiont{
+        CPROVER_PREFIX "pointer_in_range_dfcc expects three arguments",
+        expr.source_location()};
+    }
+
+    for(const auto &arg : expr.arguments())
+    {
+      if(arg.type().id() != ID_pointer)
+      {
+        throw invalid_source_file_exceptiont{
+          CPROVER_PREFIX
+          "pointer_in_range_dfcc expects pointer-typed arguments",
+          arg.source_location()};
+      }
+    }
+    return nil_exprt();
+  }
   else if(identifier == CPROVER_PREFIX "same_object")
   {
     if(expr.arguments().size()!=2)

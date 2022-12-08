@@ -47,6 +47,7 @@ bool dfcc_lift_memory_predicatest::is_lifted_function(
 static bool is_core_memory_predicate(const irep_idt &function_id)
 {
   return (function_id == CPROVER_PREFIX "is_fresh") ||
+         (function_id == CPROVER_PREFIX "pointer_in_range_dfcc") ||
          (function_id == CPROVER_PREFIX "obeys_contract");
 }
 
@@ -234,6 +235,14 @@ void dfcc_lift_memory_predicatest::collect_parameters_to_lift(
       if(callee_id == CPROVER_PREFIX "is_fresh")
       {
         auto opt_rank = is_param_expr(it.call_arguments()[0], parameter_rank);
+        if(opt_rank.has_value())
+        {
+          lifted_parameters[function_id].insert(opt_rank.value());
+        }
+      }
+      else if(callee_id == CPROVER_PREFIX "pointer_in_range_dfcc")
+      {
+        auto opt_rank = is_param_expr(it.call_arguments()[1], parameter_rank);
         if(opt_rank.has_value())
         {
           lifted_parameters[function_id].insert(opt_rank.value());

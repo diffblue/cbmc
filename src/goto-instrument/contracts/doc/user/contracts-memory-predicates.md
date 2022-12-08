@@ -4,29 +4,38 @@ Back to @ref contracts-user
 
 @tableofcontents
 
-## Syntax
+The built-in and user-defined predicates discussed in this section are meant to
+let users describe the shape of the memory accessed through pointers in
+_requires clauses_ and _ensures clauses_. Attempting to call these predicates
+outside of a requires or ensures clause context will result in a verification
+error.
+## The __CPROVER_is_fresh predicate
+### Syntax
 
 ```c
 bool __CPROVER_is_fresh(void *p, size_t size);
 ```
 
-To specify memory footprint we use a special function called `__CPROVER_is_fresh `. The meaning of `__CPROVER_is_fresh` is that we are borrowing a pointer from the
-external environment (in a precondition), or returning it to the calling context (in a postcondition).
+To specify memory footprint we use a special function called `__CPROVER_is_fresh `.
+The meaning of `__CPROVER_is_fresh` is that we are borrowing a pointer from the
+external environment (in a precondition), or returning it to the calling context
+(in a postcondition).
 
-### Parameters
+#### Parameters
 
 `__CPROVER_is_fresh` takes two arguments: a pointer and an allocation size.
 The first argument is the pointer to be checked for "freshness" (i.e., not previously
 allocated), and the second is the expected size in bytes for the memory
-available at the pointer.  
+available at the pointer.
 
-### Return Value
+#### Return Value
 
 It returns a `bool` value, indicating whether the pointer is fresh.
 
-## Semantics
+### Semantics
 
-To illustrate the semantics for `__CPROVER_is_fresh`, consider the following implementation of `sum` function.
+To illustrate the semantics for `__CPROVER_is_fresh`, consider the following
+implementation of `sum` function.
 
 ```c
 int *err_signal; // Global variable
@@ -45,7 +54,7 @@ __CPROVER_assigns(*out, err_signal)
 }
 ```
 
-### Enforcement
+#### Enforcement
 
 When checking the contract abstracts a function a `__CPROVER_is_fresh`
 in a _requires_ clause will cause fresh memory to be allocated.
@@ -74,7 +83,7 @@ int sum(const uint32_t a, const uint32_t b, uint32_t* out)
 }
 ```
 
-### Replacement
+#### Replacement
 
 In our example, consider that a function `foo` may call `sum`.
 
@@ -120,10 +129,28 @@ int foo()
 }
 ```
 
+## The __CPROVER_pointer_in_range_dfcc predicate
+### Syntax
+
+```c
+bool __CPROVER_pointer_in_range_dfcc(void *lb, void *p, void *ub);
+```
+
+This predicate holds if `lb`, `p` and `ub` are valid pointers within the same
+object and the pointers are ordered such that `lb <= p && p <= ub` holds.
+
+### Semantics
+In assertion contexts, the predicate checks the conditions described above.
+In assumption contexts, the predicate checks that `lb` and `ub` are valid pointers
+into the same object, and updates `p` using a side effect to be a non-deterministic
+pointer ranging between `lb` and `ub`.
+
 ## User defined memory predicates
 
 Users can write their own memory predicates based on the core predicates described above.
 `__CPROVER_is_fresh` allows to specify pointer validity and separation.
+`__CPROVER_pointer_in_range` allows to specify aliasing constraints.
+
 For instance, one could write a predicate defining linked lists of at most `len`
 elements as follows:
 

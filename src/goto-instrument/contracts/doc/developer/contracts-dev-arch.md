@@ -28,6 +28,7 @@ Each of these translation passes is implemented in a specific class:
  :-------------------------------|:---------------------------------------
  @ref dfcc_instrumentt           | Implements @ref contracts-dev-spec-dfcc for @ref goto_functiont, @ref goto_programt, or subsequences of instructions of @ref goto_programt
  @ref dfcc_is_fresht             | Implements @ref contracts-dev-spec-is-fresh
+ @ref dfcc_pointer_in_ranget     | Implements @ref contracts-dev-spec-pointer-in-range
  @ref dfcc_lift_memory_predicatest | Implements @ref contracts-dev-spec-memory-predicates-rewriting
  @ref dfcc_is_freeablet          | Implements @ref contracts-dev-spec-is-freeable
  @ref dfcc_obeys_contractt       | Implements @ref contracts-dev-spec-obeys-contract
