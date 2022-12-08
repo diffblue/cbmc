@@ -294,6 +294,20 @@ exprt state_encodingt::evaluate_expr_rec(
                                          : ID_state_rw_ok;
     return ternary_exprt(new_id, state, pointer, size, what.type());
   }
+  else if(
+    const auto r_or_w_ok_expr =
+      expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(what))
+  {
+    // we replace prophecy expressions by our state
+    auto pointer =
+      evaluate_expr_rec(loc, state, r_or_w_ok_expr->pointer(), bound_symbols);
+    auto size =
+      evaluate_expr_rec(loc, state, r_or_w_ok_expr->size(), bound_symbols);
+    auto new_id = what.id() == ID_prophecy_r_ok   ? ID_state_r_ok
+                  : what.id() == ID_prophecy_w_ok ? ID_state_w_ok
+                                                  : ID_state_rw_ok;
+    return ternary_exprt(new_id, state, pointer, size, what.type());
+  }
   else if(what.id() == ID_is_cstring)
   {
     // we need to add the state

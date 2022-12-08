@@ -644,9 +644,13 @@ exprt instrument_spec_assignst::target_validity_expr(
   // (or is NULL if we allow it explicitly).
   // This assertion will be falsified whenever `start_address` is invalid or
   // not of the right size (or is NULL if we do not allow it explicitly).
-  auto result =
-    or_exprt{not_exprt{car.condition()},
-             w_ok_exprt{car.target_start_address(), car.target_size()}};
+  symbol_exprt deallocated =
+    ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr();
+  symbol_exprt dead = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+  auto result = or_exprt{
+    not_exprt{car.condition()},
+    prophecy_w_ok_exprt{
+      car.target_start_address(), car.target_size(), deallocated, dead}};
 
   if(allow_null_target)
     result.add_to_operands(null_object(car.target_start_address()));
