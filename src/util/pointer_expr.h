@@ -385,6 +385,21 @@ public:
     PRECONDITION(op2().type().id() == ID_pointer);
   }
 
+  const exprt &lower_bound() const
+  {
+    return op0();
+  }
+
+  const exprt &pointer() const
+  {
+    return op1();
+  }
+
+  const exprt &upper_bound() const
+  {
+    return op2();
+  }
+
   // translate into equivalent conjunction
   exprt lower() const;
 };
@@ -414,7 +429,7 @@ inline pointer_in_range_exprt &to_pointer_in_range_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_pointer_in_range);
   DATA_INVARIANT(
-    expr.operands().size() == 3, "pointer_in_range must have one operand");
+    expr.operands().size() == 3, "pointer_in_range must have three operands");
   return static_cast<pointer_in_range_exprt &>(expr);
 }
 
