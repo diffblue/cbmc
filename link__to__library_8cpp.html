@@ -98,15 +98,17 @@ $(document).ready(function(){initNavTree('link__to__library_8cpp.html',''); init
 <p>Library Linking.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="link__to__library_8h_source.html">link_to_library.h</a>&quot;</code><br />
+<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="compute__called__functions_8h_source.html">compute_called_functions.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="goto__convert__functions_8h_source.html">goto_convert_functions.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="goto__model_8h_source.html">goto_model.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="link__goto__model_8h_source.html">link_goto_model.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for link_to_library.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="link__to__library_8cpp__incl.svg" width="2460" height="1276"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="link__to__library_8cpp__incl.svg" width="2064" height="1291"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -114,17 +116,72 @@ $(document).ready(function(){initNavTree('link__to__library_8cpp.html',''); init
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad559b9b463b5fc47a9bc540030285b04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="link__to__library_8cpp.html#ad559b9b463b5fc47a9bc540030285b04">link_to_library</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::function&lt; void(const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)&gt; &amp;library)</td></tr>
-<tr class="memdesc:ad559b9b463b5fc47a9bc540030285b04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Complete missing function definitions using the <code>library</code>.  <a href="link__to__library_8cpp.html#ad559b9b463b5fc47a9bc540030285b04">More...</a><br /></td></tr>
-<tr class="separator:ad559b9b463b5fc47a9bc540030285b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18cad4fed1ebaa9bd84b4bbebc3673b3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classreplace__symbolt.html#abe16a63821719dd22d327df3ee6772dd">replace_symbolt::expr_mapt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="link__to__library_8cpp.html#a18cad4fed1ebaa9bd84b4bbebc3673b3">add_one_function</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::function&lt; void(const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)&gt; &amp;library, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;missing_function)</td></tr>
+<tr class="memdesc:a18cad4fed1ebaa9bd84b4bbebc3673b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to add <code>missing_function</code> from <code>library</code> to <code>goto_model</code>.  <a href="link__to__library_8cpp.html#a18cad4fed1ebaa9bd84b4bbebc3673b3">More...</a><br /></td></tr>
+<tr class="separator:a18cad4fed1ebaa9bd84b4bbebc3673b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacd1e2602f452f3e6fd3aa31928f6b72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="link__to__library_8cpp.html#aacd1e2602f452f3e6fd3aa31928f6b72">link_to_library</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::function&lt; void(const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)&gt; &amp;library)</td></tr>
+<tr class="memdesc:aacd1e2602f452f3e6fd3aa31928f6b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Complete missing function definitions using the <code>library</code>.  <a href="link__to__library_8cpp.html#aacd1e2602f452f3e6fd3aa31928f6b72">More...</a><br /></td></tr>
+<tr class="separator:aacd1e2602f452f3e6fd3aa31928f6b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Library Linking. </p>
 
 <p class="definition">Definition in file <a class="el" href="link__to__library_8cpp_source.html">link_to_library.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ad559b9b463b5fc47a9bc540030285b04"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad559b9b463b5fc47a9bc540030285b04">&#9670;&nbsp;</a></span>link_to_library()</h2>
+<a id="a18cad4fed1ebaa9bd84b4bbebc3673b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18cad4fed1ebaa9bd84b4bbebc3673b3">&#9670;&nbsp;</a></span>add_one_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classreplace__symbolt.html#abe16a63821719dd22d327df3ee6772dd">replace_symbolt::expr_mapt</a>&gt; add_one_function </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::function&lt; void(const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>library</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>missing_function</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Try to add <code>missing_function</code> from <code>library</code> to <code>goto_model</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="link__to__library_8cpp_source.html#l00022">22</a> of file <a class="el" href="link__to__library_8cpp_source.html">link_to_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aacd1e2602f452f3e6fd3aa31928f6b72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacd1e2602f452f3e6fd3aa31928f6b72">&#9670;&nbsp;</a></span>link_to_library()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -144,7 +201,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::function&lt; void(const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramtype">const std::function&lt; void(const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)&gt; &amp;&#160;</td>
           <td class="paramname"><em>library</em>&#160;</td>
         </tr>
         <tr>
@@ -160,12 +217,12 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">goto_model</td><td>goto model that may contain function calls and symbols with missing function bodies </td></tr>
     <tr><td class="paramname">message_handler</td><td>message handler to report library processing problems </td></tr>
-    <tr><td class="paramname">library</td><td>generator function that produces function definitions for a given set of symbol names that have no body. </td></tr>
+    <tr><td class="paramname">library</td><td>generator function that produces function definitions (in the symbol table that is the third parameter) for a given set of symbol names (first parameter) that have no body in the source symbol table (second parameter). </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="link__to__library_8cpp_source.html#l00025">25</a> of file <a class="el" href="link__to__library_8cpp_source.html">link_to_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="link__to__library_8cpp_source.html#l00081">81</a> of file <a class="el" href="link__to__library_8cpp_source.html">link_to_library.cpp</a>.</p>
 
 </div>
 </div>

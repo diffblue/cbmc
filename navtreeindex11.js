@@ -1,6 +1,5 @@
 var NAVTREEINDEX11 =
 {
-"classas__modet.html#a6ce9d5d828f649479e85e0ab91b6128d":[6,0,84,6],
 "classas__modet.html#a81f0723c82efd25ccf674a8eb412f5aa":[6,0,84,1],
 "classas__modet.html#a9bce791330a8e3308cb13557da0ee5b0":[6,0,84,5],
 "classascii__encoding__targett.html":[6,0,85],
@@ -249,5 +248,6 @@ var NAVTREEINDEX11 =
 "classbitvector__typet.html#afd4cd55038937cd22d6392a7efa2e92b":[6,0,114,0],
 "classbitxor__exprt.html":[6,0,115],
 "classbitxor__exprt.html#ab70de7370c5361b33c5c04f5ac4471fb":[6,0,115,0],
-"classbool__typet.html":[6,0,116]
+"classbool__typet.html":[6,0,116],
+"classbool__typet.html#af11d0f023622e0bf98c03f56ed364cc2":[6,0,116,0]
 };

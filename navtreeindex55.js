@@ -1,6 +1,5 @@
 var NAVTREEINDEX55 =
 {
-"classrw__range__sett.html#a93a939eeef2559d351d3dfac37e9836a":[6,0,977,17],
 "classrw__range__sett.html#a967f168338101ee5925177a651dce9bd":[6,0,977,15],
 "classrw__range__sett.html#a9c6b738d70e99ae14a06003091164142":[6,0,977,8],
 "classrw__range__sett.html#aa34a39c03dac3e9220df02e67a8e8173":[6,0,977,18],
@@ -249,5 +248,6 @@ var NAVTREEINDEX55 =
 "classsatcheck__zchaff__baset.html#af3737b0e25559b34cc210eaeafab91f6":[6,0,1002,5],
 "classsatcheck__zchafft.html":[6,0,1003],
 "classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be":[6,0,1003,1],
-"classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca":[6,0,1003,0]
+"classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca":[6,0,1003,0],
+"classsatcheck__zcoret.html":[6,0,1004]
 };

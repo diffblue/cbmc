@@ -1,8 +1,5 @@
 var NAVTREEINDEX75 =
 {
-"destructor__tree_8cpp.html":[7,0,2,14,15],
-"destructor__tree_8cpp_source.html":[7,0,2,14,15],
-"destructor__tree_8h.html":[7,0,2,14,16],
 "destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a":[7,0,2,14,16,4],
 "destructor__tree_8h_source.html":[7,0,2,14,16],
 "developer_guide.html":[0,3],
@@ -249,5 +246,8 @@ var NAVTREEINDEX75 =
 "does__remove__const_8cpp.html":[7,0,2,0,23],
 "does__remove__const_8cpp_source.html":[7,0,2,0,23],
 "does__remove__const_8h.html":[7,0,2,0,24],
-"does__remove__const_8h_source.html":[7,0,2,0,24]
+"does__remove__const_8h_source.html":[7,0,2,0,24],
+"dot_8cpp.html":[7,0,2,13,34],
+"dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b":[7,0,2,13,34,1],
+"dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859":[7,0,2,13,34,2]
 };

@@ -1,7 +1,5 @@
 var NAVTREEINDEX122 =
 {
-"structclauset_1_1stept.html#a1fd650111199f5d384148f4b243ad0b9":[6,0,180,0,1],
-"structclauset_1_1stept.html#a96534295587ea6fb0e094ee023196827":[6,0,180,0,0],
 "structcmdlinet_1_1option__namest.html":[6,0,182,0],
 "structcmdlinet_1_1option__namest.html#a18e338b75b40cc4586e4f345456f6efe":[6,0,182,0,3],
 "structcmdlinet_1_1option__namest.html#a6d8d994b301a22e1ab5f93d4c88fc2a6":[6,0,182,0,2],
@@ -249,5 +247,7 @@ var NAVTREEINDEX122 =
 "structdatat.html#aee59b852add5a617fc5d43028bd2ce26":[6,0,336,2],
 "structdatat.html#af2d4a7cb72d7b3989627812c02d50fbb":[6,0,336,6],
 "structdecision__procedure__objectt.html":[6,0,338],
-"structdecision__procedure__objectt.html#a686fe5dba418fe2355ab78d5d625311f":[6,0,338,0]
+"structdecision__procedure__objectt.html#a686fe5dba418fe2355ab78d5d625311f":[6,0,338,0],
+"structdecision__procedure__objectt.html#a6a2604daf0577c670a93333f4078df18":[6,0,338,1],
+"structdecision__procedure__objectt.html#abf0517bdc601e0c700a1b0f71d29a427":[6,0,338,3]
 };

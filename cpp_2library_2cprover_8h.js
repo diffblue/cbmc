@@ -25,7 +25,5 @@ var cpp_2library_2cprover_8h =
     [ "__CPROVER_set_must", "cpp_2library_2cprover_8h.html#ad3a2aedad97977b64290f8141eed690c", null ],
     [ "__typeof__", "cpp_2library_2cprover_8h.html#a294a033f64010c023e5d38a93d5cea65", null ],
     [ "__CPROVER_deallocated", "cpp_2library_2cprover_8h.html#a62443eebddd4033552d58dcf25c77c8f", null ],
-    [ "__CPROVER_malloc_is_new_array", "cpp_2library_2cprover_8h.html#ab74981b452a29fe3b2ae0af47fb7f309", null ],
-    [ "__CPROVER_memory_leak", "cpp_2library_2cprover_8h.html#aa558c53640fe7cc910b049da86d9a9f2", null ],
-    [ "__CPROVER_new_object", "cpp_2library_2cprover_8h.html#a69b79506a08d1d49d8ce8b043d0cd720", null ]
+    [ "__CPROVER_memory_leak", "cpp_2library_2cprover_8h.html#aa558c53640fe7cc910b049da86d9a9f2", null ]
 ];
