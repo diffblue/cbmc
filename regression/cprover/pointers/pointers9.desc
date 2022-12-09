@@ -3,9 +3,9 @@ pointers9.c
 --text --solve --inline --no-safety
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝main::1::x❞:=123\]\)$
-^\(\d+\) ∀ ς : state \. \(S22\(ς\) ∧ ¬\(ς\(❝main::1::p❞\) = ❝main::1::x❞\)\) ⇒ S23T\(ς\)$
-^\(\d+\) ∀ ς : state \. \(S22\(ς\) ∧ ς\(❝main::1::p❞\) = ❝main::1::x❞\) ⇒ S23\(ς\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = 123\)$
+^\(\d+\) ∀ ς : state \. S11\(ς\) ⇒ S12\(ς\[❝main::1::x❞:=123\]\)$
+^\(\d+\) ∀ ς : state \. \(S12\(ς\) ∧ ¬\(ς\(❝main::1::p❞\) = ❝main::1::x❞\)\) ⇒ S13T\(ς\)$
+^\(\d+\) ∀ ς : state \. \(S12\(ς\) ∧ ς\(❝main::1::p❞\) = ❝main::1::x❞\) ⇒ S13\(ς\)$
+^\(\d+\) ∀ ς : state \. S13\(ς\) ⇒ \(ς\(ς\(❝main::1::p❞\)\) = 123\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 --

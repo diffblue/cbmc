@@ -2,7 +2,7 @@ CORE
 main.c
 --pointer-check
 dereference failure: dead object in \*from_foo: FAILURE$
-^\*\* 1 of 6 failed
+^\*\* 2 of 7 failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

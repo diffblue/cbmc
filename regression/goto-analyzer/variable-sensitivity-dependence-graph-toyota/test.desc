@@ -3,24 +3,24 @@ main.c
 file1.c file2.c --dependence-graph-vs --vsd-structs every-field --vsd-arrays every-element --show
 ^EXIT=0$
 ^SIGNAL=0$
-^Data dependencies: 58 \[st.a\]$
-^Data dependencies: 58 \[st.b\]$
-^Data dependencies: 1 \[st.a\], 58 \[st.a\]$
-^Data dependencies: 4 \[st.b\], 58 \[st.b\]$
-^Data dependencies: 1 \[st.a\], 4 \[st.b\], 58 \[st.a, st.b\]$
-^Data dependencies: 52 \[ar\[\([^)]*\)0\]\]$
-^Data dependencies: 52 \[ar\[\([^)]*\)1\]\]$
-^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 52 \[ar\[\([^)]*\)0\]\]$
-^Data dependencies: 13 \[ar\[\([^)]*\)1\]\], 52 \[ar\[\([^)]*\)1\]\]$
-^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 13 \[ar\[\([^)]*\)1\]\], 52 \[ar\[\([^)]*\)0\], ar\[\([^)]*\)1\]\]$
+^Data dependencies: 48 \[st.a\]$
+^Data dependencies: 48 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 48 \[st.a\]$
+^Data dependencies: 4 \[st.b\], 48 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 4 \[st.b\], 48 \[st.a, st.b\]$
+^Data dependencies: 42 \[ar\[\([^)]*\)0\]\]$
+^Data dependencies: 42 \[ar\[\([^)]*\)1\]\]$
+^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 42 \[ar\[\([^)]*\)0\]\]$
+^Data dependencies: 13 \[ar\[\([^)]*\)1\]\], 42 \[ar\[\([^)]*\)1\]\]$
+^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 13 \[ar\[\([^)]*\)1\]\], 42 \[ar\[\([^)]*\)0\], ar\[\([^)]*\)1\]\]$
 ^Data dependencies: 19 \[arr\[\([^)]*\)1\]\]$
 ^Data dependencies: 18 \[arr\[\([^)]*\)0\]\]$
 ^Data dependencies: 20 \[arr\[\([^)]*\)2\]\], 22 \[arr\[\([^)]*\)2\]\]$
-^Data dependencies: 1 \[st.a\], 58 \[st.a\], 62 \[st.a\]$
-^Data dependencies: 4 \[st.b\], 58 \[st.b\], 65 \[st.b\]$
-^Data dependencies: 1 \[st.a\], 4 \[st.b\], 58 \[st.a, st.b\], 62 \[st.a\], 65 \[st.b\]$
-^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 52 \[ar\[\([^)]*\)0\]\], 73 \[ar\[\([^)]*\)0\]\]$
-^Data dependencies: 13 \[ar\[\([^)]*\)1\]\], 52 \[ar\[\([^)]*\)1\]\], 76 \[ar\[\([^)]*\)1\]\]$
-^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 13 \[ar\[\([^)]*\)1\]\], 52 \[ar\[\([^)]*\)0\], ar\[\([^)]*\)1\]\], 73 \[ar\[\([^)]*\)0\]\], 76 \[ar\[\([^)]*\)1\]\]$
+^Data dependencies: 1 \[st.a\], 48 \[st.a\], 52 \[st.a\]$
+^Data dependencies: 4 \[st.b\], 48 \[st.b\], 55 \[st.b\]$
+^Data dependencies: 1 \[st.a\], 4 \[st.b\], 48 \[st.a, st.b\], 52 \[st.a\], 55 \[st.b\]$
+^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 42 \[ar\[\([^)]*\)0\]\], 63 \[ar\[\([^)]*\)0\]\]$
+^Data dependencies: 13 \[ar\[\([^)]*\)1\]\], 42 \[ar\[\([^)]*\)1\]\], 66 \[ar\[\([^)]*\)1\]\]$
+^Data dependencies: 10 \[ar\[\([^)]*\)0\]\], 13 \[ar\[\([^)]*\)1\]\], 42 \[ar\[\([^)]*\)0\], ar\[\([^)]*\)1\]\], 63 \[ar\[\([^)]*\)0\]\], 66 \[ar\[\([^)]*\)1\]\]$
 --
 ^warning: ignoring
