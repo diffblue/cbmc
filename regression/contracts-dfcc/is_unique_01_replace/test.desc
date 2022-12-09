@@ -6,8 +6,5 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that verification succeeds if only expressions inside the assigns clause are assigned within the function.
-
-Note: For all 'enforce' tests, nothing can be assumed about the return value of the function (as the function call is not replaced at this point).
-
-To make such assumptions would cause verification to fail.
+This test shows that replacing a call by a contract establishes the
+postconditions of the contracts.

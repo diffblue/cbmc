@@ -7,7 +7,7 @@ activate-multi-line-match
 VERIFICATION FAILED
 <assignment assignment_type="actual_parameter" base_name="u" display_name="test::u" hidden="false" identifier="test::u" mode="C" step_nr="\d+" thread="0">\n\s*<location file=".*" line="\d+" working-directory=".*"/>\n\s*<full_lhs_type>union myunion</full_lhs_type>\n\s*<full_lhs>u</full_lhs>
 <value>\{ \.i=\d+ll? \}</value>\n\s*<value_expression>\n\s*<union>\n\s*<member member_name="i">\n\s*<integer binary="\d+" c_type=".*int.*" width="\d+">\d+</integer>\n\s*</member>\n\s*</union>\n\s*</value_expression>
-<assignment assignment_type="state" base_name="u" display_name="test::u" hidden="false" identifier="test::u" mode="C" step_nr="\d+" thread="0">\n\s*<location file=".*" function="test" line="\d+" working-directory=".*"/>\n\s*<full_lhs_type>signed long( long)? int</full_lhs_type>\n\s*<full_lhs>u\.i</full_lhs>\n\s*<full_lhs_value binary="[01]+">\d+ll?</full_lhs_value>\n\s*</assignment>
+<assignment assignment_type="state" base_name="u" display_name="test::u" hidden="false" identifier="test::u" mode="C" step_nr="\d+" thread="0">\n\s*<location file=".*" function="test" line="\d+" working-directory=".*"/>\n\s*<full_lhs_type>(signed long( long)? int|int64_t)</full_lhs_type>\n\s*<full_lhs>u\.i</full_lhs>\n\s*<full_lhs_value binary="[01]+">\d+ll?</full_lhs_value>\n\s*</assignment>
 --
 ^warning: ignoring
 --

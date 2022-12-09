@@ -164,6 +164,8 @@ extension_for_type(const typet &type)
     return smt_bit_vector_theoryt::sign_extend;
   if(can_cast_type<unsignedbv_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
+  if(can_cast_type<bv_typet>(type))
+    return smt_bit_vector_theoryt::zero_extend;
   UNREACHABLE;
 }
 
@@ -947,6 +949,9 @@ static smt_termt convert_to_smt_shift(
   INVARIANT(
     first_bit_vector_sort && second_bit_vector_sort,
     "Shift expressions are expected to have bit vector operands.");
+  INVARIANT(
+    shift.type() == shift.op0().type(),
+    "Shift expression type must be equals to first operand type.");
   const std::size_t first_width = first_bit_vector_sort->bit_width();
   const std::size_t second_width = second_bit_vector_sort->bit_width();
   if(first_width > second_width)
@@ -958,10 +963,11 @@ static smt_termt convert_to_smt_shift(
   }
   else if(first_width < second_width)
   {
-    return factory(
+    const auto result = factory(
       extension_for_type(shift.op0().type())(second_width - first_width)(
         first_operand),
       second_operand);
+    return smt_bit_vector_theoryt::extract(first_width - 1, 0)(result);
   }
   else
   {

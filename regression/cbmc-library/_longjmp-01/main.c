@@ -1,5 +1,9 @@
 #include <setjmp.h>
 
+#ifndef __GNUC__
+#  define _longjmp(a, b) longjmp(a, b)
+#endif
+
 static jmp_buf env;
 
 int main()

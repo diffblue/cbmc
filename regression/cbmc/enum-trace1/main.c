@@ -16,6 +16,9 @@ typedef enum ENUMT
 
 void test(enum ENUM e, enum_t t)
 {
+  // ensure sane input values
+  __CPROVER_assume(__CPROVER_enum_is_in_range(e));
+  __CPROVER_assume(__CPROVER_enum_is_in_range(t));
   enum ENUM ee = e;
   enum_t tt = t;
 

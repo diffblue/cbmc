@@ -1,9 +1,9 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract foo _ --malloc-may-fail --malloc-fail-null
+--dfcc main --replace-call-with-contract foo --malloc-may-fail --malloc-fail-null
 ^EXIT=0$
 ^SIGNAL=0$
-\[main\.assertion\.1\] line 35 expecting SUCCESS: SUCCESS$
+\[bar\.assertion\.\d+\] line \d+ expecting SUCCESS: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 This test checks that objects of size zero or of __CPROVER_max_malloc_size

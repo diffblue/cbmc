@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 // This file is highly reduced from some open source projects.
 // The following four lines are adapted from the openssl library
 // Full repository here:

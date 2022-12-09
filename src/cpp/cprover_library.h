@@ -18,6 +18,7 @@ class symbol_table_baset;
 
 void cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
+  const symbol_table_baset &,
   symbol_table_baset &,
   message_handlert &);
 

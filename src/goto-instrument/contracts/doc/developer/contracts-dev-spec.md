@@ -9,6 +9,7 @@ sections:
 2. @subpage contracts-dev-spec-transform-params
 3. @subpage contracts-dev-spec-codegen
 4. @subpage contracts-dev-spec-spec-rewriting
+4. @subpage contracts-dev-spec-memory-predicates-rewriting
 5. @subpage contracts-dev-spec-dfcc
 6. @subpage contracts-dev-spec-harness
 7. @subpage contracts-dev-spec-contract-checking

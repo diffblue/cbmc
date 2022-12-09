@@ -3,10 +3,10 @@ struct2.c
 --text --solve --inline
 ^EXIT=0$
 ^SIGNAL=0$
-^\(\d+\) ∀ ς : state \. S20\(ς\) ⇒ S21\(ς\[❝s❞.❝x❞:=1\]\)$
-^\(\d+\) ∀ ς : state \. S21\(ς\) ⇒ S22\(ς\[❝s❞.❝y❞:=2\]\)$
-^\(\d+\) ∀ ς : state \. S22\(ς\) ⇒ \(ς\(❝s❞.❝x❞\) = 1\)$
-^\(\d+\) ∀ ς : state \. S23\(ς\) ⇒ \(ς\(❝s❞.❝y❞\) = 2\)$
+^\(\d+\) ∀ ς : state \. S10\(ς\) ⇒ S11\(ς\[❝s❞.❝x❞:=1\]\)$
+^\(\d+\) ∀ ς : state \. S11\(ς\) ⇒ S12\(ς\[❝s❞.❝y❞:=2\]\)$
+^\(\d+\) ∀ ς : state \. S12\(ς\) ⇒ \(ς\(❝s❞.❝x❞\) = 1\)$
+^\(\d+\) ∀ ς : state \. S13\(ς\) ⇒ \(ς\(❝s❞.❝y❞\) = 2\)$
 ^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
 --

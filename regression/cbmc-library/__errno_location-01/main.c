@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <errno.h>
 
-int main()
+int main(int arc, char *argv[])
 {
-  __errno_location();
-  assert(0);
+  // errno expands to use of __errno_location() with glibc
+  assert(errno == 0);
   return 0;
 }

@@ -162,12 +162,17 @@ skip_target: SKIP;
 CALL __CPROVER_deallocate(ptr);
 ```
 
-Calls to `__CPROVER_was_freed` or `__CPROVER_is_freeable` are rewritten as described
-in @subpage contracts-dev-spec-is-freeable
+Calls to `__CPROVER_was_freed` or `__CPROVER_is_freeable` are rewritten as
+described in @subpage contracts-dev-spec-is-freeable
 
-Calls to `__CPROVER_is_fresh` are rewritten as described in @subpage contracts-dev-spec-is-fresh
+Calls to `__CPROVER_is_fresh` are rewritten as described in
+@subpage contracts-dev-spec-is-fresh
 
-Calls to `__CPROVER_obeys_contract` are rewritten as described in @subpage contracts-dev-spec-obeys-contract
+Calls to `__CPROVER_obeys_contract` are rewritten as described in
+@subpage contracts-dev-spec-obeys-contract
+
+Calls to `__CPROVER_pointer_in_range_dfcc` are rewritten as described in
+@subpage contracts-dev-spec-pointer-in-range
 
 For all other function or function pointer calls, we proceed as follows.
 
