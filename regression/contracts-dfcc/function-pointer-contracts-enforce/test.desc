@@ -1,6 +1,6 @@
 CORE
 main.c
---restrict-function-pointer foo.CALL/arr_fun_contract --dfcc main --enforce-contract foo
+--malloc-may-fail --malloc-fail-null --restrict-function-pointer foo.CALL/arr_fun_contract --dfcc main --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

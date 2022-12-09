@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

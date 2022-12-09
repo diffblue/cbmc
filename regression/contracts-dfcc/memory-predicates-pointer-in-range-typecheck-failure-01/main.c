@@ -3,9 +3,7 @@
 
 void foo(char *arr, size_t size, char *cur)
   // clang-format off
-__CPROVER_requires(
-    (0 < size && size < __CPROVER_max_malloc_size) &&
-    __CPROVER_is_fresh(arr, size) &&
+__CPROVER_requires(0 < size && __CPROVER_is_fresh(arr, size) &&
     __CPROVER_pointer_in_range_dfcc(arr, cur, arr + size))
 __CPROVER_ensures(__CPROVER_pointer_in_range_dfcc(
   arr, cur /*, arr + size missing arg */))
