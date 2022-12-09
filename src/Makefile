@@ -14,6 +14,7 @@ DIRS = analyses \
        goto-harness \
        goto-programs \
        goto-symex \
+       goto-synthesizer \
        jsil \
        json \
        json-symtab-language \
@@ -36,6 +37,7 @@ all: cbmc.dir \
      goto-diff.dir \
      goto-instrument.dir \
      goto-harness.dir \
+     goto-synthesizer.dir \
      symtab2gb.dir \
      # Empty last line
 
@@ -103,6 +105,10 @@ memory-analyzer.dir: util.dir goto-programs.dir langapi.dir linking.dir \
 
 symtab2gb.dir: util.dir goto-programs.dir langapi.dir linking.dir \
                json.dir json-symtab-language.dir ansi-c.dir
+
+goto-synthesizer.dir: languages util.dir goto-programs.dir langapi.dir \
+                    json.dir goto-checker.dir \
+                    goto-instrument.dir
 
 # building for a particular directory
 
@@ -180,7 +186,7 @@ doc :
 install: all
 	for b in \
 		cbmc crangler \
-		goto-analyzer goto-cc goto-diff goto-instrument goto-harness \
+		goto-analyzer goto-cc goto-diff goto-instrument goto-harness goto-synthesizer \
 		symtab2gb ; do \
 		  cp $$b/$$b $(PREFIX)/bin/ ; \
 			cp ../doc/man/$$b.1 $(PREFIX)/doc/man/man1/ ; \

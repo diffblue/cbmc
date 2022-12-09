@@ -117,6 +117,7 @@ add_subdirectory(goto-instrument)
 add_subdirectory(goto-analyzer)
 add_subdirectory(goto-diff)
 add_subdirectory(goto-harness)
+add_subdirectory(goto-synthesizer)
 add_subdirectory(symtab2gb)
 
 if(UNIX OR WITH_MEMORY_ANALYZER)
