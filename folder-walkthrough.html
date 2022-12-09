@@ -93,7 +93,7 @@ $(document).ready(function(){initNavTree('folder-walkthrough.html',''); initResi
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Martin Brain, Peter Schrammel</dd></dl>
-<h2><a class="anchor" id="autotoc_md170"></a>
+<h2><a class="anchor" id="autotoc_md171"></a>
 &lt;tt&gt;src/&lt;/tt&gt;</h2>
 <p>The source code is divided into a number of sub-directories, each containing the code for a different part of the system.</p>
 <ul>
@@ -151,22 +151,22 @@ $(document).ready(function(){initNavTree('folder-walkthrough.html',''); initResi
 <li><code>common</code>: System specific magic required to get the system to build. This should only need to be edited if porting CBMC to a new platform / build environment.</li>
 <li><code>doxygen.cfg</code>: The config file for doxygen.cfg</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md171"></a>
+<h2><a class="anchor" id="autotoc_md172"></a>
 &lt;tt&gt;doc/&lt;/tt&gt;</h2>
 <p>Contains the CBMC man page. Doxygen HTML pages are generated into the <code>doc/html</code> directory when running <code>doxygen</code> from <code>src</code>.</p>
-<h2><a class="anchor" id="autotoc_md172"></a>
+<h2><a class="anchor" id="autotoc_md173"></a>
 &lt;tt&gt;regression/&lt;/tt&gt;</h2>
 <p>The <code>regression/</code> directory contains the regression test suites. See <a class="el" href="compilation-and-development.html">Compilation and Development</a> for information on how to run and develop regression tests.</p>
-<h2><a class="anchor" id="autotoc_md173"></a>
+<h2><a class="anchor" id="autotoc_md174"></a>
 &lt;tt&gt;unit/&lt;/tt&gt;</h2>
 <p>The <code>unit/</code> directory contains the unit test suites. See <a class="el" href="compilation-and-development.html">Compilation and Development</a> for information on how to run and develop unit tests.</p>
-<h2><a class="anchor" id="autotoc_md174"></a>
+<h2><a class="anchor" id="autotoc_md175"></a>
 Directory dependencies</h2>
 <p>This diagram shows <em>intended</em> directory dependencies. Arrows should be read transitively - dependencies of dependencies are often used directly.</p>
 <p>There are <code>module_dependencies.txt</code> files in each directory, which are checked by the linter. Where directories in <code>module_dependencies.txt</code> are marked with comments such as 'dubious' or 'should go away', these dependencies have generally not been included in the diagram.</p>
 <div class="dotgraph">
 <iframe scrolling="no" frameborder="0" src="dot_inline_dotgraph_14.svg" width="1380" height="1044"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-<p>Last modified: 2022-12-09 11:27:02 +0000 </p>
+<p>Last modified: 2022-12-09 08:49:52 -0600 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

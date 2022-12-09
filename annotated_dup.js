@@ -565,6 +565,7 @@ var annotated_dup =
     [ "goto_symex_property_decidert", "classgoto__symex__property__decidert.html", "classgoto__symex__property__decidert" ],
     [ "goto_symex_statet", "classgoto__symex__statet.html", "classgoto__symex__statet" ],
     [ "goto_symext", "classgoto__symext.html", "classgoto__symext" ],
+    [ "goto_synthesizer_parse_optionst", "classgoto__synthesizer__parse__optionst.html", "classgoto__synthesizer__parse__optionst" ],
     [ "goto_trace_providert", "classgoto__trace__providert.html", "classgoto__trace__providert" ],
     [ "goto_trace_stept", "classgoto__trace__stept.html", "classgoto__trace__stept" ],
     [ "goto_trace_storaget", "classgoto__trace__storaget.html", "classgoto__trace__storaget" ],

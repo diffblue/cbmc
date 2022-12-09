@@ -1,0 +1,37 @@
+<h1>NAME</h1>
+<p>goto-synthesizer - Synthesize and apply loop contracts of goto binaries.</p>
+<h1>SYNOPSIS</h1>
+<dl>
+<dt><strong>goto-synthesizer [-?] [-h] [--help]</strong></dt>
+<dd><p>show help</p>
+</dd>
+<dt><strong>goto-synthesizer --version</strong></dt>
+<dd><p>show version and exit</p>
+</dd>
+<dt><strong>goto-synthesizer [options] <em>in</em> [<em>out</em>]</strong></dt>
+<dd><p>perform synthesis and loop-contracts transformation</p>
+</dd>
+</dl>
+<h1>DESCRIPTION</h1>
+<p><strong>goto-synthesis</strong> reads a GOTO binary, performs loop-contracts synthesis and program transformation for the synthesized contracts, and then writes the resulting program as GOTO binary on disk.</p>
+<h1>OPTIONS</h1>
+<h2>User-interface options:</h2>
+<dl>
+<dt><strong>--xml-ui</strong></dt>
+<dd><p>use XML-formatted output</p>
+</dd>
+<dt><strong>--json-ui</strong></dt>
+<dd><p>use JSON-formatted output</p>
+</dd>
+<dt><strong>--verbosity</strong> <em>n</em></dt>
+<dd><p>verbosity level</p>
+</dd>
+</dl>
+<h1>ENVIRONMENT</h1>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<h1>BUGS</h1>
+<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<h1>SEE ALSO</h1>
+<p><strong>cbmc</strong>(1), <strong>goto-cc</strong>(1) <strong>goto-instrument</strong>(1)</p>
+<h1>COPYRIGHT</h1>
+<p>2022, Qinheping Hu</p>

@@ -16,6 +16,7 @@ var modules =
     [ "goto-instrument", "group__goto-instrument.html", null ],
     [ "goto-programs", "group__goto-programs.html", null ],
     [ "goto-symex", "group__goto-symex.html", null ],
+    [ "goto-synthesizer", "group__goto-synthesizer.html", null ],
     [ "jsil", "group__jsil.html", null ],
     [ "json", "group__json.html", null ],
     [ "langapi", "group__langapi.html", null ],
