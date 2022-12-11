@@ -1,7 +1,8 @@
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
-DIRS = cbmc \
+DIRS = cbmc-shadow-memory \
+       cbmc \
        cbmc-library \
        cprover \
        crangler \
