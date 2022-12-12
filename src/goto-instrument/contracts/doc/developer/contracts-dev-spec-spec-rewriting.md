@@ -215,4 +215,4 @@ void foo(
 ---
  Prev | Next
 :-----|:------
- @ref contracts-dev-spec-spec-rewriting | @ref contracts-dev-spec-dfcc
+ @ref contracts-dev-spec-codegen | @ref contracts-dev-spec-memory-predicates-rewriting

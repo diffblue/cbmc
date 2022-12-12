@@ -33,6 +33,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc_is_fresh.h"
 #include "dfcc_library.h"
 #include "dfcc_obeys_contract.h"
+#include "dfcc_pointer_in_range.h"
 #include "dfcc_utils.h"
 
 #include <memory>
@@ -239,6 +240,10 @@ void dfcc_instrumentt::instrument_harness_function(
   auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
   auto &body = goto_function.body;
 
+  // rewrite pointer_in_range calls
+  dfcc_pointer_in_ranget pointer_in_range(library, message_handler);
+  pointer_in_range.rewrite_calls(body, null_expr);
+
   // rewrite is_fresh_calls
   dfcc_is_fresht is_fresh(library, message_handler);
   is_fresh.rewrite_calls(body, null_expr);
@@ -425,6 +430,11 @@ void dfcc_instrumentt::instrument_instructions(
   const std::function<bool(const goto_programt::targett &)> &pred,
   std::set<irep_idt> &function_pointer_contracts)
 {
+  // rewrite pointer_in_range calls
+  dfcc_pointer_in_ranget pointer_in_range(library, message_handler);
+  pointer_in_range.rewrite_calls(
+    goto_program, first_instruction, last_instruction, write_set);
+
   // rewrite is_fresh calls
   dfcc_is_fresht is_fresh(library, message_handler);
   is_fresh.rewrite_calls(

@@ -108,6 +108,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 #ifndef __GNUC__
 _Bool __builtin_mul_overflow();
 #endif
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
 
 void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
@@ -146,10 +147,6 @@ __CPROVER_HIDE:;
   // and __CPROVER_allocate doesn't, but no one cares
   malloc_res = __CPROVER_allocate(alloc_size, 1);
 
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated =
-    (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
-
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_is_new_array =
@@ -173,6 +170,9 @@ __CPROVER_HIDE:;
 #undef malloc
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 // malloc is marked "inline" for the benefit of goto-analyzer. Really,
 // goto-analyzer should take care of inlining as needed.
@@ -210,10 +210,6 @@ __CPROVER_HIDE:;
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
 
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated =
-    (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
-
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_is_new_array =
@@ -233,16 +229,16 @@ __CPROVER_HIDE:;
 /* FUNCTION: __builtin_alloca */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-extern void *__CPROVER_alloca_object;
+const void *__CPROVER_alloca_object = 0;
+#ifndef LIBRARY_CHECK
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
   __CPROVER_HIDE:;
   void *res;
   res = __CPROVER_allocate(alloca_size, 0);
-
-  // make sure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // record the object size for non-determistic bounds checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
@@ -276,7 +272,13 @@ __CPROVER_HIDE:;
 #undef free
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-extern void *__CPROVER_alloca_object;
+#ifndef LIBRARY_CHECK
+const void *__CPROVER_alloca_object = 0;
+#endif
+const void *__CPROVER_new_object = 0;
+#ifndef LIBRARY_CHECK
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 void free(void *ptr)
 {

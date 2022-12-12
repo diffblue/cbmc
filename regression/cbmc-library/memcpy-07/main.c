@@ -1,4 +1,5 @@
 // #include <string.h> intentionally omitted
+void *memcpy();
 
 struct c
 {

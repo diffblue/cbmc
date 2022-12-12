@@ -49,27 +49,27 @@ include ../config.inc
 include ../common
 
 BUILTIN_FILES = \
-  arm_builtin_headers.inc \
-  clang_builtin_headers.inc \
   cprover_builtin_headers.inc \
-  cw_builtin_headers.inc \
-  gcc_builtin_headers_alpha.inc \
-  gcc_builtin_headers_arm.inc \
-  gcc_builtin_headers_generic.inc \
-  gcc_builtin_headers_ia32-2.inc \
-  gcc_builtin_headers_ia32-3.inc \
-  gcc_builtin_headers_ia32-4.inc \
-  gcc_builtin_headers_ia32-5.inc \
-  gcc_builtin_headers_ia32.inc \
-  gcc_builtin_headers_math.inc \
-  gcc_builtin_headers_mem_string.inc \
-  gcc_builtin_headers_mips.inc \
-  gcc_builtin_headers_omp.inc \
-  gcc_builtin_headers_power.inc \
-  gcc_builtin_headers_tm.inc \
-  gcc_builtin_headers_types.inc \
-  gcc_builtin_headers_ubsan.inc \
-  windows_builtin_headers.inc
+  compiler_headers/arm_builtin_headers.inc \
+  compiler_headers/clang_builtin_headers.inc \
+  compiler_headers/cw_builtin_headers.inc \
+  compiler_headers/gcc_builtin_headers_alpha.inc \
+  compiler_headers/gcc_builtin_headers_arm.inc \
+  compiler_headers/gcc_builtin_headers_generic.inc \
+  compiler_headers/gcc_builtin_headers_ia32-2.inc \
+  compiler_headers/gcc_builtin_headers_ia32-3.inc \
+  compiler_headers/gcc_builtin_headers_ia32-4.inc \
+  compiler_headers/gcc_builtin_headers_ia32-5.inc \
+  compiler_headers/gcc_builtin_headers_ia32.inc \
+  compiler_headers/gcc_builtin_headers_math.inc \
+  compiler_headers/gcc_builtin_headers_mem_string.inc \
+  compiler_headers/gcc_builtin_headers_mips.inc \
+  compiler_headers/gcc_builtin_headers_omp.inc \
+  compiler_headers/gcc_builtin_headers_power.inc \
+  compiler_headers/gcc_builtin_headers_tm.inc \
+  compiler_headers/gcc_builtin_headers_types.inc \
+  compiler_headers/gcc_builtin_headers_ubsan.inc \
+  compiler_headers/windows_builtin_headers.inc
 
 CLEANFILES = ansi-c$(LIBEXT) \
   ansi_c_y.tab.h ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_y.tab.cpp.output \

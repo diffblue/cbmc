@@ -12,7 +12,9 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
 add_executable(file_converter file_converter.cpp)
 
 function(make_inc name)
+    get_filename_component(inc_path "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc" DIRECTORY)
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${inc_path}
         COMMAND file_converter "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" > "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
         DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" file_converter
     )
@@ -52,51 +54,51 @@ endif()
 
 ################################################################################
 
-make_inc(arm_builtin_headers)
-make_inc(clang_builtin_headers)
+make_inc(compiler_headers/arm_builtin_headers)
+make_inc(compiler_headers/clang_builtin_headers)
+make_inc(compiler_headers/cw_builtin_headers)
+make_inc(compiler_headers/gcc_builtin_headers_alpha)
+make_inc(compiler_headers/gcc_builtin_headers_arm)
+make_inc(compiler_headers/gcc_builtin_headers_generic)
+make_inc(compiler_headers/gcc_builtin_headers_ia32)
+make_inc(compiler_headers/gcc_builtin_headers_ia32-2)
+make_inc(compiler_headers/gcc_builtin_headers_ia32-3)
+make_inc(compiler_headers/gcc_builtin_headers_ia32-4)
+make_inc(compiler_headers/gcc_builtin_headers_ia32-5)
+make_inc(compiler_headers/gcc_builtin_headers_math)
+make_inc(compiler_headers/gcc_builtin_headers_mem_string)
+make_inc(compiler_headers/gcc_builtin_headers_mips)
+make_inc(compiler_headers/gcc_builtin_headers_omp)
+make_inc(compiler_headers/gcc_builtin_headers_power)
+make_inc(compiler_headers/gcc_builtin_headers_tm)
+make_inc(compiler_headers/gcc_builtin_headers_types)
+make_inc(compiler_headers/gcc_builtin_headers_ubsan)
+make_inc(compiler_headers/windows_builtin_headers)
 make_inc(cprover_builtin_headers)
-make_inc(cw_builtin_headers)
-make_inc(gcc_builtin_headers_alpha)
-make_inc(gcc_builtin_headers_arm)
-make_inc(gcc_builtin_headers_generic)
-make_inc(gcc_builtin_headers_ia32)
-make_inc(gcc_builtin_headers_ia32-2)
-make_inc(gcc_builtin_headers_ia32-3)
-make_inc(gcc_builtin_headers_ia32-4)
-make_inc(gcc_builtin_headers_ia32-5)
-make_inc(gcc_builtin_headers_math)
-make_inc(gcc_builtin_headers_mem_string)
-make_inc(gcc_builtin_headers_mips)
-make_inc(gcc_builtin_headers_omp)
-make_inc(gcc_builtin_headers_power)
-make_inc(gcc_builtin_headers_tm)
-make_inc(gcc_builtin_headers_types)
-make_inc(gcc_builtin_headers_ubsan)
-make_inc(windows_builtin_headers)
 
 set(extra_dependencies
-    ${CMAKE_CURRENT_BINARY_DIR}/arm_builtin_headers.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/clang_builtin_headers.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/arm_builtin_headers.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/clang_builtin_headers.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/cw_builtin_headers.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_alpha.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_arm.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_generic.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-2.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-3.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-4.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-5.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_math.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_mem_string.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_mips.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_omp.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_power.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_tm.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_types.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ubsan.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/windows_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc
     ${CMAKE_CURRENT_BINARY_DIR}/cprover_builtin_headers.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/cw_builtin_headers.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_alpha.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_arm.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_generic.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ia32-2.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ia32-3.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ia32-4.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ia32-5.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ia32.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_math.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_mem_string.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_mips.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_omp.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_power.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_tm.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_types.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ubsan.inc
-    ${CMAKE_CURRENT_BINARY_DIR}/windows_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 

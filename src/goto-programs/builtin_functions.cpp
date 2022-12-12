@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rational.h>
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table_base.h>
+#include <util/symbol.h>
 
 #include <langapi/language_util.h>
 
@@ -1473,20 +1473,16 @@ void goto_convertt::do_function_call_symbol(
     // append d or f for double/float
     name+=use_double?'d':'f';
 
+    DATA_INVARIANT(
+      ns.lookup(name).type == f_type,
+      "builtin declaration should match constructed type");
+
     symbol_exprt new_function=function;
     new_function.set_identifier(name);
     new_function.type()=f_type;
 
     code_function_callt function_call(lhs, new_function, new_arguments);
     function_call.add_source_location()=function.source_location();
-
-    if(!symbol_table.has_symbol(name))
-    {
-      symbolt new_symbol{name, f_type, mode};
-      new_symbol.base_name=name;
-      new_symbol.location=function.source_location();
-      symbol_table.add(new_symbol);
-    }
 
     copy(function_call, FUNCTION_CALL, dest);
   }

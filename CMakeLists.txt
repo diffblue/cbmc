@@ -157,6 +157,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
               "$<TARGET_FILE:goto-cc>"
               "$<TARGET_FILE:goto-diff>"
               "$<TARGET_FILE:goto-instrument>"
+              "$<TARGET_FILE:goto-synthesizer>"
               "$<TARGET_FILE:janalyzer>"
               "$<TARGET_FILE:jbmc>"
               "$<TARGET_FILE:jdiff>"
@@ -215,6 +216,7 @@ cprover_default_properties(
     cbmc
     cbmc-lib
     cpp
+    cprover-api-cpp
     cprover
     cprover-lib
     crangler
@@ -232,6 +234,8 @@ cprover_default_properties(
     goto-instrument-lib
     goto-programs
     goto-symex
+    goto-synthesizer
+    goto-synthesizer-lib
     jsil
     json
     json-symtab-language

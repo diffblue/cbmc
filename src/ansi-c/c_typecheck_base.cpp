@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
+#include <goto-programs/name_mangler.h>
+
 #include "ansi_c_declaration.h"
 #include "c_storage_spec.h"
 #include "expr2c.h"
@@ -760,7 +762,6 @@ void c_typecheck_baset::typecheck_declaration(
       declaration.set_is_register(full_spec.is_register);
       declaration.set_is_typedef(full_spec.is_typedef);
       declaration.set_is_weak(full_spec.is_weak);
-      declaration.set_is_used(full_spec.is_used);
 
       symbolt symbol;
       declaration.to_symbol(declarator, symbol);
@@ -788,6 +789,20 @@ void c_typecheck_baset::typecheck_declaration(
         else
           symbol.value = symbol_exprt::typeless(renaming_entry->second);
         symbol.is_macro=true;
+      }
+
+      if(full_spec.is_used && symbol.is_file_local)
+      {
+        // GCC __attribute__((__used__)) - do not treat those as file-local, but
+        // make sure the name is unique
+        symbol.is_file_local = false;
+
+        symbolt symbol_for_renaming = symbol;
+        if(!full_spec.asm_label.empty())
+          symbol_for_renaming.name = full_spec.asm_label;
+        full_spec.asm_label = djb_manglert{}(
+          symbol_for_renaming,
+          id2string(symbol_for_renaming.location.get_file()));
       }
 
       if(full_spec.section.empty())

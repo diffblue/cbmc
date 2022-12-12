@@ -27,6 +27,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_contract_functions.h"
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
+#include "dfcc_lift_memory_predicates.h"
 #include "dfcc_utils.h"
 
 /// Generate the contract write set
@@ -183,7 +184,8 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
   message_handlert &message_handler,
   dfcc_utilst &utils,
   dfcc_libraryt &library,
-  dfcc_instrumentt &instrument)
+  dfcc_instrumentt &instrument,
+  dfcc_lift_memory_predicatest &memory_predicates)
   : contract_mode(contract_mode),
     wrapper_symbol(wrapper_symbol),
     wrapped_symbol(wrapped_symbol),
@@ -214,6 +216,7 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
     utils(utils),
     library(library),
     instrument(instrument),
+    memory_predicates(memory_predicates),
     ns(goto_model.symbol_table),
     converter(goto_model.symbol_table, log.get_message_handler())
 {
@@ -700,6 +703,9 @@ void dfcc_wrapper_programt::encode_requires_clauses()
   }
   const auto address_of_requires_write_set = addr_of_requires_write_set;
 
+  // fix calls to user-defined memory predicates
+  memory_predicates.fix_calls(requires_program);
+
   // instrument for side effects
   instrument.instrument_goto_program(
     wrapper_id,
@@ -765,6 +771,9 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   arguments.emplace_back(addr_of_contract_write_set);
   link_deallocated_contract.add(
     goto_programt::make_function_call(call, wrapper_sl));
+
+  // fix calls to user-defined user-defined memory predicates
+  memory_predicates.fix_calls(ensures_program);
 
   // instrument for side effects
   instrument.instrument_goto_program(
