@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --no-simplify --no-propagation
 ^EXIT=10$

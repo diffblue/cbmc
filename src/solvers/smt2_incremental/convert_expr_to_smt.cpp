@@ -1351,7 +1351,7 @@ static smt_termt convert_expr_to_smt(
     smt_bit_vector_theoryt::extract(offset_bits - 1, 0)(converted_expr);
   if(width > offset_bits)
   {
-    return smt_bit_vector_theoryt::zero_extend(width - offset_bits)(extract_op);
+    return smt_bit_vector_theoryt::sign_extend(width - offset_bits)(extract_op);
   }
   return extract_op;
 }
