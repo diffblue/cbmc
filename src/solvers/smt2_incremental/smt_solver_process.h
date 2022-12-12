@@ -72,15 +72,12 @@ protected:
 class smt_incremental_dry_run_solvert : public smt_base_solver_processt
 {
 public:
-  /// \param message_handler:
-  ///   The messaging system to be used for logging purposes.
   /// \param out_stream:
   ///   Reference to the stream to print the SMT formula.
   /// \param file_stream:
   ///   Pointer to the file stream to print the SMT formula into. `nullptr` if
   ///     output is to `std::cout`.
   smt_incremental_dry_run_solvert(
-    message_handlert &message_handler,
     std::ostream &out_stream,
     std::unique_ptr<std::ostream> file_stream);
 
@@ -101,8 +98,6 @@ protected:
   std::unique_ptr<std::ostream> file_stream;
   /// The output stream reference to print the SMT formula to.
   std::ostream &out_stream;
-  /// For debug printing.
-  messaget log;
 
   /// Description of the current solver
   const std::string desc = "SMT2 incremental dry-run";

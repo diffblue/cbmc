@@ -81,12 +81,9 @@ smt_responset smt_piped_solver_processt::receive_response(
 }
 
 smt_incremental_dry_run_solvert::smt_incremental_dry_run_solvert(
-  message_handlert &message_handler,
   std::ostream &out_stream,
   std::unique_ptr<std::ostream> file_stream)
-  : file_stream(std::move(file_stream)),
-    out_stream(out_stream),
-    log(message_handler)
+  : file_stream(std::move(file_stream)), out_stream(out_stream)
 {
 }
 

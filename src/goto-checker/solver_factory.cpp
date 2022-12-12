@@ -380,7 +380,7 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
         ? nullptr
         : open_outfile_and_check(outfile_arg, message_handler, "--outfile");
     solver_process = util_make_unique<smt_incremental_dry_run_solvert>(
-      message_handler, on_std_out ? std::cout : *outfile, std::move(outfile));
+      on_std_out ? std::cout : *outfile, std::move(outfile));
   }
   else
   {
