@@ -1408,7 +1408,7 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;    <a class="code" href="classsmt__bit__vector__theoryt.html#a878e8f13de0601dca45de9a3706fc105">smt_bit_vector_theoryt::extract</a>(offset_bits - 1, 0)(converted_expr);</div>
 <div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;  <span class="keywordflow">if</span>(width &gt; offset_bits)</div>
 <div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;  {</div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsmt__bit__vector__theoryt.html#a86d510aea2bb45dd41bb671e5ff851c7">smt_bit_vector_theoryt::zero_extend</a>(width - offset_bits)(extract_op);</div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsmt__bit__vector__theoryt.html#a7b51d737568ab464212ecd038effec44">smt_bit_vector_theoryt::sign_extend</a>(width - offset_bits)(extract_op);</div>
 <div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;  }</div>
 <div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;  <span class="keywordflow">return</span> extract_op;</div>
 <div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;}</div>
