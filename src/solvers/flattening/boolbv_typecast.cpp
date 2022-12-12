@@ -187,10 +187,10 @@ bool boolbvt::type_conversion(
       return false;
 
     case bvtypet::IS_BV:
-      INVARIANT(
-        src_width == dest_width,
-        "source bitvector size shall equal the destination bitvector size");
+      INVARIANT(src_width >= dest_width, "cannot extend bv-typed bitvector");
       dest = src;
+      if(dest_width < src_width)
+        dest.resize(dest_width);
       return false;
 
     case bvtypet::IS_C_BIT_FIELD:
@@ -265,10 +265,10 @@ bool boolbvt::type_conversion(
     }
     else if(src_bvtype == bvtypet::IS_BV)
     {
-      INVARIANT(
-        src_width == dest_width,
-        "source bitvector width shall equal the destination bitvector width");
+      INVARIANT(src_width >= dest_width, "cannot extend bv-typed bitvector");
       dest = src;
+      if(dest_width < src_width)
+        dest.resize(dest_width);
       return false;
     }
     else if(
@@ -424,10 +424,10 @@ bool boolbvt::type_conversion(
     break;
 
     case bvtypet::IS_BV:
-      INVARIANT(
-        src_width == dest_width,
-        "source bitvector width shall equal the destination bitvector width");
+      INVARIANT(src_width >= dest_width, "cannot extend bv-typed bitvector");
       dest = src;
+      if(dest_width < src_width)
+        dest.resize(dest_width);
       return false;
 
     case bvtypet::IS_RANGE:
@@ -506,10 +506,10 @@ bool boolbvt::type_conversion(
     break;
 
   case bvtypet::IS_BV:
-    INVARIANT(
-      src_width == dest_width,
-      "source bitvector width shall equal the destination bitvector width");
+    INVARIANT(src_width >= dest_width, "cannot extend bv-typed bitvector");
     dest = src;
+    if(dest_width < src_width)
+      dest.resize(dest_width);
     return false;
 
   case bvtypet::IS_C_BOOL:
