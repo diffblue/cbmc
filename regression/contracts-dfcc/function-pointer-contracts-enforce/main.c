@@ -9,7 +9,7 @@ typedef void (*arr_fun_t)(char *arr, size_t size);
 // resets the first element to zero
 void arr_fun_contract(char *arr, size_t size)
   // clang-format off
-__CPROVER_requires(size > 0 && __CPROVER_is_fresh(arr, size))
+__CPROVER_requires(0 < size && __CPROVER_is_fresh(arr, size))
 __CPROVER_assigns(arr[0])
 __CPROVER_ensures(arr[0] == 0)
   // clang-format on

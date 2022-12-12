@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
 ^.*error: __CPROVER_pointer_in_range_dfcc expects three arguments$
 ^EXIT=(1|64)$
 ^SIGNAL=0$

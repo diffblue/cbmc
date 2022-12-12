@@ -7,8 +7,8 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-This test checks assuming is_fresh(ptr, size) with a non-deterministic size
-does not result in spurious falsifications when checking assigns clauses.
-An implicit strict upper bound of __CPROVER_max_malloc_size is imposed on the size by
-__CPROVER_is_fresh which guarantees the absence of pointer overflow when computing
-the address `ptr + size`.
+This test checks that assuming is_fresh(ptr, size) with a non-deterministic size
+checks that size < __CPROVER_max_malloc_size and then assumes it.
+This guarantees that the address `ptr + size` can always be computed and
+represented without offset bits overflowing into the object bits in the pointer
+model used by CBMC.

@@ -8,10 +8,11 @@
 
 // external dependencies
 extern __CPROVER_size_t __CPROVER_max_malloc_size;
-extern const void *__CPROVER_alloca_object;
+const void *__CPROVER_alloca_object = 0;
 extern const void *__CPROVER_deallocated;
-extern const void *__CPROVER_new_object;
-extern __CPROVER_bool __CPROVER_malloc_is_new_array;
+const void *__CPROVER_new_object = 0;
+extern const void *__CPROVER_memory_leak;
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
 int __builtin_clzll(unsigned long long);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 __CPROVER_size_t __VERIFIER_nondet_size();
@@ -1191,17 +1192,41 @@ __CPROVER_HIDE:;
         (write_set->assert_ensures_ctx == 0),
       "only one context flag at a time");
 #endif
-    // fail if size is too big
-    if(size >= __CPROVER_max_malloc_size)
-      return 0;
+    if(
+      __CPROVER_malloc_failure_mode ==
+      __CPROVER_malloc_failure_mode_return_null)
+    {
+      // When --malloc-may-fail --malloc-fail-null
+      // add implicit assumption that the size is capped
+      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+    }
+    else if(
+      __CPROVER_malloc_failure_mode ==
+      __CPROVER_malloc_failure_mode_assert_then_assume)
+    {
+      // When --malloc-may-fail --malloc-fail-assert
+      // check if max allocation size is exceeded and
+      // add implicit assumption that the size is capped
+      __CPROVER_assert(
+        size < __CPROVER_max_malloc_size,
+        "__CPROVER_is_fresh max allocation size exceeded");
+      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+    }
 
-    // pass a null write set pointer to the instrumented malloc
-    void *ptr = __CPROVER_contracts_malloc(size, 0);
+    void *ptr = __CPROVER_allocate(size, 0);
     *elem = ptr;
-    // malloc can also return a NULL pointer if failure modes are active
-    if(!ptr)
-      return 0;
-      // record fresh object in the object set
+
+    // record the object size for non-determistic bounds checking
+    __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_malloc_is_new_array =
+      record_malloc ? 0 : __CPROVER_malloc_is_new_array;
+
+    // do not detect memory leaks when assuming a precondition of a contract
+    // for contract checking
+    // __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
+    // __CPROVER_memory_leak = record_may_leak ? ptr : __CPROVER_memory_leak;
+
+    // record fresh object in the object set
 #ifdef DFCC_DEBUG
     // manually inlined below
     __CPROVER_contracts_obj_set_add(write_set->linked_is_fresh, ptr);
@@ -1226,13 +1251,37 @@ __CPROVER_HIDE:;
       "only one context flag at a time");
 #endif
     // fail if size is too big
-    if(size >= __CPROVER_max_malloc_size)
-      return 0;
-    void *ptr = __CPROVER_contracts_malloc(size, 0);
+    if(
+      __CPROVER_malloc_failure_mode ==
+      __CPROVER_malloc_failure_mode_return_null)
+    {
+      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+    }
+    else if(
+      __CPROVER_malloc_failure_mode ==
+      __CPROVER_malloc_failure_mode_assert_then_assume)
+    {
+      __CPROVER_assert(
+        size < __CPROVER_max_malloc_size,
+        "__CPROVER_is_fresh requires size < __CPROVER_max_malloc_size");
+      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+    }
+
+    void *ptr = __CPROVER_allocate(size, 0);
     *elem = ptr;
-    if(!ptr)
-      return 0;
-      // record fresh object in the caller's write set
+
+    // record the object size for non-determistic bounds checking
+    __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_malloc_is_new_array =
+      record_malloc ? 0 : __CPROVER_malloc_is_new_array;
+
+    // detect memory leaks when is_fresh is assumed in a post condition
+    // of a replaced contract to model a malloc performed by the function
+    // being abstracted by the contract
+    __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
+    __CPROVER_memory_leak = record_may_leak ? ptr : __CPROVER_memory_leak;
+
+    // record fresh object in the caller's write set
 #ifdef DFCC_DEBUG
     __CPROVER_contracts_obj_set_add(write_set->linked_allocated, ptr);
 #else

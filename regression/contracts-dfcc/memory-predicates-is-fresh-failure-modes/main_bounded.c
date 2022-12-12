@@ -1,12 +1,15 @@
 #include <stdlib.h>
 
+const size_t MAX_SIZE = 5000000;
 void foo(char *arr, size_t size)
   // clang-format off
+__CPROVER_requires(size < MAX_SIZE)
 __CPROVER_requires(__CPROVER_is_fresh(arr, size))
 __CPROVER_assigns(__CPROVER_object_from(arr))
 // clang-format on
 {
-  assert(__CPROVER_same_object(arr, arr + size));
+  __CPROVER_assert(arr != NULL, "arr is not NULL");
+  __CPROVER_assert(size < __CPROVER_max_malloc_size, "size is capped");
   if(size > 0)
   {
     arr[0] = 0;

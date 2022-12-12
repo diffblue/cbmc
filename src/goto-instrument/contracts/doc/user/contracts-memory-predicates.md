@@ -129,6 +129,40 @@ int foo()
 }
 ```
 
+#### Influence of memory allocation failure modes flags in assumption contexts
+
+CBMC models
+[memory allocation failure modes](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/memory-primitives.md#malloc-modelling).
+When activated, these modesl result in different
+behaviours for `__CPROVER_is_fresh` in assumption contexts (i.e. when used in a
+requires clause of a contract being checked against a function, or in an
+ensures clause of a contract being used to abstract a function call).
+
+1. **No failure mode** (no flags):
+  In this mode, `malloc` and `__CPROVER_is_fresh` never fail
+  and will accept a size parameter up to `SIZE_MAX` without triggerring errors.
+  However, pointer overflow and assigns clause checking errors will happen any
+  time one tries to access such objects beyond an offset of
+  `__CPROVER_max_malloc_size` (in bytes), by executing `ptr[size-1]` or
+  `ptr[size]` in user-code, or by writing
+  `__CPROVER_assigns(__CPROVER_object_from(ptr))` in a contract;
+1. **Fail with NULL** (flags: `--malloc-may-fail --malloc-fail-null`):
+  In this mode, if `size` is larger than
+  `__CPROVER_max_malloc_size`, `malloc` returns a NULL pointer, and imposes an
+  implicit assumption that size is less than `__CPROVER_max_malloc_size` when
+  returning a non-NULL pointer. `__CPROVER_is_fresh` never fails in assumption
+  contexts, so it adds an implicit assumption that `size` is less
+  than `__CPROVER_max_malloc_size`.
+1. **Fail assert** (flags: `--malloc-may-fail --malloc-fail-assert`):
+  In this mode, if `size` is larger
+  than `__CPROVER_max_malloc_size`, an `max allocation size exceeded` assertion
+  is triggered in `malloc` and execution continues under the assumption that
+  `size` is less than `__CPROVER_max_malloc_size`, with `malloc` returning a
+  non-NULL pointer. `__CPROVER_is_fresh` never fails in assumption contexts,
+  so it will trigger a `max allocation size exceeded` assertion and continue
+  execution under the implicit assumption that `size` is less than
+  `__CPROVER_max_malloc_size`.
+
 ## The __CPROVER_pointer_in_range_dfcc predicate
 ### Syntax
 
