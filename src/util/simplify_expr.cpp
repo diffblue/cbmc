@@ -862,6 +862,17 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     to_constant_expr(tmp).set_value(ID_NULL);
     return std::move(tmp);
   }
+  else if(
+    expr_type.id() == ID_pointer && expr.op().is_constant() &&
+    (op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv ||
+     op_type.id() == ID_bv) &&
+    to_bitvector_type(op_type).get_width() >=
+      to_bitvector_type(expr_type).get_width())
+  {
+    constant_exprt new_expr = to_constant_expr(expr.op());
+    new_expr.type() = expr_type;
+    return new_expr;
+  }
 
   // eliminate duplicate pointer typecasts
   // (T1 *)(T2 *)x -> (T1 *)x
