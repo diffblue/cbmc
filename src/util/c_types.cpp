@@ -74,6 +74,13 @@ signedbv_typet signed_size_type()
   return pointer_diff_type();
 }
 
+signedbv_typet pointer_offset_type()
+{
+  // Use use one extra bit on top of size_t to encode both
+  // all of size_t and negative offsets.
+  return signedbv_typet(config.ansi_c.pointer_width + 1);
+}
+
 signedbv_typet signed_long_int_type()
 {
   signedbv_typet result(config.ansi_c.long_int_width);
