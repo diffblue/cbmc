@@ -11,8 +11,10 @@
 
 smt_piped_solver_processt::smt_piped_solver_processt(
   std::string command_line,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  std::unique_ptr<std::ostream> out_stream)
   : command_line_description{"\"" + command_line + "\""},
+    out_stream(std::move(out_stream)),
     process{split_string(command_line, ' ', false, true), message_handler},
     log{message_handler}
 {
@@ -28,6 +30,15 @@ void smt_piped_solver_processt::send(const smt_commandt &smt_command)
   const std::string command_string = smt_to_smt2_string(smt_command);
   log.debug() << "Sending command to SMT2 solver - " << command_string
               << messaget::eom;
+
+  if(out_stream != nullptr)
+  {
+    // Using `std::endl` instead of '\n' to also flush the stream as it is a
+    // debugging functionality, to guarantee a consistent output in case of
+    // hanging after `(check-sat)`
+    *out_stream << command_string << std::endl;
+  }
+
   const auto response = process.send(command_string + "\n");
   switch(response)
   {

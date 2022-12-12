@@ -37,9 +37,12 @@ public:
   ///   The command and arguments for invoking the smt2 solver.
   /// \param message_handler:
   ///   The messaging system to be used for logging purposes.
+  /// \param out_stream:
+  ///   Pointer to the stream to print the SMT formula. `nullptr` if no output.
   smt_piped_solver_processt(
     std::string command_line,
-    message_handlert &message_handler);
+    message_handlert &message_handler,
+    std::unique_ptr<std::ostream> out_stream);
 
   const std::string &description() override;
 
@@ -54,6 +57,8 @@ public:
 protected:
   /// The command line used to start the process.
   std::string command_line_description;
+  /// Pointer to the stream to print the SMT formula. `nullptr` if no output.
+  std::unique_ptr<std::ostream> out_stream;
   /// The raw solver sub process.
   piped_processt process;
   /// For buffering / combining communications from the solver to cbmc.
