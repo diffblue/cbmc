@@ -1,8 +1,8 @@
 CORE
 main-contract-signature-conflict.c
 --dfcc main --enforce-contract foo
-^.*function 'foo' and the corresponding pure contract symbol 'contract::foo' have incompatible type signatures.*$
-^EXIT=6$
+function symbol 'foo' redefined with a different type
+^EXIT=(64|1)$
 ^SIGNAL=0$
 --
 --

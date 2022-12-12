@@ -5,7 +5,7 @@ main.c
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-Base name\.+: fun\nMode\.+: C\nType\.+: signed int \(\)
-Base name\.+: fun2\nMode\.+: C\nType\.+: MYINT \(\)
+Base name\.+: fun\nMode\.+: C\nType\.+: signed int \(void\)
+Base name\.+: fun2\nMode\.+: C\nType\.+: MYINT \(void\)
 --
 warning: ignoring

@@ -853,7 +853,11 @@ void goto_convertt::do_function_call_symbol(
   {
     do_function_call_symbol(*symbol);
 
-    code_function_callt function_call(lhs, function, arguments);
+    // use symbol->symbol_expr() to ensure we use the type from the symbol table
+    code_function_callt function_call(
+      lhs,
+      symbol->symbol_expr().with_source_location<symbol_exprt>(function),
+      arguments);
     function_call.add_source_location() = function.source_location();
 
     // remove void-typed assignments, which may have been created when the
@@ -1495,7 +1499,11 @@ void goto_convertt::do_function_call_symbol(
     do_function_call_symbol(*symbol);
 
     // insert function call
-    code_function_callt function_call(lhs, function, arguments);
+    // use symbol->symbol_expr() to ensure we use the type from the symbol table
+    code_function_callt function_call(
+      lhs,
+      symbol->symbol_expr().with_source_location<symbol_exprt>(function),
+      arguments);
     function_call.add_source_location()=function.source_location();
 
     // remove void-typed assignments, which may have been created when the
