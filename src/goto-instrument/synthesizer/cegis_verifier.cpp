@@ -17,6 +17,7 @@ Author: Qinheping Hu
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 
+#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/pointer_arithmetic.h>
 #include <goto-programs/process_goto_program.h>
@@ -391,6 +392,11 @@ bool cegis_verifiert::verify()
     checker = util_make_unique<
       all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>(
       options, ui_message_handler, goto_model);
+
+  goto_convert(
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    log.get_message_handler());
 
   // Run the checker to get the result.
   const resultt result = (*checker)();
