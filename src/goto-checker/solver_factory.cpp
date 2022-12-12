@@ -382,17 +382,20 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
     solver_process = util_make_unique<smt_incremental_dry_run_solvert>(
       on_std_out ? std::cout : *outfile, std::move(outfile));
   }
-  else
+  else if(!dump_smt_formula.empty())
   {
-    const auto out_filename = options.get_option("dump-smt-formula");
-
     // If no out_filename is provided `open_outfile_and_check` will return
     // `nullptr`, and the solver will work normally without any logging.
-    solver_process = util_make_unique<smt_piped_solver_processt>(
+    solver_process = util_make_unique<smt_piped_solver_process_with_dumpt>(
       std::move(solver_command),
       message_handler,
       open_outfile_and_check(
-        out_filename, message_handler, "--dump-smt-formula"));
+        dump_smt_formula, message_handler, "--dump-smt-formula"));
+  }
+  else
+  {
+    solver_process = util_make_unique<smt_piped_solver_processt>(
+      std::move(solver_command), message_handler);
   }
 
   return util_make_unique<solvert>(

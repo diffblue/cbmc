@@ -9,12 +9,16 @@
 #include <util/invariant.h>
 #include <util/string_utils.h>
 
+void smt_base_solver_processt::send(const smt_commandt &smt_command)
+{
+  const std::string command_string = smt_to_smt2_string(smt_command);
+  send(command_string);
+}
+
 smt_piped_solver_processt::smt_piped_solver_processt(
   std::string command_line,
-  message_handlert &message_handler,
-  std::unique_ptr<std::ostream> out_stream)
+  message_handlert &message_handler)
   : command_line_description{"\"" + command_line + "\""},
-    out_stream(std::move(out_stream)),
     process{split_string(command_line, ' ', false, true), message_handler},
     log{message_handler}
 {
@@ -25,20 +29,10 @@ std::string smt_piped_solver_processt::description()
   return command_line_description;
 }
 
-void smt_piped_solver_processt::send(const smt_commandt &smt_command)
+void smt_piped_solver_processt::send(const std::string &command_string)
 {
-  const std::string command_string = smt_to_smt2_string(smt_command);
   log.debug() << "Sending command to SMT2 solver - " << command_string
               << messaget::eom;
-
-  if(out_stream != nullptr)
-  {
-    // Using `std::endl` instead of '\n' to also flush the stream as it is a
-    // debugging functionality, to guarantee a consistent output in case of
-    // hanging after `(check-sat)`
-    *out_stream << command_string << std::endl;
-  }
-
   const auto response = process.send(command_string + "\n");
   switch(response)
   {
@@ -92,9 +86,9 @@ std::string smt_incremental_dry_run_solvert::description()
   return "SMT2 incremental dry-run";
 }
 
-void smt_incremental_dry_run_solvert::send(const smt_commandt &smt_command)
+void smt_incremental_dry_run_solvert::send(const std::string &smt_command)
 {
-  out_stream << smt_to_smt2_string(smt_command) << '\n';
+  out_stream << smt_command << '\n';
 }
 
 smt_responset smt_incremental_dry_run_solvert::receive_response(
@@ -105,4 +99,30 @@ smt_responset smt_incremental_dry_run_solvert::receive_response(
   // `unknown`, and does not trigger a subsequent invocation to get the model
   // (as a `smt_sat_responset` answer will trigger).
   return smt_check_sat_responset{smt_unsat_responset{}};
+}
+
+smt_piped_solver_process_with_dumpt::smt_piped_solver_process_with_dumpt(
+  std::string command_line,
+  message_handlert &message_handler,
+  std::unique_ptr<std::ostream> out_stream)
+  : smt_piped_solver_processt{std::move(command_line), message_handler},
+    smt_incremental_dry_run_solvert{*out_stream, std::move(out_stream)}
+{
+}
+
+void smt_piped_solver_process_with_dumpt::send(const std::string &command)
+{
+  smt_incremental_dry_run_solvert::send(command);
+  smt_piped_solver_processt::send(command);
+}
+
+std::string smt_piped_solver_process_with_dumpt::description()
+{
+  return smt_piped_solver_processt::description();
+}
+
+smt_responset smt_piped_solver_process_with_dumpt::receive_response(
+  const std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
+{
+  return smt_piped_solver_processt::receive_response(identifier_table);
 }
