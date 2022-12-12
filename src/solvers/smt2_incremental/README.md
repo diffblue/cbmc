@@ -35,14 +35,6 @@ The new incremental SMT backend has been designed to interoperate with external
 solvers, so the solver name must be in the `PATH` or an executable with full
 path must be provided.
 
-Due to lack of support for conversion of `array_of` expressions that are added
-by CBMC in the before the new SMT backend is invoked, it is necessary to supply
-an extra argument `--slice-formula` so that instances of `arrayof_exprt` are
-removed from the formula to be converted.
-
-As we move forward with our array-support implementation, we anticipate that the
-need for this extra flag will be diminished.
-
 ## Internal code architecture
 
 ### Overview of the sequence of data processing and data flow -

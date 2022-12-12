@@ -8,7 +8,6 @@ VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$
 --
-type: pointer
 --
 Test that given a `.c` program where all assertions hold, the solver responds
 with unsat and CBMC reports that verification is successful.

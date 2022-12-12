@@ -1,6 +1,6 @@
 CORE
 pointer_values_2.c
---trace --slice-formula
+--trace
 \[main\.assertion\.1\] line \d should fail as b can also be assigned 0xDEADBEEF: FAILURE
 a=\(signed int \*\)3735928559
 b=\(signed int \*\)3735928559
