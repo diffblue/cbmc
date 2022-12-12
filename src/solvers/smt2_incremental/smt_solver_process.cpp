@@ -20,7 +20,7 @@ smt_piped_solver_processt::smt_piped_solver_processt(
 {
 }
 
-const std::string &smt_piped_solver_processt::description()
+std::string smt_piped_solver_processt::description()
 {
   return command_line_description;
 }
@@ -87,9 +87,9 @@ smt_incremental_dry_run_solvert::smt_incremental_dry_run_solvert(
 {
 }
 
-const std::string &smt_incremental_dry_run_solvert::description()
+std::string smt_incremental_dry_run_solvert::description()
 {
-  return desc;
+  return "SMT2 incremental dry-run";
 }
 
 void smt_incremental_dry_run_solvert::send(const smt_commandt &smt_command)

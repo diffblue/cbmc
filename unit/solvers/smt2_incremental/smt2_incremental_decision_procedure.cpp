@@ -74,7 +74,7 @@ public:
   {
   }
 
-  const std::string &description() override
+  std::string description() override
   {
     UNREACHABLE;
   }

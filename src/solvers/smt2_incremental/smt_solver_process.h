@@ -17,7 +17,7 @@ class smt_commandt;
 class smt_base_solver_processt
 {
 public:
-  virtual const std::string &description() = 0;
+  virtual std::string description() = 0;
 
   /// \brief Converts given SMT2 command to SMT2 string and sends it to the
   ///    solver process.
@@ -44,7 +44,7 @@ public:
     message_handlert &message_handler,
     std::unique_ptr<std::ostream> out_stream);
 
-  const std::string &description() override;
+  std::string description() override;
 
   void send(const smt_commandt &smt_command) override;
 
@@ -81,7 +81,7 @@ public:
     std::ostream &out_stream,
     std::unique_ptr<std::ostream> file_stream);
 
-  const std::string &description() override;
+  std::string description() override;
 
   void send(const smt_commandt &smt_command) override;
 
@@ -98,9 +98,6 @@ protected:
   std::unique_ptr<std::ostream> file_stream;
   /// The output stream reference to print the SMT formula to.
   std::ostream &out_stream;
-
-  /// Description of the current solver
-  const std::string desc = "SMT2 incremental dry-run";
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_SOLVER_PROCESS_H
