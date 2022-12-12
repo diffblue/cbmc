@@ -1,5 +1,6 @@
 var NAVTREEINDEX60 =
 {
+"classsmt__core__theoryt.html#a5816cc0d7bf0fc74458afa8becd26dfb":[6,0,1076,14],
 "classsmt__core__theoryt.html#ad22cb1751a8fc5adf3b3cbe1ae229f15":[6,0,1076,9],
 "classsmt__core__theoryt.html#aee63d386df0284e03d5510f7f079ccc0":[6,0,1076,12],
 "classsmt__core__theoryt.html#afb75a4ed1c9eaa2ae0dcabbc58bdfcd5":[6,0,1076,15],
@@ -143,10 +144,11 @@ var NAVTREEINDEX60 =
 "classsmt__piped__solver__processt.html#a25471c43457f27c52e6f754ead4bc99e":[6,0,1101,4],
 "classsmt__piped__solver__processt.html#a3f1ddebc550b58d026d5e86a45700718":[6,0,1101,1],
 "classsmt__piped__solver__processt.html#a4ff6bfc60fc62796134478109bf3c25d":[6,0,1101,2],
-"classsmt__piped__solver__processt.html#a7849f2ff8b4ff957ca2076c8447519a7":[6,0,1101,8],
-"classsmt__piped__solver__processt.html#a8561b3013799136d2e17772c3340e473":[6,0,1101,0],
+"classsmt__piped__solver__processt.html#a7849f2ff8b4ff957ca2076c8447519a7":[6,0,1101,9],
+"classsmt__piped__solver__processt.html#ab5c506da7e045f94248efa0dcc9bd2bf":[6,0,1101,0],
 "classsmt__piped__solver__processt.html#abfcdb3a870f10e10c69e949b300a5f63":[6,0,1101,3],
-"classsmt__piped__solver__processt.html#adcd93cfdc883868860d48f58d21eded2":[6,0,1101,7],
+"classsmt__piped__solver__processt.html#acadd00c5f576553ccddf232462060439":[6,0,1101,7],
+"classsmt__piped__solver__processt.html#adcd93cfdc883868860d48f58d21eded2":[6,0,1101,8],
 "classsmt__pop__commandt.html":[6,0,1102],
 "classsmt__pop__commandt.html#a27aa2d2e4518965ee801f90f53eda36e":[6,0,1102,1],
 "classsmt__pop__commandt.html#a574f37afddb618d21a9fd34f2db767c2":[6,0,1102,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX60 =
 "classsolver__factoryt.html#a425cf88f6cb97ec9b4d5cd1518f64669":[6,0,1119,4],
 "classsolver__factoryt.html#a46e71b3faf0bf24a01547adbd623fa29":[6,0,1119,1],
 "classsolver__factoryt.html#a51c649ddc04da302a7f77b63c2cbf446":[6,0,1119,5],
-"classsolver__factoryt.html#a62906235bbc56ed332b3a3a621f5db1b":[6,0,1119,13],
-"classsolver__factoryt.html#a7bba17dd53b0fc1fe11797777965ba8d":[6,0,1119,12],
-"classsolver__factoryt.html#a903c43676fad2ec972d230d1ad4b0e74":[6,0,1119,14]
+"classsolver__factoryt.html#a62906235bbc56ed332b3a3a621f5db1b":[6,0,1119,13]
 };

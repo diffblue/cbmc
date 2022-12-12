@@ -1,5 +1,7 @@
 var NAVTREEINDEX99 =
 {
+"group__goto-programs.html":[4,14],
+"group__goto-symex.html":[4,15],
 "group__goto-synthesizer.html":[4,16],
 "group__janalyzer.html":[4,27],
 "group__java__bytecode.html":[4,28],
@@ -247,7 +249,5 @@ var NAVTREEINDEX99 =
 "instrument__spec__assigns_8h.html#ac09a386785e5b5ac02ebdf7b5dbd44bca88a48ee392a039e394663307de6bd66d":[7,0,2,13,1,10,4,1],
 "instrument__spec__assigns_8h.html#ac8b2e427daf191181f39934e4a9c5a5d":[7,0,2,13,1,10,9],
 "instrument__spec__assigns_8h_source.html":[7,0,2,13,1,10],
-"instrumenter__pensieve_8h.html":[7,0,2,13,3,11],
-"instrumenter__pensieve_8h_source.html":[7,0,2,13,3,11],
-"instrumenter__strategies_8cpp.html":[7,0,2,13,3,12]
+"instrumenter__pensieve_8h.html":[7,0,2,13,3,11]
 };

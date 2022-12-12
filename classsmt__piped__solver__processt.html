@@ -111,14 +111,14 @@ $(document).ready(function(){initNavTree('classsmt__piped__solver__processt.html
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classsmt__piped__solver__processt__coll__graph.svg" width="2231" height="488"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classsmt__piped__solver__processt__coll__graph.svg" width="2279" height="524"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8561b3013799136d2e17772c3340e473"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#a8561b3013799136d2e17772c3340e473">smt_piped_solver_processt</a> (std::string command_line, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="separator:a8561b3013799136d2e17772c3340e473"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5c506da7e045f94248efa0dcc9bd2bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#ab5c506da7e045f94248efa0dcc9bd2bf">smt_piped_solver_processt</a> (std::string command_line, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, std::unique_ptr&lt; std::ostream &gt; <a class="el" href="classsmt__piped__solver__processt.html#acadd00c5f576553ccddf232462060439">out_stream</a>)</td></tr>
+<tr class="separator:ab5c506da7e045f94248efa0dcc9bd2bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ff6bfc60fc62796134478109bf3c25d"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#a4ff6bfc60fc62796134478109bf3c25d">description</a> () override</td></tr>
 <tr class="separator:a4ff6bfc60fc62796134478109bf3c25d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25471c43457f27c52e6f754ead4bc99e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#a25471c43457f27c52e6f754ead4bc99e">send</a> (const <a class="el" href="classsmt__commandt.html">smt_commandt</a> &amp;smt_command) override</td></tr>
@@ -137,6 +137,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a06579c719d2b594396f0ec793e5ebe7d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#a06579c719d2b594396f0ec793e5ebe7d">command_line_description</a></td></tr>
 <tr class="memdesc:a06579c719d2b594396f0ec793e5ebe7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The command line used to start the process.  <a href="classsmt__piped__solver__processt.html#a06579c719d2b594396f0ec793e5ebe7d">More...</a><br /></td></tr>
 <tr class="separator:a06579c719d2b594396f0ec793e5ebe7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acadd00c5f576553ccddf232462060439"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; std::ostream &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#acadd00c5f576553ccddf232462060439">out_stream</a></td></tr>
+<tr class="memdesc:acadd00c5f576553ccddf232462060439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the stream to print the SMT formula. <code>nullptr</code> if no output.  <a href="classsmt__piped__solver__processt.html#acadd00c5f576553ccddf232462060439">More...</a><br /></td></tr>
+<tr class="separator:acadd00c5f576553ccddf232462060439"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcd93cfdc883868860d48f58d21eded2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classpiped__processt.html">piped_processt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt__piped__solver__processt.html#adcd93cfdc883868860d48f58d21eded2">process</a></td></tr>
 <tr class="memdesc:adcd93cfdc883868860d48f58d21eded2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The raw solver sub process.  <a href="classsmt__piped__solver__processt.html#adcd93cfdc883868860d48f58d21eded2">More...</a><br /></td></tr>
 <tr class="separator:adcd93cfdc883868860d48f58d21eded2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,8 +154,8 @@ Protected Attributes</h2></td></tr>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00033">33</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8561b3013799136d2e17772c3340e473"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8561b3013799136d2e17772c3340e473">&#9670;&nbsp;</a></span>smt_piped_solver_processt()</h2>
+<a id="ab5c506da7e045f94248efa0dcc9bd2bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5c506da7e045f94248efa0dcc9bd2bf">&#9670;&nbsp;</a></span>smt_piped_solver_processt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -167,7 +170,13 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
-          <td class="paramname"><em>message_handler</em>&#160;</td>
+          <td class="paramname"><em>message_handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unique_ptr&lt; std::ostream &gt;&#160;</td>
+          <td class="paramname"><em>out_stream</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -180,6 +189,7 @@ Protected Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">command_line</td><td>The command and arguments for invoking the smt2 solver. </td></tr>
     <tr><td class="paramname">message_handler</td><td>The messaging system to be used for logging purposes. </td></tr>
+    <tr><td class="paramname">out_stream</td><td>Pointer to the stream to print the SMT formula. <code>nullptr</code> if no output. </td></tr>
   </table>
   </dd>
 </dl>
@@ -239,7 +249,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classsmt__base__solver__processt.html#a2c593d281f773e6b871b6ad7f60460a7">smt_base_solver_processt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8cpp_source.html#l00021">21</a> of file <a class="el" href="smt__solver__process_8cpp_source.html">smt_solver_process.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8cpp_source.html#l00023">23</a> of file <a class="el" href="smt__solver__process_8cpp_source.html">smt_solver_process.cpp</a>.</p>
 
 </div>
 </div>
@@ -269,7 +279,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classsmt__base__solver__processt.html#ade955dae551a3362b2d07ff9d6b4554d">smt_base_solver_processt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8cpp_source.html#l00056">56</a> of file <a class="el" href="smt__solver__process_8cpp_source.html">smt_solver_process.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8cpp_source.html#l00067">67</a> of file <a class="el" href="smt__solver__process_8cpp_source.html">smt_solver_process.cpp</a>.</p>
 
 </div>
 </div>
@@ -301,7 +311,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classsmt__base__solver__processt.html#aa4eba82b93f3d3150a857043f53a8d3d">smt_base_solver_processt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8cpp_source.html#l00026">26</a> of file <a class="el" href="smt__solver__process_8cpp_source.html">smt_solver_process.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8cpp_source.html#l00028">28</a> of file <a class="el" href="smt__solver__process_8cpp_source.html">smt_solver_process.cpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +338,7 @@ Protected Attributes</h2></td></tr>
 
 <p>The command line used to start the process. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00056">56</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00059">59</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
 
 </div>
 </div>
@@ -354,7 +364,33 @@ Protected Attributes</h2></td></tr>
 
 <p>For debug printing. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00062">62</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00067">67</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
+
+</div>
+</div>
+<a id="acadd00c5f576553ccddf232462060439"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acadd00c5f576553ccddf232462060439">&#9670;&nbsp;</a></span>out_stream</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;std::ostream&gt; smt_piped_solver_processt::out_stream</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Pointer to the stream to print the SMT formula. <code>nullptr</code> if no output. </p>
+
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00061">61</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
 
 </div>
 </div>
@@ -380,7 +416,7 @@ Protected Attributes</h2></td></tr>
 
 <p>The raw solver sub process. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00058">58</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00063">63</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
 
 </div>
 </div>
@@ -406,7 +442,7 @@ Protected Attributes</h2></td></tr>
 
 <p>For buffering / combining communications from the solver to cbmc. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00060">60</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__solver__process_8h_source.html#l00065">65</a> of file <a class="el" href="smt__solver__process_8h_source.html">smt_solver_process.h</a>.</p>
 
 </div>
 </div>

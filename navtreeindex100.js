@@ -1,5 +1,7 @@
 var NAVTREEINDEX100 =
 {
+"instrumenter__pensieve_8h_source.html":[7,0,2,13,3,11],
+"instrumenter__strategies_8cpp.html":[7,0,2,13,3,12],
 "instrumenter__strategies_8cpp_source.html":[7,0,2,13,3,12],
 "integer__interval_8h.html":[7,0,2,29,88],
 "integer__interval_8h.html#a35c92211cace2a7df8a36381a8762884":[7,0,2,29,88,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX100 =
 "java__bytecode__convert__class_8h.html":[7,0,1,0,1,31],
 "java__bytecode__convert__class_8h.html#a140068163cef315ce6d5cb9dc065e52c":[7,0,1,0,1,31,2],
 "java__bytecode__convert__class_8h.html#a33d01c009e7bdcc23ab2f640f00a6998":[7,0,1,0,1,31,1],
-"java__bytecode__convert__class_8h.html#a8f382dbb21bba89369e101a596a5741c":[7,0,1,0,1,31,5],
-"java__bytecode__convert__class_8h.html#ae26ea6e44ba71de38e7fdc47dea6b50e":[7,0,1,0,1,31,3],
-"java__bytecode__convert__class_8h.html#af7a3fe36ba52d36981e6246210f47002":[7,0,1,0,1,31,4]
+"java__bytecode__convert__class_8h.html#a8f382dbb21bba89369e101a596a5741c":[7,0,1,0,1,31,5]
 };
