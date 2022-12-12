@@ -877,8 +877,12 @@ static exprt unpack_rec(
     auto element_bits = pointer_offset_bits(subtype, ns);
     CHECK_RETURN(element_bits.has_value());
 
-    if(!unpack_byte_array && *element_bits == bits_per_byte)
+    if(
+      !unpack_byte_array && *element_bits == bits_per_byte &&
+      can_cast_type<bitvector_typet>(subtype))
+    {
       return src;
+    }
 
     const auto constant_size_opt = numeric_cast<mp_integer>(array_type.size());
     return unpack_array_vector(
@@ -899,8 +903,12 @@ static exprt unpack_rec(
     auto element_bits = pointer_offset_bits(subtype, ns);
     CHECK_RETURN(element_bits.has_value());
 
-    if(!unpack_byte_array && *element_bits == bits_per_byte)
+    if(
+      !unpack_byte_array && *element_bits == bits_per_byte &&
+      can_cast_type<bitvector_typet>(subtype))
+    {
       return src;
+    }
 
     return unpack_array_vector(
       src,
@@ -1455,17 +1463,27 @@ static exprt lower_byte_update_byte_array_vector_non_const(
         src.offset(), non_const_update_bound.type()),
       non_const_update_bound}};
 
+  PRECONDITION(
+    src.id() == ID_byte_update_little_endian ||
+    src.id() == ID_byte_update_big_endian);
+  const bool little_endian = src.id() == ID_byte_update_little_endian;
+  endianness_mapt map(
+    to_array_type(value_as_byte_array.type()).element_type(),
+    little_endian,
+    ns);
   if_exprt array_comprehension_body{
     or_exprt{std::move(lower_bound), std::move(upper_bound)},
     index_exprt{src.op(), array_comprehension_index},
-    typecast_exprt::conditional_cast(
+    bv_to_expr(
       index_exprt{
         value_as_byte_array,
         minus_exprt{
           array_comprehension_index,
           typecast_exprt::conditional_cast(
             src.offset(), array_comprehension_index.type())}},
-      subtype)};
+      subtype,
+      map,
+      ns)};
 
   return simplify_expr(
     array_comprehension_exprt{
@@ -1491,6 +1509,11 @@ static exprt lower_byte_update_byte_array_vector(
   const optionalt<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
+  PRECONDITION(
+    src.id() == ID_byte_update_little_endian ||
+    src.id() == ID_byte_update_big_endian);
+  const bool little_endian = src.id() == ID_byte_update_little_endian;
+
   // apply 'array-update-with' num_elements times
   exprt result = src.op();
 
@@ -1511,21 +1534,18 @@ static exprt lower_byte_update_byte_array_vector(
         continue;
     }
 
-    exprt update_value;
+    endianness_mapt map(element.type(), little_endian, ns);
+    exprt update_value = bv_to_expr(element, subtype, map, ns);
     if(non_const_update_bound.has_value())
     {
-      update_value = typecast_exprt::conditional_cast(
-        if_exprt{
-          binary_predicate_exprt{
-            from_integer(i, non_const_update_bound->type()),
-            ID_lt,
-            *non_const_update_bound},
-          element,
-          index_exprt{src.op(), where}},
-        subtype);
+      update_value = if_exprt{
+        binary_predicate_exprt{
+          from_integer(i, non_const_update_bound->type()),
+          ID_lt,
+          *non_const_update_bound},
+        update_value,
+        index_exprt{src.op(), where}};
     }
-    else
-      update_value = typecast_exprt::conditional_cast(element, subtype);
 
     if(result.id() != ID_with)
       result = with_exprt{result, std::move(where), std::move(update_value)};
