@@ -1,5 +1,6 @@
 var NAVTREEINDEX103 =
 {
+"java__types_8h.html#a3c56e22e7dec53a7acd66424f17c6e22":[7,0,1,0,1,88,40],
 "java__types_8h.html#a3cbb61d76f726c3876277dc82df9a1b5":[7,0,1,0,1,88,50],
 "java__types_8h.html#a4615a7a07e0bb6636a1b01369bb8718f":[7,0,1,0,1,88,28],
 "java__types_8h.html#a49052368d7846279ccce118b080bb76e":[7,0,1,0,1,88,76],
@@ -248,6 +249,5 @@ var NAVTREEINDEX103 =
 "jsil__parser_8h.html#abe854d80cabd6380ab7f932de4df5d5a":[7,0,2,17,13,2],
 "jsil__parser_8h.html#ad79917e6dc81de832b201615e3c37ec2":[7,0,2,17,13,1],
 "jsil__parser_8h_source.html":[7,0,2,17,13],
-"jsil__typecheck_8cpp.html":[7,0,2,17,14],
-"jsil__typecheck_8cpp.html#a6c02ba24bffd19350f46a216560557af":[7,0,2,17,14,0]
+"jsil__typecheck_8cpp.html":[7,0,2,17,14]
 };

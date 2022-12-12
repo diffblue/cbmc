@@ -99,18 +99,19 @@ $(document).ready(function(){initNavTree('contracts-memory-predicates.html','');
 </li>
 <li class="level2"><a href="#autotoc_md107">Semantics</a><ul><li class="level3"><a href="#autotoc_md108">Enforcement</a></li>
 <li class="level3"><a href="#autotoc_md109">Replacement</a></li>
+<li class="level3"><a href="#autotoc_md110">Influence of memory allocation failure modes flags in assumption contexts</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md110">The __CPROVER_pointer_in_range_dfcc predicate</a><ul><li class="level2"><a href="#autotoc_md111">Syntax</a></li>
-<li class="level2"><a href="#autotoc_md112">Semantics</a></li>
+<li class="level1"><a href="#autotoc_md111">The __CPROVER_pointer_in_range_dfcc predicate</a><ul><li class="level2"><a href="#autotoc_md112">Syntax</a></li>
+<li class="level2"><a href="#autotoc_md113">Semantics</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md113">User defined memory predicates</a><ul><li class="level2"><a href="#autotoc_md114">Limitations</a></li>
+<li class="level1"><a href="#autotoc_md114">User defined memory predicates</a><ul><li class="level2"><a href="#autotoc_md115">Limitations</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md115">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md116">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_user_contracts_memory_predicates"></a> Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
@@ -205,17 +206,29 @@ Replacement</h3>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> *err_signal;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md110"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md110"></a>
+Influence of memory allocation failure modes flags in assumption contexts</h3>
+<p>CBMC models <a href="https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/memory-primitives.md#malloc-modelling">memory allocation failure modes</a>. When activated, these modesl result in different behaviours for <code>__CPROVER_is_fresh</code> in assumption contexts (i.e. when used in a requires clause of a contract being checked against a function, or in an ensures clause of a contract being used to abstract a function call).</p>
+<ol type="1">
+<li><b>No failure mode</b> (no flags): In this mode, <code>malloc</code> and <code>__CPROVER_is_fresh</code> never fail and will accept a size parameter up to <code>SIZE_MAX</code> without triggerring errors. However, pointer overflow and assigns clause checking errors will happen any time one tries to access such objects beyond an offset of <code>__CPROVER_max_malloc_size</code> (in bytes), by executing <code>ptr[size-1]</code> or <code>ptr[size]</code> in user-code, or by writing <code>__CPROVER_assigns(__CPROVER_object_from(ptr))</code> in a contract;</li>
+</ol>
+<ol type="1">
+<li><b>Fail with NULL</b> (flags: <code>--malloc-may-fail --malloc-fail-null</code>): In this mode, if <code>size</code> is larger than <code>__CPROVER_max_malloc_size</code>, <code>malloc</code> returns a NULL pointer, and imposes an implicit assumption that size is less than <code>__CPROVER_max_malloc_size</code> when returning a non-NULL pointer. <code>__CPROVER_is_fresh</code> never fails in assumption contexts, so it adds an implicit assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>.</li>
+</ol>
+<ol type="1">
+<li><b>Fail assert</b> (flags: <code>--malloc-may-fail --malloc-fail-assert</code>): In this mode, if <code>size</code> is larger than <code>__CPROVER_max_malloc_size</code>, an <code>max allocation size exceeded</code> assertion is triggered in <code>malloc</code> and execution continues under the assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>, with <code>malloc</code> returning a non-NULL pointer. <code>__CPROVER_is_fresh</code> never fails in assumption contexts, so it will trigger a <code>max allocation size exceeded</code> assertion and continue execution under the implicit assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>.</li>
+</ol>
+<h1><a class="anchor" id="autotoc_md111"></a>
 The __CPROVER_pointer_in_range_dfcc predicate</h1>
-<h2><a class="anchor" id="autotoc_md111"></a>
+<h2><a class="anchor" id="autotoc_md112"></a>
 Syntax</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code" href="cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a">__CPROVER_pointer_in_range_dfcc</a>(<span class="keywordtype">void</span> *lb, <span class="keywordtype">void</span> *p, <span class="keywordtype">void</span> *ub);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a33926c3f831d23353ac2baf02eeb063a"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a">__CPROVER_pointer_in_range_dfcc</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_pointer_in_range_dfcc(void *lb, void *ptr, void *ub)</div></div>
 </div><!-- fragment --><p>This predicate holds if <code>lb</code>, <code>p</code> and <code>ub</code> are valid pointers within the same object and the pointers are ordered such that <code>lb &lt;= p &amp;&amp; p &lt;= ub</code> holds.</p>
-<h2><a class="anchor" id="autotoc_md112"></a>
+<h2><a class="anchor" id="autotoc_md113"></a>
 Semantics</h2>
 <p>In assertion contexts, the predicate checks the conditions described above. In assumption contexts, the predicate checks that <code>lb</code> and <code>ub</code> are valid pointers into the same object, and updates <code>p</code> using a side effect to be a non-deterministic pointer ranging between <code>lb</code> and <code>ub</code>.</p>
-<h1><a class="anchor" id="autotoc_md113"></a>
+<h1><a class="anchor" id="autotoc_md114"></a>
 User defined memory predicates</h1>
 <p>Users can write their own memory predicates based on the core predicates described above. <code>__CPROVER_is_fresh</code> allows to specify pointer validity and separation. <code>__CPROVER_pointer_in_range</code> allows to specify aliasing constraints.</p>
 <p>For instance, one could write a predicate defining linked lists of at most <code>len</code> elements as follows:</p>
@@ -277,14 +290,14 @@ User defined memory predicates</h1>
 <div class="line">  <span class="keywordflow">return</span> l-&gt;value + l-&gt;next-&gt;value + l-&gt;next-&gt;next-&gt;value + b-&gt;first-&gt;size +</div>
 <div class="line">         b-&gt;second-&gt;size;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md114"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md115"></a>
 Limitations</h2>
 <p>The main limitation with user defined predicates are:</p><ul>
 <li>their evaluation must terminate;</li>
 <li>self-recursive predicates are supported, but mutually recursive predicates are not supported for the moment.</li>
 </ul>
 <p>For instance, in the <code>is_list</code> example above, recursion is bounded by the use of the explicit <code>len</code> parameter. The <code>is_double_buffer</code> predicate also describes a bounded structure.</p>
-<h1><a class="anchor" id="autotoc_md115"></a>
+<h1><a class="anchor" id="autotoc_md116"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>

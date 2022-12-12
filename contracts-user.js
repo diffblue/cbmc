@@ -9,12 +9,12 @@ var contracts_user =
       [ "Additional Resources", "contracts-loops.html#autotoc_md102", null ]
     ] ],
     [ "Requires and Ensures Clauses", "contracts-requires-ensures.html", [
-      [ "Syntax", "contracts-requires-ensures.html#autotoc_md119", null ],
-      [ "Semantics", "contracts-requires-ensures.html#autotoc_md120", [
-        [ "Enforcement", "contracts-requires-ensures.html#autotoc_md121", null ],
-        [ "Replacement", "contracts-requires-ensures.html#autotoc_md122", null ]
+      [ "Syntax", "contracts-requires-ensures.html#autotoc_md120", null ],
+      [ "Semantics", "contracts-requires-ensures.html#autotoc_md121", [
+        [ "Enforcement", "contracts-requires-ensures.html#autotoc_md122", null ],
+        [ "Replacement", "contracts-requires-ensures.html#autotoc_md123", null ]
       ] ],
-      [ "Additional Resources", "contracts-requires-ensures.html#autotoc_md123", null ]
+      [ "Additional Resources", "contracts-requires-ensures.html#autotoc_md124", null ]
     ] ],
     [ "Assigns Clauses", "contracts-assigns.html", [
       [ "Syntax", "contracts-assigns.html#autotoc_md59", [
@@ -62,17 +62,18 @@ var contracts_user =
         ] ],
         [ "Semantics", "contracts-memory-predicates.html#autotoc_md107", [
           [ "Enforcement", "contracts-memory-predicates.html#autotoc_md108", null ],
-          [ "Replacement", "contracts-memory-predicates.html#autotoc_md109", null ]
+          [ "Replacement", "contracts-memory-predicates.html#autotoc_md109", null ],
+          [ "Influence of memory allocation failure modes flags in assumption contexts", "contracts-memory-predicates.html#autotoc_md110", null ]
         ] ]
       ] ],
-      [ "The __CPROVER_pointer_in_range_dfcc predicate", "contracts-memory-predicates.html#autotoc_md110", [
-        [ "Syntax", "contracts-memory-predicates.html#autotoc_md111", null ],
-        [ "Semantics", "contracts-memory-predicates.html#autotoc_md112", null ]
+      [ "The __CPROVER_pointer_in_range_dfcc predicate", "contracts-memory-predicates.html#autotoc_md111", [
+        [ "Syntax", "contracts-memory-predicates.html#autotoc_md112", null ],
+        [ "Semantics", "contracts-memory-predicates.html#autotoc_md113", null ]
       ] ],
-      [ "User defined memory predicates", "contracts-memory-predicates.html#autotoc_md113", [
-        [ "Limitations", "contracts-memory-predicates.html#autotoc_md114", null ]
+      [ "User defined memory predicates", "contracts-memory-predicates.html#autotoc_md114", [
+        [ "Limitations", "contracts-memory-predicates.html#autotoc_md115", null ]
       ] ],
-      [ "Additional Resources", "contracts-memory-predicates.html#autotoc_md115", null ]
+      [ "Additional Resources", "contracts-memory-predicates.html#autotoc_md116", null ]
     ] ],
     [ "Function Pointer Predicates", "contracts-function-pointer-predicates.html", [
       [ "Syntax", "contracts-function-pointer-predicates.html#autotoc_md83", [
@@ -95,9 +96,9 @@ var contracts_user =
       [ "Additional Resources", "contracts-history-variables.html#autotoc_md97", null ]
     ] ],
     [ "Quantifiers", "contracts-quantifiers.html", [
-      [ "Syntax", "contracts-quantifiers.html#autotoc_md116", null ],
-      [ "Semantics", "contracts-quantifiers.html#autotoc_md117", null ],
-      [ "Additional Resources", "contracts-quantifiers.html#autotoc_md118", null ]
+      [ "Syntax", "contracts-quantifiers.html#autotoc_md117", null ],
+      [ "Semantics", "contracts-quantifiers.html#autotoc_md118", null ],
+      [ "Additional Resources", "contracts-quantifiers.html#autotoc_md119", null ]
     ] ],
     [ "Command Line Interface for Code Contracts", "contracts-user-cli.html", [
       [ "Applying loop and/or function contracts transformations (without the dynamic frames method)", "contracts-user-cli.html#autotoc_md70", null ],

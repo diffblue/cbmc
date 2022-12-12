@@ -1,5 +1,6 @@
 var NAVTREEINDEX99 =
 {
+"group__goto-synthesizer.html":[4,16],
 "group__janalyzer.html":[4,27],
 "group__java__bytecode.html":[4,28],
 "group__jbmc.html":[4,29],
@@ -248,6 +249,5 @@ var NAVTREEINDEX99 =
 "instrument__spec__assigns_8h_source.html":[7,0,2,13,1,10],
 "instrumenter__pensieve_8h.html":[7,0,2,13,3,11],
 "instrumenter__pensieve_8h_source.html":[7,0,2,13,3,11],
-"instrumenter__strategies_8cpp.html":[7,0,2,13,3,12],
-"instrumenter__strategies_8cpp_source.html":[7,0,2,13,3,12]
+"instrumenter__strategies_8cpp.html":[7,0,2,13,3,12]
 };
