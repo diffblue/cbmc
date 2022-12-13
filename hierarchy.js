@@ -1021,11 +1021,11 @@ var hierarchy =
       [ "natural_loops_templatet< P, T >", "classnatural__loops__templatet.html", null ]
     ] ],
     [ "c_wranglert::loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", null ],
+    [ "loop_contracts_synthesizer_baset", "classloop__contracts__synthesizer__baset.html", [
+      [ "enumerative_loop_contracts_synthesizert", "classenumerative__loop__contracts__synthesizert.html", null ]
+    ] ],
     [ "loop_idt", "structloop__idt.html", null ],
     [ "framet::loop_infot", "structframet_1_1loop__infot.html", null ],
-    [ "loop_invariant_synthesizer_baset", "classloop__invariant__synthesizer__baset.html", [
-      [ "enumerative_loop_invariant_synthesizert", "classenumerative__loop__invariant__synthesizert.html", null ]
-    ] ],
     [ "loop_templatet< T >", "classloop__templatet.html", [
       [ "loop_with_parent_analysis_templatet< T >", "classloop__with__parent__analysis__templatet.html", null ]
     ] ],

@@ -2,7 +2,6 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
 [
     [ "accelerate", "dir_6299ea566f0780fdfe4a304b3be6fd1f.html", "dir_6299ea566f0780fdfe4a304b3be6fd1f" ],
     [ "contracts", "dir_e4c408710983314831560c91befbbf77.html", "dir_e4c408710983314831560c91befbbf77" ],
-    [ "synthesizer", "dir_4a34ed65d8d5d918df77e0784061e390.html", "dir_4a34ed65d8d5d918df77e0784061e390" ],
     [ "wmm", "dir_034d9ce8f5e904bef115a46acd2961c1.html", "dir_034d9ce8f5e904bef115a46acd2961c1" ],
     [ "aggressive_slicer.cpp", "aggressive__slicer_8cpp.html", null ],
     [ "aggressive_slicer.h", "aggressive__slicer_8h.html", "aggressive__slicer_8h" ],

@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/format.h" name="/home/runner/work/cbmc/cbmc/src/util/format.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4250,5,4434,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4249,5,4433,47"/>
 <area shape="rect" id="node2" href="$symex__main_8cpp.html" title="Symbolic Execution." alt="" coords="5,206,220,262"/>
-<area shape="rect" id="node3" href="$format__expr_8h.html" title=" " alt="" coords="4250,95,4434,151"/>
-<area shape="rect" id="node59" href="$format__type_8h.html" title=" " alt="" coords="7610,95,7794,151"/>
-<area shape="rect" id="node4" href="$local__safe__pointers_8cpp.html" title="Local safe pointer analysis." alt="" coords="1346,206,1530,262"/>
-<area shape="rect" id="node5" href="$axioms_8cpp.html" title="Axioms." alt="" coords="1554,213,1770,255"/>
-<area shape="rect" id="node6" href="$format__hooks_8cpp.html" title=" " alt="" coords="7393,206,7579,262"/>
-<area shape="rect" id="node7" href="$generalization_8cpp.html" title="Generalization." alt="" coords="1794,213,2055,255"/>
-<area shape="rect" id="node8" href="$inductiveness_8cpp.html" title="Inductiveness." alt="" coords="2079,213,2338,255"/>
-<area shape="rect" id="node9" href="$propagate_8cpp.html" title="Propagate." alt="" coords="2362,213,2597,255"/>
-<area shape="rect" id="node10" href="$report__traces_8cpp.html" title="Solver." alt="" coords="2621,206,2805,262"/>
-<area shape="rect" id="node11" href="$solver_8cpp.html" title="Solver." alt="" coords="2829,213,3036,255"/>
-<area shape="rect" id="node12" href="$solver__types_8cpp.html" title="Solver Types." alt="" coords="3061,206,3245,262"/>
-<area shape="rect" id="node13" href="$state__encoding__targets_8cpp.html" title=" " alt="" coords="3269,206,3453,262"/>
-<area shape="rect" id="node14" href="$variable__encoding_8cpp.html" title="Variable Encoding." alt="" coords="3477,206,3671,262"/>
-<area shape="rect" id="node15" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3696,206,3889,262"/>
-<area shape="rect" id="node16" href="$dfcc_8cpp.html" title=" " alt="" coords="7603,199,7801,269"/>
-<area shape="rect" id="node17" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="4122,199,4319,269"/>
-<area shape="rect" id="node18" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="4344,199,4585,269"/>
-<area shape="rect" id="node19" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="4610,199,4807,269"/>
-<area shape="rect" id="node20" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="7825,199,8022,269"/>
-<area shape="rect" id="node21" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="4831,199,5029,269"/>
-<area shape="rect" id="node22" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="5053,199,5255,269"/>
-<area shape="rect" id="node23" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="5280,199,5479,269"/>
-<area shape="rect" id="node24" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="5503,206,5696,262"/>
-<area shape="rect" id="node25" href="$expr__enumerator_8cpp.html" title=" " alt="" coords="5721,206,5963,262"/>
-<area shape="rect" id="node26" href="$goto__program_8cpp.html" title="Program Transformation." alt="" coords="8046,206,8230,262"/>
-<area shape="rect" id="node27" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="5987,206,6171,262"/>
-<area shape="rect" id="node28" href="$remove__const__function__pointers_8cpp.html" title="Goto Programs." alt="" coords="6196,206,6461,262"/>
-<area shape="rect" id="node29" href="$goto__state_8cpp.html" title=" " alt="" coords="6485,206,6684,262"/>
-<area shape="rect" id="node30" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="244,206,443,262"/>
-<area shape="rect" id="node31" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="467,206,671,262"/>
-<area shape="rect" id="node32" href="$solver__hardness_8cpp.html" title=" " alt="" coords="8254,206,8465,262"/>
-<area shape="rect" id="node33" href="$ssa__step_8cpp.html" title=" " alt="" coords="695,206,887,262"/>
-<area shape="rect" id="node34" href="$value__set_8cpp.html" title="Value Set." alt="" coords="6759,206,6952,262"/>
-<area shape="rect" id="node35" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="912,206,1113,262"/>
-<area shape="rect" id="node36" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="1138,206,1322,262"/>
-<area shape="rect" id="node37" href="$string__constraint_8h.html" title="Defines string constraints." alt="" coords="3914,206,4098,262"/>
-<area shape="rect" id="node53" href="$string__constraint__instantiation_8cpp.html" title="Defines related function for string constraints." alt="" coords="5942,317,6193,373"/>
-<area shape="rect" id="node57" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="6977,206,7161,262"/>
-<area shape="rect" id="node58" href="$format__type_8cpp.html" title=" " alt="" coords="7185,206,7369,262"/>
-<area shape="rect" id="node38" href="$string__constraint_8cpp.html" title=" " alt="" coords="4026,317,4210,373"/>
-<area shape="rect" id="node39" href="$string__constraint__generator_8h.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="3786,317,4002,373"/>
-<area shape="rect" id="node54" href="$string__refinement__util_8h.html" title=" " alt="" coords="4973,317,5157,373"/>
-<area shape="rect" id="node40" href="$string__builtin__function_8cpp.html" title=" " alt="" coords="4344,540,4543,596"/>
-<area shape="rect" id="node41" href="$string__builtin__function_8h.html" title=" " alt="" coords="4415,429,4599,485"/>
-<area shape="rect" id="node42" href="$string__constraint__generator__code__points_8cpp.html" title="Generates string constraints for Java functions dealing with code points." alt="" coords="3906,421,4111,492"/>
-<area shape="rect" id="node43" href="$string__constraint__generator__comparison_8cpp.html" title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,..." alt="" coords="4135,421,4341,492"/>
-<area shape="rect" id="node44" href="$string__constraint__generator__constants_8cpp.html" title="Generates string constraints for constant strings." alt="" coords="4623,421,4829,492"/>
-<area shape="rect" id="node45" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="2530,421,2735,492"/>
-<area shape="rect" id="node46" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="2759,421,2965,492"/>
-<area shape="rect" id="node47" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="2989,421,3194,492"/>
-<area shape="rect" id="node48" href="$string__constraint__generator__testing_8cpp.html" title="Generates string constraints for string functions that return Boolean values." alt="" coords="3218,421,3423,492"/>
-<area shape="rect" id="node49" href="$string__constraint__generator__transformation_8cpp.html" title="Generates string constraints for string transformations, that is, functions taking one string and ret..." alt="" coords="3447,421,3653,492"/>
-<area shape="rect" id="node50" href="$string__constraint__generator__valueof_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="3677,421,3882,492"/>
-<area shape="rect" id="node51" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="4853,429,5037,485"/>
-<area shape="rect" id="node52" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="6575,540,6759,596"/>
-<area shape="rect" id="node55" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5061,429,5311,485"/>
-<area shape="rect" id="node56" href="$string__refinement__util_8cpp.html" title=" " alt="" coords="5335,429,5531,485"/>
-<area shape="rect" id="node60" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="8539,199,8737,269"/>
+<area shape="rect" id="node3" href="$format__expr_8h.html" title=" " alt="" coords="4249,95,4433,151"/>
+<area shape="rect" id="node59" href="$format__type_8h.html" title=" " alt="" coords="7565,95,7749,151"/>
+<area shape="rect" id="node4" href="$local__safe__pointers_8cpp.html" title="Local safe pointer analysis." alt="" coords="1345,206,1529,262"/>
+<area shape="rect" id="node5" href="$axioms_8cpp.html" title="Axioms." alt="" coords="1553,213,1769,255"/>
+<area shape="rect" id="node6" href="$format__hooks_8cpp.html" title=" " alt="" coords="7348,206,7533,262"/>
+<area shape="rect" id="node7" href="$generalization_8cpp.html" title="Generalization." alt="" coords="1793,213,2054,255"/>
+<area shape="rect" id="node8" href="$inductiveness_8cpp.html" title="Inductiveness." alt="" coords="2078,213,2337,255"/>
+<area shape="rect" id="node9" href="$propagate_8cpp.html" title="Propagate." alt="" coords="2361,213,2595,255"/>
+<area shape="rect" id="node10" href="$report__traces_8cpp.html" title="Solver." alt="" coords="2619,206,2803,262"/>
+<area shape="rect" id="node11" href="$solver_8cpp.html" title="Solver." alt="" coords="2828,213,3035,255"/>
+<area shape="rect" id="node12" href="$solver__types_8cpp.html" title="Solver Types." alt="" coords="3059,206,3243,262"/>
+<area shape="rect" id="node13" href="$state__encoding__targets_8cpp.html" title=" " alt="" coords="3267,206,3451,262"/>
+<area shape="rect" id="node14" href="$variable__encoding_8cpp.html" title="Variable Encoding." alt="" coords="3475,206,3670,262"/>
+<area shape="rect" id="node15" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3695,206,3888,262"/>
+<area shape="rect" id="node16" href="$dfcc_8cpp.html" title=" " alt="" coords="7558,199,7755,269"/>
+<area shape="rect" id="node17" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="4121,199,4318,269"/>
+<area shape="rect" id="node18" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="4343,199,4584,269"/>
+<area shape="rect" id="node19" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="4609,199,4806,269"/>
+<area shape="rect" id="node20" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="7779,199,7977,269"/>
+<area shape="rect" id="node21" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="4830,199,5027,269"/>
+<area shape="rect" id="node22" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="5051,199,5254,269"/>
+<area shape="rect" id="node23" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="5279,199,5477,269"/>
+<area shape="rect" id="node24" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="5501,206,5695,262"/>
+<area shape="rect" id="node25" href="$goto__program_8cpp.html" title="Program Transformation." alt="" coords="8001,206,8185,262"/>
+<area shape="rect" id="node26" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="5719,206,5903,262"/>
+<area shape="rect" id="node27" href="$remove__const__function__pointers_8cpp.html" title="Goto Programs." alt="" coords="5928,206,6193,262"/>
+<area shape="rect" id="node28" href="$goto__state_8cpp.html" title=" " alt="" coords="6217,206,6416,262"/>
+<area shape="rect" id="node29" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="6440,206,6639,262"/>
+<area shape="rect" id="node30" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="244,206,448,262"/>
+<area shape="rect" id="node31" href="$solver__hardness_8cpp.html" title=" " alt="" coords="8209,206,8419,262"/>
+<area shape="rect" id="node32" href="$ssa__step_8cpp.html" title=" " alt="" coords="473,206,665,262"/>
+<area shape="rect" id="node33" href="$expr__enumerator_8cpp.html" title=" " alt="" coords="689,206,886,262"/>
+<area shape="rect" id="node34" href="$value__set_8cpp.html" title="Value Set." alt="" coords="6713,206,6907,262"/>
+<area shape="rect" id="node35" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="911,206,1112,262"/>
+<area shape="rect" id="node36" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="1137,206,1321,262"/>
+<area shape="rect" id="node37" href="$string__constraint_8h.html" title="Defines string constraints." alt="" coords="3913,206,4097,262"/>
+<area shape="rect" id="node53" href="$string__constraint__instantiation_8cpp.html" title="Defines related function for string constraints." alt="" coords="5918,317,6169,373"/>
+<area shape="rect" id="node57" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="6931,206,7115,262"/>
+<area shape="rect" id="node58" href="$format__type_8cpp.html" title=" " alt="" coords="7139,206,7323,262"/>
+<area shape="rect" id="node38" href="$string__constraint_8cpp.html" title=" " alt="" coords="4025,317,4209,373"/>
+<area shape="rect" id="node39" href="$string__constraint__generator_8h.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="3785,317,4001,373"/>
+<area shape="rect" id="node54" href="$string__refinement__util_8h.html" title=" " alt="" coords="4971,317,5155,373"/>
+<area shape="rect" id="node40" href="$string__builtin__function_8cpp.html" title=" " alt="" coords="4343,540,4541,596"/>
+<area shape="rect" id="node41" href="$string__builtin__function_8h.html" title=" " alt="" coords="4414,429,4598,485"/>
+<area shape="rect" id="node42" href="$string__constraint__generator__code__points_8cpp.html" title="Generates string constraints for Java functions dealing with code points." alt="" coords="3905,421,4110,492"/>
+<area shape="rect" id="node43" href="$string__constraint__generator__comparison_8cpp.html" title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,..." alt="" coords="4134,421,4339,492"/>
+<area shape="rect" id="node44" href="$string__constraint__generator__constants_8cpp.html" title="Generates string constraints for constant strings." alt="" coords="4622,421,4827,492"/>
+<area shape="rect" id="node45" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="2529,421,2734,492"/>
+<area shape="rect" id="node46" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="2758,421,2963,492"/>
+<area shape="rect" id="node47" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="2987,421,3193,492"/>
+<area shape="rect" id="node48" href="$string__constraint__generator__testing_8cpp.html" title="Generates string constraints for string functions that return Boolean values." alt="" coords="3217,421,3422,492"/>
+<area shape="rect" id="node49" href="$string__constraint__generator__transformation_8cpp.html" title="Generates string constraints for string transformations, that is, functions taking one string and ret..." alt="" coords="3446,421,3651,492"/>
+<area shape="rect" id="node50" href="$string__constraint__generator__valueof_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="3675,421,3881,492"/>
+<area shape="rect" id="node51" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="4851,429,5035,485"/>
+<area shape="rect" id="node52" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="6551,540,6735,596"/>
+<area shape="rect" id="node55" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5060,429,5309,485"/>
+<area shape="rect" id="node56" href="$string__refinement__util_8cpp.html" title=" " alt="" coords="5333,429,5529,485"/>
+<area shape="rect" id="node60" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="8494,199,8691,269"/>
 </map>

@@ -1,44 +1,45 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/natural_loops.h" name="/home/runner/work/cbmc/cbmc/src/analyses/natural_loops.h">
-<area shape="rect" id="node1" title="Compute natural loops in a goto_function." alt="" coords="1717,5,1913,61"/>
+<area shape="rect" id="node1" title="Compute natural loops in a goto_function." alt="" coords="1678,5,1874,61"/>
 <area shape="rect" id="node2" href="$sese__regions_8cpp.html" title="Single&#45;entry, single&#45;exit region analysis." alt="" coords="5,117,189,173"/>
-<area shape="rect" id="node3" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="350,473,543,529"/>
-<area shape="rect" id="node4" href="$accelerate_8h.html" title="Loop Acceleration." alt="" coords="1214,354,1407,410"/>
-<area shape="rect" id="node5" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1799,473,2057,529"/>
-<area shape="rect" id="node6" href="$acceleration__utils_8h.html" title="Loop Acceleration." alt="" coords="1027,109,1221,180"/>
-<area shape="rect" id="node8" href="$disjunctive__polynomial__acceleration_8h.html" title="Loop Acceleration." alt="" coords="482,228,731,299"/>
-<area shape="rect" id="node11" href="$enumerating__loop__acceleration_8h.html" title="Loop Acceleration." alt="" coords="973,347,1189,417"/>
+<area shape="rect" id="node3" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="611,473,805,529"/>
+<area shape="rect" id="node4" href="$accelerate_8h.html" title="Loop Acceleration." alt="" coords="991,354,1185,410"/>
+<area shape="rect" id="node5" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1620,473,1879,529"/>
+<area shape="rect" id="node6" href="$acceleration__utils_8h.html" title="Loop Acceleration." alt="" coords="1077,109,1270,180"/>
+<area shape="rect" id="node8" href="$disjunctive__polynomial__acceleration_8h.html" title="Loop Acceleration." alt="" coords="533,228,782,299"/>
+<area shape="rect" id="node11" href="$enumerating__loop__acceleration_8h.html" title="Loop Acceleration." alt="" coords="1496,347,1712,417"/>
 <area shape="rect" id="node14" href="$sat__path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1363,235,1611,291"/>
 <area shape="rect" id="node16" href="$accelerator_8h.html" title="Loop Acceleration." alt="" coords="265,235,458,291"/>
-<area shape="rect" id="node17" href="$all__paths__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1736,235,1987,291"/>
-<area shape="rect" id="node19" href="$path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1524,117,1745,173"/>
-<area shape="rect" id="node20" href="$goto__program2code_8h.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="2598,117,2791,173"/>
-<area shape="rect" id="node23" href="$havoc__loops_8cpp.html" title="Havoc Loops." alt="" coords="2087,235,2281,291"/>
-<area shape="rect" id="node24" href="$k__induction_8cpp.html" title="k&#45;induction" alt="" coords="3198,235,3391,291"/>
-<area shape="rect" id="node25" href="$loop__utils_8h.html" title="Helper functions for k&#45;induction and loop invariants." alt="" coords="2329,117,2522,173"/>
-<area shape="rect" id="node40" href="$enumerative__loop__invariant__synthesizer_8cpp.html" title="Enumerative Loop Invariant Synthesizer." alt="" coords="2815,109,3046,180"/>
-<area shape="rect" id="node41" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="3070,109,3263,180"/>
-<area shape="rect" id="node42" href="$ensure__one__backedge__per__target_8cpp.html" title="Ensure one backedge per target." alt="" coords="3287,109,3486,180"/>
-<area shape="rect" id="node7" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1094,228,1287,299"/>
-<area shape="rect" id="node10" href="$polynomial__accelerator_8h.html" title="Loop Acceleration." alt="" coords="755,235,1018,291"/>
-<area shape="rect" id="node9" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="398,347,647,417"/>
-<area shape="rect" id="node13" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="672,354,949,410"/>
-<area shape="rect" id="node12" href="$enumerating__loop__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="839,465,1055,536"/>
-<area shape="rect" id="node15" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1431,354,1694,410"/>
-<area shape="rect" id="node18" href="$all__paths__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1719,354,1985,410"/>
-<area shape="rect" id="node21" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="3415,235,3609,291"/>
-<area shape="rect" id="node22" href="$goto__program2code_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="3633,235,3826,291"/>
-<area shape="rect" id="node26" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="2546,235,2739,291"/>
-<area shape="rect" id="node32" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="2329,235,2522,291"/>
-<area shape="rect" id="node38" href="$function__assigns_8cpp.html" title="Compute objects assigned to in a function." alt="" coords="2763,235,2957,291"/>
-<area shape="rect" id="node39" href="$loop__utils_8cpp.html" title="Helper functions for k&#45;induction and loop invariants." alt="" coords="2981,235,3174,291"/>
-<area shape="rect" id="node27" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3042,354,3235,410"/>
-<area shape="rect" id="node28" href="$dfcc_8cpp.html" title=" " alt="" coords="3260,347,3457,417"/>
-<area shape="rect" id="node29" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2820,347,3017,417"/>
-<area shape="rect" id="node30" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="3481,347,3679,417"/>
-<area shape="rect" id="node31" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="3703,347,3902,417"/>
-<area shape="rect" id="node33" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="2327,347,2524,417"/>
-<area shape="rect" id="node34" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="2549,354,2795,410"/>
-<area shape="rect" id="node35" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="2060,354,2303,410"/>
-<area shape="rect" id="node36" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="2305,473,2540,529"/>
-<area shape="rect" id="node37" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="2081,473,2281,529"/>
+<area shape="rect" id="node17" href="$all__paths__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1787,235,2037,291"/>
+<area shape="rect" id="node19" href="$path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1592,117,1813,173"/>
+<area shape="rect" id="node20" href="$goto__program2code_8h.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="2062,117,2255,173"/>
+<area shape="rect" id="node23" href="$havoc__loops_8cpp.html" title="Havoc Loops." alt="" coords="2497,235,2690,291"/>
+<area shape="rect" id="node24" href="$k__induction_8cpp.html" title="k&#45;induction" alt="" coords="2714,235,2907,291"/>
+<area shape="rect" id="node25" href="$loop__utils_8h.html" title="Helper functions for k&#45;induction and loop invariants." alt="" coords="2605,117,2798,173"/>
+<area shape="rect" id="node41" href="$ensure__one__backedge__per__target_8cpp.html" title="Ensure one backedge per target." alt="" coords="2822,109,3021,180"/>
+<area shape="rect" id="node42" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="3044,109,3255,180"/>
+<area shape="rect" id="node43" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="3279,117,3476,173"/>
+<area shape="rect" id="node7" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1145,228,1338,299"/>
+<area shape="rect" id="node10" href="$polynomial__accelerator_8h.html" title="Loop Acceleration." alt="" coords="806,235,1069,291"/>
+<area shape="rect" id="node9" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="415,347,665,417"/>
+<area shape="rect" id="node13" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="689,354,967,410"/>
+<area shape="rect" id="node12" href="$enumerating__loop__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="1295,465,1511,536"/>
+<area shape="rect" id="node15" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1209,354,1471,410"/>
+<area shape="rect" id="node18" href="$all__paths__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1787,354,2053,410"/>
+<area shape="rect" id="node21" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="2062,235,2255,291"/>
+<area shape="rect" id="node22" href="$goto__program2code_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="2279,235,2473,291"/>
+<area shape="rect" id="node26" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="2931,235,3125,291"/>
+<area shape="rect" id="node32" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="3149,235,3342,291"/>
+<area shape="rect" id="node39" href="$function__assigns_8cpp.html" title="Compute objects assigned to in a function." alt="" coords="3366,235,3559,291"/>
+<area shape="rect" id="node40" href="$loop__utils_8cpp.html" title="Helper functions for k&#45;induction and loop invariants." alt="" coords="3583,235,3777,291"/>
+<area shape="rect" id="node27" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2837,354,3030,410"/>
+<area shape="rect" id="node28" href="$dfcc_8cpp.html" title=" " alt="" coords="2393,347,2591,417"/>
+<area shape="rect" id="node29" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3055,347,3252,417"/>
+<area shape="rect" id="node30" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2615,347,2812,417"/>
+<area shape="rect" id="node31" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="2170,347,2369,417"/>
+<area shape="rect" id="node33" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="3831,347,4028,417"/>
+<area shape="rect" id="node34" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4053,354,4299,410"/>
+<area shape="rect" id="node35" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3276,354,3519,410"/>
+<area shape="rect" id="node38" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="3543,354,3806,410"/>
+<area shape="rect" id="node36" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3159,473,3393,529"/>
+<area shape="rect" id="node37" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="3417,473,3617,529"/>
 </map>
