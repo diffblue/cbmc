@@ -357,10 +357,6 @@ void dfcc_lift_memory_predicatest::lift_parameters_and_update_body(
       }
     }
   }
-  for(auto instruction : body.instructions)
-  {
-    instruction.output(log.debug());
-  }
 }
 
 void dfcc_lift_memory_predicatest::lift_predicate(
