@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --bounds-check --retain-trivial-checks
 ^Generated \d+ VCC\(s\), 0 remaining after simplification$

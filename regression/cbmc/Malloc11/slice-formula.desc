@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend new-smt-backend
 main.c
 --pointer-check --slice-formula
 ^EXIT=0$

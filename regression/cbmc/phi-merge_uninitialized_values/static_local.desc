@@ -1,4 +1,4 @@
-CORE 
+CORE  new-smt-backend
 test.c
 --function staticLocalUninitialized --show-vcc
 activate-multi-line-match

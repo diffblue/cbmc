@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 test.c
 --reachability-slice --show-goto-functions --cover location
 ^EXIT=0$

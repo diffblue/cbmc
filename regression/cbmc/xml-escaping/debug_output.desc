@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --verbosity 10 --xml-ui
 ^EXIT=10$

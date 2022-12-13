@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend new-smt-backend
 at_bounds1.c
 --pointer-primitive-check --malloc-fail-null
 ^\[main.pointer_primitives.\d+\] line 13 pointer outside object bounds in R_OK\(q \+ (\(signed (long (long )?)?int\))?1, (\(unsigned (long (long )?)?int\))?0\): FAILURE$

@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --pointer-check --malloc-may-fail --malloc-fail-null
 activate-multi-line-match

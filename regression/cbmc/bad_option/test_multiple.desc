@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --trace --foo --refine-strings
 ^EXIT=(64|1)$

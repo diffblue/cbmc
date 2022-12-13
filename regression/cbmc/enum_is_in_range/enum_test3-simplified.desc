@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 enum_test3.c
 --show-goto-functions
 0 ≤ cast\(main::1::ev1, (un)?signedbv\[\d+\]\) ∧ cast\(main::1::ev1, (un)?signedbv\[\d+\]\) ≤ 4$

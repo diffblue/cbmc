@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 test.c
 --reachability-slice-fb --show-goto-functions
 ^EXIT=0$

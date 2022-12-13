@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 b.c
 a.c --pointer-check
 ^EXIT=0$

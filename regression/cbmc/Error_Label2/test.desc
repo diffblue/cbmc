@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --error-label ERROR --no-assertions
 ^EXIT=10$

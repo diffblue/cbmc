@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --memory-leak-check --memory-cleanup-check --no-assertions
 ^EXIT=10$

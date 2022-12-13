@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 test.c
 --unwind 6 test.c --trace --json-ui --partial-loops --slice-formula
 activate-multi-line-match

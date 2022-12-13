@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --little-endian -D__LITTLE_ENDIAN__
 ^EXIT=0$

@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --full-slice
 ^\[main\.assertion\.\d+\] line 9 assertion havoc_slice W_OK.*: FAILURE$
