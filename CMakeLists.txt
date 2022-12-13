@@ -240,6 +240,7 @@ cprover_default_properties(
     json
     json-symtab-language
     langapi
+    lib-unit
     linking
     pointer-analysis
     solvers
