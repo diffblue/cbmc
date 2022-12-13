@@ -8,7 +8,7 @@ int main()
     y = 10;
     goto label;
     x = 1; // dead code, makes sure the above goto is not removed
-  label:
+  label:;
     _Bool nondet;
     if(nondet)
       __CPROVER_assert(y != 10, "violated via first loop");
