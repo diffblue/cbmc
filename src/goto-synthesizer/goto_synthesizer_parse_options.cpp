@@ -13,6 +13,13 @@ Author: Qinheping Hu
 #include <util/version.h>
 
 #include <goto-programs/read_goto_binary.h>
+#include <goto-programs/set_properties.h>
+#include <goto-programs/write_goto_binary.h>
+
+#include <goto-instrument/contracts/contracts.h>
+#include <goto-instrument/nondet_volatile.h>
+
+#include "enumerative_loop_contracts_synthesizer.h"
 
 #include <iostream>
 
@@ -42,6 +49,51 @@ int goto_synthesizer_parse_optionst::doit()
 
   // TODO
   // Migrate synthesizer and tests from goto-instrument to goto-synthesizer
+
+  {
+    // Synthesize loop invariants and annotate them into `goto_model`
+    enumerative_loop_contracts_synthesizert synthesizer(goto_model, log);
+    annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
+
+    // Apply loop contracts.
+    std::set<std::string> to_exclude_from_nondet_static(
+      cmdline.get_values("nondet-static-exclude").begin(),
+      cmdline.get_values("nondet-static-exclude").end());
+    code_contractst contracts(goto_model, log);
+    contracts.apply_loop_contracts(to_exclude_from_nondet_static);
+  }
+
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
+
+  // add loop ids
+  goto_model.goto_functions.compute_loop_numbers();
+
+  // label the assertions
+  label_properties(goto_model);
+
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
+
+  // write new binary?
+  if(cmdline.args.size() == 2)
+  {
+    log.status() << "Writing GOTO program to '" << cmdline.args[1] << "'"
+                 << messaget::eom;
+
+    if(write_goto_binary(cmdline.args[1], goto_model, ui_message_handler))
+      return CPROVER_EXIT_CONVERSION_FAILED;
+    else
+      return CPROVER_EXIT_SUCCESS;
+  }
+  else if(cmdline.args.size() < 2)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "Invalid number of positional arguments passed",
+      "[in] [out]",
+      "goto-instrument needs one input and one output file, aside from other "
+      "flags");
+  }
 
   help();
   return CPROVER_EXIT_USAGE_ERROR;

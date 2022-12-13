@@ -6,8 +6,8 @@ Author: Qinheping Hu
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
-#define CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
+#ifndef CPROVER_GOTO_SYNTHESIZER_SYNTHESIZER_UTILS_H
+#define CPROVER_GOTO_SYNTHESIZER_SYNTHESIZER_UTILS_H
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/loop_ids.h>
@@ -53,4 +53,4 @@ void annotate_invariants(
   goto_modelt &goto_model,
   messaget &log);
 
-#endif // CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_SYNTHESIZER_UTILS_H
+#endif // CPROVER_GOTO_SYNTHESIZER_SYNTHESIZER_UTILS_H

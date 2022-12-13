@@ -1,16 +1,16 @@
 /*******************************************************************\
 
-Module: Loop Invariant Synthesizer Interface
+Module: Loop Contracts Synthesizer Interface
 
 Author: Qinheping Hu
 
 \*******************************************************************/
 
 /// \file
-/// Loop Invariant Synthesizer Interface
+/// Loop Contracts Synthesizer Interface
 
-#ifndef CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_LOOP_INVARIANT_SYNTHESIZER_BASE_H
-#define CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_LOOP_INVARIANT_SYNTHESIZER_BASE_H
+#ifndef CPROVER_GOTO_SYNTHESIZER_LOOP_CONTRACTS_SYNTHESIZER_BASE_H
+#define CPROVER_GOTO_SYNTHESIZER_LOOP_CONTRACTS_SYNTHESIZER_BASE_H
 
 #include <goto-programs/goto_model.h>
 
@@ -23,20 +23,20 @@ Author: Qinheping Hu
 
 class messaget;
 
-/// A base class for loop invariant synthesizers.
-/// Provides a method for synthesizing loop invariants in a given `goto_model`.
+/// A base class for loop contracts synthesizers.
+/// Provides a method for synthesizing loop contracts in a given `goto_model`.
 ///
 /// Derived class should clarify what types of `goto_model` they targets, e.g.,
 /// a `goto_model` contains only memory safety checks, or a `goto_model`
 /// contains both memory safety checks and correctness checks.
-class loop_invariant_synthesizer_baset
+class loop_contracts_synthesizer_baset
 {
 public:
-  loop_invariant_synthesizer_baset(const goto_modelt &goto_model, messaget &log)
+  loop_contracts_synthesizer_baset(const goto_modelt &goto_model, messaget &log)
     : goto_model(goto_model), log(log)
   {
   }
-  virtual ~loop_invariant_synthesizer_baset() = default;
+  virtual ~loop_contracts_synthesizer_baset() = default;
 
   /// Synthesize loop invariants that are inductive in the given GOTO program.
   ///
@@ -52,4 +52,4 @@ protected:
   messaget &log;
 };
 
-#endif // CPROVER_GOTO_INSTRUMENT_SYNTHESIZER_LOOP_INVARIANT_SYNTHESIZER_BASE_H
+#endif // CPROVER_GOTO_SYNTHESIZER_LOOP_CONTRACTS_SYNTHESIZER_BASE_H
