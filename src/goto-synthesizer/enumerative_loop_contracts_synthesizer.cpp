@@ -1,19 +1,19 @@
 /*******************************************************************\
 
-Module: Enumerative Loop Invariant Synthesizer
+Module: Enumerative Loop Contracts Synthesizer
 
 Author: Qinheping Hu
 
 \*******************************************************************/
 
 /// \file
-/// Enumerative Loop Invariant Synthesizer
+/// Enumerative Loop Contracts Synthesizer
 
-#include "enumerative_loop_invariant_synthesizer.h"
+#include "enumerative_loop_contracts_synthesizer.h"
 
 #include <analyses/natural_loops.h>
 
-void enumerative_loop_invariant_synthesizert::init_candidates()
+void enumerative_loop_contracts_synthesizert::init_candidates()
 {
   for(auto &function_p : goto_model.goto_functions.function_map)
   {
@@ -38,7 +38,7 @@ void enumerative_loop_invariant_synthesizert::init_candidates()
   }
 }
 
-invariant_mapt enumerative_loop_invariant_synthesizert::synthesize_all()
+invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
 {
   init_candidates();
 
@@ -47,7 +47,7 @@ invariant_mapt enumerative_loop_invariant_synthesizert::synthesize_all()
   return invariant_candiate_map;
 }
 
-exprt enumerative_loop_invariant_synthesizert::synthesize(loop_idt loop_id)
+exprt enumerative_loop_contracts_synthesizert::synthesize(loop_idt loop_id)
 {
   return true_exprt();
 }

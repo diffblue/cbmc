@@ -84,6 +84,7 @@ target_link_libraries(
         goto-checker
         goto-programs
         goto-instrument-lib
+        goto-synthesizer-lib
         goto-symex
         cbmc-lib
         json-symtab-language

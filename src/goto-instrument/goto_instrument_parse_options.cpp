@@ -108,7 +108,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set_fi_fp_removal.h"
 
 #include "accelerate/accelerate.h"
-#include "synthesizer/enumerative_loop_invariant_synthesizer.h"
 
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
@@ -1148,17 +1147,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
-  if(cmdline.isset("synthesize-loop-invariants"))
-  {
-    log.warning() << "Loop invariant synthesizer is still work in progress. "
-                     "It only generates TRUE as invariants."
-                  << messaget::eom;
-
-    // Synthesize loop invariants and annotate them into `goto_model`
-    enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
-    annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
-  }
-
   bool use_dfcc = cmdline.isset(FLAG_DFCC);
   if(use_dfcc)
   {
@@ -1978,7 +1966,6 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_DFCC
     HELP_LOOP_CONTRACTS
-    HELP_LOOP_INVARIANT_SYNTHESIZER
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     HELP_ENFORCE_CONTRACT_REC

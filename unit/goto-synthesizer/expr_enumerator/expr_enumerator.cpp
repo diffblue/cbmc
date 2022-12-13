@@ -12,7 +12,7 @@ Author: Qinheping Hu
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 
-#include <goto-instrument/synthesizer/expr_enumerator.h>
+#include <goto-synthesizer/expr_enumerator.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("enumeratingsummation expressions", "[core]")
