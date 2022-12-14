@@ -3701,20 +3701,12 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         "one of the operands should have pointer type");
 
       const auto &base_type = to_pointer_type(expr.type()).base_type();
+      DATA_INVARIANT(
+        base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
 
-      mp_integer element_size;
-      if(base_type.id() == ID_empty)
-      {
-        // This is a gcc extension.
-        // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-        element_size = 1;
-      }
-      else
-      {
-        auto element_size_opt = pointer_offset_size(base_type, ns);
-        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 0);
-        element_size = *element_size_opt;
-      }
+      auto element_size_opt = pointer_offset_size(base_type, ns);
+      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 0);
+      mp_integer element_size = *element_size_opt;
 
       // First convert the pointer operand
       out << "(let ((?pointerop ";
@@ -3911,20 +3903,11 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
     {
       // Pointer difference
       const auto &base_type = to_pointer_type(expr.op0().type()).base_type();
-      mp_integer element_size;
-
-      if(base_type.id() == ID_empty)
-      {
-        // Pointer arithmetic on void is a gcc extension.
-        // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-        element_size = 1;
-      }
-      else
-      {
-        auto element_size_opt = pointer_offset_size(base_type, ns);
-        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 1);
-        element_size = *element_size_opt;
-      }
+      DATA_INVARIANT(
+        base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
+      auto element_size_opt = pointer_offset_size(base_type, ns);
+      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 1);
+      mp_integer element_size = *element_size_opt;
 
       if(element_size >= 2)
         out << "(bvsdiv ";

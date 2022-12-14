@@ -196,7 +196,7 @@ protected:
   virtual void typecheck_expr_binary_arithmetic(exprt &expr);
   virtual void typecheck_expr_shifts(shift_exprt &expr);
   virtual void typecheck_expr_pointer_arithmetic(exprt &expr);
-  virtual void typecheck_arithmetic_pointer(const exprt &expr);
+  virtual void typecheck_arithmetic_pointer(exprt &expr);
   virtual void typecheck_expr_binary_boolean(exprt &expr);
   virtual void typecheck_expr_trinary(if_exprt &expr);
   virtual void typecheck_expr_address_of(exprt &expr);

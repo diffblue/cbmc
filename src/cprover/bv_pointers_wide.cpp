@@ -414,19 +414,12 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
         CHECK_RETURN(bv.size() == bits);
 
         typet pointer_base_type = to_pointer_type(op.type()).base_type();
-
-        if(pointer_base_type.id() == ID_empty)
-        {
-          // This is a gcc extension.
-          // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-          size = 1;
-        }
-        else
-        {
-          auto size_opt = pointer_offset_size(pointer_base_type, ns);
-          CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
-          size = *size_opt;
-        }
+        DATA_INVARIANT(
+          pointer_base_type.id() != ID_empty,
+          "no pointer arithmetic over void pointers");
+        auto size_opt = pointer_offset_size(pointer_base_type, ns);
+        CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
+        size = *size_opt;
       }
     }
 
@@ -484,22 +477,12 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
     typet pointer_base_type =
       to_pointer_type(minus_expr.lhs().type()).base_type();
-    mp_integer element_size;
-
-    if(pointer_base_type.id() == ID_empty)
-    {
-      // This is a gcc extension.
-      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      element_size = 1;
-    }
-    else
-    {
-      auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
-      element_size = *element_size_opt;
-    }
-
-    return offset_arithmetic(type, bv, element_size, neg_op1);
+    DATA_INVARIANT(
+      pointer_base_type.id() != ID_empty,
+      "no pointer arithmetic over void pointers");
+    auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
+    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+    return offset_arithmetic(type, bv, *element_size_opt, neg_op1);
   }
   else if(
     expr.id() == ID_byte_extract_little_endian ||
@@ -631,21 +614,17 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
 
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
 
-      // Support for void* is a gcc extension, with the size treated as 1 byte
-      // (no division required below).
-      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      if(lhs_pt.base_type().id() != ID_empty)
-      {
-        auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
-        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+      DATA_INVARIANT(
+        lhs_pt.base_type().id() != ID_empty,
+        "no pointer arithmetic over void pointers");
+      auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
+      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
 
-        if(*element_size_opt != 1)
-        {
-          bvt element_size_bv =
-            bv_utils.build_constant(*element_size_opt, width);
-          difference = bv_utils.divider(
-            difference, element_size_bv, bv_utilst::representationt::SIGNED);
-        }
+      if(*element_size_opt != 1)
+      {
+        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        difference = bv_utils.divider(
+          difference, element_size_bv, bv_utilst::representationt::SIGNED);
       }
 
       prop.l_set_to_true(prop.limplies(
