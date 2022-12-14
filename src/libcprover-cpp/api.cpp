@@ -19,17 +19,8 @@
 
 extern configt config;
 
-api_sessiont::api_sessiont()
-  : message_handler(
-      util_make_unique<null_message_handlert>(null_message_handlert{})),
-    options(util_make_unique<optionst>(optionst{}))
+api_sessiont::api_sessiont() : api_sessiont{api_optionst::create()}
 {
-  // Needed to initialise the language options correctly
-  cmdlinet cmdline;
-  // config is global in config.cpp
-  config.set(cmdline);
-  // Initialise C language mode
-  register_language(new_ansi_c_language);
 }
 
 api_sessiont::api_sessiont(const api_optionst &options)
