@@ -71,6 +71,12 @@ struct api_sessiont
   /// Verify previously loaded model.
   void verify_model();
 
+  /// Drop unused functions from the loaded goto_model simplifying it
+  void drop_unused_functions();
+
+  /// Validate the loaded goto model
+  void validate_goto_model();
+
 private:
   std::unique_ptr<api_session_implementationt> implementation;
 };

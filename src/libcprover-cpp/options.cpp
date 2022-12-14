@@ -14,12 +14,6 @@ api_optionst api_optionst::create()
   return api_optionst{};
 }
 
-api_optionst &api_optionst::simplify(bool on)
-{
-  simplify_enabled = on;
-  return *this;
-}
-
 static std::unique_ptr<optionst> make_internal_default_options()
 {
   std::unique_ptr<optionst> options = util_make_unique<optionst>();
@@ -31,6 +25,24 @@ static std::unique_ptr<optionst> make_internal_default_options()
   options->set_option("depth", UINT32_MAX);
   options->set_option("sat-preprocessor", true);
   return options;
+}
+
+api_optionst &api_optionst::simplify(bool on)
+{
+  simplify_enabled = on;
+  return *this;
+}
+
+api_optionst &api_optionst::drop_unused_functions(bool on)
+{
+  drop_unused_functions_enabled = on;
+  return *this;
+}
+
+api_optionst &api_optionst::validate_goto_model(bool on)
+{
+  validate_goto_model_enabled = on;
+  return *this;
 }
 
 std::unique_ptr<optionst> api_optionst::to_engine_options() const

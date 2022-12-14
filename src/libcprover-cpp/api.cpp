@@ -4,6 +4,7 @@
 
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/invariant.h>
 #include <util/message.h>
 #include <util/options.h>
 #include <util/ui_message.h>
@@ -13,6 +14,7 @@
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/set_properties.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -158,4 +160,33 @@ void api_sessiont::verify_model()
       *implementation->options, ui_message_handler, *implementation->model);
   (void)verifier();
   verifier.report();
+}
+
+void api_sessiont::drop_unused_functions()
+{
+  INVARIANT(
+    implementation->model != nullptr,
+    "Model has not been loaded. Load it first using "
+    "api::load_model_from_files");
+
+  messaget log{*implementation->message_handler};
+  log.status() << "Performing instrumentation pass: dropping unused functions"
+               << messaget::eom;
+
+  remove_unused_functions(
+    *implementation->model, *implementation->message_handler);
+}
+
+void api_sessiont::validate_goto_model()
+{
+  INVARIANT(
+    implementation->model != nullptr,
+    "Model has not been loaded. Load it first using "
+    "api::load_model_from_files");
+
+  messaget log{*implementation->message_handler};
+  log.status() << "Validating consistency of goto-model supplied to API session"
+               << messaget::eom;
+
+  implementation->model->validate();
 }
