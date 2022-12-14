@@ -19,15 +19,23 @@
 
 extern configt config;
 
+struct api_session_implementationt
+{
+  std::unique_ptr<goto_modelt> model;
+  std::unique_ptr<message_handlert> message_handler;
+  std::unique_ptr<optionst> options;
+};
+
 api_sessiont::api_sessiont() : api_sessiont{api_optionst::create()}
 {
 }
 
 api_sessiont::api_sessiont(const api_optionst &options)
-  : message_handler(
-      util_make_unique<null_message_handlert>(null_message_handlert{})),
-    options(options.to_engine_options())
+  : implementation{util_make_unique<api_session_implementationt>()}
 {
+  implementation->message_handler =
+    util_make_unique<null_message_handlert>(null_message_handlert{});
+  implementation->options = options.to_engine_options();
   // Needed to initialise the language options correctly
   cmdlinet cmdline;
   // config is global in config.cpp
@@ -40,6 +48,6 @@ api_sessiont::~api_sessiont() = default;
 
 void api_sessiont::load_model_from_files(const std::vector<std::string> &files)
 {
-  model = util_make_unique<goto_modelt>(
-    initialize_goto_model(files, *message_handler, *options));
+  implementation->model = util_make_unique<goto_modelt>(initialize_goto_model(
+    files, *implementation->message_handler, *implementation->options));
 }
