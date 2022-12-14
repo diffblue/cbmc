@@ -19,6 +19,34 @@ struct api_session_implementationt;
 
 #include "options.h" // IWYU pragma: keep
 
+/// Opaque message type. Properties of messages to be fetched through further
+/// api calls.
+struct api_messaget;
+
+/// Given a \p api_message, this function returns that message expressed as a
+/// C language string.
+/// \note The memory for the returned string is owned by the message and as such
+/// does not need to be freed by users of the API.
+const char *api_message_get_string(const api_messaget &message);
+
+/// The type of pointers to contextual data passed to the api_message_callback
+/// functions. These pointers point to api consumer data and are just passed
+/// through to the callback verbatim. These support users of the api to avoid
+/// using global variables.
+using api_call_back_contextt = void *;
+
+/// The type of call back for feedback of status information and results.
+/// \param message: A structured message object. The lifetime of this object is
+///   the duration of the call to the callback. So if any data from it is
+///   required to persist, then this data must be copied into the API consumers
+///   memory.
+/// \param call_back_context: A pointer to the context for the function. This
+///   is passed through the API to the function and is for use like a capture
+///   group. Memory for this object is owned by the consumer of the API.
+using api_message_callbackt = void (*)(
+  const api_messaget &message,
+  api_call_back_contextt call_back_context);
+
 // An object in the pattern of Session Facade - owning all of the memory
 // the API is using and being responsible for the management of that.
 struct api_sessiont
@@ -27,6 +55,14 @@ struct api_sessiont
   api_sessiont();
   explicit api_sessiont(const api_optionst &options);
   ~api_sessiont(); // default constructed in the .cpp file
+
+  /// \param callback: A call back function to receive progress updates and
+  ///                  success/failure statuses.
+  /// \param context: A context pointer passed through to the callback function.
+  ///                 This is used similarly to a capture in a lambda function.
+  void set_message_callback(
+    api_message_callbackt callback,
+    api_call_back_contextt context);
 
   /// Load a goto_model from a given vector of filenames.
   /// \param files: A vector<string> containing the filenames to be loaded

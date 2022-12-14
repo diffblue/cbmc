@@ -9,6 +9,13 @@
 #include <iostream>
 #include <vector>
 
+void print_messages_to_stdout(
+  const api_messaget &message,
+  api_call_back_contextt)
+{
+  std::cout << api_message_get_string(message) << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
   try
@@ -25,6 +32,7 @@ int main(int argc, char *argv[])
     api_sessiont api(api_options);
 
     // Demonstrate the loading of a goto-model from the command line arguments
+    api.set_message_callback(print_messages_to_stdout, nullptr);
     api.load_model_from_files(arguments);
 
     std::cout << "Successfully initialised goto_model" << std::endl;
