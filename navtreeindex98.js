@@ -1,6 +1,5 @@
 var NAVTREEINDEX98 =
 {
-"goto__inline_8h.html#a15fe6e63eca5b8c0595c9212b9fb0506":[7,0,2,14,40,0],
 "goto__inline_8h.html#a51f1567f914838ff660812d988fe20ea":[7,0,2,14,40,4],
 "goto__inline_8h.html#a7d6904a047ecaa8998a759c0bc2cb73c":[7,0,2,14,40,3],
 "goto__inline_8h.html#ac1fd082b4cde2afde0b20910773e8d3f":[7,0,2,14,40,5],
@@ -249,5 +248,6 @@ var NAVTREEINDEX98 =
 "group__goto-diff.html":[4,10],
 "group__goto-harness.html":[4,11],
 "group__goto-instrument.html":[4,13],
-"group__goto-programs.html":[4,14]
+"group__goto-programs.html":[4,14],
+"group__goto-symex.html":[4,15]
 };

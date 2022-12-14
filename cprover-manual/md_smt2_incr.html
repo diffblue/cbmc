@@ -105,15 +105,14 @@ Requisites</h3>
 <h3><a class="anchor" id="usage"></a>
 Usage</h3>
 <p>To use the incremental SMT2 backend it is enough to add the <code>--incremental-smt2-solver</code> argument to the CBMC command line followed by the command to invoke the chosen solver using smtlib 2.6 input in interactive mode.</p>
-<p>Note that the use of the <code>--slice-formula</code> option is recommended at this time to slice out unnecessary code (that may not be supported at the moment) and this can also improve performance.</p>
 <p>Here are two examples to show how to analyse a file <code>program.c</code> using Z3 and CVC5 solvers.</p>
 <p>To use the Z3 SMT solver:</p>
-<div class="fragment"><div class="line">cbmc --slice-formula --incremental-smt2-solver &#39;z3 -smt2 -in&#39; program.c</div>
+<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;z3 -smt2 -in&#39; program.c</div>
 </div><!-- fragment --><p>If <code>z3</code> is not on the <code>PATH</code>, then it is enough to replace &lsquo;'z3 -smt2 -in&rsquo;<code>with</code>'&lt;command-to-execute-z3&gt; -smt2 -in'`,</p>
 <p>Similarly to execute CBMC using the CVC5 solver:</p>
-<div class="fragment"><div class="line">cbmc --slice-formula --incremental-smt2-solver &#39;cvc5 --lang=smtlib2.6 --incremental&#39; program.c</div>
+<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;cvc5 --lang=smtlib2.6 --incremental&#39; program.c</div>
 </div><!-- fragment --><p>As the command to execute the solver is left to the user, it is possible to fine-tune it by passing extra parameters (when the solver allows so). For example Z3 allows to set certain parameters by adding <code>param_name=value</code> to the command line, so to use the Z3 solver with <code>well_sorted_check</code> property set to <code>false</code> the following has to be run:</p>
-<div class="fragment"><div class="line">cbmc --slice-formula --incremental-smt2-solver &#39;z3 -smt2 -in well_sorted_check=false&#39; program.c</div>
+<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;z3 -smt2 -in well_sorted_check=false&#39; program.c</div>
 </div><!-- fragment --><h3><a class="anchor" id="examples"></a>
 Examples</h3>
 <p>Given a C program <code>program.c</code> as follows:</p>
@@ -128,7 +127,7 @@ Examples</h3>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>To analyze it we should run:</p>
-<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;z3 -smt2 -in&#39; --slice-formula program.c</div>
+<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;z3 -smt2 -in&#39; program.c</div>
 </div><!-- fragment --><p>We will get the verification results as follows:</p>
 <div class="fragment"><div class="line">CBMC version 5.70.0 (cbmc-5.70.0-53-g20535ad14d) 64-bit x86_64 macos</div>
 <div class="line">Parsing program.c</div>
@@ -166,7 +165,7 @@ Examples</h3>
 <div class="line">VERIFICATION FAILED</div>
 </div><!-- fragment --><p>As expected CBMC returns <code>FAILURE</code> for both assertions at lines <code>5</code> and <code>7</code>.</p>
 <p>The incremental smt2 backend also supports trace generation, so to get a trace that fails the assertions the <code>--trace</code> argument should be added, so the command to run is:</p>
-<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;z3 -smt2 -in&#39; --slice-formula --trace program.c</div>
+<div class="fragment"><div class="line">cbmc --incremental-smt2-solver &#39;z3 -smt2 -in&#39; --trace program.c</div>
 </div><!-- fragment --><p>This will append the trace to CBMC’s output as follows:</p>
 <div class="fragment"><div class="line">CBMC version 5.70.0 (cbmc-5.70.0-53-g20535ad14d) 64-bit x86_64 macos</div>
 <div class="line">Parsing program.c</div>
@@ -210,7 +209,7 @@ Examples</h3>
 <div class="line"> </div>
 <div class="line">** 2 of 2 failed (3 iterations)</div>
 <div class="line">VERIFICATION FAILED</div>
-</div><!-- fragment --><p>Last modified: 2022-12-14 09:30:20 +0000 </p>
+</div><!-- fragment --><p>Last modified: 2022-12-14 11:21:28 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
