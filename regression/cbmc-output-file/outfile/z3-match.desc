@@ -1,6 +1,6 @@
 CORE
 test.c
---incremental-smt2-solver 'z3 --smt2 -in' --slice-formula --outfile %out-file-name%
+--incremental-smt2-solver 'z3 --smt2 -in' --outfile %out-file-name%
 Passing problem to incremental SMT2 solving via SMT2 incremental dry-run
 Output file matches.
 ^EXIT=0$

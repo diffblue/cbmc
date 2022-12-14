@@ -1,6 +1,6 @@
 CORE
 array-misalign.c
---slice-formula
+
 \[main.assertion\.1\] line \d+ assertion x\[0\] == 256ul: SUCCESS
 \[main.assertion\.2\] line \d+ assertion x\[0\] == 0ul: FAILURE
 \[main.assertion\.3\] line \d+ assertion x\[1\] == 0ul: SUCCESS

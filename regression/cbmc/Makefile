@@ -30,7 +30,7 @@ test-paths-lifo:
 					  -s paths-lifo $(GCC_ONLY)
 
 test-new-smt-backend:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'z3 --smt2 -in' --slice-formula" \
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'z3 --smt2 -in'" \
 					  -I new-smt-backend \
 					  -s new-smt-backend $(GCC_ONLY)
 

@@ -1,6 +1,6 @@
 CORE
 test.c
---incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --slice-formula --dump-smt-formula %out-file-name%
+--incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --dump-smt-formula %out-file-name%
 Passing problem to incremental SMT2 solving via "cvc5 --lang=smtlib2.6 --incremental"
 \[main.assertion.\d+\] line \d+ Nondeterministic int assert.: FAILURE
 Output file matches.

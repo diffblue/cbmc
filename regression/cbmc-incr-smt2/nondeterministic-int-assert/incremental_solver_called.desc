@@ -1,6 +1,6 @@
 CORE
 test.c
---verbosity 10
+--slice-formula --verbosity 10
 Passing problem to incremental SMT2 solving via
 Sending command to SMT2 solver - \(set-option :produce-models true\)
 Sending command to SMT2 solver - \(set-logic ALL\)

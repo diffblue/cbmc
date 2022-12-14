@@ -61,15 +61,12 @@ To use the incremental SMT2 backend it is enough to add the `--incremental-smt2-
 the CBMC command line followed by the command to invoke the chosen solver using smtlib 2.6 input in
 interactive mode.
 
-Note that the use of the `--slice-formula` option is recommended at this time to slice out
-unnecessary code (that may not be supported at the moment) and this can also improve performance.
-
 Here are two examples to show how to analyse a file `program.c` using Z3 and CVC5 solvers.
 
 To use the Z3 SMT solver:
 
 ```shell 
-cbmc --slice-formula --incremental-smt2-solver 'z3 -smt2 -in' program.c
+cbmc --incremental-smt2-solver 'z3 -smt2 -in' program.c
 ```
 
 If `z3` is not on the `PATH`, then it is enough to replace `'z3 -smt2 -in'`
@@ -78,7 +75,7 @@ with `'<command-to-execute-z3> -smt2 -in'`,
 Similarly to execute CBMC using the CVC5 solver:
 
 ```shell
-cbmc --slice-formula --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' program.c
+cbmc --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' program.c
 ```
 
 As the command to execute the solver is left to the user, it is possible to fine-tune it by passing
@@ -87,7 +84,7 @@ adding `param_name=value` to the command line, so to use the Z3 solver with `wel
 property set to `false` the following has to be run:
 
 ```shell
-cbmc --slice-formula --incremental-smt2-solver 'z3 -smt2 -in well_sorted_check=false' program.c
+cbmc --incremental-smt2-solver 'z3 -smt2 -in well_sorted_check=false' program.c
 ```
 
 ### Examples
@@ -110,7 +107,7 @@ int main()
 To analyze it we should run:
 
 ```shell
-cbmc --incremental-smt2-solver 'z3 -smt2 -in' --slice-formula program.c
+cbmc --incremental-smt2-solver 'z3 -smt2 -in' program.c
 ```
 
 We will get the verification results as follows:
@@ -162,7 +159,7 @@ The incremental smt2 backend also supports trace generation, so to get a trace t
 assertions the `--trace` argument should be added, so the command to run is:
 
 ```shell
-cbmc --incremental-smt2-solver 'z3 -smt2 -in' --slice-formula --trace program.c
+cbmc --incremental-smt2-solver 'z3 -smt2 -in' --trace program.c
 ```
 
 This will append the trace to CBMC's output as follows:
