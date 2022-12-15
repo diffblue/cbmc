@@ -1,5 +1,6 @@
 var NAVTREEINDEX130 =
 {
+"structzip__iteratort.html#a457b0cfeb9c46c20e4511cecd873f740":[6,0,1339,10],
 "structzip__iteratort.html#a56bffc3666fad687790476ee75412e94":[6,0,1339,8],
 "structzip__iteratort.html#a634c95c844942a19989dcef2a40b6a06":[6,0,1339,9],
 "structzip__iteratort.html#a72042a7e46e3c2ca4e866c8c674e0a3a":[6,0,1339,15],
@@ -248,6 +249,5 @@ var NAVTREEINDEX130 =
 "tutorial.html":[0,4,13],
 "tutorial.html#autotoc_md184":[0,4,13,0,0],
 "tutorial.html#autotoc_md185":[0,4,13,0,1],
-"tutorial.html#autotoc_md186":[0,4,13,0,1,0],
-"tutorial.html#autotoc_md187":[0,4,13,0,1,1]
+"tutorial.html#autotoc_md186":[0,4,13,0,1,0]
 };
