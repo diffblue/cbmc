@@ -5,7 +5,7 @@ main.c
 ^\[main.assertion.2\] line .* assertion \(void \*\)0 != \(void \*\)0 - \(.*\)1: SUCCESS$
 ^\[main.assertion.3\] line .* assertion \(void \*\)0 != \(void \*\)0 \+ \(.*\)offset: SUCCESS$
 ^\[main.assertion.4\] line .* assertion \(void \*\)0 - \(void \*\)0 == \(.*\)0: SUCCESS$
-^\[main.assertion.5\] line .* assertion ptr - \(void \*\)0 == \(.*\)0: FAILURE$
+^\[main.assertion.5\] line .* assertion ptr - \(signed int \*\)\(void \*\)0 == \(.*\)0: FAILURE$
 ^\[main.assertion.6\] line .* assertion \(ptr - \(.*\)1\) \+ \(.*\)1 == \(\(.* \*\)NULL\): SUCCESS$
 ^\[main.assertion.7\] line .* assertion \(ptr - \(.*\)1\) \+ \(.*\)1 == \(\(.* \*\)NULL\): FAILURE$
 ^EXIT=10$

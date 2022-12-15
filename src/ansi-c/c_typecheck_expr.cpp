@@ -4171,8 +4171,11 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     if(type0.id()==ID_pointer &&
        type1.id()==ID_pointer)
     {
-      // We should check the subtypes, and complain if
-      // they are really different.
+      if(type0 != type1)
+      {
+        throw invalid_source_file_exceptiont{
+          "pointer subtraction over different types", expr.source_location()};
+      }
       expr.type()=pointer_diff_type();
       typecheck_arithmetic_pointer(op0);
       typecheck_arithmetic_pointer(op1);

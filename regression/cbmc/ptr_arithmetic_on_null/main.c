@@ -12,7 +12,11 @@ void main()
   assert(NULL - NULL == 0);
 
   int *ptr;
+#ifdef MISSING_CAST
   assert(ptr - NULL == 0);
+#else
+  assert(ptr - (int *)NULL == 0);
+#endif
   ptr = NULL;
   assert((ptr - 1) + 1 == NULL);
 
