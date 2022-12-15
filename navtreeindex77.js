@@ -1,5 +1,17 @@
 var NAVTREEINDEX77 =
 {
+"expr__enumerator_8h_source.html":[7,0,2,16,3],
+"expr__initializer_8cpp.html":[7,0,2,29,46],
+"expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227":[7,0,2,29,46,2],
+"expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc":[7,0,2,29,46,1],
+"expr__initializer_8cpp_source.html":[7,0,2,29,46],
+"expr__initializer_8h.html":[7,0,2,29,47],
+"expr__initializer_8h.html#a66d4e2cbac65c3a8f2ba76b11848aed0":[7,0,2,29,47,1],
+"expr__initializer_8h.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc":[7,0,2,29,47,0],
+"expr__initializer_8h_source.html":[7,0,2,29,47],
+"expr__iterator_8h.html":[7,0,2,29,48],
+"expr__iterator_8h.html#addfbeeaadc665ad599c8ea568433f6c2":[7,0,2,29,48,5],
+"expr__iterator_8h_source.html":[7,0,2,29,48],
 "expr__query_8h.html":[7,0,3,0,2],
 "expr__query_8h.html#add4a1a8e5afb0e07d66e6df3edb0aa26":[7,0,3,0,2,1],
 "expr__query_8h_source.html":[7,0,3,0,2],
@@ -237,17 +249,5 @@ var NAVTREEINDEX77 =
 "format__expr_8h.html#a9eccf5b58db8906bc1559fb48ad4ac31":[7,0,2,29,66,0],
 "format__expr_8h_source.html":[7,0,2,29,66],
 "format__hooks_8cpp.html":[7,0,2,6,21],
-"format__hooks_8cpp.html#a99f1d4ea67707ff8d4523fd40162692e":[7,0,2,6,21,0],
-"format__hooks_8cpp_source.html":[7,0,2,6,21],
-"format__hooks_8h.html":[7,0,2,6,22],
-"format__hooks_8h.html#a99f1d4ea67707ff8d4523fd40162692e":[7,0,2,6,22,0],
-"format__hooks_8h_source.html":[7,0,2,6,22],
-"format__number__range_8cpp.html":[7,0,2,29,67],
-"format__number__range_8cpp.html#a4d74d4689b3cda8bebfbe313bd8118e9":[7,0,2,29,67,1],
-"format__number__range_8cpp.html#a72011bb1b45c5f05ab26ca1bb056c091":[7,0,2,29,67,2],
-"format__number__range_8cpp.html#afe19b207f4631bdc74578199f4696b60":[7,0,2,29,67,0],
-"format__number__range_8cpp_source.html":[7,0,2,29,67],
-"format__number__range_8h.html":[7,0,2,29,68],
-"format__number__range_8h.html#a39aaa7cf1c9a37f49fafa3a2d804582c":[7,0,2,29,68,0],
-"format__number__range_8h.html#a5eb2fba6d2e8ec0fa7f63d3747115c69":[7,0,2,29,68,1]
+"format__hooks_8cpp.html#a99f1d4ea67707ff8d4523fd40162692e":[7,0,2,6,21,0]
 };

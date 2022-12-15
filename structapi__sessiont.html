@@ -115,6 +115,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a02e72d5b706f438066efef2ac615897e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf0aa09167bf2a8ee61e15b9263612fb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#adf0aa09167bf2a8ee61e15b9263612fb">~api_sessiont</a> ()</td></tr>
 <tr class="separator:adf0aa09167bf2a8ee61e15b9263612fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f46c4d48b00c26c4e87555d76dd24ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a9f46c4d48b00c26c4e87555d76dd24ac">set_message_callback</a> (<a class="el" href="api_8h.html#ab3927ad5888f46073d051dc0490d2c32">api_message_callbackt</a> callback, <a class="el" href="api_8h.html#aef5c168f63b0af20b228b52e58e6b5c2">api_call_back_contextt</a> context)</td></tr>
+<tr class="separator:a9f46c4d48b00c26c4e87555d76dd24ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a68c26073a32dc450bb753e77a096ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a0a68c26073a32dc450bb753e77a096ea">load_model_from_files</a> (const std::vector&lt; std::string &gt; &amp;files)</td></tr>
 <tr class="memdesc:a0a68c26073a32dc450bb753e77a096ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a goto_model from a given vector of filenames.  <a href="structapi__sessiont.html#a0a68c26073a32dc450bb753e77a096ea">More...</a><br /></td></tr>
 <tr class="separator:a0a68c26073a32dc450bb753e77a096ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,7 +128,7 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00024">24</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00052">52</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abd292e751c8cc99001ba4107745f6e96"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abd292e751c8cc99001ba4107745f6e96">&#9670;&nbsp;</a></span>api_sessiont() <span class="overload">[1/2]</span></h2>
@@ -225,7 +227,44 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00049">49</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00103">103</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a9f46c4d48b00c26c4e87555d76dd24ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f46c4d48b00c26c4e87555d76dd24ac">&#9670;&nbsp;</a></span>set_message_callback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void api_sessiont::set_message_callback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="api_8h.html#ab3927ad5888f46073d051dc0490d2c32">api_message_callbackt</a>&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="api_8h.html#aef5c168f63b0af20b228b52e58e6b5c2">api_call_back_contextt</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">callback</td><td>A call back function to receive progress updates and success/failure statuses. </td></tr>
+    <tr><td class="paramname">context</td><td>A context pointer passed through to the callback function. This is used similarly to a capture in a lambda function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00095">95</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -250,7 +289,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00036">36</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00072">72</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
 
 </div>
 </div>

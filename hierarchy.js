@@ -154,6 +154,7 @@ var hierarchy =
     [ "ansi_c_parse_treet", "classansi__c__parse__treet.html", null ],
     [ "ansi_c_scopet", "classansi__c__scopet.html", null ],
     [ "configt::ansi_ct", "structconfigt_1_1ansi__ct.html", null ],
+    [ "api_messaget", "structapi__messaget.html", null ],
     [ "api_optionst", "classapi__optionst.html", null ],
     [ "api_session_implementationt", "structapi__session__implementationt.html", null ],
     [ "api_sessiont", "structapi__sessiont.html", null ],
@@ -1053,6 +1054,7 @@ var hierarchy =
     [ "merged_irep_hash", "structmerged__irep__hash.html", null ],
     [ "merged_irepst", "classmerged__irepst.html", null ],
     [ "message_handlert", "classmessage__handlert.html", [
+      [ "api_message_handlert", "classapi__message__handlert.html", null ],
       [ "console_message_handlert", "classconsole__message__handlert.html", [
         [ "cl_message_handlert", "classcl__message__handlert.html", null ],
         [ "gcc_message_handlert", "classgcc__message__handlert.html", null ]

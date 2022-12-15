@@ -97,9 +97,13 @@ var NAVTREEINDEX1 =
 "ansi__c__typecheck_8h.html#ad7efaeb90fa079763877eaeeff915155":[7,0,2,1,22,2],
 "ansi__c__typecheck_8h_source.html":[7,0,2,1,22],
 "api_8cpp.html":[7,0,2,21,0],
-"api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe":[7,0,2,21,0,1],
+"api_8cpp.html#a4928511967c81658f0646ce20cb975d0":[7,0,2,21,0,3],
+"api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe":[7,0,2,21,0,4],
 "api_8cpp_source.html":[7,0,2,21,0],
 "api_8h.html":[7,0,2,21,1],
+"api_8h.html#a4928511967c81658f0646ce20cb975d0":[7,0,2,21,1,3],
+"api_8h.html#ab3927ad5888f46073d051dc0490d2c32":[7,0,2,21,1,2],
+"api_8h.html#aef5c168f63b0af20b228b52e58e6b5c2":[7,0,2,21,1,1],
 "api_8h_source.html":[7,0,2,21,1],
 "arith__tools_8cpp.html":[7,0,2,29,0],
 "arith__tools_8cpp.html#a0d723e7fcdf6ef8322b386bc05abd6ad":[7,0,2,29,0,1],
@@ -245,9 +249,5 @@ var NAVTREEINDEX1 =
 "assembler__parser_8h.html#a1e1b3db7412542337859f16c7e8f360f":[7,0,2,2,1,3],
 "assembler__parser_8h.html#a68a7adb761cc1b5e2b3c8e5345276b51":[7,0,2,2,1,1],
 "assembler__parser_8h.html#a8c075bff2b919b27fc1fdbe8faf1f847":[7,0,2,2,1,2],
-"assembler__parser_8h.html#ac83ace5f35e36ecf1b1b2ff17c030702":[7,0,2,2,1,4],
-"assembler__parser_8h_source.html":[7,0,2,2,1],
-"assignments__from__json_8cpp.html":[7,0,1,0,1,0],
-"assignments__from__json_8cpp.html#a2bcaa10bbe1163fa29d7958e8a11db6c":[7,0,1,0,1,0,2],
-"assignments__from__json_8cpp.html#a323f0fcacbf786b74ade3e2aef34b5c4":[7,0,1,0,1,0,11]
+"assembler__parser_8h.html#ac83ace5f35e36ecf1b1b2ff17c030702":[7,0,2,2,1,4]
 };

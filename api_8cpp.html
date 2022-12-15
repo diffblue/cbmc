@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('api_8cpp.html',''); initResizable(); }
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">api.cpp File Reference</div>  </div>
@@ -122,12 +123,46 @@ $(document).ready(function(){initNavTree('api_8cpp.html',''); initResizable(); }
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__session__implementationt.html">api_session_implementationt</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__messaget.html">api_messaget</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classapi__message__handlert.html">api_message_handlert</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a4928511967c81658f0646ce20cb975d0"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="api_8cpp.html#a4928511967c81658f0646ce20cb975d0">api_message_get_string</a> (const <a class="el" href="structapi__messaget.html">api_messaget</a> &amp;message)</td></tr>
+<tr class="memdesc:a4928511967c81658f0646ce20cb975d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a <code>api_message</code>, this function returns that message expressed as a C language string.  <a href="api_8cpp.html#a4928511967c81658f0646ce20cb975d0">More...</a><br /></td></tr>
+<tr class="separator:a4928511967c81658f0646ce20cb975d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:ad2957e882e3568503e4f786a480f2bfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classconfigt.html">configt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></td></tr>
 <tr class="separator:ad2957e882e3568503e4f786a480f2bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a4928511967c81658f0646ce20cb975d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4928511967c81658f0646ce20cb975d0">&#9670;&nbsp;</a></span>api_message_get_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* api_message_get_string </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structapi__messaget.html">api_messaget</a> &amp;&#160;</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Given a <code>api_message</code>, this function returns that message expressed as a C language string. </p>
+<dl class="section note"><dt>Note</dt><dd>The memory for the returned string is owned by the message and as such does not need to be freed by users of the API. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00054">54</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a id="ad2957e882e3568503e4f786a480f2bfe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad2957e882e3568503e4f786a480f2bfe">&#9670;&nbsp;</a></span>config</h2>
