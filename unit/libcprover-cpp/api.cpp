@@ -62,7 +62,9 @@ std::string contains_in_ordert::describe() const
   return description.str();
 }
 
-TEST_CASE("Test loading model from file.", "[core][libcprover-cpp]")
+TEST_CASE(
+  "Test loading and verifying model from file.",
+  "[core][libcprover-cpp]")
 {
   api_sessiont api(api_optionst::create());
 
@@ -76,13 +78,35 @@ TEST_CASE("Test loading model from file.", "[core][libcprover-cpp]")
       output.emplace_back(api_message_get_string(message));
     };
 
-  api.set_message_callback(write_output, &output);
-  api.load_model_from_files({"test.c"});
-  CHECK_THAT(
-    output,
-    (contains_in_ordert{
-      "Parsing test.c",
-      "Converting",
-      "Type-checking test",
-      "Generating GOTO Program"}));
+  SECTION("Load from file")
+  {
+    api.set_message_callback(write_output, &output);
+    api.load_model_from_files({"test.c"});
+    CHECK_THAT(
+      output,
+      (contains_in_ordert{
+        "Parsing test.c",
+        "Converting",
+        "Type-checking test",
+        "Generating GOTO Program"}));
+    output.clear();
+    SECTION("Verify")
+    {
+      api.verify_model();
+      CHECK_THAT(
+        output,
+        (contains_in_ordert{
+          "Removal of function pointers and virtual functions",
+          "Generic Property Instrumentation",
+          "Starting Bounded Model Checking",
+          "Generated 1 VCC(s), 1 remaining after simplification",
+          "Passing problem to propositional reduction",
+          "converting SSA",
+          "Running propositional reduction",
+          "Post-processing",
+          "SAT checker: instance is SATISFIABLE",
+          "[main.assertion.1] line 8 assertion a[4] != 4: FAILURE",
+          "VERIFICATION FAILED"}));
+    }
+  }
 }

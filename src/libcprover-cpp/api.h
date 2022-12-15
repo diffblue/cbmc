@@ -68,6 +68,9 @@ struct api_sessiont
   /// \param files: A vector<string> containing the filenames to be loaded
   void load_model_from_files(const std::vector<std::string> &files);
 
+  /// Verify previously loaded model.
+  void verify_model();
+
 private:
   std::unique_ptr<api_session_implementationt> implementation;
 };
