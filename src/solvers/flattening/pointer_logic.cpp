@@ -95,7 +95,8 @@ exprt pointer_logict::pointer_expr(
     objects[numeric_cast_v<std::size_t>(pointer.object)];
 
   typet subtype = type.base_type();
-  // This is a gcc extension.
+  // In a counterexample we may up with void pointers with an offset; handle
+  // this just like GCC does and treat them as char pointers:
   // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
   if(subtype.id() == ID_empty)
     subtype = char_type();

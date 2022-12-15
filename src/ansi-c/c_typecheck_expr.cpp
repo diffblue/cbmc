@@ -1893,8 +1893,8 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
     }
     else if(type0.id() == ID_pointer)
     {
-      expr.type()=type0;
-      typecheck_arithmetic_pointer(op0);
+      typecheck_arithmetic_pointer(to_unary_expr(expr).op());
+      expr.type() = to_unary_expr(expr).op().type();
     }
     else
     {
@@ -4123,7 +4123,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   throw 0;
 }
 
-void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
+void c_typecheck_baset::typecheck_arithmetic_pointer(exprt &expr)
 {
   const typet &type=expr.type();
   PRECONDITION(type.id() == ID_pointer);
@@ -4153,6 +4153,13 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
     throw 0;
+  }
+  else if(base_type.id() == ID_empty)
+  {
+    // This is a gcc extension.
+    // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+    typecast_exprt tc{expr, pointer_type(char_type())};
+    expr.swap(tc);
   }
 }
 
@@ -4192,7 +4199,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     {
       typecheck_arithmetic_pointer(op0);
       make_index_type(op1);
-      expr.type()=type0;
+      expr.type() = op0.type();
       return;
     }
   }
