@@ -1,36 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="32,537,119,564"/>
-<area shape="rect" id="node2" href="$classgoto__convertt.html" title=" " alt="" coords="200,56,312,83"/>
-<area shape="rect" id="node5" href="$classlanguage__filest.html" title=" " alt="" coords="195,233,317,260"/>
-<area shape="rect" id="node6" href="$classlanguaget.html" title=" " alt="" coords="213,284,299,311"/>
-<area shape="rect" id="node13" href="$classparsert.html" title=" " alt="" coords="222,537,290,564"/>
-<area shape="rect" id="node22" href="$classpreprocessort.html" title=" " alt="" coords="201,588,311,615"/>
-<area shape="rect" id="node23" href="$classsafety__checkert.html" title=" " alt="" coords="193,639,319,665"/>
-<area shape="rect" id="node24" href="$classtypecheckt.html" title=" " alt="" coords="209,892,303,919"/>
-<area shape="rect" id="node3" href="$classcleanert.html" title="Allows to clean expressions of side effects." alt="" coords="427,5,502,32"/>
-<area shape="rect" id="node4" href="$classgoto__convert__functionst.html" title=" " alt="" coords="375,56,554,83"/>
-<area shape="rect" id="node7" href="$classansi__c__languaget.html" title=" " alt="" coords="397,107,532,133"/>
-<area shape="rect" id="node8" href="$classcpp__languaget.html" title=" " alt="" coords="406,157,523,184"/>
-<area shape="rect" id="node9" href="$classjava__bytecode__languaget.html" title=" " alt="" coords="370,208,559,235"/>
-<area shape="rect" id="node10" href="$classjsil__languaget.html" title=" " alt="" coords="408,259,521,285"/>
-<area shape="rect" id="node11" href="$classjson__symtab__languaget.html" title=" " alt="" coords="376,309,553,336"/>
-<area shape="rect" id="node12" href="$classstatement__list__languaget.html" title="Implements the language interface for the Statement List language." alt="" coords="371,360,559,387"/>
-<area shape="rect" id="node14" href="$classansi__c__parsert.html" title=" " alt="" coords="407,411,523,437"/>
-<area shape="rect" id="node15" href="$classassembler__parsert.html" title=" " alt="" coords="393,461,536,488"/>
-<area shape="rect" id="node16" href="$classcpp__parsert.html" title=" " alt="" coords="415,512,514,539"/>
-<area shape="rect" id="node17" href="$classjava__bytecode__parsert.html" title=" " alt="" coords="379,563,550,589"/>
-<area shape="rect" id="node18" href="$classjsil__parsert.html" title=" " alt="" coords="417,613,512,640"/>
-<area shape="rect" id="node19" href="$classjson__parsert.html" title=" " alt="" coords="413,664,516,691"/>
-<area shape="rect" id="node20" href="$classstatement__list__parsert.html" title="Responsible for starting the parse process and to translate the result into a statement_list_parse_tr..." alt="" coords="380,715,549,741"/>
-<area shape="rect" id="node21" href="$classxml__parsert.html" title=" " alt="" coords="415,765,515,792"/>
-<area shape="rect" id="node25" href="$classc__typecheck__baset.html" title=" " alt="" coords="391,1019,538,1045"/>
-<area shape="rect" id="node28" href="$classjava__bytecode__typecheckt.html" title=" " alt="" coords="367,816,563,843"/>
-<area shape="rect" id="node29" href="$classjsil__typecheckt.html" title=" " alt="" coords="405,867,525,893"/>
-<area shape="rect" id="node30" href="$classlinkingt.html" title=" " alt="" coords="429,917,500,944"/>
-<area shape="rect" id="node31" href="$classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check." alt="" coords="367,968,562,995"/>
-<area shape="rect" id="node26" href="$classansi__c__typecheckt.html" title=" " alt="" coords="611,993,753,1020"/>
-<area shape="rect" id="node27" href="$classcpp__typecheckt.html" title=" " alt="" coords="620,1044,744,1071"/>
-<area shape="rect" id="node32" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="5,1044,145,1071"/>
-<area shape="rect" id="node33" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="205,1044,307,1071"/>
-<area shape="rect" id="node34" href="$classmulti__namespacet.html" title="A multi namespace is essentially a namespace, with a list of namespaces." alt="" coords="393,1069,536,1096"/>
+<area shape="rect" id="node1" href="$classmessage__handlert.html" title=" " alt="" coords="5,157,148,184"/>
+<area shape="rect" id="node2" href="$classconsole__message__handlert.html" title=" " alt="" coords="196,31,395,57"/>
+<area shape="rect" id="node5" href="$classinlining__decoratort.html" title="Decorator for a message_handlert used during function inlining that collect names of GOTO functions c..." alt="" coords="223,81,367,108"/>
+<area shape="rect" id="node6" href="$classnull__message__handlert.html" title=" " alt="" coords="209,132,382,159"/>
+<area shape="rect" id="node7" href="$classsmt2__message__handlert.html" title=" " alt="" coords="204,183,387,209"/>
+<area shape="rect" id="node8" href="$classstream__message__handlert.html" title=" " alt="" coords="198,233,393,260"/>
+<area shape="rect" id="node11" href="$classui__message__handlert.html" title=" " alt="" coords="215,284,376,311"/>
+<area shape="rect" id="node3" href="$classcl__message__handlert.html" title=" " alt="" coords="451,5,611,32"/>
+<area shape="rect" id="node4" href="$classgcc__message__handlert.html" title=" " alt="" coords="446,56,617,83"/>
+<area shape="rect" id="node9" href="$classcerr__message__handlert.html" title=" " alt="" coords="444,208,619,235"/>
+<area shape="rect" id="node10" href="$classcout__message__handlert.html" title=" " alt="" coords="443,259,620,285"/>
 </map>

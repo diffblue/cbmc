@@ -1,14 +1,16 @@
 var NAVTREEINDEX130 =
 {
-"structzip__iteratort.html#a72042a7e46e3c2ca4e866c8c674e0a3a":[6,0,1338,15],
-"structzip__iteratort.html#a7b29ca337bf21e8a336eecd77545ea86":[6,0,1338,13],
-"structzip__iteratort.html#ad35b46c5eac589d3794af0080515140f":[6,0,1338,2],
-"structzip__iteratort.html#ae2496fb3995b1c345876f9b816bccbe8":[6,0,1338,11],
-"structzip__iteratort.html#ae3896ca6ff6a5cb7ff475cbd2d120add":[6,0,1338,1],
-"structzip__iteratort.html#ae3c70629e0bfeac5b26a9f055412aed6":[6,0,1338,3],
-"structzip__iteratort.html#af7e17e274a2d95a807f8a6392e4184fe":[6,0,1338,4],
-"structzip__iteratort.html#afb9fafc4427ec1035ad10e5309978059":[6,0,1338,12],
-"structzip__iteratort.html#afd558b9fc504bc514fb3d1a04ac53a21":[6,0,1338,6],
+"structzip__iteratort.html#a56bffc3666fad687790476ee75412e94":[6,0,1339,8],
+"structzip__iteratort.html#a634c95c844942a19989dcef2a40b6a06":[6,0,1339,9],
+"structzip__iteratort.html#a72042a7e46e3c2ca4e866c8c674e0a3a":[6,0,1339,15],
+"structzip__iteratort.html#a7b29ca337bf21e8a336eecd77545ea86":[6,0,1339,13],
+"structzip__iteratort.html#ad35b46c5eac589d3794af0080515140f":[6,0,1339,2],
+"structzip__iteratort.html#ae2496fb3995b1c345876f9b816bccbe8":[6,0,1339,11],
+"structzip__iteratort.html#ae3896ca6ff6a5cb7ff475cbd2d120add":[6,0,1339,1],
+"structzip__iteratort.html#ae3c70629e0bfeac5b26a9f055412aed6":[6,0,1339,3],
+"structzip__iteratort.html#af7e17e274a2d95a807f8a6392e4184fe":[6,0,1339,4],
+"structzip__iteratort.html#afb9fafc4427ec1035ad10e5309978059":[6,0,1339,12],
+"structzip__iteratort.html#afd558b9fc504bc514fb3d1a04ac53a21":[6,0,1339,6],
 "substitute__symbols_8cpp.html":[7,0,2,29,234],
 "substitute__symbols_8cpp.html#a20706d3b67c90093ece45847ce84eb52":[7,0,2,29,234,0],
 "substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3":[7,0,2,29,234,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX130 =
 "tutorial.html#autotoc_md184":[0,4,13,0,0],
 "tutorial.html#autotoc_md185":[0,4,13,0,1],
 "tutorial.html#autotoc_md186":[0,4,13,0,1,0],
-"tutorial.html#autotoc_md187":[0,4,13,0,1,1],
-"tutorial.html#autotoc_md188":[0,4,13,0,2],
-"tutorial.html#autotoc_md189":[0,4,13,0,2,0]
+"tutorial.html#autotoc_md187":[0,4,13,0,1,1]
 };

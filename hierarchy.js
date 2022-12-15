@@ -155,6 +155,7 @@ var hierarchy =
     [ "ansi_c_scopet", "classansi__c__scopet.html", null ],
     [ "configt::ansi_ct", "structconfigt_1_1ansi__ct.html", null ],
     [ "api_optionst", "classapi__optionst.html", null ],
+    [ "api_session_implementationt", "structapi__session__implementationt.html", null ],
     [ "api_sessiont", "structapi__sessiont.html", null ],
     [ "bv_refinementt::approximationt", "structbv__refinementt_1_1approximationt.html", null ],
     [ "goto_cc_cmdlinet::argt", "structgoto__cc__cmdlinet_1_1argt.html", null ],
