@@ -8,8 +8,7 @@
 #include <vector>
 
 // Forward declaration of API dependencies
-class goto_modelt;
-class message_handlert;
+struct api_session_implementationt;
 
 // There has been a design decision to allow users to include all of
 // the API headers by just including `api.h`, so we want to have an
@@ -34,9 +33,7 @@ struct api_sessiont
   void load_model_from_files(const std::vector<std::string> &files);
 
 private:
-  std::unique_ptr<goto_modelt> model;
-  std::unique_ptr<message_handlert> message_handler;
-  std::unique_ptr<optionst> options;
+  std::unique_ptr<api_session_implementationt> implementation;
 };
 
 #endif
