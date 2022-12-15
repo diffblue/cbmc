@@ -76,16 +76,11 @@ static void get_symbols(
 
       for(const auto &s : new_symbols)
       {
-        // keep functions called in contracts within scope.
-        // should we keep local variables from the contract as well?
-        const symbolt *new_symbol = nullptr;
-        if(!ns.lookup(s, new_symbol))
-        {
-          if(new_symbol->type.id() == ID_code)
-          {
-            working_set.push_back(new_symbol);
-          }
-        }
+        const symbolt *symbol_ptr;
+        // identifiers for parameters of prototypes need not exist, and neither
+        // does __CPROVER_return_value
+        if(!ns.lookup(s, symbol_ptr))
+          working_set.push_back(symbol_ptr);
       }
     }
   }
@@ -239,6 +234,7 @@ void remove_internal_symbols(
     if(exported.find(it->first)==exported.end())
     {
       symbol_table_baset::symbolst::const_iterator next = std::next(it);
+      log.debug() << "Removing unused symbol " << it->first << messaget::eom;
       symbol_table.erase(it);
       it=next;
     }
