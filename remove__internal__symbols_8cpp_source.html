@@ -168,150 +168,146 @@ $(document).ready(function(){initNavTree('remove__internal__symbols_8cpp_source.
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;s : new_symbols)</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="comment">// keep functions called in contracts within scope.</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="comment">// should we keep local variables from the contract as well?</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> *new_symbol = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">if</span>(!ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(s, new_symbol))</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;          <span class="keywordflow">if</span>(new_symbol-&gt;<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_code)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;          {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            working_set.push_back(new_symbol);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;          }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      }</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  }</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">  107</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a>(</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;mh,</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> keep_file_local)</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;{</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <a class="code" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a>(symbol_table, mh, keep_file_local, {});</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;}</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00130"></a><span class="lineno"><a class="line" href="remove__internal__symbols_8cpp.html#a3760d2ecc4ff4dacfffc75125b0b82a6">  130</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a>(</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;mh,</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> keep_file_local,</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keyword">const</span> std::set&lt;irep_idt&gt; &amp;keep)</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;{</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <a class="code" href="classnamespacet.html">namespacet</a> ns(symbol_table);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <a class="code" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> exported;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(mh);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  <span class="comment">// we retain certain special ones</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  <a class="code" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> special;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  special.insert(<span class="stringliteral">&quot;argc&#39;&quot;</span>);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  special.insert(<span class="stringliteral">&quot;argv&#39;&quot;</span>);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  special.insert(<span class="stringliteral">&quot;envp&#39;&quot;</span>);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  special.insert(<span class="stringliteral">&quot;envp_size&#39;&quot;</span>);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;memory&quot;</span>);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  special.insert(<a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;deallocated&quot;</span>);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;dead_object&quot;</span>);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;assignable&quot;</span>);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_upto&quot;</span>);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_from&quot;</span>);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_whole&quot;</span>);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;freeable&quot;</span>);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;is_freeable&quot;</span>);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;was_freed&quot;</span>);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  special.insert(<a class="code" href="adjust__float__expressions_8cpp.html#a469c2c09085894f27e344ef9e1731542">rounding_mode_identifier</a>());</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  special.insert(<span class="stringliteral">&quot;__new&quot;</span>);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  special.insert(<span class="stringliteral">&quot;__new_array&quot;</span>);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  special.insert(<span class="stringliteral">&quot;__placement_new&quot;</span>);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  special.insert(<span class="stringliteral">&quot;__placement_new_array&quot;</span>);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  special.insert(<span class="stringliteral">&quot;__delete&quot;</span>);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  special.insert(<span class="stringliteral">&quot;__delete_array&quot;</span>);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="comment">// plus any extra symbols we wish to keep</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  special.insert(keep.begin(), keep.end());</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="keywordflow">for</span>(symbol_table_baset::symbolst::const_iterator it =</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.begin();</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      it != symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end();</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      it++)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">// already marked?</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">if</span>(exported.find(it-&gt;first)!=exported.end())</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">// not marked yet</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=it-&gt;second;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">if</span>(special.find(symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>)!=special.end())</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    }</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">bool</span> is_function=symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordtype">bool</span> is_file_local=symbol.<a class="code" href="classsymbolt.html#a5a84d8bf820f7cfdd2eb18dd29bee9c4">is_file_local</a>;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordtype">bool</span> is_type=symbol.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a>;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">bool</span> has_body=symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>();</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordtype">bool</span> has_initializer = symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>();</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordtype">bool</span> is_contract = is_function &amp;&amp; symbol.<a class="code" href="classsymbolt.html#a693a06be1f5a7f744c8fdac606a192f3">is_property</a>;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">// __attribute__((constructor)), __attribute__((destructor))</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>==ID_C &amp;&amp; is_function &amp;&amp; is_file_local)</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    {</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type=<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      <span class="keywordflow">if</span>(code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_constructor ||</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;         code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_destructor)</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        is_file_local=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> *symbol_ptr;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="comment">// identifiers for parameters of prototypes need not exist, and neither</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="comment">// does __CPROVER_return_value</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">if</span>(!ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(s, symbol_ptr))</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;          working_set.push_back(symbol_ptr);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">  102</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a>(</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;mh,</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> keep_file_local)</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;{</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <a class="code" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a>(symbol_table, mh, keep_file_local, {});</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;}</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="remove__internal__symbols_8cpp.html#a3760d2ecc4ff4dacfffc75125b0b82a6">  125</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a>(</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;mh,</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> keep_file_local,</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keyword">const</span> std::set&lt;irep_idt&gt; &amp;keep)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;{</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <a class="code" href="classnamespacet.html">namespacet</a> ns(symbol_table);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <a class="code" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> exported;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(mh);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="comment">// we retain certain special ones</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <a class="code" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> special;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  special.insert(<span class="stringliteral">&quot;argc&#39;&quot;</span>);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  special.insert(<span class="stringliteral">&quot;argv&#39;&quot;</span>);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  special.insert(<span class="stringliteral">&quot;envp&#39;&quot;</span>);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  special.insert(<span class="stringliteral">&quot;envp_size&#39;&quot;</span>);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;memory&quot;</span>);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  special.insert(<a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;deallocated&quot;</span>);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;dead_object&quot;</span>);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;assignable&quot;</span>);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_upto&quot;</span>);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_from&quot;</span>);</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_whole&quot;</span>);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;freeable&quot;</span>);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;is_freeable&quot;</span>);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  special.insert(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;was_freed&quot;</span>);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  special.insert(<a class="code" href="adjust__float__expressions_8cpp.html#a469c2c09085894f27e344ef9e1731542">rounding_mode_identifier</a>());</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  special.insert(<span class="stringliteral">&quot;__new&quot;</span>);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  special.insert(<span class="stringliteral">&quot;__new_array&quot;</span>);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  special.insert(<span class="stringliteral">&quot;__placement_new&quot;</span>);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  special.insert(<span class="stringliteral">&quot;__placement_new_array&quot;</span>);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  special.insert(<span class="stringliteral">&quot;__delete&quot;</span>);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  special.insert(<span class="stringliteral">&quot;__delete_array&quot;</span>);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="comment">// plus any extra symbols we wish to keep</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  special.insert(keep.begin(), keep.end());</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">for</span>(symbol_table_baset::symbolst::const_iterator it =</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.begin();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      it != symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      it++)</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">// already marked?</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">if</span>(exported.find(it-&gt;first)!=exported.end())</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">// not marked yet</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=it-&gt;second;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">if</span>(special.find(symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>)!=special.end())</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordtype">bool</span> is_function=symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordtype">bool</span> is_file_local=symbol.<a class="code" href="classsymbolt.html#a5a84d8bf820f7cfdd2eb18dd29bee9c4">is_file_local</a>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordtype">bool</span> is_type=symbol.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a>;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordtype">bool</span> has_body=symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>();</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordtype">bool</span> has_initializer = symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>();</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">bool</span> is_contract = is_function &amp;&amp; symbol.<a class="code" href="classsymbolt.html#a693a06be1f5a7f744c8fdac606a192f3">is_property</a>;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">// __attribute__((constructor)), __attribute__((destructor))</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>==ID_C &amp;&amp; is_function &amp;&amp; is_file_local)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type=<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">if</span>(code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_constructor ||</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;         code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_destructor)</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        is_file_local=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">if</span>(is_type || symbol.<a class="code" href="classsymbolt.html#a41b10aefcf4640d76d4932cdef15ac16">is_macro</a>)</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    {</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      <span class="comment">// never EXPORTED by itself</span></div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">if</span>(is_type || symbol.<a class="code" href="classsymbolt.html#a41b10aefcf4640d76d4932cdef15ac16">is_macro</a>)</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="comment">// never EXPORTED by itself</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_function)</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    {</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <span class="comment">// body? not local (i.e., &quot;static&quot;)?</span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        has_body &amp;&amp;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        (!is_file_local ||</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;         (<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#a41ea95a51ebb0cf87fbdb80035ac5c79">main</a>.has_value() &amp;&amp; symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> == <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#a41ea95a51ebb0cf87fbdb80035ac5c79">main</a>.value())))</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      {</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      }</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(has_body &amp;&amp; is_file_local &amp;&amp; keep_file_local)</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      {</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_contract)</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    {</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="comment">// &#39;extern&#39; symbols are only exported if there</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <span class="comment">// is an initializer.</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      <span class="keywordflow">if</span>((has_initializer || !symbol.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a>) &amp;&amp;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;         !is_file_local)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      {</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="comment">// remove all that are _not_ exported!</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="keywordflow">for</span>(symbol_table_baset::symbolst::const_iterator it =</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.begin();</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      it != symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end();) <span class="comment">// no it++</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">if</span>(exported.find(it-&gt;first)==exported.end())</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    {</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      symbol_table_baset::symbolst::const_iterator next = std::next(it);</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      symbol_table.<a class="code" href="classsymbol__table__baset.html#a59e0b21c149755e97e8c803586c0ca82">erase</a>(it);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      it=next;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_function)</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <span class="comment">// body? not local (i.e., &quot;static&quot;)?</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        has_body &amp;&amp;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        (!is_file_local ||</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;         (<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#a41ea95a51ebb0cf87fbdb80035ac5c79">main</a>.has_value() &amp;&amp; symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> == <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#a41ea95a51ebb0cf87fbdb80035ac5c79">main</a>.value())))</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      {</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      }</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(has_body &amp;&amp; is_file_local &amp;&amp; keep_file_local)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(is_contract)</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    }</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    {</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      <span class="comment">// &#39;extern&#39; symbols are only exported if there</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <span class="comment">// is an initializer.</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="keywordflow">if</span>((has_initializer || !symbol.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a>) &amp;&amp;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;         !is_file_local)</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <a class="code" href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a>(ns, symbol, exported);</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      }</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="comment">// remove all that are _not_ exported!</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  <span class="keywordflow">for</span>(symbol_table_baset::symbolst::const_iterator it =</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.begin();</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      it != symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end();) <span class="comment">// no it++</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">if</span>(exported.find(it-&gt;first)==exported.end())</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      symbol_table_baset::symbolst::const_iterator next = std::next(it);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      log.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;Removing unused symbol &quot;</span> &lt;&lt; it-&gt;first &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      symbol_table.<a class="code" href="classsymbol__table__baset.html#a59e0b21c149755e97e8c803586c0ca82">erase</a>(it);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      it=next;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    }</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    {</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      it++;</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      it++;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;}</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;}</div>
 <div class="ttc" id="aadjust__float__expressions_8cpp_html_a469c2c09085894f27e344ef9e1731542"><div class="ttname"><a href="adjust__float__expressions_8cpp.html#a469c2c09085894f27e344ef9e1731542">rounding_mode_identifier</a></div><div class="ttdeci">irep_idt rounding_mode_identifier()</div><div class="ttdoc">Return the identifier of the program symbol used to store the current rounding mode.</div><div class="ttdef"><b>Definition:</b> <a href="adjust__float__expressions_8cpp_source.html#l00024">adjust_float_expressions.cpp:24</a></div></div>
 <div class="ttc" id="aadjust__float__expressions_8h_html"><div class="ttname"><a href="adjust__float__expressions_8h.html">adjust_float_expressions.h</a></div><div class="ttdoc">Symbolic Execution.</div></div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
@@ -331,6 +327,8 @@ $(document).ready(function(){initNavTree('remove__internal__symbols_8cpp_source.
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassmessaget_html"><div class="ttname"><a href="classmessaget.html">messaget</a></div><div class="ttdoc">Class that provides messages with a built-in verbosity 'level'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00154">message.h:155</a></div></div>
+<div class="ttc" id="aclassmessaget_html_a9b00d066828dcda2059ead6b91f55d86"><div class="ttname"><a href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">messaget::debug</a></div><div class="ttdeci">mstreamt &amp; debug() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00429">message.h:429</a></div></div>
+<div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
 <div class="ttc" id="aclassnamespacet_html_a564f54a32d91e10781812a6681e62c39"><div class="ttname"><a href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">namespacet::lookup</a></div><div class="ttdeci">bool lookup(const irep_idt &amp;name, const symbolt *&amp;symbol) const override</div><div class="ttdoc">See documentation for namespace_baset::lookup().</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00138">namespace.cpp:138</a></div></div>
 <div class="ttc" id="aclasssymbol__table__baset_html"><div class="ttname"><a href="classsymbol__table__baset.html">symbol_table_baset</a></div><div class="ttdoc">The symbol table base class interface.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table__base_8h_source.html#l00021">symbol_table_base.h:22</a></div></div>
@@ -355,7 +353,7 @@ $(document).ready(function(){initNavTree('remove__internal__symbols_8cpp_source.
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
 <div class="ttc" id="aremove__internal__symbols_8cpp_html_a5c3e4e7da5a4f874a6adb3e48a5a2c99"><div class="ttname"><a href="remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99">get_symbols</a></div><div class="ttdeci">static void get_symbols(const namespacet &amp;ns, const symbolt &amp;in_symbol, find_symbols_sett &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="remove__internal__symbols_8cpp_source.html#l00026">remove_internal_symbols.cpp:26</a></div></div>
-<div class="ttc" id="aremove__internal__symbols_8cpp_html_af24e984d10e87325924d01beaea3d56b"><div class="ttname"><a href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a></div><div class="ttdeci">void remove_internal_symbols(symbol_table_baset &amp;symbol_table, message_handlert &amp;mh, const bool keep_file_local)</div><div class="ttdoc">Removes internal symbols from a symbol table A symbol is EXPORTED if it is a.</div><div class="ttdef"><b>Definition:</b> <a href="remove__internal__symbols_8cpp_source.html#l00107">remove_internal_symbols.cpp:107</a></div></div>
+<div class="ttc" id="aremove__internal__symbols_8cpp_html_af24e984d10e87325924d01beaea3d56b"><div class="ttname"><a href="remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b">remove_internal_symbols</a></div><div class="ttdeci">void remove_internal_symbols(symbol_table_baset &amp;symbol_table, message_handlert &amp;mh, const bool keep_file_local)</div><div class="ttdoc">Removes internal symbols from a symbol table A symbol is EXPORTED if it is a.</div><div class="ttdef"><b>Definition:</b> <a href="remove__internal__symbols_8cpp_source.html#l00102">remove_internal_symbols.cpp:102</a></div></div>
 <div class="ttc" id="aremove__internal__symbols_8h_html"><div class="ttname"><a href="remove__internal__symbols_8h.html">remove_internal_symbols.h</a></div><div class="ttdoc">Remove symbols that are internal only.</div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>
 <div class="ttc" id="astatic__lifetime__init_8h_html"><div class="ttname"><a href="static__lifetime__init_8h.html">static_lifetime_init.h</a></div></div>
