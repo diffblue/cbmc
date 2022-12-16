@@ -1,6 +1,5 @@
 var NAVTREEINDEX21 =
 {
-"classcpp__enum__typet.html#a03b3e0ecc9ca510c2a954abbc14e5ad5":[6,0,296,5],
 "classcpp__enum__typet.html#a4daedfa55c94e010b7126ad37295ad15":[6,0,296,7],
 "classcpp__enum__typet.html#a6f6e13cf4b382706a094238c9fb48d75":[6,0,296,0],
 "classcpp__enum__typet.html#a7862c3da6bd4ef2b19e9068cc4fe5c1f":[6,0,296,8],
@@ -249,5 +248,6 @@ var NAVTREEINDEX21 =
 "classcpp__storage__spect.html#ac90bba24dab6baabd408aa46dc191eb9":[6,0,312,12],
 "classcpp__storage__spect.html#ad5fd2e2a0be433a5438fb43a3b1ef5c6":[6,0,312,21],
 "classcpp__storage__spect.html#ae0b2b15ea3a0248dc3de28baeb69aa23":[6,0,312,15],
-"classcpp__storage__spect.html#aee2bb06e425b56b28cde11051cefc5c4":[6,0,312,2]
+"classcpp__storage__spect.html#aee2bb06e425b56b28cde11051cefc5c4":[6,0,312,2],
+"classcpp__storage__spect.html#af5da1c4f9740eda0be789e50fc113e24":[6,0,312,22]
 };

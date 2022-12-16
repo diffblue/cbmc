@@ -1,6 +1,5 @@
 var NAVTREEINDEX11 =
 {
-"classas86__cmdlinet.html":[6,0,85],
 "classas86__cmdlinet.html#a4a6fda1f5be137def6726b69663d14f1":[6,0,85,1],
 "classas86__cmdlinet.html#a7cdab6f4c4f14daf930935f55e9222db":[6,0,85,0],
 "classas__cmdlinet.html":[6,0,86],
@@ -153,8 +152,8 @@ var NAVTREEINDEX11 =
 "classbdd__nodet.html#a2c2eac3624c4fef3756b280355f22b06":[6,0,105,10],
 "classbdd__nodet.html#a3d28cb10310a6c704a619aef486b18df":[6,0,105,2],
 "classbdd__nodet.html#a43ca7cabdf3efef08825ba51a3f39eef":[6,0,105,0],
-"classbdd__nodet.html#a5825403a22d4e075e00438fdd7314ac2":[6,0,105,12],
 "classbdd__nodet.html#a5825403a22d4e075e00438fdd7314ac2":[6,0,105,13],
+"classbdd__nodet.html#a5825403a22d4e075e00438fdd7314ac2":[6,0,105,12],
 "classbdd__nodet.html#a6642b651e7c6d038adc136b9199e6ae7":[6,0,105,5],
 "classbdd__nodet.html#a681be2264442e57f962a4272b4a7b5c7":[6,0,105,8],
 "classbdd__nodet.html#a681be2264442e57f962a4272b4a7b5c7":[6,0,105,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX11 =
 "classbitnot__exprt.html":[6,0,114],
 "classbitnot__exprt.html#ae3f65a7ff3b232cb2ab330c839da6f4d":[6,0,114,0],
 "classbitor__exprt.html":[6,0,115],
-"classbitor__exprt.html#a839e532e22d88cc6709ea7bd39d3550c":[6,0,115,0]
+"classbitor__exprt.html#a839e532e22d88cc6709ea7bd39d3550c":[6,0,115,0],
+"classbitreverse__exprt.html":[6,0,116]
 };

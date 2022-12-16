@@ -985,6 +985,7 @@ var hierarchy =
     [ "labelt", "structlabelt.html", null ],
     [ "java_bytecode_parse_treet::classt::lambda_method_handlet", "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html", null ],
     [ "language_entryt", "structlanguage__entryt.html", null ],
+    [ "language_filest", "classlanguage__filest.html", null ],
     [ "language_filet", "classlanguage__filet.html", null ],
     [ "language_modulet", "classlanguage__modulet.html", null ],
     [ "lazy_class_to_declared_symbols_mapt", "classlazy__class__to__declared__symbols__mapt.html", null ],
@@ -1073,7 +1074,6 @@ var hierarchy =
         [ "cleanert", "classcleanert.html", null ],
         [ "goto_convert_functionst", "classgoto__convert__functionst.html", null ]
       ] ],
-      [ "language_filest", "classlanguage__filest.html", null ],
       [ "languaget", "classlanguaget.html", [
         [ "ansi_c_languaget", "classansi__c__languaget.html", null ],
         [ "cpp_languaget", "classcpp__languaget.html", null ],
