@@ -93,22 +93,6 @@ public:
   {
   }
 
-  /// Zero initialise a symbol object.
-  void clear()
-  {
-    type.make_nil();
-    value.make_nil();
-    location.make_nil();
-
-    name=module=base_name=mode=pretty_name=irep_idt();
-
-    is_type=is_macro=is_exported=
-    is_input=is_output=is_state_var=is_property=
-    is_static_lifetime=is_thread_local=
-    is_lvalue=is_file_local=is_extern=is_volatile=
-    is_parameter=is_auxiliary=is_weak=false;
-  }
-
   void swap(symbolt &b);
   void show(std::ostream &out) const;
 

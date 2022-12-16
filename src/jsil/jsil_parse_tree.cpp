@@ -40,10 +40,8 @@ static bool insert_at_label(
   return true;
 }
 
-void jsil_declarationt::to_symbol(symbolt &symbol) const
+symbolt jsil_declarationt::to_symbol() const
 {
-  symbol.clear();
-
   symbol_exprt s(to_symbol_expr(
       static_cast<const exprt&>(find(ID_declarator))));
 
@@ -56,10 +54,8 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
   else if(proc_type=="spec")
     symbol_type=jsil_spec_code_typet(symbol_type);
 
-  symbol.name=s.get_identifier();
+  symbolt symbol{s.get_identifier(), symbol_type, "jsil"};
   symbol.base_name=s.get_identifier();
-  symbol.mode="jsil";
-  symbol.type=symbol_type;
   symbol.location=s.source_location();
 
   code_blockt code(to_code_block(
@@ -79,6 +75,8 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
     throw "throw label "+throws.get_string(ID_label)+" not found";
 
   symbol.value.swap(code);
+
+  return symbol;
 }
 
 void jsil_declarationt::output(std::ostream &out) const

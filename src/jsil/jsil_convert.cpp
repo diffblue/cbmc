@@ -43,8 +43,7 @@ bool jsil_convertt::operator()(
       it!=parse_tree.items.end();
       ++it)
   {
-    symbolt new_symbol;
-    it->to_symbol(new_symbol);
+    symbolt new_symbol = it->to_symbol();
 
     if(convert_code(new_symbol, to_code(new_symbol.value)))
       return true;

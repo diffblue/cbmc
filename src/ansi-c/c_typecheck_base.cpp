@@ -781,8 +781,7 @@ void c_typecheck_baset::typecheck_declaration(
       declaration.set_is_typedef(full_spec.is_typedef);
       declaration.set_is_weak(full_spec.is_weak);
 
-      symbolt symbol;
-      declaration.to_symbol(declarator, symbol);
+      symbolt symbol = declaration.to_symbol(declarator);
       current_symbol=symbol;
 
       // now check other half of type
