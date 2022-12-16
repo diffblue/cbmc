@@ -292,7 +292,7 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      {</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordflow">if</span>(outputs&gt;0)</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;          assert(!dest.empty());</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;          <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!dest.empty());</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          compiler.<a class="code" href="classcompilet.html#a56a7982125b9cca520900dd85ec523f1">add_input_file</a>(dest);</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          os.close();</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        }</div>
@@ -321,7 +321,7 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">if</span>(outputs&gt;0)</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    {</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      assert(!dest.empty());</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!dest.empty());</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      compiler.<a class="code" href="classcompilet.html#a56a7982125b9cca520900dd85ec523f1">add_input_file</a>(dest);</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    }</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordflow">else</span></div>
@@ -350,7 +350,7 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
 <div class="line"><a name="l00261"></a><span class="lineno"><a class="line" href="classas__modet.html#a0d7732720bfc93908a1568fb4cac6ff6">  261</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classas__modet.html#a0d7732720bfc93908a1568fb4cac6ff6">as_modet::run_as</a>()</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;{</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  assert(!<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">parsed_argv</a>.empty());</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">parsed_argv</a>.empty());</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="comment">// build new argv</span></div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  std::vector&lt;std::string&gt; new_argv;</div>
@@ -477,6 +477,7 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="ttc" id="aliteral_8h_html_afe9a214e6401c7ef6920677a5a066fdf"><div class="ttname"><a href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a></div><div class="ttdeci">literalt pos(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00194">literal.h:194</a></div></div>
 <div class="ttc" id="arun_8cpp_html_a32e6ac327187b7ac705f730a35ab0628"><div class="ttname"><a href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a></div><div class="ttdeci">int run(const std::string &amp;what, const std::vector&lt; std::string &gt; &amp;argv)</div><div class="ttdef"><b>Definition:</b> <a href="run_8cpp_source.html#l00048">run.cpp:48</a></div></div>
 <div class="ttc" id="arun_8h_html"><div class="ttname"><a href="run_8h.html">run.h</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ab387c011f5197baecbafce33f6732826a32d8b233e3c58a262a0b75872297d8d5"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a32d8b233e3c58a262a0b75872297d8d5">configt::ansi_ct::flavourt::GCC</a></div><div class="ttdeci">@ GCC</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_af249a411a92a3effeb3155adbe35ea5c"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#af249a411a92a3effeb3155adbe35ea5c">configt::ansi_ct::mode</a></div><div class="ttdeci">flavourt mode</div><div class="ttdef"><b>Definition:</b> <a href="config_8h_source.html#l00237">config.h:237</a></div></div>

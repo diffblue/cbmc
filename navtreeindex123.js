@@ -1,5 +1,6 @@
 var NAVTREEINDEX123 =
 {
+"structcover__goalst_1_1goalt.html":[6,0,285,0],
 "structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467":[6,0,285,0,0],
 "structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467a19fa901d0342d2ef237e501308076e44":[6,0,285,0,0,2],
 "structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467a45f13b5d901c0830b50b76c99914492f":[6,0,285,0,0,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX123 =
 "structgdb__apit_1_1pointer__valuet.html#a07d6e041e8ff92b58810ee5a7cdc0457":[6,0,508,1,0],
 "structgdb__apit_1_1pointer__valuet.html#a1467a8e7ec97034dedb257ef1973792a":[6,0,508,1,6],
 "structgdb__apit_1_1pointer__valuet.html#a22d263c7ea54a329f10beac27185f92e":[6,0,508,1,2],
-"structgdb__apit_1_1pointer__valuet.html#a9b8e0295796fd3320b826d9d9b71d188":[6,0,508,1,1],
-"structgdb__apit_1_1pointer__valuet.html#aabd4146d8301cbb1782e2a1951583d46":[6,0,508,1,3]
+"structgdb__apit_1_1pointer__valuet.html#a9b8e0295796fd3320b826d9d9b71d188":[6,0,508,1,1]
 };

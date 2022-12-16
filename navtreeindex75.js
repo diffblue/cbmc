@@ -1,5 +1,6 @@
 var NAVTREEINDEX75 =
 {
+"dependence__graph_8h_source.html":[7,0,2,0,20],
 "deprecate_8h.html":[7,0,2,29,32],
 "deprecate_8h.html#a065a4ac368219a0601f41d050c3d76a5":[7,0,2,29,32,1],
 "deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a":[7,0,2,29,32,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX75 =
 "dirty_8h_source.html":[7,0,2,0,22],
 "disjunctive__polynomial__acceleration_8cpp.html":[7,0,2,13,0,9],
 "disjunctive__polynomial__acceleration_8cpp_source.html":[7,0,2,13,0,9],
-"disjunctive__polynomial__acceleration_8h.html":[7,0,2,13,0,10],
-"disjunctive__polynomial__acceleration_8h_source.html":[7,0,2,13,0,10]
+"disjunctive__polynomial__acceleration_8h.html":[7,0,2,13,0,10]
 };
