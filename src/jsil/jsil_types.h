@@ -47,7 +47,7 @@ public:
 inline jsil_builtin_code_typet &to_jsil_builtin_code_type(
   code_typet &code)
 {
-  assert(code.get_bool("jsil_builtin_proceduret"));
+  PRECONDITION(code.get_bool("jsil_builtin_proceduret"));
   return static_cast<jsil_builtin_code_typet &>(code);
 }
 
@@ -70,7 +70,7 @@ public:
 inline jsil_spec_code_typet &to_jsil_spec_code_type(
   code_typet &code)
 {
-  assert(code.get_bool("jsil_spec_proceduret"));
+  PRECONDITION(code.get_bool("jsil_spec_proceduret"));
   return static_cast<jsil_spec_code_typet &>(code);
 }
 
@@ -101,13 +101,13 @@ public:
 
 inline jsil_union_typet &to_jsil_union_type(typet &type)
 {
-  assert(type.id()==ID_union);
+  PRECONDITION(type.id() == ID_union);
   return static_cast<jsil_union_typet &>(type);
 }
 
 inline const jsil_union_typet &to_jsil_union_type(const typet &type)
 {
-  assert(type.id()==ID_union);
+  PRECONDITION(type.id() == ID_union);
   return static_cast<const jsil_union_typet &>(type);
 }
 

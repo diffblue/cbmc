@@ -31,7 +31,7 @@ static bool insert_at_label(
     if(l.get_label()!=label)
       continue;
 
-    assert(l.code().get_statement()==ID_skip);
+    DATA_INVARIANT(l.code().get_statement() == ID_skip, "code should be skip");
     l.code()=code;
 
     return false;

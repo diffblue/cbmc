@@ -1215,7 +1215,7 @@ void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
   const symbolt &new_symbol)
 {
-  assert(new_symbol.is_type);
+  PRECONDITION(new_symbol.is_type);
 
   if(!old_symbol.is_type)
   {
@@ -1310,7 +1310,7 @@ bool linkingt::needs_renaming_type(
   const symbolt &old_symbol,
   const symbolt &new_symbol)
 {
-  assert(new_symbol.is_type);
+  PRECONDITION(new_symbol.is_type);
 
   if(!old_symbol.is_type)
     return true;
