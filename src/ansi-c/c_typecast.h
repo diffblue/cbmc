@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_C_TYPECAST_H
 #define CPROVER_ANSI_C_C_TYPECAST_H
 
+#include <util/optional.h>
+
 #include <list>
 #include <string>
 
@@ -64,6 +66,10 @@ public:
 
   std::list<std::string> errors;
   std::list<std::string> warnings;
+
+  /// \return empty when address can be taken,
+  /// error message otherwise
+  static optionalt<std::string> check_address_can_be_taken(const typet &);
 
 protected:
   const namespacet &ns;

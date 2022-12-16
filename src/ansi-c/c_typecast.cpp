@@ -739,6 +739,15 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 
   if(src_type.id()==ID_array)
   {
+    // This is the promotion from an array
+    // to a pointer to the first element.
+    auto error_opt = check_address_can_be_taken(expr.type());
+    if(error_opt.has_value())
+    {
+      errors.push_back(error_opt.value());
+      return;
+    }
+
     index_exprt index(expr, from_integer(0, c_index_type()));
     expr = typecast_exprt::conditional_cast(address_of_exprt(index), dest_type);
     return;
@@ -764,4 +773,32 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
       expr = typecast_exprt(expr, dest_type);
     }
   }
+}
+
+optionalt<std::string>
+c_typecastt::check_address_can_be_taken(const typet &type)
+{
+  if(type.id() == ID_c_bit_field)
+    return std::string("cannot take address of a bit field");
+
+  if(type.id() == ID_bool)
+    return std::string("cannot take address of a proper Boolean");
+
+  if(can_cast_type<bitvector_typet>(type))
+  {
+    // The width of the bitvector must be a multiple of CHAR_BIT.
+    auto width = to_bitvector_type(type).get_width();
+    if(width % config.ansi_c.char_width != 0)
+    {
+      return std::string(
+        "bitvector must have width that is a multiple of CHAR_BIT");
+    }
+    else
+      return {};
+  }
+
+  if(type.id() == ID_array)
+    return check_address_can_be_taken(to_array_type(type).element_type());
+
+  return {}; // ok
 }

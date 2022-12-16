@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "builtin_factory.h"
 #include "c_expr.h"
 #include "c_qualifiers.h"
+#include "c_typecast.h"
 #include "c_typecheck_base.h"
 #include "expr2c.h"
 #include "padding.h"
@@ -1187,6 +1188,12 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(op_type.id()==ID_array)
   {
+    // This is the promotion from an array
+    // to a pointer to the first element.
+    auto error_opt = c_typecastt::check_address_can_be_taken(op_type);
+    if(error_opt.has_value())
+      throw invalid_source_file_exceptiont{*error_opt, expr.source_location()};
+
     index_exprt index(op, from_integer(0, c_index_type()));
     op=address_of_exprt(index);
   }
@@ -1710,19 +1717,10 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
 {
   exprt &op = to_unary_expr(expr).op();
 
-  if(op.type().id()==ID_c_bit_field)
-  {
-    error().source_location = expr.source_location();
-    error() << "cannot take address of a bit field" << eom;
-    throw 0;
-  }
+  auto error_opt = c_typecastt::check_address_can_be_taken(op.type());
 
-  if(op.is_boolean())
-  {
-    error().source_location = expr.source_location();
-    error() << "cannot take address of a single bit" << eom;
-    throw 0;
-  }
+  if(error_opt.has_value())
+    throw invalid_source_file_exceptiont{*error_opt, expr.source_location()};
 
   // special case: address of label
   if(op.id()==ID_label)

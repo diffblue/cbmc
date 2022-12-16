@@ -1,0 +1,7 @@
+CORE
+pointer-to-bool.c
+
+cannot take address of a proper Boolean$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
