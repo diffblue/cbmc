@@ -1,5 +1,6 @@
 var NAVTREEINDEX76 =
 {
+"disjunctive__polynomial__acceleration_8cpp_source.html":[7,0,2,13,0,9],
 "disjunctive__polynomial__acceleration_8h.html":[7,0,2,13,0,10],
 "disjunctive__polynomial__acceleration_8h_source.html":[7,0,2,13,0,10],
 "document__properties_8cpp.html":[7,0,2,13,31],
@@ -248,6 +249,5 @@ var NAVTREEINDEX76 =
 "expr__enumerator_8cpp.html#aed623c098f63568d2a6e0b88e5ad8f63":[7,0,2,16,2,1],
 "expr__enumerator_8cpp_source.html":[7,0,2,16,2],
 "expr__enumerator_8h.html":[7,0,2,16,3],
-"expr__enumerator_8h.html#a5a5e1a2355a3da8b158edba08fcb5d58":[7,0,2,16,3,8],
-"expr__enumerator_8h.html#a5d6d101d19a63617b9e5e4c6ce519e84":[7,0,2,16,3,9]
+"expr__enumerator_8h.html#a5a5e1a2355a3da8b158edba08fcb5d58":[7,0,2,16,3,8]
 };

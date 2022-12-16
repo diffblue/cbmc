@@ -29,6 +29,7 @@ var classc__typecastt =
     ] ],
     [ "c_typecastt", "classc__typecastt.html#a237a385ddc3a808eb08318d5179287ac", null ],
     [ "~c_typecastt", "classc__typecastt.html#aa725b51442f2bab753da9d58c70486a7", null ],
+    [ "check_address_can_be_taken", "classc__typecastt.html#a3d6fef4453dd46b754c7dc06f6dec587", null ],
     [ "do_typecast", "classc__typecastt.html#a3b3d6fee5cc08b80fdedfcd6df42d596", null ],
     [ "follow_with_qualifiers", "classc__typecastt.html#a3459a846ae1805c51ff8b974f6179797", null ],
     [ "get_c_type", "classc__typecastt.html#a9a586a4708d4a41c895e026a04e6bd02", null ],

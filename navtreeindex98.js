@@ -1,5 +1,6 @@
 var NAVTREEINDEX98 =
 {
+"goto__harness__parse__options_8cpp_source.html":[7,0,2,12,9],
 "goto__harness__parse__options_8h.html":[7,0,2,12,10],
 "goto__harness__parse__options_8h.html#ab430f2ce255e76dd7b95cfe9d1181bcb":[7,0,2,12,10,2],
 "goto__harness__parse__options_8h_source.html":[7,0,2,12,10],
@@ -248,6 +249,5 @@ var NAVTREEINDEX98 =
 "group__cbmc.html":[4,4],
 "group__contracts-module.html":[4,12],
 "group__cpp.html":[4,5],
-"group__cprover.html":[4,6],
-"group__dfcc-module.html":[4,12,0]
+"group__cprover.html":[4,6]
 };
