@@ -33,25 +33,14 @@ bool exprt::is_constant() const
 /// \return True if is a Boolean constant representing `true`, false otherwise.
 bool exprt::is_true() const
 {
-  return is_constant() &&
-         type().id()==ID_bool &&
-         get(ID_value)!=ID_false;
+  return is_constant() && is_boolean() && get(ID_value) != ID_false;
 }
 
 /// Return whether the expression is a constant representing `false`.
 /// \return True if is a Boolean constant representing `false`, false otherwise.
 bool exprt::is_false() const
 {
-  return is_constant() &&
-         type().id()==ID_bool &&
-         get(ID_value)==ID_false;
-}
-
-/// Return whether the expression represents a Boolean.
-/// \return True if is a Boolean, false otherwise.
-bool exprt::is_boolean() const
-{
-  return type().id()==ID_bool;
+  return is_constant() && is_boolean() && get(ID_value) == ID_false;
 }
 
 /// Return whether the expression is a constant representing 0.

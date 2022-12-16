@@ -663,15 +663,13 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
     return unchanged(expr);
 
   // check if these are really boolean
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
   {
     bool all_bool=true;
 
     for(const auto &op : expr.operands())
     {
-      if(
-        op.id() == ID_typecast &&
-        to_typecast_expr(op).op().type().id() == ID_bool)
+      if(op.id() == ID_typecast && to_typecast_expr(op).op().is_boolean())
       {
       }
       else if(op.is_zero() || op.is_one())
@@ -1323,7 +1321,7 @@ simplify_exprt::simplify_bitnot(const bitnot_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     return unchanged(expr);
 
   exprt tmp0=expr.op0();
@@ -1902,7 +1900,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
   // are we comparing with a typecast from bool?
   if(
     expr.op0().id() == ID_typecast &&
-    to_typecast_expr(expr.op0()).op().type().id() == ID_bool)
+    to_typecast_expr(expr.op0()).op().is_boolean())
   {
     const auto &lhs_typecast_op = to_typecast_expr(expr.op0()).op();
 

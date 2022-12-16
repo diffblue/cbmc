@@ -95,7 +95,7 @@ bvt boolbvt::conversion_failed(const exprt &expr)
 ///   circuit
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
-  if(expr.type().id()==ID_bool)
+  if(expr.is_boolean())
     return {convert(expr)};
 
   if(expr.id()==ID_index)
@@ -317,7 +317,7 @@ bvt boolbvt::convert_function_application(
 
 literalt boolbvt::convert_rest(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   if(expr.id()==ID_typecast)
     return convert_typecast(to_typecast_expr(expr));
@@ -506,7 +506,7 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
 void boolbvt::set_to(const exprt &expr, bool value)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))

@@ -76,7 +76,7 @@ bool simplify_exprt::simplify_if_recursive(
   const exprt &cond,
   bool truth)
 {
-  if(expr.type().id() == ID_bool)
+  if(expr.is_boolean())
   {
     bool new_truth;
 

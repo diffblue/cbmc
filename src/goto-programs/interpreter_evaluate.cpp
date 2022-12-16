@@ -380,7 +380,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
       const auto width = to_c_bool_type(expr.type()).get_width();
       return {bvrep2integer(value, width, false)};
     }
-    else if(expr.type().id()==ID_bool)
+    else if(expr.is_boolean())
     {
       return {expr.is_true()};
     }
@@ -910,7 +910,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
         const auto s = integer2bvrep(value, width);
         return {bvrep2integer(s, width, false)};
       }
-      else if((expr.type().id()==ID_bool) || (expr.type().id()==ID_c_bool))
+      else if(expr.is_boolean() || expr.type().id() == ID_c_bool)
         return {value != 0};
     }
   }

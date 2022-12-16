@@ -282,7 +282,7 @@ replace_expr_copy(const union_find_replacet &symbol_resolve, exprt expr)
 /// \param value: the boolean value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
   PRECONDITION(equality_propagation);
   if(!value)
     equations.push_back(not_exprt{expr});

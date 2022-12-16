@@ -136,7 +136,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
       if(
         component.is_nil() || component.type().id() == ID_c_bit_field ||
-        component.type().id() == ID_bool)
+        component.is_boolean())
       {
         return unchanged(expr);
       }

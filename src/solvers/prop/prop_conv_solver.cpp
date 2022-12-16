@@ -38,7 +38,7 @@ void prop_conv_solvert::set_all_frozen()
 exprt prop_conv_solvert::handle(const exprt &expr)
 {
   // We can only improve Booleans.
-  if(expr.type().id() != ID_bool)
+  if(!expr.is_boolean())
     return expr;
 
   // We convert to a literal to obtain a 'small' handle
@@ -107,7 +107,7 @@ optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
 
   if(expr.id() == ID_not)
   {
-    if(expr.type().id() == ID_bool)
+    if(expr.is_boolean())
     {
       auto tmp = get_bool(to_not_expr(expr).op());
       if(tmp.has_value())
@@ -118,7 +118,7 @@ optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
   }
   else if(expr.id() == ID_and || expr.id() == ID_or)
   {
-    if(expr.type().id() == ID_bool && expr.operands().size() >= 1)
+    if(expr.is_boolean() && expr.operands().size() >= 1)
     {
       for(const auto &op : expr.operands())
       {
@@ -189,7 +189,7 @@ literalt prop_conv_solvert::convert(const exprt &expr)
 
 literalt prop_conv_solvert::convert_bool(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   const exprt::operandst &op = expr.operands();
 
@@ -292,7 +292,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     INVARIANT(op.size() == 2, "equality takes two operands");
     bool equal = (expr.id() == ID_equal);
 
-    if(op[0].type().id() == ID_bool && op[1].type().id() == ID_bool)
+    if(op[0].is_boolean() && op[1].is_boolean())
     {
       literalt tmp1 = convert(op[0]), tmp2 = convert(op[1]);
       return equal ? prop.lequal(tmp1, tmp2) : prop.lxor(tmp1, tmp2);
@@ -345,11 +345,11 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 
 void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   const bool has_only_boolean_operands = std::all_of(
     expr.operands().begin(), expr.operands().end(), [](const exprt &expr) {
-      return expr.type().id() == ID_bool;
+      return expr.is_boolean();
     });
 
   if(has_only_boolean_operands)
@@ -474,7 +474,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
 exprt prop_conv_solvert::get(const exprt &expr) const
 {
-  if(expr.type().id() == ID_bool)
+  if(expr.is_boolean())
   {
     auto value = get_bool(expr);
 

@@ -799,7 +799,7 @@ static bool has_quantifier(const exprt &expr)
 
 literalt smt2_convt::convert(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   // Three cases where no new handle is needed.
 
@@ -856,7 +856,7 @@ literalt smt2_convt::convert(const exprt &expr)
 exprt smt2_convt::handle(const exprt &expr)
 {
   // We can only improve Booleans.
-  if(expr.type().id() != ID_bool)
+  if(!expr.is_boolean())
     return expr;
 
   return literal_exprt(convert(expr));
@@ -1339,7 +1339,7 @@ void smt2_convt::convert_expr(const exprt &expr)
           expr.id()==ID_xor)
   {
     DATA_INVARIANT(
-      expr.type().id() == ID_bool,
+      expr.is_boolean(),
       "logical and, or, and xor expressions should have Boolean type");
     DATA_INVARIANT(
       expr.operands().size() >= 2,
@@ -1358,8 +1358,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     const implies_exprt &implies_expr = to_implies_expr(expr);
 
     DATA_INVARIANT(
-      implies_expr.type().id() == ID_bool,
-      "implies expression should have Boolean type");
+      implies_expr.is_boolean(), "implies expression should have Boolean type");
 
     out << "(=> ";
     convert_expr(implies_expr.op0());
@@ -1372,8 +1371,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     const not_exprt &not_expr = to_not_expr(expr);
 
     DATA_INVARIANT(
-      not_expr.type().id() == ID_bool,
-      "not expression should have Boolean type");
+      not_expr.is_boolean(), "not expression should have Boolean type");
 
     out << "(not ";
     convert_expr(not_expr.op());
@@ -2028,7 +2026,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     const auto &op1 = to_binary_expr(expr).op1();
 
     DATA_INVARIANT(
-      keep_result || expr.type().id() == ID_bool,
+      keep_result || expr.is_boolean(),
       "overflow plus and overflow minus expressions shall be of Boolean type");
 
     bool subtract = can_cast_expr<minus_overflow_exprt>(expr) ||
@@ -2124,7 +2122,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     const auto &op1 = to_binary_expr(expr).op1();
 
     DATA_INVARIANT(
-      keep_result || expr.type().id() == ID_bool,
+      keep_result || expr.is_boolean(),
       "overflow mult expression shall be of Boolean type");
 
     // No better idea than to multiply with double the bits and then compare
@@ -4455,7 +4453,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
     if(use_array_theory(expr.array()))
     {
-      if(expr.type().id() == ID_bool && !use_array_of_bool)
+      if(expr.is_boolean() && !use_array_of_bool)
       {
         out << "(= ";
         out << "(select ";
@@ -4822,7 +4820,7 @@ void smt2_convt::unflatten(
 
 void smt2_convt::set_to(const exprt &expr, bool value)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   if(expr.id()==ID_and && value)
   {

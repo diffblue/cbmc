@@ -37,7 +37,7 @@ exprt guard_exprt::guard_expr(exprt expr) const
 
 void guard_exprt::add(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   if(is_false() || expr.is_true())
     return;

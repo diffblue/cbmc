@@ -221,7 +221,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
-  if(expr.type().id() == ID_bool || expr.type().id() == ID_c_bool)
+  if(expr.is_boolean() || expr.type().id() == ID_c_bool)
   {
     new_expr = typecast_exprt(expr, int_type);
     return true;
@@ -308,7 +308,7 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
 
   if(
     expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
-    expr.type().id() != ID_c_bool && expr.type().id() != ID_bool &&
+    expr.type().id() != ID_c_bool && !expr.is_boolean() &&
     expr.type().id() != ID_c_enum_tag)
   {
     return false;
@@ -640,7 +640,7 @@ bool cpp_typecheckt::standard_conversion_boolean(
 
   if(
     expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
-    expr.type().id() != ID_pointer && expr.type().id() != ID_bool &&
+    expr.type().id() != ID_pointer && !expr.is_boolean() &&
     expr.type().id() != ID_c_enum_tag)
   {
     return false;
@@ -1838,7 +1838,7 @@ bool cpp_typecheckt::reinterpret_typecast(
 
   if(
     (e.type().id() == ID_unsignedbv || e.type().id() == ID_signedbv ||
-     e.type().id() == ID_c_bool || e.type().id() == ID_bool) &&
+     e.type().id() == ID_c_bool || e.is_boolean()) &&
     type.id() == ID_pointer && !is_reference(type))
   {
     // integer to pointer
