@@ -1,6 +1,5 @@
 var NAVTREEINDEX74 =
 {
-"cpp__typecheck__fargs_8h.html":[7,0,2,5,62],
 "cpp__typecheck__fargs_8h_source.html":[7,0,2,5,62],
 "cpp__typecheck__function_8cpp.html":[7,0,2,5,63],
 "cpp__typecheck__function_8cpp_source.html":[7,0,2,5,63],
@@ -249,5 +248,6 @@ var NAVTREEINDEX74 =
 "dependence__graph_8cpp.html":[7,0,2,0,19],
 "dependence__graph_8cpp.html#a9c7d249ff0680c6e2e9736819e0f8122":[7,0,2,0,19,1],
 "dependence__graph_8cpp_source.html":[7,0,2,0,19],
-"dependence__graph_8h.html":[7,0,2,0,20]
+"dependence__graph_8h.html":[7,0,2,0,20],
+"dependence__graph_8h_source.html":[7,0,2,0,20]
 };
