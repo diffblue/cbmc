@@ -1,5 +1,6 @@
 var NAVTREEINDEX121 =
 {
+"struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#a220f8108f620240b6a0589f1dec86db0":[6,0,5,3],
 "struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#a25de72f4cd8b504a2d820c3f3e91d95e":[6,0,5,2],
 "struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#a366bcdf2822e6ef4711cab0612762239":[6,0,5,5],
 "struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#a587a823f8152bfb2b56267f79fbb9499":[6,0,5,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX121 =
 "structc__wranglert_1_1loop__contract__clauset.html#a89bef6a1589d32c0f5a9e035c081795c":[6,0,151,3,2],
 "structc__wranglert_1_1loop__contract__clauset.html#a90a0d0ff0dafe2675e16926747516e13":[6,0,151,3,0],
 "structc__wranglert_1_1loop__contract__clauset.html#a97c5572e8c926dca44162151e1eee47f":[6,0,151,3,4],
-"structc__wranglert_1_1loop__contract__clauset.html#ab76279826c67f30c527eccbcb9092158":[6,0,151,3,3],
-"structc__wranglert_1_1loop__contract__clauset.html#ad4df69c0e9134cf8e6019ec1c40975cf":[6,0,151,3,1]
+"structc__wranglert_1_1loop__contract__clauset.html#ab76279826c67f30c527eccbcb9092158":[6,0,151,3,3]
 };

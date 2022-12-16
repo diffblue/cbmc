@@ -21,6 +21,7 @@ var classparsert =
     [ "in", "classparsert.html#a400e7c320c73c1e83ca4c6c531e3722c", null ],
     [ "last_line", "classparsert.html#a7cc67811c3bdc43bb25d269a1fb34eb7", null ],
     [ "line_no", "classparsert.html#ae30107d041ca239b3e24be58f6ed5dfc", null ],
+    [ "log", "classparsert.html#a94e006a32fee9b88158cb35bc2788b65", null ],
     [ "previous_line_no", "classparsert.html#ab62352356552d8e83177c52db8fa1aa2", null ],
     [ "source_location", "classparsert.html#a28bc578d212eb0c5adbb2e7b3887e1dd", null ],
     [ "stack", "classparsert.html#ad8957b2b4a2b5305105071c1945c9068", null ],
