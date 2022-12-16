@@ -104,7 +104,7 @@ var classconstant__interval__exprt =
     [ "is_unsigned", "classconstant__interval__exprt.html#ace9c62e13ebdd23dd3101271a53367cd", null ],
     [ "is_unsigned", "classconstant__interval__exprt.html#a79352db2ca2841a7d52cdf37a7e66c5b", null ],
     [ "is_unsigned", "classconstant__interval__exprt.html#a944cb1e81045302ac516f9b6c4c3a066", null ],
-    [ "is_valid_bound", "classconstant__interval__exprt.html#af545ae064927379cf1d69633c8494258", null ],
+    [ "is_valid_bound", "classconstant__interval__exprt.html#abc419b63ad6c05fc8c9d7dc77caf10f2", null ],
     [ "is_well_formed", "classconstant__interval__exprt.html#aa662c52cff30c0dd7a2a58b6f56c10ee", null ],
     [ "is_zero", "classconstant__interval__exprt.html#ad2ad04534f62c0e114b019e39eefead5", null ],
     [ "is_zero", "classconstant__interval__exprt.html#a0b9c9744519d5603aa1eb2d2c075dd35", null ],

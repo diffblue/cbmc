@@ -379,7 +379,7 @@ $(document).ready(function(){initNavTree('smt2__parser_8cpp_source.html',''); in
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;{</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="keyword">auto</span> <a class="code" href="classsmt2__parsert.html#a812e6bafe97a7342a100bbe13c943ab7">binding</a> = this-&gt;<a class="code" href="classsmt2__parsert.html#a812e6bafe97a7342a100bbe13c943ab7">binding</a>(<span class="keywordtype">id</span>);</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classsmt2__parsert.html#a812e6bafe97a7342a100bbe13c943ab7">binding</a>.second.type().id() != ID_bool)</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classsmt2__parsert.html#a812e6bafe97a7342a100bbe13c943ab7">binding</a>.second.is_boolean())</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classsmt2__parsert.html#aad4b098b4853c945e5f00e8423b13efd">error</a>() &lt;&lt; <span class="keywordtype">id</span> &lt;&lt; <span class="stringliteral">&quot; expects a boolean term&quot;</span>;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160; </div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(<span class="keywordtype">id</span>, <a class="code" href="classsmt2__parsert.html#a812e6bafe97a7342a100bbe13c943ab7">binding</a>.first, <a class="code" href="classsmt2__parsert.html#a812e6bafe97a7342a100bbe13c943ab7">binding</a>.second);</div>
@@ -651,7 +651,7 @@ $(document).ready(function(){initNavTree('smt2__parser_8cpp_source.html',''); in
 <div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classsmt2__parsert.html#aedcdbd543e5bbe61fbf4e1951f9ef326">smt2_tokenizer</a>.<a class="code" href="classsmt2__tokenizert.html#a4814af0917196caed6312acd0cda3d6b">get_buffer</a>() == <span class="stringliteral">&quot;named&quot;</span>)</div>
 <div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        {</div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;          <span class="comment">// &#39;named terms&#39; must be Boolean</span></div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;          <span class="keywordflow">if</span>(term.type().id() != ID_bool)</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;          <span class="keywordflow">if</span>(!term.is_boolean())</div>
 <div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classsmt2__parsert.html#aad4b098b4853c945e5f00e8423b13efd">error</a>(<span class="stringliteral">&quot;named terms must be Boolean&quot;</span>);</div>
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160; </div>
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;          <span class="keywordflow">if</span>(<a class="code" href="classsmt2__parsert.html#ad8b874ac235f5d6a18e4461e8dfa558e">next_token</a>() == smt2_tokenizert::SYMBOL)</div>
@@ -1336,7 +1336,7 @@ $(document).ready(function(){initNavTree('smt2__parser_8cpp_source.html',''); in
 <div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;    <span class="keywordflow">if</span>(op.size() != 3)</div>
 <div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classsmt2__parsert.html#aad4b098b4853c945e5f00e8423b13efd">error</a>(<span class="stringliteral">&quot;ite takes three operands&quot;</span>);</div>
 <div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160; </div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;    <span class="keywordflow">if</span>(op[0].type().<span class="keywordtype">id</span>() != ID_bool)</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;    <span class="keywordflow">if</span>(!op[0].is_boolean())</div>
 <div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classsmt2__parsert.html#aad4b098b4853c945e5f00e8423b13efd">error</a>(<span class="stringliteral">&quot;ite takes a boolean as first operand&quot;</span>);</div>
 <div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160; </div>
 <div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;    <span class="keywordflow">if</span>(op[1].type() != op[2].type())</div>

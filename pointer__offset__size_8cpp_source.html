@@ -134,7 +134,7 @@ $(document).ready(function(){initNavTree('pointer__offset__size_8cpp_source.html
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      result += bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      bit_field_bits %= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(comp.type().id() == ID_bool)</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(comp.is_boolean())</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    {</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      ++bit_field_bits;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      result += bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
@@ -346,7 +346,7 @@ $(document).ready(function(){initNavTree('pointer__offset__size_8cpp_source.html
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      <span class="keywordflow">if</span>(bytes &gt; 0)</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        result = <a class="code" href="classplus__exprt.html">plus_exprt</a>(result, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(bytes, result.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    }</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(c.type().id() == ID_bool)</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(c.is_boolean())</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    {</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      ++bit_field_bits;</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      <span class="keyword">const</span> std::size_t bytes = bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
@@ -456,7 +456,7 @@ $(document).ready(function(){initNavTree('pointer__offset__size_8cpp_source.html
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keywordflow">if</span>(bytes &gt; 0)</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;          result = <a class="code" href="classplus__exprt.html">plus_exprt</a>(result, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(bytes, result.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      }</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(c.type().id() == ID_bool)</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(c.is_boolean())</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;      {</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        ++bit_field_bits;</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        <span class="keyword">const</span> std::size_t bytes = bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>

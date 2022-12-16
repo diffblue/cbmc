@@ -180,7 +180,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="classpolynomialt.html">polynomialt</a> poly;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="classexprt.html">exprt</a> target=*it;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">if</span>(it-&gt;type().id()==ID_bool)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_boolean())</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="comment">// Hack: don&#39;t try to accelerate booleans.</span></div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="keywordflow">continue</span>;</div>
@@ -242,7 +242,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;Trying to accelerate &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(*it) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">if</span>(it-&gt;type().id()==ID_bool)</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_boolean())</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    {</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="comment">// Hack: don&#39;t try to accelerate booleans.</span></div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      accelerator.<a class="code" href="classpath__acceleratort.html#ade045dd86ae9100d317725b84d81ba4a">dirty_vars</a>.insert(*it);</div>
