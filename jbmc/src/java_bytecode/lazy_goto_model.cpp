@@ -57,7 +57,6 @@ lazy_goto_modelt::lazy_goto_modelt(
       driver_program_generate_function_body),
     message_handler(message_handler)
 {
-  language_files.set_message_handler(message_handler);
 }
 
 lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
@@ -154,7 +153,7 @@ void lazy_goto_modelt::initialize(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(symbol_table))
+    if(language_files.typecheck(symbol_table, message_handler))
     {
       throw invalid_input_exceptiont("CONVERSION ERROR");
     }
