@@ -1,5 +1,7 @@
 var NAVTREEINDEX122 =
 {
+"structc__wranglert_1_1loop__contract__clauset.html#a90a0d0ff0dafe2675e16926747516e13":[6,0,151,3,0],
+"structc__wranglert_1_1loop__contract__clauset.html#a97c5572e8c926dca44162151e1eee47f":[6,0,151,3,4],
 "structc__wranglert_1_1loop__contract__clauset.html#ab76279826c67f30c527eccbcb9092158":[6,0,151,3,3],
 "structc__wranglert_1_1loop__contract__clauset.html#ad4df69c0e9134cf8e6019ec1c40975cf":[6,0,151,3,1],
 "structc__wranglert_1_1objectt.html":[6,0,151,4],
@@ -247,7 +249,5 @@ var NAVTREEINDEX122 =
 "structcover__configt.html#a759decd6e301aed340d70abd5e309d86":[6,0,281,7],
 "structcover__configt.html#a7bc02837ac46dfd9d2fcbebec265c328":[6,0,281,6],
 "structcover__configt.html#a8e300c0089d886e0fa78cfa133846707":[6,0,281,4],
-"structcover__configt.html#abd6e2cfc201cdbd4a160760287aa2d80":[6,0,281,1],
-"structcover__configt.html#ac18158b74fdf4d14ee39c676413b9088":[6,0,281,0],
-"structcover__configt.html#ac1b4f168e96b6a829d43f4cdae44f979":[6,0,281,5]
+"structcover__configt.html#abd6e2cfc201cdbd4a160760287aa2d80":[6,0,281,1]
 };

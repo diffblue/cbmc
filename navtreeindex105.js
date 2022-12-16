@@ -13,6 +13,7 @@ var NAVTREEINDEX105 =
 "lexical__loops_8h.html#afd32460cb325865c6603ea19aee27dd6":[7,0,2,0,50,1],
 "lexical__loops_8h_source.html":[7,0,2,0,50],
 "libcprover-cpp_2options_8cpp.html":[7,0,2,21,2],
+"libcprover-cpp_2options_8cpp.html#aa7769251023684264061cc9f93608128":[7,0,2,21,2,0],
 "libcprover-cpp_2options_8cpp_source.html":[7,0,2,21,2],
 "libcprover-cpp_2options_8h.html":[7,0,2,21,3],
 "libcprover-cpp_2options_8h_source.html":[7,0,2,21,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX105 =
 "mathematical__expr_8h.html#a6437e6abb177ae553a2ccbbb6836e2aa":[7,0,2,29,126,23],
 "mathematical__expr_8h.html#a7ccff73ffbf76b6491990f5e95ecc8dc":[7,0,2,29,126,31],
 "mathematical__expr_8h.html#a876f37d59ec9ff7d2de348df3a68666a":[7,0,2,29,126,29],
-"mathematical__expr_8h.html#a87d5b87888eddde3f27a208eb338c156":[7,0,2,29,126,35],
-"mathematical__expr_8h.html#a8e101f81828095718f3dc5cdf339e0b7":[7,0,2,29,126,22]
+"mathematical__expr_8h.html#a87d5b87888eddde3f27a208eb338c156":[7,0,2,29,126,35]
 };

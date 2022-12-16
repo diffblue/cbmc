@@ -1,23 +1,23 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/stack_decision_procedure.h" name="/home/runner/work/cbmc/cbmc/src/solvers/stack_decision_procedure.h">
-<area shape="rect" id="node1" title="Decision procedure with incremental solving with contexts and assumptions." alt="" coords="3938,5,4122,61"/>
-<area shape="rect" id="node2" href="$goto__symex__fault__localizer_8cpp.html" title="Fault Localization for Goto Symex." alt="" coords="3553,117,3784,173"/>
-<area shape="rect" id="node3" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="3963,451,4147,507"/>
-<area shape="rect" id="node4" href="$prop__conv_8h.html" title=" " alt="" coords="3809,117,3993,173"/>
-<area shape="rect" id="node42" href="$smt2__conv_8h.html" title=" " alt="" coords="4697,117,4881,173"/>
-<area shape="rect" id="node59" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="4067,109,4297,180"/>
-<area shape="rect" id="node5" href="$prop__conv_8cpp.html" title=" " alt="" coords="3809,235,3993,291"/>
-<area shape="rect" id="node6" href="$prop__conv__solver_8h.html" title=" " alt="" coords="3393,235,3577,291"/>
-<area shape="rect" id="node41" href="$prop__minimize_8cpp.html" title="Minimize some target function incrementally." alt="" coords="3601,235,3785,291"/>
-<area shape="rect" id="node7" href="$solver__hardness_8h.html" title=" " alt="" coords="3462,347,3673,403"/>
-<area shape="rect" id="node11" href="$equality_8h.html" title=" " alt="" coords="3063,347,3264,403"/>
-<area shape="rect" id="node40" href="$prop__conv__solver_8cpp.html" title=" " alt="" coords="3697,347,3881,403"/>
-<area shape="rect" id="node8" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="5493,673,5724,729"/>
-<area shape="rect" id="node9" href="$solver__hardness_8cpp.html" title=" " alt="" coords="3375,451,3586,507"/>
-<area shape="rect" id="node10" href="$symex__target__equation_8cpp.html" title="Symbolic Execution Implementation of functions to build SSA equation." alt="" coords="3611,451,3825,507"/>
-<area shape="rect" id="node12" href="$arrays_8h.html" title="Theory of Arrays with Extensionality." alt="" coords="3063,451,3264,507"/>
-<area shape="rect" id="node39" href="$equality_8cpp.html" title=" " alt="" coords="2837,451,3039,507"/>
-<area shape="rect" id="node13" href="$arrays_8cpp.html" title=" " alt="" coords="3063,562,3264,618"/>
-<area shape="rect" id="node14" href="$boolbv_8h.html" title=" " alt="" coords="2725,562,2927,618"/>
+<area shape="rect" id="node1" title="Decision procedure with incremental solving with contexts and assumptions." alt="" coords="3794,5,3978,61"/>
+<area shape="rect" id="node2" href="$goto__symex__fault__localizer_8cpp.html" title="Fault Localization for Goto Symex." alt="" coords="3409,117,3640,173"/>
+<area shape="rect" id="node3" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="3841,451,4025,507"/>
+<area shape="rect" id="node4" href="$prop__conv_8h.html" title=" " alt="" coords="3665,117,3849,173"/>
+<area shape="rect" id="node41" href="$smt2__conv_8h.html" title=" " alt="" coords="4553,117,4737,173"/>
+<area shape="rect" id="node59" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="3923,109,4153,180"/>
+<area shape="rect" id="node5" href="$prop__conv_8cpp.html" title=" " alt="" coords="3665,235,3849,291"/>
+<area shape="rect" id="node6" href="$prop__conv__solver_8h.html" title=" " alt="" coords="3249,235,3433,291"/>
+<area shape="rect" id="node40" href="$prop__minimize_8cpp.html" title="Minimize some target function incrementally." alt="" coords="3457,235,3641,291"/>
+<area shape="rect" id="node7" href="$solver__hardness_8h.html" title=" " alt="" coords="3367,347,3578,403"/>
+<area shape="rect" id="node11" href="$equality_8h.html" title=" " alt="" coords="3064,347,3265,403"/>
+<area shape="rect" id="node39" href="$prop__conv__solver_8cpp.html" title=" " alt="" coords="3602,347,3786,403"/>
+<area shape="rect" id="node8" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="5268,673,5499,729"/>
+<area shape="rect" id="node9" href="$solver__hardness_8cpp.html" title=" " alt="" coords="3597,451,3807,507"/>
+<area shape="rect" id="node10" href="$symex__target__equation_8cpp.html" title="Symbolic Execution Implementation of functions to build SSA equation." alt="" coords="3307,451,3521,507"/>
+<area shape="rect" id="node12" href="$arrays_8h.html" title="Theory of Arrays with Extensionality." alt="" coords="2803,451,3004,507"/>
+<area shape="rect" id="node38" href="$equality_8cpp.html" title=" " alt="" coords="3064,451,3265,507"/>
+<area shape="rect" id="node13" href="$arrays_8cpp.html" title=" " alt="" coords="2803,562,3004,618"/>
+<area shape="rect" id="node14" href="$boolbv_8h.html" title=" " alt="" coords="2505,562,2707,618"/>
 <area shape="rect" id="node15" href="$bv__pointers__wide_8h.html" title=" " alt="" coords="5,673,223,729"/>
 <area shape="rect" id="node16" href="$boolbv_8cpp.html" title=" " alt="" coords="247,673,448,729"/>
 <area shape="rect" id="node17" href="$boolbv__abs_8cpp.html" title=" " alt="" coords="472,673,673,729"/>
@@ -41,22 +41,22 @@
 <area shape="rect" id="node35" href="$boolbv__extractbit_8cpp.html" title=" " alt="" coords="4573,673,4775,729"/>
 <area shape="rect" id="node36" href="$boolbv__extractbits_8cpp.html" title=" " alt="" coords="4799,673,5000,729"/>
 <area shape="rect" id="node37" href="$boolbv__floatbv__mod__rem_8cpp.html" title=" " alt="" coords="5025,673,5243,729"/>
-<area shape="rect" id="node38" href="$boolbv__floatbv__op_8cpp.html" title=" " alt="" coords="5268,673,5469,729"/>
-<area shape="rect" id="node43" href="$state__encoding__targets_8h.html" title=" " alt="" coords="5227,235,5411,291"/>
-<area shape="rect" id="node46" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="4372,235,4565,291"/>
-<area shape="rect" id="node47" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4590,235,4774,291"/>
-<area shape="rect" id="node48" href="$smt2__dec_8h.html" title=" " alt="" coords="5019,235,5203,291"/>
-<area shape="rect" id="node58" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="4799,228,4995,299"/>
-<area shape="rect" id="node44" href="$state__encoding_8cpp.html" title=" " alt="" coords="5227,347,5411,403"/>
-<area shape="rect" id="node45" href="$state__encoding__targets_8cpp.html" title=" " alt="" coords="5435,347,5619,403"/>
-<area shape="rect" id="node49" href="$solver__factory_8h.html" title="Solver Factory." alt="" coords="5019,347,5203,403"/>
-<area shape="rect" id="node56" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="4777,347,4995,403"/>
-<area shape="rect" id="node57" href="$smt2__dec_8cpp.html" title=" " alt="" coords="4569,347,4753,403"/>
-<area shape="rect" id="node50" href="$goto__symex__property__decider_8h.html" title="Property Decider for Goto&#45;Symex." alt="" coords="4994,451,5229,507"/>
-<area shape="rect" id="node51" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="5019,562,5203,618"/>
-<area shape="rect" id="node52" href="$goto__symex__property__decider_8cpp.html" title="Property Decider for Goto&#45;Symex." alt="" coords="5228,562,5477,618"/>
-<area shape="rect" id="node53" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="5501,562,5716,618"/>
-<area shape="rect" id="node54" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="4565,555,4751,625"/>
-<area shape="rect" id="node55" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="4775,562,4995,618"/>
-<area shape="rect" id="node60" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="4118,228,4347,299"/>
+<area shape="rect" id="node42" href="$state__encoding__targets_8h.html" title=" " alt="" coords="5083,235,5267,291"/>
+<area shape="rect" id="node45" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="4228,235,4421,291"/>
+<area shape="rect" id="node46" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4446,235,4630,291"/>
+<area shape="rect" id="node47" href="$smt2__dec_8h.html" title=" " alt="" coords="4875,235,5059,291"/>
+<area shape="rect" id="node58" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="4655,228,4851,299"/>
+<area shape="rect" id="node43" href="$state__encoding_8cpp.html" title=" " alt="" coords="5083,347,5267,403"/>
+<area shape="rect" id="node44" href="$state__encoding__targets_8cpp.html" title=" " alt="" coords="5291,347,5475,403"/>
+<area shape="rect" id="node48" href="$solver__factory_8h.html" title="Solver Factory." alt="" coords="4875,347,5059,403"/>
+<area shape="rect" id="node56" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="4633,347,4851,403"/>
+<area shape="rect" id="node57" href="$smt2__dec_8cpp.html" title=" " alt="" coords="4425,347,4609,403"/>
+<area shape="rect" id="node49" href="$goto__symex__property__decider_8h.html" title="Property Decider for Goto&#45;Symex." alt="" coords="4769,451,5003,507"/>
+<area shape="rect" id="node55" href="$libcprover-cpp_2options_8cpp.html" title=" " alt="" coords="5027,451,5211,507"/>
+<area shape="rect" id="node50" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="4794,562,4978,618"/>
+<area shape="rect" id="node51" href="$goto__symex__property__decider_8cpp.html" title="Property Decider for Goto&#45;Symex." alt="" coords="5003,562,5252,618"/>
+<area shape="rect" id="node52" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="5276,562,5491,618"/>
+<area shape="rect" id="node53" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="4340,555,4525,625"/>
+<area shape="rect" id="node54" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="4549,562,4769,618"/>
+<area shape="rect" id="node60" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="3974,228,4203,299"/>
 </map>
