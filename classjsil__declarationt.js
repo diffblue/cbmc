@@ -12,7 +12,7 @@ var classjsil__declarationt =
     [ "returns_value", "classjsil__declarationt.html#a771bd28831517465f19ee082523525ac", null ],
     [ "throws_label", "classjsil__declarationt.html#a44352feb760797e2d936e1cb125a72e8", null ],
     [ "throws_value", "classjsil__declarationt.html#a095944fc19614bccab539190cf941de1", null ],
-    [ "to_symbol", "classjsil__declarationt.html#ad565c02154f7f1716974e2f613ea67a6", null ],
+    [ "to_symbol", "classjsil__declarationt.html#a8c37d361525c0e72591c7a0cd71fa577", null ],
     [ "value", "classjsil__declarationt.html#afcbf031599fe517979ec440f63c9852e", null ],
     [ "value", "classjsil__declarationt.html#a946171ef8a90c640b145359c69ebba95", null ]
 ];

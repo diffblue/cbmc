@@ -33,5 +33,5 @@ var classansi__c__declarationt =
     [ "set_is_thread_local", "classansi__c__declarationt.html#a0240f7a138b6a256322977ac6db5945f", null ],
     [ "set_is_typedef", "classansi__c__declarationt.html#aebe33060f62c5f9f80b5775e81c27707", null ],
     [ "set_is_weak", "classansi__c__declarationt.html#a47dd58a1d85939d83f5b61bd3203e121", null ],
-    [ "to_symbol", "classansi__c__declarationt.html#ab26a8d23510af881fed48d7b0b9a6146", null ]
+    [ "to_symbol", "classansi__c__declarationt.html#a48bf12989201b1775899ebe9e576c566", null ]
 ];
