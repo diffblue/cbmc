@@ -304,7 +304,7 @@ static simplify_exprt::resultt<> simplify_string_is_empty(
   const refined_string_exprt &s =
     to_string_expr(function_app.arguments().at(0));
 
-  if(s.length().id() != ID_constant)
+  if(!s.length().is_constant())
     return simplify_exprt::unchanged(expr);
 
   const auto numeric_length =
@@ -381,7 +381,7 @@ static simplify_exprt::resultt<> simplify_string_index_of(
   {
     auto &starting_index_expr = expr.arguments().at(2);
 
-    if(starting_index_expr.id() != ID_constant)
+    if(!starting_index_expr.is_constant())
     {
       return simplify_exprt::unchanged(expr);
     }
@@ -466,7 +466,7 @@ static simplify_exprt::resultt<> simplify_string_index_of(
           std::distance(s1_data.operands().begin(), it), expr.type());
     }
   }
-  else if(expr.arguments().at(1).id() == ID_constant)
+  else if(expr.arguments().at(1).is_constant())
   {
     // Second argument is a constant character
 
@@ -518,7 +518,7 @@ static simplify_exprt::resultt<> simplify_string_char_at(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
-  if(expr.arguments().at(1).id() != ID_constant)
+  if(!expr.arguments().at(1).is_constant())
   {
     return simplify_exprt::unchanged(expr);
   }
@@ -661,7 +661,7 @@ static simplify_exprt::resultt<> simplify_string_startswith(
   if(expr.arguments().size() == 3)
   {
     auto &offset = expr.arguments()[2];
-    if(offset.id() != ID_constant)
+    if(!offset.is_constant())
       return simplify_exprt::unchanged(expr);
     offset_int = numeric_cast_v<mp_integer>(to_constant_expr(offset));
   }
@@ -1445,7 +1445,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
 
   if(old_type_followed.id() == ID_struct)
   {
-    if(with_expr.old().id() == ID_struct || with_expr.old().id() == ID_constant)
+    if(with_expr.old().id() == ID_struct || with_expr.old().is_constant())
     {
       while(with_expr.operands().size() > 1)
       {
@@ -1475,7 +1475,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
     with_expr.old().type().id() == ID_vector)
   {
     if(
-      with_expr.old().id() == ID_array || with_expr.old().id() == ID_constant ||
+      with_expr.old().id() == ID_array || with_expr.old().is_constant() ||
       with_expr.old().id() == ID_vector)
     {
       while(with_expr.operands().size() > 1)
@@ -1778,8 +1778,9 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   if(!el_size.has_value() || *el_size == 0)
     return unchanged(expr);
 
-  if(expr.op().id()==ID_array_of &&
-     to_array_of_expr(expr.op()).op().id()==ID_constant)
+  if(
+    expr.op().id() == ID_array_of &&
+    to_array_of_expr(expr.op()).op().is_constant())
   {
     const auto const_bits_opt = expr2bits(
       to_array_of_expr(expr.op()).op(),

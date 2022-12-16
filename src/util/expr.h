@@ -199,7 +199,13 @@ public:
     op.push_back(std::move(e3));
   }
 
-  bool is_constant() const;
+  /// Return whether the expression is a constant.
+  /// \return True if is a constant, false otherwise
+  bool is_constant() const
+  {
+    return id() == ID_constant;
+  }
+
   bool is_true() const;
   bool is_false() const;
   bool is_zero() const;

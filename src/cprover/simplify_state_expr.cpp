@@ -628,7 +628,7 @@ static bool is_one(const exprt &src)
 {
   if(src.id() == ID_typecast)
     return is_one(to_typecast_expr(src).op());
-  else if(src.id() == ID_constant)
+  else if(src.is_constant())
   {
     auto value_opt = numeric_cast<mp_integer>(src);
     return value_opt.has_value() && *value_opt == 1;

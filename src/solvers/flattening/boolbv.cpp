@@ -114,7 +114,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_cond(to_cond_expr(expr));
   else if(expr.id()==ID_if)
     return convert_if(to_if_expr(expr));
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
     return convert_constant(to_constant_expr(expr));
   else if(expr.id()==ID_typecast)
     return convert_bv_typecast(to_typecast_expr(expr));

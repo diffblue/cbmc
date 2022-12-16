@@ -311,7 +311,7 @@ bool interpretert::memory_offset_to_byte_offset(
 /// \return vector in which the result of the evaluation is stored
 interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 {
-  if(expr.id()==ID_constant)
+  if(expr.is_constant())
   {
     if(expr.type().id()==ID_struct)
     {

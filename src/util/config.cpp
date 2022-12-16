@@ -1236,7 +1236,7 @@ static unsigned unsigned_from_ns(
   simplify(tmp, ns);
 
   INVARIANT(
-    tmp.id() == ID_constant,
+    tmp.is_constant(),
     "symbol table configuration entry '" + id2string(id) +
       "' must be a constant");
 

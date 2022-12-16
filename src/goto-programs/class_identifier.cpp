@@ -95,8 +95,7 @@ void set_class_identifier(
 
   if(components.front().get_name() == JAVA_CLASS_IDENTIFIER_FIELD_NAME)
   {
-    INVARIANT(
-      expr.op0().id()==ID_constant, "@class_identifier must be a constant");
+    INVARIANT(expr.op0().is_constant(), "@class_identifier must be a constant");
     expr.op0()=constant_exprt(class_type.get_identifier(), string_typet());
   }
   else

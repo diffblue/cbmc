@@ -22,13 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
-/// Return whether the expression is a constant.
-/// \return True if is a constant, false otherwise
-bool exprt::is_constant() const
-{
-  return id()==ID_constant;
-}
-
 /// Return whether the expression is a constant representing `true`.
 /// \return True if is a Boolean constant representing `true`, false otherwise.
 bool exprt::is_true() const

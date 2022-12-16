@@ -43,7 +43,7 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
     CALL_ON_EXPR(dereference_exprt);
   }
-  else if(expr.id() == ID_constant)
+  else if(expr.is_constant())
   {
     CALL_ON_EXPR(constant_exprt);
   }

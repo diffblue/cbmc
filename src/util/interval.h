@@ -103,7 +103,7 @@ public:
 
     bool b = true;
 
-    b &= id == ID_constant || id == ID_min || id == ID_max;
+    b &= expr.is_constant() || id == ID_min || id == ID_max;
 
     if(expr.is_boolean() && id == ID_constant)
     {

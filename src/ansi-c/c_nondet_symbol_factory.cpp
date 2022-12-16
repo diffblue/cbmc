@@ -172,7 +172,7 @@ void symbol_factoryt::gen_nondet_array_init(
 {
   auto const &array_type = to_array_type(expr.type());
   const auto &size = array_type.size();
-  PRECONDITION(size.id() == ID_constant);
+  PRECONDITION(size.is_constant());
   auto const array_size = numeric_cast<mp_integer>(to_constant_expr(size));
   DATA_INVARIANT(
     array_size.has_value() && *array_size >= 0,

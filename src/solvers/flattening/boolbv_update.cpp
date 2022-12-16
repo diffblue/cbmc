@@ -76,7 +76,7 @@ void boolbvt::convert_update_rec(
     std::size_t element_size=boolbv_width(subtype);
 
     DATA_INVARIANT(
-      size_expr.id() == ID_constant,
+      size_expr.is_constant(),
       "array in update expression should be constant-sized");
 
     // iterate over array

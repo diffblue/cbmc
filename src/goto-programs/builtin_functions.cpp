@@ -140,8 +140,7 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
-  if(arguments[0].type().id()!=ID_unsignedbv ||
-     arguments[0].id()!=ID_constant)
+  if(arguments[0].type().id() != ID_unsignedbv || !arguments[0].is_constant())
   {
     error().source_location=function.find_source_location();
     error() << "'" << identifier << "' expected first operand to be "
@@ -149,9 +148,7 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
-  if(
-    arguments[1].type().id() != ID_unsignedbv ||
-    arguments[1].id() != ID_constant)
+  if(arguments[1].type().id() != ID_unsignedbv || !arguments[1].is_constant())
   {
     error().source_location = function.find_source_location();
     error() << "'" << identifier << "' expected second operand to be "

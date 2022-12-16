@@ -1389,7 +1389,7 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
     // add a typecast for NULL
     else if(
-      u.op().id() == ID_constant && is_null_pointer(to_constant_expr(u.op())) &&
+      u.op().is_constant() && is_null_pointer(to_constant_expr(u.op())) &&
       to_pointer_type(u.op().type()).base_type().id() == ID_empty)
     {
       const struct_union_typet::componentt &comp=
@@ -1445,7 +1445,7 @@ void dump_ct::cleanup_expr(exprt &expr)
 
             // add a typecast for NULL or 0
             if(
-              argument.id() == ID_constant &&
+              argument.is_constant() &&
               is_null_pointer(to_constant_expr(argument)))
             {
               const typet &comp_type=
@@ -1461,8 +1461,7 @@ void dump_ct::cleanup_expr(exprt &expr)
       }
     }
   }
-  else if(expr.id()==ID_constant &&
-          expr.type().id()==ID_signedbv)
+  else if(expr.is_constant() && expr.type().id() == ID_signedbv)
   {
     #if 0
     const irep_idt &cformat=expr.get(ID_C_cformat);

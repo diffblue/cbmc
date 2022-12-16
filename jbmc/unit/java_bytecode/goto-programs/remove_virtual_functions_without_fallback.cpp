@@ -33,9 +33,7 @@ exprt resolve_classid_test(
 
   const auto &expr_binary = to_binary_expr(expr);
 
-  if(
-    expr_binary.op0().id() == ID_constant &&
-    expr_binary.op1().id() != ID_constant)
+  if(expr_binary.op0().is_constant() && !expr_binary.op1().is_constant())
   {
     binary_exprt swapped = expr_binary;
     std::swap(swapped.op0(), swapped.op1());
@@ -46,7 +44,7 @@ exprt resolve_classid_test(
     expr_binary.op0().id() == ID_member &&
     to_member_expr(expr_binary.op0()).get_component_name() ==
       "@class_identifier" &&
-    expr_binary.op1().id() == ID_constant &&
+    expr_binary.op1().is_constant() &&
     expr_binary.op1().type().id() == ID_string)
   {
     binary_exprt resolved = expr_binary;

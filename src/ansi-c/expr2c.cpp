@@ -1273,7 +1273,7 @@ std::string expr2ct::convert_complex(
 {
   if(
     src.operands().size() == 2 && to_binary_expr(src).op0().is_zero() &&
-    to_binary_expr(src).op1().id() == ID_constant)
+    to_binary_expr(src).op1().is_constant())
   {
     // This is believed to be gcc only; check if this is sensible
     // in MSC mode.
@@ -3871,7 +3871,7 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_code)
     return convert_code(to_code(src));
 
-  else if(src.id()==ID_constant)
+  else if(src.is_constant())
     return convert_constant(to_constant_expr(src), precedence);
 
   else if(src.id() == ID_annotated_pointer_constant)

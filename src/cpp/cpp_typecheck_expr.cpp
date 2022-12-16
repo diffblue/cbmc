@@ -1150,7 +1150,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
     DATA_INVARIANT(
       symbol_expr.id() == ID_symbol || symbol_expr.id() == ID_member ||
-        symbol_expr.id() == ID_constant,
+        symbol_expr.is_constant(),
       "expression kind unexpected");
 
     // If it is a symbol or a constant, just return it!
@@ -1188,7 +1188,7 @@ void cpp_typecheckt::typecheck_expr_member(
       expr=symbol_expr;
       return;
     }
-    else if(symbol_expr.id()==ID_constant)
+    else if(symbol_expr.is_constant())
     {
       expr=symbol_expr;
       return;

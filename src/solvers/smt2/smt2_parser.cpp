@@ -742,7 +742,7 @@ exprt smt2_parsert::function_application()
           {
             // For now, we can only do this when
             // the source operand is a constant.
-            if(source_op.id() == ID_constant)
+            if(source_op.is_constant())
             {
               mp_integer significand, exponent;
 

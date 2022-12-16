@@ -169,7 +169,7 @@ void local_may_aliast::get_rec(
   const exprt &rhs,
   const loc_infot &loc_info_src) const
 {
-  if(rhs.id()==ID_constant)
+  if(rhs.is_constant())
   {
     if(rhs.is_zero())
       dest.insert(objects.number(exprt(ID_null_object)));

@@ -164,8 +164,8 @@ linker_script_merget::linker_script_merget(
                       .id() == ID_array &&
 
                   to_index_expr(to_address_of_expr(expr).object())
-                      .index()
-                      .id() == ID_constant &&
+                    .index()
+                    .is_constant() &&
                   to_index_expr(to_address_of_expr(expr).object())
                       .index()
                       .type()

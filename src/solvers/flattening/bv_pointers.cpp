@@ -322,9 +322,9 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
 
     return std::move(bv);
   }
-  else if(expr.id()==ID_constant ||
-          expr.id()==ID_string_constant ||
-          expr.id()==ID_array)
+  else if(
+    expr.is_constant() || expr.id() == ID_string_constant ||
+    expr.id() == ID_array)
   { // constant
     return add_addr(expr);
   }
@@ -415,7 +415,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const auto &object_address_expr = to_object_address_expr(expr);
     return add_addr(object_address_expr.object_expr());
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     const constant_exprt &c = to_constant_expr(expr);
 

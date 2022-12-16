@@ -493,7 +493,7 @@ exprt gdb_value_extractort::get_pointer_value(
   const exprt &zero_expr,
   const source_locationt &location)
 {
-  PRECONDITION(zero_expr.id() == ID_constant);
+  PRECONDITION(zero_expr.is_constant());
 
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type() == zero_expr.type());

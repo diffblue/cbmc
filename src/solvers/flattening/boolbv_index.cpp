@@ -105,7 +105,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     #ifdef UNIFORM_ARRAY_HACK
     bool is_uniform = array.id() == ID_array_of;
 
-    if(array.id() == ID_constant || array.id() == ID_array)
+    if(array.is_constant() || array.id() == ID_array)
     {
       is_uniform = array.operands().size() <= 1 ||
                    std::all_of(
@@ -154,8 +154,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     #ifdef ACTUAL_ARRAY_HACK
     // More useful when updates to concrete locations in
     // actual arrays are compacted by simplify_expr
-    if((array.id()==ID_constant || array.id()==ID_array) &&
-       prop.has_set_to())
+    if((array.is_constant() || array.id() == ID_array) && prop.has_set_to())
     {
       #ifdef CONSTANT_ARRAY_HACK
       // TODO : Compile the whole array into a single relation

@@ -1017,8 +1017,7 @@ void value_set_fit::assign(
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+lhs.type().pretty();
 
-        if(rhs.id()==ID_struct ||
-           rhs.id()==ID_constant)
+        if(rhs.id() == ID_struct || rhs.is_constant())
         {
           DATA_INVARIANT(
             no < rhs.operands().size(), "component index must be in bounds");
@@ -1085,8 +1084,7 @@ void value_set_fit::assign(
       {
         assign(lhs_index, to_array_of_expr(rhs).what(), ns);
       }
-      else if(rhs.id()==ID_array ||
-              rhs.id()==ID_constant)
+      else if(rhs.id() == ID_array || rhs.is_constant())
       {
         for(const auto &op : rhs.operands())
         {

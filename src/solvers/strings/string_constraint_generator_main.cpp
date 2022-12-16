@@ -166,7 +166,7 @@ string_constraint_generatort::add_axioms_for_constrain_characters(
   const auto &args = f.arguments();
   PRECONDITION(3 <= args.size() && args.size() <= 5);
   PRECONDITION(args[2].type().id() == ID_string);
-  PRECONDITION(args[2].id() == ID_constant);
+  PRECONDITION(args[2].is_constant());
 
   const array_string_exprt s = array_pool.find(args[1], args[0]);
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();

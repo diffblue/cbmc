@@ -104,19 +104,15 @@ bool check_struct_structure(const struct_exprt &expr)
   {
     return false;
   }
-  if(
-    expr.operands().size() > 1 && std::any_of(
-                                    ++expr.operands().begin(),
-                                    expr.operands().end(),
-                                    [&](const exprt &operand) {
-                                      return operand.id() != ID_constant &&
-                                             operand.id() !=
-                                               ID_annotated_pointer_constant;
-                                    }))
-  {
-    return false;
-  }
-  return true;
+
+  return expr.operands().size() == 1 ||
+         std::all_of(
+           std::next(expr.operands().begin()),
+           expr.operands().end(),
+           [&](const exprt &operand) {
+             return can_cast_expr<constant_exprt>(operand) ||
+                    can_cast_expr<annotated_pointer_constant_exprt>(operand);
+           });
 }
 
 bool check_address_structure(const address_of_exprt &address)

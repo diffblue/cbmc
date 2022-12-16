@@ -213,7 +213,7 @@ std::string trace_numeric_value(
 {
   const typet &type = expr.type();
 
-  if(expr.id()==ID_constant)
+  if(expr.is_constant())
   {
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||

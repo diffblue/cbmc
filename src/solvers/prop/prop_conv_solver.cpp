@@ -153,7 +153,7 @@ optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
 
 literalt prop_conv_solvert::convert(const exprt &expr)
 {
-  if(!use_cache || expr.id() == ID_symbol || expr.id() == ID_constant)
+  if(!use_cache || expr.id() == ID_symbol || expr.is_constant())
   {
     literalt literal = convert_bool(expr);
     if(freeze_all && !literal.is_constant())

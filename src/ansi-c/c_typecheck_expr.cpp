@@ -176,7 +176,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
 {
   if(expr.id()==ID_side_effect)
     typecheck_expr_side_effect(to_side_effect_expr(expr));
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
     typecheck_expr_constant(expr);
   else if(expr.id()==ID_infinity)
   {
@@ -860,8 +860,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     follow_macros(expr);
 
     #if 0
-    if(expr.id()==ID_constant &&
-       !base_name.empty())
+    if(expr.is_constant() && !base_name.empty())
       expr.set(ID_C_cformat, base_name);
     else
     #endif
