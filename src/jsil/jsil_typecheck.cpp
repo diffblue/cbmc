@@ -602,12 +602,8 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
     if(s_it==symbol_table.symbols.end())
     {
       // create new symbol
-      symbolt new_symbol;
-      new_symbol.name=identifier;
-      new_symbol.type=symbol_expr.type();
+      symbolt new_symbol{identifier, symbol_expr.type(), "jsil"};
       new_symbol.base_name=identifier_base;
-      new_symbol.mode="jsil";
-      new_symbol.is_type=false;
       new_symbol.is_lvalue=new_symbol.type.id()!=ID_code;
 
       // mark as already typechecked
@@ -787,11 +783,7 @@ void jsil_typecheckt::typecheck_function_call(
     else
     {
       // Should be function, declaration not found yet
-      symbolt new_symbol;
-      new_symbol.name=id;
-      new_symbol.type = code_typet({}, typet());
-      new_symbol.mode="jsil";
-      new_symbol.is_type=false;
+      symbolt new_symbol{id, code_typet({}, typet()), "jsil"};
       new_symbol.value=exprt("no-body-just-yet");
 
       make_type_compatible(lhs, jsil_any_type(), true);

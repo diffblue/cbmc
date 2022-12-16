@@ -24,11 +24,8 @@ void jsil_internal_additions(symbol_table_baset &dest)
   // add __CPROVER_rounding_mode
 
   {
-    symbolt symbol;
-    symbol.name = rounding_mode_identifier();
+    symbolt symbol{rounding_mode_identifier(), signed_int_type(), ID_C};
     symbol.base_name = symbol.name;
-    symbol.type=signed_int_type();
-    symbol.mode=ID_C;
     symbol.is_lvalue=true;
     symbol.is_state_var=true;
     symbol.is_thread_local=true;
@@ -42,22 +39,16 @@ void jsil_internal_additions(symbol_table_baset &dest)
   {
     code_typet eval_type({code_typet::parametert(typet())}, empty_typet());
 
-    symbolt symbol;
+    symbolt symbol{"eval", eval_type, "jsil"};
     symbol.base_name="eval";
-    symbol.name="eval";
-    symbol.type=eval_type;
-    symbol.mode="jsil";
     dest.add(symbol);
   }
 
   // add nan
 
   {
-    symbolt symbol;
+    symbolt symbol{"nan", floatbv_typet(), "jsil"};
     symbol.base_name="nan";
-    symbol.name="nan";
-    symbol.type=floatbv_typet();
-    symbol.mode="jsil";
     // mark as already typechecked
     symbol.is_extern=true;
     dest.add(symbol);
@@ -66,11 +57,8 @@ void jsil_internal_additions(symbol_table_baset &dest)
   // add empty symbol used for decl statements
 
   {
-    symbolt symbol;
+    symbolt symbol{"decl_symbol", empty_typet(), "jsil"};
     symbol.base_name="decl_symbol";
-    symbol.name="decl_symbol";
-    symbol.type=empty_typet();
-    symbol.mode="jsil";
     // mark as already typechecked
     symbol.is_extern=true;
     dest.add(symbol);
@@ -92,13 +80,8 @@ void jsil_internal_additions(symbol_table_baset &dest)
 
   for(const auto &identifier : builtin_objects)
   {
-    symbolt new_symbol;
-    new_symbol.name=identifier;
-    new_symbol.type=jsil_builtin_object_type();
+    symbolt new_symbol{identifier, jsil_builtin_object_type(), "jsil"};
     new_symbol.base_name=identifier;
-    new_symbol.mode="jsil";
-    new_symbol.is_type=false;
-    new_symbol.is_lvalue=false;
     // mark as already typechecked
     new_symbol.is_extern=true;
     dest.add(new_symbol);
