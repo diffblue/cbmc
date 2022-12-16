@@ -125,228 +125,224 @@ $(document).ready(function(){initNavTree('boolbv__quantifier_8cpp_source.html','
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">if</span>(y.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_ge)</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;y_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(y);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, y_binary.lhs()) &amp;&amp; y_binary.rhs().id() == ID_constant)</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(y_binary.rhs());</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      }</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordflow">if</span>(var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_unsignedbv)</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(quantifier_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_and)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;x : quantifier_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <span class="keywordflow">if</span>(x.id()!=ID_ge)</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;x_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(x);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, x_binary.lhs()) &amp;&amp; x_binary.rhs().id() == ID_constant)</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(x_binary.rhs());</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      }</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordflow">if</span>(var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_unsignedbv)</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">static</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;constant_exprt&gt;</a></div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">   80</a></span>&#160;<a class="code" href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">get_quantifier_var_max</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;var_expr, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;quantifier_expr)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">if</span>(quantifier_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_or)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;x : quantifier_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keywordflow">if</span>(x.id()!=ID_ge)</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;x_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(x);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, x_binary.lhs()) &amp;&amp; x_binary.rhs().id() == ID_constant)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keyword">const</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a> &amp;over_expr = <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(x_binary.rhs());</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> over_i = numeric_cast_v&lt;mp_integer&gt;(over_expr);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        over_i-=1;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(over_i, x_binary.rhs().type());</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  }</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;x : quantifier_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="keywordflow">if</span>(x.id()!=ID_not)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, y_binary.lhs()) &amp;&amp; y_binary.rhs().is_constant())</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(y_binary.rhs());</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">if</span>(var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_unsignedbv)</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(quantifier_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_and)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;x : quantifier_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">if</span>(x.id()!=ID_ge)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;x_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(x);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, x_binary.lhs()) &amp;&amp; x_binary.rhs().is_constant())</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(x_binary.rhs());</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordflow">if</span>(var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_unsignedbv)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;}</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">static</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;constant_exprt&gt;</a></div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">   78</a></span>&#160;<a class="code" href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">get_quantifier_var_max</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;var_expr, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;quantifier_expr)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keywordflow">if</span>(quantifier_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_or)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;x : quantifier_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      <span class="keywordflow">if</span>(x.id()!=ID_ge)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;x_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(x);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, x_binary.lhs()) &amp;&amp; x_binary.rhs().is_constant())</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keyword">const</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a> &amp;over_expr = <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(x_binary.rhs());</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> over_i = numeric_cast_v&lt;mp_integer&gt;(over_expr);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        over_i-=1;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(over_i, x_binary.rhs().type());</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;x : quantifier_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <span class="keywordflow">if</span>(x.id()!=ID_not)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <a class="code" href="classexprt.html">exprt</a> y = <a class="code" href="std__expr_8h.html#a6662a285d4d229964538bfc2113f19c7">to_not_expr</a>(x).<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="keywordflow">if</span>(y.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_ge)</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <a class="code" href="classexprt.html">exprt</a> y = <a class="code" href="std__expr_8h.html#a6662a285d4d229964538bfc2113f19c7">to_not_expr</a>(x).<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>();</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keywordflow">if</span>(y.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_ge)</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;y_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(y);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, y_binary.lhs()) &amp;&amp; y_binary.rhs().id() == ID_constant)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keyword">const</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a> &amp;over_expr = <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(y_binary.rhs());</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> over_i = numeric_cast_v&lt;mp_integer&gt;(over_expr);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        over_i-=1;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(over_i, y_binary.rhs().type());</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno"><a class="line" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">  138</a></span>&#160;<span class="keyword">static</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a>(</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="keyword">const</span> <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a> &amp;expr,</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;{</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().size() &gt; 1)</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="comment">// Qx,y.P(x,y) is the same as Qx.Qy.P(x,y)</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keyword">auto</span> new_variables = expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>();</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    new_variables.pop_back();</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keyword">auto</span> new_expression = <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(),</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().back(),</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), new_variables, expr.<a class="code" href="classbinding__exprt.html#a2b4b3083a57a5d0d14057ecdba159513">where</a>()));</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a>(new_expression, ns);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;var_expr = expr.<a class="code" href="classquantifier__exprt.html#a6de99fd6fd13716f29b2892bbddc0a5d">symbol</a>();</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> where_simplified = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(expr.<a class="code" href="classbinding__exprt.html#a2b4b3083a57a5d0d14057ecdba159513">where</a>(), ns);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keywordflow">if</span>(where_simplified.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>() || where_simplified.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">return</span> where_simplified;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keywordflow">if</span>(var_expr.<a class="code" href="classexprt.html#a5fe12260ebfb9d8406806d32d6a32c37">is_boolean</a>())</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="comment">// Expand in full.</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">// This grows worst-case exponentially in the quantifier nesting depth.</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_forall)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    {</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="comment">// ∀b.f(b) &lt;===&gt; f(0)∧f(1)</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classand__exprt.html">and_exprt</a>(</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({false_exprt()}), expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({true_exprt()}));</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    }</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_exists)</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="comment">// ∃b.f(b) &lt;===&gt; f(0)∨f(1)</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classor__exprt.html">or_exprt</a>(</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({false_exprt()}), expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({true_exprt()}));</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    }</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;constant_exprt&gt;</a> min_i =</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <a class="code" href="boolbv__quantifier_8cpp.html#a42dbfe0b711b4305d5f8d620fe2ee754">get_quantifier_var_min</a>(var_expr, where_simplified);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;constant_exprt&gt;</a> max_i =</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <a class="code" href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">get_quantifier_var_max</a>(var_expr, where_simplified);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <span class="keywordflow">if</span>(!min_i.has_value() || !max_i.has_value())</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> lb = numeric_cast_v&lt;mp_integer&gt;(min_i.value());</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> ub = numeric_cast_v&lt;mp_integer&gt;(max_i.value());</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <span class="keywordflow">if</span>(lb &gt; ub)</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keyword">auto</span> expr_simplified =</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>(), where_simplified);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  std::vector&lt;exprt&gt; expr_insts;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> i = lb; i &lt;= ub; ++i)</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  {</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <a class="code" href="classexprt.html">exprt</a> constraint_expr =</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      expr_simplified.instantiate({<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(i, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())});</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    expr_insts.push_back(constraint_expr);</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  }</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_forall)</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  {</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">// maintain the domain constraint if it isn&#39;t guaranteed</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="comment">// by the instantiations (for a disjunction the domain</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="comment">// constraint is implied by the instantiations)</span></div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">if</span>(where_simplified.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_and)</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    {</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        var_expr, ID_gt, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(lb, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        var_expr, ID_le, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(ub, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    }</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(expr_insts), ns);</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  }</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_exists)</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  {</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">// maintain the domain constraint if it isn&#39;t trivially satisfied</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">// by the instantiations (for a conjunction the instantiations are</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="comment">// stronger constraints)</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordflow">if</span>(where_simplified.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_or)</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    {</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        var_expr, ID_gt, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(lb, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        var_expr, ID_le, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(ub, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    }</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="std__expr_8cpp.html#a4d859ac2f51f3b898154a185ddd2daa2">disjunction</a>(expr_insts), ns);</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  }</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;y_binary = <a class="code" href="std__expr_8h.html#af1e0baf6cb398a6874d05477adb48a13">to_binary_relation_expr</a>(y);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a>(var_expr, y_binary.lhs()) &amp;&amp; y_binary.rhs().is_constant())</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keyword">const</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a> &amp;over_expr = <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(y_binary.rhs());</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> over_i = numeric_cast_v&lt;mp_integer&gt;(over_expr);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        over_i-=1;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(over_i, y_binary.rhs().type());</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  }</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;}</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno"><a class="line" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">  134</a></span>&#160;<span class="keyword">static</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a>(</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="keyword">const</span> <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a> &amp;expr,</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;{</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().size() &gt; 1)</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  {</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="comment">// Qx,y.P(x,y) is the same as Qx.Qy.P(x,y)</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keyword">auto</span> new_variables = expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>();</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    new_variables.pop_back();</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keyword">auto</span> new_expression = <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(),</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>().back(),</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), new_variables, expr.<a class="code" href="classbinding__exprt.html#a2b4b3083a57a5d0d14057ecdba159513">where</a>()));</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a>(new_expression, ns);</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;var_expr = expr.<a class="code" href="classquantifier__exprt.html#a6de99fd6fd13716f29b2892bbddc0a5d">symbol</a>();</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> where_simplified = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(expr.<a class="code" href="classbinding__exprt.html#a2b4b3083a57a5d0d14057ecdba159513">where</a>(), ns);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordflow">if</span>(where_simplified.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>() || where_simplified.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">return</span> where_simplified;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  }</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordflow">if</span>(var_expr.<a class="code" href="classexprt.html#a5fe12260ebfb9d8406806d32d6a32c37">is_boolean</a>())</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  {</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="comment">// Expand in full.</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">// This grows worst-case exponentially in the quantifier nesting depth.</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_forall)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="comment">// ∀b.f(b) &lt;===&gt; f(0)∧f(1)</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classand__exprt.html">and_exprt</a>(</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({false_exprt()}), expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({true_exprt()}));</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_exists)</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="comment">// ∃b.f(b) &lt;===&gt; f(0)∨f(1)</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classor__exprt.html">or_exprt</a>(</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({false_exprt()}), expr.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>({true_exprt()}));</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;constant_exprt&gt;</a> min_i =</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <a class="code" href="boolbv__quantifier_8cpp.html#a42dbfe0b711b4305d5f8d620fe2ee754">get_quantifier_var_min</a>(var_expr, where_simplified);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;constant_exprt&gt;</a> max_i =</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <a class="code" href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">get_quantifier_var_max</a>(var_expr, where_simplified);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keywordflow">if</span>(!min_i.has_value() || !max_i.has_value())</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> lb = numeric_cast_v&lt;mp_integer&gt;(min_i.value());</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> ub = numeric_cast_v&lt;mp_integer&gt;(max_i.value());</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  <span class="keywordflow">if</span>(lb &gt; ub)</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <span class="keyword">auto</span> expr_simplified =</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), expr.<a class="code" href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">variables</a>(), where_simplified);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  std::vector&lt;exprt&gt; expr_insts;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> i = lb; i &lt;= ub; ++i)</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  {</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <a class="code" href="classexprt.html">exprt</a> constraint_expr =</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      expr_simplified.instantiate({<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(i, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())});</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    expr_insts.push_back(constraint_expr);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_forall)</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">// maintain the domain constraint if it isn&#39;t guaranteed</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">// by the instantiations (for a disjunction the domain</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="comment">// constraint is implied by the instantiations)</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">if</span>(where_simplified.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_and)</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    {</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        var_expr, ID_gt, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(lb, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        var_expr, ID_le, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(ub, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="std__expr_8cpp.html#a009993933b4e656e434c7b1a51b83291">conjunction</a>(expr_insts), ns);</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_exists)</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">// maintain the domain constraint if it isn&#39;t trivially satisfied</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">// by the instantiations (for a conjunction the instantiations are</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">// stronger constraints)</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">if</span>(where_simplified.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_or)</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    {</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        var_expr, ID_gt, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(lb, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      expr_insts.push_back(<a class="code" href="classbinary__predicate__exprt.html">binary_predicate_exprt</a>(</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        var_expr, ID_le, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(ub, var_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>())));</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    }</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="std__expr_8cpp.html#a4d859ac2f51f3b898154a185ddd2daa2">disjunction</a>(expr_insts), ns);</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  }</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;}</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno"><a class="line" href="classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece">  243</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece">boolbvt::convert_quantifier</a>(<span class="keyword">const</span> <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a> &amp;src)</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;{</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_forall || src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_exists);</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece">  247</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece">boolbvt::convert_quantifier</a>(<span class="keyword">const</span> <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a> &amp;src)</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;{</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_forall || src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_exists);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="comment">// We first worry about the scoping of the symbols bound by the quantifier.</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="keyword">auto</span> fresh_symbols = <a class="code" href="classboolbvt.html#a3a209adfddec76c2df966f386abe8c15">fresh_binding</a>(src);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="comment">// replace in where()</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keyword">auto</span> where_replaced = src.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>(fresh_symbols);</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="comment">// We first worry about the scoping of the symbols bound by the quantifier.</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="keyword">auto</span> fresh_symbols = <a class="code" href="classboolbvt.html#a3a209adfddec76c2df966f386abe8c15">fresh_binding</a>(src);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="comment">// replace in where()</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keyword">auto</span> where_replaced = src.<a class="code" href="classbinding__exprt.html#aaad86c80e00880f284ba80e83b3e448a">instantiate</a>(fresh_symbols);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="comment">// produce new quantifier expression</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keyword">auto</span> new_src =</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), std::move(fresh_symbols), where_replaced);</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="comment">// produce new quantifier expression</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keyword">auto</span> new_src =</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <a class="code" href="classquantifier__exprt.html">quantifier_exprt</a>(src.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), std::move(fresh_symbols), where_replaced);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> res = <a class="code" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a>(src, <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="keywordflow">if</span>(res)</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classprop__conv__solvert.html#a0e425a3d546b908a4cb09a911a945592">convert_bool</a>(*res);</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="comment">// we failed to instantiate here, need to pass to post-processing</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>.emplace_back(<a class="code" href="classboolbvt_1_1quantifiert.html">quantifiert</a>(src, <a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#acd417a4b281966755360a57a77a78b48">new_variable</a>()));</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>.back().l;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;}</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00272"></a><span class="lineno"><a class="line" href="classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45">  272</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45">boolbvt::finish_eager_conversion_quantifiers</a>()</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;{</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>.empty())</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="comment">// we do not yet have any elaborate post-processing</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;q : <a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>)</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(q.expr);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> res = <a class="code" href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a>(src, <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">if</span>(res)</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classprop__conv__solvert.html#a0e425a3d546b908a4cb09a911a945592">convert_bool</a>(*res);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="comment">// we failed to instantiate here, need to pass to post-processing</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>.emplace_back(<a class="code" href="classboolbvt_1_1quantifiert.html">quantifiert</a>(src, <a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>.<a class="code" href="classpropt.html#acd417a4b281966755360a57a77a78b48">new_variable</a>()));</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>.back().l;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;}</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00268"></a><span class="lineno"><a class="line" href="classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45">  268</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45">boolbvt::finish_eager_conversion_quantifiers</a>()</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;{</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>.empty())</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="comment">// we do not yet have any elaborate post-processing</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;q : <a class="code" href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">quantifier_list</a>)</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(q.expr);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="aboolbv_8h_html"><div class="ttname"><a href="boolbv_8h.html">boolbv.h</a></div></div>
-<div class="ttc" id="aboolbv__quantifier_8cpp_html_a277c3cac0cab510a9a7399975588aec1"><div class="ttname"><a href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a></div><div class="ttdeci">static optionalt&lt; exprt &gt; eager_quantifier_instantiation(const quantifier_exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00138">boolbv_quantifier.cpp:138</a></div></div>
+<div class="ttc" id="aboolbv__quantifier_8cpp_html_a277c3cac0cab510a9a7399975588aec1"><div class="ttname"><a href="boolbv__quantifier_8cpp.html#a277c3cac0cab510a9a7399975588aec1">eager_quantifier_instantiation</a></div><div class="ttdeci">static optionalt&lt; exprt &gt; eager_quantifier_instantiation(const quantifier_exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00134">boolbv_quantifier.cpp:134</a></div></div>
 <div class="ttc" id="aboolbv__quantifier_8cpp_html_a312cdb1b916e963335ae84f0195756d6"><div class="ttname"><a href="boolbv__quantifier_8cpp.html#a312cdb1b916e963335ae84f0195756d6">expr_eq</a></div><div class="ttdeci">static bool expr_eq(const exprt &amp;expr1, const exprt &amp;expr2)</div><div class="ttdoc">A method to detect equivalence between experts that can contain typecast.</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00017">boolbv_quantifier.cpp:17</a></div></div>
 <div class="ttc" id="aboolbv__quantifier_8cpp_html_a42dbfe0b711b4305d5f8d620fe2ee754"><div class="ttname"><a href="boolbv__quantifier_8cpp.html#a42dbfe0b711b4305d5f8d620fe2ee754">get_quantifier_var_min</a></div><div class="ttdeci">static optionalt&lt; constant_exprt &gt; get_quantifier_var_min(const exprt &amp;var_expr, const exprt &amp;quantifier_expr)</div><div class="ttdoc">To obtain the min value for the quantifier variable of the specified forall/exists operator.</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00026">boolbv_quantifier.cpp:26</a></div></div>
-<div class="ttc" id="aboolbv__quantifier_8cpp_html_ac0894cf51d6a49eec03aba6dcc8ec5d2"><div class="ttname"><a href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">get_quantifier_var_max</a></div><div class="ttdeci">static optionalt&lt; constant_exprt &gt; get_quantifier_var_max(const exprt &amp;var_expr, const exprt &amp;quantifier_expr)</div><div class="ttdoc">To obtain the max value for the quantifier variable of the specified forall/exists operator.</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00080">boolbv_quantifier.cpp:80</a></div></div>
+<div class="ttc" id="aboolbv__quantifier_8cpp_html_ac0894cf51d6a49eec03aba6dcc8ec5d2"><div class="ttname"><a href="boolbv__quantifier_8cpp.html#ac0894cf51d6a49eec03aba6dcc8ec5d2">get_quantifier_var_max</a></div><div class="ttdeci">static optionalt&lt; constant_exprt &gt; get_quantifier_var_max(const exprt &amp;var_expr, const exprt &amp;quantifier_expr)</div><div class="ttdoc">To obtain the max value for the quantifier variable of the specified forall/exists operator.</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00078">boolbv_quantifier.cpp:78</a></div></div>
 <div class="ttc" id="aclassand__exprt_html"><div class="ttname"><a href="classand__exprt.html">and_exprt</a></div><div class="ttdoc">Boolean AND.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02070">std_expr.h:2071</a></div></div>
 <div class="ttc" id="aclassarrayst_html_a218964ded2d9d313b4f7427cfee03d0e"><div class="ttname"><a href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">arrayst::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="arrays_8h_source.html#l00056">arrays.h:56</a></div></div>
 <div class="ttc" id="aclassbinary__predicate__exprt_html"><div class="ttname"><a href="classbinary__predicate__exprt.html">binary_predicate_exprt</a></div><div class="ttdoc">A base class for expressions that are predicates, i.e., Boolean-typed, and that take exactly two argu...</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00675">std_expr.h:676</a></div></div>
@@ -355,15 +351,15 @@ $(document).ready(function(){initNavTree('boolbv__quantifier_8cpp_source.html','
 <div class="ttc" id="aclassbinding__exprt_html_ad037f0418443cfe0d6800706492405a1"><div class="ttname"><a href="classbinding__exprt.html#ad037f0418443cfe0d6800706492405a1">binding_exprt::variables</a></div><div class="ttdeci">variablest &amp; variables()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03073">std_expr.h:3073</a></div></div>
 <div class="ttc" id="aclassboolbvt_1_1quantifiert_html"><div class="ttname"><a href="classboolbvt_1_1quantifiert.html">boolbvt::quantifiert</a></div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8h_source.html#l00253">boolbv.h:254</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_a3a209adfddec76c2df966f386abe8c15"><div class="ttname"><a href="classboolbvt.html#a3a209adfddec76c2df966f386abe8c15">boolbvt::fresh_binding</a></div><div class="ttdeci">binding_exprt::variablest fresh_binding(const binding_exprt &amp;)</div><div class="ttdoc">create new, unique variables for the given binding</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8cpp_source.html#l00536">boolbv.cpp:536</a></div></div>
-<div class="ttc" id="aclassboolbvt_html_a461f847e5b1d1c737d1ab2e39063ce45"><div class="ttname"><a href="classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45">boolbvt::finish_eager_conversion_quantifiers</a></div><div class="ttdeci">void finish_eager_conversion_quantifiers()</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00272">boolbv_quantifier.cpp:272</a></div></div>
-<div class="ttc" id="aclassboolbvt_html_a5df3a1617336f6f1773b4aafb71fcece"><div class="ttname"><a href="classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece">boolbvt::convert_quantifier</a></div><div class="ttdeci">virtual literalt convert_quantifier(const quantifier_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00247">boolbv_quantifier.cpp:247</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_a461f847e5b1d1c737d1ab2e39063ce45"><div class="ttname"><a href="classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45">boolbvt::finish_eager_conversion_quantifiers</a></div><div class="ttdeci">void finish_eager_conversion_quantifiers()</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00268">boolbv_quantifier.cpp:268</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_a5df3a1617336f6f1773b4aafb71fcece"><div class="ttname"><a href="classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece">boolbvt::convert_quantifier</a></div><div class="ttdeci">virtual literalt convert_quantifier(const quantifier_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__quantifier_8cpp_source.html#l00243">boolbv_quantifier.cpp:243</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_ac8296cf364960234058f1a489ffa5a8d"><div class="ttname"><a href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">boolbvt::conversion_failed</a></div><div class="ttdeci">bvt conversion_failed(const exprt &amp;expr)</div><div class="ttdoc">Print that the expression of x has failed conversion, then return a vector of x's width.</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8cpp_source.html#l00082">boolbv.cpp:82</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_aca1804a407ee5d2d86766f9e45764a1f"><div class="ttname"><a href="classboolbvt.html#aca1804a407ee5d2d86766f9e45764a1f">boolbvt::quantifier_list</a></div><div class="ttdeci">quantifier_listt quantifier_list</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8h_source.html#l00266">boolbv.h:266</a></div></div>
 <div class="ttc" id="aclassconstant__exprt_html"><div class="ttname"><a href="classconstant__exprt.html">constant_exprt</a></div><div class="ttdoc">A constant literal expression.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02941">std_expr.h:2942</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
-<div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
-<div class="ttc" id="aclassexprt_html_a5fe12260ebfb9d8406806d32d6a32c37"><div class="ttname"><a href="classexprt.html#a5fe12260ebfb9d8406806d32d6a32c37">exprt::is_boolean</a></div><div class="ttdeci">bool is_boolean() const</div><div class="ttdoc">Return whether the expression represents a Boolean.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00210">expr.h:210</a></div></div>
-<div class="ttc" id="aclassexprt_html_a727eaab489ece52bb6abbee2af9bc019"><div class="ttname"><a href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">exprt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdoc">Return whether the expression is a constant representing false.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00041">expr.cpp:41</a></div></div>
+<div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00027">expr.cpp:27</a></div></div>
+<div class="ttc" id="aclassexprt_html_a5fe12260ebfb9d8406806d32d6a32c37"><div class="ttname"><a href="classexprt.html#a5fe12260ebfb9d8406806d32d6a32c37">exprt::is_boolean</a></div><div class="ttdeci">bool is_boolean() const</div><div class="ttdoc">Return whether the expression represents a Boolean.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00216">expr.h:216</a></div></div>
+<div class="ttc" id="aclassexprt_html_a727eaab489ece52bb6abbee2af9bc019"><div class="ttname"><a href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">exprt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdoc">Return whether the expression is a constant representing false.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
@@ -380,7 +376,7 @@ $(document).ready(function(){initNavTree('boolbv__quantifier_8cpp_source.html','
 <div class="ttc" id="aexpr__util_8cpp_html_aa79cc1bbca02fcac0ab2f9344a240136"><div class="ttname"><a href="expr__util_8cpp.html#aa79cc1bbca02fcac0ab2f9344a240136">skip_typecast</a></div><div class="ttdeci">const exprt &amp; skip_typecast(const exprt &amp;expr)</div><div class="ttdoc">find the expression nested inside typecasts, if any</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00219">expr_util.cpp:219</a></div></div>
 <div class="ttc" id="aexpr__util_8h_html"><div class="ttname"><a href="expr__util_8h.html">expr_util.h</a></div><div class="ttdoc">Deprecated expression utility functions.</div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
-<div class="ttc" id="asimplify__expr_8cpp_html_adebe9c3e4a7aac67777c20e448f6f2bc"><div class="ttname"><a href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a></div><div class="ttdeci">exprt simplify_expr(exprt src, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03023">simplify_expr.cpp:3023</a></div></div>
+<div class="ttc" id="asimplify__expr_8cpp_html_adebe9c3e4a7aac67777c20e448f6f2bc"><div class="ttname"><a href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a></div><div class="ttdeci">exprt simplify_expr(exprt src, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03024">simplify_expr.cpp:3024</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>

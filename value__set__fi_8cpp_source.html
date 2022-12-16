@@ -1109,416 +1109,414 @@ $(document).ready(function(){initNavTree('value__set__fi_8cpp_source.html',''); 
 <div class="line"><a name="l01017"></a><span class="lineno"> 1017</span>&#160;                <span class="stringliteral">&quot;rhs.type():\n&quot;</span>+rhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>()+<span class="stringliteral">&quot;\n&quot;</span>+</div>
 <div class="line"><a name="l01018"></a><span class="lineno"> 1018</span>&#160;                <span class="stringliteral">&quot;type:\n&quot;</span>+lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>();</div>
 <div class="line"><a name="l01019"></a><span class="lineno"> 1019</span>&#160; </div>
-<div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160;        <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_struct ||</div>
-<div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160;           rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_constant)</div>
-<div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;        {</div>
-<div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;          <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;            <a class="code" href="abstract__environment_8h.html#a7d48c0be045ec87e8bfc065e4674508fa7fa3b767c460b54a2be4d49030b349c7">no</a> &lt; rhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size(), <span class="stringliteral">&quot;component index must be in bounds&quot;</span>);</div>
-<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;          rhs_member=rhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[<a class="code" href="abstract__environment_8h.html#a7d48c0be045ec87e8bfc065e4674508fa7fa3b767c460b54a2be4d49030b349c7">no</a>];</div>
-<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;        }</div>
-<div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_with)</div>
-<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;        {</div>
-<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;          <span class="comment">// see if this is the member we want</span></div>
-<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;          <span class="keyword">const</span> <span class="keyword">auto</span> &amp;rhs_with = <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(rhs);</div>
-<div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;          <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;member_operand = rhs_with.where();</div>
-<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160; </div>
-<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;          <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;component_name=</div>
-<div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;            member_operand.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_component_name);</div>
-<div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160; </div>
-<div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;          <span class="keywordflow">if</span>(component_name==name)</div>
-<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;          {</div>
-<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;            <span class="comment">// yes! just take op2</span></div>
-<div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;            rhs_member = rhs_with.new_value();</div>
-<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;          }</div>
-<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;          {</div>
-<div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;            <span class="comment">// no! do op0</span></div>
-<div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;            rhs_member=<a class="code" href="classexprt.html">exprt</a>(ID_member, subtype);</div>
-<div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;            rhs_member.<a class="code" href="classexprt.html#a477ecb575e3644ca2670135b62f98c34">copy_to_operands</a>(rhs_with.old());</div>
-<div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;            rhs_member.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_component_name, name);</div>
-<div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;          }</div>
-<div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;        }</div>
-<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;        {</div>
-<div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;          rhs_member=<a class="code" href="classexprt.html">exprt</a>(ID_member, subtype);</div>
-<div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160;          rhs_member.<a class="code" href="classexprt.html#a477ecb575e3644ca2670135b62f98c34">copy_to_operands</a>(rhs);</div>
-<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;          rhs_member.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_component_name, name);</div>
-<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;        }</div>
-<div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160; </div>
-<div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_member, rhs_member, ns);</div>
-<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;      }</div>
-<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;    }</div>
-<div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;  }</div>
-<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;  {</div>
-<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;    <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> lhs_index(</div>
-<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;      lhs,</div>
-<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;      <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>()),</div>
-<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;      <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
-<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160; </div>
-<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;    <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_unknown ||</div>
-<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;       rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_invalid)</div>
-<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;    {</div>
-<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;      <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(</div>
-<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;        lhs_index, <a class="code" href="classexprt.html">exprt</a>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type()), ns);</div>
-<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;    }</div>
-<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;    {</div>
-<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;      <span class="comment">// do nothing</span></div>
-<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;    }</div>
-<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;    {</div>
-<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;      <span class="keywordflow">if</span>(rhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() != type)</div>
-<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;value_set_fit::assign type mismatch: &quot;</span></div>
-<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;              <span class="stringliteral">&quot;rhs.type():\n&quot;</span>+rhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>()+<span class="stringliteral">&quot;\n&quot;</span>+</div>
-<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;              <span class="stringliteral">&quot;type:\n&quot;</span>+type.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>();</div>
-<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160; </div>
-<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;      <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array_of)</div>
-<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;      {</div>
-<div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, <a class="code" href="std__expr_8h.html#a9ea196d6fad92905394e71928a64b6e2">to_array_of_expr</a>(rhs).what(), ns);</div>
-<div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;      }</div>
-<div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array ||</div>
-<div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;              rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_constant)</div>
-<div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;      {</div>
-<div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : rhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;        {</div>
-<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;          <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, op, ns);</div>
-<div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;        }</div>
-<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;      }</div>
-<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_with)</div>
-<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;      {</div>
-<div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;        <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> op0_index(</div>
-<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;          <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(rhs).old(),</div>
-<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;          <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>()),</div>
-<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;          <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
-<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160; </div>
-<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, op0_index, ns);</div>
-<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(rhs).new_value(), ns);</div>
-<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;      }</div>
-<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;      {</div>
-<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;        <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> rhs_index(</div>
-<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;          rhs,</div>
-<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;          <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>()),</div>
-<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;          <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
-<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, rhs_index, ns);</div>
-<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;      }</div>
-<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;    }</div>
-<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;  }</div>
-<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;  {</div>
-<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;    <span class="comment">// basic type</span></div>
-<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;    <a class="code" href="classreference__counting.html">object_mapt</a> values_rhs;</div>
+<div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160;        <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || rhs.<a class="code" href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">is_constant</a>())</div>
+<div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160;        {</div>
+<div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;          <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;            <a class="code" href="abstract__environment_8h.html#a7d48c0be045ec87e8bfc065e4674508fa7fa3b767c460b54a2be4d49030b349c7">no</a> &lt; rhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size(), <span class="stringliteral">&quot;component index must be in bounds&quot;</span>);</div>
+<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;          rhs_member=rhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[<a class="code" href="abstract__environment_8h.html#a7d48c0be045ec87e8bfc065e4674508fa7fa3b767c460b54a2be4d49030b349c7">no</a>];</div>
+<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;        }</div>
+<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_with)</div>
+<div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;        {</div>
+<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;          <span class="comment">// see if this is the member we want</span></div>
+<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;          <span class="keyword">const</span> <span class="keyword">auto</span> &amp;rhs_with = <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(rhs);</div>
+<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;          <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;member_operand = rhs_with.where();</div>
+<div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160; </div>
+<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;          <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;component_name=</div>
+<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;            member_operand.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_component_name);</div>
+<div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160; </div>
+<div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160;          <span class="keywordflow">if</span>(component_name==name)</div>
+<div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;          {</div>
+<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;            <span class="comment">// yes! just take op2</span></div>
+<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;            rhs_member = rhs_with.new_value();</div>
+<div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;          }</div>
+<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;          {</div>
+<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;            <span class="comment">// no! do op0</span></div>
+<div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;            rhs_member=<a class="code" href="classexprt.html">exprt</a>(ID_member, subtype);</div>
+<div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;            rhs_member.<a class="code" href="classexprt.html#a477ecb575e3644ca2670135b62f98c34">copy_to_operands</a>(rhs_with.old());</div>
+<div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;            rhs_member.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_component_name, name);</div>
+<div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;          }</div>
+<div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;        }</div>
+<div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;        {</div>
+<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;          rhs_member=<a class="code" href="classexprt.html">exprt</a>(ID_member, subtype);</div>
+<div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;          rhs_member.<a class="code" href="classexprt.html#a477ecb575e3644ca2670135b62f98c34">copy_to_operands</a>(rhs);</div>
+<div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160;          rhs_member.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_component_name, name);</div>
+<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;        }</div>
+<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160; </div>
+<div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_member, rhs_member, ns);</div>
+<div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;      }</div>
+<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;    }</div>
+<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;  }</div>
+<div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;  {</div>
+<div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;    <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> lhs_index(</div>
+<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;      lhs,</div>
+<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;      <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>()),</div>
+<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;      <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
+<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160; </div>
+<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;    <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_unknown ||</div>
+<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;       rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_invalid)</div>
+<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;    {</div>
+<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;      <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(</div>
+<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;        lhs_index, <a class="code" href="classexprt.html">exprt</a>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(), <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type()), ns);</div>
+<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;    }</div>
+<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;    {</div>
+<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;      <span class="comment">// do nothing</span></div>
+<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;    }</div>
+<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;    {</div>
+<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;      <span class="keywordflow">if</span>(rhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() != type)</div>
+<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;value_set_fit::assign type mismatch: &quot;</span></div>
+<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;              <span class="stringliteral">&quot;rhs.type():\n&quot;</span>+rhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>()+<span class="stringliteral">&quot;\n&quot;</span>+</div>
+<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;              <span class="stringliteral">&quot;type:\n&quot;</span>+type.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>();</div>
+<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160; </div>
+<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160;      <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array_of)</div>
+<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;      {</div>
+<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, <a class="code" href="std__expr_8h.html#a9ea196d6fad92905394e71928a64b6e2">to_array_of_expr</a>(rhs).what(), ns);</div>
+<div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;      }</div>
+<div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array || rhs.<a class="code" href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">is_constant</a>())</div>
+<div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;      {</div>
+<div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : rhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;        {</div>
+<div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;          <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, op, ns);</div>
+<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;        }</div>
+<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;      }</div>
+<div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(rhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_with)</div>
+<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;      {</div>
+<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;        <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> op0_index(</div>
+<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;          <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(rhs).old(),</div>
+<div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;          <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>()),</div>
+<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;          <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
+<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160; </div>
+<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, op0_index, ns);</div>
+<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(rhs).new_value(), ns);</div>
+<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;      }</div>
+<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;      {</div>
+<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;        <span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> rhs_index(</div>
+<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;          rhs,</div>
+<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;          <a class="code" href="classexprt.html">exprt</a>(ID_unknown, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>()),</div>
+<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;          <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
+<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;        <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs_index, rhs_index, ns);</div>
+<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;      }</div>
+<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;    }</div>
+<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;  }</div>
+<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;  {</div>
+<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;    <span class="comment">// basic type</span></div>
+<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;    <a class="code" href="classreference__counting.html">object_mapt</a> values_rhs;</div>
+<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160; </div>
+<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;    <a class="code" href="classvalue__set__fit.html#a5b415d493a4915dedb6392b92093eaa4">get_value_set</a>(rhs, values_rhs, ns);</div>
 <div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160; </div>
-<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;    <a class="code" href="classvalue__set__fit.html#a5b415d493a4915dedb6392b92093eaa4">get_value_set</a>(rhs, values_rhs, ns);</div>
-<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160; </div>
-<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;    <a class="code" href="classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71">assign_recursion_sett</a> recset;</div>
-<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(lhs, values_rhs, <span class="stringliteral">&quot;&quot;</span>, ns, recset);</div>
-<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;  }</div>
-<div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160;}</div>
-<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160; </div>
-<div class="line"><a name="l01128"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f"> 1128</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">value_set_fit::assign_rec</a>(</div>
-<div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs,</div>
-<div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;  <span class="keyword">const</span> <a class="code" href="classreference__counting.html">object_mapt</a> &amp;values_rhs,</div>
-<div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
-<div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l01133"></a><span class="lineno"> 1133</span>&#160;  <a class="code" href="classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71">assign_recursion_sett</a> &amp;recursion_set)</div>
-<div class="line"><a name="l01134"></a><span class="lineno"> 1134</span>&#160;{</div>
-<div class="line"><a name="l01135"></a><span class="lineno"> 1135</span>&#160;<span class="preprocessor">  #if 0</span></div>
-<div class="line"><a name="l01136"></a><span class="lineno"> 1136</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;ASSIGN_REC LHS: &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(lhs) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;ASSIGN_REC SUFFIX: &quot;</span> &lt;&lt; suffix &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160; </div>
-<div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="classvalue__set__fit_1_1object__map__dt.html#ae9835d9f9ee11fd6419845cd8a3acb33">object_map_dt::const_iterator</a> it=values_rhs.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>().<a class="code" href="classvalue__set__fit_1_1object__map__dt.html#ae8afd1120feeb59414d640340ab7e741">begin</a>();</div>
-<div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160;      it!=values_rhs.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>().<a class="code" href="classvalue__set__fit_1_1object__map__dt.html#a702457e5439dcb3b708f5c38dabb88da">end</a>(); it++)</div>
-<div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;ASSIGN_REC RHS: &quot;</span> &lt;&lt; <a class="code" href="classvalue__set__fit.html#addc8d37ed2eaef79a835068a92dca462">to_expr</a>(it) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160; </div>
-<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;  <span class="keywordflow">if</span>(lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;#REF#&quot;</span>)</div>
-<div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;  {</div>
-<div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;ident = lhs.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_identifier);</div>
-<div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;    <a class="code" href="classreference__counting.html">object_mapt</a> temp;</div>
-<div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;    <a class="code" href="classvalue__set__fit.html#ad76fce18b27962024c7403e4f7f2c61e">gvs_recursion_sett</a> recset;</div>
-<div class="line"><a name="l01149"></a><span class="lineno"> 1149</span>&#160;    <a class="code" href="classvalue__set__fit.html#a77de525ddc87f099e2aa75df4b020c4f">get_value_set_rec</a>(</div>
-<div class="line"><a name="l01150"></a><span class="lineno"> 1150</span>&#160;      lhs, temp, <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>(), ns, recset);</div>
-<div class="line"><a name="l01151"></a><span class="lineno"> 1151</span>&#160; </div>
-<div class="line"><a name="l01152"></a><span class="lineno"> 1152</span>&#160;    <span class="keywordflow">if</span>(recursion_set.find(ident)!=recursion_set.end())</div>
-<div class="line"><a name="l01153"></a><span class="lineno"> 1153</span>&#160;    {</div>
-<div class="line"><a name="l01154"></a><span class="lineno"> 1154</span>&#160;      recursion_set.insert(ident);</div>
-<div class="line"><a name="l01155"></a><span class="lineno"> 1155</span>&#160; </div>
-<div class="line"><a name="l01156"></a><span class="lineno"> 1156</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;object_entry : temp.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>())</div>
-<div class="line"><a name="l01157"></a><span class="lineno"> 1157</span>&#160;      {</div>
-<div class="line"><a name="l01158"></a><span class="lineno"> 1158</span>&#160;        <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keywordtype">object</span> = <a class="code" href="classvalue__set__fit.html#a1cc32712dfac7900796f5d51534d124a">object_numbering</a>[object_entry.first];</div>
-<div class="line"><a name="l01159"></a><span class="lineno"> 1159</span>&#160; </div>
-<div class="line"><a name="l01160"></a><span class="lineno"> 1160</span>&#160;        <span class="keywordflow">if</span>(<span class="keywordtype">object</span>.<span class="keywordtype">id</span>() != ID_unknown)</div>
-<div class="line"><a name="l01161"></a><span class="lineno"> 1161</span>&#160;          <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(<span class="keywordtype">object</span>, values_rhs, suffix, ns, recursion_set);</div>
-<div class="line"><a name="l01162"></a><span class="lineno"> 1162</span>&#160;      }</div>
-<div class="line"><a name="l01163"></a><span class="lineno"> 1163</span>&#160; </div>
-<div class="line"><a name="l01164"></a><span class="lineno"> 1164</span>&#160;      recursion_set.erase(ident);</div>
-<div class="line"><a name="l01165"></a><span class="lineno"> 1165</span>&#160;    }</div>
-<div class="line"><a name="l01166"></a><span class="lineno"> 1166</span>&#160;  }</div>
-<div class="line"><a name="l01167"></a><span class="lineno"> 1167</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_symbol)</div>
-<div class="line"><a name="l01168"></a><span class="lineno"> 1168</span>&#160;  {</div>
-<div class="line"><a name="l01169"></a><span class="lineno"> 1169</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier = <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(lhs).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
-<div class="line"><a name="l01170"></a><span class="lineno"> 1170</span>&#160; </div>
-<div class="line"><a name="l01171"></a><span class="lineno"> 1171</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier),</div>
-<div class="line"><a name="l01172"></a><span class="lineno"> 1172</span>&#160;                  <span class="stringliteral">&quot;value_set::dynamic_object&quot;</span>) ||</div>
-<div class="line"><a name="l01173"></a><span class="lineno"> 1173</span>&#160;       <a class="code" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier),</div>
-<div class="line"><a name="l01174"></a><span class="lineno"> 1174</span>&#160;                  <span class="stringliteral">&quot;value_set::return_value&quot;</span>) ||</div>
-<div class="line"><a name="l01175"></a><span class="lineno"> 1175</span>&#160;       <a class="code" href="classvalue__set__fit.html#a4a542fe2ba17347c7f67cde69412c62b">values</a>.find(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier)+suffix)!=<a class="code" href="classvalue__set__fit.html#a4a542fe2ba17347c7f67cde69412c62b">values</a>.end())</div>
-<div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;       <span class="comment">// otherwise we don&#39;t track this value</span></div>
-<div class="line"><a name="l01177"></a><span class="lineno"> 1177</span>&#160;    {</div>
-<div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;      <a class="code" href="structvalue__set__fit_1_1entryt.html">entryt</a> &amp;entry = <a class="code" href="classvalue__set__fit.html#a44c8821d1784c5dff42398636e8c126c">get_entry</a>(identifier, suffix);</div>
-<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160; </div>
-<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classvalue__set__fit.html#a4cc4e2de689087057d31bf06b44c2c6d">make_union</a>(entry.<a class="code" href="structvalue__set__fit_1_1entryt.html#a7e728a1ad3702edea40e4e6a244f3026">object_map</a>, values_rhs))</div>
-<div class="line"><a name="l01181"></a><span class="lineno"> 1181</span>&#160;        <a class="code" href="classvalue__set__fit.html#af0fe94e12eddc76dfe8effb801903441">changed</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01182"></a><span class="lineno"> 1182</span>&#160;    }</div>
-<div class="line"><a name="l01183"></a><span class="lineno"> 1183</span>&#160;  }</div>
-<div class="line"><a name="l01184"></a><span class="lineno"> 1184</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dynamic_object)</div>
-<div class="line"><a name="l01185"></a><span class="lineno"> 1185</span>&#160;  {</div>
-<div class="line"><a name="l01186"></a><span class="lineno"> 1186</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdynamic__object__exprt.html">dynamic_object_exprt</a> &amp;dynamic_object=</div>
-<div class="line"><a name="l01187"></a><span class="lineno"> 1187</span>&#160;      <a class="code" href="pointer__expr_8h.html#af3ae96e14b5d76bf6f6652f61382ba4a">to_dynamic_object_expr</a>(lhs);</div>
-<div class="line"><a name="l01188"></a><span class="lineno"> 1188</span>&#160; </div>
-<div class="line"><a name="l01189"></a><span class="lineno"> 1189</span>&#160;    <span class="keyword">const</span> std::string name=</div>
-<div class="line"><a name="l01190"></a><span class="lineno"> 1190</span>&#160;      <span class="stringliteral">&quot;value_set::dynamic_object&quot;</span>+</div>
-<div class="line"><a name="l01191"></a><span class="lineno"> 1191</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(dynamic_object.<a class="code" href="classdynamic__object__exprt.html#a3970bb111abefc2a4b3290388d447f1c">get_instance</a>());</div>
-<div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160; </div>
-<div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classvalue__set__fit.html#a4cc4e2de689087057d31bf06b44c2c6d">make_union</a>(<a class="code" href="classvalue__set__fit.html#a44c8821d1784c5dff42398636e8c126c">get_entry</a>(name, suffix).object_map, values_rhs))</div>
-<div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;      <a class="code" href="classvalue__set__fit.html#af0fe94e12eddc76dfe8effb801903441">changed</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;  }</div>
-<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dereference)</div>
-<div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;  {</div>
-<div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;    <span class="keywordflow">if</span>(lhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=1)</div>
-<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;      <span class="keywordflow">throw</span> lhs.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>()+<span class="stringliteral">&quot; expected to have one operand&quot;</span>;</div>
-<div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160; </div>
-<div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;    <a class="code" href="classreference__counting.html">object_mapt</a> reference_set;</div>
-<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;    <a class="code" href="classvalue__set__fit.html#a1480dabacf96da78da28b2938c3dd566">get_reference_set_sharing</a>(lhs, reference_set, ns);</div>
-<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160; </div>
-<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;object_entry : reference_set.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>())</div>
-<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;    {</div>
-<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;      <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keywordtype">object</span> = <a class="code" href="classvalue__set__fit.html#a1cc32712dfac7900796f5d51534d124a">object_numbering</a>[object_entry.first];</div>
-<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160; </div>
-<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;      <span class="keywordflow">if</span>(<span class="keywordtype">object</span>.<span class="keywordtype">id</span>()!=ID_unknown)</div>
-<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;        <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(<span class="keywordtype">object</span>, values_rhs, suffix, ns, recursion_set);</div>
-<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;    }</div>
-<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;  }</div>
-<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_index)</div>
-<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160;  {</div>
-<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(lhs).<a class="code" href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">array</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
-<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160; </div>
-<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array)</div>
-<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;    {</div>
-<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;      <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(</div>
-<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;        <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(lhs).array(),</div>
-<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;        values_rhs,</div>
-<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;        <span class="stringliteral">&quot;[]&quot;</span> + suffix,</div>
-<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;        ns,</div>
-<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;        recursion_set);</div>
-<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;    }</div>
-<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;  }</div>
-<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
-<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;  {</div>
-<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(lhs).compound().is_nil())</div>
-<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;    <a class="code" href="classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71">assign_recursion_sett</a> recset;</div>
+<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(lhs, values_rhs, <span class="stringliteral">&quot;&quot;</span>, ns, recset);</div>
+<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;  }</div>
+<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;}</div>
+<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160; </div>
+<div class="line"><a name="l01126"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f"> 1126</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">value_set_fit::assign_rec</a>(</div>
+<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs,</div>
+<div class="line"><a name="l01128"></a><span class="lineno"> 1128</span>&#160;  <span class="keyword">const</span> <a class="code" href="classreference__counting.html">object_mapt</a> &amp;values_rhs,</div>
+<div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160;  <span class="keyword">const</span> std::string &amp;suffix,</div>
+<div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
+<div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;  <a class="code" href="classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71">assign_recursion_sett</a> &amp;recursion_set)</div>
+<div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;{</div>
+<div class="line"><a name="l01133"></a><span class="lineno"> 1133</span>&#160;<span class="preprocessor">  #if 0</span></div>
+<div class="line"><a name="l01134"></a><span class="lineno"> 1134</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;ASSIGN_REC LHS: &quot;</span> &lt;&lt; <a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>(lhs) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l01135"></a><span class="lineno"> 1135</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;ASSIGN_REC SUFFIX: &quot;</span> &lt;&lt; suffix &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l01136"></a><span class="lineno"> 1136</span>&#160; </div>
+<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="classvalue__set__fit_1_1object__map__dt.html#ae9835d9f9ee11fd6419845cd8a3acb33">object_map_dt::const_iterator</a> it=values_rhs.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>().<a class="code" href="classvalue__set__fit_1_1object__map__dt.html#ae8afd1120feeb59414d640340ab7e741">begin</a>();</div>
+<div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160;      it!=values_rhs.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>().<a class="code" href="classvalue__set__fit_1_1object__map__dt.html#a702457e5439dcb3b708f5c38dabb88da">end</a>(); it++)</div>
+<div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;ASSIGN_REC RHS: &quot;</span> &lt;&lt; <a class="code" href="classvalue__set__fit.html#addc8d37ed2eaef79a835068a92dca462">to_expr</a>(it) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160; </div>
+<div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;  <span class="keywordflow">if</span>(lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;#REF#&quot;</span>)</div>
+<div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160;  {</div>
+<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;ident = lhs.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_identifier);</div>
+<div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;    <a class="code" href="classreference__counting.html">object_mapt</a> temp;</div>
+<div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160;    <a class="code" href="classvalue__set__fit.html#ad76fce18b27962024c7403e4f7f2c61e">gvs_recursion_sett</a> recset;</div>
+<div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;    <a class="code" href="classvalue__set__fit.html#a77de525ddc87f099e2aa75df4b020c4f">get_value_set_rec</a>(</div>
+<div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;      lhs, temp, <span class="stringliteral">&quot;&quot;</span>, <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>(), ns, recset);</div>
+<div class="line"><a name="l01149"></a><span class="lineno"> 1149</span>&#160; </div>
+<div class="line"><a name="l01150"></a><span class="lineno"> 1150</span>&#160;    <span class="keywordflow">if</span>(recursion_set.find(ident)!=recursion_set.end())</div>
+<div class="line"><a name="l01151"></a><span class="lineno"> 1151</span>&#160;    {</div>
+<div class="line"><a name="l01152"></a><span class="lineno"> 1152</span>&#160;      recursion_set.insert(ident);</div>
+<div class="line"><a name="l01153"></a><span class="lineno"> 1153</span>&#160; </div>
+<div class="line"><a name="l01154"></a><span class="lineno"> 1154</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;object_entry : temp.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>())</div>
+<div class="line"><a name="l01155"></a><span class="lineno"> 1155</span>&#160;      {</div>
+<div class="line"><a name="l01156"></a><span class="lineno"> 1156</span>&#160;        <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keywordtype">object</span> = <a class="code" href="classvalue__set__fit.html#a1cc32712dfac7900796f5d51534d124a">object_numbering</a>[object_entry.first];</div>
+<div class="line"><a name="l01157"></a><span class="lineno"> 1157</span>&#160; </div>
+<div class="line"><a name="l01158"></a><span class="lineno"> 1158</span>&#160;        <span class="keywordflow">if</span>(<span class="keywordtype">object</span>.<span class="keywordtype">id</span>() != ID_unknown)</div>
+<div class="line"><a name="l01159"></a><span class="lineno"> 1159</span>&#160;          <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(<span class="keywordtype">object</span>, values_rhs, suffix, ns, recursion_set);</div>
+<div class="line"><a name="l01160"></a><span class="lineno"> 1160</span>&#160;      }</div>
+<div class="line"><a name="l01161"></a><span class="lineno"> 1161</span>&#160; </div>
+<div class="line"><a name="l01162"></a><span class="lineno"> 1162</span>&#160;      recursion_set.erase(ident);</div>
+<div class="line"><a name="l01163"></a><span class="lineno"> 1163</span>&#160;    }</div>
+<div class="line"><a name="l01164"></a><span class="lineno"> 1164</span>&#160;  }</div>
+<div class="line"><a name="l01165"></a><span class="lineno"> 1165</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_symbol)</div>
+<div class="line"><a name="l01166"></a><span class="lineno"> 1166</span>&#160;  {</div>
+<div class="line"><a name="l01167"></a><span class="lineno"> 1167</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier = <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(lhs).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
+<div class="line"><a name="l01168"></a><span class="lineno"> 1168</span>&#160; </div>
+<div class="line"><a name="l01169"></a><span class="lineno"> 1169</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier),</div>
+<div class="line"><a name="l01170"></a><span class="lineno"> 1170</span>&#160;                  <span class="stringliteral">&quot;value_set::dynamic_object&quot;</span>) ||</div>
+<div class="line"><a name="l01171"></a><span class="lineno"> 1171</span>&#160;       <a class="code" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier),</div>
+<div class="line"><a name="l01172"></a><span class="lineno"> 1172</span>&#160;                  <span class="stringliteral">&quot;value_set::return_value&quot;</span>) ||</div>
+<div class="line"><a name="l01173"></a><span class="lineno"> 1173</span>&#160;       <a class="code" href="classvalue__set__fit.html#a4a542fe2ba17347c7f67cde69412c62b">values</a>.find(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier)+suffix)!=<a class="code" href="classvalue__set__fit.html#a4a542fe2ba17347c7f67cde69412c62b">values</a>.end())</div>
+<div class="line"><a name="l01174"></a><span class="lineno"> 1174</span>&#160;       <span class="comment">// otherwise we don&#39;t track this value</span></div>
+<div class="line"><a name="l01175"></a><span class="lineno"> 1175</span>&#160;    {</div>
+<div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;      <a class="code" href="structvalue__set__fit_1_1entryt.html">entryt</a> &amp;entry = <a class="code" href="classvalue__set__fit.html#a44c8821d1784c5dff42398636e8c126c">get_entry</a>(identifier, suffix);</div>
+<div class="line"><a name="l01177"></a><span class="lineno"> 1177</span>&#160; </div>
+<div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classvalue__set__fit.html#a4cc4e2de689087057d31bf06b44c2c6d">make_union</a>(entry.<a class="code" href="structvalue__set__fit_1_1entryt.html#a7e728a1ad3702edea40e4e6a244f3026">object_map</a>, values_rhs))</div>
+<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160;        <a class="code" href="classvalue__set__fit.html#af0fe94e12eddc76dfe8effb801903441">changed</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;    }</div>
+<div class="line"><a name="l01181"></a><span class="lineno"> 1181</span>&#160;  }</div>
+<div class="line"><a name="l01182"></a><span class="lineno"> 1182</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dynamic_object)</div>
+<div class="line"><a name="l01183"></a><span class="lineno"> 1183</span>&#160;  {</div>
+<div class="line"><a name="l01184"></a><span class="lineno"> 1184</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdynamic__object__exprt.html">dynamic_object_exprt</a> &amp;dynamic_object=</div>
+<div class="line"><a name="l01185"></a><span class="lineno"> 1185</span>&#160;      <a class="code" href="pointer__expr_8h.html#af3ae96e14b5d76bf6f6652f61382ba4a">to_dynamic_object_expr</a>(lhs);</div>
+<div class="line"><a name="l01186"></a><span class="lineno"> 1186</span>&#160; </div>
+<div class="line"><a name="l01187"></a><span class="lineno"> 1187</span>&#160;    <span class="keyword">const</span> std::string name=</div>
+<div class="line"><a name="l01188"></a><span class="lineno"> 1188</span>&#160;      <span class="stringliteral">&quot;value_set::dynamic_object&quot;</span>+</div>
+<div class="line"><a name="l01189"></a><span class="lineno"> 1189</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(dynamic_object.<a class="code" href="classdynamic__object__exprt.html#a3970bb111abefc2a4b3290388d447f1c">get_instance</a>());</div>
+<div class="line"><a name="l01190"></a><span class="lineno"> 1190</span>&#160; </div>
+<div class="line"><a name="l01191"></a><span class="lineno"> 1191</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classvalue__set__fit.html#a4cc4e2de689087057d31bf06b44c2c6d">make_union</a>(<a class="code" href="classvalue__set__fit.html#a44c8821d1784c5dff42398636e8c126c">get_entry</a>(name, suffix).object_map, values_rhs))</div>
+<div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160;      <a class="code" href="classvalue__set__fit.html#af0fe94e12eddc76dfe8effb801903441">changed</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;  }</div>
+<div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dereference)</div>
+<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;  {</div>
+<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;    <span class="keywordflow">if</span>(lhs.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=1)</div>
+<div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;      <span class="keywordflow">throw</span> lhs.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>()+<span class="stringliteral">&quot; expected to have one operand&quot;</span>;</div>
+<div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160; </div>
+<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;    <a class="code" href="classreference__counting.html">object_mapt</a> reference_set;</div>
+<div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;    <a class="code" href="classvalue__set__fit.html#a1480dabacf96da78da28b2938c3dd566">get_reference_set_sharing</a>(lhs, reference_set, ns);</div>
+<div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160; </div>
+<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;object_entry : reference_set.<a class="code" href="classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69">read</a>())</div>
+<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160;    {</div>
+<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;      <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<span class="keywordtype">object</span> = <a class="code" href="classvalue__set__fit.html#a1cc32712dfac7900796f5d51534d124a">object_numbering</a>[object_entry.first];</div>
+<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160; </div>
+<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;      <span class="keywordflow">if</span>(<span class="keywordtype">object</span>.<span class="keywordtype">id</span>()!=ID_unknown)</div>
+<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;        <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(<span class="keywordtype">object</span>, values_rhs, suffix, ns, recursion_set);</div>
+<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;    }</div>
+<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;  }</div>
+<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_index)</div>
+<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;  {</div>
+<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(lhs).<a class="code" href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">array</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
+<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160; </div>
+<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array)</div>
+<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160;    {</div>
+<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;      <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(</div>
+<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;        <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(lhs).array(),</div>
+<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;        values_rhs,</div>
+<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;        <span class="stringliteral">&quot;[]&quot;</span> + suffix,</div>
+<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;        ns,</div>
+<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;        recursion_set);</div>
+<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;    }</div>
+<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;  }</div>
+<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_member)</div>
+<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;  {</div>
+<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(lhs).compound().is_nil())</div>
+<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160; </div>
+<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;    <span class="keyword">const</span> std::string &amp;component_name=lhs.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(ID_component_name);</div>
 <div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160; </div>
-<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;    <span class="keyword">const</span> std::string &amp;component_name=lhs.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(ID_component_name);</div>
+<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = ns.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(<a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(lhs).compound().type());</div>
 <div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160; </div>
-<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = ns.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(<a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(lhs).compound().type());</div>
-<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160; </div>
-<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;      type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union,</div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;      <span class="stringliteral">&quot;operand 0 of member expression must be struct or union&quot;</span>);</div>
-<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160; </div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(</div>
-<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;      <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(lhs).compound(),</div>
-<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;      values_rhs,</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;      <span class="stringliteral">&quot;.&quot;</span> + component_name + suffix,</div>
-<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;      ns,</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;      recursion_set);</div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;  }</div>
-<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;valid_object&quot;</span> ||</div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;          lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;dynamic_type&quot;</span>)</div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;  {</div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;    <span class="comment">// we ignore this here</span></div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;  }</div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string_constant)</div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;  {</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;    <span class="comment">// someone writes into a string-constant</span></div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;    <span class="comment">// evil guy</span></div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;  }</div>
-<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_null_object)</div>
-<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;  {</div>
-<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;    <span class="comment">// evil as well</span></div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;  }</div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_typecast)</div>
-<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;  {</div>
-<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypecast__exprt.html">typecast_exprt</a> &amp;typecast_expr=<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(lhs);</div>
-<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160; </div>
-<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(typecast_expr.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), values_rhs, suffix, ns, recursion_set);</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;  }</div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;    lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == <span class="stringliteral">&quot;zero_string&quot;</span> || lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == <span class="stringliteral">&quot;is_zero_string&quot;</span> ||</div>
-<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;    lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == <span class="stringliteral">&quot;zero_string_length&quot;</span> || lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_address_of)</div>
-<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;  {</div>
-<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;    <span class="comment">// ignore</span></div>
-<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;  }</div>
-<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_byte_extract_little_endian ||</div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;          lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_byte_extract_big_endian)</div>
-<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;  {</div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(</div>
-<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;      <a class="code" href="byte__operators_8h.html#af1763b1e9181575ca253edca181f1a1f">to_byte_extract_expr</a>(lhs).op(), values_rhs, suffix, ns, recursion_set);</div>
-<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;  }</div>
-<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;assign NYI: &#39;&quot;</span> + lhs.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>() + <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
-<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;}</div>
-<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160; </div>
-<div class="line"><a name="l01282"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#af49d986b76d9f03bdc9228db562ffc62"> 1282</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#af49d986b76d9f03bdc9228db562ffc62">value_set_fit::do_function_call</a>(</div>
-<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keyword">function</span>,</div>
-<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments,</div>
-<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;{</div>
-<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="keyword">function</span>);</div>
-<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160; </div>
-<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;type=<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;parameter_types=type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>();</div>
-<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160; </div>
-<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;  <span class="comment">// these first need to be assigned to dummy, temporary arguments</span></div>
-<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;  <span class="comment">// and only thereafter to the actuals, in order</span></div>
-<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;  <span class="comment">// to avoid overwriting actuals that are needed for recursive</span></div>
-<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;  <span class="comment">// calls</span></div>
-<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160; </div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;arguments.size(); i++)</div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;  {</div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;    <span class="keyword">const</span> std::string identifier=<span class="stringliteral">&quot;value_set::&quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<span class="keyword">function</span>) + <span class="stringliteral">&quot;::&quot;</span> +</div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;                                 <span class="stringliteral">&quot;argument$&quot;</span>+<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(i);</div>
-<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;    <a class="code" href="classvalue__set__fit.html#a380ae07f690a0692d42eb7ba14134143">add_var</a>(identifier);</div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> dummy_lhs(identifier, arguments[i].type());</div>
-<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(dummy_lhs, arguments[i], ns);</div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;  }</div>
+<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;      type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union,</div>
+<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;      <span class="stringliteral">&quot;operand 0 of member expression must be struct or union&quot;</span>);</div>
+<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160; </div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(</div>
+<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;      <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(lhs).compound(),</div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;      values_rhs,</div>
+<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;      <span class="stringliteral">&quot;.&quot;</span> + component_name + suffix,</div>
+<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;      ns,</div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;      recursion_set);</div>
+<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;  }</div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;valid_object&quot;</span> ||</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;          lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;dynamic_type&quot;</span>)</div>
+<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;  {</div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;    <span class="comment">// we ignore this here</span></div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;  }</div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_string_constant)</div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;  {</div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    <span class="comment">// someone writes into a string-constant</span></div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    <span class="comment">// evil guy</span></div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;  }</div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_null_object)</div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;  {</div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;    <span class="comment">// evil as well</span></div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;  }</div>
+<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_typecast)</div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;  {</div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypecast__exprt.html">typecast_exprt</a> &amp;typecast_expr=<a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(lhs);</div>
+<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160; </div>
+<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(typecast_expr.<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>(), values_rhs, suffix, ns, recursion_set);</div>
+<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;  }</div>
+<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;    lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == <span class="stringliteral">&quot;zero_string&quot;</span> || lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == <span class="stringliteral">&quot;is_zero_string&quot;</span> ||</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;    lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == <span class="stringliteral">&quot;zero_string_length&quot;</span> || lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_address_of)</div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;  {</div>
+<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;    <span class="comment">// ignore</span></div>
+<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;  }</div>
+<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_byte_extract_little_endian ||</div>
+<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;          lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_byte_extract_big_endian)</div>
+<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;  {</div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;    <a class="code" href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">assign_rec</a>(</div>
+<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;      <a class="code" href="byte__operators_8h.html#af1763b1e9181575ca253edca181f1a1f">to_byte_extract_expr</a>(lhs).op(), values_rhs, suffix, ns, recursion_set);</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;  }</div>
+<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;assign NYI: &#39;&quot;</span> + lhs.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>() + <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
+<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;}</div>
+<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160; </div>
+<div class="line"><a name="l01280"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#af49d986b76d9f03bdc9228db562ffc62"> 1280</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#af49d986b76d9f03bdc9228db562ffc62">value_set_fit::do_function_call</a>(</div>
+<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keyword">function</span>,</div>
+<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments,</div>
+<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;{</div>
+<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<span class="keyword">function</span>);</div>
+<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160; </div>
+<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;type=<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;parameter_types=type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>();</div>
+<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160; </div>
+<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;  <span class="comment">// these first need to be assigned to dummy, temporary arguments</span></div>
+<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;  <span class="comment">// and only thereafter to the actuals, in order</span></div>
+<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;  <span class="comment">// to avoid overwriting actuals that are needed for recursive</span></div>
+<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;  <span class="comment">// calls</span></div>
+<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160; </div>
+<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;arguments.size(); i++)</div>
+<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;  {</div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;    <span class="keyword">const</span> std::string identifier=<span class="stringliteral">&quot;value_set::&quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<span class="keyword">function</span>) + <span class="stringliteral">&quot;::&quot;</span> +</div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;                                 <span class="stringliteral">&quot;argument$&quot;</span>+<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(i);</div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;    <a class="code" href="classvalue__set__fit.html#a380ae07f690a0692d42eb7ba14134143">add_var</a>(identifier);</div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> dummy_lhs(identifier, arguments[i].type());</div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(dummy_lhs, arguments[i], ns);</div>
+<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;  }</div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160; </div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;  <span class="comment">// now assign to &#39;actual actuals&#39;</span></div>
 <div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160; </div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;  <span class="comment">// now assign to &#39;actual actuals&#39;</span></div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;  std::size_t i=0;</div>
 <div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160; </div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;  std::size_t i=0;</div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160; </div>
-<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;  <span class="keywordflow">for</span>(code_typet::parameterst::const_iterator</div>
-<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;      it=parameter_types.begin();</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;      it!=parameter_types.end();</div>
-<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;      it++)</div>
-<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;  {</div>
-<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier=it-&gt;get_identifier();</div>
-<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;    <span class="keywordflow">if</span>(identifier.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
-<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;  <span class="keywordflow">for</span>(code_typet::parameterst::const_iterator</div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;      it=parameter_types.begin();</div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;      it!=parameter_types.end();</div>
+<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;      it++)</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;  {</div>
+<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier=it-&gt;get_identifier();</div>
+<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;    <span class="keywordflow">if</span>(identifier.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
+<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160; </div>
+<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;    <a class="code" href="classvalue__set__fit.html#a380ae07f690a0692d42eb7ba14134143">add_var</a>(identifier);</div>
 <div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160; </div>
-<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;    <a class="code" href="classvalue__set__fit.html#a380ae07f690a0692d42eb7ba14134143">add_var</a>(identifier);</div>
-<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160; </div>
-<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> v_expr=</div>
-<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;      <a class="code" href="classsymbol__exprt.html">symbol_exprt</a>(<span class="stringliteral">&quot;value_set::&quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<span class="keyword">function</span>) + <span class="stringliteral">&quot;::&quot;</span> +</div>
-<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;                   <span class="stringliteral">&quot;argument$&quot;</span>+<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(i), it-&gt;type());</div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160; </div>
-<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> actual_lhs(identifier, it-&gt;type());</div>
-<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(actual_lhs, v_expr, ns);</div>
-<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;    i++;</div>
-<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;  }</div>
-<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;}</div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160; </div>
-<div class="line"><a name="l01331"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#aa2d9724f26bde8f36c13fd0df9e2aecc"> 1331</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#aa2d9724f26bde8f36c13fd0df9e2aecc">value_set_fit::do_end_function</a>(</div>
-<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs,</div>
-<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;{</div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;  <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160; </div>
-<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;  std::string rvs = <span class="stringliteral">&quot;value_set::return_value&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classvalue__set__fit.html#a6abba379601783c308f9bfa299c3ff54">from_function</a>);</div>
-<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> rhs(rvs, lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160; </div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;  <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs, rhs, ns);</div>
-<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;}</div>
-<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160; </div>
-<div class="line"><a name="l01344"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb"> 1344</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb">value_set_fit::apply_code</a>(<span class="keyword">const</span> <a class="code" href="classcodet.html">codet</a> &amp;code, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;{</div>
-<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;statement=code.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_statement);</div>
-<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160; </div>
-<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;  <span class="keywordflow">if</span>(statement==ID_block)</div>
-<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;  {</div>
-<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;stmt : <a class="code" href="std__code_8h.html#aa9a306d0a9489ff305aed6d04985a941">to_code_block</a>(code).statements())</div>
-<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;      <a class="code" href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb">apply_code</a>(stmt, ns);</div>
-<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;  }</div>
-<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_function_call)</div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;  {</div>
-<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;    <span class="comment">// shouldn&#39;t be here</span></div>
-<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;  }</div>
-<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_assign)</div>
-<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;  {</div>
-<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;    <span class="keywordflow">if</span>(code.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=2)</div>
-<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;assignment expected to have two operands&quot;</span>;</div>
-<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160; </div>
-<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(code.<a class="code" href="classcodet.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>(), code.<a class="code" href="classcodet.html#a45b09d80623454a1e7b85a995484a4dd">op1</a>(), ns);</div>
-<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;  }</div>
-<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_decl)</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;  {</div>
-<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;    <span class="keywordflow">if</span>(code.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=1)</div>
-<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;decl expected to have one operand&quot;</span>;</div>
+<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> v_expr=</div>
+<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;      <a class="code" href="classsymbol__exprt.html">symbol_exprt</a>(<span class="stringliteral">&quot;value_set::&quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<span class="keyword">function</span>) + <span class="stringliteral">&quot;::&quot;</span> +</div>
+<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;                   <span class="stringliteral">&quot;argument$&quot;</span>+<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(i), it-&gt;type());</div>
+<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160; </div>
+<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> actual_lhs(identifier, it-&gt;type());</div>
+<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(actual_lhs, v_expr, ns);</div>
+<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;    i++;</div>
+<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;  }</div>
+<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;}</div>
+<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160; </div>
+<div class="line"><a name="l01329"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#aa2d9724f26bde8f36c13fd0df9e2aecc"> 1329</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#aa2d9724f26bde8f36c13fd0df9e2aecc">value_set_fit::do_end_function</a>(</div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs,</div>
+<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;{</div>
+<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;  <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160; </div>
+<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;  std::string rvs = <span class="stringliteral">&quot;value_set::return_value&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classvalue__set__fit.html#a6abba379601783c308f9bfa299c3ff54">from_function</a>);</div>
+<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> rhs(rvs, lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160; </div>
+<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;  <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs, rhs, ns);</div>
+<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;}</div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160; </div>
+<div class="line"><a name="l01342"></a><span class="lineno"><a class="line" href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb"> 1342</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb">value_set_fit::apply_code</a>(<span class="keyword">const</span> <a class="code" href="classcodet.html">codet</a> &amp;code, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;{</div>
+<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;statement=code.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_statement);</div>
+<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160; </div>
+<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;  <span class="keywordflow">if</span>(statement==ID_block)</div>
+<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;  {</div>
+<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;stmt : <a class="code" href="std__code_8h.html#aa9a306d0a9489ff305aed6d04985a941">to_code_block</a>(code).statements())</div>
+<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;      <a class="code" href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb">apply_code</a>(stmt, ns);</div>
+<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;  }</div>
+<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_function_call)</div>
+<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;  {</div>
+<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;    <span class="comment">// shouldn&#39;t be here</span></div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;  }</div>
+<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_assign)</div>
+<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;  {</div>
+<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;    <span class="keywordflow">if</span>(code.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=2)</div>
+<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;assignment expected to have two operands&quot;</span>;</div>
+<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160; </div>
+<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(code.<a class="code" href="classcodet.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>(), code.<a class="code" href="classcodet.html#a45b09d80623454a1e7b85a995484a4dd">op1</a>(), ns);</div>
+<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;  }</div>
+<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_decl)</div>
+<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;  {</div>
+<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;    <span class="keywordflow">if</span>(code.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size()!=1)</div>
+<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;decl expected to have one operand&quot;</span>;</div>
+<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160; </div>
+<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs=code.<a class="code" href="classcodet.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>();</div>
 <div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160; </div>
-<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;lhs=code.<a class="code" href="classcodet.html#aa720c8b89fba1d2d38b230e0ed6cd2b2">op0</a>();</div>
-<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160; </div>
-<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;    <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_symbol)</div>
-<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;decl expected to have symbol on lhs&quot;</span>;</div>
-<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160; </div>
-<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs, <a class="code" href="classexprt.html">exprt</a>(ID_invalid, lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()), ns);</div>
-<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;  }</div>
-<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_expression)</div>
-<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  {</div>
-<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;    <span class="comment">// can be ignored, we don&#39;t expect side effects here</span></div>
-<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;  }</div>
-<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_cpp_delete ||</div>
-<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;          statement==ID_cpp_delete_array)</div>
-<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  {</div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;    <span class="comment">// does nothing</span></div>
-<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;  }</div>
-<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==<span class="stringliteral">&quot;lock&quot;</span> || statement==<span class="stringliteral">&quot;unlock&quot;</span>)</div>
-<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;  {</div>
-<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;    <span class="comment">// ignore for now</span></div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;  }</div>
-<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_asm)</div>
-<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;  {</div>
-<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;    <span class="comment">// ignore for now, probably not safe</span></div>
-<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;  }</div>
-<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_nondet)</div>
-<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;  {</div>
-<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;    <span class="comment">// doesn&#39;t do anything</span></div>
-<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;  }</div>
-<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_printf)</div>
-<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;  {</div>
-<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;    <span class="comment">// doesn&#39;t do anything</span></div>
-<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;  }</div>
-<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_return)</div>
-<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;  {</div>
-<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcode__returnt.html">code_returnt</a> &amp;code_return = <a class="code" href="goto__instruction__code_8h.html#a2a7ca6101a55e84f3b0fa1604db4d75b">to_code_return</a>(code);</div>
-<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;    <span class="comment">// this is turned into an assignment</span></div>
-<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;    std::string rvs = <span class="stringliteral">&quot;value_set::return_value&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classvalue__set__fit.html#a6abba379601783c308f9bfa299c3ff54">from_function</a>);</div>
-<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;    <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> lhs(rvs, code_return.<a class="code" href="classcode__returnt.html#aa0935519c742a57d3abaf4123288d1b7">return_value</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs, code_return.<a class="code" href="classcode__returnt.html#aa0935519c742a57d3abaf4123288d1b7">return_value</a>(), ns);</div>
-<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;  }</div>
-<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_fence)</div>
-<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;  {</div>
-<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;  }</div>
-<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;    statement == ID_array_copy || statement == ID_array_replace ||</div>
-<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;    statement == ID_array_set || statement == ID_array_equal)</div>
-<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;  {</div>
-<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;  }</div>
-<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="goto__instruction__code_8h.html#a2be8d6f380b3ee71b639c55b393141b3">can_cast_expr&lt;code_inputt&gt;</a>(code) || <a class="code" href="goto__instruction__code_8h.html#a4b0c2dc2a5ef9a06156bf75041b32f09">can_cast_expr&lt;code_outputt&gt;</a>(code))</div>
-<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;  {</div>
-<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;    <span class="comment">// doesn&#39;t do anything</span></div>
-<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;  }</div>
-<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement == ID_havoc_object)</div>
-<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;  {</div>
-<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;  }</div>
-<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;    <span class="keywordflow">throw</span></div>
-<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;      code.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>()+<span class="stringliteral">&quot;\n&quot;</span>+</div>
-<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;      <span class="stringliteral">&quot;value_set_fit: unexpected statement: &quot;</span>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(statement);</div>
-<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;}</div>
+<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;    <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_symbol)</div>
+<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;decl expected to have symbol on lhs&quot;</span>;</div>
+<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160; </div>
+<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs, <a class="code" href="classexprt.html">exprt</a>(ID_invalid, lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()), ns);</div>
+<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;  }</div>
+<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_expression)</div>
+<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;  {</div>
+<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;    <span class="comment">// can be ignored, we don&#39;t expect side effects here</span></div>
+<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  }</div>
+<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_cpp_delete ||</div>
+<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;          statement==ID_cpp_delete_array)</div>
+<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;  {</div>
+<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;    <span class="comment">// does nothing</span></div>
+<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  }</div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==<span class="stringliteral">&quot;lock&quot;</span> || statement==<span class="stringliteral">&quot;unlock&quot;</span>)</div>
+<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;  {</div>
+<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;    <span class="comment">// ignore for now</span></div>
+<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;  }</div>
+<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_asm)</div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;  {</div>
+<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;    <span class="comment">// ignore for now, probably not safe</span></div>
+<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;  }</div>
+<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_nondet)</div>
+<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;  {</div>
+<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;    <span class="comment">// doesn&#39;t do anything</span></div>
+<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;  }</div>
+<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_printf)</div>
+<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;  {</div>
+<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;    <span class="comment">// doesn&#39;t do anything</span></div>
+<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;  }</div>
+<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_return)</div>
+<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;  {</div>
+<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcode__returnt.html">code_returnt</a> &amp;code_return = <a class="code" href="goto__instruction__code_8h.html#a2a7ca6101a55e84f3b0fa1604db4d75b">to_code_return</a>(code);</div>
+<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;    <span class="comment">// this is turned into an assignment</span></div>
+<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;    std::string rvs = <span class="stringliteral">&quot;value_set::return_value&quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classvalue__set__fit.html#a6abba379601783c308f9bfa299c3ff54">from_function</a>);</div>
+<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;    <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> lhs(rvs, code_return.<a class="code" href="classcode__returnt.html#aa0935519c742a57d3abaf4123288d1b7">return_value</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;    <a class="code" href="classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58">assign</a>(lhs, code_return.<a class="code" href="classcode__returnt.html#aa0935519c742a57d3abaf4123288d1b7">return_value</a>(), ns);</div>
+<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;  }</div>
+<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement==ID_fence)</div>
+<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;  {</div>
+<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;  }</div>
+<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;    statement == ID_array_copy || statement == ID_array_replace ||</div>
+<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;    statement == ID_array_set || statement == ID_array_equal)</div>
+<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;  {</div>
+<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;  }</div>
+<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="goto__instruction__code_8h.html#a2be8d6f380b3ee71b639c55b393141b3">can_cast_expr&lt;code_inputt&gt;</a>(code) || <a class="code" href="goto__instruction__code_8h.html#a4b0c2dc2a5ef9a06156bf75041b32f09">can_cast_expr&lt;code_outputt&gt;</a>(code))</div>
+<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;  {</div>
+<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;    <span class="comment">// doesn&#39;t do anything</span></div>
+<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;  }</div>
+<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(statement == ID_havoc_object)</div>
+<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;  {</div>
+<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;  }</div>
+<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;    <span class="keywordflow">throw</span></div>
+<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;      code.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>()+<span class="stringliteral">&quot;\n&quot;</span>+</div>
+<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;      <span class="stringliteral">&quot;value_set_fit: unexpected statement: &quot;</span>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(statement);</div>
+<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;}</div>
 <div class="ttc" id="aabstract__environment_8h_html_a7d48c0be045ec87e8bfc065e4674508fa7fa3b767c460b54a2be4d49030b349c7"><div class="ttname"><a href="abstract__environment_8h.html#a7d48c0be045ec87e8bfc065e4674508fa7fa3b767c460b54a2be4d49030b349c7">widen_modet::no</a></div><div class="ttdeci">@ no</div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
@@ -1546,9 +1544,9 @@ $(document).ready(function(){initNavTree('value__set__fi_8cpp_source.html',''); 
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassexprt_html_a10c073e5cdd14b181d56cf53def8b378"><div class="ttname"><a href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a></div><div class="ttdeci">std::vector&lt; exprt &gt; operandst</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00058">expr.h:58</a></div></div>
 <div class="ttc" id="aclassexprt_html_a477ecb575e3644ca2670135b62f98c34"><div class="ttname"><a href="classexprt.html#a477ecb575e3644ca2670135b62f98c34">exprt::copy_to_operands</a></div><div class="ttdeci">void copy_to_operands(const exprt &amp;expr)</div><div class="ttdoc">Copy the given argument to the end of exprt's operands.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00155">expr.h:155</a></div></div>
-<div class="ttc" id="aclassexprt_html_a847cfca1ba40ed1ed04683e3b6788096"><div class="ttname"><a href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">exprt::is_zero</a></div><div class="ttdeci">bool is_zero() const</div><div class="ttdoc">Return whether the expression is a constant representing 0.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00054">expr.cpp:54</a></div></div>
+<div class="ttc" id="aclassexprt_html_a847cfca1ba40ed1ed04683e3b6788096"><div class="ttname"><a href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">exprt::is_zero</a></div><div class="ttdeci">bool is_zero() const</div><div class="ttdoc">Return whether the expression is a constant representing 0.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00047">expr.cpp:47</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
-<div class="ttc" id="aclassexprt_html_aa0da0eed1e748681d28c8fe3a50ffda5"><div class="ttname"><a href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">exprt::is_constant</a></div><div class="ttdeci">bool is_constant() const</div><div class="ttdoc">Return whether the expression is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00027">expr.cpp:27</a></div></div>
+<div class="ttc" id="aclassexprt_html_aa0da0eed1e748681d28c8fe3a50ffda5"><div class="ttname"><a href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">exprt::is_constant</a></div><div class="ttdeci">bool is_constant() const</div><div class="ttdoc">Return whether the expression is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00204">expr.h:204</a></div></div>
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html"><div class="ttname"><a href="classindex__exprt.html">index_exprt</a></div><div class="ttdoc">Array index operator.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01409">std_expr.h:1410</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html_a677da95c5fed7e6548bcc311c3685a49"><div class="ttname"><a href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">index_exprt::array</a></div><div class="ttdeci">exprt &amp; array()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01440">std_expr.h:1440</a></div></div>
@@ -1609,14 +1607,14 @@ $(document).ready(function(){initNavTree('value__set__fi_8cpp_source.html',''); 
 <div class="ttc" id="aclassvalue__set__fit_html_a4cc4e2de689087057d31bf06b44c2c6d"><div class="ttname"><a href="classvalue__set__fit.html#a4cc4e2de689087057d31bf06b44c2c6d">value_set_fit::make_union</a></div><div class="ttdeci">bool make_union(object_mapt &amp;dest, const object_mapt &amp;src) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00280">value_set_fi.cpp:280</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_a5b415d493a4915dedb6392b92093eaa4"><div class="ttname"><a href="classvalue__set__fit.html#a5b415d493a4915dedb6392b92093eaa4">value_set_fit::get_value_set</a></div><div class="ttdeci">std::vector&lt; exprt &gt; get_value_set(const exprt &amp;expr, const namespacet &amp;ns) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00294">value_set_fi.cpp:294</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_a6abba379601783c308f9bfa299c3ff54"><div class="ttname"><a href="classvalue__set__fit.html#a6abba379601783c308f9bfa299c3ff54">value_set_fit::from_function</a></div><div class="ttdeci">unsigned from_function</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8h_source.html#l00039">value_set_fi.h:39</a></div></div>
-<div class="ttc" id="aclassvalue__set__fit_html_a709bc8b7156aa1c4f068259e628775eb"><div class="ttname"><a href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb">value_set_fit::apply_code</a></div><div class="ttdeci">void apply_code(const codet &amp;code, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01344">value_set_fi.cpp:1344</a></div></div>
-<div class="ttc" id="aclassvalue__set__fit_html_a749d18119553ce28558714d0ecf6e48f"><div class="ttname"><a href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">value_set_fit::assign_rec</a></div><div class="ttdeci">void assign_rec(const exprt &amp;lhs, const object_mapt &amp;values_rhs, const std::string &amp;suffix, const namespacet &amp;ns, assign_recursion_sett &amp;recursion_set)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01128">value_set_fi.cpp:1128</a></div></div>
+<div class="ttc" id="aclassvalue__set__fit_html_a709bc8b7156aa1c4f068259e628775eb"><div class="ttname"><a href="classvalue__set__fit.html#a709bc8b7156aa1c4f068259e628775eb">value_set_fit::apply_code</a></div><div class="ttdeci">void apply_code(const codet &amp;code, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01342">value_set_fi.cpp:1342</a></div></div>
+<div class="ttc" id="aclassvalue__set__fit_html_a749d18119553ce28558714d0ecf6e48f"><div class="ttname"><a href="classvalue__set__fit.html#a749d18119553ce28558714d0ecf6e48f">value_set_fit::assign_rec</a></div><div class="ttdeci">void assign_rec(const exprt &amp;lhs, const object_mapt &amp;values_rhs, const std::string &amp;suffix, const namespacet &amp;ns, assign_recursion_sett &amp;recursion_set)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01126">value_set_fi.cpp:1126</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_a77de525ddc87f099e2aa75df4b020c4f"><div class="ttname"><a href="classvalue__set__fit.html#a77de525ddc87f099e2aa75df4b020c4f">value_set_fit::get_value_set_rec</a></div><div class="ttdeci">void get_value_set_rec(const exprt &amp;expr, object_mapt &amp;dest, const std::string &amp;suffix, const typet &amp;original_type, const namespacet &amp;ns, gvs_recursion_sett &amp;recursion_set) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00367">value_set_fi.cpp:367</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_a7bb980762f9373677f0fdb02729b9c7e"><div class="ttname"><a href="classvalue__set__fit.html#a7bb980762f9373677f0fdb02729b9c7e">value_set_fit::dereference_rec</a></div><div class="ttdeci">void dereference_rec(const exprt &amp;src, exprt &amp;dest) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00688">value_set_fi.cpp:688</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_a96ae76961faf887fcf75cef4df094078"><div class="ttname"><a href="classvalue__set__fit.html#a96ae76961faf887fcf75cef4df094078">value_set_fit::output</a></div><div class="ttdeci">void output(const namespacet &amp;ns, std::ostream &amp;out) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00038">value_set_fi.cpp:38</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_a96e99e0599e4cc7a46308e12c344847f"><div class="ttname"><a href="classvalue__set__fit.html#a96e99e0599e4cc7a46308e12c344847f">value_set_fit::flatten_rec</a></div><div class="ttdeci">void flatten_rec(const entryt &amp;, object_mapt &amp;, flatten_seent &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00151">value_set_fi.cpp:151</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_aa1f18db30605befb3d2d5ded8fbe6f34"><div class="ttname"><a href="classvalue__set__fit.html#aa1f18db30605befb3d2d5ded8fbe6f34">value_set_fit::expr_sett</a></div><div class="ttdeci">std::unordered_set&lt; exprt, irep_hash &gt; expr_sett</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8h_source.html#l00190">value_set_fi.h:190</a></div></div>
-<div class="ttc" id="aclassvalue__set__fit_html_aa2d9724f26bde8f36c13fd0df9e2aecc"><div class="ttname"><a href="classvalue__set__fit.html#aa2d9724f26bde8f36c13fd0df9e2aecc">value_set_fit::do_end_function</a></div><div class="ttdeci">void do_end_function(const exprt &amp;lhs, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01331">value_set_fi.cpp:1331</a></div></div>
+<div class="ttc" id="aclassvalue__set__fit_html_aa2d9724f26bde8f36c13fd0df9e2aecc"><div class="ttname"><a href="classvalue__set__fit.html#aa2d9724f26bde8f36c13fd0df9e2aecc">value_set_fit::do_end_function</a></div><div class="ttdeci">void do_end_function(const exprt &amp;lhs, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01329">value_set_fi.cpp:1329</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_aa2eafffeef8120e238b8eeb7551fe976"><div class="ttname"><a href="classvalue__set__fit.html#aa2eafffeef8120e238b8eeb7551fe976">value_set_fit::flatten_seent</a></div><div class="ttdeci">std::set&lt; idt &gt; flatten_seent</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8h_source.html#l00196">value_set_fi.h:196</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_aa8f13393e8c904ea2b104ae7c83c1d27"><div class="ttname"><a href="classvalue__set__fit.html#aa8f13393e8c904ea2b104ae7c83c1d27">value_set_fit::flatten</a></div><div class="ttdeci">void flatten(const entryt &amp;e, object_mapt &amp;dest) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00135">value_set_fi.cpp:135</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_aacc85d82e480f541b56c1a1fa26ee159"><div class="ttname"><a href="classvalue__set__fit.html#aacc85d82e480f541b56c1a1fa26ee159">value_set_fit::offset_is_zero</a></div><div class="ttdeci">bool offset_is_zero(const offsett &amp;offset) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8h_source.html#l00061">value_set_fi.h:61</a></div></div>
@@ -1626,7 +1624,7 @@ $(document).ready(function(){initNavTree('value__set__fi_8cpp_source.html',''); 
 <div class="ttc" id="aclassvalue__set__fit_html_add0eaab401e0e4df9118a4036bf25eda"><div class="ttname"><a href="classvalue__set__fit.html#add0eaab401e0e4df9118a4036bf25eda">value_set_fit::valuest</a></div><div class="ttdeci">std::map&lt; idt, entryt &gt; valuest</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8h_source.html#l00195">value_set_fi.h:195</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_addc8d37ed2eaef79a835068a92dca462"><div class="ttname"><a href="classvalue__set__fit.html#addc8d37ed2eaef79a835068a92dca462">value_set_fit::to_expr</a></div><div class="ttdeci">exprt to_expr(const object_map_dt::value_type &amp;it) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00221">value_set_fi.cpp:221</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_af0fe94e12eddc76dfe8effb801903441"><div class="ttname"><a href="classvalue__set__fit.html#af0fe94e12eddc76dfe8effb801903441">value_set_fit::changed</a></div><div class="ttdeci">bool changed</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8h_source.html#l00260">value_set_fi.h:260</a></div></div>
-<div class="ttc" id="aclassvalue__set__fit_html_af49d986b76d9f03bdc9228db562ffc62"><div class="ttname"><a href="classvalue__set__fit.html#af49d986b76d9f03bdc9228db562ffc62">value_set_fit::do_function_call</a></div><div class="ttdeci">void do_function_call(const irep_idt &amp;function, const exprt::operandst &amp;arguments, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01282">value_set_fi.cpp:1282</a></div></div>
+<div class="ttc" id="aclassvalue__set__fit_html_af49d986b76d9f03bdc9228db562ffc62"><div class="ttname"><a href="classvalue__set__fit.html#af49d986b76d9f03bdc9228db562ffc62">value_set_fit::do_function_call</a></div><div class="ttdeci">void do_function_call(const irep_idt &amp;function, const exprt::operandst &amp;arguments, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l01280">value_set_fi.cpp:1280</a></div></div>
 <div class="ttc" id="aclassvalue__set__fit_html_afacaad659944f35542414de2e1a7d26e"><div class="ttname"><a href="classvalue__set__fit.html#afacaad659944f35542414de2e1a7d26e">value_set_fit::get_reference_set_sharing_rec</a></div><div class="ttdeci">void get_reference_set_sharing_rec(const exprt &amp;expr, object_mapt &amp;dest, const namespacet &amp;ns) const</div><div class="ttdef"><b>Definition:</b> <a href="value__set__fi_8cpp_source.html#l00763">value_set_fi.cpp:763</a></div></div>
 <div class="ttc" id="aconverter_8cpp_html_ad8e2b943a39300fa9ca5cd4b40266848"><div class="ttname"><a href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a></div><div class="ttdeci">bool has_prefix(const std::string &amp;s, const std::string &amp;prefix)</div><div class="ttdef"><b>Definition:</b> <a href="converter_8cpp_source.html#l00013">converter.cpp:13</a></div></div>
 <div class="ttc" id="aexpr__util_8cpp_html_ae2ae8e358c96aa4b13b11a502bc9328b"><div class="ttname"><a href="expr__util_8cpp.html#ae2ae8e358c96aa4b13b11a502bc9328b">is_null_pointer</a></div><div class="ttdeci">bool is_null_pointer(const constant_exprt &amp;expr)</div><div class="ttdoc">Returns true if expr has a pointer type and a value NULL; it also returns true when expr has value ze...</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00356">expr_util.cpp:356</a></div></div>
@@ -1648,7 +1646,7 @@ $(document).ready(function(){initNavTree('value__set__fi_8cpp_source.html',''); 
 <div class="ttc" id="apointer__expr_8h_html_af3ae96e14b5d76bf6f6652f61382ba4a"><div class="ttname"><a href="pointer__expr_8h.html#af3ae96e14b5d76bf6f6652f61382ba4a">to_dynamic_object_expr</a></div><div class="ttdeci">const dynamic_object_exprt &amp; to_dynamic_object_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a dynamic_object_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00301">pointer_expr.h:301</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html_af3c9bf0da53bd25369f3d3095d471bcc"><div class="ttname"><a href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a></div><div class="ttdeci">const address_of_exprt &amp; to_address_of_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an address_of_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00460">pointer_expr.h:460</a></div></div>
 <div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
-<div class="ttc" id="asimplify__expr_8cpp_html_a02e7eaea06c1c477751552efb37dd4b1"><div class="ttname"><a href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a></div><div class="ttdeci">bool simplify(exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03018">simplify_expr.cpp:3018</a></div></div>
+<div class="ttc" id="asimplify__expr_8cpp_html_a02e7eaea06c1c477751552efb37dd4b1"><div class="ttname"><a href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a></div><div class="ttdeci">bool simplify(exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03019">simplify_expr.cpp:3019</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="asmt2__incremental__decision__procedure_8cpp_html_ac39a0adbcad4c2c02388ed215fe82ea0"><div class="ttname"><a href="smt2__incremental__decision__procedure_8cpp.html#ac39a0adbcad4c2c02388ed215fe82ea0">get_identifier</a></div><div class="ttdeci">static optionalt&lt; smt_termt &gt; get_identifier(const exprt &amp;expr, const std::unordered_map&lt; exprt, smt_identifier_termt, irep_hash &gt; &amp;expression_handle_identifiers, const std::unordered_map&lt; exprt, smt_identifier_termt, irep_hash &gt; &amp;expression_identifiers)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__incremental__decision__procedure_8cpp_source.html#l00344">smt2_incremental_decision_procedure.cpp:344</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>

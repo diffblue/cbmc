@@ -1386,429 +1386,428 @@ $(document).ready(function(){initNavTree('c__typecheck__type_8cpp_source.html','
 <div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(tmp_v.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
 <div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;        value=0;</div>
 <div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;        tmp_v.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_constant &amp;&amp;</div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;        !<a class="code" href="arith__tools_8cpp.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a>(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(tmp_v), value))</div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;      {</div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;      }</div>
-<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;      {</div>
-<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=v.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;enum is not a constant&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;        <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;      }</div>
-<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;    }</div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160; </div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;    <span class="keywordflow">if</span>(value&lt;min_value)</div>
-<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;      min_value=value;</div>
-<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;    <span class="keywordflow">if</span>(value&gt;max_value)</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;      max_value=value;</div>
-<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160; </div>
-<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;    <a class="code" href="classtypet.html">typet</a> constant_type;</div>
-<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160; </div>
-<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;    <span class="keywordflow">if</span>(have_underlying_type)</div>
-<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;    {</div>
-<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;      constant_type = type.<a class="code" href="classtypet.html#a6f22d3040c7f2cf5dd747bcc5bc8a22f">find_type</a>(ID_enum_underlying_type);</div>
-<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;tmp = <a class="code" href="bitvector__types_8h.html#aa8def4269e57de650cc8d1cb1ded3c6b">to_integer_bitvector_type</a>(constant_type);</div>
-<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160; </div>
-<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;      <span class="keywordflow">if</span>(value &lt; tmp.smallest() || value &gt; tmp.largest())</div>
-<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;      {</div>
-<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;        std::ostringstream msg;</div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;        msg &lt;&lt; <span class="stringliteral">&quot;enumerator value is not representable in the underlying type &#39;&quot;</span></div>
-<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;            &lt;&lt; constant_type.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_C_c_type) &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
-<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a>{msg.str(), v.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()};</div>
-<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;      }</div>
-<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;    }</div>
-<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;    {</div>
-<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;      constant_type = <a class="code" href="classc__typecheck__baset.html#ab4f9e0d33d0999308b74b59307571f89">enum_constant_type</a>(min_value, max_value);</div>
-<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;    }</div>
-<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160; </div>
-<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;    v=<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(value, constant_type);</div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160; </div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;    declaration.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()=constant_type;</div>
-<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a72ae771307ec3e3bac4dd6959b6434a9">typecheck_declaration</a>(declaration);</div>
-<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160; </div>
-<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> base_name=</div>
-<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;      declaration.<a class="code" href="classansi__c__declarationt.html#aa63027834283f5e089514801ade33c2a">declarator</a>().<a class="code" href="classansi__c__declaratort.html#a8d4863a1cda4d532b71af449857d239e">get_base_name</a>();</div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160; </div>
-<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> identifier=</div>
-<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;      declaration.<a class="code" href="classansi__c__declarationt.html#aa63027834283f5e089514801ade33c2a">declarator</a>().<a class="code" href="classansi__c__declaratort.html#af192a1a9e89c42f301805c3c7cfe1c6f">get_name</a>();</div>
-<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160; </div>
-<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;    <span class="comment">// store</span></div>
-<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;    <a class="code" href="classc__enum__typet_1_1c__enum__membert.html">c_enum_typet::c_enum_membert</a> member;</div>
-<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;    member.<a class="code" href="classc__enum__typet_1_1c__enum__membert.html#a0d50214bf8c90a68159cb9d91fa587f2">set_identifier</a>(identifier);</div>
-<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;    member.<a class="code" href="classc__enum__typet_1_1c__enum__membert.html#acb290dc5466d42f9f0ed017ac1e9780e">set_base_name</a>(base_name);</div>
-<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;    <span class="comment">// Note: The value will be correctly set to a bv type when we know</span></div>
-<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;    <span class="comment">// the width of the bitvector</span></div>
-<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;    member.<a class="code" href="classc__enum__typet_1_1c__enum__membert.html#a4ae0bee50375035fd36b3e7643e0ddc9">set_value</a>(<a class="code" href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a>(value));</div>
-<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;    enum_members.push_back(member);</div>
-<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160; </div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    <span class="comment">// produce value for next constant</span></div>
-<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;    ++value;</div>
-<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;  }</div>
-<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160; </div>
-<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;  <span class="comment">// Remove these now; we add them to the</span></div>
-<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;  <span class="comment">// c_enum symbol later.</span></div>
-<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;  as_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().clear();</div>
-<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160; </div>
-<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;  <span class="keywordtype">bool</span> is_packed=type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed);</div>
-<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160; </div>
-<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;  <span class="comment">// We use a subtype to store the underlying type.</span></div>
-<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;  <a class="code" href="classbitvector__typet.html">bitvector_typet</a> underlying_type(ID_nil);</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160; </div>
-<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;  <span class="keywordflow">if</span>(have_underlying_type)</div>
-<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;  {</div>
-<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;    underlying_type =</div>
-<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;      <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(type.<a class="code" href="classtypet.html#a6f22d3040c7f2cf5dd747bcc5bc8a22f">find_type</a>(ID_enum_underlying_type));</div>
-<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;  }</div>
-<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;  {</div>
-<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;    underlying_type = <a class="code" href="classc__typecheck__baset.html#ac217801da848b8deae60dfb37fd7c650">enum_underlying_type</a>(min_value, max_value, is_packed);</div>
-<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;  }</div>
-<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160; </div>
-<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;  <span class="comment">// Get the width to make the values have a bitvector type</span></div>
-<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  std::size_t width = underlying_type.<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
-<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;member : enum_members)</div>
-<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;  {</div>
-<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;    <span class="comment">// Note: This is inefficient as it first turns integers to strings</span></div>
-<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;    <span class="comment">// and then turns them back to bvrep</span></div>
-<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;    <span class="keyword">auto</span> value = <a class="code" href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member.get_value()));</div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;    member.set_value(<a class="code" href="arith__tools_8cpp.html#add07997e8180be6cd7b53205b5b1118d">integer2bvrep</a>(value, width));</div>
-<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;  }</div>
-<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160; </div>
-<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;  <span class="comment">// tag?</span></div>
-<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_tag).<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;  {</div>
-<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;    <span class="comment">// None, it&#39;s anonymous. We generate a tag.</span></div>
-<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;    std::string anon_identifier=<span class="stringliteral">&quot;#anon_enum&quot;</span>;</div>
-<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160; </div>
-<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;member : enum_members)</div>
-<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;    {</div>
-<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;      anon_identifier+=<span class="charliteral">&#39;$&#39;</span>;</div>
-<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;      anon_identifier+=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member.get_base_name());</div>
-<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;      anon_identifier+=<span class="charliteral">&#39;=&#39;</span>;</div>
-<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;      anon_identifier+=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member.get_value());</div>
-<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;    }</div>
-<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160; </div>
-<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;    <span class="keywordflow">if</span>(is_packed)</div>
-<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;      anon_identifier+=<span class="stringliteral">&quot;#packed&quot;</span>;</div>
-<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160; </div>
-<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;    type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag).<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_identifier, anon_identifier);</div>
-<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;  }</div>
-<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160; </div>
-<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;  <a class="code" href="classirept.html">irept</a> &amp;tag=type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag);</div>
-<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> base_name=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_C_base_name);</div>
-<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> identifier=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_identifier);</div>
-<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160; </div>
-<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;  <span class="comment">// Put into symbol table</span></div>
-<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;  <a class="code" href="classtype__symbolt.html">type_symbolt</a> enum_tag_symbol{identifier, type, <a class="code" href="classc__typecheck__baset.html#a4e0cc11b5266640e174d81df26405bf2">mode</a>};</div>
-<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;  enum_tag_symbol.location=source_location;</div>
-<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;  enum_tag_symbol.is_file_local=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;  enum_tag_symbol.base_name=base_name;</div>
-<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160; </div>
-<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;  <span class="comment">// throw in the enum members as &#39;body&#39;</span></div>
-<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;  <a class="code" href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">irept::subt</a> &amp;body=enum_tag_symbol.type.add(ID_body).get_sub();</div>
-<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160; </div>
-<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;member : enum_members)</div>
-<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;    body.push_back(member);</div>
-<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160; </div>
-<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;  enum_tag_symbol.type.add_subtype() = underlying_type;</div>
-<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160; </div>
-<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;  <span class="comment">// is it in the symbol table already?</span></div>
-<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;  symbol_table_baset::symbolst::const_iterator s_it =</div>
-<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(identifier);</div>
-<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160; </div>
-<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;  <span class="keywordflow">if</span>(s_it!=<a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
-<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;  {</div>
-<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;    <span class="comment">// Yes.</span></div>
-<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=s_it-&gt;second;</div>
-<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160; </div>
-<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_c_enum)</div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;    {</div>
-<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;use of tag that does not match previous declaration&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;    }</div>
-<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160; </div>
-<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="c__types_8h.html#a549a7ed5b2f9355d44ea5c8c4f804c03">to_c_enum_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>).<a class="code" href="classc__enum__typet.html#ae6e4efa08f8679da7937112e089fd609">is_incomplete</a>())</div>
-<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;    {</div>
-<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;      <span class="comment">// Ok, overwrite the type in the symbol table.</span></div>
-<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;      <span class="comment">// This gives us the members and the subtype.</span></div>
-<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;      <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">get_writeable_ref</a>(symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>).<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>=enum_tag_symbol.type;</div>
-<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;    }</div>
-<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;    {</div>
-<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;      <span class="comment">// We might already have the same anonymous enum, and this is</span></div>
-<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;      <span class="comment">// simply ok. Note that the C standard treats these as</span></div>
-<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;      <span class="comment">// different types.</span></div>
-<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;      <span class="keywordflow">if</span>(!base_name.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
-<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;      {</div>
-<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;redeclaration of enum tag&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;        <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;      }</div>
-<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;    }</div>
-<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;  }</div>
-<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;  {</div>
-<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> *new_symbol;</div>
-<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a39ddc2a0a8218d16a43e5c83f352ee2e">move_symbol</a>(enum_tag_symbol, new_symbol);</div>
-<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;  }</div>
-<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160; </div>
-<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;  <span class="comment">// We produce a c_enum_tag as the resulting type.</span></div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(ID_c_enum_tag);</div>
-<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;  type.<a class="code" href="classirept.html#a52bb64e4082f24bc2ffe3bd29c5fbb2a">remove</a>(ID_tag);</div>
-<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;  type.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_identifier, identifier);</div>
-<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;}</div>
-<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160; </div>
-<div class="line"><a name="l01472"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#a8272b9a6694848d2f0c57c7f56de46b4"> 1472</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#a8272b9a6694848d2f0c57c7f56de46b4">c_typecheck_baset::typecheck_c_enum_tag_type</a>(<a class="code" href="classc__enum__tag__typet.html">c_enum_tag_typet</a> &amp;type)</div>
-<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;{</div>
-<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;  <span class="comment">// It&#39;s just a tag.</span></div>
-<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160; </div>
-<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_tag).<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;  {</div>
-<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;anonymous enum tag without members&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;  }</div>
-<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160; </div>
-<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_enum_underlying_type).<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>())</div>
-<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;  {</div>
-<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;    <a class="code" href="classmessaget.html#a32445635da38d1ef7370c6447a93cbc7">warning</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;    <a class="code" href="classmessaget.html#a32445635da38d1ef7370c6447a93cbc7">warning</a>() &lt;&lt; <span class="stringliteral">&quot;ignoring specification of underlying type for enum&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;  }</div>
-<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160; </div>
-<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160; </div>
-<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;  <a class="code" href="classirept.html">irept</a> &amp;tag=type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag);</div>
-<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> base_name=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_C_base_name);</div>
-<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> identifier=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_identifier);</div>
-<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160; </div>
-<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;  <span class="comment">// is it in the symbol table?</span></div>
-<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;  symbol_table_baset::symbolst::const_iterator s_it =</div>
-<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(identifier);</div>
-<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160; </div>
-<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;  <span class="keywordflow">if</span>(s_it!=<a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
-<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;  {</div>
-<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    <span class="comment">// Yes.</span></div>
-<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=s_it-&gt;second;</div>
-<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160; </div>
-<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_c_enum)</div>
-<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160;    {</div>
-<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=source_location;</div>
-<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;use of tag that does not match previous declaration&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;    }</div>
-<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;  }</div>
-<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;  {</div>
-<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;    <span class="comment">// no, add it as an incomplete c_enum</span></div>
-<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;    <a class="code" href="classc__enum__typet.html">c_enum_typet</a> new_type(<a class="code" href="c__types_8cpp.html#a7acad2c30feee311bc25620ae1913813">signed_int_type</a>()); <span class="comment">// default subtype</span></div>
-<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;    new_type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag)=tag;</div>
-<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160;    new_type.<a class="code" href="classc__enum__typet.html#a844d9bd6d1ba542aee05fa238c14b105">make_incomplete</a>();</div>
-<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160; </div>
-<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;    <a class="code" href="classtype__symbolt.html">type_symbolt</a> enum_tag_symbol{identifier, new_type, <a class="code" href="classc__typecheck__baset.html#a4e0cc11b5266640e174d81df26405bf2">mode</a>};</div>
-<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;    enum_tag_symbol.location=source_location;</div>
-<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;    enum_tag_symbol.is_file_local=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;    enum_tag_symbol.base_name=base_name;</div>
-<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160; </div>
-<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> *new_symbol;</div>
-<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a39ddc2a0a8218d16a43e5c83f352ee2e">move_symbol</a>(enum_tag_symbol, new_symbol);</div>
-<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;  }</div>
-<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160; </div>
-<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;  <span class="comment">// Clean up resulting type</span></div>
-<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;  type.<a class="code" href="classirept.html#a52bb64e4082f24bc2ffe3bd29c5fbb2a">remove</a>(ID_tag);</div>
-<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;  type.<a class="code" href="classtag__typet.html#a79e64c5ba192da6eb6596212742f29db">set_identifier</a>(identifier);</div>
-<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;}</div>
-<div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160; </div>
-<div class="line"><a name="l01532"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#a6b54656ecac20e2a610c8d090c5cf3a6"> 1532</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#a6b54656ecac20e2a610c8d090c5cf3a6">c_typecheck_baset::typecheck_c_bit_field_type</a>(<a class="code" href="classc__bit__field__typet.html">c_bit_field_typet</a> &amp;type)</div>
-<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;{</div>
-<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;  <a class="code" href="classc__typecheck__baset.html#aeb126e27d88ff73018bb50286f0c77ed">typecheck_type</a>(type.<a class="code" href="classc__bit__field__typet.html#ae9ae5a4c6f1d3b5a7b094923f8be48ed">underlying_type</a>());</div>
-<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160; </div>
-<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> i;</div>
-<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160; </div>
-<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;  {</div>
-<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160;    <a class="code" href="classexprt.html">exprt</a> &amp;width_expr=<span class="keyword">static_cast&lt;</span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_size));</div>
-<div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160; </div>
-<div class="line"><a name="l01541"></a><span class="lineno"> 1541</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a1f8b0b1f486051b3dcf5d337d2d12acf">typecheck_expr</a>(width_expr);</div>
-<div class="line"><a name="l01542"></a><span class="lineno"> 1542</span>&#160;    <a class="code" href="classc__typecheck__baset.html#ac21018a2150f023bd3d1feaa610add2f">make_constant_index</a>(width_expr);</div>
-<div class="line"><a name="l01543"></a><span class="lineno"> 1543</span>&#160; </div>
-<div class="line"><a name="l01544"></a><span class="lineno"> 1544</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="arith__tools_8cpp.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a>(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(width_expr), i))</div>
-<div class="line"><a name="l01545"></a><span class="lineno"> 1545</span>&#160;    {</div>
-<div class="line"><a name="l01546"></a><span class="lineno"> 1546</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01547"></a><span class="lineno"> 1547</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to convert bit field width&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01548"></a><span class="lineno"> 1548</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01549"></a><span class="lineno"> 1549</span>&#160;    }</div>
-<div class="line"><a name="l01550"></a><span class="lineno"> 1550</span>&#160; </div>
-<div class="line"><a name="l01551"></a><span class="lineno"> 1551</span>&#160;    <span class="keywordflow">if</span>(i&lt;0)</div>
-<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;    {</div>
-<div class="line"><a name="l01553"></a><span class="lineno"> 1553</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01554"></a><span class="lineno"> 1554</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field width is negative&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01555"></a><span class="lineno"> 1555</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01556"></a><span class="lineno"> 1556</span>&#160;    }</div>
-<div class="line"><a name="l01557"></a><span class="lineno"> 1557</span>&#160; </div>
-<div class="line"><a name="l01558"></a><span class="lineno"> 1558</span>&#160;    type.<a class="code" href="classbitvector__typet.html#a329ccb0a4b923e70fea5b0c7bcb2081a">set_width</a>(numeric_cast_v&lt;std::size_t&gt;(i));</div>
-<div class="line"><a name="l01559"></a><span class="lineno"> 1559</span>&#160;    type.<a class="code" href="classirept.html#a52bb64e4082f24bc2ffe3bd29c5fbb2a">remove</a>(ID_size);</div>
-<div class="line"><a name="l01560"></a><span class="lineno"> 1560</span>&#160;  }</div>
-<div class="line"><a name="l01561"></a><span class="lineno"> 1561</span>&#160; </div>
-<div class="line"><a name="l01562"></a><span class="lineno"> 1562</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;underlying_type = type.<a class="code" href="classc__bit__field__typet.html#ae9ae5a4c6f1d3b5a7b094923f8be48ed">underlying_type</a>();</div>
-<div class="line"><a name="l01563"></a><span class="lineno"> 1563</span>&#160; </div>
-<div class="line"><a name="l01564"></a><span class="lineno"> 1564</span>&#160;  std::size_t sub_width=0;</div>
-<div class="line"><a name="l01565"></a><span class="lineno"> 1565</span>&#160; </div>
-<div class="line"><a name="l01566"></a><span class="lineno"> 1566</span>&#160;  <span class="keywordflow">if</span>(underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool)</div>
-<div class="line"><a name="l01567"></a><span class="lineno"> 1567</span>&#160;  {</div>
-<div class="line"><a name="l01568"></a><span class="lineno"> 1568</span>&#160;    <span class="comment">// This is the &#39;proper&#39; bool.</span></div>
-<div class="line"><a name="l01569"></a><span class="lineno"> 1569</span>&#160;    sub_width=1;</div>
-<div class="line"><a name="l01570"></a><span class="lineno"> 1570</span>&#160;  }</div>
-<div class="line"><a name="l01571"></a><span class="lineno"> 1571</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01572"></a><span class="lineno"> 1572</span>&#160;    underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_signedbv ||</div>
-<div class="line"><a name="l01573"></a><span class="lineno"> 1573</span>&#160;    underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_unsignedbv || underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_c_bool)</div>
-<div class="line"><a name="l01574"></a><span class="lineno"> 1574</span>&#160;  {</div>
-<div class="line"><a name="l01575"></a><span class="lineno"> 1575</span>&#160;    sub_width = <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(underlying_type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
-<div class="line"><a name="l01576"></a><span class="lineno"> 1576</span>&#160;  }</div>
-<div class="line"><a name="l01577"></a><span class="lineno"> 1577</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_c_enum_tag)</div>
-<div class="line"><a name="l01578"></a><span class="lineno"> 1578</span>&#160;  {</div>
-<div class="line"><a name="l01579"></a><span class="lineno"> 1579</span>&#160;    <span class="comment">// These point to an enum, which has a sub-subtype,</span></div>
-<div class="line"><a name="l01580"></a><span class="lineno"> 1580</span>&#160;    <span class="comment">// which may be smaller or larger than int, and we thus have</span></div>
-<div class="line"><a name="l01581"></a><span class="lineno"> 1581</span>&#160;    <span class="comment">// to check.</span></div>
-<div class="line"><a name="l01582"></a><span class="lineno"> 1582</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;c_enum_type =</div>
-<div class="line"><a name="l01583"></a><span class="lineno"> 1583</span>&#160;      <a class="code" href="c__types_8h.html#a549a7ed5b2f9355d44ea5c8c4f804c03">to_c_enum_type</a>(<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#aa14679493b0ac7bea8197a3ac6d1bf7f">to_c_enum_tag_type</a>(underlying_type)));</div>
-<div class="line"><a name="l01584"></a><span class="lineno"> 1584</span>&#160; </div>
-<div class="line"><a name="l01585"></a><span class="lineno"> 1585</span>&#160;    <span class="keywordflow">if</span>(c_enum_type.is_incomplete())</div>
-<div class="line"><a name="l01586"></a><span class="lineno"> 1586</span>&#160;    {</div>
-<div class="line"><a name="l01587"></a><span class="lineno"> 1587</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01588"></a><span class="lineno"> 1588</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field has incomplete enum type&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01589"></a><span class="lineno"> 1589</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01590"></a><span class="lineno"> 1590</span>&#160;    }</div>
-<div class="line"><a name="l01591"></a><span class="lineno"> 1591</span>&#160; </div>
-<div class="line"><a name="l01592"></a><span class="lineno"> 1592</span>&#160;    sub_width = <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(c_enum_type.underlying_type()).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
-<div class="line"><a name="l01593"></a><span class="lineno"> 1593</span>&#160;  }</div>
-<div class="line"><a name="l01594"></a><span class="lineno"> 1594</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01595"></a><span class="lineno"> 1595</span>&#160;  {</div>
-<div class="line"><a name="l01596"></a><span class="lineno"> 1596</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01597"></a><span class="lineno"> 1597</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field with non-integer type: &quot;</span> &lt;&lt; <a class="code" href="classc__typecheck__baset.html#a70827109ec6b951e2f018c84a80c77c8">to_string</a>(underlying_type)</div>
-<div class="line"><a name="l01598"></a><span class="lineno"> 1598</span>&#160;            &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01599"></a><span class="lineno"> 1599</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01600"></a><span class="lineno"> 1600</span>&#160;  }</div>
-<div class="line"><a name="l01601"></a><span class="lineno"> 1601</span>&#160; </div>
-<div class="line"><a name="l01602"></a><span class="lineno"> 1602</span>&#160;  <span class="keywordflow">if</span>(i&gt;sub_width)</div>
-<div class="line"><a name="l01603"></a><span class="lineno"> 1603</span>&#160;  {</div>
-<div class="line"><a name="l01604"></a><span class="lineno"> 1604</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01605"></a><span class="lineno"> 1605</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field (&quot;</span> &lt;&lt; i</div>
-<div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;            &lt;&lt; <span class="stringliteral">&quot; bits) larger than type (&quot;</span> &lt;&lt; sub_width &lt;&lt; <span class="stringliteral">&quot; bits)&quot;</span></div>
-<div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;            &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01608"></a><span class="lineno"> 1608</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;  }</div>
-<div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160;}</div>
-<div class="line"><a name="l01611"></a><span class="lineno"> 1611</span>&#160; </div>
-<div class="line"><a name="l01612"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#ae9520cd8031d19eae0883ee9f828b758"> 1612</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#ae9520cd8031d19eae0883ee9f828b758">c_typecheck_baset::typecheck_typeof_type</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)</div>
-<div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;{</div>
-<div class="line"><a name="l01614"></a><span class="lineno"> 1614</span>&#160;  <span class="comment">// save location</span></div>
-<div class="line"><a name="l01615"></a><span class="lineno"> 1615</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01616"></a><span class="lineno"> 1616</span>&#160; </div>
-<div class="line"><a name="l01617"></a><span class="lineno"> 1617</span>&#160;  <span class="comment">// retain the qualifiers as is</span></div>
-<div class="line"><a name="l01618"></a><span class="lineno"> 1618</span>&#160;  <a class="code" href="classc__qualifierst.html">c_qualifierst</a> c_qualifiers;</div>
-<div class="line"><a name="l01619"></a><span class="lineno"> 1619</span>&#160;  c_qualifiers.<a class="code" href="classc__qualifierst.html#ab50a41a4a8f709f54164342958c760e4">read</a>(type);</div>
-<div class="line"><a name="l01620"></a><span class="lineno"> 1620</span>&#160; </div>
-<div class="line"><a name="l01621"></a><span class="lineno"> 1621</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;as_expr = (<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;)type;</div>
-<div class="line"><a name="l01622"></a><span class="lineno"> 1622</span>&#160; </div>
-<div class="line"><a name="l01623"></a><span class="lineno"> 1623</span>&#160;  <span class="keywordflow">if</span>(!as_expr.has_operands())</div>
-<div class="line"><a name="l01624"></a><span class="lineno"> 1624</span>&#160;  {</div>
-<div class="line"><a name="l01625"></a><span class="lineno"> 1625</span>&#160;    <a class="code" href="classtypet.html">typet</a> t=<span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classtypet.html">typet</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_type_arg));</div>
-<div class="line"><a name="l01626"></a><span class="lineno"> 1626</span>&#160;    <a class="code" href="classc__typecheck__baset.html#aeb126e27d88ff73018bb50286f0c77ed">typecheck_type</a>(t);</div>
-<div class="line"><a name="l01627"></a><span class="lineno"> 1627</span>&#160;    type.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(t);</div>
-<div class="line"><a name="l01628"></a><span class="lineno"> 1628</span>&#160;  }</div>
-<div class="line"><a name="l01629"></a><span class="lineno"> 1629</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01630"></a><span class="lineno"> 1630</span>&#160;  {</div>
-<div class="line"><a name="l01631"></a><span class="lineno"> 1631</span>&#160;    <a class="code" href="classexprt.html">exprt</a> expr = <a class="code" href="std__expr_8h.html#ab732b1d384f4dd5bfc303c051b8dc5da">to_unary_expr</a>(as_expr).<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>();</div>
-<div class="line"><a name="l01632"></a><span class="lineno"> 1632</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a1f8b0b1f486051b3dcf5d337d2d12acf">typecheck_expr</a>(expr);</div>
-<div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160; </div>
-<div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;    <span class="comment">// undo an implicit address-of</span></div>
-<div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_address_of &amp;&amp;</div>
-<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;       expr.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_implicit))</div>
-<div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;    {</div>
-<div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;      expr = <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<a class="code" href="classaddress__of__exprt.html#ad81853a6acc7627a48fcfa8087e3aa5d">object</a>();</div>
-<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;    }</div>
-<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160; </div>
-<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;    type.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;  }</div>
-<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160; </div>
-<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;  type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;  c_qualifiers.<a class="code" href="classc__qualifierst.html#a42142eb06f861600220d6456a3cc6979">write</a>(type);</div>
-<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;}</div>
-<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160; </div>
-<div class="line"><a name="l01648"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#ad2f8df708a6f6b30107b561dcddf00af"> 1648</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#ad2f8df708a6f6b30107b561dcddf00af">c_typecheck_baset::typecheck_typedef_type</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)</div>
-<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;{</div>
-<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier = <a class="code" href="typedef__type_8h.html#a2dfb910a8fd3e5c1b1338e3f22825d19">to_typedef_type</a>(type).<a class="code" href="classtypedef__typet.html#abe868d2a7418a49bab1a9ab25358b675">get_identifier</a>();</div>
-<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160; </div>
-<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;  symbol_table_baset::symbolst::const_iterator s_it =</div>
-<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(identifier);</div>
-<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160; </div>
-<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  <span class="keywordflow">if</span>(s_it == <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
-<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;  {</div>
-<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;typedef symbol &#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; not found&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;  }</div>
-<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160; </div>
-<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol = s_it-&gt;second;</div>
-<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160; </div>
-<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;  <span class="keywordflow">if</span>(!symbol.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a>)</div>
-<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;  {</div>
-<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;expected type symbol for typedef&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;  }</div>
-<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160; </div>
-<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;  <span class="comment">// overwrite, but preserve (add) any qualifiers and other flags</span></div>
-<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160; </div>
-<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;  <a class="code" href="classc__qualifierst.html">c_qualifierst</a> c_qualifiers(type);</div>
-<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;  <span class="keywordtype">bool</span> is_packed = type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed);</div>
-<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;  <a class="code" href="classirept.html">irept</a> <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a> = type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_C_alignment);</div>
-<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160; </div>
-<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;  c_qualifiers += <a class="code" href="classc__qualifierst.html">c_qualifierst</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160;  type = symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>;</div>
-<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;  c_qualifiers.<a class="code" href="classc__qualifierst.html#a42142eb06f861600220d6456a3cc6979">write</a>(type);</div>
-<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160; </div>
-<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;  <span class="keywordflow">if</span>(is_packed)</div>
-<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;    type.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_C_packed, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>.is_not_nil())</div>
-<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;    type.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_C_alignment, <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>);</div>
-<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160; </div>
-<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;  <span class="comment">// CPROVER extensions</span></div>
-<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;rational&quot;</span>)</div>
-<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;  {</div>
-<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;    type=<a class="code" href="classrational__typet.html">rational_typet</a>();</div>
-<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;  }</div>
-<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;integer&quot;</span>)</div>
-<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;  {</div>
-<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;    type=<a class="code" href="classinteger__typet.html">integer_typet</a>();</div>
-<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;  }</div>
-<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;}</div>
-<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160; </div>
-<div class="line"><a name="l01697"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14"> 1697</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14">c_typecheck_baset::adjust_function_parameter</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)<span class="keyword"> const</span></div>
-<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;  {</div>
-<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;    <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;    type = <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
-<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;    type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  }</div>
-<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
-<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;  {</div>
-<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;    <span class="comment">// see ISO/IEC 9899:1999 page 199 clause 8,</span></div>
-<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;    <span class="comment">// may be hidden in typedef</span></div>
-<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;    <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
-<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;    type=<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(type);</div>
-<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;    type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;  }</div>
-<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_KnR)</div>
-<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;  {</div>
-<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;    <span class="comment">// any KnR args without type yet?</span></div>
-<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;    type=<a class="code" href="c__types_8cpp.html#a7acad2c30feee311bc25620ae1913813">signed_int_type</a>(); <span class="comment">// the default is integer!</span></div>
-<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;    <span class="comment">// no source location</span></div>
-<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;  }</div>
-<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160;}</div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;        tmp_v.<a class="code" href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">is_constant</a>() &amp;&amp; !<a class="code" href="arith__tools_8cpp.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a>(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(tmp_v), value))</div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;      {</div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;      }</div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;      {</div>
+<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=v.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;enum is not a constant&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;        <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;      }</div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;    }</div>
+<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160; </div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;    <span class="keywordflow">if</span>(value&lt;min_value)</div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;      min_value=value;</div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;    <span class="keywordflow">if</span>(value&gt;max_value)</div>
+<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;      max_value=value;</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160; </div>
+<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;    <a class="code" href="classtypet.html">typet</a> constant_type;</div>
+<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160; </div>
+<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;    <span class="keywordflow">if</span>(have_underlying_type)</div>
+<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;    {</div>
+<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;      constant_type = type.<a class="code" href="classtypet.html#a6f22d3040c7f2cf5dd747bcc5bc8a22f">find_type</a>(ID_enum_underlying_type);</div>
+<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;tmp = <a class="code" href="bitvector__types_8h.html#aa8def4269e57de650cc8d1cb1ded3c6b">to_integer_bitvector_type</a>(constant_type);</div>
+<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160; </div>
+<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;      <span class="keywordflow">if</span>(value &lt; tmp.smallest() || value &gt; tmp.largest())</div>
+<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;      {</div>
+<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;        std::ostringstream msg;</div>
+<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;        msg &lt;&lt; <span class="stringliteral">&quot;enumerator value is not representable in the underlying type &#39;&quot;</span></div>
+<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;            &lt;&lt; constant_type.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_C_c_type) &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
+<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a>{msg.str(), v.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>()};</div>
+<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;      }</div>
+<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;    }</div>
+<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;    {</div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;      constant_type = <a class="code" href="classc__typecheck__baset.html#ab4f9e0d33d0999308b74b59307571f89">enum_constant_type</a>(min_value, max_value);</div>
+<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;    }</div>
+<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160; </div>
+<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;    v=<a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(value, constant_type);</div>
+<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160; </div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;    declaration.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()=constant_type;</div>
+<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a72ae771307ec3e3bac4dd6959b6434a9">typecheck_declaration</a>(declaration);</div>
+<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160; </div>
+<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> base_name=</div>
+<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;      declaration.<a class="code" href="classansi__c__declarationt.html#aa63027834283f5e089514801ade33c2a">declarator</a>().<a class="code" href="classansi__c__declaratort.html#a8d4863a1cda4d532b71af449857d239e">get_base_name</a>();</div>
+<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160; </div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> identifier=</div>
+<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;      declaration.<a class="code" href="classansi__c__declarationt.html#aa63027834283f5e089514801ade33c2a">declarator</a>().<a class="code" href="classansi__c__declaratort.html#af192a1a9e89c42f301805c3c7cfe1c6f">get_name</a>();</div>
+<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160; </div>
+<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;    <span class="comment">// store</span></div>
+<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;    <a class="code" href="classc__enum__typet_1_1c__enum__membert.html">c_enum_typet::c_enum_membert</a> member;</div>
+<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;    member.<a class="code" href="classc__enum__typet_1_1c__enum__membert.html#a0d50214bf8c90a68159cb9d91fa587f2">set_identifier</a>(identifier);</div>
+<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;    member.<a class="code" href="classc__enum__typet_1_1c__enum__membert.html#acb290dc5466d42f9f0ed017ac1e9780e">set_base_name</a>(base_name);</div>
+<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;    <span class="comment">// Note: The value will be correctly set to a bv type when we know</span></div>
+<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;    <span class="comment">// the width of the bitvector</span></div>
+<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;    member.<a class="code" href="classc__enum__typet_1_1c__enum__membert.html#a4ae0bee50375035fd36b3e7643e0ddc9">set_value</a>(<a class="code" href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a>(value));</div>
+<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;    enum_members.push_back(member);</div>
+<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160; </div>
+<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;    <span class="comment">// produce value for next constant</span></div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    ++value;</div>
+<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;  }</div>
+<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160; </div>
+<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;  <span class="comment">// Remove these now; we add them to the</span></div>
+<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;  <span class="comment">// c_enum symbol later.</span></div>
+<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;  as_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().clear();</div>
+<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160; </div>
+<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;  <span class="keywordtype">bool</span> is_packed=type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed);</div>
+<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160; </div>
+<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;  <span class="comment">// We use a subtype to store the underlying type.</span></div>
+<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;  <a class="code" href="classbitvector__typet.html">bitvector_typet</a> underlying_type(ID_nil);</div>
+<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160; </div>
+<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;  <span class="keywordflow">if</span>(have_underlying_type)</div>
+<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;  {</div>
+<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;    underlying_type =</div>
+<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;      <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(type.<a class="code" href="classtypet.html#a6f22d3040c7f2cf5dd747bcc5bc8a22f">find_type</a>(ID_enum_underlying_type));</div>
+<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;  }</div>
+<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;  {</div>
+<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;    underlying_type = <a class="code" href="classc__typecheck__baset.html#ac217801da848b8deae60dfb37fd7c650">enum_underlying_type</a>(min_value, max_value, is_packed);</div>
+<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;  }</div>
+<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160; </div>
+<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;  <span class="comment">// Get the width to make the values have a bitvector type</span></div>
+<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;  std::size_t width = underlying_type.<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
+<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;member : enum_members)</div>
+<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;  {</div>
+<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;    <span class="comment">// Note: This is inefficient as it first turns integers to strings</span></div>
+<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;    <span class="comment">// and then turns them back to bvrep</span></div>
+<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;    <span class="keyword">auto</span> value = <a class="code" href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member.get_value()));</div>
+<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;    member.set_value(<a class="code" href="arith__tools_8cpp.html#add07997e8180be6cd7b53205b5b1118d">integer2bvrep</a>(value, width));</div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  }</div>
+<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160; </div>
+<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;  <span class="comment">// tag?</span></div>
+<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_tag).<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  {</div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;    <span class="comment">// None, it&#39;s anonymous. We generate a tag.</span></div>
+<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;    std::string anon_identifier=<span class="stringliteral">&quot;#anon_enum&quot;</span>;</div>
+<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160; </div>
+<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;member : enum_members)</div>
+<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;    {</div>
+<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;      anon_identifier+=<span class="charliteral">&#39;$&#39;</span>;</div>
+<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;      anon_identifier+=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member.get_base_name());</div>
+<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;      anon_identifier+=<span class="charliteral">&#39;=&#39;</span>;</div>
+<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;      anon_identifier+=<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(member.get_value());</div>
+<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;    }</div>
+<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160; </div>
+<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;    <span class="keywordflow">if</span>(is_packed)</div>
+<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;      anon_identifier+=<span class="stringliteral">&quot;#packed&quot;</span>;</div>
+<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160; </div>
+<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;    type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag).<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_identifier, anon_identifier);</div>
+<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;  }</div>
+<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160; </div>
+<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;  <a class="code" href="classirept.html">irept</a> &amp;tag=type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag);</div>
+<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> base_name=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_C_base_name);</div>
+<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> identifier=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_identifier);</div>
+<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160; </div>
+<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;  <span class="comment">// Put into symbol table</span></div>
+<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;  <a class="code" href="classtype__symbolt.html">type_symbolt</a> enum_tag_symbol{identifier, type, <a class="code" href="classc__typecheck__baset.html#a4e0cc11b5266640e174d81df26405bf2">mode</a>};</div>
+<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;  enum_tag_symbol.location=source_location;</div>
+<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;  enum_tag_symbol.is_file_local=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;  enum_tag_symbol.base_name=base_name;</div>
+<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160; </div>
+<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;  <span class="comment">// throw in the enum members as &#39;body&#39;</span></div>
+<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;  <a class="code" href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">irept::subt</a> &amp;body=enum_tag_symbol.type.add(ID_body).get_sub();</div>
+<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160; </div>
+<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;member : enum_members)</div>
+<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;    body.push_back(member);</div>
+<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160; </div>
+<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;  enum_tag_symbol.type.add_subtype() = underlying_type;</div>
+<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160; </div>
+<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;  <span class="comment">// is it in the symbol table already?</span></div>
+<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;  symbol_table_baset::symbolst::const_iterator s_it =</div>
+<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(identifier);</div>
+<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160; </div>
+<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;  <span class="keywordflow">if</span>(s_it!=<a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
+<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;  {</div>
+<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;    <span class="comment">// Yes.</span></div>
+<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=s_it-&gt;second;</div>
+<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160; </div>
+<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_c_enum)</div>
+<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;    {</div>
+<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
+<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;use of tag that does not match previous declaration&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;    }</div>
+<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160; </div>
+<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="c__types_8h.html#a549a7ed5b2f9355d44ea5c8c4f804c03">to_c_enum_type</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>).<a class="code" href="classc__enum__typet.html#ae6e4efa08f8679da7937112e089fd609">is_incomplete</a>())</div>
+<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;    {</div>
+<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;      <span class="comment">// Ok, overwrite the type in the symbol table.</span></div>
+<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;      <span class="comment">// This gives us the members and the subtype.</span></div>
+<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;      <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">get_writeable_ref</a>(symbol.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>).<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>=enum_tag_symbol.type;</div>
+<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;    }</div>
+<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160;    {</div>
+<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;      <span class="comment">// We might already have the same anonymous enum, and this is</span></div>
+<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;      <span class="comment">// simply ok. Note that the C standard treats these as</span></div>
+<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;      <span class="comment">// different types.</span></div>
+<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;      <span class="keywordflow">if</span>(!base_name.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
+<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;      {</div>
+<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160;        <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;redeclaration of enum tag&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;        <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;      }</div>
+<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;    }</div>
+<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;  }</div>
+<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;  {</div>
+<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> *new_symbol;</div>
+<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a39ddc2a0a8218d16a43e5c83f352ee2e">move_symbol</a>(enum_tag_symbol, new_symbol);</div>
+<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;  }</div>
+<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160; </div>
+<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;  <span class="comment">// We produce a c_enum_tag as the resulting type.</span></div>
+<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;  type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>(ID_c_enum_tag);</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  type.<a class="code" href="classirept.html#a52bb64e4082f24bc2ffe3bd29c5fbb2a">remove</a>(ID_tag);</div>
+<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;  type.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_identifier, identifier);</div>
+<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;}</div>
+<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160; </div>
+<div class="line"><a name="l01471"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#a8272b9a6694848d2f0c57c7f56de46b4"> 1471</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#a8272b9a6694848d2f0c57c7f56de46b4">c_typecheck_baset::typecheck_c_enum_tag_type</a>(<a class="code" href="classc__enum__tag__typet.html">c_enum_tag_typet</a> &amp;type)</div>
+<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;{</div>
+<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;  <span class="comment">// It&#39;s just a tag.</span></div>
+<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160; </div>
+<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_tag).<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;  {</div>
+<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;anonymous enum tag without members&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;  }</div>
+<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160; </div>
+<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_enum_underlying_type).<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>())</div>
+<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;  {</div>
+<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;    <a class="code" href="classmessaget.html#a32445635da38d1ef7370c6447a93cbc7">warning</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;    <a class="code" href="classmessaget.html#a32445635da38d1ef7370c6447a93cbc7">warning</a>() &lt;&lt; <span class="stringliteral">&quot;ignoring specification of underlying type for enum&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;  }</div>
+<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160; </div>
+<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160; </div>
+<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;  <a class="code" href="classirept.html">irept</a> &amp;tag=type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag);</div>
+<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> base_name=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_C_base_name);</div>
+<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> identifier=tag.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_identifier);</div>
+<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160; </div>
+<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;  <span class="comment">// is it in the symbol table?</span></div>
+<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;  symbol_table_baset::symbolst::const_iterator s_it =</div>
+<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(identifier);</div>
+<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160; </div>
+<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;  <span class="keywordflow">if</span>(s_it!=<a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
+<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;  {</div>
+<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;    <span class="comment">// Yes.</span></div>
+<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=s_it-&gt;second;</div>
+<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160; </div>
+<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;    <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_c_enum)</div>
+<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;    {</div>
+<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=source_location;</div>
+<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;use of tag that does not match previous declaration&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160;    }</div>
+<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;  }</div>
+<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;  {</div>
+<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;    <span class="comment">// no, add it as an incomplete c_enum</span></div>
+<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;    <a class="code" href="classc__enum__typet.html">c_enum_typet</a> new_type(<a class="code" href="c__types_8cpp.html#a7acad2c30feee311bc25620ae1913813">signed_int_type</a>()); <span class="comment">// default subtype</span></div>
+<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;    new_type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_tag)=tag;</div>
+<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;    new_type.<a class="code" href="classc__enum__typet.html#a844d9bd6d1ba542aee05fa238c14b105">make_incomplete</a>();</div>
+<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160; </div>
+<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160;    <a class="code" href="classtype__symbolt.html">type_symbolt</a> enum_tag_symbol{identifier, new_type, <a class="code" href="classc__typecheck__baset.html#a4e0cc11b5266640e174d81df26405bf2">mode</a>};</div>
+<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;    enum_tag_symbol.location=source_location;</div>
+<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;    enum_tag_symbol.is_file_local=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;    enum_tag_symbol.base_name=base_name;</div>
+<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160; </div>
+<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> *new_symbol;</div>
+<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a39ddc2a0a8218d16a43e5c83f352ee2e">move_symbol</a>(enum_tag_symbol, new_symbol);</div>
+<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;  }</div>
+<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160; </div>
+<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;  <span class="comment">// Clean up resulting type</span></div>
+<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;  type.<a class="code" href="classirept.html#a52bb64e4082f24bc2ffe3bd29c5fbb2a">remove</a>(ID_tag);</div>
+<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;  type.<a class="code" href="classtag__typet.html#a79e64c5ba192da6eb6596212742f29db">set_identifier</a>(identifier);</div>
+<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;}</div>
+<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160; </div>
+<div class="line"><a name="l01531"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#a6b54656ecac20e2a610c8d090c5cf3a6"> 1531</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#a6b54656ecac20e2a610c8d090c5cf3a6">c_typecheck_baset::typecheck_c_bit_field_type</a>(<a class="code" href="classc__bit__field__typet.html">c_bit_field_typet</a> &amp;type)</div>
+<div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;{</div>
+<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;  <a class="code" href="classc__typecheck__baset.html#aeb126e27d88ff73018bb50286f0c77ed">typecheck_type</a>(type.<a class="code" href="classc__bit__field__typet.html#ae9ae5a4c6f1d3b5a7b094923f8be48ed">underlying_type</a>());</div>
+<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160; </div>
+<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> i;</div>
+<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160; </div>
+<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160;  {</div>
+<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;    <a class="code" href="classexprt.html">exprt</a> &amp;width_expr=<span class="keyword">static_cast&lt;</span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#af10848c30ad5c49d23f2632c8b3dbc88">add</a>(ID_size));</div>
+<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160; </div>
+<div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a1f8b0b1f486051b3dcf5d337d2d12acf">typecheck_expr</a>(width_expr);</div>
+<div class="line"><a name="l01541"></a><span class="lineno"> 1541</span>&#160;    <a class="code" href="classc__typecheck__baset.html#ac21018a2150f023bd3d1feaa610add2f">make_constant_index</a>(width_expr);</div>
+<div class="line"><a name="l01542"></a><span class="lineno"> 1542</span>&#160; </div>
+<div class="line"><a name="l01543"></a><span class="lineno"> 1543</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="arith__tools_8cpp.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a>(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(width_expr), i))</div>
+<div class="line"><a name="l01544"></a><span class="lineno"> 1544</span>&#160;    {</div>
+<div class="line"><a name="l01545"></a><span class="lineno"> 1545</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01546"></a><span class="lineno"> 1546</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to convert bit field width&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01547"></a><span class="lineno"> 1547</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01548"></a><span class="lineno"> 1548</span>&#160;    }</div>
+<div class="line"><a name="l01549"></a><span class="lineno"> 1549</span>&#160; </div>
+<div class="line"><a name="l01550"></a><span class="lineno"> 1550</span>&#160;    <span class="keywordflow">if</span>(i&lt;0)</div>
+<div class="line"><a name="l01551"></a><span class="lineno"> 1551</span>&#160;    {</div>
+<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01553"></a><span class="lineno"> 1553</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field width is negative&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01554"></a><span class="lineno"> 1554</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01555"></a><span class="lineno"> 1555</span>&#160;    }</div>
+<div class="line"><a name="l01556"></a><span class="lineno"> 1556</span>&#160; </div>
+<div class="line"><a name="l01557"></a><span class="lineno"> 1557</span>&#160;    type.<a class="code" href="classbitvector__typet.html#a329ccb0a4b923e70fea5b0c7bcb2081a">set_width</a>(numeric_cast_v&lt;std::size_t&gt;(i));</div>
+<div class="line"><a name="l01558"></a><span class="lineno"> 1558</span>&#160;    type.<a class="code" href="classirept.html#a52bb64e4082f24bc2ffe3bd29c5fbb2a">remove</a>(ID_size);</div>
+<div class="line"><a name="l01559"></a><span class="lineno"> 1559</span>&#160;  }</div>
+<div class="line"><a name="l01560"></a><span class="lineno"> 1560</span>&#160; </div>
+<div class="line"><a name="l01561"></a><span class="lineno"> 1561</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;underlying_type = type.<a class="code" href="classc__bit__field__typet.html#ae9ae5a4c6f1d3b5a7b094923f8be48ed">underlying_type</a>();</div>
+<div class="line"><a name="l01562"></a><span class="lineno"> 1562</span>&#160; </div>
+<div class="line"><a name="l01563"></a><span class="lineno"> 1563</span>&#160;  std::size_t sub_width=0;</div>
+<div class="line"><a name="l01564"></a><span class="lineno"> 1564</span>&#160; </div>
+<div class="line"><a name="l01565"></a><span class="lineno"> 1565</span>&#160;  <span class="keywordflow">if</span>(underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool)</div>
+<div class="line"><a name="l01566"></a><span class="lineno"> 1566</span>&#160;  {</div>
+<div class="line"><a name="l01567"></a><span class="lineno"> 1567</span>&#160;    <span class="comment">// This is the &#39;proper&#39; bool.</span></div>
+<div class="line"><a name="l01568"></a><span class="lineno"> 1568</span>&#160;    sub_width=1;</div>
+<div class="line"><a name="l01569"></a><span class="lineno"> 1569</span>&#160;  }</div>
+<div class="line"><a name="l01570"></a><span class="lineno"> 1570</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01571"></a><span class="lineno"> 1571</span>&#160;    underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_signedbv ||</div>
+<div class="line"><a name="l01572"></a><span class="lineno"> 1572</span>&#160;    underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_unsignedbv || underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_c_bool)</div>
+<div class="line"><a name="l01573"></a><span class="lineno"> 1573</span>&#160;  {</div>
+<div class="line"><a name="l01574"></a><span class="lineno"> 1574</span>&#160;    sub_width = <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(underlying_type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
+<div class="line"><a name="l01575"></a><span class="lineno"> 1575</span>&#160;  }</div>
+<div class="line"><a name="l01576"></a><span class="lineno"> 1576</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(underlying_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_c_enum_tag)</div>
+<div class="line"><a name="l01577"></a><span class="lineno"> 1577</span>&#160;  {</div>
+<div class="line"><a name="l01578"></a><span class="lineno"> 1578</span>&#160;    <span class="comment">// These point to an enum, which has a sub-subtype,</span></div>
+<div class="line"><a name="l01579"></a><span class="lineno"> 1579</span>&#160;    <span class="comment">// which may be smaller or larger than int, and we thus have</span></div>
+<div class="line"><a name="l01580"></a><span class="lineno"> 1580</span>&#160;    <span class="comment">// to check.</span></div>
+<div class="line"><a name="l01581"></a><span class="lineno"> 1581</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;c_enum_type =</div>
+<div class="line"><a name="l01582"></a><span class="lineno"> 1582</span>&#160;      <a class="code" href="c__types_8h.html#a549a7ed5b2f9355d44ea5c8c4f804c03">to_c_enum_type</a>(<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#aa14679493b0ac7bea8197a3ac6d1bf7f">to_c_enum_tag_type</a>(underlying_type)));</div>
+<div class="line"><a name="l01583"></a><span class="lineno"> 1583</span>&#160; </div>
+<div class="line"><a name="l01584"></a><span class="lineno"> 1584</span>&#160;    <span class="keywordflow">if</span>(c_enum_type.is_incomplete())</div>
+<div class="line"><a name="l01585"></a><span class="lineno"> 1585</span>&#160;    {</div>
+<div class="line"><a name="l01586"></a><span class="lineno"> 1586</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01587"></a><span class="lineno"> 1587</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field has incomplete enum type&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01588"></a><span class="lineno"> 1588</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01589"></a><span class="lineno"> 1589</span>&#160;    }</div>
+<div class="line"><a name="l01590"></a><span class="lineno"> 1590</span>&#160; </div>
+<div class="line"><a name="l01591"></a><span class="lineno"> 1591</span>&#160;    sub_width = <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(c_enum_type.underlying_type()).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
+<div class="line"><a name="l01592"></a><span class="lineno"> 1592</span>&#160;  }</div>
+<div class="line"><a name="l01593"></a><span class="lineno"> 1593</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01594"></a><span class="lineno"> 1594</span>&#160;  {</div>
+<div class="line"><a name="l01595"></a><span class="lineno"> 1595</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01596"></a><span class="lineno"> 1596</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field with non-integer type: &quot;</span> &lt;&lt; <a class="code" href="classc__typecheck__baset.html#a70827109ec6b951e2f018c84a80c77c8">to_string</a>(underlying_type)</div>
+<div class="line"><a name="l01597"></a><span class="lineno"> 1597</span>&#160;            &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01598"></a><span class="lineno"> 1598</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01599"></a><span class="lineno"> 1599</span>&#160;  }</div>
+<div class="line"><a name="l01600"></a><span class="lineno"> 1600</span>&#160; </div>
+<div class="line"><a name="l01601"></a><span class="lineno"> 1601</span>&#160;  <span class="keywordflow">if</span>(i&gt;sub_width)</div>
+<div class="line"><a name="l01602"></a><span class="lineno"> 1602</span>&#160;  {</div>
+<div class="line"><a name="l01603"></a><span class="lineno"> 1603</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01604"></a><span class="lineno"> 1604</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;bit field (&quot;</span> &lt;&lt; i</div>
+<div class="line"><a name="l01605"></a><span class="lineno"> 1605</span>&#160;            &lt;&lt; <span class="stringliteral">&quot; bits) larger than type (&quot;</span> &lt;&lt; sub_width &lt;&lt; <span class="stringliteral">&quot; bits)&quot;</span></div>
+<div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;            &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01608"></a><span class="lineno"> 1608</span>&#160;  }</div>
+<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;}</div>
+<div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160; </div>
+<div class="line"><a name="l01611"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#ae9520cd8031d19eae0883ee9f828b758"> 1611</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#ae9520cd8031d19eae0883ee9f828b758">c_typecheck_baset::typecheck_typeof_type</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)</div>
+<div class="line"><a name="l01612"></a><span class="lineno"> 1612</span>&#160;{</div>
+<div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;  <span class="comment">// save location</span></div>
+<div class="line"><a name="l01614"></a><span class="lineno"> 1614</span>&#160;  <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01615"></a><span class="lineno"> 1615</span>&#160; </div>
+<div class="line"><a name="l01616"></a><span class="lineno"> 1616</span>&#160;  <span class="comment">// retain the qualifiers as is</span></div>
+<div class="line"><a name="l01617"></a><span class="lineno"> 1617</span>&#160;  <a class="code" href="classc__qualifierst.html">c_qualifierst</a> c_qualifiers;</div>
+<div class="line"><a name="l01618"></a><span class="lineno"> 1618</span>&#160;  c_qualifiers.<a class="code" href="classc__qualifierst.html#ab50a41a4a8f709f54164342958c760e4">read</a>(type);</div>
+<div class="line"><a name="l01619"></a><span class="lineno"> 1619</span>&#160; </div>
+<div class="line"><a name="l01620"></a><span class="lineno"> 1620</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;as_expr = (<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;)type;</div>
+<div class="line"><a name="l01621"></a><span class="lineno"> 1621</span>&#160; </div>
+<div class="line"><a name="l01622"></a><span class="lineno"> 1622</span>&#160;  <span class="keywordflow">if</span>(!as_expr.has_operands())</div>
+<div class="line"><a name="l01623"></a><span class="lineno"> 1623</span>&#160;  {</div>
+<div class="line"><a name="l01624"></a><span class="lineno"> 1624</span>&#160;    <a class="code" href="classtypet.html">typet</a> t=<span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classtypet.html">typet</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_type_arg));</div>
+<div class="line"><a name="l01625"></a><span class="lineno"> 1625</span>&#160;    <a class="code" href="classc__typecheck__baset.html#aeb126e27d88ff73018bb50286f0c77ed">typecheck_type</a>(t);</div>
+<div class="line"><a name="l01626"></a><span class="lineno"> 1626</span>&#160;    type.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(t);</div>
+<div class="line"><a name="l01627"></a><span class="lineno"> 1627</span>&#160;  }</div>
+<div class="line"><a name="l01628"></a><span class="lineno"> 1628</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01629"></a><span class="lineno"> 1629</span>&#160;  {</div>
+<div class="line"><a name="l01630"></a><span class="lineno"> 1630</span>&#160;    <a class="code" href="classexprt.html">exprt</a> expr = <a class="code" href="std__expr_8h.html#ab732b1d384f4dd5bfc303c051b8dc5da">to_unary_expr</a>(as_expr).<a class="code" href="classunary__exprt.html#a7b8e5933140d1314f3970b9a52362936">op</a>();</div>
+<div class="line"><a name="l01631"></a><span class="lineno"> 1631</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a1f8b0b1f486051b3dcf5d337d2d12acf">typecheck_expr</a>(expr);</div>
+<div class="line"><a name="l01632"></a><span class="lineno"> 1632</span>&#160; </div>
+<div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160;    <span class="comment">// undo an implicit address-of</span></div>
+<div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_address_of &amp;&amp;</div>
+<div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160;       expr.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_implicit))</div>
+<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;    {</div>
+<div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;      expr = <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(expr).<a class="code" href="classaddress__of__exprt.html#ad81853a6acc7627a48fcfa8087e3aa5d">object</a>();</div>
+<div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;    }</div>
+<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160; </div>
+<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;    type.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;  }</div>
+<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160; </div>
+<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160;  type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;  c_qualifiers.<a class="code" href="classc__qualifierst.html#a42142eb06f861600220d6456a3cc6979">write</a>(type);</div>
+<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;}</div>
+<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160; </div>
+<div class="line"><a name="l01647"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#ad2f8df708a6f6b30107b561dcddf00af"> 1647</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#ad2f8df708a6f6b30107b561dcddf00af">c_typecheck_baset::typecheck_typedef_type</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)</div>
+<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;{</div>
+<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier = <a class="code" href="typedef__type_8h.html#a2dfb910a8fd3e5c1b1338e3f22825d19">to_typedef_type</a>(type).<a class="code" href="classtypedef__typet.html#abe868d2a7418a49bab1a9ab25358b675">get_identifier</a>();</div>
+<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160; </div>
+<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;  symbol_table_baset::symbolst::const_iterator s_it =</div>
+<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;    <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.find(identifier);</div>
+<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160; </div>
+<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;  <span class="keywordflow">if</span>(s_it == <a class="code" href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">symbol_table</a>.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.end())</div>
+<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  {</div>
+<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;typedef symbol &#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; not found&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;  }</div>
+<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160; </div>
+<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol = s_it-&gt;second;</div>
+<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160; </div>
+<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;  <span class="keywordflow">if</span>(!symbol.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a>)</div>
+<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;  {</div>
+<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;    <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;expected type symbol for typedef&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;  }</div>
+<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160; </div>
+<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;  <span class="comment">// overwrite, but preserve (add) any qualifiers and other flags</span></div>
+<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160; </div>
+<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;  <a class="code" href="classc__qualifierst.html">c_qualifierst</a> c_qualifiers(type);</div>
+<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;  <span class="keywordtype">bool</span> is_packed = type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed);</div>
+<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;  <a class="code" href="classirept.html">irept</a> <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a> = type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_C_alignment);</div>
+<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160; </div>
+<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;  c_qualifiers += <a class="code" href="classc__qualifierst.html">c_qualifierst</a>(symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;  type = symbol.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>;</div>
+<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160;  c_qualifiers.<a class="code" href="classc__qualifierst.html#a42142eb06f861600220d6456a3cc6979">write</a>(type);</div>
+<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160; </div>
+<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;  <span class="keywordflow">if</span>(is_packed)</div>
+<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;    type.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_C_packed, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>.is_not_nil())</div>
+<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;    type.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_C_alignment, <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>);</div>
+<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160; </div>
+<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;  <span class="comment">// CPROVER extensions</span></div>
+<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;  <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;rational&quot;</span>)</div>
+<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  {</div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;    type=<a class="code" href="classrational__typet.html">rational_typet</a>();</div>
+<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;  }</div>
+<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(symbol.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;integer&quot;</span>)</div>
+<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;  {</div>
+<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;    type=<a class="code" href="classinteger__typet.html">integer_typet</a>();</div>
+<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;  }</div>
+<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;}</div>
+<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160; </div>
+<div class="line"><a name="l01696"></a><span class="lineno"><a class="line" href="classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14"> 1696</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14">c_typecheck_baset::adjust_function_parameter</a>(<a class="code" href="classtypet.html">typet</a> &amp;type)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;  {</div>
+<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;    <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;    type = <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
+<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;    type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;  }</div>
+<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
+<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  {</div>
+<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;    <span class="comment">// see ISO/IEC 9899:1999 page 199 clause 8,</span></div>
+<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;    <span class="comment">// may be hidden in typedef</span></div>
+<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;    <a class="code" href="classsource__locationt.html">source_locationt</a> source_location=type.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>();</div>
+<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;    type=<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(type);</div>
+<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;    type.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;  }</div>
+<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_KnR)</div>
+<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;  {</div>
+<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;    <span class="comment">// any KnR args without type yet?</span></div>
+<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;    type=<a class="code" href="c__types_8cpp.html#a7acad2c30feee311bc25620ae1913813">signed_int_type</a>(); <span class="comment">// the default is integer!</span></div>
+<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;    <span class="comment">// no source location</span></div>
+<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;  }</div>
+<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;}</div>
 <div class="ttc" id="aansi__c__convert__type_8h_html"><div class="ttname"><a href="ansi__c__convert__type_8h.html">ansi_c_convert_type.h</a></div><div class="ttdoc">ANSI-C Language Conversion.</div></div>
 <div class="ttc" id="aansi__c__declaration_8h_html"><div class="ttname"><a href="ansi__c__declaration_8h.html">ansi_c_declaration.h</a></div><div class="ttdoc">ANSI-CC Language Type Checking.</div></div>
 <div class="ttc" id="aansi__c__declaration_8h_html_abd2ad6cf8237a12b0b1836234a0c5797"><div class="ttname"><a href="ansi__c__declaration_8h.html#abd2ad6cf8237a12b0b1836234a0c5797">to_ansi_c_declaration</a></div><div class="ttdeci">ansi_c_declarationt &amp; to_ansi_c_declaration(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="ansi__c__declaration_8h_source.html#l00238">ansi_c_declaration.h:238</a></div></div>
@@ -1887,31 +1886,31 @@ $(document).ready(function(){initNavTree('c__typecheck__type_8cpp_source.html','
 <div class="ttc" id="aclassc__typecheck__baset_html_a0273b8ffdb8ccf954007fc5e2df40d3b"><div class="ttname"><a href="classc__typecheck__baset.html#a0273b8ffdb8ccf954007fc5e2df40d3b">c_typecheck_baset::symbol_table</a></div><div class="ttdeci">symbol_table_baset &amp; symbol_table</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8h_source.html#l00070">c_typecheck_base.h:70</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a0619e6c4c4a8bc4d4f0c87968560ebef"><div class="ttname"><a href="classc__typecheck__baset.html#a0619e6c4c4a8bc4d4f0c87968560ebef">c_typecheck_baset::current_symbol</a></div><div class="ttdeci">symbolt current_symbol</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8h_source.html#l00073">c_typecheck_base.h:73</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a06fa57b618c1c6129cbb2791b19f4574"><div class="ttname"><a href="classc__typecheck__baset.html#a06fa57b618c1c6129cbb2791b19f4574">c_typecheck_baset::typecheck_compound_body</a></div><div class="ttdeci">virtual void typecheck_compound_body(struct_union_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00897">c_typecheck_type.cpp:897</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_a1b8799b19164c3101a05573e031730d3"><div class="ttname"><a href="classc__typecheck__baset.html#a1b8799b19164c3101a05573e031730d3">c_typecheck_baset::make_index_type</a></div><div class="ttdeci">virtual void make_index_type(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l01249">c_typecheck_expr.cpp:1249</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_a1b8799b19164c3101a05573e031730d3"><div class="ttname"><a href="classc__typecheck__baset.html#a1b8799b19164c3101a05573e031730d3">c_typecheck_baset::make_index_type</a></div><div class="ttdeci">virtual void make_index_type(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l01248">c_typecheck_expr.cpp:1248</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a1e6ec219c947079f7b28f0fd28f3a67a"><div class="ttname"><a href="classc__typecheck__baset.html#a1e6ec219c947079f7b28f0fd28f3a67a">c_typecheck_baset::typecheck_code_type</a></div><div class="ttdeci">virtual void typecheck_code_type(code_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00434">c_typecheck_type.cpp:434</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a1f8b0b1f486051b3dcf5d337d2d12acf"><div class="ttname"><a href="classc__typecheck__baset.html#a1f8b0b1f486051b3dcf5d337d2d12acf">c_typecheck_baset::typecheck_expr</a></div><div class="ttdeci">virtual void typecheck_expr(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l00046">c_typecheck_expr.cpp:46</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a39ddc2a0a8218d16a43e5c83f352ee2e"><div class="ttname"><a href="classc__typecheck__baset.html#a39ddc2a0a8218d16a43e5c83f352ee2e">c_typecheck_baset::move_symbol</a></div><div class="ttdeci">void move_symbol(symbolt &amp;symbol, symbolt *&amp;new_symbol)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8cpp_source.html#l00038">c_typecheck_base.cpp:38</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a47161bf10cfaa0777de0d0111b3e6fda"><div class="ttname"><a href="classc__typecheck__baset.html#a47161bf10cfaa0777de0d0111b3e6fda">c_typecheck_baset::typecheck_vector_type</a></div><div class="ttdeci">virtual void typecheck_vector_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00666">c_typecheck_type.cpp:666</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a4e0cc11b5266640e174d81df26405bf2"><div class="ttname"><a href="classc__typecheck__baset.html#a4e0cc11b5266640e174d81df26405bf2">c_typecheck_baset::mode</a></div><div class="ttdeci">const irep_idt mode</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8h_source.html#l00072">c_typecheck_base.h:72</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a50c25f15369805403de02b06472e84fe"><div class="ttname"><a href="classc__typecheck__baset.html#a50c25f15369805403de02b06472e84fe">c_typecheck_baset::typecheck_c_enum_type</a></div><div class="ttdeci">virtual void typecheck_c_enum_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01233">c_typecheck_type.cpp:1233</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_a5625b0d9e8e99bfa4f8e878672b1a4d2"><div class="ttname"><a href="classc__typecheck__baset.html#a5625b0d9e8e99bfa4f8e878672b1a4d2">c_typecheck_baset::make_constant</a></div><div class="ttdeci">virtual void make_constant(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l04526">c_typecheck_expr.cpp:4526</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_a6b54656ecac20e2a610c8d090c5cf3a6"><div class="ttname"><a href="classc__typecheck__baset.html#a6b54656ecac20e2a610c8d090c5cf3a6">c_typecheck_baset::typecheck_c_bit_field_type</a></div><div class="ttdeci">virtual void typecheck_c_bit_field_type(c_bit_field_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01532">c_typecheck_type.cpp:1532</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_a5625b0d9e8e99bfa4f8e878672b1a4d2"><div class="ttname"><a href="classc__typecheck__baset.html#a5625b0d9e8e99bfa4f8e878672b1a4d2">c_typecheck_baset::make_constant</a></div><div class="ttdeci">virtual void make_constant(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l04525">c_typecheck_expr.cpp:4525</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_a6b54656ecac20e2a610c8d090c5cf3a6"><div class="ttname"><a href="classc__typecheck__baset.html#a6b54656ecac20e2a610c8d090c5cf3a6">c_typecheck_baset::typecheck_c_bit_field_type</a></div><div class="ttdeci">virtual void typecheck_c_bit_field_type(c_bit_field_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01531">c_typecheck_type.cpp:1531</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a6ea297bd7d8b527ad156aa9792e724f3"><div class="ttname"><a href="classc__typecheck__baset.html#a6ea297bd7d8b527ad156aa9792e724f3">c_typecheck_baset::add_rounding_mode</a></div><div class="ttdeci">static void add_rounding_mode(exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l00061">c_typecheck_expr.cpp:61</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a6f2417b6bedfdb8679ce55e3e6858353"><div class="ttname"><a href="classc__typecheck__baset.html#a6f2417b6bedfdb8679ce55e3e6858353">c_typecheck_baset::clean_code</a></div><div class="ttdeci">std::list&lt; codet &gt; clean_code</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8h_source.html#l00276">c_typecheck_base.h:276</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a70827109ec6b951e2f018c84a80c77c8"><div class="ttname"><a href="classc__typecheck__baset.html#a70827109ec6b951e2f018c84a80c77c8">c_typecheck_baset::to_string</a></div><div class="ttdeci">virtual std::string to_string(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8cpp_source.html#l00028">c_typecheck_base.cpp:28</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_a72ae771307ec3e3bac4dd6959b6434a9"><div class="ttname"><a href="classc__typecheck__baset.html#a72ae771307ec3e3bac4dd6959b6434a9">c_typecheck_baset::typecheck_declaration</a></div><div class="ttdeci">void typecheck_declaration(ansi_c_declarationt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8cpp_source.html#l00749">c_typecheck_base.cpp:749</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_a8272b9a6694848d2f0c57c7f56de46b4"><div class="ttname"><a href="classc__typecheck__baset.html#a8272b9a6694848d2f0c57c7f56de46b4">c_typecheck_baset::typecheck_c_enum_tag_type</a></div><div class="ttdeci">virtual void typecheck_c_enum_tag_type(c_enum_tag_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01472">c_typecheck_type.cpp:1472</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_a86652842f848b51ad587922343e48b14"><div class="ttname"><a href="classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14">c_typecheck_baset::adjust_function_parameter</a></div><div class="ttdeci">virtual void adjust_function_parameter(typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01697">c_typecheck_type.cpp:1697</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_a8272b9a6694848d2f0c57c7f56de46b4"><div class="ttname"><a href="classc__typecheck__baset.html#a8272b9a6694848d2f0c57c7f56de46b4">c_typecheck_baset::typecheck_c_enum_tag_type</a></div><div class="ttdeci">virtual void typecheck_c_enum_tag_type(c_enum_tag_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01471">c_typecheck_type.cpp:1471</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_a86652842f848b51ad587922343e48b14"><div class="ttname"><a href="classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14">c_typecheck_baset::adjust_function_parameter</a></div><div class="ttdeci">virtual void adjust_function_parameter(typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01696">c_typecheck_type.cpp:1696</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_ab4f9e0d33d0999308b74b59307571f89"><div class="ttname"><a href="classc__typecheck__baset.html#ab4f9e0d33d0999308b74b59307571f89">c_typecheck_baset::enum_constant_type</a></div><div class="ttdeci">typet enum_constant_type(const mp_integer &amp;min, const mp_integer &amp;max) const</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01143">c_typecheck_type.cpp:1143</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_abb7f1a903c6a3a159b0fd0455d1cc957"><div class="ttname"><a href="classc__typecheck__baset.html#abb7f1a903c6a3a159b0fd0455d1cc957">c_typecheck_baset::typecheck_custom_type</a></div><div class="ttdeci">virtual void typecheck_custom_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00332">c_typecheck_type.cpp:332</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_ac21018a2150f023bd3d1feaa610add2f"><div class="ttname"><a href="classc__typecheck__baset.html#ac21018a2150f023bd3d1feaa610add2f">c_typecheck_baset::make_constant_index</a></div><div class="ttdeci">virtual void make_constant_index(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l04546">c_typecheck_expr.cpp:4546</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_ac21018a2150f023bd3d1feaa610add2f"><div class="ttname"><a href="classc__typecheck__baset.html#ac21018a2150f023bd3d1feaa610add2f">c_typecheck_baset::make_constant_index</a></div><div class="ttdeci">virtual void make_constant_index(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__expr_8cpp_source.html#l04545">c_typecheck_expr.cpp:4545</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_ac217801da848b8deae60dfb37fd7c650"><div class="ttname"><a href="classc__typecheck__baset.html#ac217801da848b8deae60dfb37fd7c650">c_typecheck_baset::enum_underlying_type</a></div><div class="ttdeci">bitvector_typet enum_underlying_type(const mp_integer &amp;min, const mp_integer &amp;max, bool is_packed) const</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01175">c_typecheck_type.cpp:1175</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_ac5c00bc7a1359429fb1f4e73fe44e715"><div class="ttname"><a href="classc__typecheck__baset.html#ac5c00bc7a1359429fb1f4e73fe44e715">c_typecheck_baset::typecheck_compound_type</a></div><div class="ttdeci">virtual void typecheck_compound_type(struct_union_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00762">c_typecheck_type.cpp:762</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_ac72b7bde133e0365c2b9ac3ef20d2ff6"><div class="ttname"><a href="classc__typecheck__baset.html#ac72b7bde133e0365c2b9ac3ef20d2ff6">c_typecheck_baset::is_complete_type</a></div><div class="ttdeci">virtual bool is_complete_type(const typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__code_8cpp_source.html#l00366">c_typecheck_code.cpp:366</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_accbaaf3a695fe1898c5383a914d03eb3"><div class="ttname"><a href="classc__typecheck__baset.html#accbaaf3a695fe1898c5383a914d03eb3">c_typecheck_baset::parameter_map</a></div><div class="ttdeci">id_type_mapt parameter_map</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__base_8h_source.html#l00076">c_typecheck_base.h:76</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_ad2f8df708a6f6b30107b561dcddf00af"><div class="ttname"><a href="classc__typecheck__baset.html#ad2f8df708a6f6b30107b561dcddf00af">c_typecheck_baset::typecheck_typedef_type</a></div><div class="ttdeci">virtual void typecheck_typedef_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01648">c_typecheck_type.cpp:1648</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_ad2f8df708a6f6b30107b561dcddf00af"><div class="ttname"><a href="classc__typecheck__baset.html#ad2f8df708a6f6b30107b561dcddf00af">c_typecheck_baset::typecheck_typedef_type</a></div><div class="ttdeci">virtual void typecheck_typedef_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01647">c_typecheck_type.cpp:1647</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_ae4fee3896dd7ee4f9b02b6d89f6eb987"><div class="ttname"><a href="classc__typecheck__baset.html#ae4fee3896dd7ee4f9b02b6d89f6eb987">c_typecheck_baset::typecheck_array_type</a></div><div class="ttdeci">virtual void typecheck_array_type(array_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00532">c_typecheck_type.cpp:532</a></div></div>
-<div class="ttc" id="aclassc__typecheck__baset_html_ae9520cd8031d19eae0883ee9f828b758"><div class="ttname"><a href="classc__typecheck__baset.html#ae9520cd8031d19eae0883ee9f828b758">c_typecheck_baset::typecheck_typeof_type</a></div><div class="ttdeci">virtual void typecheck_typeof_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01612">c_typecheck_type.cpp:1612</a></div></div>
+<div class="ttc" id="aclassc__typecheck__baset_html_ae9520cd8031d19eae0883ee9f828b758"><div class="ttname"><a href="classc__typecheck__baset.html#ae9520cd8031d19eae0883ee9f828b758">c_typecheck_baset::typecheck_typeof_type</a></div><div class="ttdeci">virtual void typecheck_typeof_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l01611">c_typecheck_type.cpp:1611</a></div></div>
 <div class="ttc" id="aclassc__typecheck__baset_html_aeb126e27d88ff73018bb50286f0c77ed"><div class="ttname"><a href="classc__typecheck__baset.html#aeb126e27d88ff73018bb50286f0c77ed">c_typecheck_baset::typecheck_type</a></div><div class="ttdeci">virtual void typecheck_type(typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="c__typecheck__type_8cpp_source.html#l00034">c_typecheck_type.cpp:34</a></div></div>
 <div class="ttc" id="aclasscode__frontend__assignt_html"><div class="ttname"><a href="classcode__frontend__assignt.html">code_frontend_assignt</a></div><div class="ttdoc">A codet representing an assignment in the program.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00023">std_code.h:24</a></div></div>
 <div class="ttc" id="aclasscode__frontend__assignt_html_a43913795b3352d958512a508e5504e2f"><div class="ttname"><a href="classcode__frontend__assignt.html#a43913795b3352d958512a508e5504e2f">code_frontend_assignt::rhs</a></div><div class="ttdeci">exprt &amp; rhs()</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l00046">std_code.h:46</a></div></div>
@@ -1930,13 +1929,13 @@ $(document).ready(function(){initNavTree('c__typecheck__type_8cpp_source.html','
 <div class="ttc" id="aclassdstringt_html_a35856c8b02e5d3c87e3ce014c54354f4"><div class="ttname"><a href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">dstringt::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00090">dstring.h:90</a></div></div>
 <div class="ttc" id="aclassdstringt_html_a8c018ec9eff52e79cf02ef6b70868ce2"><div class="ttname"><a href="classdstringt.html#a8c018ec9eff52e79cf02ef6b70868ce2">dstringt::end</a></div><div class="ttdeci">std::string::const_iterator end() const</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00199">dstring.h:199</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
-<div class="ttc" id="aclassexprt_html_a0c920fda0345f73fb24df50e61ac463b"><div class="ttname"><a href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">exprt::find_source_location</a></div><div class="ttdeci">const source_locationt &amp; find_source_location() const</div><div class="ttdoc">Get a source_locationt from the expression or from its operands (non-recursively).</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00154">expr.cpp:154</a></div></div>
-<div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
-<div class="ttc" id="aclassexprt_html_a4f28296a5ed6b9fa5f2a40c57b3ac4b8"><div class="ttname"><a href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">exprt::add_source_location</a></div><div class="ttdeci">source_locationt &amp; add_source_location()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00222">expr.h:222</a></div></div>
-<div class="ttc" id="aclassexprt_html_a6886a3ce6164e88129c3c969de596893"><div class="ttname"><a href="classexprt.html#a6886a3ce6164e88129c3c969de596893">exprt::source_location</a></div><div class="ttdeci">const source_locationt &amp; source_location() const</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00217">expr.h:217</a></div></div>
-<div class="ttc" id="aclassexprt_html_a727eaab489ece52bb6abbee2af9bc019"><div class="ttname"><a href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">exprt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdoc">Return whether the expression is a constant representing false.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00041">expr.cpp:41</a></div></div>
+<div class="ttc" id="aclassexprt_html_a0c920fda0345f73fb24df50e61ac463b"><div class="ttname"><a href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">exprt::find_source_location</a></div><div class="ttdeci">const source_locationt &amp; find_source_location() const</div><div class="ttdoc">Get a source_locationt from the expression or from its operands (non-recursively).</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00147">expr.cpp:147</a></div></div>
+<div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00027">expr.cpp:27</a></div></div>
+<div class="ttc" id="aclassexprt_html_a4f28296a5ed6b9fa5f2a40c57b3ac4b8"><div class="ttname"><a href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">exprt::add_source_location</a></div><div class="ttdeci">source_locationt &amp; add_source_location()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00228">expr.h:228</a></div></div>
+<div class="ttc" id="aclassexprt_html_a6886a3ce6164e88129c3c969de596893"><div class="ttname"><a href="classexprt.html#a6886a3ce6164e88129c3c969de596893">exprt::source_location</a></div><div class="ttdeci">const source_locationt &amp; source_location() const</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00223">expr.h:223</a></div></div>
+<div class="ttc" id="aclassexprt_html_a727eaab489ece52bb6abbee2af9bc019"><div class="ttname"><a href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">exprt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdoc">Return whether the expression is a constant representing false.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
-<div class="ttc" id="aclassexprt_html_aa0da0eed1e748681d28c8fe3a50ffda5"><div class="ttname"><a href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">exprt::is_constant</a></div><div class="ttdeci">bool is_constant() const</div><div class="ttdoc">Return whether the expression is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00027">expr.cpp:27</a></div></div>
+<div class="ttc" id="aclassexprt_html_aa0da0eed1e748681d28c8fe3a50ffda5"><div class="ttname"><a href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">exprt::is_constant</a></div><div class="ttdeci">bool is_constant() const</div><div class="ttdoc">Return whether the expression is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00204">expr.h:204</a></div></div>
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassinteger__typet_html"><div class="ttname"><a href="classinteger__typet.html">integer_typet</a></div><div class="ttdoc">Unbounded, signed integers (mathematical integers, not bitvectors)</div><div class="ttdef"><b>Definition:</b> <a href="mathematical__types_8h_source.html#l00021">mathematical_types.h:22</a></div></div>
 <div class="ttc" id="aclassinvalid__source__file__exceptiont_html"><div class="ttname"><a href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a></div><div class="ttdoc">Thrown when we can't handle something in an input source file.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00171">exception_utils.h:172</a></div></div>
@@ -2023,7 +2022,7 @@ $(document).ready(function(){initNavTree('c__typecheck__type_8cpp_source.html','
 <div class="ttc" id="apointer__expr_8h_html_af3c9bf0da53bd25369f3d3095d471bcc"><div class="ttname"><a href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a></div><div class="ttdeci">const address_of_exprt &amp; to_address_of_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an address_of_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00460">pointer_expr.h:460</a></div></div>
 <div class="ttc" id="apointer__offset__size_8cpp_html_a22ecef14fd8d85a84c6a579261f56044"><div class="ttname"><a href="pointer__offset__size_8cpp.html#a22ecef14fd8d85a84c6a579261f56044">size_of_expr</a></div><div class="ttdeci">optionalt&lt; exprt &gt; size_of_expr(const typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__offset__size_8cpp_source.html#l00281">pointer_offset_size.cpp:281</a></div></div>
 <div class="ttc" id="apointer__offset__size_8h_html"><div class="ttname"><a href="pointer__offset__size_8h.html">pointer_offset_size.h</a></div><div class="ttdoc">Pointer Logic.</div></div>
-<div class="ttc" id="asimplify__expr_8cpp_html_a02e7eaea06c1c477751552efb37dd4b1"><div class="ttname"><a href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a></div><div class="ttdeci">bool simplify(exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03018">simplify_expr.cpp:3018</a></div></div>
+<div class="ttc" id="asimplify__expr_8cpp_html_a02e7eaea06c1c477751552efb37dd4b1"><div class="ttname"><a href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a></div><div class="ttdeci">bool simplify(exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03019">simplify_expr.cpp:3019</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>

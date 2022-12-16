@@ -569,7 +569,7 @@ $(document).ready(function(){initNavTree('interpreter_8cpp_source.html',''); ini
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;size_expr = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>();</div>
 <div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> subtype_size = <a class="code" href="classinterpretert.html#ad0dd60fbc78ad67fa6d60954c262e8ef">get_size</a>(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type).element_type());</div>
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> count;</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordflow">if</span>(size_expr.id()!=ID_constant)</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordflow">if</span>(!size_expr.is_constant())</div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    {</div>
 <div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      count=<a class="code" href="classinterpretert.html#a2775eaea561235a70dda6cddf32b7e53">base_address_to_actual_size</a>(offset)/subtype_size;</div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    }</div>

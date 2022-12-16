@@ -192,7 +192,7 @@ $(document).ready(function(){initNavTree('overflow__instrumenter_8cpp_source.htm
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  {</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;typecast_expr = <a class="code" href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a>(expr);</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">if</span>(typecast_expr.op().id() == ID_constant)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">if</span>(typecast_expr.op().is_constant())</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;old_type = typecast_expr.op().type();</div>

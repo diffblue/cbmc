@@ -275,7 +275,7 @@ $(document).ready(function(){initNavTree('constant__pointer__abstract__object_8c
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        {</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;          <span class="keyword">auto</span> <span class="keyword">const</span> &amp;array_symbol = <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(array);</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;          out &lt;&lt; array_symbol.get_identifier() &lt;&lt; <span class="stringliteral">&quot;[&quot;</span>;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;          <span class="keywordflow">if</span>(array_index.index().id() == ID_constant)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;          <span class="keywordflow">if</span>(array_index.index().is_constant())</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            out &lt;&lt; <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(array_index.index()).<a class="code" href="classconstant__exprt.html#a364195bb848744c45ede7fc4877acabe">get_value</a>();</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;            out &lt;&lt; <span class="stringliteral">&quot;?&quot;</span>;</div>
