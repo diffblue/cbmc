@@ -512,8 +512,8 @@ bool Parser::SyntaxError()
 
     message+="'";
 
-    parser.error().source_location=source_location;
-    parser.error() << message << messaget::eom;
+    parser.log.error().source_location = source_location;
+    parser.log.error() << message << messaget::eom;
   }
 
   return ++number_of_errors < max_errors;

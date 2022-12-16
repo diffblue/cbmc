@@ -22,7 +22,7 @@ bool parse_xml(
   xml_parser.clear();
   xml_parser.set_file(filename);
   xml_parser.in=&in;
-  xml_parser.set_message_handler(message_handler);
+  xml_parser.log.set_message_handler(message_handler);
 
   bool result=yyxmlparse()!=0;
 

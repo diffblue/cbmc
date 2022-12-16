@@ -104,7 +104,7 @@ bool cpp_languaget::parse(
   cpp_parser.clear();
   cpp_parser.set_file(path);
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.set_message_handler(get_message_handler());
+  cpp_parser.log.set_message_handler(get_message_handler());
   cpp_parser.mode=config.ansi_c.mode;
 
   bool result=cpp_parser.parse();
@@ -244,7 +244,7 @@ bool cpp_languaget::to_expr(
   cpp_parser.clear();
   cpp_parser.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.set_message_handler(get_message_handler());
+  cpp_parser.log.set_message_handler(get_message_handler());
 
   bool result=cpp_parser.parse();
 
