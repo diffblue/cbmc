@@ -6,12 +6,22 @@
 #include <util/config.h>
 #include <util/message.h>
 #include <util/options.h>
+#include <util/ui_message.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/process_goto_program.h>
+#include <goto-programs/remove_skip.h>
+#include <goto-programs/set_properties.h>
 
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/cprover_library.h>
+#include <assembler/remove_asm.h>
+#include <goto-checker/all_properties_verifier_with_trace_storage.h>
+#include <goto-checker/multi_path_symex_checker.h>
 #include <langapi/mode.h>
+#include <pointer-analysis/add_failed_symbols.h>
 
 #include <memory>
 #include <string>
@@ -104,4 +114,48 @@ void api_sessiont::load_model_from_files(const std::vector<std::string> &files)
 {
   implementation->model = util_make_unique<goto_modelt>(initialize_goto_model(
     files, *implementation->message_handler, *implementation->options));
+}
+
+void api_sessiont::verify_model()
+{
+  PRECONDITION(implementation->model);
+
+  // Remove inline assembler; this needs to happen before adding the library.
+  remove_asm(*implementation->model);
+
+  // add the library
+  messaget log{*implementation->message_handler};
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(
+    *implementation->model,
+    *implementation->message_handler,
+    cprover_c_library_factory);
+
+  // Common removal of types and complex constructs
+  if(::process_goto_program(
+       *implementation->model, *implementation->options, log))
+  {
+    return;
+  }
+
+  // add failed symbols
+  // needs to be done before pointer analysis
+  add_failed_symbols(implementation->model->symbol_table);
+
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(*implementation->model);
+
+  remove_skip(*implementation->model);
+
+  ui_message_handlert ui_message_handler(*implementation->message_handler);
+  all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>
+    verifier(
+      *implementation->options, ui_message_handler, *implementation->model);
+  (void)verifier();
+  verifier.report();
 }
