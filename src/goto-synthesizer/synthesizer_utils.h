@@ -9,10 +9,9 @@ Author: Qinheping Hu
 #ifndef CPROVER_GOTO_SYNTHESIZER_SYNTHESIZER_UTILS_H
 #define CPROVER_GOTO_SYNTHESIZER_SYNTHESIZER_UTILS_H
 
+#include <goto-programs/goto_model.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/loop_ids.h>
-
-#include <map>
 
 class goto_functiont;
 class messaget;
@@ -50,7 +49,13 @@ get_loop_head(const unsigned int loop_number, goto_functiont &function);
 /// loops. Corresponding loops are specified by keys of `invariant_map`
 void annotate_invariants(
   const invariant_mapt &invariant_map,
-  goto_modelt &goto_model,
-  messaget &log);
+  goto_modelt &goto_model);
+
+/// Combine invariant of form
+/// (in_inv || !guard) && (!guard -> pos_inv)
+invariant_mapt combine_in_and_post_invariant_clauses(
+  const invariant_mapt &in_clauses,
+  const invariant_mapt &post_clauses,
+  const invariant_mapt &neg_guards);
 
 #endif // CPROVER_GOTO_SYNTHESIZER_SYNTHESIZER_UTILS_H

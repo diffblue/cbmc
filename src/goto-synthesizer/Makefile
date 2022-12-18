@@ -1,4 +1,5 @@
-SRC = enumerative_loop_contracts_synthesizer.cpp \
+SRC = cegis_verifier.cpp \
+      enumerative_loop_contracts_synthesizer.cpp \
       expr_enumerator.cpp \
       goto_synthesizer_languages.cpp \
       goto_synthesizer_main.cpp \
@@ -8,25 +9,30 @@ SRC = enumerative_loop_contracts_synthesizer.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../analyses/analyses$(LIBEXT) \
-      ../cpp/cpp$(LIBEXT) \
-      ../linking/linking$(LIBEXT) \
+      ../assembler/assembler$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
       ../goto-checker/goto-checker$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-instrument/contracts/contracts$(OBJEXT) \
-      ../goto-instrument/contracts/utils$(OBJEXT) \
+      ../goto-instrument/contracts/havoc_assigns_clause_targets$(OBJEXT) \
+      ../goto-instrument/contracts/inlining_decorator$(OBJEXT) \
       ../goto-instrument/contracts/instrument_spec_assigns$(OBJEXT) \
       ../goto-instrument/contracts/memory_predicates$(OBJEXT) \
-      ../goto-instrument/contracts/inlining_decorator$(OBJEXT) \
-      ../goto-instrument/contracts/havoc_assigns_clause_targets$(OBJEXT) \
+      ../goto-instrument/contracts/utils$(OBJEXT) \
       ../goto-instrument/havoc_utils$(OBJEXT) \
       ../goto-instrument/loop_utils$(OBJEXT) \
-      ../goto-instrument/unwindset$(OBJEXT) \
-      ../goto-instrument/unwind$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) \
-      ../langapi/langapi$(LIBEXT) \
-      ../util/util$(LIBEXT) \
+      ../goto-instrument/unwind$(OBJEXT) \
+      ../goto-instrument/unwindset$(OBJEXT) \
+      ../goto-symex/goto-symex$(LIBEXT) \
       ../json/json$(LIBEXT) \
+      ../langapi/langapi$(LIBEXT) \
+      ../linking/linking$(LIBEXT) \
+      ../pointer-analysis/pointer-analysis$(LIBEXT) \
+      ../solvers/solvers$(LIBEXT) \
+      ../util/util$(LIBEXT) \
+      ../xmllang/xmllang$(LIBEXT) \
       # Empty last line
 
 INCLUDES= -I ..

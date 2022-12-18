@@ -3,14 +3,15 @@
 set -e
 
 goto_cc=$1
-goto_synthesizer=$2
-cbmc=$3
-is_windows=$4
+goto_instrument=$2
+goto_synthesizer=$3
+cbmc=$4
+is_windows=$5
 
 name=${*:$#}
 name=${name%.c}
 
-args=${*:5:$#-5}
+args=${*:6:$#-6}
 if [[ "$args" != *" _ "* ]]
 then
   args_inst=$args
@@ -27,7 +28,9 @@ else
 fi
 
 rm -f "${name}-mod.gb"
-$goto_synthesizer ${args_inst} "${name}.gb" "${name}-mod.gb"
+rm -f "${name}-mod-2.gb"
+echo "Running goto-instrument: "
+$goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"
 if [ ! -e "${name}-mod.gb" ] ; then
   cp "$name.gb" "${name}-mod.gb"
 elif echo $args_inst | grep -q -- "--dump-c" ; then
@@ -41,4 +44,7 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
 
   rm "${name}-mod.c"
 fi
-$cbmc "${name}-mod.gb" ${args_cbmc}
+echo "Running goto-synthesizer: "
+$goto_synthesizer "${name}-mod.gb" "${name}-mod-2.gb"
+echo "Running CBMC: "
+$cbmc "${name}-mod-2.gb" ${args_cbmc}

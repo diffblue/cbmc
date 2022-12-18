@@ -8,7 +8,11 @@ Author: Qinheping Hu
 
 #include "synthesizer_utils.h"
 
+#include <util/optional.h>
+
 #include <analyses/natural_loops.h>
+#include <goto-instrument/contracts/utils.h>
+#include <goto-instrument/havoc_utils.h>
 
 goto_programt::const_targett get_loop_end_from_loop_head_and_content(
   const goto_programt::const_targett &loop_head,
@@ -94,8 +98,7 @@ get_loop_head(const unsigned int target_loop_number, goto_functiont &function)
 
 void annotate_invariants(
   const invariant_mapt &invariant_map,
-  goto_modelt &goto_model,
-  messaget &log)
+  goto_modelt &goto_model)
 {
   for(const auto &invariant_map_entry : invariant_map)
   {
@@ -111,4 +114,26 @@ void annotate_invariants(
     loop_end->condition_nonconst().add(ID_C_spec_loop_invariant) =
       invariant_map_entry.second;
   }
+}
+
+invariant_mapt combine_in_and_post_invariant_clauses(
+  const invariant_mapt &in_clauses,
+  const invariant_mapt &post_clauses,
+  const invariant_mapt &neg_guards)
+{
+  // Combine invariant
+  // (in_inv || !guard) && (!guard -> pos_inv)
+  invariant_mapt result;
+  for(const auto &in_clause : in_clauses)
+  {
+    const auto &id = in_clause.first;
+    const auto &it_guard = neg_guards.find(id);
+
+    INVARIANT(it_guard != neg_guards.end(), "Some loop guard is missing.");
+
+    result[id] = and_exprt(
+      or_exprt(it_guard->second, in_clause.second),
+      implies_exprt(it_guard->second, post_clauses.at(id)));
+  }
+  return result;
 }

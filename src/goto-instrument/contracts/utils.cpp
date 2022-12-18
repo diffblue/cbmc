@@ -447,3 +447,49 @@ void generate_history_variables_initialization(
   // Add all the history variable initialization instructions
   program.destructive_append(history);
 }
+
+bool is_transformed_loop_end(const goto_programt::const_targett &target)
+{
+  // The end of the loop end of transformed loop is
+  // ASSIGN entered_loop = true
+  if(!is_assignment_to_instrumented_variable(target, ENTERED_LOOP))
+    return false;
+
+  return target->assign_rhs() == true_exprt();
+}
+
+bool is_assignment_to_instrumented_variable(
+  const goto_programt::const_targett &target,
+  std::string var_name)
+{
+  INVARIANT(
+    var_name == IN_BASE_CASE || var_name == ENTERED_LOOP ||
+      var_name == IN_LOOP_HAVOC_BLOCK,
+    "var_name is not of instrumented variables.");
+
+  if(!target->is_assign())
+    return false;
+
+  if(can_cast_expr<symbol_exprt>(target->assign_lhs()))
+  {
+    const auto &lhs = to_symbol_expr(target->assign_lhs());
+    return id2string(lhs.get_identifier()).find("::" + var_name) !=
+           std::string::npos;
+  }
+
+  return false;
+}
+
+unsigned get_suffix_unsigned(const std::string &str, const std::string &prefix)
+{
+  // first_index is the end of the `prefix`.
+  auto first_index = str.find(prefix);
+  INVARIANT(
+    first_index != std::string::npos, "Prefix not found in the given string");
+  first_index += prefix.length();
+
+  // last_index is the index of not-digit.
+  auto last_index = str.find_first_not_of("0123456789", first_index);
+  std::string result = str.substr(first_index, last_index - first_index);
+  return std::stol(result);
+}

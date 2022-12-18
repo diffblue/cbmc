@@ -316,7 +316,47 @@ exprt binary_functional_enumeratort::instantiate(const expr_listt &exprs) const
     exprs.size() == 2,
     "number of arguments should be 2: " + integer2string(exprs.size()));
   if(op_id == ID_equal)
+  {
+    auto &lhs = exprs.front();
+    auto &rhs = exprs.back();
+
+    // Widening conversion.
+    if(
+      lhs.type() != rhs.type() &&
+      (lhs.type().id() == ID_unsignedbv || lhs.type().id() == ID_signedbv) &&
+      (rhs.type().id() == ID_unsignedbv || rhs.type().id() == ID_signedbv))
+    {
+      const auto &lhs_type = type_try_dynamic_cast<bitvector_typet>(lhs.type());
+      const auto &rhs_type = type_try_dynamic_cast<bitvector_typet>(rhs.type());
+      if(lhs_type->get_width() >= rhs_type->get_width())
+        return equal_exprt(lhs, typecast_exprt(rhs, lhs.type()));
+      else
+        return equal_exprt(typecast_exprt(lhs, rhs.type()), rhs);
+    }
+
     return equal_exprt(exprs.front(), exprs.back());
+  }
+  if(op_id == ID_notequal)
+  {
+    auto &lhs = exprs.front();
+    auto &rhs = exprs.back();
+
+    // Widening conversion.
+    if(
+      lhs.type() != rhs.type() &&
+      (lhs.type().id() == ID_unsignedbv || lhs.type().id() == ID_signedbv) &&
+      (rhs.type().id() == ID_unsignedbv || rhs.type().id() == ID_signedbv))
+    {
+      const auto &lhs_type = type_try_dynamic_cast<bitvector_typet>(lhs.type());
+      const auto &rhs_type = type_try_dynamic_cast<bitvector_typet>(rhs.type());
+      if(lhs_type->get_width() >= rhs_type->get_width())
+        return notequal_exprt(lhs, typecast_exprt(rhs, lhs.type()));
+      else
+        return notequal_exprt(typecast_exprt(lhs, rhs.type()), rhs);
+    }
+
+    return notequal_exprt(exprs.front(), exprs.back());
+  }
   if(op_id == ID_le)
     return less_than_or_equal_exprt(exprs.front(), exprs.back());
   if(op_id == ID_lt)
@@ -333,8 +373,6 @@ exprt binary_functional_enumeratort::instantiate(const expr_listt &exprs) const
     return plus_exprt(exprs.front(), exprs.back());
   if(op_id == ID_minus)
     return minus_exprt(exprs.front(), exprs.back());
-  if(op_id == ID_notequal)
-    return notequal_exprt(exprs.front(), exprs.back());
   return binary_exprt(exprs.front(), op_id, exprs.back());
 }
 
