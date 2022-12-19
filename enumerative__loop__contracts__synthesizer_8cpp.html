@@ -88,6 +88,8 @@ $(document).ready(function(){initNavTree('enumerative__loop__contracts__synthesi
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">enumerative_loop_contracts_synthesizer.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -96,22 +98,89 @@ $(document).ready(function(){initNavTree('enumerative__loop__contracts__synthesi
 <p>Enumerative Loop Contracts Synthesizer.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>&quot;</code><br />
+<code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="find__symbols_8h_source.html">util/find_symbols.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="format__expr_8h_source.html">util/format_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="replace__symbol_8h_source.html">util/replace_symbol.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="natural__loops_8h_source.html">analyses/natural_loops.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="expr__enumerator_8h_source.html">expr_enumerator.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for enumerative_loop_contracts_synthesizer.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="enumerative__loop__contracts__synthesizer_8cpp__incl.svg" width="2439" height="827"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="enumerative__loop__contracts__synthesizer_8cpp__incl.svg" width="2899" height="752"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
 <p><a href="enumerative__loop__contracts__synthesizer_8cpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:aad4ccf660c6afc6af586973c98be1ff8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumerative__loop__contracts__synthesizer_8cpp.html#aad4ccf660c6afc6af586973c98be1ff8">replace_tmp_post</a> (<a class="el" href="classexprt.html">exprt</a> &amp;dest, const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;tmp_post_map)</td></tr>
+<tr class="separator:aad4ccf660c6afc6af586973c98be1ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1063f4a25b58c084336c54666f1049d7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumerative__loop__contracts__synthesizer_8cpp.html#a1063f4a25b58c084336c54666f1049d7">construct_terminals</a> (const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;symbols)</td></tr>
+<tr class="separator:a1063f4a25b58c084336c54666f1049d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Enumerative Loop Contracts Synthesizer. </p>
 
 <p class="definition">Definition in file <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html">enumerative_loop_contracts_synthesizer.cpp</a>.</p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a1063f4a25b58c084336c54666f1049d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1063f4a25b58c084336c54666f1049d7">&#9670;&nbsp;</a></span>construct_terminals()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classexprt.html">exprt</a>&gt; construct_terminals </td>
+          <td>(</td>
+          <td class="paramtype">const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>symbols</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html#l00044">44</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html">enumerative_loop_contracts_synthesizer.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aad4ccf660c6afc6af586973c98be1ff8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad4ccf660c6afc6af586973c98be1ff8">&#9670;&nbsp;</a></span>replace_tmp_post()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void replace_tmp_post </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>tmp_post_map</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html#l00027">27</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html">enumerative_loop_contracts_synthesizer.cpp</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

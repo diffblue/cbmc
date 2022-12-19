@@ -1,44 +1,45 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/unwindset.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/unwindset.h">
-<area shape="rect" id="node1" title="Loop unwinding." alt="" coords="3170,5,3363,61"/>
-<area shape="rect" id="node2" href="$bmc__util_8h.html" title="Bounded Model Checking Utilities." alt="" coords="1740,117,1924,173"/>
-<area shape="rect" id="node22" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="461,109,645,180"/>
-<area shape="rect" id="node27" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="2542,109,2727,180"/>
-<area shape="rect" id="node28" href="$single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="2752,109,2939,180"/>
-<area shape="rect" id="node33" href="$symex__bmc_8cpp.html" title="Bounded Model Checking for ANSI&#45;C." alt="" coords="2963,117,3147,173"/>
-<area shape="rect" id="node34" href="$symex__bmc__incremental__one__loop_8cpp.html" title=" " alt="" coords="3171,109,3362,180"/>
-<area shape="rect" id="node35" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3386,117,3579,173"/>
-<area shape="rect" id="node36" href="$dfcc__library_8cpp.html" title=" " alt="" coords="3604,109,3801,180"/>
-<area shape="rect" id="node37" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3825,117,4068,173"/>
-<area shape="rect" id="node41" href="$unwind_8cpp.html" title="Loop unwinding." alt="" coords="4093,117,4286,173"/>
-<area shape="rect" id="node42" href="$unwindset_8cpp.html" title=" " alt="" coords="4310,117,4503,173"/>
-<area shape="rect" id="node3" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1703,354,1908,410"/>
-<area shape="rect" id="node4" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="2400,235,2605,291"/>
-<area shape="rect" id="node7" href="$all__properties__verifier__with__trace__storage_8h.html" title="Goto verifier for verifying all properties that stores traces." alt="" coords="720,228,904,299"/>
-<area shape="rect" id="node10" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1187,235,1371,291"/>
-<area shape="rect" id="node11" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="1603,228,1795,299"/>
-<area shape="rect" id="node12" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="523,354,754,410"/>
-<area shape="rect" id="node13" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="461,228,645,299"/>
-<area shape="rect" id="node14" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1395,235,1579,291"/>
-<area shape="rect" id="node15" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="2681,228,2866,299"/>
-<area shape="rect" id="node16" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="2791,354,3025,410"/>
-<area shape="rect" id="node17" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="2891,228,3077,299"/>
-<area shape="rect" id="node18" href="$stop__on__fail__verifier_8h.html" title="Goto Verifier for stopping at the first failing property." alt="" coords="979,235,1163,291"/>
-<area shape="rect" id="node19" href="$stop__on__fail__verifier__with__fault__localization_8h.html" title="Goto Verifier for stopping at the first failing property and localizing the fault." alt="" coords="1971,228,2159,299"/>
-<area shape="rect" id="node20" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2184,235,2376,291"/>
-<area shape="rect" id="node5" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="2250,361,2513,403"/>
-<area shape="rect" id="node6" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2537,361,2767,403"/>
-<area shape="rect" id="node8" href="$api_8cpp.html" title=" " alt="" coords="779,354,963,410"/>
-<area shape="rect" id="node9" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1587,465,1779,521"/>
-<area shape="rect" id="node21" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2033,354,2225,410"/>
-<area shape="rect" id="node23" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="222,235,437,291"/>
-<area shape="rect" id="node26" href="$java__multi__path__symex__only__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="5,347,224,417"/>
-<area shape="rect" id="node24" href="$java__multi__path__symex__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="248,354,499,410"/>
-<area shape="rect" id="node25" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="241,465,506,521"/>
-<area shape="rect" id="node29" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="3102,235,3322,291"/>
-<area shape="rect" id="node32" href="$java__single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="3329,347,3551,417"/>
-<area shape="rect" id="node30" href="$java__single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="3050,354,3305,410"/>
-<area shape="rect" id="node31" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="3042,465,3313,521"/>
-<area shape="rect" id="node38" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3588,235,3823,291"/>
-<area shape="rect" id="node39" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="3847,235,4047,291"/>
-<area shape="rect" id="node40" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="4071,235,4329,291"/>
+<area shape="rect" id="node1" title="Loop unwinding." alt="" coords="3237,5,3430,61"/>
+<area shape="rect" id="node2" href="$bmc__util_8h.html" title="Bounded Model Checking Utilities." alt="" coords="1833,117,2017,173"/>
+<area shape="rect" id="node23" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="605,109,789,180"/>
+<area shape="rect" id="node28" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="2609,109,2794,180"/>
+<area shape="rect" id="node29" href="$single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="2819,109,3005,180"/>
+<area shape="rect" id="node34" href="$symex__bmc_8cpp.html" title="Bounded Model Checking for ANSI&#45;C." alt="" coords="3029,117,3213,173"/>
+<area shape="rect" id="node35" href="$symex__bmc__incremental__one__loop_8cpp.html" title=" " alt="" coords="3238,109,3429,180"/>
+<area shape="rect" id="node36" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3453,117,3646,173"/>
+<area shape="rect" id="node37" href="$dfcc__library_8cpp.html" title=" " alt="" coords="3671,109,3868,180"/>
+<area shape="rect" id="node38" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3892,117,4135,173"/>
+<area shape="rect" id="node42" href="$unwind_8cpp.html" title="Loop unwinding." alt="" coords="4159,117,4353,173"/>
+<area shape="rect" id="node43" href="$unwindset_8cpp.html" title=" " alt="" coords="4377,117,4570,173"/>
+<area shape="rect" id="node3" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1691,354,1896,410"/>
+<area shape="rect" id="node4" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="2277,235,2483,291"/>
+<area shape="rect" id="node7" href="$all__properties__verifier__with__trace__storage_8h.html" title="Goto verifier for verifying all properties that stores traces." alt="" coords="813,228,997,299"/>
+<area shape="rect" id="node11" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1280,235,1464,291"/>
+<area shape="rect" id="node12" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="1696,228,1888,299"/>
+<area shape="rect" id="node13" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="249,354,479,410"/>
+<area shape="rect" id="node14" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="605,228,789,299"/>
+<area shape="rect" id="node15" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1488,235,1672,291"/>
+<area shape="rect" id="node16" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="2774,228,2959,299"/>
+<area shape="rect" id="node17" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="2792,354,3027,410"/>
+<area shape="rect" id="node18" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="2984,228,3171,299"/>
+<area shape="rect" id="node19" href="$stop__on__fail__verifier_8h.html" title="Goto Verifier for stopping at the first failing property." alt="" coords="1072,235,1256,291"/>
+<area shape="rect" id="node20" href="$stop__on__fail__verifier__with__fault__localization_8h.html" title="Goto Verifier for stopping at the first failing property and localizing the fault." alt="" coords="2065,228,2253,299"/>
+<area shape="rect" id="node21" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2507,235,2699,291"/>
+<area shape="rect" id="node5" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="1971,361,2234,403"/>
+<area shape="rect" id="node6" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2259,361,2488,403"/>
+<area shape="rect" id="node8" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="987,354,1184,410"/>
+<area shape="rect" id="node9" href="$api_8cpp.html" title=" " alt="" coords="779,354,963,410"/>
+<area shape="rect" id="node10" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1611,465,1803,521"/>
+<area shape="rect" id="node22" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2512,354,2704,410"/>
+<area shape="rect" id="node24" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="366,235,581,291"/>
+<area shape="rect" id="node27" href="$java__multi__path__symex__only__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="5,347,224,417"/>
+<area shape="rect" id="node25" href="$java__multi__path__symex__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="504,354,755,410"/>
+<area shape="rect" id="node26" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="497,465,762,521"/>
+<area shape="rect" id="node30" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="3195,235,3415,291"/>
+<area shape="rect" id="node33" href="$java__single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="3339,347,3562,417"/>
+<area shape="rect" id="node31" href="$java__single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="3058,354,3313,410"/>
+<area shape="rect" id="node32" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="3050,465,3321,521"/>
+<area shape="rect" id="node39" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3655,235,3889,291"/>
+<area shape="rect" id="node40" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="3913,235,4113,291"/>
+<area shape="rect" id="node41" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="4137,235,4396,291"/>
 </map>

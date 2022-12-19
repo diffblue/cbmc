@@ -1,41 +1,42 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/local_safe_pointers.h" name="/home/runner/work/cbmc/cbmc/src/analyses/local_safe_pointers.h">
-<area shape="rect" id="node1" title="Local safe pointer analysis." alt="" coords="1863,5,2047,61"/>
-<area shape="rect" id="node2" href="$local__safe__pointers_8cpp.html" title="Local safe pointer analysis." alt="" coords="1617,109,1801,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1825,109,2084,165"/>
-<area shape="rect" id="node4" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="2107,109,2306,165"/>
-<area shape="rect" id="node5" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1013,458,1219,514"/>
-<area shape="rect" id="node6" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="635,213,819,284"/>
-<area shape="rect" id="node12" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="641,569,833,625"/>
-<area shape="rect" id="node15" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="1091,213,1277,284"/>
-<area shape="rect" id="node17" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="1568,332,1755,403"/>
-<area shape="rect" id="node18" href="$single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="1340,213,1527,284"/>
-<area shape="rect" id="node24" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="1749,221,1968,277"/>
-<area shape="rect" id="node31" href="$path__storage_8cpp.html" title=" " alt="" coords="1993,221,2191,277"/>
-<area shape="rect" id="node32" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2215,221,2430,277"/>
-<area shape="rect" id="node33" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2454,221,2669,277"/>
-<area shape="rect" id="node34" href="$symex__decl_8cpp.html" title="Symbolic Execution." alt="" coords="2693,221,2907,277"/>
-<area shape="rect" id="node35" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2931,221,3146,277"/>
-<area shape="rect" id="node36" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3170,221,3385,277"/>
-<area shape="rect" id="node37" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="3409,221,3623,277"/>
-<area shape="rect" id="node38" href="$symex__main_8cpp.html" title="Symbolic Execution." alt="" coords="3647,221,3862,277"/>
-<area shape="rect" id="node39" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="3886,221,4101,277"/>
-<area shape="rect" id="node7" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="619,339,834,395"/>
-<area shape="rect" id="node13" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="360,332,544,403"/>
-<area shape="rect" id="node14" href="$java__multi__path__symex__only__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="32,451,251,521"/>
-<area shape="rect" id="node8" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="275,458,506,514"/>
-<area shape="rect" id="node9" href="$api_8cpp.html" title=" " alt="" coords="531,458,715,514"/>
-<area shape="rect" id="node10" href="$java__multi__path__symex__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="739,458,989,514"/>
-<area shape="rect" id="node11" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="858,569,1123,625"/>
-<area shape="rect" id="node16" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="961,332,1146,403"/>
-<area shape="rect" id="node19" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="1323,339,1543,395"/>
-<area shape="rect" id="node23" href="$java__single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="1243,451,1466,521"/>
-<area shape="rect" id="node20" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="1489,458,1724,514"/>
-<area shape="rect" id="node21" href="$java__single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="1749,458,2003,514"/>
-<area shape="rect" id="node22" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="1741,569,2011,625"/>
-<area shape="rect" id="node25" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="1779,339,1973,395"/>
-<area shape="rect" id="node26" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1997,332,2190,403"/>
-<area shape="rect" id="node27" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="2214,332,2463,403"/>
-<area shape="rect" id="node28" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="2488,339,2765,395"/>
-<area shape="rect" id="node29" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="2790,339,3053,395"/>
-<area shape="rect" id="node30" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="3077,339,3312,395"/>
+<area shape="rect" id="node1" title="Local safe pointer analysis." alt="" coords="2320,5,2504,61"/>
+<area shape="rect" id="node2" href="$local__safe__pointers_8cpp.html" title="Local safe pointer analysis." alt="" coords="2075,109,2259,165"/>
+<area shape="rect" id="node3" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2283,109,2541,165"/>
+<area shape="rect" id="node4" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="2565,109,2763,165"/>
+<area shape="rect" id="node5" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1208,458,1413,514"/>
+<area shape="rect" id="node6" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="925,213,1109,284"/>
+<area shape="rect" id="node13" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1453,569,1645,625"/>
+<area shape="rect" id="node16" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="1338,213,1523,284"/>
+<area shape="rect" id="node18" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="1945,332,2132,403"/>
+<area shape="rect" id="node19" href="$single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="1717,213,1904,284"/>
+<area shape="rect" id="node25" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="2207,221,2425,277"/>
+<area shape="rect" id="node32" href="$path__storage_8cpp.html" title=" " alt="" coords="2450,221,2649,277"/>
+<area shape="rect" id="node33" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2673,221,2887,277"/>
+<area shape="rect" id="node34" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2911,221,3126,277"/>
+<area shape="rect" id="node35" href="$symex__decl_8cpp.html" title="Symbolic Execution." alt="" coords="3150,221,3365,277"/>
+<area shape="rect" id="node36" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3389,221,3603,277"/>
+<area shape="rect" id="node37" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3627,221,3842,277"/>
+<area shape="rect" id="node38" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="3866,221,4081,277"/>
+<area shape="rect" id="node39" href="$symex__main_8cpp.html" title="Symbolic Execution." alt="" coords="4105,221,4319,277"/>
+<area shape="rect" id="node40" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="4343,221,4558,277"/>
+<area shape="rect" id="node7" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="742,339,957,395"/>
+<area shape="rect" id="node14" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="1055,332,1239,403"/>
+<area shape="rect" id="node15" href="$java__multi__path__symex__only__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="5,451,224,521"/>
+<area shape="rect" id="node8" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="457,458,687,514"/>
+<area shape="rect" id="node9" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="987,458,1184,514"/>
+<area shape="rect" id="node10" href="$api_8cpp.html" title=" " alt="" coords="248,458,432,514"/>
+<area shape="rect" id="node11" href="$java__multi__path__symex__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="712,458,963,514"/>
+<area shape="rect" id="node12" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="705,569,970,625"/>
+<area shape="rect" id="node17" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="1338,332,1523,403"/>
+<area shape="rect" id="node20" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="1701,339,1921,395"/>
+<area shape="rect" id="node24" href="$java__single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="1438,451,1661,521"/>
+<area shape="rect" id="node21" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="1684,458,1919,514"/>
+<area shape="rect" id="node22" href="$java__single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="1943,458,2198,514"/>
+<area shape="rect" id="node23" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="1935,569,2206,625"/>
+<area shape="rect" id="node26" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="2207,339,2401,395"/>
+<area shape="rect" id="node27" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="2425,332,2618,403"/>
+<area shape="rect" id="node28" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="2642,332,2891,403"/>
+<area shape="rect" id="node29" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="2916,339,3193,395"/>
+<area shape="rect" id="node30" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="3218,339,3481,395"/>
+<area shape="rect" id="node31" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="3505,339,3740,395"/>
 </map>

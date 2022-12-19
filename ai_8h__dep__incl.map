@@ -1,41 +1,42 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/ai.h" name="/home/runner/work/cbmc/cbmc/src/analyses/ai.h">
-<area shape="rect" id="node1" title="Abstract Interpretation." alt="" coords="1739,5,1923,47"/>
+<area shape="rect" id="node1" title="Abstract Interpretation." alt="" coords="1729,5,1913,47"/>
 <area shape="rect" id="node2" href="$ai_8cpp.html" title="Abstract Interpretation." alt="" coords="35,109,225,151"/>
-<area shape="rect" id="node3" href="$constant__propagator_8h.html" title="Constant propagation." alt="" coords="1055,221,1261,277"/>
-<area shape="rect" id="node5" href="$build__analyzer_8cpp.html" title=" " alt="" coords="2207,339,2391,395"/>
+<area shape="rect" id="node3" href="$constant__propagator_8h.html" title="Constant propagation." alt="" coords="1287,221,1493,277"/>
+<area shape="rect" id="node5" href="$build__analyzer_8cpp.html" title=" " alt="" coords="2431,339,2615,395"/>
 <area shape="rect" id="node8" href="$custom__bitvector__analysis_8h.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="249,102,448,158"/>
-<area shape="rect" id="node11" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="1517,221,1746,277"/>
-<area shape="rect" id="node18" href="$escape__analysis_8h.html" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="840,102,1036,158"/>
-<area shape="rect" id="node20" href="$global__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="599,102,789,158"/>
-<area shape="rect" id="node22" href="$interval__analysis_8cpp.html" title="Interval Analysis – implements the functionality necessary for performing abstract interpretation ove..." alt="" coords="1394,102,1594,158"/>
-<area shape="rect" id="node23" href="$invariant__propagation_8h.html" title="Invariant Propagation." alt="" coords="1618,102,1826,158"/>
-<area shape="rect" id="node25" href="$is__threaded_8cpp.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="1850,102,2034,158"/>
-<area shape="rect" id="node26" href="$reaching__definitions_8h.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="1112,102,1319,158"/>
-<area shape="rect" id="node28" href="$uninitialized__domain_8h.html" title="Detection for Uninitialized Local Variables." alt="" coords="2109,102,2340,158"/>
-<area shape="rect" id="node31" href="$three__way__merge__abstract__interpreter_8h.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="2365,95,2581,165"/>
-<area shape="rect" id="node35" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="2605,102,2847,158"/>
-<area shape="rect" id="node36" href="$show__on__source_8cpp.html" title=" " alt="" coords="2871,102,3055,158"/>
-<area shape="rect" id="node37" href="$static__simplifier_8cpp.html" title=" " alt="" coords="3079,102,3263,158"/>
-<area shape="rect" id="node38" href="$static__verifier_8cpp.html" title=" " alt="" coords="3287,102,3471,158"/>
-<area shape="rect" id="node39" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="3495,102,3711,158"/>
-<area shape="rect" id="node4" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="1051,339,1257,395"/>
-<area shape="rect" id="node6" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="767,339,1026,395"/>
-<area shape="rect" id="node7" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="1282,339,1493,395"/>
+<area shape="rect" id="node11" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="1749,221,1978,277"/>
+<area shape="rect" id="node19" href="$escape__analysis_8h.html" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="784,102,980,158"/>
+<area shape="rect" id="node21" href="$global__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="569,102,760,158"/>
+<area shape="rect" id="node23" href="$interval__analysis_8cpp.html" title="Interval Analysis – implements the functionality necessary for performing abstract interpretation ove..." alt="" coords="1519,102,1719,158"/>
+<area shape="rect" id="node24" href="$invariant__propagation_8h.html" title="Invariant Propagation." alt="" coords="1005,102,1213,158"/>
+<area shape="rect" id="node26" href="$is__threaded_8cpp.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="1794,102,1978,158"/>
+<area shape="rect" id="node27" href="$reaching__definitions_8h.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="1288,102,1495,158"/>
+<area shape="rect" id="node29" href="$uninitialized__domain_8h.html" title="Detection for Uninitialized Local Variables." alt="" coords="2053,102,2284,158"/>
+<area shape="rect" id="node32" href="$three__way__merge__abstract__interpreter_8h.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="2309,95,2525,165"/>
+<area shape="rect" id="node36" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="2549,102,2791,158"/>
+<area shape="rect" id="node37" href="$show__on__source_8cpp.html" title=" " alt="" coords="2815,102,2999,158"/>
+<area shape="rect" id="node38" href="$static__simplifier_8cpp.html" title=" " alt="" coords="3023,102,3207,158"/>
+<area shape="rect" id="node39" href="$static__verifier_8cpp.html" title=" " alt="" coords="3231,102,3415,158"/>
+<area shape="rect" id="node40" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="3439,102,3655,158"/>
+<area shape="rect" id="node4" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="1053,339,1260,395"/>
+<area shape="rect" id="node6" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="770,339,1029,395"/>
+<area shape="rect" id="node7" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="1285,339,1495,395"/>
 <area shape="rect" id="node9" href="$custom__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="33,221,232,277"/>
 <area shape="rect" id="node10" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="257,221,441,277"/>
-<area shape="rect" id="node12" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="1517,339,1746,395"/>
-<area shape="rect" id="node13" href="$static__show__domain_8cpp.html" title=" " alt="" coords="2511,339,2698,395"/>
-<area shape="rect" id="node14" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="1770,339,1965,395"/>
-<area shape="rect" id="node15" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="1989,339,2183,395"/>
-<area shape="rect" id="node16" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="1880,451,2073,507"/>
-<area shape="rect" id="node17" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="2097,451,2291,507"/>
-<area shape="rect" id="node19" href="$escape__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive escape analysis." alt="" coords="732,221,928,277"/>
-<area shape="rect" id="node21" href="$global__may__alias_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive global may alias analysis." alt="" coords="465,221,656,277"/>
-<area shape="rect" id="node24" href="$invariant__propagation_8cpp.html" title="Invariant Propagation." alt="" coords="1770,221,1978,277"/>
-<area shape="rect" id="node27" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="1285,221,1492,277"/>
-<area shape="rect" id="node29" href="$uninitialized__domain_8cpp.html" title="Detection for Uninitialized Local Variables." alt="" coords="2053,221,2284,277"/>
-<area shape="rect" id="node30" href="$uninitialized_8cpp.html" title="Detection for Uninitialized Local Variables." alt="" coords="2308,221,2501,277"/>
-<area shape="rect" id="node32" href="$three__way__merge__abstract__interpreter_8cpp.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="2577,213,2793,284"/>
-<area shape="rect" id="node33" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="2817,213,3043,284"/>
-<area shape="rect" id="node34" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="2817,332,3043,403"/>
+<area shape="rect" id="node12" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="1519,339,1749,395"/>
+<area shape="rect" id="node13" href="$static__show__domain_8cpp.html" title=" " alt="" coords="2639,339,2826,395"/>
+<area shape="rect" id="node14" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="1773,339,1967,395"/>
+<area shape="rect" id="node15" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="1992,339,2185,395"/>
+<area shape="rect" id="node18" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="2210,339,2407,395"/>
+<area shape="rect" id="node16" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="1884,451,2077,507"/>
+<area shape="rect" id="node17" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="2101,451,2295,507"/>
+<area shape="rect" id="node20" href="$escape__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive escape analysis." alt="" coords="732,221,928,277"/>
+<area shape="rect" id="node22" href="$global__may__alias_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive global may alias analysis." alt="" coords="465,221,656,277"/>
+<area shape="rect" id="node25" href="$invariant__propagation_8cpp.html" title="Invariant Propagation." alt="" coords="1003,221,1211,277"/>
+<area shape="rect" id="node28" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="1517,221,1724,277"/>
+<area shape="rect" id="node30" href="$uninitialized__domain_8cpp.html" title="Detection for Uninitialized Local Variables." alt="" coords="2053,221,2284,277"/>
+<area shape="rect" id="node31" href="$uninitialized_8cpp.html" title="Detection for Uninitialized Local Variables." alt="" coords="2308,221,2501,277"/>
+<area shape="rect" id="node33" href="$three__way__merge__abstract__interpreter_8cpp.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="2577,213,2793,284"/>
+<area shape="rect" id="node34" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="2817,213,3043,284"/>
+<area shape="rect" id="node35" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="2850,332,3077,403"/>
 </map>

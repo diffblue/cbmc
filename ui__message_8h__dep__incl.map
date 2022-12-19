@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/ui_message.h" name="/home/runner/work/cbmc/cbmc/src/util/ui_message.h">
-<area shape="rect" id="node1" title=" " alt="" coords="3743,5,3946,47"/>
-<area shape="rect" id="node2" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="299,102,483,158"/>
-<area shape="rect" id="node3" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="678,221,883,277"/>
+<area shape="rect" id="node1" title=" " alt="" coords="3933,5,4135,47"/>
+<area shape="rect" id="node2" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="287,102,471,158"/>
+<area shape="rect" id="node3" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="599,221,805,277"/>
 <area shape="rect" id="node7" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="776,332,967,388"/>
-<area shape="rect" id="node8" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1633,221,1861,277"/>
-<area shape="rect" id="node12" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="3027,102,3211,158"/>
-<area shape="rect" id="node13" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="3235,102,3441,158"/>
-<area shape="rect" id="node14" href="$goto__symex__fault__localizer_8cpp.html" title="Fault Localization for Goto Symex." alt="" coords="3465,102,3696,158"/>
-<area shape="rect" id="node15" href="$goto__symex__property__decider_8cpp.html" title="Property Decider for Goto&#45;Symex." alt="" coords="3720,102,3969,158"/>
-<area shape="rect" id="node16" href="$goto__verifier_8cpp.html" title="Goto Verifier Interface." alt="" coords="3994,102,4178,158"/>
-<area shape="rect" id="node17" href="$incremental__goto__checker_8cpp.html" title="Incremental Goto Checker Interface." alt="" coords="4203,102,4425,158"/>
-<area shape="rect" id="node18" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="4449,102,4680,158"/>
-<area shape="rect" id="node19" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="4705,95,4889,165"/>
-<area shape="rect" id="node20" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="4913,102,5097,158"/>
-<area shape="rect" id="node21" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="5121,102,5355,158"/>
-<area shape="rect" id="node22" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="5379,95,5566,165"/>
-<area shape="rect" id="node23" href="$symex__bmc__incremental__one__loop_8h.html" title=" " alt="" coords="508,95,699,165"/>
-<area shape="rect" id="node26" href="$goto__diff_8h.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1578,102,1762,158"/>
-<area shape="rect" id="node32" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="3013,221,3197,277"/>
-<area shape="rect" id="node35" href="$function__call__harness__generator_8cpp.html" title=" " alt="" coords="5590,95,5774,165"/>
-<area shape="rect" id="node36" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3221,221,3463,277"/>
-<area shape="rect" id="node40" href="$show__locations_8h.html" title="Show program locations." alt="" coords="2592,102,2785,158"/>
-<area shape="rect" id="node42" href="$class__hierarchy_8cpp.html" title="Class Hierarchy." alt="" coords="5798,102,5982,158"/>
-<area shape="rect" id="node43" href="$loop__ids_8h.html" title="Loop IDs." alt="" coords="1217,221,1401,277"/>
-<area shape="rect" id="node47" href="$show__goto__functions_8cpp.html" title="Show goto functions." alt="" coords="6007,102,6197,158"/>
-<area shape="rect" id="node48" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="6222,102,6406,158"/>
-<area shape="rect" id="node49" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="6430,102,6614,158"/>
-<area shape="rect" id="node50" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="6639,102,6843,158"/>
-<area shape="rect" id="node51" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="6867,102,7071,158"/>
-<area shape="rect" id="node52" href="$api_8cpp.html" title=" " alt="" coords="7095,102,7279,158"/>
-<area shape="rect" id="node53" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="2809,102,3003,158"/>
-<area shape="rect" id="node55" href="$parse__options_8h.html" title=" " alt="" coords="2250,109,2466,151"/>
-<area shape="rect" id="node59" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2117,221,2309,277"/>
-<area shape="rect" id="node60" href="$ui__message_8cpp.html" title=" " alt="" coords="7303,109,7522,151"/>
+<area shape="rect" id="node8" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1900,221,2128,277"/>
+<area shape="rect" id="node12" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="3217,102,3401,158"/>
+<area shape="rect" id="node13" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="3425,102,3630,158"/>
+<area shape="rect" id="node14" href="$goto__symex__fault__localizer_8cpp.html" title="Fault Localization for Goto Symex." alt="" coords="3655,102,3885,158"/>
+<area shape="rect" id="node15" href="$goto__symex__property__decider_8cpp.html" title="Property Decider for Goto&#45;Symex." alt="" coords="3909,102,4159,158"/>
+<area shape="rect" id="node16" href="$goto__verifier_8cpp.html" title="Goto Verifier Interface." alt="" coords="4183,102,4367,158"/>
+<area shape="rect" id="node17" href="$incremental__goto__checker_8cpp.html" title="Incremental Goto Checker Interface." alt="" coords="4392,102,4615,158"/>
+<area shape="rect" id="node18" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="4639,102,4869,158"/>
+<area shape="rect" id="node19" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="4894,95,5078,165"/>
+<area shape="rect" id="node20" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="5102,102,5286,158"/>
+<area shape="rect" id="node21" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="5310,102,5545,158"/>
+<area shape="rect" id="node22" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="5569,95,5755,165"/>
+<area shape="rect" id="node23" href="$symex__bmc__incremental__one__loop_8h.html" title=" " alt="" coords="496,95,687,165"/>
+<area shape="rect" id="node26" href="$goto__diff_8h.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1826,102,2010,158"/>
+<area shape="rect" id="node32" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2383,221,2567,277"/>
+<area shape="rect" id="node35" href="$function__call__harness__generator_8cpp.html" title=" " alt="" coords="5779,95,5963,165"/>
+<area shape="rect" id="node36" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3239,221,3482,277"/>
+<area shape="rect" id="node40" href="$show__locations_8h.html" title="Show program locations." alt="" coords="2999,102,3192,158"/>
+<area shape="rect" id="node42" href="$class__hierarchy_8cpp.html" title="Class Hierarchy." alt="" coords="5987,102,6171,158"/>
+<area shape="rect" id="node43" href="$loop__ids_8h.html" title="Loop IDs." alt="" coords="1275,221,1459,277"/>
+<area shape="rect" id="node48" href="$show__goto__functions_8cpp.html" title="Show goto functions." alt="" coords="6196,102,6387,158"/>
+<area shape="rect" id="node49" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="6411,102,6595,158"/>
+<area shape="rect" id="node50" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="6619,102,6803,158"/>
+<area shape="rect" id="node51" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="6828,102,7032,158"/>
+<area shape="rect" id="node52" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="7056,102,7260,158"/>
+<area shape="rect" id="node53" href="$api_8cpp.html" title=" " alt="" coords="7285,102,7469,158"/>
+<area shape="rect" id="node54" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="2781,102,2975,158"/>
+<area shape="rect" id="node56" href="$parse__options_8h.html" title=" " alt="" coords="2439,109,2655,151"/>
+<area shape="rect" id="node59" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="3023,221,3215,277"/>
+<area shape="rect" id="node60" href="$ui__message_8cpp.html" title=" " alt="" coords="7493,109,7711,151"/>
 <area shape="rect" id="node4" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="5,339,268,381"/>
-<area shape="rect" id="node5" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="293,339,522,381"/>
-<area shape="rect" id="node6" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="546,332,751,388"/>
-<area shape="rect" id="node9" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="1895,332,2114,388"/>
-<area shape="rect" id="node10" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="2355,332,2540,388"/>
-<area shape="rect" id="node11" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1629,332,1871,388"/>
-<area shape="rect" id="node24" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="468,213,653,284"/>
-<area shape="rect" id="node25" href="$symex__bmc__incremental__one__loop_8cpp.html" title=" " alt="" coords="253,213,444,284"/>
-<area shape="rect" id="node27" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="958,221,1142,277"/>
-<area shape="rect" id="node28" href="$syntactic__diff_8h.html" title="Syntactic GOTO&#45;DIFF." alt="" coords="1885,221,2092,277"/>
-<area shape="rect" id="node30" href="$java__syntactic__diff_8h.html" title="Syntactic GOTO&#45;DIFF for Java." alt="" coords="1425,221,1609,277"/>
-<area shape="rect" id="node29" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2565,332,2749,388"/>
-<area shape="rect" id="node31" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1421,332,1605,388"/>
-<area shape="rect" id="node33" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="2773,332,2957,388"/>
-<area shape="rect" id="node34" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="2981,332,3165,388"/>
-<area shape="rect" id="node37" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3413,332,3647,388"/>
-<area shape="rect" id="node38" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="3189,332,3389,388"/>
-<area shape="rect" id="node39" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3671,332,3930,388"/>
-<area shape="rect" id="node41" href="$show__locations_8cpp.html" title="Show program locations." alt="" coords="3488,221,3681,277"/>
+<area shape="rect" id="node5" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="522,339,751,381"/>
+<area shape="rect" id="node6" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="293,332,498,388"/>
+<area shape="rect" id="node9" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="1946,332,2165,388"/>
+<area shape="rect" id="node10" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="2189,332,2375,388"/>
+<area shape="rect" id="node11" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1679,332,1922,388"/>
+<area shape="rect" id="node24" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="389,213,575,284"/>
+<area shape="rect" id="node25" href="$symex__bmc__incremental__one__loop_8cpp.html" title=" " alt="" coords="175,213,365,284"/>
+<area shape="rect" id="node27" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1483,221,1667,277"/>
+<area shape="rect" id="node28" href="$syntactic__diff_8h.html" title="Syntactic GOTO&#45;DIFF." alt="" coords="2152,221,2359,277"/>
+<area shape="rect" id="node30" href="$java__syntactic__diff_8h.html" title="Syntactic GOTO&#45;DIFF for Java." alt="" coords="1691,221,1875,277"/>
+<area shape="rect" id="node29" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2399,332,2583,388"/>
+<area shape="rect" id="node31" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1471,332,1655,388"/>
+<area shape="rect" id="node33" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="2607,332,2791,388"/>
+<area shape="rect" id="node34" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="2815,332,2999,388"/>
+<area shape="rect" id="node37" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3239,332,3474,388"/>
+<area shape="rect" id="node38" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="3498,332,3698,388"/>
+<area shape="rect" id="node39" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3722,332,3981,388"/>
+<area shape="rect" id="node41" href="$show__locations_8cpp.html" title="Show program locations." alt="" coords="3775,221,3968,277"/>
 <area shape="rect" id="node44" href="$loop__ids_8cpp.html" title="Loop IDs." alt="" coords="1213,332,1397,388"/>
-<area shape="rect" id="node45" href="$synthesizer__utils_8h.html" title=" " alt="" coords="991,332,1189,388"/>
-<area shape="rect" id="node46" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="2138,332,2330,388"/>
-<area shape="rect" id="node54" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="3808,221,4001,277"/>
-<area shape="rect" id="node56" href="$crangler__parse__options_8h.html" title="CRANGLER Command Line Option Processing." alt="" coords="2333,221,2532,277"/>
-<area shape="rect" id="node57" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="2557,221,2741,277"/>
-<area shape="rect" id="node58" href="$goto__harness__parse__options_8h.html" title=" " alt="" coords="2765,221,2988,277"/>
+<area shape="rect" id="node45" href="$cegis__verifier_8h.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="1163,436,1361,492"/>
+<area shape="rect" id="node46" href="$synthesizer__utils_8h.html" title=" " alt="" coords="991,332,1189,388"/>
+<area shape="rect" id="node47" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3023,332,3215,388"/>
+<area shape="rect" id="node55" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="3557,221,3751,277"/>
+<area shape="rect" id="node57" href="$crangler__parse__options_8h.html" title="CRANGLER Command Line Option Processing." alt="" coords="2592,221,2791,277"/>
+<area shape="rect" id="node58" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="2815,221,2999,277"/>
 </map>

@@ -95,15 +95,15 @@ $(document).ready(function(){initNavTree('synthesizer__utils_8h.html',''); initR
 <div class="title">synthesizer_utils.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="goto__program_8h_source.html">goto-programs/goto_program.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="goto__program_8h_source.html">goto-programs/goto_program.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="loop__ids_8h_source.html">goto-programs/loop_ids.h</a>&gt;</code><br />
-<code>#include &lt;map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for synthesizer_utils.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__incl.svg" width="1702" height="754"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__incl.svg" width="2290" height="1142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('synthesizer__utils_8h.html',''); initR
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__dep__incl.svg" width="595" height="408"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8h__dep__incl.svg" width="790" height="408"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -138,9 +138,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a5b70f6fb5fede91018331caeb1991280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8h.html#a5b70f6fb5fede91018331caeb1991280">get_loop_head</a> (const unsigned int loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
 <tr class="memdesc:a5b70f6fb5fede91018331caeb1991280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>.  <a href="synthesizer__utils_8h.html#a5b70f6fb5fede91018331caeb1991280">More...</a><br /></td></tr>
 <tr class="separator:a5b70f6fb5fede91018331caeb1991280"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbaf3cb86ea581b649f6598ae5caabee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8h.html#adbaf3cb86ea581b649f6598ae5caabee">annotate_invariants</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;invariant_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <a class="el" href="classmessaget.html">messaget</a> &amp;log)</td></tr>
-<tr class="memdesc:adbaf3cb86ea581b649f6598ae5caabee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the invariants in <code>invariant_map</code> to their corresponding loops.  <a href="synthesizer__utils_8h.html#adbaf3cb86ea581b649f6598ae5caabee">More...</a><br /></td></tr>
-<tr class="separator:adbaf3cb86ea581b649f6598ae5caabee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab60371e081d74195d69c087bb3b9543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8h.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;invariant_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
+<tr class="memdesc:aab60371e081d74195d69c087bb3b9543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the invariants in <code>invariant_map</code> to their corresponding loops.  <a href="synthesizer__utils_8h.html#aab60371e081d74195d69c087bb3b9543">More...</a><br /></td></tr>
+<tr class="separator:aab60371e081d74195d69c087bb3b9543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec2d1ec60e566d40c16409fe34d14518"><td class="memItemLeft" align="right" valign="top"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8h.html#aec2d1ec60e566d40c16409fe34d14518">combine_in_and_post_invariant_clauses</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;in_clauses, const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;post_clauses, const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;neg_guards)</td></tr>
+<tr class="memdesc:aec2d1ec60e566d40c16409fe34d14518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combine invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv)  <a href="synthesizer__utils_8h.html#aec2d1ec60e566d40c16409fe34d14518">More...</a><br /></td></tr>
+<tr class="separator:aec2d1ec60e566d40c16409fe34d14518"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a64838a6fe2bdb68b1dfbc524788ea90c"></a>
@@ -155,13 +158,13 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8h_source.html#l00022">22</a> of file <a class="el" href="synthesizer__utils_8h_source.html">synthesizer_utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8h_source.html#l00021">21</a> of file <a class="el" href="synthesizer__utils_8h_source.html">synthesizer_utils.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="adbaf3cb86ea581b649f6598ae5caabee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adbaf3cb86ea581b649f6598ae5caabee">&#9670;&nbsp;</a></span>annotate_invariants()</h2>
+<a id="aab60371e081d74195d69c087bb3b9543"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab60371e081d74195d69c087bb3b9543">&#9670;&nbsp;</a></span>annotate_invariants()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -176,13 +179,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_model</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classmessaget.html">messaget</a> &amp;&#160;</td>
-          <td class="paramname"><em>log</em>&#160;</td>
+          <td class="paramname"><em>goto_model</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -195,7 +192,45 @@ Functions</h2></td></tr>
 <p>Annotate the invariants in <code>invariant_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>invariant_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00095">95</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00099">99</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aec2d1ec60e566d40c16409fe34d14518"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec2d1ec60e566d40c16409fe34d14518">&#9670;&nbsp;</a></span>combine_in_and_post_invariant_clauses()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> combine_in_and_post_invariant_clauses </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
+          <td class="paramname"><em>in_clauses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
+          <td class="paramname"><em>post_clauses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
+          <td class="paramname"><em>neg_guards</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Combine invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv) </p>
+
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00119">119</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -228,7 +263,7 @@ Functions</h2></td></tr>
 <p>Find and return the last instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00084">84</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00088">88</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -258,7 +293,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00013">13</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00017">17</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +325,7 @@ Functions</h2></td></tr>
 
 <p>Find the goto instruction of <code>loop</code> that jumps to <code>loop_head</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00035">35</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00039">39</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +358,7 @@ Functions</h2></td></tr>
 <p>Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00090">90</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00094">94</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -361,7 +396,7 @@ Functions</h2></td></tr>
 
 <p>Return loop head if <code>finding_head</code> is true, Otherwise return loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00057">57</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00061">61</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>

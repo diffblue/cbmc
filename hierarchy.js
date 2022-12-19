@@ -207,6 +207,8 @@ var hierarchy =
     [ "call_validatet< Base, T >", "structcall__validatet.html", null ],
     [ "goto_program2codet::caset", "structgoto__program2codet_1_1caset.html", null ],
     [ "cbmc_invariants_should_throwt", "structcbmc__invariants__should__throwt.html", null ],
+    [ "cegis_verifiert", "classcegis__verifiert.html", null ],
+    [ "cext", "classcext.html", null ],
     [ "cfg_dominators_templatet< P, T, post_dom >", "classcfg__dominators__templatet.html", null ],
     [ "cfg_dominators_templatet< P, T, false >", "classcfg__dominators__templatet.html", null ],
     [ "cfg_infot", "classcfg__infot.html", [

@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/pointer_predicates.h" name="/home/runner/work/cbmc/cbmc/src/util/pointer_predicates.h">
-<area shape="rect" id="node1" title="Various predicates over pointers in programs." alt="" coords="3037,5,3221,61"/>
+<area shape="rect" id="node1" title="Various predicates over pointers in programs." alt="" coords="3253,5,3437,61"/>
 <area shape="rect" id="node2" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="5,117,217,173"/>
 <area shape="rect" id="node3" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="242,117,426,173"/>
 <area shape="rect" id="node4" href="$axioms_8cpp.html" title="Axioms." alt="" coords="450,124,666,165"/>
@@ -19,13 +19,15 @@
 <area shape="rect" id="node18" href="$mm__io_8cpp.html" title="Perform Memory&#45;mapped I/O instrumentation." alt="" coords="3567,117,3751,173"/>
 <area shape="rect" id="node19" href="$string__abstraction_8cpp.html" title="String Abstraction." alt="" coords="3775,117,3959,173"/>
 <area shape="rect" id="node20" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3984,117,4199,173"/>
-<area shape="rect" id="node21" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4223,117,4424,173"/>
-<area shape="rect" id="node22" href="$bv__pointers_8cpp.html" title=" " alt="" coords="4448,117,4649,173"/>
-<area shape="rect" id="node23" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="4673,117,4875,173"/>
-<area shape="rect" id="node24" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4899,117,5083,173"/>
-<area shape="rect" id="node25" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5108,109,5304,180"/>
-<area shape="rect" id="node26" href="$object__tracking_8cpp.html" title=" " alt="" coords="5328,117,5567,173"/>
-<area shape="rect" id="node27" href="$pointer__expr_8cpp.html" title=" " alt="" coords="5591,117,5775,173"/>
-<area shape="rect" id="node28" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="5799,117,5983,173"/>
-<area shape="rect" id="node29" href="$simplify__expr__pointer_8cpp.html" title=" " alt="" coords="6007,117,6191,173"/>
+<area shape="rect" id="node21" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="4223,117,4421,173"/>
+<area shape="rect" id="node22" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="4445,109,4655,180"/>
+<area shape="rect" id="node23" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4680,117,4881,173"/>
+<area shape="rect" id="node24" href="$bv__pointers_8cpp.html" title=" " alt="" coords="4905,117,5107,173"/>
+<area shape="rect" id="node25" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="5131,117,5332,173"/>
+<area shape="rect" id="node26" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="5357,117,5541,173"/>
+<area shape="rect" id="node27" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5565,109,5761,180"/>
+<area shape="rect" id="node28" href="$object__tracking_8cpp.html" title=" " alt="" coords="5785,117,6024,173"/>
+<area shape="rect" id="node29" href="$pointer__expr_8cpp.html" title=" " alt="" coords="6049,117,6233,173"/>
+<area shape="rect" id="node30" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="6257,117,6441,173"/>
+<area shape="rect" id="node31" href="$simplify__expr__pointer_8cpp.html" title=" " alt="" coords="6465,117,6649,173"/>
 </map>
