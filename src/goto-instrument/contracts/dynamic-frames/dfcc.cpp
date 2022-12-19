@@ -22,6 +22,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
+#include <util/string_utils.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_functions.h>
@@ -47,6 +48,72 @@ Author: Remi Delmas, delmarsd@amazon.com
 
 #include "dfcc_lift_memory_predicates.h"
 
+invalid_function_contract_pair_exceptiont::
+  invalid_function_contract_pair_exceptiont(
+    std::string reason,
+    std::string correct_format)
+  : cprover_exception_baset(std::move(reason)),
+    correct_format(std::move(correct_format))
+{
+}
+
+std::string invalid_function_contract_pair_exceptiont::what() const
+{
+  std::string res;
+
+  res += "Invalid function-contract mapping";
+  res += "\nReason: " + reason;
+
+  if(!correct_format.empty())
+  {
+    res += "\nFormat: " + correct_format;
+  }
+
+  return res;
+}
+
+#include <iostream>
+
+static std::pair<irep_idt, irep_idt>
+parse_function_contract_pair(const irep_idt &cli_flag)
+{
+  auto const correct_format_message =
+    "the format for function and contract pairs is "
+    "`<function_name>[/<contract_name>]`";
+
+  std::string cli_flag_str = id2string(cli_flag);
+
+  auto split = split_string(cli_flag_str, '/', true, false);
+
+  if(split.size() == 1)
+  {
+    return std::make_pair(cli_flag, cli_flag);
+  }
+  else if(split.size() == 2)
+  {
+    auto function_name = split[0];
+    if(function_name.size() == 0)
+    {
+      throw invalid_function_contract_pair_exceptiont{
+        "couldn't find function name before '/' in '" + cli_flag_str + "'",
+        correct_format_message};
+    }
+    auto contract_name = split[1];
+    if(contract_name.size() == 0)
+    {
+      throw invalid_function_contract_pair_exceptiont{
+        "couldn't find contract name after '/' in '" + cli_flag_str + "'",
+        correct_format_message};
+    }
+    return std::make_pair(function_name, contract_name);
+  }
+  else
+  {
+    throw invalid_function_contract_pair_exceptiont{
+      "couldn't parse '" + cli_flag_str + "'", correct_format_message};
+  }
+}
+
 void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
@@ -59,17 +126,15 @@ void dfcc(
   message_handlert &message_handler)
 {
   std::map<irep_idt, irep_idt> to_replace_map;
-  for(const auto &function_id : to_replace)
-    to_replace_map.insert({function_id, function_id});
+  for(const auto &cli_flag : to_replace)
+    to_replace_map.insert(parse_function_contract_pair(cli_flag));
 
   dfcc(
     options,
     goto_model,
     harness_id,
-    to_check.has_value()
-      ? optionalt<std::pair<irep_idt, irep_idt>>(
-          std::pair<irep_idt, irep_idt>(to_check.value(), to_check.value()))
-      : optionalt<std::pair<irep_idt, irep_idt>>{},
+    to_check.has_value() ? parse_function_contract_pair(to_check.value())
+                         : optionalt<std::pair<irep_idt, irep_idt>>{},
     allow_recursive_calls,
     to_replace_map,
     apply_loop_contracts,
@@ -164,7 +229,7 @@ void dfcct::check_transform_goto_model_preconditions()
         "' either not found or has no body");
 
     // triggers signature compatibility checking
-    contract_handler.get_pure_contract_symbol(pair.second);
+    contract_handler.get_pure_contract_symbol(pair.second, pair.first);
 
     PRECONDITION_WITH_DIAGNOSTICS(
       pair.first != harness_id,
@@ -196,7 +261,7 @@ void dfcct::check_transform_goto_model_preconditions()
       "Function to replace '" + id2string(pair.first) + "' not found");
 
     // triggers signature compatibility checking
-    contract_handler.get_pure_contract_symbol(pair.second);
+    contract_handler.get_pure_contract_symbol(pair.second, pair.first);
 
     PRECONDITION_WITH_DIAGNOSTICS(
       pair.first != harness_id,

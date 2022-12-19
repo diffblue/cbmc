@@ -101,18 +101,17 @@ public:
   const std::size_t get_assigns_clause_size(const irep_idt &contract_id);
 
   /// Searches for a symbol named "contract::contract_id" in the symbol table.
-  ///
-  /// If a symbol "contract::contract_id" was found and its type signature is
-  /// compatible with that of "contract_id" a reference to the symbol is
-  /// returned.
-  ///
-  /// If a symbol "contract::contract_id" was found but its type signature is
-  /// not compatible with that of "contract_id" an exception is thrown.
-  ///
-  /// If a symbol "contract::contract_id" was found, a fresh symbol representing
-  /// a contract with empty clauses is inserted in the symbol table and a
-  /// reference to that symbol is returned.
-  const symbolt &get_pure_contract_symbol(const irep_idt &contract_id);
+  /// If the "contract::contract_id" is found and \p function_id_opt is present,
+  /// type signature compatibility is checked between the contract and
+  /// the function, and an exception is thrown if they are incompatible.
+  /// If the symbol was not found and \p function_id_opt was provided,
+  /// the function is used as a template to derive a new default contract with
+  /// empty requires, empty assigns, empty frees, empty ensures clauses.
+  /// If the symbol was not found and \p function_id_opt was not provided, a
+  /// PRECONDITION is triggered.
+  const symbolt &get_pure_contract_symbol(
+    const irep_idt &contract_id,
+    const optionalt<irep_idt> function_id_opt = {});
 
 protected:
   goto_modelt &goto_model;

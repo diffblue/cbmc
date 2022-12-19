@@ -1,0 +1,11 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/my_contractt _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+^Contract 'my_contractt' not found, deriving empty pure contract 'contract::my_contractt' from function 'foo'$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that we get a warning that a default contract is derived from the
+signature of the function being checked when specifying a non-existing contract.
