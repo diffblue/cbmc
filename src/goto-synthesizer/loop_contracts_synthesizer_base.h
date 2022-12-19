@@ -16,11 +16,6 @@ Author: Qinheping Hu
 
 #include "synthesizer_utils.h"
 
-#define OPT_SYNTHESIZE_LOOP_INVARIANTS "(synthesize-loop-invariants)"
-#define HELP_LOOP_INVARIANT_SYNTHESIZER                                        \
-  " --synthesize-loop-invariants\n"                                            \
-  "                              synthesize and apply loop invariants\n"
-
 class messaget;
 
 /// A base class for loop contracts synthesizers.
@@ -32,7 +27,7 @@ class messaget;
 class loop_contracts_synthesizer_baset
 {
 public:
-  loop_contracts_synthesizer_baset(const goto_modelt &goto_model, messaget &log)
+  loop_contracts_synthesizer_baset(goto_modelt &goto_model, messaget &log)
     : goto_model(goto_model), log(log)
   {
   }
@@ -48,7 +43,7 @@ public:
   virtual exprt synthesize(loop_idt) = 0;
 
 protected:
-  const goto_modelt &goto_model;
+  goto_modelt &goto_model;
   messaget &log;
 };
 

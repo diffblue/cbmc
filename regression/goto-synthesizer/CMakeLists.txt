@@ -12,9 +12,8 @@ else()
   set(gcc_only_string "")
 endif()
 
-
 add_test_pl_tests(
-    "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-synthesizer> $<TARGET_FILE:cbmc> ${is_windows}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:goto-synthesizer> $<TARGET_FILE:cbmc> ${is_windows}"
 )
 
 ## Enabling these causes a very significant increase in the time taken to run the regressions

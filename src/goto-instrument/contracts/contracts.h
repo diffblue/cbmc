@@ -122,6 +122,18 @@ public:
   symbol_tablet &get_symbol_table();
   goto_functionst &get_goto_functions();
 
+  std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
+  get_original_loop_number_map() const
+  {
+    return original_loop_number_map;
+  }
+
+  std::unordered_set<goto_programt::const_targett, const_target_hash>
+  get_loop_havoc_set() const
+  {
+    return loop_havoc_set;
+  }
+
   namespacet ns;
 
 protected:
@@ -136,6 +148,17 @@ protected:
 
   /// Name of loops we are going to unwind.
   std::list<std::string> loop_names;
+
+  /// Store the map from instrumented instructions for loop contracts to their
+  /// original loop numbers. Following instrumented instructions are stored.
+  /// 1. loop-havoc   ---   begin of transformed loops
+  /// 2. ASSIGN ENTERED_LOOP = TRUE   ---   end of transformed loops
+  std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
+    original_loop_number_map;
+
+  /// Loop havoc instructions instrumneted during applying loop contracts.
+  std::unordered_set<goto_programt::const_targett, const_target_hash>
+    loop_havoc_set;
 
 public:
   /// \brief Enforce contract of a single function

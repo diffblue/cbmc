@@ -14,16 +14,16 @@ else
 endif
 
 test:
-	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-synthesizer/goto-synthesizer ../../../src/cbmc/cbmc $(is_windows)' -X smt-backend $(GCC_ONLY)
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/goto-synthesizer/goto-synthesizer ../../../src/cbmc/cbmc $(is_windows)' -X smt-backend $(GCC_ONLY)
 
 test-cprover-smt2:
-	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-synthesizer/goto-synthesizer "../../../src/cbmc/cbmc --cprover-smt2" $(is_windows)' \
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/goto-synthesizer/goto-synthesizer "../../../src/cbmc/cbmc --cprover-smt2" $(is_windows)' \
 					  -X broken-smt-backend -X thorough-smt-backend \
 					  -X broken-cprover-smt-backend -X thorough-cprover-smt-backend \
 					  -s cprover-smt2 $(GCC_ONLY)
 
 test-z3:
-	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-synthesizer/goto-synthesizer "../../../src/cbmc/cbmc --z3" $(is_windows)' \
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/goto-synthesizer/goto-synthesizer "../../../src/cbmc/cbmc --z3" $(is_windows)' \
 					  -X broken-smt-backend -X thorough-smt-backend \
 					  -X broken-z3-smt-backend -X thorough-z3-smt-backend \
 					  -s z3 $(GCC_ONLY)

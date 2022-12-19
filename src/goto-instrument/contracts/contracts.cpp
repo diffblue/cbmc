@@ -59,6 +59,7 @@ void code_contractst::check_apply_loop_contracts(
   const irep_idt &mode)
 {
   const auto loop_head_location = loop_head->source_location();
+  const auto loop_number = loop_end->loop_number;
 
   // Vector representing a (possibly multidimensional) decreases clause
   const auto &decreases_clause_exprs = decreases_clause.operands();
@@ -95,10 +96,12 @@ void code_contractst::check_apply_loop_contracts(
   //                        |    STEP:
   //                  --.   |      assert (initial_invariant_val);
   // loop assigns check |   |      in_base_case = false;
-  //  - not applicable   >=======  havoc (assigns_set);
-  // func assigns check |   |      assume (invariant_expr);
-  //  + deferred        |   `-     old_variant_val = decreases_clause_expr;
-  //                  --'      * HEAD:
+  //  - not applicable   >=======  in_loop_havoc_block = true;
+  // func assigns check |   |      havoc (assigns_set);
+  //  + deferred        |   |      in_loop_havoc_block = false;
+  //                  --'   |      assume (invariant_expr);
+  //                        `-     old_variant_val = decreases_clause_expr;
+  //                           * HEAD:
   // loop assigns check     ,-     ... eval guard ...
   //  + assertions added    |      if (!guard)
   // func assigns check     |        goto EXIT;
@@ -142,7 +145,11 @@ void code_contractst::check_apply_loop_contracts(
   // i.e., the loop guard was satisfied.
   const auto entered_loop =
     new_tmp_symbol(
-      bool_typet(), loop_head_location, mode, symbol_table, "__entered_loop")
+      bool_typet(),
+      loop_head_location,
+      mode,
+      symbol_table,
+      std::string(ENTERED_LOOP) + "__" + std::to_string(loop_number))
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(entered_loop, loop_head_location));
@@ -153,7 +160,7 @@ void code_contractst::check_apply_loop_contracts(
   // if the loop is not vacuous and must be abstracted with contracts.
   const auto initial_invariant_val =
     new_tmp_symbol(
-      bool_typet(), loop_head_location, mode, symbol_table, "__init_invariant")
+      bool_typet(), loop_head_location, mode, symbol_table, INIT_INVARIANT)
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(initial_invariant_val, loop_head_location));
@@ -292,8 +299,25 @@ void code_contractst::check_apply_loop_contracts(
     loop_head, add_pragma_disable_assigns_check(pre_loop_head_instrs));
 
   // Generate havocing code for assignment targets.
+  // ASSIGN in_loop_havoc_block = true;
+  // havoc (assigns_set);
+  // ASSIGN in_loop_havoc_block = false;
+  const auto in_loop_havoc_block =
+    new_tmp_symbol(
+      bool_typet(),
+      loop_head_location,
+      mode,
+      symbol_table,
+      std::string(IN_LOOP_HAVOC_BLOCK) + +"__" + std::to_string(loop_number))
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(in_loop_havoc_block, loop_head_location));
+  pre_loop_head_instrs.add(
+    goto_programt::make_assignment(in_loop_havoc_block, true_exprt{}));
   havoc_assigns_targetst havoc_gen(to_havoc, ns);
   havoc_gen.append_full_havoc_code(loop_head_location, pre_loop_head_instrs);
+  pre_loop_head_instrs.add(
+    goto_programt::make_assignment(in_loop_havoc_block, false_exprt{}));
 
   // Insert the second block of pre_loop_head_instrs: the havocing code.
   // We do not `add_pragma_disable_assigns_check`,
@@ -1414,6 +1438,66 @@ void code_contractst::apply_loop_contracts(
   unwindset.parse_unwindset(loop_names, log.get_message_handler());
   goto_unwindt goto_unwind;
   goto_unwind(goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSUME);
+
+  remove_skip(goto_model);
+
+  // Record original loop number for some instrumented instructions.
+  for(auto &goto_function_entry : goto_functions.function_map)
+  {
+    auto &goto_function = goto_function_entry.second;
+    bool is_in_loop_havoc_block = false;
+
+    unsigned loop_number_of_loop_havoc = 0;
+    for(goto_programt::const_targett it_instr =
+          goto_function.body.instructions.begin();
+        it_instr != goto_function.body.instructions.end();
+        it_instr++)
+    {
+      // Don't override original loop numbers.
+      if(original_loop_number_map.count(it_instr) != 0)
+        continue;
+
+      // Store loop number for
+      // ASSIGN ENTERED_LOOP = TRUE
+      if(
+        is_assignment_to_instrumented_variable(it_instr, ENTERED_LOOP) &&
+        it_instr->assign_rhs() == true_exprt())
+      {
+        const auto &assign_lhs =
+          expr_try_dynamic_cast<symbol_exprt>(it_instr->assign_lhs());
+        original_loop_number_map[it_instr] = get_suffix_unsigned(
+          id2string(assign_lhs->get_identifier()),
+          std::string(ENTERED_LOOP) + "__");
+        continue;
+      }
+
+      // Loop havocs are assignments between
+      // ASSIGN IN_LOOP_HAVOC_BLOCK = true
+      // and
+      // ASSIGN IN_LOOP_HAVOC_BLOCK = false
+
+      // Entering the loop-havoc block.
+      if(is_assignment_to_instrumented_variable(it_instr, IN_LOOP_HAVOC_BLOCK))
+      {
+        is_in_loop_havoc_block = it_instr->assign_rhs() == true_exprt();
+        const auto &assign_lhs =
+          expr_try_dynamic_cast<symbol_exprt>(it_instr->assign_lhs());
+        loop_number_of_loop_havoc = get_suffix_unsigned(
+          id2string(assign_lhs->get_identifier()),
+          std::string(IN_LOOP_HAVOC_BLOCK) + "__");
+        continue;
+      }
+
+      // Assignments in loop-havoc block are loop havocs.
+      if(is_in_loop_havoc_block && it_instr->is_assign())
+      {
+        loop_havoc_set.emplace(it_instr);
+
+        // Store loop number for loop havoc.
+        original_loop_number_map[it_instr] = loop_number_of_loop_havoc;
+      }
+    }
+  }
 }
 
 void code_contractst::enforce_contracts(
