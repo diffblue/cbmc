@@ -1,5 +1,6 @@
 var NAVTREEINDEX30 =
 {
+"classfloat__approximationt.html#a1714edcebeb6c32adee115c261c65c03":[6,0,468,4],
 "classfloat__approximationt.html#a21bf6c01a1323e4f889452273a67315d":[6,0,468,3],
 "classfloat__approximationt.html#a3da588fecfd3ca12d3c7060f3db6a5d4":[6,0,468,5],
 "classfloat__approximationt.html#a58148141a21518adb0b6cbd68051f1b7":[6,0,468,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX30 =
 "classformat__specifiert.html#ae0f8a87067f94ca7b5d191eda204a82e":[6,0,481,9],
 "classformat__specifiert.html#aed530855f71d6e2e38de1d3eb9193884":[6,0,481,16],
 "classformat__specifiert.html#af5f818e985663307ff51477488a8632d":[6,0,481,21],
-"classformat__spect.html":[6,0,482],
-"classformat__spect.html#a01c30ffbb193022aa30267124e9eea7d":[6,0,482,2]
+"classformat__spect.html":[6,0,482]
 };

@@ -1,5 +1,6 @@
 var NAVTREEINDEX126 =
 {
+"structlanguage__entryt.html#a7d52d03029cdafd72734d941f8a0fa5b":[6,0,730,2],
 "structlanguage__entryt.html#ae91dbc02fcfab9e575dcb24977945b1d":[6,0,730,1],
 "structleft__and__right__valuest.html":[6,0,742],
 "structleft__and__right__valuest.html#a10a183af780b342e29ddec6583ae12dd":[6,0,742,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX126 =
 "structobject__creation__infot.html#afdfcdfb316545c6cdf901c066d85d1a7":[6,0,860,1],
 "structobject__creation__referencet.html":[6,0,861],
 "structobject__creation__referencet.html#acdaa06943888bbc7e6993a7845311e5b":[6,0,861,1],
-"structobject__creation__referencet.html#ae1f67c9efbadf14bd64a6c67efbc40bc":[6,0,861,0],
-"structobject__factory__parameterst.html":[6,0,863]
+"structobject__creation__referencet.html#ae1f67c9efbadf14bd64a6c67efbc40bc":[6,0,861,0]
 };

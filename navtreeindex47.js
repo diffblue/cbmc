@@ -1,5 +1,6 @@
 var NAVTREEINDEX47 =
 {
+"classlocal__control__flow__historyt.html#af8b2f7b3eaac25d6341293e641c9b452":[6,0,763,15],
 "classlocal__control__flow__historyt.html#af9a7ae995d543ba8049435af10fde3a1":[6,0,763,7],
 "classlocal__may__alias__factoryt.html":[6,0,764],
 "classlocal__may__alias__factoryt.html#a0e173f769a205990861b7f602fa5e4c1":[6,0,764,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX47 =
 "classmerge__irept.html#afec4dd158f457fcfe890fcbd8bf23e8f":[6,0,791,3],
 "classmerge__location__update__visitort.html":[6,0,792],
 "classmerge__location__update__visitort.html#a01e53c9b79a9438eedd95670b4c5e2b9":[6,0,792,2],
-"classmerge__location__update__visitort.html#a538a3b4937108bac8c83aa65ee63e9a1":[6,0,792,0],
-"classmerge__location__update__visitort.html#a8f18b7466e6c08b5ba88400710d79e2c":[6,0,792,1]
+"classmerge__location__update__visitort.html#a538a3b4937108bac8c83aa65ee63e9a1":[6,0,792,0]
 };

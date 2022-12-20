@@ -1,5 +1,6 @@
 var NAVTREEINDEX61 =
 {
+"classsmt__sort__output__visitort.html#a2b62dbf3fd6caae9b0cc2a986372bc07":[6,0,1115,2],
 "classsmt__sort__output__visitort.html#aa6f7d3df30f4a22703b9e082be204ab9":[6,0,1115,3],
 "classsmt__sortt.html":[6,0,1116],
 "classsmt__sortt.html#a02a80a8e05daf1f9f847fd5fe3d5dd84":[6,0,1116,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX61 =
 "classstate__encodingt.html#a5687b9b3be39a053aa90104dbe8070ad":[6,0,1144,33],
 "classstate__encodingt.html#a5687b9b3be39a053aa90104dbe8070ad":[6,0,1144,34],
 "classstate__encodingt.html#a57a6330e97244fc369c555a7023b859b":[6,0,1144,45],
-"classstate__encodingt.html#a60afbcc693dfa1f23b99abc4a16c67d5":[6,0,1144,10],
-"classstate__encodingt.html#a679376c93264c51e7460df72a67e3840":[6,0,1144,5]
+"classstate__encodingt.html#a60afbcc693dfa1f23b99abc4a16c67d5":[6,0,1144,10]
 };
