@@ -29,6 +29,7 @@ Date: February 2016
 #include <string>
 #include <unordered_set>
 
+// clang-format off
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
   " --apply-loop-contracts\n"                                                  \
@@ -36,12 +37,14 @@ Date: February 2016
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
-  " --replace-call-with-contract <fun>\n"                                      \
-  "                              replace calls to fun with fun's contract\n"
+  " --replace-call-with-contract <function>[/contract]\n"                      \
+  "                              replace calls to function with contract\n"
 
 #define FLAG_ENFORCE_CONTRACT "enforce-contract"
 #define HELP_ENFORCE_CONTRACT                                                  \
-  " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
+  " --enforce-contract <function>[/contract]"                                  \
+  "                              wrap function with an assertion of contract\n"
+// clang-format on
 
 class local_may_aliast;
 

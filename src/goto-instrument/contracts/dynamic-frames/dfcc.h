@@ -29,6 +29,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_H
 
+#include <util/exception_utils.h>
 #include <util/irep.h>
 #include <util/message.h>
 
@@ -56,18 +57,31 @@ class optionst;
 
 // clang-format off
 #define HELP_DFCC                                                              \
-  "--dfcc             activate dynamic frame condition checking for function\n"\
-  "                   contracts using given function as entry point"
-// clang-format on
+  "--dfcc <harness>   activate dynamic frame condition checking for function\n"\
+  "                   contracts using the given harness as entry point"
 
-// clang-format off
 #define FLAG_ENFORCE_CONTRACT_REC "enforce-contract-rec"
 #define OPT_ENFORCE_CONTRACT_REC "(" FLAG_ENFORCE_CONTRACT_REC "):"
 #define HELP_ENFORCE_CONTRACT_REC                                              \
-  " --enforce-contract-rec <fun>  wrap fun with an assertion of its contract\n"\
+  " --enforce-contract-rec <function>[/<contract>]"                            \
+  "                               wrap fun with an assertion of the contract\n"\
   "                               and assume recursive calls to fun satisfy \n"\
   "                               the contract"
 // clang-format on
+
+/// Exception thrown for bad function/contract specification pairs passed on
+/// the CLI.
+class invalid_function_contract_pair_exceptiont : public cprover_exception_baset
+{
+public:
+  explicit invalid_function_contract_pair_exceptiont(
+    std::string reason,
+    std::string correct_format = "");
+
+  std::string what() const override;
+
+  std::string correct_format;
+};
 
 /// \ingroup dfcc-module
 /// \brief Applies function contracts transformation to GOTO model,

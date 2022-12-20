@@ -1,0 +1,13 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/my_contract --replace-call-with-contract bar/my_contract _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test demonstrates the ability to check specify a function_name/contract_name
+mapping for contract checking and contract replacement.
+
+The same contract `my_contract` is used for both `foo` and `bar` functions in
+checking and replacement mode, respectively.
