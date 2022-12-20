@@ -644,6 +644,7 @@ var annotated_dup =
     [ "interval_uniont", "classinterval__uniont.html", "classinterval__uniont" ],
     [ "inv_object_storet", "classinv__object__storet.html", "classinv__object__storet" ],
     [ "invalid_command_line_argument_exceptiont", "classinvalid__command__line__argument__exceptiont.html", "classinvalid__command__line__argument__exceptiont" ],
+    [ "invalid_function_contract_pair_exceptiont", "classinvalid__function__contract__pair__exceptiont.html", "classinvalid__function__contract__pair__exceptiont" ],
     [ "invalid_input_exceptiont", "classinvalid__input__exceptiont.html", "classinvalid__input__exceptiont" ],
     [ "invalid_restriction_exceptiont", "classinvalid__restriction__exceptiont.html", "classinvalid__restriction__exceptiont" ],
     [ "invalid_source_file_exceptiont", "classinvalid__source__file__exceptiont.html", "classinvalid__source__file__exceptiont" ],

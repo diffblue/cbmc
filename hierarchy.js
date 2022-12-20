@@ -358,6 +358,7 @@ var hierarchy =
       [ "gdb_interaction_exceptiont", "classgdb__interaction__exceptiont.html", null ],
       [ "incorrect_goto_program_exceptiont", "classincorrect__goto__program__exceptiont.html", null ],
       [ "invalid_command_line_argument_exceptiont", "classinvalid__command__line__argument__exceptiont.html", null ],
+      [ "invalid_function_contract_pair_exceptiont", "classinvalid__function__contract__pair__exceptiont.html", null ],
       [ "invalid_input_exceptiont", "classinvalid__input__exceptiont.html", [
         [ "invalid_source_file_exceptiont", "classinvalid__source__file__exceptiont.html", null ]
       ] ],

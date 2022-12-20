@@ -99,7 +99,8 @@ $(document).ready(function(){initNavTree('dfcc_8h.html',''); initResizable(); })
 
 <p>Main class orchestrating the the whole program transformation for function contracts with Dynamic Frame Condition Checking (DFCC)  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="exception__utils_8h_source.html">util/exception_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>&quot;</code><br />
@@ -115,7 +116,7 @@ $(document).ready(function(){initNavTree('dfcc_8h.html',''); initResizable(); })
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8h__incl.svg" width="2778" height="918"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8h__incl.svg" width="3010" height="1291"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -131,6 +132,9 @@ $(document).ready(function(){initNavTree('dfcc_8h.html',''); initResizable(); })
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinvalid__function__contract__pair__exceptiont.html">invalid_function_contract_pair_exceptiont</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exception thrown for bad function/contract specification pairs passed on the CLI.  <a href="classinvalid__function__contract__pair__exceptiont.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcct.html">dfcct</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point into the contracts transformation.  <a href="classdfcct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,7 +182,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00054">54</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00055">55</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -194,7 +198,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00064">64</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00063">63</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -209,10 +213,10 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;--dfcc             activate dynamic frame condition checking for function\n&quot;</span>\</div>
-<div class="line">  <span class="stringliteral">&quot;                   contracts using given function as entry point&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;--dfcc &lt;harness&gt;   activate dynamic frame condition checking for function\n&quot;</span>\</div>
+<div class="line">  <span class="stringliteral">&quot;                   contracts using the given harness as entry point&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00058">58</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00059">59</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -227,11 +231,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --enforce-contract-rec &lt;fun&gt;  wrap fun with an assertion of its contract\n&quot;</span>\</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --enforce-contract-rec &lt;function&gt;[/&lt;contract&gt;]&quot;</span>                            \</div>
+<div class="line">  <span class="stringliteral">&quot;                               wrap fun with an assertion of the contract\n&quot;</span>\</div>
 <div class="line">  <span class="stringliteral">&quot;                               and assume recursive calls to fun satisfy \n&quot;</span>\</div>
 <div class="line">  <span class="stringliteral">&quot;                               the contract&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00066">66</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00065">65</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -247,7 +252,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00055">55</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00056">56</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -263,7 +268,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00065">65</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00064">64</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>

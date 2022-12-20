@@ -144,7 +144,7 @@ Macros</h2></td></tr>
 <tr class="separator:a051e6496766835c8bfc4d5f74cf6b56a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31c48af55fa7161300741d422cc91a67"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8h.html#a31c48af55fa7161300741d422cc91a67">FLAG_ENFORCE_CONTRACT</a>&#160;&#160;&#160;&quot;enforce-contract&quot;</td></tr>
 <tr class="separator:a31c48af55fa7161300741d422cc91a67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88f293be45084aa89794529552710a86"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8h.html#a88f293be45084aa89794529552710a86">HELP_ENFORCE_CONTRACT</a>&#160;&#160;&#160;  &quot; --enforce-contract &lt;fun&gt;     wrap fun with an assertion of its contract\n&quot;</td></tr>
+<tr class="memitem:a88f293be45084aa89794529552710a86"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="contracts_8h.html#a88f293be45084aa89794529552710a86">HELP_ENFORCE_CONTRACT</a></td></tr>
 <tr class="separator:a88f293be45084aa89794529552710a86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -164,7 +164,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00042">42</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00043">43</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -180,7 +180,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00032">32</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00033">33</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -196,7 +196,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00037">37</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00038">38</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -207,12 +207,14 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HELP_ENFORCE_CONTRACT&#160;&#160;&#160;  &quot; --enforce-contract &lt;fun&gt;     wrap fun with an assertion of its contract\n&quot;</td>
+          <td class="memname">#define HELP_ENFORCE_CONTRACT</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00043">43</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --enforce-contract &lt;function&gt;[/contract]&quot;</span>                                  \</div>
+<div class="line">  <span class="stringliteral">&quot;                              wrap function with an assertion of contract\n&quot;</span></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00044">44</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -230,7 +232,7 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --apply-loop-contracts\n&quot;</span>                                                  \</div>
 <div class="line">  <span class="stringliteral">&quot;                              check and use loop contracts when provided\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00033">33</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00034">34</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>
@@ -245,10 +247,10 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --replace-call-with-contract &lt;fun&gt;\n&quot;</span>                                      \</div>
-<div class="line">  <span class="stringliteral">&quot;                              replace calls to fun with fun&#39;s contract\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --replace-call-with-contract &lt;function&gt;[/contract]\n&quot;</span>                      \</div>
+<div class="line">  <span class="stringliteral">&quot;                              replace calls to function with contract\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00038">38</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8h_source.html#l00039">39</a> of file <a class="el" href="contracts_8h_source.html">contracts.h</a>.</p>
 
 </div>
 </div>

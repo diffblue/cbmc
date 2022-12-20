@@ -109,6 +109,7 @@ $(document).ready(function(){initNavTree('dfcc_8cpp.html',''); initResizable(); 
 <code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="string__utils_8h_source.html">util/string_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__convert__functions_8h_source.html">goto-programs/goto_convert_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__functions_8h_source.html">goto-programs/goto_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__inline_8h_source.html">goto-programs/goto_inline.h</a>&gt;</code><br />
@@ -130,12 +131,13 @@ $(document).ready(function(){initNavTree('dfcc_8cpp.html',''); initResizable(); 
 <code>#include &lt;<a class="el" href="mode_8h_source.html">langapi/mode.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__lift__memory__predicates_8h_source.html">dfcc_lift_memory_predicates.h</a>&quot;</code><br />
+<code>#include &lt;iostream&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for dfcc.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8cpp__incl.svg" width="5652" height="812"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8cpp__incl.svg" width="5686" height="738"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -143,6 +145,8 @@ $(document).ready(function(){initNavTree('dfcc_8cpp.html',''); initResizable(); 
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a551092f802d7511a29c5a94aa51f5f20"><td class="memItemLeft" align="right" valign="top">static std::pair&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc_8cpp.html#a551092f802d7511a29c5a94aa51f5f20">parse_function_contract_pair</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;cli_flag)</td></tr>
+<tr class="separator:a551092f802d7511a29c5a94aa51f5f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf3830cbcefce961b35b7685ec749073e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#gaf3830cbcefce961b35b7685ec749073e">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_check, const bool allow_recursive_calls, const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const bool apply_loop_contracts, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:gaf3830cbcefce961b35b7685ec749073e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#gaf3830cbcefce961b35b7685ec749073e">More...</a><br /></td></tr>
 <tr class="separator:gaf3830cbcefce961b35b7685ec749073e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,6 +154,35 @@ Functions</h2></td></tr>
 <tr class="memdesc:gafdbf369497f3ee91c04204da63eefd86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts and loop contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#gafdbf369497f3ee91c04204da63eefd86">More...</a><br /></td></tr>
 <tr class="separator:gafdbf369497f3ee91c04204da63eefd86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a551092f802d7511a29c5a94aa51f5f20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a551092f802d7511a29c5a94aa51f5f20">&#9670;&nbsp;</a></span>parse_function_contract_pair()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::pair&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; parse_function_contract_pair </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>cli_flag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00078">78</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

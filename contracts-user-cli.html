@@ -96,20 +96,20 @@ $(document).ready(function(){initNavTree('contracts-user-cli.html',''); initResi
 <h1><a class="anchor" id="autotoc_md70"></a>
 Applying loop and/or function contracts transformations (without the dynamic frames method)</h1>
 <p>The program transformation takes the following parameters:</p>
-<div class="fragment"><div class="line">goto-instrument [--apply-loop-contracts] [--enforce-contract f] (--replace-call-with-contract g)* in.gb out.gb</div>
+<div class="fragment"><div class="line">goto-instrument [--apply-loop-contracts] [--enforce-contract &lt;function&gt;] (--replace-call-with-contract &lt;function&gt;)* in.gb out.gb</div>
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>--apply-loop-contracts</code> is optional and specifies to apply loop contracts globally;</li>
-<li><code>--enforce-contract f</code> is optional and specifies that <code>f</code> must be checked against its contract.</li>
-<li><code>--replace-call-with-contract g</code> is optional and specifies that all calls to <code>g</code> must be replaced with its contract;</li>
+<li><code>--enforce-contract &lt;function&gt;</code> is optional and specifies that <code>function</code> must be checked against its contract.</li>
+<li><code>--replace-call-with-contract &lt;function&gt;</code> is optional and specifies that all calls to <code>function</code> must be replaced with its contract;</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md71"></a>
 Applying the function contracts transformation (with the dynamic frames method)</h1>
 <p>The program transformation takes the following parameters:</p>
-<div class="fragment"><div class="line">goto-instrument --dfcc harness [--enforce-contract f] (--replace-call-with-contract g)* [--apply-loop-contracts] in.gb out.gb</div>
+<div class="fragment"><div class="line">goto-instrument --dfcc harness [--enforce-contract &lt;function&gt;[/&lt;contract&gt;]] (--replace-call-with-contract &lt;function&gt;[/&lt;contract&gt;])* in.gb out.gb</div>
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>--dfcc harness</code> specifies the proof harness (i.e. the entry point of the analysis);</li>
-<li><code>--enforce-contract f</code> is optional and specifies that <code>f</code> must be checked against its contract.</li>
-<li><code>--replace-call-with-contract g</code> is optional and specifies that all calls to <code>g</code> must be replaced with its contract; </li>
+<li><code>--enforce-contract &lt;function&gt;[/&lt;contract&gt;]</code> is optional and specifies that <code>function</code> must be checked against <code>contract</code>. When <code>contract</code> is not specfied, the contract is assumed to be carried by the <code>function</code> itself.</li>
+<li><code>--replace-call-with-contract &lt;function&gt;[/&lt;contract&gt;]</code> is optional and specifies that all calls to <code>function</code> must be replaced with <code>contract</code>. When <code>contract</code> is not specfied, the contract is assumed to be carried by the <code>function</code> itself. </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

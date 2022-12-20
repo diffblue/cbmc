@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/string_utils.h" name="/home/runner/work/cbmc/cbmc/src/util/string_utils.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4623,5,4807,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4739,5,4923,61"/>
 <area shape="rect" id="node2" href="$abstract__object__set_8cpp.html" title=" " alt="" coords="5,117,259,173"/>
 <area shape="rect" id="node3" href="$builtin__factory_8cpp.html" title=" " alt="" coords="283,117,467,173"/>
 <area shape="rect" id="node4" href="$expr2c_8cpp.html" title=" " alt="" coords="491,124,693,165"/>
@@ -12,39 +12,40 @@
 <area shape="rect" id="node11" href="$goto__harness__generator__factory_8cpp.html" title=" " alt="" coords="2125,109,2309,180"/>
 <area shape="rect" id="node12" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="2333,109,2539,180"/>
 <area shape="rect" id="node13" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="2563,117,2765,173"/>
-<area shape="rect" id="node14" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="2789,117,2982,173"/>
-<area shape="rect" id="node15" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="3007,117,3228,173"/>
-<area shape="rect" id="node16" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3252,117,3511,173"/>
-<area shape="rect" id="node17" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="3535,117,3729,173"/>
-<area shape="rect" id="node18" href="$replace__calls_8cpp.html" title="Replace calls Replaces calls to given functions with calls to other given functions." alt="" coords="3753,117,3946,173"/>
-<area shape="rect" id="node19" href="$source__lines_8cpp.html" title="Set of source code lines contributing to a basic block." alt="" coords="3970,117,4163,173"/>
-<area shape="rect" id="node20" href="$splice__call_8cpp.html" title="Prepend a nullary call to another function useful for context/ environment setting in arbitrary nodes..." alt="" coords="4187,117,4381,173"/>
-<area shape="rect" id="node21" href="$unwindset_8cpp.html" title=" " alt="" coords="4405,117,4598,173"/>
-<area shape="rect" id="node22" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="4623,117,4807,173"/>
-<area shape="rect" id="node23" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="4831,117,5054,173"/>
-<area shape="rect" id="node24" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="5079,117,5297,173"/>
-<area shape="rect" id="node25" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="5322,117,5521,173"/>
-<area shape="rect" id="node26" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="5545,117,5749,173"/>
-<area shape="rect" id="node27" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="5773,117,5977,173"/>
-<area shape="rect" id="node28" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="6001,117,6185,173"/>
-<area shape="rect" id="node29" href="$smt__solver__process_8cpp.html" title=" " alt="" coords="6209,109,6393,180"/>
-<area shape="rect" id="node30" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="6418,109,6614,180"/>
-<area shape="rect" id="node31" href="$cmdline_8cpp.html" title=" " alt="" coords="6639,124,6831,165"/>
-<area shape="rect" id="node32" href="$config_8cpp.html" title=" " alt="" coords="6855,124,7039,165"/>
-<area shape="rect" id="node33" href="$console_8cpp.html" title=" " alt="" coords="7063,124,7254,165"/>
-<area shape="rect" id="node34" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="7279,117,7463,173"/>
-<area shape="rect" id="node35" href="$interval__union_8cpp.html" title=" " alt="" coords="7487,117,7671,173"/>
-<area shape="rect" id="node36" href="$lispexpr_8cpp.html" title=" " alt="" coords="7695,124,7886,165"/>
-<area shape="rect" id="node37" href="$parse__options_8cpp.html" title=" " alt="" coords="7910,124,8141,165"/>
-<area shape="rect" id="node38" href="$string__utils_8cpp.html" title=" " alt="" coords="8165,117,8349,173"/>
-<area shape="rect" id="node39" href="$structured__data_8cpp.html" title=" " alt="" coords="8373,117,8557,173"/>
-<area shape="rect" id="node40" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="8582,117,8877,173"/>
-<area shape="rect" id="node47" href="$java__string__literals_8cpp.html" title=" " alt="" coords="8901,117,9120,173"/>
-<area shape="rect" id="node48" href="$java__utils_8cpp.html" title=" " alt="" coords="9144,117,9363,173"/>
-<area shape="rect" id="node41" href="$ci__lazy__methods__needed_8cpp.html" title="Context&#45;insensitive lazy methods container." alt="" coords="8180,235,8399,291"/>
-<area shape="rect" id="node42" href="$generic__parameter__specialization__map_8cpp.html" title=" " alt="" coords="8423,235,8732,291"/>
-<area shape="rect" id="node43" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="8757,228,9003,299"/>
-<area shape="rect" id="node46" href="$select__pointer__type_8cpp.html" title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)..." alt="" coords="9028,235,9247,291"/>
-<area shape="rect" id="node44" href="$generic__parameter__specialization__map__keys_8cpp.html" title=" " alt="" coords="8627,347,8874,417"/>
-<area shape="rect" id="node45" href="$java__object__factory_8cpp.html" title=" " alt="" coords="8899,354,9117,410"/>
+<area shape="rect" id="node14" href="$dfcc_8cpp.html" title=" " alt="" coords="2789,109,2987,180"/>
+<area shape="rect" id="node15" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="3011,117,3205,173"/>
+<area shape="rect" id="node16" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="3229,117,3451,173"/>
+<area shape="rect" id="node17" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3475,117,3733,173"/>
+<area shape="rect" id="node18" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="3758,117,3951,173"/>
+<area shape="rect" id="node19" href="$replace__calls_8cpp.html" title="Replace calls Replaces calls to given functions with calls to other given functions." alt="" coords="3975,117,4169,173"/>
+<area shape="rect" id="node20" href="$source__lines_8cpp.html" title="Set of source code lines contributing to a basic block." alt="" coords="4193,117,4386,173"/>
+<area shape="rect" id="node21" href="$splice__call_8cpp.html" title="Prepend a nullary call to another function useful for context/ environment setting in arbitrary nodes..." alt="" coords="4410,117,4603,173"/>
+<area shape="rect" id="node22" href="$unwindset_8cpp.html" title=" " alt="" coords="4627,117,4821,173"/>
+<area shape="rect" id="node23" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="4845,117,5029,173"/>
+<area shape="rect" id="node24" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="5054,117,5277,173"/>
+<area shape="rect" id="node25" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="5301,117,5520,173"/>
+<area shape="rect" id="node26" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="5545,117,5743,173"/>
+<area shape="rect" id="node27" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="5767,117,5971,173"/>
+<area shape="rect" id="node28" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="5995,117,6199,173"/>
+<area shape="rect" id="node29" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="6224,117,6408,173"/>
+<area shape="rect" id="node30" href="$smt__solver__process_8cpp.html" title=" " alt="" coords="6432,109,6616,180"/>
+<area shape="rect" id="node31" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="6641,109,6837,180"/>
+<area shape="rect" id="node32" href="$cmdline_8cpp.html" title=" " alt="" coords="6861,124,7053,165"/>
+<area shape="rect" id="node33" href="$config_8cpp.html" title=" " alt="" coords="7077,124,7261,165"/>
+<area shape="rect" id="node34" href="$console_8cpp.html" title=" " alt="" coords="7286,124,7477,165"/>
+<area shape="rect" id="node35" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="7501,117,7685,173"/>
+<area shape="rect" id="node36" href="$interval__union_8cpp.html" title=" " alt="" coords="7709,117,7893,173"/>
+<area shape="rect" id="node37" href="$lispexpr_8cpp.html" title=" " alt="" coords="7918,124,8109,165"/>
+<area shape="rect" id="node38" href="$parse__options_8cpp.html" title=" " alt="" coords="8133,124,8363,165"/>
+<area shape="rect" id="node39" href="$string__utils_8cpp.html" title=" " alt="" coords="8388,117,8572,173"/>
+<area shape="rect" id="node40" href="$structured__data_8cpp.html" title=" " alt="" coords="8596,117,8780,173"/>
+<area shape="rect" id="node41" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="8805,117,9099,173"/>
+<area shape="rect" id="node48" href="$java__string__literals_8cpp.html" title=" " alt="" coords="9124,117,9343,173"/>
+<area shape="rect" id="node49" href="$java__utils_8cpp.html" title=" " alt="" coords="9367,117,9585,173"/>
+<area shape="rect" id="node42" href="$ci__lazy__methods__needed_8cpp.html" title="Context&#45;insensitive lazy methods container." alt="" coords="8403,235,8621,291"/>
+<area shape="rect" id="node43" href="$generic__parameter__specialization__map_8cpp.html" title=" " alt="" coords="8645,235,8955,291"/>
+<area shape="rect" id="node44" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="8979,228,9226,299"/>
+<area shape="rect" id="node47" href="$select__pointer__type_8cpp.html" title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)..." alt="" coords="9251,235,9469,291"/>
+<area shape="rect" id="node45" href="$generic__parameter__specialization__map__keys_8cpp.html" title=" " alt="" coords="8850,347,9097,417"/>
+<area shape="rect" id="node46" href="$java__object__factory_8cpp.html" title=" " alt="" coords="9121,354,9340,410"/>
 </map>
