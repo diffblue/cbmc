@@ -180,7 +180,6 @@ external_satt::resultt external_satt::do_prop_solve()
   // create a temporary file
   temporary_filet cnf_file("external-sat", ".cnf");
   write_cnf_file(cnf_file());
-  clauses.clear();
   auto output = execute_solver(cnf_file());
   return parse_result(output);
 }
