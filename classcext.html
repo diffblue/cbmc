@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('classcext.html',''); initResizable(); 
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classcext__coll__graph.svg" width="575" height="766"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classcext__coll__graph.svg" width="2172" height="351"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -119,7 +119,8 @@ Public Types</h2></td></tr>
 , <a class="el" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa7e00247c04f7315a59255c0f6a91fe1">cex_not_preserved</a>
 , <a class="el" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca38fbf5fa1a7c242b73f1c6bccfa8f370">cex_not_hold_upon_entry</a>
 , <br />
-&#160;&#160;<a class="el" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca8fbd90fb770bfd708764b084c623959a">cex_other</a>
+&#160;&#160;<a class="el" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa89431bbe23277f3636288002650c3ff">cex_assignable</a>
+, <a class="el" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca8fbd90fb770bfd708764b084c623959a">cex_other</a>
 <br />
  }</td></tr>
 <tr class="separator:a6f187d25029f8f00bc9910e09c9ad18c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,8 +154,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ab46647cb7909d09e6b2f230b295ef59a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe523bc95ec0ecc11c359da5e251aee2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18c">violation_typet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcext.html#afe523bc95ec0ecc11c359da5e251aee2">violation_type</a></td></tr>
 <tr class="separator:afe523bc95ec0ecc11c359da5e251aee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19dd124a1909fa3ab922cf342601640b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="structloop__idt.html">loop_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcext.html#a19dd124a1909fa3ab922cf342601640b">cause_loop_id</a></td></tr>
-<tr class="separator:a19dd124a1909fa3ab922cf342601640b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5303cfb94b158e5d854c9d577a3ee101"><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="structloop__idt.html">loop_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcext.html#a5303cfb94b158e5d854c9d577a3ee101">cause_loop_ids</a></td></tr>
+<tr class="separator:a5303cfb94b158e5d854c9d577a3ee101"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Formatted counterexample. </p>
@@ -185,6 +186,7 @@ Public Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a6f187d25029f8f00bc9910e09c9ad18ca06f8b744d23c57ea4a0be2ed9a2584e5"></a>cex_null_pointer&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a6f187d25029f8f00bc9910e09c9ad18caa7e00247c04f7315a59255c0f6a91fe1"></a>cex_not_preserved&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a6f187d25029f8f00bc9910e09c9ad18ca38fbf5fa1a7c242b73f1c6bccfa8f370"></a>cex_not_hold_upon_entry&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a6f187d25029f8f00bc9910e09c9ad18caa89431bbe23277f3636288002650c3ff"></a>cex_assignable&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a6f187d25029f8f00bc9910e09c9ad18ca8fbd90fb770bfd708764b084c623959a"></a>cex_other&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -251,7 +253,7 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00037">37</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00038">38</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -279,24 +281,24 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00054">54</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00055">55</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a19dd124a1909fa3ab922cf342601640b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19dd124a1909fa3ab922cf342601640b">&#9670;&nbsp;</a></span>cause_loop_id</h2>
+<a id="a5303cfb94b158e5d854c9d577a3ee101"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5303cfb94b158e5d854c9d577a3ee101">&#9670;&nbsp;</a></span>cause_loop_ids</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="structloop__idt.html">loop_idt</a>&gt; cext::cause_loop_id</td>
+          <td class="memname">std::list&lt;<a class="el" href="structloop__idt.html">loop_idt</a>&gt; cext::cause_loop_ids</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00087">87</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00088">88</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -312,7 +314,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00060">60</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00061">61</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -328,7 +330,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00075">75</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00076">76</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -344,7 +346,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00073">73</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00074">74</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -360,7 +362,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00065">65</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00066">66</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -376,7 +378,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00084">84</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00085">85</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -392,7 +394,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00081">81</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00082">82</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -408,7 +410,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00079">79</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00080">80</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -424,7 +426,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00071">71</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00072">72</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -440,7 +442,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00061">61</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00062">62</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -456,7 +458,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00086">86</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00087">87</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>

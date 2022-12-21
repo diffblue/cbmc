@@ -129,11 +129,47 @@ Functions</h2></td></tr>
 <tr class="memitem:aab60371e081d74195d69c087bb3b9543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;invariant_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
 <tr class="memdesc:aab60371e081d74195d69c087bb3b9543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the invariants in <code>invariant_map</code> to their corresponding loops.  <a href="synthesizer__utils_8cpp.html#aab60371e081d74195d69c087bb3b9543">More...</a><br /></td></tr>
 <tr class="separator:aab60371e081d74195d69c087bb3b9543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaeb6c0147c7354441c41b25a535e008a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a">annotate_assigns</a> (const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::set&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;assigns_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
+<tr class="memdesc:aaeb6c0147c7354441c41b25a535e008a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the assigns in <code>assigns_map</code> to their corresponding loops.  <a href="synthesizer__utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a">More...</a><br /></td></tr>
+<tr class="separator:aaeb6c0147c7354441c41b25a535e008a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec2d1ec60e566d40c16409fe34d14518"><td class="memItemLeft" align="right" valign="top"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aec2d1ec60e566d40c16409fe34d14518">combine_in_and_post_invariant_clauses</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;in_clauses, const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;post_clauses, const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;neg_guards)</td></tr>
 <tr class="memdesc:aec2d1ec60e566d40c16409fe34d14518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combine invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv)  <a href="synthesizer__utils_8cpp.html#aec2d1ec60e566d40c16409fe34d14518">More...</a><br /></td></tr>
 <tr class="separator:aec2d1ec60e566d40c16409fe34d14518"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="aaeb6c0147c7354441c41b25a535e008a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaeb6c0147c7354441c41b25a535e008a">&#9670;&nbsp;</a></span>annotate_assigns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void annotate_assigns </td>
+          <td>(</td>
+          <td class="paramtype">const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::set&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>assigns_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Annotate the assigns in <code>assigns_map</code> to their corresponding loops. </p>
+<p>Corresponding loops are specified by keys of <code>assigns_map</code> </p>
+
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00119">119</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aab60371e081d74195d69c087bb3b9543"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aab60371e081d74195d69c087bb3b9543">&#9670;&nbsp;</a></span>annotate_invariants()</h2>
 
@@ -201,7 +237,7 @@ Functions</h2></td></tr>
 
 <p>Combine invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv) </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00119">119</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00141">141</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>

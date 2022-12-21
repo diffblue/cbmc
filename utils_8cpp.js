@@ -11,6 +11,7 @@ var utils_8cpp =
     [ "is_assigns_clause_replacement_tracking_comment", "utils_8cpp.html#a5da8544cddc0cac684c91b55b4d2ab4f", null ],
     [ "is_loop_free", "utils_8cpp.html#a3813c832f1bc8415bed3d3f17d14b763", null ],
     [ "is_transformed_loop_end", "utils_8cpp.html#a9d1167acb38516d35006111efc44f571", null ],
+    [ "is_transformed_loop_head", "utils_8cpp.html#a523e10f9b5ded98f00cc8c5e85cf1a6a", null ],
     [ "make_assigns_clause_replacement_tracking_comment", "utils_8cpp.html#a1c73b0b817e6e049ea409d0c86e7b3e3", null ],
     [ "new_tmp_symbol", "utils_8cpp.html#a5cf09fde997eeb78602693d324d9d34b", null ],
     [ "replace_history_parameter", "utils_8cpp.html#a3c151c3ed976293e7799df9faeb14154", null ],

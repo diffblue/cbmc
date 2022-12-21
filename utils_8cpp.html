@@ -160,8 +160,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a0e4c1d1b019f583c464308badc770bb2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a0e4c1d1b019f583c464308badc770bb2">generate_history_variables_initialization</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classexprt.html">exprt</a> &amp;clause, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program)</td></tr>
 <tr class="memdesc:a0e4c1d1b019f583c464308badc770bb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function generates all the instructions required to initialize history variables.  <a href="utils_8cpp.html#a0e4c1d1b019f583c464308badc770bb2">More...</a><br /></td></tr>
 <tr class="separator:a0e4c1d1b019f583c464308badc770bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a523e10f9b5ded98f00cc8c5e85cf1a6a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a523e10f9b5ded98f00cc8c5e85cf1a6a">is_transformed_loop_head</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;target)</td></tr>
+<tr class="memdesc:a523e10f9b5ded98f00cc8c5e85cf1a6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if <code>target</code> is the head of some transformed loop.  <a href="utils_8cpp.html#a523e10f9b5ded98f00cc8c5e85cf1a6a">More...</a><br /></td></tr>
+<tr class="separator:a523e10f9b5ded98f00cc8c5e85cf1a6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d1167acb38516d35006111efc44f571"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a9d1167acb38516d35006111efc44f571">is_transformed_loop_end</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;target)</td></tr>
-<tr class="memdesc:a9d1167acb38516d35006111efc44f571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if <code>target</code> is the loop end of some transformed code.  <a href="utils_8cpp.html#a9d1167acb38516d35006111efc44f571">More...</a><br /></td></tr>
+<tr class="memdesc:a9d1167acb38516d35006111efc44f571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if <code>target</code> is the end of some transformed loop.  <a href="utils_8cpp.html#a9d1167acb38516d35006111efc44f571">More...</a><br /></td></tr>
 <tr class="separator:a9d1167acb38516d35006111efc44f571"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11be635da37bb659aab648c67bc8c6ca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a11be635da37bb659aab648c67bc8c6ca">is_assignment_to_instrumented_variable</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;target, std::string var_name)</td></tr>
 <tr class="memdesc:a11be635da37bb659aab648c67bc8c6ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if <code>target</code> is an assignment to an instrumented variable with name <code>var_name</code>.  <a href="utils_8cpp.html#a11be635da37bb659aab648c67bc8c6ca">More...</a><br /></td></tr>
@@ -428,7 +431,7 @@ Variables</h2></td></tr>
 
 <p>Convert the suffix digits right after <code>prefix</code> of <code>str</code> into unsigned. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00483">483</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00489">489</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -507,7 +510,7 @@ Variables</h2></td></tr>
 
 <p>Return true if <code>target</code> is an assignment to an instrumented variable with name <code>var_name</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00461">461</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00467">467</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -588,7 +591,29 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return true if <code>target</code> is the loop end of some transformed code. </p>
+<p>Return true if <code>target</code> is the end of some transformed loop. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00459">459</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a523e10f9b5ded98f00cc8c5e85cf1a6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a523e10f9b5ded98f00cc8c5e85cf1a6a">&#9670;&nbsp;</a></span>is_transformed_loop_head()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool is_transformed_loop_head </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>target</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return true if <code>target</code> is the head of some transformed loop. </p>
 
 <p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00451">451</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 

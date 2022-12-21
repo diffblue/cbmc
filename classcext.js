@@ -5,11 +5,12 @@ var classcext =
       [ "cex_null_pointer", "classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca06f8b744d23c57ea4a0be2ed9a2584e5", null ],
       [ "cex_not_preserved", "classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa7e00247c04f7315a59255c0f6a91fe1", null ],
       [ "cex_not_hold_upon_entry", "classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca38fbf5fa1a7c242b73f1c6bccfa8f370", null ],
+      [ "cex_assignable", "classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa89431bbe23277f3636288002650c3ff", null ],
       [ "cex_other", "classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca8fbd90fb770bfd708764b084c623959a", null ]
     ] ],
     [ "cext", "classcext.html#a079e7c9b2e6d81b4e48081d9cae7883b", null ],
     [ "cext", "classcext.html#a7edceb4c3d2bbf44369bddbd343aad31", null ],
-    [ "cause_loop_id", "classcext.html#a19dd124a1909fa3ab922cf342601640b", null ],
+    [ "cause_loop_ids", "classcext.html#a5303cfb94b158e5d854c9d577a3ee101", null ],
     [ "checked_pointer", "classcext.html#a487ef6e6fa30107c78ed945d5a02ae7a", null ],
     [ "havoced_pointer_offsets", "classcext.html#ade391b607a1494314e2a166a443cd3aa", null ],
     [ "havoced_values", "classcext.html#a91d7f1dbaa70ed6cde30b9378b365120", null ],
