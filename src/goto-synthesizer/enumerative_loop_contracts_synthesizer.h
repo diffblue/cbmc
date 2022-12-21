@@ -40,6 +40,11 @@ public:
   invariant_mapt synthesize_all() override;
   exprt synthesize(loop_idt loop_id) override;
 
+  std::map<loop_idt, std::set<exprt>> get_assigns_map() const
+  {
+    return assigns_map;
+  }
+
 private:
   /// Initialize invariants as true for all unannotated loops.
   void init_candidates();
@@ -68,11 +73,19 @@ private:
     const loop_idt &cause_loop_id,
     const irep_idt &violation_id);
 
-  ///  Synthesize invariant of form
-  ///   (in_inv || !guard) && (!guard -> pos_inv)
+  /// Synthesize assigns target and update assigns_map.
+  void synthesize_assigns(
+    const exprt &checked_pointer,
+    const std::list<loop_idt> cause_loop_ids);
+
+  /// Synthesize invariant of form
+  /// (in_inv || !guard) && (!guard -> pos_inv)
   invariant_mapt in_invariant_clause_map;
   invariant_mapt pos_invariant_clause_map;
   invariant_mapt neg_guards;
+
+  /// Synthesized assigns clauses.
+  std::map<loop_idt, std::set<exprt>> assigns_map;
 
   /// Map from tmp_post variables to their original variables.
   std::unordered_map<exprt, exprt, irep_hash> tmp_post_map;

@@ -51,6 +51,12 @@ void annotate_invariants(
   const invariant_mapt &invariant_map,
   goto_modelt &goto_model);
 
+/// Annotate the assigns in `assigns_map` to their corresponding
+/// loops. Corresponding loops are specified by keys of `assigns_map`
+void annotate_assigns(
+  const std::map<loop_idt, std::set<exprt>> &assigns_map,
+  goto_modelt &goto_model);
+
 /// Combine invariant of form
 /// (in_inv || !guard) && (!guard -> pos_inv)
 invariant_mapt combine_in_and_post_invariant_clauses(

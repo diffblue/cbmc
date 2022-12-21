@@ -54,6 +54,7 @@ int goto_synthesizer_parse_optionst::doit()
     // Synthesize loop invariants and annotate them into `goto_model`
     enumerative_loop_contracts_synthesizert synthesizer(goto_model, log);
     annotate_invariants(synthesizer.synthesize_all(), goto_model);
+    annotate_assigns(synthesizer.get_assigns_map(), goto_model);
 
     // Apply loop contracts.
     std::set<std::string> to_exclude_from_nondet_static(
