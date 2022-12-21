@@ -17,8 +17,10 @@ Author: Qinheping Hu
 #include <util/format_expr.h>
 #include <util/pointer_predicates.h>
 #include <util/replace_symbol.h>
+#include <util/simplify_expr.h>
 
 #include <analyses/natural_loops.h>
+#include <goto-instrument/havoc_utils.h>
 
 #include "cegis_verifier.h"
 #include "expr_enumerator.h"
@@ -92,7 +94,7 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
 
       loop_idt new_id(function_p.first, loop_end->loop_number);
 
-      // we only synthesize invariants for unannotated loops
+      // we only synthesize invariants and assigns for unannotated loops
       if(loop_end->condition().find(ID_C_spec_loop_invariant).is_nil())
       {
         // Store the loop guard.
@@ -106,9 +108,58 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
         // Initialize invariant clauses as `true`.
         in_invariant_clause_map[new_id] = true_exprt();
         pos_invariant_clause_map[new_id] = true_exprt();
+
+        // Initialize assigns clauses.
+        if(loop_end->condition().find(ID_C_spec_assigns).is_nil())
+        {
+          assigns_map[new_id] = {};
+        }
       }
     }
   }
+}
+
+void enumerative_loop_contracts_synthesizert::synthesize_assigns(
+  const exprt &checked_pointer,
+  const std::list<loop_idt> cause_loop_ids)
+{
+  namespacet ns(goto_model.symbol_table);
+  auto new_assign = checked_pointer;
+
+  // Add the new assigns target to the most-inner loop that doesn't contain
+  // the new assigns target yet.
+  for(const auto &loop_id : cause_loop_ids)
+  {
+    // Widen index and dereference to whole object.
+    if(new_assign.id() == ID_index || new_assign.id() == ID_dereference)
+    {
+      address_of_exprt address_of_new_assigns(new_assign);
+      havoc_utils_is_constantt is_constant(assigns_map[loop_id], ns);
+      if(!is_constant(address_of_new_assigns))
+      {
+        new_assign = pointer_object(address_of_new_assigns);
+      }
+    }
+
+    const auto &source_location =
+      get_loop_head(
+        loop_id.loop_number,
+        goto_model.goto_functions.function_map[loop_id.function_id])
+        ->source_location();
+
+    // Simplify expr to avoid offset that is out of scope.
+    // In the case of nested loops, After widening, pointer_object(ptr + i)
+    // can contain the pointer ptr in the scope of both loops, and the offset
+    // i which is only in the scope of the inner loop.
+    // After simplification, pointer_object(ptr + i) -> pointer_object(ptr).
+    new_assign = simplify_expr(new_assign, ns);
+    new_assign.add_source_location() = source_location;
+
+    // Avoid adding same target.
+    if(assigns_map[loop_id].insert(new_assign).second)
+      return;
+  }
+  INVARIANT(false, "Failed to synthesize a new assigns target.");
 }
 
 void enumerative_loop_contracts_synthesizert::build_tmp_post_map()
@@ -257,7 +308,8 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
         new_in_clauses, pos_invariant_clause_map, neg_guards);
 
       // The verifier we use to check current invariant candidates.
-      cegis_verifiert verifier(combined_invariant, goto_model, log);
+      cegis_verifiert verifier(
+        combined_invariant, assigns_map, goto_model, log);
 
       // A good strengthening clause if
       // 1. all checks pass, or
@@ -288,7 +340,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
     in_invariant_clause_map, pos_invariant_clause_map, neg_guards);
 
   // The verifier we use to check current invariant candidates.
-  cegis_verifiert verifier(combined_invariant, goto_model, log);
+  cegis_verifiert verifier(combined_invariant, assigns_map, goto_model, log);
 
   // Set of symbols the violation may be dependent on.
   // We enumerate strenghening clauses built from symbols from the set.
@@ -301,7 +353,6 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
   while(return_cex.has_value())
   {
     exprt new_invariant_clause = true_exprt();
-
     // Synthsize the new_clause
     // We use difference strategies for different type of violations.
     switch(return_cex->violation_type)
@@ -320,47 +371,55 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
       terminal_symbols = construct_terminals(dependent_symbols);
       new_invariant_clause = synthesize_strengthening_clause(
         terminal_symbols,
-        return_cex->cause_loop_id.value(),
+        return_cex->cause_loop_ids.front(),
         verifier.first_violation);
       break;
 
+    case cext::violation_typet::cex_assignable:
+      synthesize_assigns(
+        return_cex->checked_pointer, return_cex->cause_loop_ids);
+      break;
     case cext::violation_typet::cex_not_hold_upon_entry:
     case cext::violation_typet::cex_other:
       INVARIANT(false, "unsupported violation type");
       break;
     }
 
-    INVARIANT(return_cex->cause_loop_id.has_value(), "No cause loop found!");
-
-    INVARIANT(
-      new_invariant_clause != true_exprt(),
-      "failed to synthesized meaningful clause");
-
-    // There could be tmp_post varialbes in the synthesized clause.
-    // We substitute them with their original variables.
-    replace_tmp_post(new_invariant_clause, tmp_post_map);
-
-    const auto &cause_loop_id = return_cex->cause_loop_id.value();
-    // Update the dependent symbols.
-    dependent_symbols = compute_dependent_symbols(
-      cause_loop_id, new_invariant_clause, return_cex->live_variables);
-
-    // add the new cluase to the candidate invariants.
-    if(return_cex->is_violation_in_loop)
+    // Assigns map has already been updated in the switch block.
+    // Update invariants map for other types of violations.
+    if(return_cex->violation_type != cext::violation_typet::cex_assignable)
     {
-      in_invariant_clause_map[cause_loop_id] =
-        and_exprt(in_invariant_clause_map[cause_loop_id], new_invariant_clause);
-    }
-    else
-    {
-      // violation happens post-loop.
-      pos_invariant_clause_map[cause_loop_id] = and_exprt(
-        pos_invariant_clause_map[cause_loop_id], new_invariant_clause);
-    }
+      INVARIANT(!return_cex->cause_loop_ids.empty(), "No cause loop found!");
+      INVARIANT(
+        new_invariant_clause != true_exprt(),
+        "failed to synthesized meaningful clause");
 
-    // Re-combine invariant clauses and update the candidate map.
-    combined_invariant = combine_in_and_post_invariant_clauses(
-      in_invariant_clause_map, pos_invariant_clause_map, neg_guards);
+      // There could be tmp_post varialbes in the synthesized clause.
+      // We substitute them with their original variables.
+      replace_tmp_post(new_invariant_clause, tmp_post_map);
+
+      const auto &cause_loop_id = return_cex->cause_loop_ids.front();
+      // Update the dependent symbols.
+      dependent_symbols = compute_dependent_symbols(
+        cause_loop_id, new_invariant_clause, return_cex->live_variables);
+
+      // add the new cluase to the candidate invariants.
+      if(return_cex->is_violation_in_loop)
+      {
+        in_invariant_clause_map[cause_loop_id] = and_exprt(
+          in_invariant_clause_map[cause_loop_id], new_invariant_clause);
+      }
+      else
+      {
+        // violation happens post-loop.
+        pos_invariant_clause_map[cause_loop_id] = and_exprt(
+          pos_invariant_clause_map[cause_loop_id], new_invariant_clause);
+      }
+
+      // Re-combine invariant clauses and update the candidate map.
+      combined_invariant = combine_in_and_post_invariant_clauses(
+        in_invariant_clause_map, pos_invariant_clause_map, neg_guards);
+    }
 
     return_cex = verifier.verify();
   }

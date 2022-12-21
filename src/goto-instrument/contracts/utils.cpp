@@ -448,14 +448,20 @@ void generate_history_variables_initialization(
   program.destructive_append(history);
 }
 
+bool is_transformed_loop_head(const goto_programt::const_targett &target)
+{
+  // The head of a transformed loop is
+  // ASSIGN entered_loop = false
+  return is_assignment_to_instrumented_variable(target, ENTERED_LOOP) &&
+         target->assign_rhs() == false_exprt();
+}
+
 bool is_transformed_loop_end(const goto_programt::const_targett &target)
 {
-  // The end of the loop end of transformed loop is
+  // The end of a transformed loop is
   // ASSIGN entered_loop = true
-  if(!is_assignment_to_instrumented_variable(target, ENTERED_LOOP))
-    return false;
-
-  return target->assign_rhs() == true_exprt();
+  return is_assignment_to_instrumented_variable(target, ENTERED_LOOP) &&
+         target->assign_rhs() == true_exprt();
 }
 
 bool is_assignment_to_instrumented_variable(

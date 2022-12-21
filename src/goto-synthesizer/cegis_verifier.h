@@ -31,6 +31,7 @@ public:
     cex_null_pointer,
     cex_not_preserved,
     cex_not_hold_upon_entry,
+    cex_assignable,
     cex_other
   };
 
@@ -84,7 +85,7 @@ public:
   std::set<exprt> live_variables;
 
   violation_typet violation_type;
-  optionalt<loop_idt> cause_loop_id;
+  std::list<loop_idt> cause_loop_ids;
 };
 
 /// Verifier that take a goto program as input, and ouptut formatted
@@ -94,9 +95,11 @@ class cegis_verifiert
 public:
   cegis_verifiert(
     const invariant_mapt &invariant_candidates,
+    const std::map<loop_idt, std::set<exprt>> &assigns_map,
     goto_modelt &goto_model,
     messaget &log)
     : invariant_candidates(invariant_candidates),
+      assigns_map(assigns_map),
       goto_model(goto_model),
       log(log)
   {
@@ -116,12 +119,17 @@ protected:
   // TODO: replace the checker with CBMC api once it is implemented.
   optionst get_options();
 
-  // Compute the cause loop of `violation`.
+  // Compute the cause loops of `violation`.
   // We say a loop is the cause loop if the violated predicate is dependent
   // upon the write set of the loop.
-  optionalt<loop_idt> get_cause_loop_id(
+  std::list<loop_idt> get_cause_loop_id(
     const goto_tracet &goto_trace,
     const goto_programt::const_targett violation);
+
+  // Compute the cause loops of a assignable-violation.
+  // We say a loop is the cause loop if the assignable check is in the loop.
+  std::list<loop_idt>
+  get_cause_loop_id_for_assigns(const goto_tracet &goto_trace);
 
   /// Restore transformed functions to original functions.
   void restore_functions();
@@ -139,6 +147,7 @@ protected:
     unsigned location_number_of_target);
 
   const invariant_mapt &invariant_candidates;
+  const std::map<loop_idt, std::set<exprt>> &assigns_map;
   goto_modelt &goto_model;
   messaget log;
 

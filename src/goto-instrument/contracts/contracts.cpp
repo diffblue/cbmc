@@ -1457,11 +1457,11 @@ void code_contractst::apply_loop_contracts(
       if(original_loop_number_map.count(it_instr) != 0)
         continue;
 
-      // Store loop number for
-      // ASSIGN ENTERED_LOOP = TRUE
+      // Store loop number for two type of instrumented instructions.
+      // ASSIGN ENTERED_LOOP = false  ---   head of transformed loops.
+      // ASSIGN ENTERED_LOOP = true   ---   end of transformed loops.
       if(
-        is_assignment_to_instrumented_variable(it_instr, ENTERED_LOOP) &&
-        it_instr->assign_rhs() == true_exprt())
+        is_transformed_loop_end(it_instr) || is_transformed_loop_head(it_instr))
       {
         const auto &assign_lhs =
           expr_try_dynamic_cast<symbol_exprt>(it_instr->assign_lhs());

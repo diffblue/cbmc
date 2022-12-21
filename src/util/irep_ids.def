@@ -902,6 +902,7 @@ IREP_ID_TWO(overflow_result_mult, overflow_result-*)
 IREP_ID_TWO(overflow_result_shl, overflow_result-shl)
 IREP_ID_TWO(overflow_result_unary_minus, overflow_result-unary-)
 IREP_ID_ONE(field_sensitive_ssa)
+IREP_ID_ONE(checked_assigns)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

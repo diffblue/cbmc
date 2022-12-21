@@ -210,7 +210,10 @@ void generate_history_variables_initialization(
   const irep_idt &mode,
   goto_programt &program);
 
-/// Return true if `target` is the loop end of some transformed code.
+/// Return true if `target` is the head of some transformed loop.
+bool is_transformed_loop_head(const goto_programt::const_targett &target);
+
+/// Return true if `target` is the end of some transformed loop.
 bool is_transformed_loop_end(const goto_programt::const_targett &target);
 
 /// Return true if `target` is an assignment to an instrumented variable with

@@ -708,9 +708,14 @@ void instrument_spec_assignst::inclusion_check_assertion(
   comment += " is assignable";
   source_location.set_comment(comment);
 
-  dest.add(goto_programt::make_assertion(
-    inclusion_check_full(car, allow_null_lhs, include_stack_allocated),
-    source_location));
+  exprt inclusion_check =
+    inclusion_check_full(car, allow_null_lhs, include_stack_allocated);
+  // Record what target is checked.
+  auto &checked_assigns =
+    static_cast<exprt &>(inclusion_check.add(ID_checked_assigns));
+  checked_assigns = car.target();
+
+  dest.add(goto_programt::make_assertion(inclusion_check, source_location));
 }
 
 exprt instrument_spec_assignst::inclusion_check_single(
