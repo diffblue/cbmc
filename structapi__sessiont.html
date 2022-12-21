@@ -123,6 +123,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e903c6ad033ba2f4e076d5bcb07fcf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a4e903c6ad033ba2f4e076d5bcb07fcf1">verify_model</a> ()</td></tr>
 <tr class="memdesc:a4e903c6ad033ba2f4e076d5bcb07fcf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify previously loaded model.  <a href="structapi__sessiont.html#a4e903c6ad033ba2f4e076d5bcb07fcf1">More...</a><br /></td></tr>
 <tr class="separator:a4e903c6ad033ba2f4e076d5bcb07fcf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d3ce90ba93221ed66db2a820720c550"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a5d3ce90ba93221ed66db2a820720c550">drop_unused_functions</a> ()</td></tr>
+<tr class="memdesc:a5d3ce90ba93221ed66db2a820720c550"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop unused functions from the loaded goto_model simplifying it.  <a href="structapi__sessiont.html#a5d3ce90ba93221ed66db2a820720c550">More...</a><br /></td></tr>
+<tr class="separator:a5d3ce90ba93221ed66db2a820720c550"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add2fe40cf89f101ae17f8b49a594368b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#add2fe40cf89f101ae17f8b49a594368b">validate_goto_model</a> ()</td></tr>
+<tr class="memdesc:add2fe40cf89f101ae17f8b49a594368b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validate the loaded goto model.  <a href="structapi__sessiont.html#add2fe40cf89f101ae17f8b49a594368b">More...</a><br /></td></tr>
+<tr class="separator:add2fe40cf89f101ae17f8b49a594368b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -148,7 +154,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00039">39</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00041">41</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -176,7 +182,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00043">43</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00045">45</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -206,6 +212,27 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a5d3ce90ba93221ed66db2a820720c550"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d3ce90ba93221ed66db2a820720c550">&#9670;&nbsp;</a></span>drop_unused_functions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void api_sessiont::drop_unused_functions </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Drop unused functions from the loaded goto_model simplifying it. </p>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00165">165</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a0a68c26073a32dc450bb753e77a096ea"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a68c26073a32dc450bb753e77a096ea">&#9670;&nbsp;</a></span>load_model_from_files()</h2>
 
@@ -230,7 +257,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00113">113</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00115">115</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +294,28 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00105">105</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00107">107</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="add2fe40cf89f101ae17f8b49a594368b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add2fe40cf89f101ae17f8b49a594368b">&#9670;&nbsp;</a></span>validate_goto_model()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void api_sessiont::validate_goto_model </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Validate the loaded goto model. </p>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00180">180</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +336,7 @@ Private Attributes</h2></td></tr>
 
 <p>Verify previously loaded model. </p>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00119">119</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00121">121</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -313,7 +361,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00075">75</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00081">81</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
 
 </div>
 </div>

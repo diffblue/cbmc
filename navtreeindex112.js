@@ -1,5 +1,9 @@
 var NAVTREEINDEX112 =
 {
+"qdimacs__cnf_8h.html":[7,0,2,26,5,18],
+"qdimacs__cnf_8h_source.html":[7,0,2,26,5,18],
+"qdimacs__core_8cpp.html":[7,0,2,26,5,19],
+"qdimacs__core_8cpp_source.html":[7,0,2,26,5,19],
 "qdimacs__core_8h.html":[7,0,2,26,5,20],
 "qdimacs__core_8h_source.html":[7,0,2,26,5,20],
 "race__check_8cpp.html":[7,0,2,13,79],
@@ -245,9 +249,5 @@ var NAVTREEINDEX112 =
 "remove__returns_8cpp.html#a1f429be570a9e17f6c046441e3f0e503":[7,0,2,14,100,10],
 "remove__returns_8cpp.html#a377f4ad77b3ca9ae132db624b70afd54":[7,0,2,14,100,3],
 "remove__returns_8cpp.html#a4c8326fbca6bb6016f9cc23586077890":[7,0,2,14,100,2],
-"remove__returns_8cpp.html#a58a6609783e009ba3073c3c05ab0aa6e":[7,0,2,14,100,7],
-"remove__returns_8cpp.html#aa0e3591b85fdb66b704aa8379cb5d565":[7,0,2,14,100,4],
-"remove__returns_8cpp.html#adffd91c9aae69c44e705e12c824cb334":[7,0,2,14,100,9],
-"remove__returns_8cpp.html#afa45fb2afaa72fe1e8635f0af5b069f7":[7,0,2,14,100,5],
-"remove__returns_8cpp_source.html":[7,0,2,14,100]
+"remove__returns_8cpp.html#a58a6609783e009ba3073c3c05ab0aa6e":[7,0,2,14,100,7]
 };
