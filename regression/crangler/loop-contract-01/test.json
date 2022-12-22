@@ -5,7 +5,7 @@
   "functions": [
     {
       "foo": [
-        "while 1 invariant i >= 0",
+        "while 1 invariant (unsigned long int)i >= 0",
         "while 1 assigns i, __CPROVER_POINTER_OBJECT(arr)",
         "while 1 decreases 2-i"
       ]
