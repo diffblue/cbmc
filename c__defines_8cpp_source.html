@@ -153,10 +153,14 @@ $(document).ready(function(){initNavTree('c__defines_8cpp_source.html',''); init
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    }</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      out &lt;&lt; t.text;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordflow">return</span> out.str();</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">auto</span> result = out.str();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  result.pop_back();</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
 <div class="ttc" id="ac__defines_8h_html"><div class="ttname"><a href="c__defines_8h.html">c_defines.h</a></div><div class="ttdoc">c_defines</div></div>
 <div class="ttc" id="aclassc__definest_html_a0a1875b14927d673c32330cdb9801c8c"><div class="ttname"><a href="classc__definest.html#a0a1875b14927d673c32330cdb9801c8c">c_definest::map</a></div><div class="ttdeci">mapt map</div><div class="ttdef"><b>Definition:</b> <a href="c__defines_8h_source.html#l00033">c_defines.h:33</a></div></div>
 <div class="ttc" id="aclassc__definest_html_a9b1bb25449010e66a7c17556e480a7dd"><div class="ttname"><a href="classc__definest.html#a9b1bb25449010e66a7c17556e480a7dd">c_definest::operator()</a></div><div class="ttdeci">std::string operator()(const std::string &amp;) const</div><div class="ttdef"><b>Definition:</b> <a href="c__defines_8cpp_source.html#l00041">c_defines.cpp:41</a></div></div>
