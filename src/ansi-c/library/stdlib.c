@@ -271,6 +271,7 @@ __CPROVER_HIDE:;
 
 #undef free
 
+void __CPROVER_deallocate(void *);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 #ifndef LIBRARY_CHECK
 const void *__CPROVER_alloca_object = 0;
