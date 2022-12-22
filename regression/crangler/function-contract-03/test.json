@@ -5,7 +5,7 @@
   "functions": [
     {
       "f1": [
-        "requires *x1 > 1 && *x1 < 10000",
+        "requires *(signed long int*)x1 > 1 && *(signed long int*)x1 < 10000",
         "ensures __CPROVER_return_value == *x1 + 2"
       ],
       "f2": [
