@@ -15,10 +15,10 @@ args=${*:6:$#-6}
 if [[ "$args" != *" _ "* ]]
 then
   args_inst=$args
-  args_cbmc=""
+  args_synthesizer=""
 else
   args_inst="${args%%" _ "*}"
-  args_cbmc="${args#*" _ "}"
+  args_synthesizer="${args#*" _ "}"
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
@@ -45,6 +45,10 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   rm "${name}-mod.c"
 fi
 echo "Running goto-synthesizer: "
-$goto_synthesizer "${name}-mod.gb" "${name}-mod-2.gb"
-echo "Running CBMC: "
-$cbmc "${name}-mod-2.gb" ${args_cbmc}
+if echo $args_synthesizer | grep -q -- "--dump-loop-contracts" ; then
+  $goto_synthesizer ${args_synthesizer} "${name}-mod.gb"
+else
+  $goto_synthesizer "${name}-mod.gb" "${name}-mod-2.gb"
+  echo "Running CBMC: "
+  $cbmc "${name}-mod-2.gb"
+fi

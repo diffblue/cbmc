@@ -424,8 +424,8 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
     return_cex = verifier.verify();
   }
 
-  log.result() << "result : " << log.green << "PASS" << messaget::eom
-               << log.reset;
+  log.result() << "result : " << log.green << "PASS" << log.reset
+               << messaget::eom;
 
   return combined_invariant;
 }

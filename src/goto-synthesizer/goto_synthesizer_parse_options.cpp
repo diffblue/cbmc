@@ -21,7 +21,12 @@ Author: Qinheping Hu
 
 #include "enumerative_loop_contracts_synthesizer.h"
 
+#include <fstream>
 #include <iostream>
+
+#ifdef _MSC_VER
+#  include <util/unicode.h>
+#endif
 
 /// invoke main modules
 int goto_synthesizer_parse_optionst::doit()
@@ -47,22 +52,65 @@ int goto_synthesizer_parse_optionst::doit()
   if(result_get_goto_program != CPROVER_EXIT_SUCCESS)
     return result_get_goto_program;
 
-  // TODO
-  // Migrate synthesizer and tests from goto-instrument to goto-synthesizer
+  // Synthesize loop invariants and annotate them into `goto_model`
+  enumerative_loop_contracts_synthesizert synthesizer(goto_model, log);
+  const auto &invariant_map = synthesizer.synthesize_all();
+  const auto &assigns_map = synthesizer.get_assigns_map();
 
+  if(cmdline.isset("dump-loop-contracts"))
   {
-    // Synthesize loop invariants and annotate them into `goto_model`
-    enumerative_loop_contracts_synthesizert synthesizer(goto_model, log);
-    annotate_invariants(synthesizer.synthesize_all(), goto_model);
-    annotate_assigns(synthesizer.get_assigns_map(), goto_model);
+    // Default output destination is stdout.
+    // Crangler will print the result to screen when the output destination
+    // is "stdout".
+    std::string json_output_str = "stdout";
+    if(cmdline.isset("json-output"))
+    {
+      json_output_str = cmdline.get_value("json-output");
+    }
 
-    // Apply loop contracts.
-    std::set<std::string> to_exclude_from_nondet_static(
-      cmdline.get_values("nondet-static-exclude").begin(),
-      cmdline.get_values("nondet-static-exclude").end());
-    code_contractst contracts(goto_model, log);
-    contracts.apply_loop_contracts(to_exclude_from_nondet_static);
+    namespacet ns(goto_model.symbol_table);
+    // Output file specified
+    if(cmdline.args.size() == 2)
+    {
+#ifdef _MSC_VER
+      std::ofstream out(widen(cmdline.args[1]));
+#else
+      std::ofstream out(cmdline.args[1]);
+#endif
+      if(!out)
+      {
+        log.error() << "failed to write to '" << cmdline.args[1] << "'";
+        return CPROVER_EXIT_CONVERSION_FAILED;
+      }
+      dump_loop_contracts(
+        goto_model, invariant_map, assigns_map, json_output_str, out);
+    }
+    // No output file specified. Print synthesized contracts with std::cout
+    else
+    {
+      dump_loop_contracts(
+        goto_model, invariant_map, assigns_map, json_output_str, std::cout);
+    }
+
+    return CPROVER_EXIT_SUCCESS;
   }
+  else if(cmdline.isset("json-output"))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "Incompatible option detected",
+      "--json-output must be used with --dump-loop-contracts");
+  }
+
+  // Annotate loop contracts.
+  annotate_invariants(invariant_map, goto_model);
+  annotate_assigns(assigns_map, goto_model);
+
+  // Apply loop contracts.
+  std::set<std::string> to_exclude_from_nondet_static(
+    cmdline.get_values("nondet-static-exclude").begin(),
+    cmdline.get_values("nondet-static-exclude").end());
+  code_contractst contracts(goto_model, log);
+  contracts.apply_loop_contracts(to_exclude_from_nondet_static);
 
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
@@ -134,6 +182,7 @@ void goto_synthesizer_parse_optionst::help()
     " goto-synthesizer in out              synthesize and apply loop invariants.\n" // NOLINT(*)
     "\n"
     "Main options:\n"
+    HELP_DUMP_LOOP_CONTRACTS
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
