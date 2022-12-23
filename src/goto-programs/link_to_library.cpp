@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "link_goto_model.h"
 
 /// Try to add \p missing_function from \p library to \p goto_model.
-static optionalt<replace_symbolt::expr_mapt> add_one_function(
+static std::pair<optionalt<replace_symbolt::expr_mapt>, bool> add_one_function(
   goto_modelt &goto_model,
   message_handlert &message_handler,
   const std::function<void(
@@ -49,6 +49,7 @@ static optionalt<replace_symbolt::expr_mapt> add_one_function(
   }
 
   // check whether additional initialization may be required
+  bool init_required = false;
   if(
     goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION) !=
     goto_model.goto_functions.function_map.end())
@@ -60,13 +61,15 @@ static optionalt<replace_symbolt::expr_mapt> add_one_function(
         !entry.second.is_macro && entry.second.type.id() != ID_code &&
         !goto_model.symbol_table.has_symbol(entry.first))
       {
-        goto_model.unload(INITIALIZE_FUNCTION);
+        init_required = true;
         break;
       }
     }
   }
 
-  return link_goto_model(goto_model, std::move(library_model), message_handler);
+  return {
+    link_goto_model(goto_model, std::move(library_model), message_handler),
+    init_required};
 }
 
 /// Complete missing function definitions using the \p library.
@@ -95,9 +98,7 @@ void link_to_library(
   // forward declarations, or perhaps even cases of missing forward
   // declarations) may result in type changes to objects.
   replace_symbolt::expr_mapt object_type_updates;
-  const bool had_init =
-    goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION) !=
-    goto_model.goto_functions.function_map.end();
+  bool need_reinit = false;
 
   while(true)
   {
@@ -125,8 +126,10 @@ void link_to_library(
         changed = true;
         added_functions.insert(id);
 
-        auto updates_opt =
+        auto one_result =
           add_one_function(goto_model, message_handler, library, id);
+        auto updates_opt = one_result.first;
+        need_reinit |= one_result.second;
         if(!updates_opt.has_value())
         {
           messaget log{message_handler};
@@ -143,11 +146,9 @@ void link_to_library(
       break;
   }
 
-  if(
-    had_init &&
-    goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION) ==
-      goto_model.goto_functions.function_map.end())
+  if(need_reinit)
   {
+    goto_model.unload(INITIALIZE_FUNCTION);
     static_lifetime_init(
       goto_model.symbol_table,
       goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
