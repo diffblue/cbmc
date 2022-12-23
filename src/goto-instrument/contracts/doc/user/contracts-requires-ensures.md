@@ -29,7 +29,7 @@ the conjunction of the _ensures_ clauses, or `true` if none are specified.
 Both _requires_ clauses and _ensures_ clauses take a Boolean expression over the
 arguments of a function and/or global variables. The expression can include
 calls to CBMC built-in functions, to
-[Memory Predicates](@ref contracts-memory-predicates)) or to
+[Memory Predicates](@ref contracts-memory-predicates) or to
 [function pointer predicates](@ref contracts-function-pointer-predicates).
 User-defined functions can also be called inside _requires_ clauses as long as
 they are deterministic and do not have any side-effects
