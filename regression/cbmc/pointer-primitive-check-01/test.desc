@@ -3,10 +3,10 @@ main.c
 --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
-\[main.pointer_primitives.\d+\] line \d+ pointer invalid in OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
-\[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
-\[main.pointer_primitives.\d+\] line \d+ dead object in OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
-\[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ pointer invalid in __CPROVER_OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
+\[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in __CPROVER_OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ dead object in __CPROVER_OBJECT_SIZE\(\(const void \*\)p4\): SUCCESS
+\[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in __CPROVER_OBJECT_SIZE\(\(const void \*\)p4\): FAILURE
 \[main.pointer_primitives.\d+\] line \d+ pointer invalid in R_OK\(p5, .*1\): FAILURE
 \[main.pointer_primitives.\d+\] line \d+ deallocated dynamic object in R_OK\(p5, .*1\): SUCCESS
 \[main.pointer_primitives.\d+\] line \d+ dead object in R_OK\(p5, .*1\): SUCCESS
@@ -21,18 +21,18 @@ main.c
 \[main.pointer_primitives.\d+\] line \d+ pointer outside object bounds in IS_DYNAMIC_OBJECT\(\(const void \*\)p7\): FAILURE
 --
 ^warning: ignoring
-\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
-\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
-\[main.pointer_primitives\.\d+\] line \d+ dead object in POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
-\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
-\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
-\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
-\[main.pointer_primitives\.\d+\] line \d+ dead object in POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
-\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
-\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
-\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
-\[main.pointer_primitives\.\d+\] line \d+ dead object in POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
-\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in __CPROVER_POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in __CPROVER_POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ dead object in __CPROVER_POINTER_OBJECT\(\(const void \*\)p1\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in __CPROVER_POINTER_OBJECT\(\(const void \*\)p1\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in __CPROVER_POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in __CPROVER_POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ dead object in __CPROVER_POINTER_OFFSET\(\(const void \*\)p2\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in __CPROVER_POINTER_OFFSET\(\(const void \*\)p2\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ pointer invalid in __CPROVER_POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
+\[main.pointer_primitives\.\d+\] line \d+ deallocated dynamic object in __CPROVER_POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ dead object in __CPROVER_POINTER_OBJECT\(\(const void \*\)p3\): SUCCESS
+\[main.pointer_primitives\.\d+\] line \d+ pointer outside object bounds in __CPROVER_POINTER_OBJECT\(\(const void \*\)p3\): FAILURE
 --
 Verifies that checks are added for exactly those pointer primitives that are not
 universally well defined.
