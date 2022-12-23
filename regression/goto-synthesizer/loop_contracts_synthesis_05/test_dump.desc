@@ -1,0 +1,8 @@
+CORE
+main.c
+--pointer-check _ --dump-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+assigns \_\_CPROVER\_POINTER\_OBJECT\(b\-\>data\)
+--
+This test case checks if synthesized contracts are correctly dumped.

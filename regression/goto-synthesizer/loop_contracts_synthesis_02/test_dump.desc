@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check _ --dump-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+\"sources"\: \[ \"main\.c\" \]
+\"main\"\: \[ \"loop 1 invariant i \>\= 80u \|\| \_\_CPROVER\_POINTER\_OFFSET\(array\)
+--
+This test case checks if synthesized contracts are correctly dumped.
