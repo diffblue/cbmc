@@ -1,6 +1,5 @@
 var NAVTREEINDEX111 =
 {
-"pointer__expr_8h.html#a92edcddd6f9c4be1768752c85a4b4241":[7,0,2,29,159,104],
 "pointer__expr_8h.html#a935a12b990cab04871a5c3c17b956518":[7,0,2,29,159,24],
 "pointer__expr_8h.html#a938f365993c601300f8ab97cd20e5916":[7,0,2,29,159,90],
 "pointer__expr_8h.html#a95599e94c2804b7135b922ea8466099b":[7,0,2,29,159,39],
@@ -249,5 +248,6 @@ var NAVTREEINDEX111 =
 "qbf__squolem_8cpp.html":[7,0,2,26,5,13],
 "qbf__squolem_8cpp_source.html":[7,0,2,26,5,13],
 "qbf__squolem_8h.html":[7,0,2,26,5,14],
-"qbf__squolem_8h_source.html":[7,0,2,26,5,14]
+"qbf__squolem_8h_source.html":[7,0,2,26,5,14],
+"qbf__squolem__core_8cpp.html":[7,0,2,26,5,15]
 };

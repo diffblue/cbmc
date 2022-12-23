@@ -1,6 +1,5 @@
 var NAVTREEINDEX126 =
 {
-"structjava__primitive__type__infot.html#ab2ccea89393dc05ee8ec34f7b1f273f6":[6,0,692,0],
 "structjava__primitive__type__infot.html#abc9788f6fc83d39269bf08166d341af4":[6,0,692,1],
 "structlabelt.html":[6,0,728],
 "structlabelt.html#a2500f026e1c3539485bc7f6456765dc7":[6,0,728,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX126 =
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#ae0d3c74b5994134110dfb07b8a4d9b43":[6,0,858,3],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#aeaf0c246715b5bc5f3edd502a03fd4a6":[6,0,858,1],
 "structnumeric__castt_3_01mp__integer_01_4.html":[6,0,857],
-"structnumeric__castt_3_01mp__integer_01_4.html#a025be35481041e74f55b63b70f5a8ae4":[6,0,857,1]
+"structnumeric__castt_3_01mp__integer_01_4.html#a025be35481041e74f55b63b70f5a8ae4":[6,0,857,1],
+"structnumeric__castt_3_01mp__integer_01_4.html#a75011a649d3ed6142630559ddb025e70":[6,0,857,0]
 };

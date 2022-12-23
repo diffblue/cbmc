@@ -1,6 +1,5 @@
 var NAVTREEINDEX55 =
 {
-"classreplacement__predicatet.html#a56c01d246c5d16633fd10e58dc11139a":[6,0,976,6],
 "classreplacement__predicatet.html#aa9ba110be2099d861b615d6d3c5f3687":[6,0,976,2],
 "classreplacement__predicatet.html#aaba809e2a0256eaf7a2c918e6416564f":[6,0,976,4],
 "classreplacement__predicatet.html#ac11a2e06c69f2525f5aed51028aa13cb":[6,0,976,0],
@@ -249,5 +248,6 @@ var NAVTREEINDEX55 =
 "classsatcheck__lingelingt.html#aec38b620eca334ee157fcbea20adb81b":[6,0,1000,13],
 "classsatcheck__lingelingt.html#aff10efb32ca7b9fe39553b457bd5645b":[6,0,1000,0],
 "classsatcheck__minisat1__baset.html":[6,0,1001],
-"classsatcheck__minisat1__baset.html#a2c0173bba3fbe375f5d467c5097a3430":[6,0,1001,0]
+"classsatcheck__minisat1__baset.html#a2c0173bba3fbe375f5d467c5097a3430":[6,0,1001,0],
+"classsatcheck__minisat1__baset.html#a2fad6e734a4481f225b519f64d08853c":[6,0,1001,9]
 };
