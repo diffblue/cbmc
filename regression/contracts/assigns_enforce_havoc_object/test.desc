@@ -4,9 +4,9 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[foo.assigns.\d+\] line \d+ Check that __CPROVER_object_whole\(\(.*\)a1->u.b->c\) is valid: SUCCESS$
-^\[bar.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: SUCCESS$
-^\[bar.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: FAILURE$
+^\[bar.assigns.\d+\] line \d+ Check that __CPROVER_POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: SUCCESS$
+^\[bar.assigns.\d+\] line \d+ Check that __CPROVER_POINTER_OBJECT\(\(void \*\)a->u\.b->c\) is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --
-Checks that __CPROVER_havoc_object(x) is detected as a write to POINTER_OBJECT(x).
+Checks that __CPROVER_havoc_object(x) is detected as a write to __CPROVER_POINTER_OBJECT(x).
