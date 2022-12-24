@@ -95,9 +95,7 @@ $(document).ready(function(){initNavTree('contracts-assigns.html',''); initResiz
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#autotoc_md59">Syntax</a><ul><li class="level2"><a href="#autotoc_md60">Lvalue targets</a></li>
 <li class="level2"><a href="#autotoc_md61">Object slice targets</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#autotoc_md63">@code{c}</a><ul><li class="level2"><a href="#autotoc_md64">Function parameters</a></li>
+<li class="level2"><a href="#autotoc_md64">Function parameters</a></li>
 <li class="level2"><a href="#autotoc_md65">Inductive data structures</a></li>
 </ul>
 </li>
@@ -212,19 +210,55 @@ Object slice targets</h2>
 <div class="ttc" id="acprover__builtin__headers_8h_html_abca0337cfd5268f7bce166885ccd74ba"><div class="ttname"><a href="cprover__builtin__headers_8h.html#abca0337cfd5268f7bce166885ccd74ba">__CPROVER_object_from</a></div><div class="ttdeci">void __CPROVER_object_from(void *ptr)</div></div>
 </div><!-- fragment --><p>Given a pointer <code>ptr</code> pointing into some object (possibly at some non-zero offset), <code>__CPROVER_object_from(ptr)</code> specifies that the range of bytes starting at <code>ptr</code> and of size <code>__CPROVER_OBJECT_SIZE(ptr) - __CPROVER_POINTER_OFFSET(ptr)</code> is assignable.</p>
 <p>Revisiting our previous example, changing the target to <code>__CPROVER_object_from(vec-&gt;data)</code> still rejects the assignment to <code>vec-&gt;size</code>, but allows the assignment to the hidden byte which is located after the data array in memory.</p>
-<h1><a class="anchor" id="autotoc_md63"></a>
-@code{c}</h1>
-<p>#include &lt;stdlib.h&gt;</p>
-<p>#define MAX_SIZE 10</p>
-<p>struct vec_t { size_t size; char *data; };</p>
-<p>// Allocates a vect_t struct together with its data and a hidden byte // in a same object. struct vec_t *vec_alloc(size_t size) {</p>
-<p>if(size &gt; MAX_SIZE) size = MAX_SIZE;</p>
-<p>// allocate the struct + data + 1 extra hidden byte struct vec_t *vec = malloc(sizeof(struct vec_t) + size + 1); if (vec) { vec-&gt;size = size; vec-&gt;data = ((char *)vec) + sizeof(struct vec_t); } return vec; }</p>
-<p>// Clear the vec-&gt;data array void vec_clear(struct vec_t *vec) __CPROVER_assigns( vec &amp;&amp; vec-&gt;data: __CPROVER_object_from(vec-&gt;data)) { if (!vec) return;</p>
-<p>vec-&gt;size = vec-&gt;size; // FAILURE</p>
-<p>for (size_t i = 0; i &lt; vec-&gt;size; i++) vec-&gt;data[i] = 0; // SUCCESS</p>
-<p>char *hidden_byte = ((char *)vec + sizeof(*vec) + vec-&gt;size); *hidden_byte = 0; // SUCCESS }</p>
-<p>// Proof harness int <a class="el" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main()</a> { size_t size; struct vec_t *vec = vec_alloc(size); vec_clear(vec); } </p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="preprocessor">#define MAX_SIZE 10</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">struct </span>vec_t {</div>
+<div class="line">  <span class="keywordtype">size_t</span> size;</div>
+<div class="line">  <span class="keywordtype">char</span> *data;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Allocates a vect_t struct together with its data and a hidden byte</span></div>
+<div class="line"><span class="comment">// in a same object.</span></div>
+<div class="line"><span class="keyword">struct </span>vec_t *vec_alloc(<span class="keywordtype">size_t</span> size) {</div>
+<div class="line"> </div>
+<div class="line">  <span class="keywordflow">if</span>(size &gt; MAX_SIZE)</div>
+<div class="line">    size = MAX_SIZE;</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// allocate the struct + data + 1 extra hidden byte</span></div>
+<div class="line">  <span class="keyword">struct </span>vec_t *vec = malloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
+<div class="line">  <span class="keywordflow">if</span> (vec) {</div>
+<div class="line">    vec-&gt;size = size;</div>
+<div class="line">    vec-&gt;data = ((<span class="keywordtype">char</span> *)vec) + <span class="keyword">sizeof</span>(<span class="keyword">struct </span>vec_t);</div>
+<div class="line">  }</div>
+<div class="line">  <span class="keywordflow">return</span> vec;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Clear the vec-&gt;data array</span></div>
+<div class="line"><span class="keywordtype">void</span> vec_clear(<span class="keyword">struct</span> vec_t *vec)</div>
+<div class="line">  __CPROVER_assigns(</div>
+<div class="line">    vec &amp;&amp; vec-&gt;data: <a class="code" href="cprover__builtin__headers_8h.html#abca0337cfd5268f7bce166885ccd74ba">__CPROVER_object_from</a>(vec-&gt;data))</div>
+<div class="line">{</div>
+<div class="line">  <span class="keywordflow">if</span> (!vec)</div>
+<div class="line">    <span class="keywordflow">return</span>;</div>
+<div class="line"> </div>
+<div class="line">  vec-&gt;size = vec-&gt;size; <span class="comment">// FAILURE</span></div>
+<div class="line"> </div>
+<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; vec-&gt;size; i++)</div>
+<div class="line">    vec-&gt;data[i] = 0; <span class="comment">// SUCCESS</span></div>
+<div class="line"> </div>
+<div class="line">  <span class="keywordtype">char</span> *hidden_byte = ((<span class="keywordtype">char</span> *)vec + <span class="keyword">sizeof</span>(*vec) + vec-&gt;size);</div>
+<div class="line">  *hidden_byte = 0; <span class="comment">// SUCCESS</span></div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Proof harness</span></div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line">  <span class="keywordtype">size_t</span> size;</div>
+<div class="line">  <span class="keyword">struct </span>vec_t *vec = vec_alloc(size);</div>
+<div class="line">  vec_clear(vec);</div>
+<div class="line">}</div>
+</div><!-- fragment --><hr  />
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="cprover__builtin__headers_8h.html#a4fa7fcb05ec9018275a358ae39f80392">__CPROVER_object_whole</a>(<span class="keywordtype">void</span> *ptr);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a4fa7fcb05ec9018275a358ae39f80392"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a4fa7fcb05ec9018275a358ae39f80392">__CPROVER_object_whole</a></div><div class="ttdeci">void __CPROVER_object_whole(void *ptr)</div></div>
 </div><!-- fragment --><p>Given a pointer <code>ptr</code> pointing into some object (possibly at some non-zero offset), <code>__CPROVER_object_whole(ptr)</code> specifies that the range of bytes of size <code>__CPROVER_OBJECT_SIZE(ptr)</code> starting at address <code>ptr - __CPROVER_POINTER_OFFSET(ptr)</code> is assignable:</p>

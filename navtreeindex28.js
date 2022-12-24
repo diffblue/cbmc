@@ -1,5 +1,6 @@
 var NAVTREEINDEX28 =
 {
+"classevent__grapht_1_1critical__cyclet.html#ac8d7730851a4e47400548a77f5aea7da":[6,0,430,0,38],
 "classevent__grapht_1_1critical__cyclet.html#acbb2cf299ff40f0c02bdce68fd440355":[6,0,430,0,17],
 "classevent__grapht_1_1critical__cyclet.html#ad1601115945f5d4f598665aadb55a148":[6,0,430,0,6],
 "classevent__grapht_1_1critical__cyclet.html#ad5964f8989de1aed930207fa2b682e1e":[6,0,430,0,8],
@@ -248,6 +249,5 @@ var NAVTREEINDEX28 =
 "classexpr__protectedt.html#a716fd9c320aac24015294f0f094a068d":[6,0,441,6],
 "classexpr__protectedt.html#a88ada6fe8672e78a46bce47598fd0d4e":[6,0,441,7],
 "classexpr__protectedt.html#aa720c8b89fba1d2d38b230e0ed6cd2b2":[6,0,441,2],
-"classexpr__protectedt.html#aa986a943297dcabe14822e5984cbf7ce":[6,0,441,3],
-"classexpr__protectedt.html#acfdeed148b2a2a96e2eebf23ffd452a3":[6,0,441,1]
+"classexpr__protectedt.html#aa986a943297dcabe14822e5984cbf7ce":[6,0,441,3]
 };
