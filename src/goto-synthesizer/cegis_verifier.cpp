@@ -655,13 +655,25 @@ optionalt<cext> cegis_verifiert::verify()
     // The pointer checked in the null-pointer-check violation.
     if(violation_type == cext::violation_typet::cex_null_pointer)
     {
+      // ! POINTER_OBJECT(ptr) == POINTER_OBJECT(NULL)
+      // or
+      // ! POINTER_OBJECT(NULL) == POINTER_OBJECT(ptr)
+
       return_cex.checked_pointer = property_it.second.pc->condition()
                                      .operands()[0]
                                      .operands()[1]
                                      .operands()[0];
-      INVARIANT(
-        return_cex.checked_pointer.id() == ID_symbol,
-        "Checking pointer symbol");
+
+      // return the lhs if the rhs is NULL, which is a constant.
+      if(
+        return_cex.checked_pointer ==
+        null_pointer_exprt(to_pointer_type(return_cex.checked_pointer.type())))
+      {
+        return_cex.checked_pointer = property_it.second.pc->condition()
+                                       .operands()[0]
+                                       .operands()[0]
+                                       .operands()[0];
+      }
     }
 
     return return_cex;
