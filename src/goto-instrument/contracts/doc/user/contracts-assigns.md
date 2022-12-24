@@ -241,6 +241,7 @@ int main() {
   vec_clear(vec);
 }
 ```
+
 ---
 
 ```c
