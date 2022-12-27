@@ -35,6 +35,13 @@ public:
     cex_other
   };
 
+  enum class violation_locationt
+  {
+    in_loop,
+    after_loop,
+    in_condition
+  };
+
   cext(
     const std::unordered_map<exprt, mp_integer, irep_hash> &object_sizes,
     const std::unordered_map<exprt, mp_integer, irep_hash> &havoced_values,
@@ -61,16 +68,15 @@ public:
   exprt checked_pointer;
   exprt violated_predicate;
 
-  // true if the violation happens in the cause loop
-  // false if the violation happens after the cause loop
-  bool is_violation_in_loop = true;
+  // Location where the violation happens
+  violation_locationt violation_location = violation_locationt::in_loop;
 
   // We collect havoced evaluations of havoced variables and their object sizes
   // and pointer offsets.
 
   // __CPROVER_OBJECT_SIZE
   std::unordered_map<exprt, mp_integer, irep_hash> object_sizes;
-  // all the valuation of havoced variables with primitived type.
+  // all the valuation of havoced variables with primitive type.
   std::unordered_map<exprt, mp_integer, irep_hash> havoced_values;
   // __CPROVER_POINTER_OFFSET
   std::unordered_map<exprt, mp_integer, irep_hash> havoced_pointer_offsets;
@@ -88,7 +94,7 @@ public:
   std::list<loop_idt> cause_loop_ids;
 };
 
-/// Verifier that take a goto program as input, and ouptut formatted
+/// Verifier that take a goto program as input, and output formatted
 /// counterexamples for counterexample-guided-synthesis.
 class cegis_verifiert
 {
@@ -131,6 +137,12 @@ protected:
   std::list<loop_idt>
   get_cause_loop_id_for_assigns(const goto_tracet &goto_trace);
 
+  // Compute the location of the violation.
+  cext::violation_locationt get_violation_location(
+    const loop_idt &loop_id,
+    const goto_functiont &function,
+    unsigned location_number_of_target);
+
   /// Restore transformed functions to original functions.
   void restore_functions();
 
@@ -141,7 +153,14 @@ protected:
 
   /// Decide whether the target instruction is in the body of the transformed
   /// loop specified by `loop_id`.
-  bool is_instruction_in_transfomed_loop(
+  bool is_instruction_in_transformed_loop(
+    const loop_idt &loop_id,
+    const goto_functiont &function,
+    unsigned location_number_of_target);
+
+  /// Decide whether the target instruction is between the loop-havoc and the
+  /// evaluation of the loop guard.
+  bool is_instruction_in_transformed_loop_condition(
     const loop_idt &loop_id,
     const goto_functiont &function,
     unsigned location_number_of_target);
@@ -160,7 +179,7 @@ protected:
   std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
     original_loop_number_map;
 
-  /// Loop havoc instructions instrumneted during applying loop contracts.
+  /// Loop havoc instructions instrumented during applying loop contracts.
   std::unordered_set<goto_programt::const_targett, const_target_hash>
     loop_havoc_set;
 };

@@ -1,0 +1,13 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.pointer\_dereference.\d+].*SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks whether CBMC synthesizes loop invariants for checks located after the loop body.
