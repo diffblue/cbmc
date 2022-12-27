@@ -1,5 +1,9 @@
 var NAVTREEINDEX55 =
 {
+"classreplace__symbolt.html#ad7cea30b488dc804ee50b4bedb704f1d":[6,0,975,13],
+"classreplacement__predicatet.html":[6,0,976],
+"classreplacement__predicatet.html#a353705f8bd974bba315c526423d3b092":[6,0,976,3],
+"classreplacement__predicatet.html#a4370f77d04582525f132e1f35b462a03":[6,0,976,5],
 "classreplacement__predicatet.html#a56c01d246c5d16633fd10e58dc11139a":[6,0,976,6],
 "classreplacement__predicatet.html#aa9ba110be2099d861b615d6d3c5f3687":[6,0,976,2],
 "classreplacement__predicatet.html#aaba809e2a0256eaf7a2c918e6416564f":[6,0,976,4],
@@ -245,9 +249,5 @@ var NAVTREEINDEX55 =
 "classsatcheck__lingelingt.html#aa2d60a5db669a7f0fc843a52e5c2c2b7":[6,0,1000,4],
 "classsatcheck__lingelingt.html#abcd221bc04a701004aea4b49859dba5e":[6,0,1000,11],
 "classsatcheck__lingelingt.html#ac35d3530e2238b6c54f2d25316d8cc7d":[6,0,1000,10],
-"classsatcheck__lingelingt.html#ae7d2c4e88d2fc5e247c895ee541a864d":[6,0,1000,5],
-"classsatcheck__lingelingt.html#aec38b620eca334ee157fcbea20adb81b":[6,0,1000,13],
-"classsatcheck__lingelingt.html#aff10efb32ca7b9fe39553b457bd5645b":[6,0,1000,0],
-"classsatcheck__minisat1__baset.html":[6,0,1001],
-"classsatcheck__minisat1__baset.html#a2c0173bba3fbe375f5d467c5097a3430":[6,0,1001,0]
+"classsatcheck__lingelingt.html#ae7d2c4e88d2fc5e247c895ee541a864d":[6,0,1000,5]
 };

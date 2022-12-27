@@ -1,5 +1,9 @@
 var NAVTREEINDEX54 =
 {
+"classrecursive__initializationt.html#a37c17ad3879ce3294c5e5f16a90c829a":[6,0,953,24],
+"classrecursive__initializationt.html#a4bde0560b568352f7faa13fe64610020":[6,0,953,12],
+"classrecursive__initializationt.html#a51e29846770fa9fb549893115cf694bb":[6,0,953,6],
+"classrecursive__initializationt.html#a54a6689d1a85a46e39f1e7986baa2578":[6,0,953,37],
 "classrecursive__initializationt.html#a5b52c2cf5206368ce010286c281c8af0":[6,0,953,19],
 "classrecursive__initializationt.html#a61b106c6fa4d0d835244e4b5c94e62dc":[6,0,953,9],
 "classrecursive__initializationt.html#a696e863c32cc11b3f8680d6a9d6445d9":[6,0,953,36],
@@ -245,9 +249,5 @@ var NAVTREEINDEX54 =
 "classreplace__symbolt.html#abe16a63821719dd22d327df3ee6772dd":[6,0,975,0],
 "classreplace__symbolt.html#ac05c2da258218b672023a240e75162aa":[6,0,975,11],
 "classreplace__symbolt.html#ac8a81084e7315925db7c1432bffafec7":[6,0,975,17],
-"classreplace__symbolt.html#ac91c170213a717b0193befe13daf6b92":[6,0,975,20],
-"classreplace__symbolt.html#ad7cea30b488dc804ee50b4bedb704f1d":[6,0,975,13],
-"classreplacement__predicatet.html":[6,0,976],
-"classreplacement__predicatet.html#a353705f8bd974bba315c526423d3b092":[6,0,976,3],
-"classreplacement__predicatet.html#a4370f77d04582525f132e1f35b462a03":[6,0,976,5]
+"classreplace__symbolt.html#ac91c170213a717b0193befe13daf6b92":[6,0,975,20]
 };

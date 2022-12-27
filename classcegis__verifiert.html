@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('classcegis__verifiert.html',''); initR
 </div><!--header-->
 <div class="contents">
 
-<p>Verifier that take a goto program as input, and ouptut formatted counterexamples for counterexample-guided-synthesis.  
+<p>Verifier that take a goto program as input, and output formatted counterexamples for counterexample-guided-synthesis.  
  <a href="classcegis__verifiert.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>&gt;</code></p>
@@ -136,14 +136,19 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a4325ee20b8e9fe4955d49245f8501f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab07e404670c61c1457815578e2d315c3"><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="structloop__idt.html">loop_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#ab07e404670c61c1457815578e2d315c3">get_cause_loop_id_for_assigns</a> (const <a class="el" href="classgoto__tracet.html">goto_tracet</a> &amp;goto_trace)</td></tr>
 <tr class="separator:ab07e404670c61c1457815578e2d315c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a397aba104c629331f2b15db6ca14454e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcext.html#a84c0cfe748f052827a590667485f56dd">cext::violation_locationt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#a397aba104c629331f2b15db6ca14454e">get_violation_location</a> (const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;loop_id, const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, unsigned location_number_of_target)</td></tr>
+<tr class="separator:a397aba104c629331f2b15db6ca14454e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17f6c17a94ff0fb1607683b8e7e8879d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a> ()</td></tr>
 <tr class="memdesc:a17f6c17a94ff0fb1607683b8e7e8879d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restore transformed functions to original functions.  <a href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">More...</a><br /></td></tr>
 <tr class="separator:a17f6c17a94ff0fb1607683b8e7e8879d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37e3ce371a5f157829639eb385eb86c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcext.html">cext</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#a37e3ce371a5f157829639eb385eb86c4">build_cex</a> (const <a class="el" href="classgoto__tracet.html">goto_tracet</a> &amp;goto_trace, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;loop_entry_loc)</td></tr>
 <tr class="separator:a37e3ce371a5f157829639eb385eb86c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac447f4e18ebd932cf1f4f1ea4571167a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#ac447f4e18ebd932cf1f4f1ea4571167a">is_instruction_in_transfomed_loop</a> (const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;loop_id, const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, unsigned location_number_of_target)</td></tr>
-<tr class="memdesc:ac447f4e18ebd932cf1f4f1ea4571167a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decide whether the target instruction is in the body of the transformed loop specified by <code>loop_id</code>.  <a href="classcegis__verifiert.html#ac447f4e18ebd932cf1f4f1ea4571167a">More...</a><br /></td></tr>
-<tr class="separator:ac447f4e18ebd932cf1f4f1ea4571167a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d0b47fad3dc7b1b26e45d9a311bfcc5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#a4d0b47fad3dc7b1b26e45d9a311bfcc5">is_instruction_in_transformed_loop</a> (const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;loop_id, const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, unsigned location_number_of_target)</td></tr>
+<tr class="memdesc:a4d0b47fad3dc7b1b26e45d9a311bfcc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decide whether the target instruction is in the body of the transformed loop specified by <code>loop_id</code>.  <a href="classcegis__verifiert.html#a4d0b47fad3dc7b1b26e45d9a311bfcc5">More...</a><br /></td></tr>
+<tr class="separator:a4d0b47fad3dc7b1b26e45d9a311bfcc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2f8ffcc5742e4aaa4dea7a21745b80e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#ab2f8ffcc5742e4aaa4dea7a21745b80e">is_instruction_in_transformed_loop_condition</a> (const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;loop_id, const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, unsigned location_number_of_target)</td></tr>
+<tr class="memdesc:ab2f8ffcc5742e4aaa4dea7a21745b80e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decide whether the target instruction is between the loop-havoc and the evaluation of the loop guard.  <a href="classcegis__verifiert.html#ab2f8ffcc5742e4aaa4dea7a21745b80e">More...</a><br /></td></tr>
+<tr class="separator:ab2f8ffcc5742e4aaa4dea7a21745b80e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -162,13 +167,13 @@ Protected Attributes</h2></td></tr>
 <tr class="memdesc:a620992ff45b297ddb6bd1eeb2d12f639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map from instrumented instructions for loop contracts to their original loop numbers.  <a href="classcegis__verifiert.html#a620992ff45b297ddb6bd1eeb2d12f639">More...</a><br /></td></tr>
 <tr class="separator:a620992ff45b297ddb6bd1eeb2d12f639"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c4ca334afa517c6e0bb49e7b8bfecc5"><td class="memItemLeft" align="right" valign="top">std::unordered_set&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, <a class="el" href="structconst__target__hash.html">const_target_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcegis__verifiert.html#a4c4ca334afa517c6e0bb49e7b8bfecc5">loop_havoc_set</a></td></tr>
-<tr class="memdesc:a4c4ca334afa517c6e0bb49e7b8bfecc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop havoc instructions instrumneted during applying loop contracts.  <a href="classcegis__verifiert.html#a4c4ca334afa517c6e0bb49e7b8bfecc5">More...</a><br /></td></tr>
+<tr class="memdesc:a4c4ca334afa517c6e0bb49e7b8bfecc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop havoc instructions instrumented during applying loop contracts.  <a href="classcegis__verifiert.html#a4c4ca334afa517c6e0bb49e7b8bfecc5">More...</a><br /></td></tr>
 <tr class="separator:a4c4ca334afa517c6e0bb49e7b8bfecc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Verifier that take a goto program as input, and ouptut formatted counterexamples for counterexample-guided-synthesis. </p>
+<div class="textblock"><p>Verifier that take a goto program as input, and output formatted counterexamples for counterexample-guided-synthesis. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00093">93</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00099">99</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a88d8dee063ef6906231610978e07c8dc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a88d8dee063ef6906231610978e07c8dc">&#9670;&nbsp;</a></span>cegis_verifiert()</h2>
@@ -216,7 +221,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00096">96</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00102">102</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -255,7 +260,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00259">259</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00315">315</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
 
 </div>
 </div>
@@ -352,8 +357,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac447f4e18ebd932cf1f4f1ea4571167a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac447f4e18ebd932cf1f4f1ea4571167a">&#9670;&nbsp;</a></span>is_instruction_in_transfomed_loop()</h2>
+<a id="a397aba104c629331f2b15db6ca14454e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a397aba104c629331f2b15db6ca14454e">&#9670;&nbsp;</a></span>get_violation_location()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -362,7 +367,51 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool cegis_verifiert::is_instruction_in_transfomed_loop </td>
+          <td class="memname"><a class="el" href="classcext.html#a84c0cfe748f052827a590667485f56dd">cext::violation_locationt</a> cegis_verifiert::get_violation_location </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;&#160;</td>
+          <td class="paramname"><em>function</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramname"><em>location_number_of_target</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00214">214</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a4d0b47fad3dc7b1b26e45d9a311bfcc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d0b47fad3dc7b1b26e45d9a311bfcc5">&#9670;&nbsp;</a></span>is_instruction_in_transformed_loop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool cegis_verifiert::is_instruction_in_transformed_loop </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>loop_id</em>, </td>
@@ -394,7 +443,53 @@ Protected Attributes</h2></td></tr>
 
 <p>Decide whether the target instruction is in the body of the transformed loop specified by <code>loop_id</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00214">214</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00270">270</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ab2f8ffcc5742e4aaa4dea7a21745b80e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2f8ffcc5742e4aaa4dea7a21745b80e">&#9670;&nbsp;</a></span>is_instruction_in_transformed_loop_condition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool cegis_verifiert::is_instruction_in_transformed_loop_condition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structloop__idt.html">loop_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;&#160;</td>
+          <td class="paramname"><em>function</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned&#160;</td>
+          <td class="paramname"><em>location_number_of_target</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decide whether the target instruction is between the loop-havoc and the evaluation of the loop guard. </p>
+
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00234">234</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
 
 </div>
 </div>
@@ -423,7 +518,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Restore transformed functions to original functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00444">444</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00500">500</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
 
 </div>
 </div>
@@ -445,7 +540,7 @@ Protected Attributes</h2></td></tr>
 <p>Verify <code>goto_model</code>. </p>
 <p>Return an empty `optionalt if there is no violation. Otherwise, return the formatted counterexample. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00454">454</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8cpp_source.html#l00510">510</a> of file <a class="el" href="cegis__verifier_8cpp_source.html">cegis_verifier.cpp</a>.</p>
 
 </div>
 </div>
@@ -470,7 +565,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00150">150</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00169">169</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -486,7 +581,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00114">114</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00120">120</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -510,7 +605,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00151">151</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00170">170</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -534,7 +629,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00149">149</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00168">168</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -558,7 +653,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00152">152</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00171">171</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -582,9 +677,9 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Loop havoc instructions instrumneted during applying loop contracts. </p>
+<p>Loop havoc instructions instrumented during applying loop contracts. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00165">165</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00184">184</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -611,7 +706,7 @@ Protected Attributes</h2></td></tr>
 <p>Map from function names to original functions. </p>
 <p>It is used to restore functions with annotated loops to original functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00156">156</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00175">175</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -638,7 +733,7 @@ Protected Attributes</h2></td></tr>
 <p>Map from instrumented instructions for loop contracts to their original loop numbers. </p>
 <p>Returned by <code><a class="el" href="classcode__contractst.html">code_contractst</a></code> </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00161">161</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00180">180</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
@@ -656,7 +751,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Result counterexample. </p>
 
-<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00113">113</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cegis__verifier_8h_source.html#l00119">119</a> of file <a class="el" href="cegis__verifier_8h_source.html">cegis_verifier.h</a>.</p>
 
 </div>
 </div>
