@@ -211,7 +211,63 @@ std::list<loop_idt> cegis_verifiert::get_cause_loop_id(
   return result;
 }
 
-bool cegis_verifiert::is_instruction_in_transfomed_loop(
+cext::violation_locationt cegis_verifiert::get_violation_location(
+  const loop_idt &loop_id,
+  const goto_functiont &function,
+  unsigned location_number_of_target)
+{
+  if(is_instruction_in_transformed_loop_condition(
+       loop_id, function, location_number_of_target))
+  {
+    return cext::violation_locationt::in_condition;
+  }
+
+  if(is_instruction_in_transformed_loop(
+       loop_id, function, location_number_of_target))
+  {
+    return cext::violation_locationt::in_loop;
+  }
+
+  return cext::violation_locationt::after_loop;
+}
+
+bool cegis_verifiert::is_instruction_in_transformed_loop_condition(
+  const loop_idt &loop_id,
+  const goto_functiont &function,
+  unsigned location_number_of_target)
+{
+  // The transformed loop condition is a set of instructions from
+  // loop havocing instructions
+  // to
+  // if(!guard) GOTO EXIT
+  unsigned location_number_of_havocing = 0;
+  for(auto it = function.body.instructions.begin();
+      it != function.body.instructions.end();
+      ++it)
+  {
+    // Record the location number of the beginning of a transformed loop.
+    if(
+      loop_havoc_set.count(it) &&
+      original_loop_number_map[it] == loop_id.loop_number)
+    {
+      location_number_of_havocing = it->location_number;
+    }
+
+    // Reach the end of the evaluation of the transformed loop condition.
+    if(location_number_of_havocing != 0 && it->is_goto())
+    {
+      if((location_number_of_havocing < location_number_of_target &&
+          location_number_of_target < it->location_number))
+      {
+        return true;
+      }
+      location_number_of_havocing = 0;
+    }
+  }
+  return false;
+}
+
+bool cegis_verifiert::is_instruction_in_transformed_loop(
   const loop_idt &loop_id,
   const goto_functiont &function,
   unsigned location_number_of_target)
@@ -458,9 +514,9 @@ optionalt<cext> cegis_verifiert::verify()
   //
   // 1. annotate and apply the loop contracts stored in `invariant_candidates`.
   //
-  // 2. run the CBMC API to verify the intrumented goto model. As the API is not
-  //    merged yet, we preprocess the goto model and run the symex checker on it
-  //    to simulate CBMC API.
+  // 2. run the CBMC API to verify the instrumented goto model. As the API is
+  //    not merged yet, we preprocess the goto model and run the symex checker
+  //    on it to simulate CBMC API.
   // TODO: ^^^ replace the symex checker once the real API is merged.
   //
   // 3. construct the formatted counterexample from the violated property and
@@ -530,7 +586,7 @@ optionalt<cext> cegis_verifiert::verify()
   }
 
   properties = checker->get_properties();
-  // Find the violation and construct conterexample from its trace.
+  // Find the violation and construct counterexample from its trace.
   for(const auto &property_it : properties)
   {
     if(property_it.second.status != property_statust::FAIL)
@@ -622,21 +678,22 @@ optionalt<cext> cegis_verifiert::verify()
       return cext(violation_type);
     }
 
-    // Decide whether the violation is in the cause loop.
-    bool is_violation_in_loop = is_instruction_in_transfomed_loop(
-      cause_loop_ids.front(),
-      goto_model.get_goto_function(cause_loop_ids.front().function_id),
-      property_it.second.pc->location_number);
-
     log.debug() << "Found cause loop with function id: "
                 << cause_loop_ids.front().function_id
                 << ", and loop number: " << cause_loop_ids.front().loop_number
                 << messaget::eom;
 
+    auto violation_location = cext::violation_locationt::in_loop;
     // We always strengthen in_clause if the violation is
     // invariant-not-preserved.
-    if(violation_type == cext::violation_typet::cex_not_preserved)
-      is_violation_in_loop = true;
+    if(violation_type != cext::violation_typet::cex_not_preserved)
+    {
+      // Get the location of the violation
+      violation_location = get_violation_location(
+        cause_loop_ids.front(),
+        goto_model.get_goto_function(cause_loop_ids.front().function_id),
+        property_it.second.pc->location_number);
+    }
 
     restore_functions();
 
@@ -649,7 +706,7 @@ optionalt<cext> cegis_verifiert::verify()
         ->source_location());
     return_cex.violated_predicate = property_it.second.pc->condition();
     return_cex.cause_loop_ids = cause_loop_ids;
-    return_cex.is_violation_in_loop = is_violation_in_loop;
+    return_cex.violation_location = violation_location;
     return_cex.violation_type = violation_type;
 
     // The pointer checked in the null-pointer-check violation.

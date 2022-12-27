@@ -217,7 +217,7 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_same_object_predicate(
 {
   // The same object predicate says that the checked pointer points to the
   // same object as it pointed before entering the loop.
-  // It works for the array-manuplating loops where only offset of pointer
+  // It works for the array-manipulating loops where only offset of pointer
   // are modified but not the object pointers point to.
   return same_object(
     checked_pointer, unary_exprt(ID_loop_entry, checked_pointer));
@@ -228,7 +228,7 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
   const loop_idt &cause_loop_id,
   const irep_idt &violation_id)
 {
-  // Synthesis of strengthning clauses is a enumerate-and-check proecess.
+  // Synthesis of strengthening clauses is a enumerate-and-check process.
   // We first construct the enumerator for the following grammar.
   // And then enumerate clause and check that if it can make the invariant
   // inductive.
@@ -343,9 +343,9 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
   cegis_verifiert verifier(combined_invariant, assigns_map, goto_model, log);
 
   // Set of symbols the violation may be dependent on.
-  // We enumerate strenghening clauses built from symbols from the set.
+  // We enumerate strengthening clauses built from symbols from the set.
   std::set<symbol_exprt> dependent_symbols;
-  // Set of symbols we used to enumerate strenghening clauses.
+  // Set of symbols we used to enumerate strengthening clauses.
   std::vector<exprt> terminal_symbols;
 
   auto return_cex = verifier.verify();
@@ -353,7 +353,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
   while(return_cex.has_value())
   {
     exprt new_invariant_clause = true_exprt();
-    // Synthsize the new_clause
+    // Synthesize the new_clause
     // We use difference strategies for different type of violations.
     switch(return_cex->violation_type)
     {
@@ -394,7 +394,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
         new_invariant_clause != true_exprt(),
         "failed to synthesized meaningful clause");
 
-      // There could be tmp_post varialbes in the synthesized clause.
+      // There could be tmp_post variables in the synthesized clause.
       // We substitute them with their original variables.
       replace_tmp_post(new_invariant_clause, tmp_post_map);
 
@@ -403,15 +403,34 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
       dependent_symbols = compute_dependent_symbols(
         cause_loop_id, new_invariant_clause, return_cex->live_variables);
 
-      // add the new cluase to the candidate invariants.
-      if(return_cex->is_violation_in_loop)
+      // add the new clause to the candidate invariants.
+      if(
+        return_cex->violation_location ==
+        cext::violation_locationt::in_condition)
       {
+        // When the violation happens in the loop guard, the new clause
+        // should hold for the both cases of
+        // 1. loop guard holds        --- loop_guard -> in_invariant
+        // 2. loop guard doesn't hold --- !loop_guard -> pos_invariant
+        in_invariant_clause_map[cause_loop_id] = and_exprt(
+          in_invariant_clause_map[cause_loop_id], new_invariant_clause);
+        pos_invariant_clause_map[cause_loop_id] = and_exprt(
+          pos_invariant_clause_map[cause_loop_id], new_invariant_clause);
+      }
+      else if(
+        return_cex->violation_location == cext::violation_locationt::in_loop)
+      {
+        // When the violation happens in the loop body, the new clause
+        // should hold for the case of
+        // loop guard holds        --- loop_guard -> in_invariant
         in_invariant_clause_map[cause_loop_id] = and_exprt(
           in_invariant_clause_map[cause_loop_id], new_invariant_clause);
       }
       else
       {
-        // violation happens post-loop.
+        // When the violation happens after the loop body, the new clause
+        // should hold for the case of
+        // loop guard doesn't hold --- !loop_guard -> pos_invariant
         pos_invariant_clause_map[cause_loop_id] = and_exprt(
           pos_invariant_clause_map[cause_loop_id], new_invariant_clause);
       }
