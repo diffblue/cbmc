@@ -1,6 +1,6 @@
 CORE
 main.c
---bounds-check
+--bounds-check -DCMDLINE --mmio-regions 0x1000:400,0x11000:400 --mmio-regions 0x21000:400,0x31000:400
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.array_bounds\.[1-5]\] .*: SUCCESS$

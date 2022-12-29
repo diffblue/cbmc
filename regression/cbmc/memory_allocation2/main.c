@@ -24,10 +24,12 @@ static buffert(*const buffers[4]) = {BUF0, BUF1, BUF2, BUF3};
 
 main()
 {
+#ifndef CMDLINE
   __CPROVER_allocated_memory(BUF0_BASE, sizeof(buffert));
   __CPROVER_allocated_memory(BUF1_BASE, sizeof(buffert));
   __CPROVER_allocated_memory(BUF2_BASE, sizeof(buffert));
   __CPROVER_allocated_memory(BUF3_BASE, sizeof(buffert));
+#endif
 
   _cbmc_printf2(sizeof_buffers, sizeof(buffers));
   _cbmc_printf2(sizeof_buffers_0, sizeof(buffers[0]));
@@ -36,4 +38,7 @@ main()
   buffers[0]->buffer[0];
   buffers[0]->buffer[BUFFER_SIZE - 1];
   buffers[0]->buffer[BUFFER_SIZE]; // should be out-of-bounds
+  buffers[1]->buffer[0];
+  buffers[2]->buffer[0];
+  buffers[3]->buffer[0];
 }
