@@ -1,6 +1,5 @@
 var NAVTREEINDEX74 =
 {
-"cpp__static__assert_8h.html":[7,0,2,5,38],
 "cpp__static__assert_8h_source.html":[7,0,2,5,38],
 "cpp__storage__spec_8cpp.html":[7,0,2,5,39],
 "cpp__storage__spec_8cpp_source.html":[7,0,2,5,39],
@@ -249,5 +248,6 @@ var NAVTREEINDEX74 =
 "crangler__main_8cpp.html":[7,0,2,7,4],
 "crangler__main_8cpp.html#a217dbf8b442f20279ea00b898af96f52":[7,0,2,7,4,0],
 "crangler__main_8cpp_source.html":[7,0,2,7,4],
-"crangler__parse__options_8cpp.html":[7,0,2,7,5]
+"crangler__parse__options_8cpp.html":[7,0,2,7,5],
+"crangler__parse__options_8cpp_source.html":[7,0,2,7,5]
 };

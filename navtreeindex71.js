@@ -1,6 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"compilation-and-development.html#compilation-and-development-subsubsection-config-inc":[0,4,7,0,2,0],
 "compilation-and-development.html#compilation-and-development-subsubsection-macro-debug":[0,4,7,0,2,1],
 "compilation-and-development.html#compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl":[0,4,7,1,0,2],
 "compilation-and-development.html#compilation-and-development-subsubsection-running-regression-tests-with-ctest":[0,4,7,1,0,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX71 =
 "contracts_8h.html#a5bce273094114e9f3977fabf73595f85":[7,0,2,13,1,4,5],
 "contracts_8h.html#a72459550c5e18c0fe0d22293c523d503":[7,0,2,13,1,4,2],
 "contracts_8h.html#a88f293be45084aa89794529552710a86":[7,0,2,13,1,4,4],
-"contracts_8h_source.html":[7,0,2,13,1,4]
+"contracts_8h_source.html":[7,0,2,13,1,4],
+"contributing_documentation.html":[0,5]
 };

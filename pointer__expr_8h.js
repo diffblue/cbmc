@@ -40,7 +40,10 @@ var pointer__expr_8h =
     [ "can_cast_expr< pointer_in_range_exprt >", "pointer__expr_8h.html#a681fcd5112b50cb06493d52fb90f068e", null ],
     [ "can_cast_expr< pointer_object_exprt >", "pointer__expr_8h.html#afc9dfc6368c293a32eb5e49f639031ef", null ],
     [ "can_cast_expr< pointer_offset_exprt >", "pointer__expr_8h.html#a95599e94c2804b7135b922ea8466099b", null ],
+    [ "can_cast_expr< r_ok_exprt >", "pointer__expr_8h.html#ac682f164d36514bae5531822fb94295a", null ],
+    [ "can_cast_expr< r_or_w_ok_exprt >", "pointer__expr_8h.html#ad68a9f56561602aae2bc0faee1be9d07", null ],
     [ "can_cast_expr< separate_exprt >", "pointer__expr_8h.html#a040fcd63d0f64cc9fc4de17e6c435ab6", null ],
+    [ "can_cast_expr< w_ok_exprt >", "pointer__expr_8h.html#a9f66b1d08c5c95467d49b1b499f60b20", null ],
     [ "can_cast_expr< writeable_object_exprt >", "pointer__expr_8h.html#afab2843538135c6a74e14a02840fea90", null ],
     [ "can_cast_type< pointer_typet >", "pointer__expr_8h.html#a263668d57e4ac209286f7140a596f02e", null ],
     [ "can_cast_type< reference_typet >", "pointer__expr_8h.html#a0e49f887d3e1afa57ada1bb6314ed704", null ],
@@ -106,6 +109,9 @@ var pointer__expr_8h =
     [ "validate_expr", "pointer__expr_8h.html#ad1d824f099842e183b27ef368424754a", null ],
     [ "validate_expr", "pointer__expr_8h.html#a92edcddd6f9c4be1768752c85a4b4241", null ],
     [ "validate_expr", "pointer__expr_8h.html#a05e5dfb9ac0987988cf1a69072be2fc8", null ],
+    [ "validate_expr", "pointer__expr_8h.html#ac023140acae12461f6a29d33d10cbc3b", null ],
+    [ "validate_expr", "pointer__expr_8h.html#aa5ecea8f28f9f0616c75f617b04adaa7", null ],
     [ "validate_expr", "pointer__expr_8h.html#acad3a92b2a5fe8fd0c19929e07a4b261", null ],
+    [ "validate_expr", "pointer__expr_8h.html#a153753f6c402192b4f4b593ee807537a", null ],
     [ "validate_expr", "pointer__expr_8h.html#aef11fb4d68e26d0ec551c222b5bc2fe4", null ]
 ];

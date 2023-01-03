@@ -1,5 +1,10 @@
 var NAVTREEINDEX130 =
 {
+"structtrace__optionst.html#a2f24c247d5fa9b58259a3f9a7eab9cf2":[6,0,1249,6],
+"structtrace__optionst.html#a55cd374bf8f4bb8b618bd1fe32ae3826":[6,0,1249,0],
+"structtrace__optionst.html#a76a5f0f669c04090fe75a4212d1dc215":[6,0,1249,5],
+"structtrace__optionst.html#a789f2d807df3cc04ff28c8abb5dce3fe":[6,0,1249,2],
+"structtrace__optionst.html#a996e9bc10e923d796b3cbf6e44a2fa69":[6,0,1249,7],
 "structtrace__optionst.html#ac83c0ab1c6ede34802a7e4ba90a0f11b":[6,0,1249,1],
 "structtrace__optionst.html#ad62883f8a357167a764549d6831e2242":[6,0,1249,3],
 "structtrace__optionst.html#ae6c3c9965f735618492236e14a94c23f":[6,0,1249,8],
@@ -244,10 +249,5 @@ var NAVTREEINDEX130 =
 "symex__throw_8cpp.html":[7,0,2,15,72],
 "symex__throw_8cpp_source.html":[7,0,2,15,72],
 "symtab2gb__main_8cpp.html":[7,0,2,28,0],
-"symtab2gb__main_8cpp.html#ac0f2228420376f4db7e1274f2b41667c":[7,0,2,28,0,0],
-"symtab2gb__main_8cpp_source.html":[7,0,2,28,0],
-"symtab2gb__parse__options_8cpp.html":[7,0,2,28,1],
-"symtab2gb__parse__options_8cpp.html#a4b940069ca5f3c9d8d53bf02f595df12":[7,0,2,28,1,1],
-"symtab2gb__parse__options_8cpp.html#ad19f4a5a730c9cb39387429ece68e2af":[7,0,2,28,1,0],
-"symtab2gb__parse__options_8cpp_source.html":[7,0,2,28,1]
+"symtab2gb__main_8cpp.html#ac0f2228420376f4db7e1274f2b41667c":[7,0,2,28,0,0]
 };

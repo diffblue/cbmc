@@ -1,6 +1,5 @@
 var NAVTREEINDEX78 =
 {
-"float__approximation_8h.html":[7,0,2,26,2,1],
 "float__approximation_8h_source.html":[7,0,2,26,2,1],
 "float__bv_8cpp.html":[7,0,2,26,2,2],
 "float__bv_8cpp_source.html":[7,0,2,26,2,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX78 =
 "functions_func_r.html":[6,2,1,18],
 "functions_func_s.html":[6,2,1,19],
 "functions_func_t.html":[6,2,1,20],
-"functions_func_u.html":[6,2,1,21]
+"functions_func_u.html":[6,2,1,21],
+"functions_func_v.html":[6,2,1,22]
 };
