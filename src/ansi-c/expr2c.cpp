@@ -3554,6 +3554,24 @@ std::string expr2ct::convert_bitreverse(const bitreverse_exprt &src)
   return convert_norep(src, precedence);
 }
 
+std::string expr2ct::convert_r_or_w_ok(const r_or_w_ok_exprt &src)
+{
+  std::string dest = src.id() == ID_r_ok   ? "R_OK"
+                     : src.id() == ID_w_ok ? "W_OK"
+                                           : "RW_OK";
+
+  dest += '(';
+
+  unsigned p;
+  dest += convert_with_precedence(src.pointer(), p);
+  dest += ", ";
+  dest += convert_with_precedence(src.size(), p);
+
+  dest += ')';
+
+  return dest;
+}
+
 std::string expr2ct::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
@@ -3963,6 +3981,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id() == ID_bitreverse)
     return convert_bitreverse(to_bitreverse_expr(src));
 
+  else if(src.id() == ID_r_ok || src.id() == ID_w_ok || src.id() == ID_rw_ok)
+    return convert_r_or_w_ok(to_r_or_w_ok_expr(src));
+
   auto function_string_opt = convert_function(src);
   if(function_string_opt.has_value())
     return *function_string_opt;
@@ -4018,9 +4039,6 @@ optionalt<std::string> expr2ct::convert_function(const exprt &src)
     {ID_loop_entry, CPROVER_PREFIX "loop_entry"},
     {ID_saturating_minus, CPROVER_PREFIX "saturating_minus"},
     {ID_saturating_plus, CPROVER_PREFIX "saturating_plus"},
-    {ID_r_ok, "R_OK"},
-    {ID_w_ok, "W_OK"},
-    {ID_rw_ok, "RW_OK"},
     {ID_width, "WIDTH"},
   };
 
