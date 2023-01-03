@@ -85,6 +85,7 @@ var classexpr2ct =
     [ "convert_prob_coin", "classexpr2ct.html#a84ea345ac4f8c3313b8a89abe95c292b", null ],
     [ "convert_prob_uniform", "classexpr2ct.html#afd9480771afc7fc0a52c72841110a591", null ],
     [ "convert_quantified_symbol", "classexpr2ct.html#a3015354dc4a690adfc6525e71b8c55e5", null ],
+    [ "convert_r_or_w_ok", "classexpr2ct.html#a66b4664e756d1f8e1160fee03a10340e", null ],
     [ "convert_rec", "classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2", null ],
     [ "convert_rox", "classexpr2ct.html#aa4e7811ef3c54aaacd7a1b88c8b1dc77", null ],
     [ "convert_side_effect_expr_function_call", "classexpr2ct.html#a6efc74465552004bb07716b64e3afcc8", null ],

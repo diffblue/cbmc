@@ -1,5 +1,8 @@
 var NAVTREEINDEX56 =
 {
+"classsatcheck__lingelingt.html#abcd221bc04a701004aea4b49859dba5e":[6,0,1000,11],
+"classsatcheck__lingelingt.html#ac35d3530e2238b6c54f2d25316d8cc7d":[6,0,1000,10],
+"classsatcheck__lingelingt.html#ae7d2c4e88d2fc5e247c895ee541a864d":[6,0,1000,5],
 "classsatcheck__lingelingt.html#aec38b620eca334ee157fcbea20adb81b":[6,0,1000,13],
 "classsatcheck__lingelingt.html#aff10efb32ca7b9fe39553b457bd5645b":[6,0,1000,0],
 "classsatcheck__minisat1__baset.html":[6,0,1001],
@@ -246,8 +249,5 @@ var NAVTREEINDEX56 =
 "classsharing__mapt.html#a90044b11697279c1626ed8b650a156c2":[6,0,1021,51],
 "classsharing__mapt.html#a923889b52721114591fe8919fce66304":[6,0,1021,11],
 "classsharing__mapt.html#a9579fe094954bd02a2eeaae798887e40":[6,0,1021,24],
-"classsharing__mapt.html#aa10a68b61f0ff7ccb16de800be8993de":[6,0,1021,49],
-"classsharing__mapt.html#aa3e21a5fa8f297a51f5ed036e3c165d0":[6,0,1021,35],
-"classsharing__mapt.html#aa709c9035141728ff15d5b1f7f6d70f1":[6,0,1021,22],
-"classsharing__mapt.html#ab01cf6c20f764b08386f5909b0c7c5f9":[6,0,1021,8]
+"classsharing__mapt.html#aa10a68b61f0ff7ccb16de800be8993de":[6,0,1021,49]
 };
