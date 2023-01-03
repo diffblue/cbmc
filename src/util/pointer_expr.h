@@ -818,6 +818,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<r_or_w_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_r_ok || base.id() == ID_w_ok || base.id() == ID_rw_ok;
+}
+
+inline void validate_expr(const r_or_w_ok_exprt &value)
+{
+  validate_operands(value, 2, "r_or_w_ok must have two operands");
+}
+
 inline const r_or_w_ok_exprt &to_r_or_w_ok_expr(const exprt &expr)
 {
   PRECONDITION(
@@ -837,6 +848,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<r_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_r_ok;
+}
+
+inline void validate_expr(const r_ok_exprt &value)
+{
+  validate_operands(value, 2, "r_ok must have two operands");
+}
+
 inline const r_ok_exprt &to_r_ok_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_r_ok);
@@ -854,6 +876,17 @@ public:
   {
   }
 };
+
+template <>
+inline bool can_cast_expr<w_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_w_ok;
+}
+
+inline void validate_expr(const w_ok_exprt &value)
+{
+  validate_operands(value, 2, "w_ok must have two operands");
+}
 
 inline const w_ok_exprt &to_w_ok_expr(const exprt &expr)
 {
