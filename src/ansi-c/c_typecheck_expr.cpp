@@ -2671,7 +2671,6 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier == CPROVER_PREFIX "pointer_in_range")
   {
-    // experimental feature for CHC encodings -- do not use
     if(expr.arguments().size() != 3)
     {
       error().source_location = f_op.source_location();
