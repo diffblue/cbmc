@@ -79,6 +79,7 @@ var classexpr2ct =
     [ "convert_overflow", "classexpr2ct.html#a7096f8bc7fbf90165f258e8c55187e07", null ],
     [ "convert_pointer_arithmetic", "classexpr2ct.html#a3deb97f020424b7010e3d94bc8872593", null ],
     [ "convert_pointer_difference", "classexpr2ct.html#a5d45956076b0bd5643ecff36de94c459", null ],
+    [ "convert_pointer_in_range", "classexpr2ct.html#a2cd2db2a922092da31851f7a532ed928", null ],
     [ "convert_predicate_next_symbol", "classexpr2ct.html#ae0d5e0ea622208b8bfc8b83b01fe9cf0", null ],
     [ "convert_predicate_passive_symbol", "classexpr2ct.html#aca797c5e529110fa58351e0697bec24b", null ],
     [ "convert_predicate_symbol", "classexpr2ct.html#af1f5d74229e5c27462a36da427f756b5", null ],

@@ -1,5 +1,9 @@
 var NAVTREEINDEX124 =
 {
+"structfat__header__prefixt.html#aaba45f7112e06f9c5741267ee09eaa62":[6,0,451,0],
+"structfat__header__prefixt.html#acef326779778b0d990cc317faa101c96":[6,0,451,1],
+"structfault__location__infot.html":[6,0,453],
+"structfault__location__infot.html#a91705e9a0f517dd86519a3e780a04fb8":[6,0,453,1],
 "structfault__location__infot.html#a91aec8ec0d4d55dbb4ad5c51c5e66385":[6,0,453,0],
 "structfloat__bvt_1_1biased__floatt.html":[6,0,469,0],
 "structfloat__bvt_1_1rounding__mode__bitst.html":[6,0,469,1],
@@ -245,9 +249,5 @@ var NAVTREEINDEX124 =
 "structindex__set__pairt.html":[6,0,601],
 "structindex__set__pairt.html#a61a20f5657b97fba5e3b7dc0e78ec072":[6,0,601,1],
 "structindex__set__pairt.html#aa8dc71b64a2f7f54109a2d17e9a38b68":[6,0,601,0],
-"structinfix__opt.html":[6,0,604],
-"structinfix__opt.html#a5e8dee9dfdea6364767e7e89d2b90a67":[6,0,604,0],
-"structinflate__state.html":[6,0,605],
-"structinflate__state.html#a05183fc4ee620dfaac7cdde5c17697a9":[6,0,605,7],
-"structinflate__state.html#a26b59390ae38c5a0ee081a729479b89f":[6,0,605,3]
+"structinfix__opt.html":[6,0,604]
 };
