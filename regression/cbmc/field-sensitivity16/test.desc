@@ -1,0 +1,9 @@
+CORE broken-z3-smt-backend
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The test is a minimized version of code generated from s2n-quic using Kani.

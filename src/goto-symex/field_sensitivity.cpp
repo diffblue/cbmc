@@ -84,9 +84,9 @@ exprt field_sensitivityt::apply(
       member.struct_op() = tmp.get_original_expr();
       tmp.set_expression(member);
       if(was_l2)
-        return state.rename(std::move(tmp), ns).get();
+        return apply(ns, state, state.rename(std::move(tmp), ns).get(), write);
       else
-        return std::move(tmp);
+        return apply(ns, state, std::move(tmp), write);
     }
   }
   else if(
@@ -116,9 +116,12 @@ exprt field_sensitivityt::apply(
           tmp.type() = be.type();
           tmp.set_expression(*recursive_member);
           if(was_l2)
-            return state.rename(std::move(tmp), ns).get();
+          {
+            return apply(
+              ns, state, state.rename(std::move(tmp), ns).get(), write);
+          }
           else
-            return std::move(tmp);
+            return apply(ns, state, std::move(tmp), write);
         }
       }
     }
@@ -171,9 +174,12 @@ exprt field_sensitivityt::apply(
           index.index() = l2_index.get();
           tmp.set_expression(index);
           if(was_l2)
-            return state.rename(std::move(tmp), ns).get();
+          {
+            return apply(
+              ns, state, state.rename(std::move(tmp), ns).get(), write);
+          }
           else
-            return std::move(tmp);
+            return apply(ns, state, std::move(tmp), write);
         }
         else if(!write)
         {
@@ -293,6 +299,14 @@ void field_sensitivityt::field_assignments(
   {
     field_assignments_rec(
       ns, state, lhs_fs, rhs, target, allow_pointer_unsoundness);
+    // Erase the composite symbol from our working state. Note that we need to
+    // have it in the propagation table and the value set while doing the field
+    // assignments, thus we cannot skip putting it in there above.
+    if(is_divisible(lhs, true))
+    {
+      state.propagation.erase_if_exists(lhs.get_identifier());
+      state.value_set.erase_symbol(lhs, ns);
+    }
   }
 }
 
@@ -316,15 +330,11 @@ void field_sensitivityt::field_assignments_rec(
 {
   if(is_ssa_expr(lhs_fs))
   {
-    const ssa_exprt ssa_lhs = state
-                                .assignment(
-                                  to_ssa_expr(lhs_fs),
-                                  ssa_rhs,
-                                  ns,
-                                  true,
-                                  true,
-                                  allow_pointer_unsoundness)
-                                .get();
+    const ssa_exprt &l1_lhs = to_ssa_expr(lhs_fs);
+    const ssa_exprt ssa_lhs =
+      state
+        .assignment(l1_lhs, ssa_rhs, ns, true, true, allow_pointer_unsoundness)
+        .get();
 
     // do the assignment
     target.assignment(
@@ -335,6 +345,14 @@ void field_sensitivityt::field_assignments_rec(
       ssa_rhs,
       state.source,
       symex_targett::assignment_typet::STATE);
+    // Erase the composite symbol from our working state. Note that we need to
+    // have it in the propagation table and the value set while doing the field
+    // assignments, thus we cannot skip putting it in there above.
+    if(is_divisible(l1_lhs, true))
+    {
+      state.propagation.erase_if_exists(l1_lhs.get_identifier());
+      state.value_set.erase_symbol(l1_lhs, ns);
+    }
   }
   else if(
     ssa_rhs.type().id() == ID_struct || ssa_rhs.type().id() == ID_struct_tag)
