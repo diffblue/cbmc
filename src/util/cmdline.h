@@ -105,8 +105,8 @@ public:
   {
     explicit option_namest(const cmdlinet &command_line);
     struct option_names_iteratort
-      : public std::iterator<std::forward_iterator_tag, std::string>
     {
+      using iterator_category = std::forward_iterator_tag;
       option_names_iteratort() = default;
       explicit option_names_iteratort(
         const cmdlinet *command_line,

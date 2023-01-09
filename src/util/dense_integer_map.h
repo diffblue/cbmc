@@ -116,8 +116,8 @@ private:
   // operator++ that skips unset values.
   template <class UnderlyingIterator, class UnderlyingValue>
   class iterator_templatet
-    : public std::iterator<std::forward_iterator_tag, UnderlyingValue>
   {
+    using iterator_category = std::forward_iterator_tag;
     // Type of the std::iterator support class we inherit
     typedef std::iterator<std::forward_iterator_tag, UnderlyingValue>
       base_typet;
