@@ -158,7 +158,7 @@ public:
   /// enumerated by the enumerator e_i.
   /// \param partition_check an optional function checking whether a partition
   /// can be safely discarded.
-  /// \param ns namesapce used by `simplify_expr`.
+  /// \param ns namespace used by `simplify_expr`.
   non_leaf_enumeratort(
     const enumeratorst &enumerators,
     const std::function<bool(const partitiont &)> partition_check,
@@ -337,7 +337,7 @@ public:
   /// \param factory the enumerator factory---a grammar---this enumerator
   /// belongs to.
   /// \param id the identifier of this placeholder.
-  /// \param ns namesapce used for `simplify_expr`.
+  /// \param ns namespace used for `simplify_expr`.
   recursive_enumerator_placeholdert(
     enumerator_factoryt &factory,
     const std::string &id,

@@ -208,7 +208,7 @@ std::vector<std::size_t> get_ones_pos(std::size_t v)
   return result;
 }
 
-/// Construct parition of `n` elements from a bit vector `v`.
+/// Construct partition of `n` elements from a bit vector `v`.
 /// For a bit vector with ones at positions (computed by `get_ones_pos`)
 /// (ones[0], ones[1], ..., ones[k-2]),
 /// the corresponding partition is
@@ -255,7 +255,7 @@ std::list<partitiont> non_leaf_enumeratort::get_partitions(
 
   // Initial `v` is with ones at positions (n-k+1, n-k+2, ..., n-2, n-1).
   std::size_t v = 0;
-  // Initial `end` (the last bit vectorr we enumerate) is with ones at
+  // Initial `end` (the last bit vector we enumerate) is with ones at
   // positions (1, 2, 3, ..., k-1).
   std::size_t end = 0;
   for(size_t i = 0; i < k - 1; i++)
@@ -412,5 +412,5 @@ void enumerator_factoryt::attach_productions(
 {
   const auto &ret = productions_map.insert({id, enumerators});
   INVARIANT(
-    ret.second, "Cannnot attach enumerators to a non-existing nonterminal.");
+    ret.second, "Cannot attach enumerators to a non-existing nonterminal.");
 }
