@@ -2033,7 +2033,52 @@ void smt2_convt::convert_expr(const exprt &expr)
     const typet &op_type = op0.type();
     std::size_t width=boolbv_width(op_type);
 
-    if(op_type.id()==ID_signedbv)
+    if(op0.type().id() == ID_pointer || op1.type().id() == ID_pointer)
+    {
+      exprt p = op0, i = op1;
+
+      if(p.type().id() != ID_pointer)
+        p.swap(i);
+
+      const auto &object_type = to_pointer_type(p.type()).base_type();
+      exprt offset_bytes = i;
+      exprt::operandst disjuncts;
+
+      // Arithmetic over void* is a gcc extension.
+      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
+      if(object_type.id() != ID_empty)
+      {
+        auto object_size_opt = size_of_expr(object_type, ns);
+        CHECK_RETURN(object_size_opt.has_value());
+
+        offset_bytes = mult_exprt{
+          i, typecast_exprt::conditional_cast(*object_size_opt, i.type())};
+
+        // multiplying the offset by the object size may result in arithmetic
+        // overflow
+        disjuncts.push_back(mult_overflow_exprt{
+          to_mult_expr(offset_bytes).op0(), to_mult_expr(offset_bytes).op1()});
+      }
+
+      exprt pointer_offset_op = pointer_offset(p);
+      offset_bytes = typecast_exprt::conditional_cast(
+        offset_bytes, pointer_offset_op.type());
+
+      if(can_cast_expr<minus_overflow_exprt>(expr))
+        offset_bytes = unary_minus_exprt{offset_bytes};
+
+      disjuncts.push_back(plus_overflow_exprt{pointer_offset_op, offset_bytes});
+
+      plus_exprt sum{pointer_offset_op, offset_bytes};
+      exprt pointer_offset_sum = pointer_offset(typecast_exprt{sum, p.type()});
+
+      disjuncts.push_back(binary_relation_exprt{
+        pointer_offset_sum, ID_lt, from_integer(0, pointer_offset_sum.type())});
+      disjuncts.push_back(notequal_exprt{pointer_offset_sum, sum});
+
+      convert_expr(disjunction(disjuncts));
+    }
+    else if(op_type.id() == ID_signedbv)
     {
       // an overflow occurs if the top two bits of the extended sum differ
       out << "(let ((?sum (";
@@ -2072,8 +2117,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       out << ")"; // let
     }
-    else if(op_type.id()==ID_unsignedbv ||
-            op_type.id()==ID_pointer)
+    else if(op_type.id() == ID_unsignedbv)
     {
       // overflow is simply carry-out
       out << "(let ((?sum (" << (subtract ? "bvsub" : "bvadd");

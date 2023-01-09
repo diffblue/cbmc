@@ -488,6 +488,7 @@ char *getenv(const char *name)
   // the range.
 
   __CPROVER_assume(buf_size >= 1);
+  __CPROVER_assume((__CPROVER_size_t)buf_size <= __CPROVER_max_malloc_size);
   char *buffer = (char *)__CPROVER_allocate(buf_size * sizeof(char), 0);
   buffer[buf_size-1]=0;
 

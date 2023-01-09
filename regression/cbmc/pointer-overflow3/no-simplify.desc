@@ -5,7 +5,9 @@ main.c
 ^\[main.pointer_arithmetic.\d+\] line 7 pointer arithmetic: pointer outside object bounds in p - \(signed (long (long )?)?int\)10: FAILURE
 ^\[main.pointer_arithmetic.\d+\] line 10 pointer arithmetic: pointer outside object bounds in arr \+ \(signed (long (long )?)?int\)10: FAILURE
 ^\[main.pointer_arithmetic.\d+\] line 11 pointer arithmetic: pointer outside object bounds in arr - \(signed (long (long )?)?int\)10: FAILURE
-^\*\* 4 of \d+ failed
+^\[main.overflow.\d+\] line 7 arithmetic overflow on pointer \- in p \- \(signed (long (long )?)?int\)10: FAILURE
+^\[main.overflow.\d+\] line 11 arithmetic overflow on pointer \- in arr \- \(signed (long (long )?)?int\)10: FAILURE
+^\*\* 6 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
