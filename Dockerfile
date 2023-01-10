@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as builder
+FROM ubuntu:22.04 as builder
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 # Timezone data is needed during the installation of dependencies,
@@ -22,6 +22,6 @@ COPY . /tmp/cbmc
 WORKDIR /tmp/cbmc
 RUN cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ && cd build; ninja -j2
 
-FROM ubuntu:20.04 as runner
+FROM ubuntu:22.04 as runner
 COPY --from=builder /tmp/cbmc/build/bin/* /usr/local/bin/
 RUN apt-get update && apt-get install -y gcc
