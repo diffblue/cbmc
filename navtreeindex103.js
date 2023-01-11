@@ -1,5 +1,8 @@
 var NAVTREEINDEX103 =
 {
+"java__string__literals_8h.html#aec4130be5d61ab4fd8444c1e67e56876":[7,0,1,0,1,84,0],
+"java__string__literals_8h_source.html":[7,0,1,0,1,84],
+"java__syntactic__diff_8cpp.html":[7,0,1,0,3,0],
 "java__syntactic__diff_8cpp_source.html":[7,0,1,0,3,0],
 "java__syntactic__diff_8h.html":[7,0,1,0,3,1],
 "java__syntactic__diff_8h_source.html":[7,0,1,0,3,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX103 =
 "jsa_8h.html":[7,0,2,1,1,2],
 "jsa_8h.html#a00a258b3eb5b2e66ada08be3529ac866":[7,0,2,1,1,2,59],
 "jsa_8h.html#a020c7dc76f848acad59cd25037841120":[7,0,2,1,1,2,53],
-"jsa_8h.html#a03db606c9fa6f9604c2f819dd3e96686":[7,0,2,1,1,2,20],
-"jsa_8h.html#a03fee51a965fb3ecd47dcf439891ea46":[7,0,2,1,1,2,22],
-"jsa_8h.html#a071e3f0abe117e67ec29e2851af4daca":[7,0,2,1,1,2,33],
-"jsa_8h.html#a1b2fd30a318717f18765bf894d449d24":[7,0,2,1,1,2,48]
+"jsa_8h.html#a03db606c9fa6f9604c2f819dd3e96686":[7,0,2,1,1,2,20]
 };

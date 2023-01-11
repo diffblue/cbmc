@@ -183,16 +183,16 @@ $(document).ready(function(){initNavTree('dump__loop__contracts_8cpp_source.html
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="stringliteral">&quot;loop &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(invariant_entry.first.loop_number + 1) +</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="stringliteral">&quot; assigns &quot;</span>;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="keywordtype">bool</span> in_fisrt_iter = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="keywordtype">bool</span> in_first_iter = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;a : it_assigns-&gt;second)</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">if</span>(!in_fisrt_iter)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">if</span>(!in_first_iter)</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        {</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;          assign_string += <span class="stringliteral">&quot;,&quot;</span>;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        }</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;          in_fisrt_iter = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;          in_first_iter = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        }</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        assign_string += <a class="code" href="expr2c_8cpp.html#a4328dfdfdc55aac925999960e9a42ed7">expr2c</a>(</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;          <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(a, ns), ns, <a class="code" href="structexpr2c__configurationt.html#a08c0d7f0f57436f00bf8334c19436a36">expr2c_configurationt::clean_configuration</a>);</div>

@@ -1,5 +1,8 @@
 var NAVTREEINDEX112 =
 {
+"qbf__core_8h.html#a9eda71af6b80953c36fb856322337226":[7,0,2,26,5,2,0],
+"qbf__core_8h_source.html":[7,0,2,26,5,2],
+"qbf__quantor_8cpp.html":[7,0,2,26,5,3],
 "qbf__quantor_8cpp_source.html":[7,0,2,26,5,3],
 "qbf__quantor_8h.html":[7,0,2,26,5,4],
 "qbf__quantor_8h_source.html":[7,0,2,26,5,4],
@@ -246,8 +249,5 @@ var NAVTREEINDEX112 =
 "remove__instanceof_8cpp_source.html":[7,0,1,0,1,107],
 "remove__instanceof_8h.html":[7,0,1,0,1,108],
 "remove__instanceof_8h.html#a0b99cf3f6ea49afee24ae05d6c0525bf":[7,0,1,0,1,108,3],
-"remove__instanceof_8h.html#a15dd78c2a53594aa03c1d05029ec674d":[7,0,1,0,1,108,1],
-"remove__instanceof_8h.html#ad5f7d547ca35c12ba59871f967da9166":[7,0,1,0,1,108,2],
-"remove__instanceof_8h.html#addb7ac67bc501fc4af50b871b42aac98":[7,0,1,0,1,108,0],
-"remove__instanceof_8h_source.html":[7,0,1,0,1,108]
+"remove__instanceof_8h.html#a15dd78c2a53594aa03c1d05029ec674d":[7,0,1,0,1,108,1]
 };

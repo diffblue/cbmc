@@ -1,5 +1,8 @@
 var NAVTREEINDEX104 =
 {
+"jsa_8h.html#a03fee51a965fb3ecd47dcf439891ea46":[7,0,2,1,1,2,22],
+"jsa_8h.html#a071e3f0abe117e67ec29e2851af4daca":[7,0,2,1,1,2,33],
+"jsa_8h.html#a1b2fd30a318717f18765bf894d449d24":[7,0,2,1,1,2,48],
 "jsa_8h.html#a1ce1becb309c1912ecf5d684a867be10":[7,0,2,1,1,2,27],
 "jsa_8h.html#a22007ebd5a42609118f7be181712e9c1":[7,0,2,1,1,2,41],
 "jsa_8h.html#a295583615e9676bbf0dd83da4d381657":[7,0,2,1,1,2,50],
@@ -246,8 +249,5 @@ var NAVTREEINDEX104 =
 "json__symbol__table_8h.html#a73ee2e97320ee6c414eaf23922826449":[7,0,2,19,3,0],
 "json__symbol__table_8h_source.html":[7,0,2,19,3],
 "json__symtab__language_8cpp.html":[7,0,2,19,4],
-"json__symtab__language_8cpp_source.html":[7,0,2,19,4],
-"json__symtab__language_8h.html":[7,0,2,19,5],
-"json__symtab__language_8h.html#ac036a632affe8194bdd6454746da2a3f":[7,0,2,19,5,1],
-"json__symtab__language_8h_source.html":[7,0,2,19,5]
+"json__symtab__language_8cpp_source.html":[7,0,2,19,4]
 };
