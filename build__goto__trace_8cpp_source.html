@@ -438,116 +438,111 @@ $(document).ready(function(){initNavTree('build__goto__trace_8cpp_source.html','
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      goto_trace_step.<a class="code" href="classgoto__trace__stept.html#af842260da7d11a93b5c95ddbde40eaca">io_id</a> = SSA_step.io_id;</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a89e8fb9c2263e5a22670cd8ad4310191">formatted</a> = SSA_step.formatted;</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      goto_trace_step.<a class="code" href="classgoto__trace__stept.html#aa5393083be5462b9ed4e3eca5a012a2b">called_function</a> = SSA_step.called_function;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0ba7914f623ed9ed32d8d8d04b6a5184">function_arguments</a> = SSA_step.converted_function_arguments;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;arg : goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0ba7914f623ed9ed32d8d8d04b6a5184">function_arguments</a>)</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        arg = decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(arg);</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160; </div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      <span class="comment">// update internal field for specific variables in the counterexample</span></div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;      <a class="code" href="build__goto__trace_8cpp.html#a52712eee0301de56da30d7b63311937b">update_internal_field</a>(SSA_step, goto_trace_step, ns);</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      goto_trace_step.<a class="code" href="classgoto__trace__stept.html#ab072e8143e9fabce0dea4c4ec5f1e330">assignment_type</a> =</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        (SSA_step.is_assignment() &amp;&amp;</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;         (SSA_step.assignment_type ==</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;            <a class="code" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8ba54fc1ed267916c9a9a5a546d06062879">symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER</a> ||</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;          SSA_step.assignment_type ==</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;            <a class="code" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8ba66388fed363bd9d848993b9d45cabf20">symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER</a>))</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;          ? <a class="code" href="classgoto__trace__stept.html#a679fba5577d634d9fe164add2fa39897a50c1545149310eef9adf92b67aa05d81">goto_trace_stept::assignment_typet::ACTUAL_PARAMETER</a></div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;          : <a class="code" href="classgoto__trace__stept.html#a679fba5577d634d9fe164add2fa39897a2b848a8cc886d253d21a77c43cd50aae">goto_trace_stept::assignment_typet::STATE</a>;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="keywordflow">if</span>(SSA_step.original_full_lhs.is_not_nil())</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      {</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0cf67b970ca1ab157e3bbe1cce688687">full_lhs</a> = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;          <a class="code" href="build__goto__trace_8cpp.html#a1a15b18a10b6fe3f06846759415c42af">build_full_lhs_rec</a>(</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;            decision_procedure,</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;            ns,</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            SSA_step.original_full_lhs,</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;            SSA_step.ssa_full_lhs),</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;          ns);</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        <a class="code" href="build__goto__trace_8cpp.html#a8b8f169267d229e4d0f5da24470b965e">replace_nondet_in_type</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0cf67b970ca1ab157e3bbe1cce688687">full_lhs</a>, decision_procedure);</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <a class="code" href="rewrite__union_8cpp.html#a487f071e7371163b9036d8fed4e4797b">restore_union</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0cf67b970ca1ab157e3bbe1cce688687">full_lhs</a>, ns);</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      }</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      <span class="keywordflow">if</span>(SSA_step.ssa_full_lhs.is_not_nil())</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      {</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a68ba24691fe7cea7ac661e228a9f9f89">full_lhs_value</a> =</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(SSA_step.ssa_full_lhs);</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        <a class="code" href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a68ba24691fe7cea7ac661e228a9f9f89">full_lhs_value</a>, ns);</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        <a class="code" href="build__goto__trace_8cpp.html#a8b8f169267d229e4d0f5da24470b965e">replace_nondet_in_type</a>(</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;          goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a68ba24691fe7cea7ac661e228a9f9f89">full_lhs_value</a>, decision_procedure);</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;      }</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160; </div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;j : SSA_step.converted_io_args)</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;      {</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="keywordflow">if</span>(j.is_constant() || j.id() == ID_string_constant)</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;          goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a70000cff1337b2bb3faa0ef649840872">io_args</a>.push_back(j);</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        }</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        {</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;          <a class="code" href="classexprt.html">exprt</a> tmp = decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(j);</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;          goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a70000cff1337b2bb3faa0ef649840872">io_args</a>.push_back(tmp);</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        }</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;      }</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;      <span class="keywordflow">if</span>(SSA_step.is_assert() || SSA_step.is_assume() || SSA_step.is_goto())</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      {</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a8fbe7f4381fa6577c755d6947a621a9d">cond_expr</a> = SSA_step.cond_expr;</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#ac331c323349028295782b96536b54631">cond_value</a> =</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(SSA_step.cond_handle).<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>();</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;      }</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;      <span class="keywordflow">if</span>(SSA_step.source.pc-&gt;is_assert() || SSA_step.source.pc-&gt;is_assume())</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      {</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a247ae95edd6fd98371ff7dc33256d816">original_condition</a> = SSA_step.source.pc-&gt;condition();</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        <a class="code" href="rewrite__union_8cpp.html#a487f071e7371163b9036d8fed4e4797b">restore_union</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a247ae95edd6fd98371ff7dc33256d816">original_condition</a>, ns);</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      }</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      <span class="keywordflow">if</span>(ssa_step_it == last_step_to_keep)</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  }</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;}</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160; </div>
-<div class="line"><a name="l00429"></a><span class="lineno"><a class="line" href="build__goto__trace_8cpp.html#a77c5efc2ab2aaf501bbcc73b8e820134">  429</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;target,</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  symex_target_equationt::SSA_stepst::const_iterator last_step_to_keep,</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure,</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <a class="code" href="classgoto__tracet.html">goto_tracet</a> &amp;goto_trace)</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;{</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> is_last_step_to_keep =</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    [last_step_to_keep](</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;      symex_target_equationt::SSA_stepst::const_iterator it,</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;) { <span class="keywordflow">return</span> last_step_to_keep == it; };</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160; </div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    target, is_last_step_to_keep, decision_procedure, ns, goto_trace);</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;}</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00445"></a><span class="lineno"><a class="line" href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">  445</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">is_failed_assertion_step</a>(</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  symex_target_equationt::SSA_stepst::const_iterator step,</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;{</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <span class="keywordflow">return</span> step-&gt;is_assert() &amp;&amp;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;         decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(step-&gt;cond_handle).<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>();</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;}</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
-<div class="line"><a name="l00453"></a><span class="lineno"><a class="line" href="build__goto__trace_8cpp.html#a7d738898fe3273df29efec37fb59907c">  453</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;target,</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure,</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <a class="code" href="classgoto__tracet.html">goto_tracet</a> &amp;goto_trace)</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;{</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    target, <a class="code" href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">is_failed_assertion_step</a>, decision_procedure, ns, goto_trace);</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;}</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160; </div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;arg : SSA_step.converted_function_arguments)</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      {</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0ba7914f623ed9ed32d8d8d04b6a5184">function_arguments</a>.push_back(</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;          <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(arg), ns));</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      }</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160; </div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;      <span class="comment">// update internal field for specific variables in the counterexample</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      <a class="code" href="build__goto__trace_8cpp.html#a52712eee0301de56da30d7b63311937b">update_internal_field</a>(SSA_step, goto_trace_step, ns);</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      goto_trace_step.<a class="code" href="classgoto__trace__stept.html#ab072e8143e9fabce0dea4c4ec5f1e330">assignment_type</a> =</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        (SSA_step.is_assignment() &amp;&amp;</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;         (SSA_step.assignment_type ==</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;            <a class="code" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8ba54fc1ed267916c9a9a5a546d06062879">symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER</a> ||</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;          SSA_step.assignment_type ==</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <a class="code" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8ba66388fed363bd9d848993b9d45cabf20">symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER</a>))</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;          ? <a class="code" href="classgoto__trace__stept.html#a679fba5577d634d9fe164add2fa39897a50c1545149310eef9adf92b67aa05d81">goto_trace_stept::assignment_typet::ACTUAL_PARAMETER</a></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;          : <a class="code" href="classgoto__trace__stept.html#a679fba5577d634d9fe164add2fa39897a2b848a8cc886d253d21a77c43cd50aae">goto_trace_stept::assignment_typet::STATE</a>;</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keywordflow">if</span>(SSA_step.original_full_lhs.is_not_nil())</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;      {</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0cf67b970ca1ab157e3bbe1cce688687">full_lhs</a> = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;          <a class="code" href="build__goto__trace_8cpp.html#a1a15b18a10b6fe3f06846759415c42af">build_full_lhs_rec</a>(</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;            decision_procedure,</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;            ns,</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;            SSA_step.original_full_lhs,</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;            SSA_step.ssa_full_lhs),</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;          ns);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <a class="code" href="build__goto__trace_8cpp.html#a8b8f169267d229e4d0f5da24470b965e">replace_nondet_in_type</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0cf67b970ca1ab157e3bbe1cce688687">full_lhs</a>, decision_procedure);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        <a class="code" href="rewrite__union_8cpp.html#a487f071e7371163b9036d8fed4e4797b">restore_union</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a0cf67b970ca1ab157e3bbe1cce688687">full_lhs</a>, ns);</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      }</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160; </div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <span class="keywordflow">if</span>(SSA_step.ssa_full_lhs.is_not_nil())</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      {</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a68ba24691fe7cea7ac661e228a9f9f89">full_lhs_value</a> =</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(SSA_step.ssa_full_lhs);</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        <a class="code" href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a68ba24691fe7cea7ac661e228a9f9f89">full_lhs_value</a>, ns);</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        <a class="code" href="build__goto__trace_8cpp.html#a8b8f169267d229e4d0f5da24470b965e">replace_nondet_in_type</a>(</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;          goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a68ba24691fe7cea7ac661e228a9f9f89">full_lhs_value</a>, decision_procedure);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      }</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;j : SSA_step.converted_io_args)</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;      {</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a70000cff1337b2bb3faa0ef649840872">io_args</a>.push_back(</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;          <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(j), ns));</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      }</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      <span class="keywordflow">if</span>(SSA_step.is_assert() || SSA_step.is_assume() || SSA_step.is_goto())</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;      {</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a8fbe7f4381fa6577c755d6947a621a9d">cond_expr</a> = SSA_step.cond_expr;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#ac331c323349028295782b96536b54631">cond_value</a> =</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(SSA_step.cond_handle).<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>();</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      }</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160; </div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;      <span class="keywordflow">if</span>(SSA_step.source.pc-&gt;is_assert() || SSA_step.source.pc-&gt;is_assume())</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;      {</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a247ae95edd6fd98371ff7dc33256d816">original_condition</a> = SSA_step.source.pc-&gt;condition();</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;        <a class="code" href="rewrite__union_8cpp.html#a487f071e7371163b9036d8fed4e4797b">restore_union</a>(goto_trace_step.<a class="code" href="classgoto__trace__stept.html#a247ae95edd6fd98371ff7dc33256d816">original_condition</a>, ns);</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;      }</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      <span class="keywordflow">if</span>(ssa_step_it == last_step_to_keep)</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    }</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  }</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;}</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
+<div class="line"><a name="l00424"></a><span class="lineno"><a class="line" href="build__goto__trace_8cpp.html#a77c5efc2ab2aaf501bbcc73b8e820134">  424</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;target,</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  symex_target_equationt::SSA_stepst::const_iterator last_step_to_keep,</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure,</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <a class="code" href="classgoto__tracet.html">goto_tracet</a> &amp;goto_trace)</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;{</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> is_last_step_to_keep =</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    [last_step_to_keep](</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      symex_target_equationt::SSA_stepst::const_iterator it,</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;) { <span class="keywordflow">return</span> last_step_to_keep == it; };</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160; </div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    target, is_last_step_to_keep, decision_procedure, ns, goto_trace);</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;}</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
+<div class="line"><a name="l00440"></a><span class="lineno"><a class="line" href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">  440</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">is_failed_assertion_step</a>(</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  symex_target_equationt::SSA_stepst::const_iterator step,</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure)</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;{</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  <span class="keywordflow">return</span> step-&gt;is_assert() &amp;&amp;</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;         decision_procedure.<a class="code" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a>(step-&gt;cond_handle).<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>();</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;}</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
+<div class="line"><a name="l00448"></a><span class="lineno"><a class="line" href="build__goto__trace_8cpp.html#a7d738898fe3273df29efec37fb59907c">  448</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymex__target__equationt.html">symex_target_equationt</a> &amp;target,</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdecision__proceduret.html">decision_proceduret</a> &amp;decision_procedure,</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  <a class="code" href="classgoto__tracet.html">goto_tracet</a> &amp;goto_trace)</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;{</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <a class="code" href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a>(</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    target, <a class="code" href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">is_failed_assertion_step</a>, decision_procedure, ns, goto_trace);</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="abuild__goto__trace_8cpp_html_a1a15b18a10b6fe3f06846759415c42af"><div class="ttname"><a href="build__goto__trace_8cpp.html#a1a15b18a10b6fe3f06846759415c42af">build_full_lhs_rec</a></div><div class="ttdeci">static exprt build_full_lhs_rec(const decision_proceduret &amp;decision_procedure, const namespacet &amp;ns, const exprt &amp;src_original, const exprt &amp;src_ssa)</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00029">build_goto_trace.cpp:29</a></div></div>
 <div class="ttc" id="abuild__goto__trace_8cpp_html_a1dc2b38513f9f8bd0ceffdc39f710f1b"><div class="ttname"><a href="build__goto__trace_8cpp.html#a1dc2b38513f9f8bd0ceffdc39f710f1b">set_internal_dynamic_object</a></div><div class="ttdeci">static void set_internal_dynamic_object(const exprt &amp;expr, goto_trace_stept &amp;goto_trace_step, const namespacet &amp;ns)</div><div class="ttdoc">set internal field for variable assignment related to dynamic_object[0-9] and dynamic_[0-9]_array.</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00119">build_goto_trace.cpp:119</a></div></div>
 <div class="ttc" id="abuild__goto__trace_8cpp_html_a52712eee0301de56da30d7b63311937b"><div class="ttname"><a href="build__goto__trace_8cpp.html#a52712eee0301de56da30d7b63311937b">update_internal_field</a></div><div class="ttdeci">static void update_internal_field(const SSA_stept &amp;SSA_step, goto_trace_stept &amp;goto_trace_step, const namespacet &amp;ns)</div><div class="ttdoc">set internal for variables assignments related to dynamic_object and CPROVER internal functions (e....</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00148">build_goto_trace.cpp:148</a></div></div>
-<div class="ttc" id="abuild__goto__trace_8cpp_html_a6754379bcea546fb90ec13c3cfbc7a94"><div class="ttname"><a href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">is_failed_assertion_step</a></div><div class="ttdeci">static bool is_failed_assertion_step(symex_target_equationt::SSA_stepst::const_iterator step, const decision_proceduret &amp;decision_procedure)</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00445">build_goto_trace.cpp:445</a></div></div>
+<div class="ttc" id="abuild__goto__trace_8cpp_html_a6754379bcea546fb90ec13c3cfbc7a94"><div class="ttname"><a href="build__goto__trace_8cpp.html#a6754379bcea546fb90ec13c3cfbc7a94">is_failed_assertion_step</a></div><div class="ttdeci">static bool is_failed_assertion_step(symex_target_equationt::SSA_stepst::const_iterator step, const decision_proceduret &amp;decision_procedure)</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00440">build_goto_trace.cpp:440</a></div></div>
 <div class="ttc" id="abuild__goto__trace_8cpp_html_a8b8f169267d229e4d0f5da24470b965e"><div class="ttname"><a href="build__goto__trace_8cpp.html#a8b8f169267d229e4d0f5da24470b965e">replace_nondet_in_type</a></div><div class="ttdeci">static void replace_nondet_in_type(typet &amp;type, const decision_proceduret &amp;solver)</div><div class="ttdoc">Replace nondet values that appear in type by their values as found by solver.</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00185">build_goto_trace.cpp:185</a></div></div>
 <div class="ttc" id="abuild__goto__trace_8cpp_html_ad14aa7aa1ef44cb43abd52742fc41e62"><div class="ttname"><a href="build__goto__trace_8cpp.html#ad14aa7aa1ef44cb43abd52742fc41e62">build_goto_trace</a></div><div class="ttdeci">void build_goto_trace(const symex_target_equationt &amp;target, ssa_step_predicatet is_last_step_to_keep, const decision_proceduret &amp;decision_procedure, const namespacet &amp;ns, goto_tracet &amp;goto_trace)</div><div class="ttdoc">Build a trace by going through the steps of target and stopping after the step matching a given condi...</div><div class="ttdef"><b>Definition:</b> <a href="build__goto__trace_8cpp_source.html#l00207">build_goto_trace.cpp:207</a></div></div>
 <div class="ttc" id="abuild__goto__trace_8h_html"><div class="ttname"><a href="build__goto__trace_8h.html">build_goto_trace.h</a></div><div class="ttdoc">Traces of GOTO Programs.</div></div>
