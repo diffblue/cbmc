@@ -74,8 +74,8 @@ void multi_path_symex_only_checkert::generate_equation()
 {
   const auto symex_start = std::chrono::steady_clock::now();
 
-  symex.symex_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+  symex_symbol_table =
+    symex.symex_from_entry_point_of(goto_symext::get_goto_function(goto_model));
 
   const auto symex_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> symex_runtime =

@@ -128,7 +128,7 @@ bool symex_bmc_incremental_one_loopt::from_entry_point_of(
 {
   state = initialize_entry_point_state(get_goto_function);
 
-  symex_with_state(*state, get_goto_function, new_symbol_table);
+  new_symbol_table = symex_with_state(*state, get_goto_function);
 
   return should_pause_symex;
 }
@@ -138,7 +138,7 @@ bool symex_bmc_incremental_one_loopt::resume(
 {
   should_pause_symex = false;
 
-  symex_with_state(*state, get_goto_function, state->symbol_table);
+  state->symbol_table = symex_with_state(*state, get_goto_function);
 
   return should_pause_symex;
 }
