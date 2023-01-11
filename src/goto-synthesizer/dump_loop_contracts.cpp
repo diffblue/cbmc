@@ -91,16 +91,16 @@ void dump_loop_contracts(
         "loop " + std::to_string(invariant_entry.first.loop_number + 1) +
         " assigns ";
 
-      bool in_fisrt_iter = true;
+      bool in_first_iter = true;
       for(const auto &a : it_assigns->second)
       {
-        if(!in_fisrt_iter)
+        if(!in_first_iter)
         {
           assign_string += ",";
         }
         else
         {
-          in_fisrt_iter = false;
+          in_first_iter = false;
         }
         assign_string += expr2c(
           simplify_expr(a, ns), ns, expr2c_configurationt::clean_configuration);

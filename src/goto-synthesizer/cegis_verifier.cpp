@@ -53,6 +53,34 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
   return false;
 }
 
+static const exprt &
+get_checked_pointer_from_null_pointer_check(const exprt &violation)
+{
+  // A NULL-pointer check is the negation of an equation between the checked
+  // pointer and a NULL pointer.
+  // ! (POINTER_OBJECT(NULL) == POINTER_OBJECT(ptr))
+  const equal_exprt &equal_expr = to_equal_expr(to_not_expr(violation).op());
+
+  const pointer_object_exprt &lhs_pointer_object =
+    to_pointer_object_expr(equal_expr.lhs());
+  const pointer_object_exprt &rhs_pointer_object =
+    to_pointer_object_expr(equal_expr.rhs());
+
+  const exprt &lhs_pointer = lhs_pointer_object.operands()[0];
+  const exprt &rhs_pointer = rhs_pointer_object.operands()[0];
+
+  // NULL == ptr
+  if(
+    can_cast_expr<constant_exprt>(lhs_pointer) &&
+    is_null_pointer(*expr_try_dynamic_cast<constant_exprt>(lhs_pointer)))
+  {
+    return rhs_pointer;
+  }
+
+  // Not a equation with NULL on one side.
+  UNREACHABLE;
+}
+
 optionst cegis_verifiert::get_options()
 {
   optionst options;
@@ -92,6 +120,44 @@ optionst cegis_verifiert::get_options()
   remove_skip(goto_model);
   label_properties(goto_model);
   return options;
+}
+
+cext::violation_typet
+cegis_verifiert::extract_violation_type(const std::string &description)
+{
+  // The violation is a pointer OOB check.
+  if((description.find(
+        "dereference failure: pointer outside object bounds in") !=
+      std::string::npos))
+  {
+    return cext::violation_typet::cex_out_of_boundary;
+  }
+
+  // The violation is a null pointer check.
+  if(description.find("pointer NULL") != std::string::npos)
+  {
+    return cext::violation_typet::cex_null_pointer;
+  }
+
+  // The violation is a loop-invariant-preservation check.
+  if(description.find("preserved") != std::string::npos)
+  {
+    return cext::violation_typet::cex_not_preserved;
+  }
+
+  // The violation is a loop-invariant-preservation check.
+  if(description.find("invariant before entry") != std::string::npos)
+  {
+    return cext::violation_typet::cex_not_hold_upon_entry;
+  }
+
+  // The violation is an assignable check.
+  if(description.find("assignable") != std::string::npos)
+  {
+    return cext::violation_typet::cex_assignable;
+  }
+
+  return cext::violation_typet::cex_other;
 }
 
 std::list<loop_idt>
@@ -586,143 +652,118 @@ optionalt<cext> cegis_verifiert::verify()
   }
 
   properties = checker->get_properties();
-  // Find the violation and construct counterexample from its trace.
-  for(const auto &property_it : properties)
+  bool target_violation_found = false;
+  auto target_violation_info = properties.begin()->second;
+
+  // Find target violation---the violation we want to fix next.
+  // A target violation is an assignable violation or the first violation that
+  // is not assignable violation.
+  for(const auto &property : properties)
   {
-    if(property_it.second.status != property_statust::FAIL)
+    if(property.second.status != property_statust::FAIL)
       continue;
+
+    // assignable violation found
+    if(property.second.description.find("assignable") != std::string::npos)
+    {
+      target_violation = property.first;
+      target_violation_info = property.second;
+      break;
+    }
 
     // Store the violation that we want to fix with synthesized
     // assigns/invariant.
-    first_violation = property_it.first;
-
-    // Type of the violation
-    cext::violation_typet violation_type = cext::violation_typet::cex_other;
-
-    // Decide the violation type from the description of violation
-
-    // The violation is a pointer OOB check.
-    if((property_it.second.description.find(
-          "dereference failure: pointer outside object bounds in") !=
-        std::string::npos))
+    if(!target_violation_found)
     {
-      violation_type = cext::violation_typet::cex_out_of_boundary;
+      target_violation = property.first;
+      target_violation_info = property.second;
+      target_violation_found = true;
     }
-
-    // The violation is a null pointer check.
-    if(property_it.second.description.find("pointer NULL") != std::string::npos)
-    {
-      violation_type = cext::violation_typet::cex_null_pointer;
-    }
-
-    // The violation is a loop-invariant-preservation check.
-    if(property_it.second.description.find("preserved") != std::string::npos)
-    {
-      violation_type = cext::violation_typet::cex_not_preserved;
-    }
-
-    // The violation is a loop-invariant-preservation check.
-    if(
-      property_it.second.description.find("invariant before entry") !=
-      std::string::npos)
-    {
-      violation_type = cext::violation_typet::cex_not_hold_upon_entry;
-    }
-
-    // The violation is an assignable check.
-    if(property_it.second.description.find("assignable") != std::string::npos)
-    {
-      violation_type = cext::violation_typet::cex_assignable;
-    }
-
-    // Compute the cause loop---the loop for which we synthesize loop contracts,
-    // and the counterexample.
-
-    // If the violation is an assignable check, we synthesize assigns targets.
-    // In the case, cause loops are all loops the violation is in. We keep
-    // adding the new assigns target to the most-inner loop that does not
-    // contain the new target until the assignable violation is resolved.
-
-    // For other cases, we synthesize loop invariant clauses. We synthesize
-    // invariants for one loop at a time. So we return only the first cause loop
-    // although there can be multiple ones.
-
-    log.debug() << "Start to compute cause loop ids." << messaget::eom;
-
-    const auto &trace = checker->get_traces()[property_it.first];
-
-    // Doing assigns-synthesis or invariant-synthesis
-    if(violation_type == cext::violation_typet::cex_assignable)
-    {
-      cext result(violation_type);
-      result.cause_loop_ids = get_cause_loop_id_for_assigns(trace);
-      result.checked_pointer = static_cast<const exprt &>(
-        property_it.second.pc->condition().find(ID_checked_assigns));
-      restore_functions();
-      return result;
-    }
-
-    // We construct the full counterexample only for violations other than
-    // assignable checks.
-
-    // Although there can be multiple cause loop ids. We only synthesize
-    // loop invariants for the first cause loop.
-    const std::list<loop_idt> cause_loop_ids =
-      get_cause_loop_id(trace, property_it.second.pc);
-
-    if(cause_loop_ids.empty())
-    {
-      log.debug() << "No cause loop found!" << messaget::eom;
-      restore_functions();
-
-      return cext(violation_type);
-    }
-
-    log.debug() << "Found cause loop with function id: "
-                << cause_loop_ids.front().function_id
-                << ", and loop number: " << cause_loop_ids.front().loop_number
-                << messaget::eom;
-
-    auto violation_location = cext::violation_locationt::in_loop;
-    // We always strengthen in_clause if the violation is
-    // invariant-not-preserved.
-    if(violation_type != cext::violation_typet::cex_not_preserved)
-    {
-      // Get the location of the violation
-      violation_location = get_violation_location(
-        cause_loop_ids.front(),
-        goto_model.get_goto_function(cause_loop_ids.front().function_id),
-        property_it.second.pc->location_number);
-    }
-
-    restore_functions();
-
-    auto return_cex = build_cex(
-      trace,
-      get_loop_head(
-        cause_loop_ids.front().loop_number,
-        goto_model.goto_functions
-          .function_map[cause_loop_ids.front().function_id])
-        ->source_location());
-    return_cex.violated_predicate = property_it.second.pc->condition();
-    return_cex.cause_loop_ids = cause_loop_ids;
-    return_cex.violation_location = violation_location;
-    return_cex.violation_type = violation_type;
-
-    // The pointer checked in the null-pointer-check violation.
-    if(violation_type == cext::violation_typet::cex_null_pointer)
-    {
-      return_cex.checked_pointer = property_it.second.pc->condition()
-                                     .operands()[0]
-                                     .operands()[1]
-                                     .operands()[0];
-      INVARIANT(
-        return_cex.checked_pointer.id() == ID_symbol,
-        "Checking pointer symbol");
-    }
-
-    return return_cex;
   }
 
-  UNREACHABLE;
+  // Decide the violation type from the description of violation
+  cext::violation_typet violation_type =
+    extract_violation_type(target_violation_info.description);
+
+  // Compute the cause loop---the loop for which we synthesize loop contracts,
+  // and the counterexample.
+
+  // If the violation is an assignable check, we synthesize assigns targets.
+  // In the case, cause loops are all loops the violation is in. We keep
+  // adding the new assigns target to the most-inner loop that does not
+  // contain the new target until the assignable violation is resolved.
+
+  // For other cases, we synthesize loop invariant clauses. We synthesize
+  // invariants for one loop at a time. So we return only the first cause loop
+  // although there can be multiple ones.
+
+  log.debug() << "Start to compute cause loop ids." << messaget::eom;
+
+  const auto &trace = checker->get_traces()[target_violation];
+  // Doing assigns-synthesis or invariant-synthesis
+  if(violation_type == cext::violation_typet::cex_assignable)
+  {
+    cext result(violation_type);
+    result.cause_loop_ids = get_cause_loop_id_for_assigns(trace);
+    result.checked_pointer = static_cast<const exprt &>(
+      target_violation_info.pc->condition().find(ID_checked_assigns));
+    restore_functions();
+    return result;
+  }
+
+  // We construct the full counterexample only for violations other than
+  // assignable checks.
+
+  // Although there can be multiple cause loop ids. We only synthesize
+  // loop invariants for the first cause loop.
+  const std::list<loop_idt> cause_loop_ids =
+    get_cause_loop_id(trace, target_violation_info.pc);
+
+  if(cause_loop_ids.empty())
+  {
+    log.debug() << "No cause loop found!" << messaget::eom;
+    restore_functions();
+
+    return cext(violation_type);
+  }
+
+  log.debug() << "Found cause loop with function id: "
+              << cause_loop_ids.front().function_id
+              << ", and loop number: " << cause_loop_ids.front().loop_number
+              << messaget::eom;
+
+  auto violation_location = cext::violation_locationt::in_loop;
+  // We always strengthen in_clause if the violation is
+  // invariant-not-preserved.
+  if(violation_type != cext::violation_typet::cex_not_preserved)
+  {
+    // Get the location of the violation
+    violation_location = get_violation_location(
+      cause_loop_ids.front(),
+      goto_model.get_goto_function(cause_loop_ids.front().function_id),
+      target_violation_info.pc->location_number);
+  }
+
+  restore_functions();
+
+  auto return_cex = build_cex(
+    trace,
+    get_loop_head(
+      cause_loop_ids.front().loop_number,
+      goto_model.goto_functions
+        .function_map[cause_loop_ids.front().function_id])
+      ->source_location());
+  return_cex.violated_predicate = target_violation_info.pc->condition();
+  return_cex.cause_loop_ids = cause_loop_ids;
+  return_cex.violation_location = violation_location;
+  return_cex.violation_type = violation_type;
+
+  // The pointer checked in the null-pointer-check violation.
+  if(violation_type == cext::violation_typet::cex_null_pointer)
+  {
+    return_cex.checked_pointer = get_checked_pointer_from_null_pointer_check(
+      target_violation_info.pc->condition());
+  }
+
+  return return_cex;
 }

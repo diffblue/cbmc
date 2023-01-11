@@ -53,7 +53,7 @@ private:
   /// to their original variables.
   void build_tmp_post_map();
 
-  /// Compute the depedent symbols for a loop with invariant-not-preserved
+  /// Compute the dependent symbols for a loop with invariant-not-preserved
   /// violation which happen after `new_clause` was added.
   std::set<symbol_exprt> compute_dependent_symbols(
     const loop_idt &cause_loop_id,
