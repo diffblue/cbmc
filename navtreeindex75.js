@@ -1,6 +1,5 @@
 var NAVTREEINDEX75 =
 {
-"crangler__main_8cpp.html":[7,0,2,7,4],
 "crangler__main_8cpp.html#a217dbf8b442f20279ea00b898af96f52":[7,0,2,7,4,0],
 "crangler__main_8cpp_source.html":[7,0,2,7,4],
 "crangler__parse__options_8cpp.html":[7,0,2,7,5],
@@ -249,5 +248,6 @@ var NAVTREEINDEX75 =
 "dfcc__wrapper__program_8h_source.html":[7,0,2,13,1,1,28],
 "dimacs__cnf_8cpp.html":[7,0,2,26,7,4],
 "dimacs__cnf_8cpp_source.html":[7,0,2,26,7,4],
-"dimacs__cnf_8h.html":[7,0,2,26,7,5]
+"dimacs__cnf_8h.html":[7,0,2,26,7,5],
+"dimacs__cnf_8h_source.html":[7,0,2,26,7,5]
 };

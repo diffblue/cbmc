@@ -1,6 +1,5 @@
 var NAVTREEINDEX124 =
 {
-"structfat__header__prefixt.html":[6,0,451],
 "structfat__header__prefixt.html#aaba45f7112e06f9c5741267ee09eaa62":[6,0,451,0],
 "structfat__header__prefixt.html#acef326779778b0d990cc317faa101c96":[6,0,451,1],
 "structfault__location__infot.html":[6,0,453],
@@ -249,5 +248,6 @@ var NAVTREEINDEX124 =
 "structincremental__goto__checkert_1_1resultt.html#af81e34bd1f2de798ea22382a67d7d806":[6,0,594,0,3],
 "structindex__set__pairt.html":[6,0,601],
 "structindex__set__pairt.html#a61a20f5657b97fba5e3b7dc0e78ec072":[6,0,601,1],
-"structindex__set__pairt.html#aa8dc71b64a2f7f54109a2d17e9a38b68":[6,0,601,0]
+"structindex__set__pairt.html#aa8dc71b64a2f7f54109a2d17e9a38b68":[6,0,601,0],
+"structinfix__opt.html":[6,0,604]
 };
