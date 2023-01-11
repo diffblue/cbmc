@@ -176,11 +176,13 @@ void goto_symext::symex_assert(
   if(msg.empty())
     msg = "assertion";
 
-  vcc(l2_condition, msg, state);
+  vcc(
+    l2_condition, instruction.source_location().get_property_id(), msg, state);
 }
 
 void goto_symext::vcc(
   const exprt &condition,
+  const irep_idt &property_id,
   const std::string &msg,
   statet &state)
 {
@@ -193,7 +195,8 @@ void goto_symext::vcc(
   const exprt guarded_condition = state.guard.guard_expr(condition);
 
   state.remaining_vccs++;
-  target.assertion(state.guard.as_expr(), guarded_condition, msg, state.source);
+  target.assertion(
+    state.guard.as_expr(), guarded_condition, property_id, msg, state.source);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)

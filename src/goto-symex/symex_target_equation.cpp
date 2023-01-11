@@ -282,6 +282,7 @@ void symex_target_equationt::assumption(
 void symex_target_equationt::assertion(
   const exprt &guard,
   const exprt &cond,
+  const irep_idt &property_id,
   const std::string &msg,
   const sourcet &source)
 {
@@ -291,6 +292,7 @@ void symex_target_equationt::assertion(
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.comment=msg;
+  SSA_step.property_id = property_id;
 
   merge_ireps(SSA_step);
 }

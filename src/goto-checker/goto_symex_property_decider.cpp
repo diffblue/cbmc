@@ -51,7 +51,7 @@ void goto_symex_property_decidert::
   {
     if(it->is_assert())
     {
-      irep_idt property_id = it->get_property_id();
+      const irep_idt &property_id = it->property_id;
       CHECK_RETURN(!property_id.empty());
 
       // consider goal instance if it is in the given properties
