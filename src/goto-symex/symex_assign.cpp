@@ -215,14 +215,6 @@ void symex_assignt::assign_non_struct_symbol(
       assignment.rhs,
       target,
       symex_config.allow_pointer_unsoundness);
-    // Erase the composite symbol from our working state. Note that we need to
-    // have it in the propagation table and the value set while doing the field
-    // assignments, thus we cannot skip putting it in there above.
-    if(state.field_sensitivity.is_divisible(l1_lhs, true))
-    {
-      state.propagation.erase_if_exists(l1_lhs.get_identifier());
-      state.value_set.erase_symbol(l1_lhs, ns);
-    }
   }
 }
 
