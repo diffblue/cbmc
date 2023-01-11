@@ -117,7 +117,7 @@ public:
 
   /// Result counterexample.
   propertiest properties;
-  irep_idt first_violation;
+  irep_idt target_violation;
 
 protected:
   // Get the options same as using CBMC api without any flag, and
@@ -136,6 +136,9 @@ protected:
   // We say a loop is the cause loop if the assignable check is in the loop.
   std::list<loop_idt>
   get_cause_loop_id_for_assigns(const goto_tracet &goto_trace);
+
+  // Extract the violation type from violation description.
+  cext::violation_typet extract_violation_type(const std::string &description);
 
   // Compute the location of the violation.
   cext::violation_locationt get_violation_location(

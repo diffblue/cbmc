@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main.pointer\_dereference.\d+\] .* SUCCESS$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Check whether assigns clauses are synthesize before invariant clauses.

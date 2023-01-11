@@ -94,6 +94,9 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
 
       loop_idt new_id(function_p.first, loop_end->loop_number);
 
+      log.debug() << "Initialize candidates for the loop at "
+                  << loop_end->source_location() << messaget::eom;
+
       // we only synthesize invariants and assigns for unannotated loops
       if(loop_end->condition().find(ID_C_spec_loop_invariant).is_nil())
       {
@@ -372,7 +375,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
       new_invariant_clause = synthesize_strengthening_clause(
         terminal_symbols,
         return_cex->cause_loop_ids.front(),
-        verifier.first_violation);
+        verifier.target_violation);
       break;
 
     case cext::violation_typet::cex_assignable:
