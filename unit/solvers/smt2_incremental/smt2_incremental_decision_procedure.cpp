@@ -505,25 +505,18 @@ TEST_CASE(
         test.sent_commands ==
         std::vector<smt_commandt>{smt_get_value_commandt{foo_term}});
     }
-    SECTION("Get value of non-set symbol")
+    SECTION("Invariant violation due to non-set symbol")
     {
-      // smt2_incremental_decision_proceduret is used this way when cbmc is
-      // invoked with the combination of `--trace` and `--slice-formula`.
       test.sent_commands.clear();
       const exprt bar =
         make_test_symbol("bar", signedbv_typet{16}).symbol_expr();
-      REQUIRE(test.procedure.get(bar) == bar);
       REQUIRE(test.sent_commands.empty());
-    }
-    SECTION("Get value of type less symbol back")
-    {
-      // smt2_incremental_decision_proceduret is used this way as part of
-      // building the goto trace, to get the partial order concurrency clock
-      // values.
-      test.sent_commands.clear();
-      const symbol_exprt baz = symbol_exprt::typeless("baz");
-      REQUIRE(test.procedure.get(baz) == baz);
-      REQUIRE(test.sent_commands.empty());
+      cbmc_invariants_should_throwt invariants_throw;
+      REQUIRE_THROWS_MATCHES(
+        test.procedure.get(bar),
+        invariant_failedt,
+        invariant_failure_containing(
+          "symbol expressions must have a known value"));
     }
     SECTION("Get value of trivially solved expression")
     {
