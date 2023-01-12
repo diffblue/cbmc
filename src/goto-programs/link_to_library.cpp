@@ -47,6 +47,19 @@ static std::pair<optionalt<replace_symbolt::expr_mapt>, bool> add_one_function(
       library_model.goto_functions,
       message_handler);
   }
+  // We might need a function that's outside our own library, but brought in via
+  // some header file included by the library. Those functions already exist in
+  // goto_model.symbol_table, but haven't been converted just yet.
+  else if(
+    goto_model.symbol_table.symbols.find(missing_function) !=
+    goto_model.symbol_table.symbols.end())
+  {
+    goto_convert(
+      missing_function,
+      goto_model.symbol_table,
+      library_model.goto_functions,
+      message_handler);
+  }
 
   // check whether additional initialization may be required
   bool init_required = false;
