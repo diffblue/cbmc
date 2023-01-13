@@ -339,7 +339,7 @@ long double __builtin_scalblnl(long double, long);
 double __builtin_scalbn(double, int);
 float __builtin_scalbnf(float, int);
 long double __builtin_scalbnl(long double, int);
-int __builtin_signbit(double);
+int __builtin_signbit(); // this is type-generic
 int __builtin_signbitf(float);
 int __builtin_signbitl(long double);
 double __builtin_significand(double);
