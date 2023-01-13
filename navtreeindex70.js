@@ -1,6 +1,5 @@
 var NAVTREEINDEX70 =
 {
-"classvariable__sensitivity__domaint.html":[6,0,1318],
 "classvariable__sensitivity__domaint.html#a029f29c6d91e542b6af4a89f2eed6013":[6,0,1318,1],
 "classvariable__sensitivity__domaint.html#a0b326dd189c91d79ccede103882665f0":[6,0,1318,15],
 "classvariable__sensitivity__domaint.html#a0cf0394a132d08654675655239675d34":[6,0,1318,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX70 =
 "compilation-and-development.html#compilation-and-development-section-linting":[0,4,7,4],
 "compilation-and-development.html#compilation-and-development-section-running-tests":[0,4,7,1],
 "compilation-and-development.html#compilation-and-development-section-time-profiling":[0,4,7,5],
-"compilation-and-development.html#compilation-and-development-subsection-cmake-files":[0,4,7,0,1]
+"compilation-and-development.html#compilation-and-development-subsection-cmake-files":[0,4,7,0,1],
+"compilation-and-development.html#compilation-and-development-subsection-coverage":[0,4,7,1,2]
 };

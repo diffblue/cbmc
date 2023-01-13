@@ -1,6 +1,5 @@
 var NAVTREEINDEX104 =
 {
-"jsa_8h.html#a03fee51a965fb3ecd47dcf439891ea46":[7,0,2,1,1,2,22],
 "jsa_8h.html#a071e3f0abe117e67ec29e2851af4daca":[7,0,2,1,1,2,33],
 "jsa_8h.html#a1b2fd30a318717f18765bf894d449d24":[7,0,2,1,1,2,48],
 "jsa_8h.html#a1ce1becb309c1912ecf5d684a867be10":[7,0,2,1,1,2,27],
@@ -249,5 +248,6 @@ var NAVTREEINDEX104 =
 "json__symbol__table_8h.html#a73ee2e97320ee6c414eaf23922826449":[7,0,2,19,3,0],
 "json__symbol__table_8h_source.html":[7,0,2,19,3],
 "json__symtab__language_8cpp.html":[7,0,2,19,4],
-"json__symtab__language_8cpp_source.html":[7,0,2,19,4]
+"json__symtab__language_8cpp_source.html":[7,0,2,19,4],
+"json__symtab__language_8h.html":[7,0,2,19,5]
 };

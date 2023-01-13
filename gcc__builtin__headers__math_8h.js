@@ -340,7 +340,7 @@ var gcc__builtin__headers__math_8h =
     [ "__builtin_scalbn", "gcc__builtin__headers__math_8h.html#a3d64d15e169fd1a3ad3c90a721436171", null ],
     [ "__builtin_scalbnf", "gcc__builtin__headers__math_8h.html#a65edb67bd2f66c89050d6ec50caa5b90", null ],
     [ "__builtin_scalbnl", "gcc__builtin__headers__math_8h.html#ab0c53adaacb02aa2eed51b7c5bf6c077", null ],
-    [ "__builtin_signbit", "gcc__builtin__headers__math_8h.html#af262c1a250bd0e1cc15a3ec6841fd52a", null ],
+    [ "__builtin_signbit", "gcc__builtin__headers__math_8h.html#a87632cd41237eaf96889a78a01a97acc", null ],
     [ "__builtin_signbitf", "gcc__builtin__headers__math_8h.html#a4fc295c9b0a1126437334fd8ee2d8d2c", null ],
     [ "__builtin_signbitl", "gcc__builtin__headers__math_8h.html#a68d1059eb163d3f312e1e62083b8be1d", null ],
     [ "__builtin_significand", "gcc__builtin__headers__math_8h.html#ae64c6b4ce89a43f014a915734eb6a254", null ],

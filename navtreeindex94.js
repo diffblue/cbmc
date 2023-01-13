@@ -1,6 +1,5 @@
 var NAVTREEINDEX94 =
 {
-"gcc__builtin__headers__math_8h.html#a79e9a097b041cf44594f395dde1b54e1":[7,0,2,1,0,11,262],
 "gcc__builtin__headers__math_8h.html#a7b1fdbf58483028a995fa924a1c3ee0c":[7,0,2,1,0,11,127],
 "gcc__builtin__headers__math_8h.html#a7b9c8847099998336b4a34fe7a4ce5bf":[7,0,2,1,0,11,288],
 "gcc__builtin__headers__math_8h.html#a7d4cb8cc8889e7ee980b957609d2b78b":[7,0,2,1,0,11,256],
@@ -20,6 +19,7 @@ var NAVTREEINDEX94 =
 "gcc__builtin__headers__math_8h.html#a85e0d249c8481ec4ff7e50c805c07eb9":[7,0,2,1,0,11,51],
 "gcc__builtin__headers__math_8h.html#a85f247f5f406ba10c3014c68037fe858":[7,0,2,1,0,11,73],
 "gcc__builtin__headers__math_8h.html#a867e6a4f80f4e98046ccfbc4aaead64b":[7,0,2,1,0,11,66],
+"gcc__builtin__headers__math_8h.html#a87632cd41237eaf96889a78a01a97acc":[7,0,2,1,0,11,340],
 "gcc__builtin__headers__math_8h.html#a877d88584f337b20d0aa38085e24cd93":[7,0,2,1,0,11,322],
 "gcc__builtin__headers__math_8h.html#a87842ac8cd86970d4f0610c7e64397d0":[7,0,2,1,0,11,109],
 "gcc__builtin__headers__math_8h.html#a879f2f296a914753a64862839f1ea2d5":[7,0,2,1,0,11,203],
@@ -184,7 +184,6 @@ var NAVTREEINDEX94 =
 "gcc__builtin__headers__math_8h.html#aefb8b61fe318c55a4b926b6d73f2a5a5":[7,0,2,1,0,11,224],
 "gcc__builtin__headers__math_8h.html#af017a047362b9d5cecc7a7e875c181e4":[7,0,2,1,0,11,124],
 "gcc__builtin__headers__math_8h.html#af11ebcc9e02e1897c64648c4f4b71847":[7,0,2,1,0,11,214],
-"gcc__builtin__headers__math_8h.html#af262c1a250bd0e1cc15a3ec6841fd52a":[7,0,2,1,0,11,340],
 "gcc__builtin__headers__math_8h.html#af282eefa1aca4a871507313c3f7110d1":[7,0,2,1,0,11,269],
 "gcc__builtin__headers__math_8h.html#af2865e105b46d523455412512ced6b38":[7,0,2,1,0,11,99],
 "gcc__builtin__headers__math_8h.html#af32fb974214743acf2de1d2a83d65b07":[7,0,2,1,0,11,350],
@@ -249,5 +248,6 @@ var NAVTREEINDEX94 =
 "gcc__builtin__headers__mem__string_8h.html#a2caf48466d3b75e68c8971a7c51173b5":[7,0,2,1,0,12,1],
 "gcc__builtin__headers__mem__string_8h.html#a2ce75f1dc7224f4936ccfcccb089eba1":[7,0,2,1,0,12,27],
 "gcc__builtin__headers__mem__string_8h.html#a2fdbcca0f3e580b638288bfab01633db":[7,0,2,1,0,12,146],
-"gcc__builtin__headers__mem__string_8h.html#a3109c4b03255e19d7b77655a87d1ef65":[7,0,2,1,0,12,39]
+"gcc__builtin__headers__mem__string_8h.html#a3109c4b03255e19d7b77655a87d1ef65":[7,0,2,1,0,12,39],
+"gcc__builtin__headers__mem__string_8h.html#a34a520fcec2c98047f749ac38fd7f704":[7,0,2,1,0,12,78]
 };
