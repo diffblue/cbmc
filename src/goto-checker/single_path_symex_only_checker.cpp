@@ -79,7 +79,7 @@ void single_path_symex_only_checkert::initialize_worklist()
     shadow_memoryt::gather_field_declarations(goto_model, ui_message_handler);
 
   symex.initialize_path_storage_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+    goto_symext::get_goto_function(goto_model), symex_symbol_table, fields);
 }
 
 bool single_path_symex_only_checkert::has_finished_exploration(

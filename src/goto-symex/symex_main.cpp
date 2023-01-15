@@ -465,18 +465,24 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 }
 
 symbol_tablet goto_symext::symex_from_entry_point_of(
-  const get_goto_functiont &get_goto_function)
+  const get_goto_functiont &get_goto_function,
+  const shadow_memory_field_definitionst &fields)
 {
   auto state = initialize_entry_point_state(get_goto_function);
+  // Initialize declared shadow memory fields
+  state->shadow_memory.fields = fields;
 
   return symex_with_state(*state, get_goto_function);
 }
 
 void goto_symext::initialize_path_storage_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
-  symbol_table_baset &new_symbol_table)
+  symbol_table_baset &new_symbol_table,
+  const shadow_memory_field_definitionst &fields)
 {
   auto state = initialize_entry_point_state(get_goto_function);
+  // Initialize declared shadow memory fields
+  state->shadow_memory.fields = fields;
 
   path_storaget::patht entry_point_start(target, *state);
   entry_point_start.state.saved_target = state->source.pc;
