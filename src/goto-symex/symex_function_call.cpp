@@ -24,13 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 #include "symex_assign.h"
 
-static void locality(
-  const irep_idt &function_identifier,
-  goto_symext::statet &state,
-  path_storaget &path_storage,
-  const goto_functionst::goto_functiont &goto_function,
-  const namespacet &ns);
-
 bool goto_symext::get_unwind_recursion(const irep_idt &, unsigned, unsigned)
 {
   return false;
@@ -328,7 +321,7 @@ void goto_symext::symex_function_call_post_clean(
   }
 
   // preserve locality of local variables
-  locality(identifier, state, path_storage, goto_function, ns);
+  locality(identifier, state, goto_function);
 
   // assign actuals to formal parameters
   parameter_assignments(identifier, goto_function, state, cleaned_arguments);
@@ -457,14 +450,10 @@ void goto_symext::symex_end_of_function(statet &state)
   }
 }
 
-/// Preserves locality of parameters of a given function by applying L1
-/// renaming to them.
-static void locality(
+void goto_symext::locality(
   const irep_idt &function_identifier,
   goto_symext::statet &state,
-  path_storaget &path_storage,
-  const goto_functionst::goto_functiont &goto_function,
-  const namespacet &ns)
+  const goto_functionst::goto_functiont &goto_function)
 {
   unsigned &frame_nr=
     state.threads[state.source.thread_nr].function_frame[function_identifier];
@@ -472,11 +461,15 @@ static void locality(
 
   for(const auto &param : goto_function.parameter_identifiers)
   {
-    (void)state.add_object(
+    const ssa_exprt &renamed_param = state.add_object(
       ns.lookup(param).symbol_expr(),
-      [&path_storage, &frame_nr](const irep_idt &l0_name) {
+      [this, &frame_nr](const irep_idt &l0_name) {
         return path_storage.get_unique_l1_index(l0_name, frame_nr);
       },
       ns);
+
+    // Allocate shadow memory for parameters.
+    // They are like local variables.
+    shadow_memory.symex_field_local_init(state, renamed_param);
   }
 }

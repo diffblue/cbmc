@@ -465,6 +465,16 @@ protected:
     statet &state,
     const goto_programt::instructiont &instruction);
 
+  /// Preserves locality of parameters of a given function by applying L1
+  /// renaming to them.
+  /// \param function_identifier The parameter identifier
+  /// \param state The current state
+  /// \param goto_function The goto function
+  virtual void locality(
+    const irep_idt &function_identifier,
+    goto_symext::statet &state,
+    const goto_functionst::goto_functiont &goto_function);
+
   /// Symbolically execute a END_FUNCTION instruction.
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_end_of_function(statet &);
