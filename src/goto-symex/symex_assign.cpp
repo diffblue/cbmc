@@ -11,12 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_assign.h"
 
-#include "expr_skeleton.h"
-#include "goto_symex_state.h"
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
 #include <util/range.h>
 
+#include "expr_skeleton.h"
+#include "goto_symex_state.h"
 #include "symex_config.h"
 
 // We can either use with_exprt or update_exprt when building expressions that
