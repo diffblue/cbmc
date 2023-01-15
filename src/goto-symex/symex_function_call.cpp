@@ -207,8 +207,24 @@ void goto_symext::symex_function_call_symbol(
 
   target.location(state.guard.as_expr(), state.source);
 
-  symex_function_call_post_clean(
-    get_goto_function, state, cleaned_lhs, function, cleaned_arguments);
+  PRECONDITION(function.id() == ID_symbol);
+  const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+
+  if(identifier == CPROVER_PREFIX SHADOW_MEMORY_GET_FIELD)
+  {
+    shadow_memory.symex_get_field(state, cleaned_lhs, cleaned_arguments);
+    symex_transition(state);
+  }
+  else if(identifier == CPROVER_PREFIX SHADOW_MEMORY_SET_FIELD)
+  {
+    shadow_memory.symex_set_field(state, cleaned_arguments);
+    symex_transition(state);
+  }
+  else
+  {
+    symex_function_call_post_clean(
+      get_goto_function, state, cleaned_lhs, function, cleaned_arguments);
+  }
 }
 
 void goto_symext::symex_function_call_post_clean(
