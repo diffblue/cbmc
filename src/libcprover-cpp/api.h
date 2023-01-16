@@ -66,16 +66,19 @@ struct api_sessiont
 
   /// Load a goto_model from a given vector of filenames.
   /// \param files: A vector<string> containing the filenames to be loaded
-  void load_model_from_files(const std::vector<std::string> &files);
+  void load_model_from_files(const std::vector<std::string> &files) const;
 
   /// Verify previously loaded model.
-  void verify_model();
+  void verify_model() const;
 
   /// Drop unused functions from the loaded goto_model simplifying it
-  void drop_unused_functions();
+  void drop_unused_functions() const;
 
   /// Validate the loaded goto model
-  void validate_goto_model();
+  void validate_goto_model() const;
+
+  // A simple API version information function.
+  std::unique_ptr<std::string> get_api_version() const;
 
 private:
   std::unique_ptr<api_session_implementationt> implementation;
