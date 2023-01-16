@@ -164,12 +164,6 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
-          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v3
         with:
@@ -186,6 +180,8 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: make -C src -j2
+      - name: Print ccache stats
+        run: ccache -s
       - name: Run regression/cbmc tests with z3 as the backend
         run: make -C regression/cbmc test-z3
 
@@ -225,18 +221,13 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Check that doc task works
-        run: |
-          cd build
-          ninja doc
+        run: ninja -C build doc
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: cd build; ninja -j2
+        run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Checking completeness of help output
@@ -285,18 +276,13 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Check that doc task works
-        run: |
-          cd build
-          ninja doc
+        run: ninja -C build doc
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: cd build; ninja -j2
+        run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Check if package building works
@@ -747,14 +733,9 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Configure CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=cadical
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=cadical
       - name: Build using Ninja
-        run: |
-          cd build
-          ninja -j2
+        run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest
@@ -816,10 +797,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison iwyu
       - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Run include-what-you-use
         run: |
           iwyu_tool -p build/compile_commands.json -j2 | tee includes.txt
