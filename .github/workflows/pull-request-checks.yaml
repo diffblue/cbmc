@@ -140,10 +140,10 @@ jobs:
 
   # This job has been copied from the one above it, and modified to only build CBMC
   # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
-  # (unit/regression) have been stripped based on the rationale that they are going
+  # (unit/regression) have been stripped based on the rationale that they are going
   # to be run by the job above, which is basically the same, but more comprehensive.
   # The reason we opted for a new job is that adding a `test-z3` step to the current
-  # jobs increases the job runtime to unacceptable levels (over 2hrs).
+  # jobs increases the job runtime to unacceptable levels (over 2hrs).
   # This job takes approximately 18 minutes
   check-ubuntu-20_04-make-clang-smt-z3:
     runs-on: ubuntu-20.04
@@ -604,7 +604,6 @@ jobs:
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression test
-        
 
   # This job takes approximately 1 minute
   check-clang-format:
@@ -709,7 +708,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: | 
+        run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
           # remove libgcc-s1, which isn't normally available in Ubuntu 18.04
