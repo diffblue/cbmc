@@ -18,17 +18,17 @@ jobs:
           # user input
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache
+          sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache clang-10 clang++-10
           sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
           make -C src minisat2-download
       - name: Prepare ccache
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-CSMITH
+          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
           restore-keys: |
-            ${{ runner.os }}-20.04-make-${{ github.ref }}
-            ${{ runner.os }}-20.04-make
+            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-20.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -37,7 +37,7 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: |
-          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-instrument.dir -j2
+          make -C src CXX='ccache /usr/bin/clang++' cbmc.dir goto-cc.dir goto-instrument.dir -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Run 10 randomly-generated CSmith tests
