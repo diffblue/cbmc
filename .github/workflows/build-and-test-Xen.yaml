@@ -5,6 +5,7 @@ on:
     branches: [ develop ]
 
 jobs:
+  # This job takes approximately 33 minutes
   CompileXen:
     runs-on: ubuntu-20.04
     steps:

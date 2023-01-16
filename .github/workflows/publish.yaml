@@ -2,6 +2,7 @@ name: Publish CBMC documentation
 on: [push, pull_request]
 
 jobs:
+  # This job takes approximately 3 minutes
   publish:
     runs-on: ubuntu-latest
     steps:

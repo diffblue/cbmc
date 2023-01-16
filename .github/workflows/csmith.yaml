@@ -5,6 +5,7 @@ on:
     branches: [ develop ]
 
 jobs:
+  # This job takes approximately 18 minutes
   run-10-random-tests:
     runs-on: ubuntu-20.04
     steps:

@@ -4,6 +4,7 @@ on:
     branches: [ develop ]
 
 jobs:
+  # This job takes approximately 2 minutes
   check-doxygen:
     runs-on: ubuntu-20.04
     steps:
