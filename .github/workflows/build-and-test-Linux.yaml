@@ -6,6 +6,7 @@ on:
       - '**'
 
 jobs:
+  # This job takes approximately 18 minutes
   CompileLinux:
     runs-on: ubuntu-20.04
     steps:
@@ -19,7 +20,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y g++ flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+          sudo apt-get install --no-install-recommends -y clang-10 clang++-10 flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
           sudo apt-get install --no-install-recommends -y libssl-dev libelf-dev libudev-dev libpci-dev libiberty-dev autoconf
           sudo apt-get install --no-install-recommends -y gawk jq
 
@@ -27,10 +28,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-KERNEL
+          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-KERNEL
           restore-keys: |
-            ${{ runner.os }}-20.04-make-${{ github.ref }}
-            ${{ runner.os }}-20.04-make
+            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-20.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -40,7 +41,7 @@ jobs:
       - name: Build CBMC tools
         run: |
           make -C src minisat2-download
-          make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-diff.dir -j2
+          make -C src CXX='ccache /usr/bin/clang++' cbmc.dir goto-cc.dir goto-diff.dir -j2
       - name: Print ccache stats
         run: ccache -s
 

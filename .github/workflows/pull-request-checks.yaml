@@ -1,11 +1,14 @@
 name: Build and Test CBMC
 on:
+  push:
+    branches: [ develop ]
   pull_request:
     branches: [ develop ]
 env:
   cvc5-version: "1.0.0"
 
 jobs:
+  # This job takes approximately 40 minutes
   check-ubuntu-20_04-make-gcc:
     runs-on: ubuntu-20.04
     steps:
@@ -71,6 +74,7 @@ jobs:
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=2
 
+  # This job takes approximately 34 minutes
   check-ubuntu-20_04-make-clang:
     runs-on: ubuntu-20.04
     env:
@@ -138,10 +142,11 @@ jobs:
 
   # This job has been copied from the one above it, and modified to only build CBMC
   # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
-  # (unit/regression) have been stripped based on the rationale that they are going
+  # (unit/regression) have been stripped based on the rationale that they are going
   # to be run by the job above, which is basically the same, but more comprehensive.
   # The reason we opted for a new job is that adding a `test-z3` step to the current
-  # jobs increases the job runtime to unacceptable levels (over 2hrs).
+  # jobs increases the job runtime to unacceptable levels (over 2hrs).
+  # This job takes approximately 18 minutes
   check-ubuntu-20_04-make-clang-smt-z3:
     runs-on: ubuntu-20.04
     env:
@@ -161,20 +166,14 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
-          cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-clang-smt-z3-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-make-clang-smt-z3-${{ github.ref }}
-            ${{ runner.os }}-20.04-make-clang-smt-z3
+            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-20.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -183,9 +182,12 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: make -C src -j2
+      - name: Print ccache stats
+        run: ccache -s
       - name: Run regression/cbmc tests with z3 as the backend
         run: make -C regression/cbmc test-z3
 
+  # This job takes approximately 42 minutes
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
     steps:
@@ -221,18 +223,13 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Check that doc task works
-        run: |
-          cd build
-          ninja doc
+        run: ninja -C build doc
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: cd build; ninja -j2
+        run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Checking completeness of help output
@@ -245,6 +242,7 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j2
 
+  # This job takes approximately 41 minutes
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
     steps:
@@ -280,18 +278,13 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Check that doc task works
-        run: |
-          cd build
-          ninja doc
+        run: ninja -C build doc
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: cd build; ninja -j2
+        run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Check if package building works
@@ -302,6 +295,7 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j2
 
+  # This job takes approximately 24 minutes
   check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-20.04
     steps:
@@ -329,7 +323,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja
+        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
@@ -347,6 +341,7 @@ jobs:
           git checkout -- memory_allocation1 printf1 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
+  # This job takes approximately 95 minutes
   check-ubuntu-20_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-20.04
     steps:
@@ -374,7 +369,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja
+        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
@@ -384,6 +379,7 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L THOROUGH -j2
 
+  # This job takes approximately 69 minutes
   check-macos-11-make-clang:
     runs-on: macos-11
     steps:
@@ -434,6 +430,7 @@ jobs:
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=3
 
+  # This job takes approximately 66 minutes
   check-macos-12-cmake-clang:
     runs-on: macos-12
     steps:
@@ -476,6 +473,7 @@ jobs:
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
 
+  # This job takes approximately 70 minutes
   check-vs-2019-cmake-build-and-test:
     runs-on: windows-2019
     env:
@@ -528,6 +526,7 @@ jobs:
           Set-Location build
           ctest -V -L CORE -C Release . -j2
 
+  # This job takes approximately 84 minutes
   check-vs-2022-make-build-and-test:
     runs-on: windows-2022
     env:
@@ -593,8 +592,8 @@ jobs:
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression test
-        
 
+  # This job takes approximately 1 minute
   check-clang-format:
     runs-on: ubuntu-20.04
     steps:
@@ -616,6 +615,7 @@ jobs:
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-clang-format.sh
 
+  # This job takes approximately 1 minute
   check-cpplint:
     runs-on: ubuntu-20.04
     steps:
@@ -637,6 +637,7 @@ jobs:
           MERGE_BRANCH: ${{ github.ref }}
         run: ./.github/workflows/pull-request-check-cpplint.sh
 
+  # This job takes approximately 32 minutes
   windows-msi-package:
     runs-on: windows-2019
     env:
@@ -685,6 +686,7 @@ jobs:
           echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
           echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
 
+  # This job takes approximately 43 minutes
   ubuntu-18_04-package:
     runs-on: ubuntu-18.04
     env:
@@ -694,7 +696,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: | 
+        run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
           # remove libgcc-s1, which isn't normally available in Ubuntu 18.04
@@ -733,14 +735,9 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Configure CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=cadical
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=cadical
       - name: Build using Ninja
-        run: |
-          cd build
-          ninja -j2
+        run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest
@@ -754,7 +751,7 @@ jobs:
           echo "deb_package=./build/$deb_package_name" >> $GITHUB_OUTPUT
           echo "deb_package_name=ubuntu-18.04-$deb_package_name" >> $GITHUB_OUTPUT
 
-
+  # This job takes approximately 3 minutes
   check-string-table:
     runs-on: ubuntu-20.04
     steps:
@@ -762,6 +759,7 @@ jobs:
       - name: Check for unused irep ids
         run: ./scripts/string_table_check.sh
 
+  # This job takes approximately 23 minutes
   check-docker-image:
     runs-on: ubuntu-20.04
     steps:
@@ -785,6 +783,7 @@ jobs:
       - name: Smoke test goto-analyzer
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-analyzer /mnt/smoke/test.goto --unreachable-functions
 
+  # This job takes approximately 39 minutes
   include-what-you-use:
     runs-on: ubuntu-22.04
     steps:
@@ -800,10 +799,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison iwyu
       - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Run include-what-you-use
         run: |
           iwyu_tool -p build/compile_commands.json -j2 | tee includes.txt
@@ -812,6 +808,7 @@ jobs:
             exit 1
           fi
 
+  # This job takes approximately 75 minutes
   codecov-coverage-report:
     runs-on: ubuntu-20.04
     steps:
