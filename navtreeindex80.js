@@ -1,5 +1,12 @@
 var NAVTREEINDEX80 =
 {
+"gcc__builtin__headers__arm_8h.html#acb6c00d58058788b70c259720f41106a":[7,0,2,1,0,4,78],
+"gcc__builtin__headers__arm_8h.html#accddfbc7a3754ec5d37faeefd152d6f1":[7,0,2,1,0,4,44],
+"gcc__builtin__headers__arm_8h.html#ad03838ec25f537cbe62d14873b7e3338":[7,0,2,1,0,4,109],
+"gcc__builtin__headers__arm_8h.html#ad2d0b4c8ee03e2f4386e79c75b3b666c":[7,0,2,1,0,4,64],
+"gcc__builtin__headers__arm_8h.html#ad64ed20c895b4308544aa05eaa338e68":[7,0,2,1,0,4,133],
+"gcc__builtin__headers__arm_8h.html#ad68ff750e83d73d5c45bb1ef7dbbeb9b":[7,0,2,1,0,4,65],
+"gcc__builtin__headers__arm_8h.html#adf84fbe0aebc2582751f7a6a23252802":[7,0,2,1,0,4,110],
 "gcc__builtin__headers__arm_8h.html#ae0718c79e71c21ab64b0c8bd060a426c":[7,0,2,1,0,4,36],
 "gcc__builtin__headers__arm_8h.html#ae0ff96a278e0e48615cecf93d80efec7":[7,0,2,1,0,4,5],
 "gcc__builtin__headers__arm_8h.html#ae35596e9c390291b59d8eadd3384a6f0":[7,0,2,1,0,4,83],
@@ -242,12 +249,5 @@ var NAVTREEINDEX80 =
 "gcc__builtin__headers__ia32-2_8h.html#a3bcd344adfcd0f65c59b513863df81b4":[7,0,2,1,0,6,232],
 "gcc__builtin__headers__ia32-2_8h.html#a3c70ed3b5b935ce6bd6de5872fa78f33":[7,0,2,1,0,6,132],
 "gcc__builtin__headers__ia32-2_8h.html#a3cafb7b09abea7965fe2d875848f626e":[7,0,2,1,0,6,309],
-"gcc__builtin__headers__ia32-2_8h.html#a3cd054d9c4930cf08290b61343c24b3f":[7,0,2,1,0,6,490],
-"gcc__builtin__headers__ia32-2_8h.html#a3d2a45003f36ec9c2cfb32e43eca8891":[7,0,2,1,0,6,586],
-"gcc__builtin__headers__ia32-2_8h.html#a3e4ce8e5518d48515c04241765d414cc":[7,0,2,1,0,6,366],
-"gcc__builtin__headers__ia32-2_8h.html#a3e97f9b882dd75db2cbf5ca14a972b72":[7,0,2,1,0,6,101],
-"gcc__builtin__headers__ia32-2_8h.html#a3eef3ed5e6b27310b70e2480cb71ea96":[7,0,2,1,0,6,223],
-"gcc__builtin__headers__ia32-2_8h.html#a3f84d6e5d6c0e8e62896caaba245671f":[7,0,2,1,0,6,130],
-"gcc__builtin__headers__ia32-2_8h.html#a40d79314352a060ce5ffbbe7c5b240c8":[7,0,2,1,0,6,451],
-"gcc__builtin__headers__ia32-2_8h.html#a40decd78811292b731b28e2651d23501":[7,0,2,1,0,6,445]
+"gcc__builtin__headers__ia32-2_8h.html#a3cd054d9c4930cf08290b61343c24b3f":[7,0,2,1,0,6,490]
 };
