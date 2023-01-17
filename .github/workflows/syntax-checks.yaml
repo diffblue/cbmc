@@ -1,0 +1,49 @@
+name: Syntactic checks
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  # This job takes approximately 1 minute
+  check-clang-format:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-format-11
+      - name: Check updated lines of code match clang-format-11 style
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          MERGE_BRANCH: ${{ github.ref }}
+        run: ./.github/workflows/pull-request-check-clang-format.sh
+
+  # This job takes approximately 1 minute
+  check-cpplint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq python3-unidiff
+      - name: Check updated lines of code meet linting standards
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          MERGE_BRANCH: ${{ github.ref }}
+        run: ./.github/workflows/pull-request-check-cpplint.sh
