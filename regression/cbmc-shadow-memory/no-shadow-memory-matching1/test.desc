@@ -1,0 +1,9 @@
+FUTURE
+main.c
+--no-shadow-memory-matching '.*\.c:.*__cs_.*'
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Shadow memory: field 'field1' expected to exist for

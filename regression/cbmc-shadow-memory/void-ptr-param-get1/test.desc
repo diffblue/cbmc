@@ -1,0 +1,8 @@
+FUTURE
+main.c
+
+^EXIT=6$
+^SIGNAL=0$
+Shadow memory: cannot get shadow memory via type void\* for f_void_ptr::s
+--
+^warning: ignoring
