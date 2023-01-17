@@ -5,7 +5,9 @@ volatile int flag1 = 0, flag2 = 0;
 void *thr1(void *arg)
 {
   flag1 = 1;
+  __CPROVER_atomic_begin();
   turn = 1;
+  __CPROVER_atomic_end();
   __asm { mfence; }
   __CPROVER_assume(!(flag2 == 1 && turn == 1));
   x = 0;
@@ -16,7 +18,9 @@ void *thr1(void *arg)
 void *thr2(void *arg)
 {
   flag2 = 1;
+  __CPROVER_atomic_begin();
   turn = 0;
+  __CPROVER_atomic_end();
   __asm { mfence; }
   __CPROVER_assume(!(flag1 == 1 && turn == 0));
   x = 1;

@@ -208,6 +208,9 @@ void memory_model_sct::write_serialization_external(
     // This is quadratic in the number of writes
     // per address. Perhaps some better encoding
     // based on 'places'?
+#if 0
+    std::size_t w_w_data_race_property_counter = 0;
+#endif
     for(event_listt::const_iterator
         w_it1=a_rec.writes.begin();
         w_it1!=a_rec.writes.end();
@@ -225,23 +228,31 @@ void memory_model_sct::write_serialization_external(
            (*w_it2)->source.thread_nr)
           continue;
 
-        // ws is a total order, no two elements have the same rank
-        // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
+        // ws is a total order, no two elements in distinct atomic sections have
+        // the same rank
+        DATA_INVARIANT(
+          (*w_it1)->atomic_section_id == 0 ||
+          (*w_it1)->atomic_section_id != (*w_it2)->atomic_section_id,
+          "non-atomic writes in distinct threads cannot belong to the same "
+          "atomic section");
 
-        symbol_exprt s=nondet_bool_symbol("ws-ext");
-
-        // write-to-write edge
-        add_constraint(
-          equation,
-          implies_exprt(s, before(*w_it1, *w_it2)),
-          "ws-ext",
-          (*w_it1)->source);
-
-        add_constraint(
-          equation,
-          implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
-          "ws-ext",
-          (*w_it1)->source);
+        if((*w_it1)->atomic_section_id != 0 && (*w_it2)->atomic_section_id != 0)
+        {
+          notequal_exprt ne{clock(*w_it1, axiomt::AX_PROPAGATION), clock(*w_it2, axiomt::AX_PROPAGATION)};
+          equation.constraint(ne, "ws-ext", (*w_it1)->source);
+        }
+        else
+        {
+#if 0
+           notequal_exprt ne{clock(*w_it1, axiomt::AX_PROPAGATION), clock(*w_it2, axiomt::AX_PROPAGATION)};
+          equation.assertion(
+            simplify_expr(and_exprt{(*w_it1)->guard, (*w_it2)->guard}, ns),
+            ne,
+            id2string(a_it->first) + ".w_w_data_race." + std::to_string(++w_w_data_race_property_counter),
+            "write/write data race on " + id2string(a_it->first),
+            (*w_it1)->source);
+#endif
+        }
       }
     }
   }

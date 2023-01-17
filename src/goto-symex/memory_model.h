@@ -50,11 +50,14 @@ protected:
   /// \param r: read event
   /// \param w: write event
   /// \param equation: symex equation where the new constraints should be added
+  /// \param property_counter: used and updated to count the number of
+  ///   read/write data race assertions
   /// \return the new choice symbol
   symbol_exprt register_read_from_choice_symbol(
     const event_it &r,
     const event_it &w,
-    symex_target_equationt &equation);
+    symex_target_equationt &equation,
+    std::size_t &property_counter);
 
   // maps thread numbers to an event list
   typedef std::map<unsigned, event_listt> per_thread_mapt;

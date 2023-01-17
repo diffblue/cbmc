@@ -48,6 +48,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
   for(const auto &address : address_map)
   {
+    std::size_t r_w_property_counter = 0;
     for(const auto &read_event : address.second.reads)
     {
       exprt::operandst rf_choice_symbols;
@@ -60,7 +61,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         if(!po(read_event, write_event))
         {
           rf_choice_symbols.push_back(register_read_from_choice_symbol(
-            read_event, write_event, equation));
+            read_event, write_event, equation, r_w_property_counter));
         }
       }
 
@@ -83,7 +84,8 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 symbol_exprt memory_model_baset::register_read_from_choice_symbol(
   const event_it &r,
   const event_it &w,
-  symex_target_equationt &equation)
+  symex_target_equationt &equation,
+  std::size_t &property_counter)
 {
   symbol_exprt s = nondet_bool_symbol("rf");
 
@@ -106,6 +108,16 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
     // if r reads from w, then w must have happened before r
     add_constraint(
       equation, implies_exprt{s, before(w, r)}, "rf-order", r->source);
+#if 0
+    notequal_exprt ne{clock(w, axiomt::AX_PROPAGATION), clock(r, axiomt::AX_PROPAGATION)};
+    const std::string sym_name = id2string(r->ssa_lhs.get_identifier());
+    equation.assertion(
+      simplify_expr(and_exprt{w->guard, r->guard}, ns),
+      ne,
+      sym_name + ".r_w_data_race." + std::to_string(++property_counter),
+      "read/write data race on " + sym_name,
+      r->source);
+#endif
   }
 
   return s;
