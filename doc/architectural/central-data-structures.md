@@ -1,27 +1,35 @@
 # Central Data Structures
 
 The following is some light technical documentation of the major data structures
-represented in the input transformation to Intermediate Representation (IR) inside
+used in the input transformation to Intermediate Representation (IR) inside
 CBMC and the assorted CProver tools.
 
 ## goto_modelt
 
-The `goto_modelt` is the main data structure that CBMC (and the other tools) use to
-represent GOTO-IR (the `GOTO` Intermediate Representation).
+The `goto_modelt` is the main data structure that CBMC (and the other tools) used
+for the GOTO-IR (the `GOTO` Intermediate Representation).
 
-A `goto_modelt` is effectively a product type, consisting of:
+A `goto_modelt` is effectively a pair, consisting of:
 
-* A list of GOTO functions (pseudocode: `type goto_functionst = list<goto_functiont>`)
-* A symbol table containing symbol references for the symbols contained in the
-  GOTO functions (pseudocode: `type symbol_tablet = map<identifier, symbolt>`).
+* A list of GOTO functions,
+* A symbol table containing symbol references for the symbols contained in the GOTO functions.
+
+In pseudocode, the type looks this:
+
+```js
+type goto_modelt {
+  type goto_functionst = list<goto_functiont>
+  type symbol_tablet = map<identifier, symbolt>
+}
+```
 
 The abstract interface of `goto_modelt` is outlined in the file
 [`src/goto-programs/abstract_goto_model.h`](../../src/goto-programs/abstract_goto_model.h).
 
 ## goto_functiont
 
-A `goto_functiont` is also a product type. It's designed to represent a function
-at the IR level, and effectively it's the following ADT (in pseudocode):
+A `goto_functiont` is also defined as a pair. It's designed to represent a function
+at the IR level, and effectively it's the following data type (in pseudocode):
 
 ```js
 type goto_functiont {
@@ -30,17 +38,20 @@ type goto_functiont {
 }
 ```
 
-Of the two types listed above, the `parameters` one should be self-documenting,
-(the values of these are later looked up in the symbol table), so we're going to
-focus next on the type `goto_programt`
+The `goto_programt` denoting the `body` of the function will be the subject of
+a more elaborate explanation in the next section.
+
+The `parameters` subcomponent is a list of identifiers that are to be looked-up
+in the symbol-table for their values.
 
 ## goto_programt
 
-A `goto_programt` is a container of GOTO-IR instructions. In pseudocode, it would
+A `goto_programt` is a list of GOTO-IR instructions. In pseudocode, it would
 look like `type goto_programt = list<goto_instructiont>`.
 
-An instruction (`goto_instructiont`) is another product type, describing a GOTO level
-instruction with the following 3 component subtypes, again in pseudocode:
+An instruction (`goto_instructiont`) is a triple (an element with three subcomponents),
+describing a GOTO level instruction with the following 3 component subtypes,
+again in pseudocode:
 
 ```js
 type goto_instructiont {
@@ -50,18 +61,17 @@ type goto_instructiont {
 }
 ```
 
-The above subtypes are just illustrative, so we will provide some extra explanation for
-these:
+The pseudocode subtypes above require some more elaboration, so we will provide some extra
+detail to illuminate some details at the code level:
 
 * The `instruction_type` above corresponds to the `goto_program_instruction_typet` type
   listed in [`goto_program.h`](../../src/goto-programs/goto_program.h)
-  * For illustration purposes, some instruction types are `assign`, `function_call`, `return`,
-    etc.
+  * Some illustrative instruction types are `assign`, `function_call`, `return`, etc.
 * The `instruction` is a statement represented by a `goto_instruction_codet`.
-  * A `goto_instruction_codet` is a `codet` (a data structure broadly representing a statement
-    inside CBMC) that contains the actual GOTO-IR instruction.
+  * A `goto_instruction_codet` is an alias of `codet` (a data structure broadly representing
+    a statement inside CBMC) that contains the actual code to be executed.
   * You can distinguish different statements by inspecting the `irep` element `ID_statement`.
-* The `guard` is an `exprt` (A CBMC data structure broadly representing an expression)
+* The `guard` is an `exprt` (a data structure broadly representing an expression inside CBMC)
   that is expected to have type `bool`.
   * This is optional - not every instruction is expected to have a `guard` associated with it.
 
@@ -72,8 +82,7 @@ Another important data structure that needs to be discussed at this point is
 
 This is an `irept`. `irep`s are the central data structure that model most entities inside
 CBMC and the assorted tools - effectively a node/map like data structure that forms a hierachical
-tree that ends up modeling graphs like ASTs, CFGs, etc. (This will be further discussed in
-a dedicated page).
+tree that ends up modeling graphs like ASTs, CFGs, etc.
 
 `source_locationt` are attached into various `exprt`s (the data structure representing
 various expressions, usually the result of some early processing, e.g. the result of the
