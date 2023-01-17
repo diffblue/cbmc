@@ -114,12 +114,11 @@ __CPROVER_HIDE:;
     ((ptr == 0) | __CPROVER_rw_ok(ptr, size)),
     "ptr NULL or writable up to size");
   __CPROVER_assert(
-    size < __CPROVER_max_malloc_size,
+    size <= __CPROVER_max_malloc_size,
     "CAR size is less than __CPROVER_max_malloc_size");
-  __CPROVER_ssize_t offset = __CPROVER_POINTER_OFFSET(ptr);
+  __CPROVER_size_t offset = __CPROVER_POINTER_OFFSET(ptr);
   __CPROVER_assert(
-    !(offset > 0) |
-      ((__CPROVER_size_t)offset + size < __CPROVER_max_malloc_size),
+    !(offset > 0) | (offset + size <= __CPROVER_max_malloc_size),
     "no offset bits overflow on CAR upper bound computation");
   return (__CPROVER_contracts_car_t){
     .is_writable = ptr != 0, .size = size, .lb = ptr, .ub = (char *)ptr + size};
@@ -163,12 +162,11 @@ __CPROVER_HIDE:;
     ((ptr == 0) | __CPROVER_rw_ok(ptr, size)),
     "ptr NULL or writable up to size");
   __CPROVER_assert(
-    size < __CPROVER_max_malloc_size,
+    size <= __CPROVER_max_malloc_size,
     "CAR size is less than __CPROVER_max_malloc_size");
-  __CPROVER_ssize_t offset = __CPROVER_POINTER_OFFSET(ptr);
+  __CPROVER_size_t offset = __CPROVER_POINTER_OFFSET(ptr);
   __CPROVER_assert(
-    !(offset > 0) |
-      ((__CPROVER_size_t)offset + size < __CPROVER_max_malloc_size),
+    !(offset > 0) | (offset + size <= __CPROVER_max_malloc_size),
     "no offset bits overflow on CAR upper bound computation");
   __CPROVER_contracts_car_t *elem = set->elems + idx;
   *elem = (__CPROVER_contracts_car_t){
@@ -783,14 +781,13 @@ __CPROVER_HIDE:;
 
   // Compute the upper bound, perform inclusion check against contract-assigns
   __CPROVER_assert(
-    size < __CPROVER_max_malloc_size,
+    size <= __CPROVER_max_malloc_size,
     "CAR size is less than __CPROVER_max_malloc_size");
 
   __CPROVER_size_t offset = __CPROVER_POINTER_OFFSET(ptr);
 
   __CPROVER_assert(
-    !(offset > 0) |
-      ((__CPROVER_size_t)offset + size < __CPROVER_max_malloc_size),
+    !(offset > 0) | (offset + size <= __CPROVER_max_malloc_size),
     "no offset bits overflow on CAR upper bound computation");
   void *ub = (void *)((char *)ptr + size);
   __CPROVER_contracts_car_t *elem = set->contract_assigns.elems;
@@ -1198,7 +1195,7 @@ __CPROVER_HIDE:;
     {
       // When --malloc-may-fail --malloc-fail-null
       // add implicit assumption that the size is capped
-      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+      __CPROVER_assume(size <= __CPROVER_max_malloc_size);
     }
     else if(
       __CPROVER_malloc_failure_mode ==
@@ -1208,9 +1205,9 @@ __CPROVER_HIDE:;
       // check if max allocation size is exceeded and
       // add implicit assumption that the size is capped
       __CPROVER_assert(
-        size < __CPROVER_max_malloc_size,
+        size <= __CPROVER_max_malloc_size,
         "__CPROVER_is_fresh max allocation size exceeded");
-      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+      __CPROVER_assume(size <= __CPROVER_max_malloc_size);
     }
 
     void *ptr = __CPROVER_allocate(size, 0);
@@ -1255,16 +1252,16 @@ __CPROVER_HIDE:;
       __CPROVER_malloc_failure_mode ==
       __CPROVER_malloc_failure_mode_return_null)
     {
-      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+      __CPROVER_assume(size <= __CPROVER_max_malloc_size);
     }
     else if(
       __CPROVER_malloc_failure_mode ==
       __CPROVER_malloc_failure_mode_assert_then_assume)
     {
       __CPROVER_assert(
-        size < __CPROVER_max_malloc_size,
-        "__CPROVER_is_fresh requires size < __CPROVER_max_malloc_size");
-      __CPROVER_assume(size < __CPROVER_max_malloc_size);
+        size <= __CPROVER_max_malloc_size,
+        "__CPROVER_is_fresh requires size <= __CPROVER_max_malloc_size");
+      __CPROVER_assume(size <= __CPROVER_max_malloc_size);
     }
 
     void *ptr = __CPROVER_allocate(size, 0);
@@ -1360,8 +1357,8 @@ __CPROVER_HIDE:;
   __CPROVER_assert(
     __CPROVER_same_object(lb, ub),
     "lb and ub pointers must have the same object");
-  __CPROVER_ssize_t lb_offset = __CPROVER_POINTER_OFFSET(lb);
-  __CPROVER_ssize_t ub_offset = __CPROVER_POINTER_OFFSET(ub);
+  __CPROVER_size_t lb_offset = __CPROVER_POINTER_OFFSET(lb);
+  __CPROVER_size_t ub_offset = __CPROVER_POINTER_OFFSET(ub);
   __CPROVER_assert(
     lb_offset <= ub_offset, "lb and ub pointers must be ordered");
   if(write_set->assume_requires_ctx | write_set->assume_ensures_ctx)
@@ -1373,14 +1370,14 @@ __CPROVER_HIDE:;
     __CPROVER_size_t offset = __VERIFIER_nondet_size();
 
     // this cast is safe because we prove that ub and lb are ordered
-    __CPROVER_size_t max_offset = (__CPROVER_size_t)(ub_offset - lb_offset);
+    __CPROVER_size_t max_offset = ub_offset - lb_offset;
     __CPROVER_assume(offset <= max_offset);
     *ptr = (char *)lb + offset;
     return 1;
   }
   else /* write_set->assert_requires_ctx | write_set->assert_ensures_ctx */
   {
-    __CPROVER_ssize_t offset = __CPROVER_POINTER_OFFSET(*ptr);
+    __CPROVER_size_t offset = __CPROVER_POINTER_OFFSET(*ptr);
     return __CPROVER_same_object(lb, *ptr) && lb_offset <= offset &&
            offset <= ub_offset;
   }

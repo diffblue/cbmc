@@ -7,8 +7,8 @@ __CPROVER_assigns(__CPROVER_object_from(arr))
 // clang-format on
 {
   __CPROVER_assert(arr != NULL, "arr is not NULL");
-  __CPROVER_assert(size < __CPROVER_max_malloc_size, "size is capped");
-  if(size > 0 && size < __CPROVER_max_malloc_size)
+  __CPROVER_assert(size <= __CPROVER_max_malloc_size, "size is capped");
+  if(size > 0 && size <= __CPROVER_max_malloc_size)
   {
     arr[0] = 0;
     arr[size - 1] = 0;
