@@ -2,14 +2,8 @@ CORE
 main.c
 --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^\[__CPROVER_contracts_car_set_insert.assertion.\d+\] line \d+ CAR size is less than __CPROVER_max_malloc_size: FAILURE$
-^\[__CPROVER_contracts_write_set_check_assignment.assertion.\d+\] line \d+ ptr NULL or writable up to size: FAILURE$
-^\[__CPROVER_contracts_write_set_check_assignment.assertion.\d+\] line \d+ no offset bits overflow on CAR upper bound computation: FAILURE$
 ^\[foo.assertion.\d+\] line \d+ size is capped: FAILURE$
-^\[foo.assigns.\d+\] line \d+ Check that arr\[\(.*\)0\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line \d+ Check that arr\[\(.*\)\(size - \(.*\)1\)\] is assignable: FAILURE$
-^\[foo.pointer_arithmetic.\d+\] line \d+ pointer arithmetic: pointer outside object bounds in arr \+ \(.*\)\(size - \(.*\)1\): FAILURE$
-^\[foo.pointer_arithmetic.\d+\] line \d+ pointer arithmetic: pointer outside object bounds in arr \+ \(.*\)\(size - \(.*\)1\): FAILURE$
-^\[foo.pointer_dereference.\d+\] line \d+ dereference failure: pointer outside object bounds in arr\[\(.*\)\(size - \(.*\)1\)\]: FAILURE$
+^\*\* 2 of \d+ failed
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
