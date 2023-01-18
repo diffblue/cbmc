@@ -71,6 +71,7 @@ public:
       report_error(ui_message_handler);
       break;
     }
+    incremental_goto_checker.report();
   }
 
 protected:
