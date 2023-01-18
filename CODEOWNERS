@@ -67,6 +67,7 @@
 
 /cmake/        @diffblue/diffblue-opensource
 CMakeLists.txt @diffblue/diffblue-opensource
+justfile       @NlightNFotis
 
 # These files change frequently and changes are low-risk
 
