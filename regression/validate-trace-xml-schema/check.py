@@ -50,6 +50,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # produces intermingled XML on the command line
     ['coverage_report1', 'test.desc'],
     ['coverage_report1', 'paths.desc'],
+    ['coverage_report2', 'test.desc'],
     ['graphml_witness1', 'test.desc'],
     ['switch8', 'program-only.desc'],
     ['Failing_Assert1', 'dimacs.desc'],
