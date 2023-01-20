@@ -1,5 +1,6 @@
 var NAVTREEINDEX71 =
 {
+"compilation-and-development.html#compilation-and-development-section-formatting":[0,4,7,3],
 "compilation-and-development.html#compilation-and-development-section-linting":[0,4,7,4],
 "compilation-and-development.html#compilation-and-development-section-running-tests":[0,4,7,1],
 "compilation-and-development.html#compilation-and-development-section-time-profiling":[0,4,7,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX71 =
 "contracts-user-cli.html#autotoc_md71":[1,0,11,1],
 "contracts-user.html":[1,0],
 "contracts_8cpp.html":[7,0,2,13,1,3],
-"contracts_8cpp.html#a67b8b84f69ec94d01dfdd6b343ef928e":[7,0,2,13,1,3,1],
-"contracts_8cpp.html#aa5cfbf27af004419d6d598ab11fea026":[7,0,2,13,1,3,0]
+"contracts_8cpp.html#a67b8b84f69ec94d01dfdd6b343ef928e":[7,0,2,13,1,3,1]
 };
