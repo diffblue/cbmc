@@ -1,6 +1,5 @@
 var NAVTREEINDEX115 =
 {
-"satcheck__zcore_8cpp_source.html":[7,0,2,27,7,32],
 "satcheck__zcore_8h.html":[7,0,2,27,7,33],
 "satcheck__zcore_8h_source.html":[7,0,2,27,7,33],
 "scratch__program_8cpp.html":[7,0,2,13,0,24],
@@ -249,5 +248,6 @@ var NAVTREEINDEX115 =
 "simplify__state__expr_8cpp.html#a3403a8a6eca1bfc01ad2c90b6a3b1213":[7,0,2,6,45,12],
 "simplify__state__expr_8cpp.html#a3ce970378cd74d6c80e0cb9105ab6a22":[7,0,2,6,45,11],
 "simplify__state__expr_8cpp.html#a5b77799aa8a8494952ca8108d2788a01":[7,0,2,6,45,7],
-"simplify__state__expr_8cpp.html#a65c04ea08e9caf529cb628ca5c83a8fb":[7,0,2,6,45,16]
+"simplify__state__expr_8cpp.html#a65c04ea08e9caf529cb628ca5c83a8fb":[7,0,2,6,45,16],
+"simplify__state__expr_8cpp.html#a701d47bc957d2620039c57556df3c33f":[7,0,2,6,45,20]
 };

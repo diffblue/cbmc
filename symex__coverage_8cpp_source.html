@@ -328,207 +328,204 @@ $(document).ready(function(){initNavTree('symex__coverage_8cpp_source.html','');
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    symex_coveraget::coveraget::const_iterator c_entry = coverage.find(it);</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">if</span>(c_entry != coverage.end())</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      <span class="keywordflow">if</span>(!(c_entry-&gt;second.size() == 1 || is_branch))</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      {</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        std::cerr &lt;&lt; it-&gt;location_number &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;cov : c_entry-&gt;second)</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;          std::cerr &lt;&lt; cov.second.succ-&gt;location_number &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        c_entry-&gt;second.size() == 1 || is_branch,</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="stringliteral">&quot;instructions other than branch instructions have exactly 1 successor&quot;</span>);</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;cov : c_entry-&gt;second)</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      {</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          cov.second.num_executions &gt; 0,</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          <span class="stringliteral">&quot;coverage entries can only exist with at least one execution&quot;</span>);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        c_entry-&gt;second.size() == 1 || is_branch || it-&gt;is_function_call(),</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        <span class="stringliteral">&quot;instructions other than branch instructions or function calls have &quot;</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="stringliteral">&quot;exactly 1 successor&quot;</span>,</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="stringliteral">&quot;found at goto program instruction number &quot;</span> +</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;          <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(it-&gt;location_number));</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;cov : c_entry-&gt;second)</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;          cov.second.num_executions &gt; 0,</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;          <span class="stringliteral">&quot;coverage entries can only exist with at least one execution&quot;</span>);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordflow">if</span>(entry.first-&gt;second.hits == 0)</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          ++<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>;</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordflow">if</span>(entry.first-&gt;second.hits == 0)</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;          ++<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordflow">if</span>(cov.second.num_executions &gt; entry.first-&gt;second.hits)</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;          entry.first-&gt;second.hits = cov.second.num_executions;</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordflow">if</span>(cov.second.num_executions &gt; entry.first-&gt;second.hits)</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;          entry.first-&gt;second.hits = cov.second.num_executions;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <span class="keywordflow">if</span>(is_branch)</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        {</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;          <span class="keyword">auto</span> cond_entry = entry.first-&gt;second.conditions.find(it);</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;            cond_entry != entry.first-&gt;second.conditions.end(),</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            <span class="stringliteral">&quot;branch should have condition&quot;</span>);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;          <span class="keywordflow">if</span>(it-&gt;get_target() == cov.second.succ)</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;          {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;            <span class="keywordflow">if</span>(!cond_entry-&gt;second.false_taken)</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;            {</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;              cond_entry-&gt;second.false_taken = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;              ++<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;            }</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;          }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;          {</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            <span class="keywordflow">if</span>(!cond_entry-&gt;second.true_taken)</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            {</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;              cond_entry-&gt;second.true_taken = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;              ++<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;            }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;          }</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        }</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      }</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    }</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  }</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;}</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
-<div class="line"><a name="l00290"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">  290</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">symex_coveraget::compute_overall_coverage</a>(</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> &amp;dest)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="keyword">typedef</span> std::map&lt;irep_idt, coverage_recordt&gt; file_recordst;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  file_recordst file_records;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      !gf_entry.second.body_available() ||</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      gf_entry.first == goto_functions.<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">entry_point</a>() ||</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      gf_entry.first == <a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    {</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    }</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordflow">if</span>(is_branch)</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        {</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;          <span class="keyword">auto</span> cond_entry = entry.first-&gt;second.conditions.find(it);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            cond_entry != entry.first-&gt;second.conditions.end(),</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            <span class="stringliteral">&quot;branch should have condition&quot;</span>);</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;          <span class="keywordflow">if</span>(it-&gt;get_target() == cov.second.succ)</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;          {</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            <span class="keywordflow">if</span>(!cond_entry-&gt;second.false_taken)</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            {</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;              cond_entry-&gt;second.false_taken = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;              ++<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;            }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;          }</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;          <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;          {</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;            <span class="keywordflow">if</span>(!cond_entry-&gt;second.true_taken)</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            {</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;              cond_entry-&gt;second.true_taken = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;              ++<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;          }</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      }</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    }</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;}</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
+<div class="line"><a name="l00287"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">  287</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">symex_coveraget::compute_overall_coverage</a>(</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> &amp;dest)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="keyword">typedef</span> std::map&lt;irep_idt, coverage_recordt&gt; file_recordst;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  file_recordst file_records;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  {</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      !gf_entry.second.body_available() ||</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      gf_entry.first == goto_functions.<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">entry_point</a>() ||</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      gf_entry.first == <a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>)</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    {</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    }</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160; </div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <a class="code" href="classgoto__program__coverage__recordt.html">goto_program_coverage_recordt</a> func_cov(</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <a class="code" href="classsymex__coveraget.html#accc0497c9983ba50dd6583957c6f62b0">ns</a>, gf_entry.first, gf_entry.second.body, <a class="code" href="classsymex__coveraget.html#ae15ab9f69ea2fcdb27774e3d26fc1cf3">coverage</a>);</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <a class="code" href="classgoto__program__coverage__recordt.html">goto_program_coverage_recordt</a> func_cov(</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <a class="code" href="classsymex__coveraget.html#accc0497c9983ba50dd6583957c6f62b0">ns</a>, gf_entry.first, gf_entry.second.body, <a class="code" href="classsymex__coveraget.html#ae15ab9f69ea2fcdb27774e3d26fc1cf3">coverage</a>);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160; </div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    std::pair&lt;file_recordst::iterator, bool&gt; entry = file_records.insert(</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      std::make_pair(func_cov.<a class="code" href="classgoto__program__coverage__recordt.html#aad3a4b18e453c28e952017ecff0c62c5">get_file</a>(), <a class="code" href="classcoverage__recordt.html">coverage_recordt</a>(<span class="stringliteral">&quot;class&quot;</span>)));</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> &amp;file_record = entry.first-&gt;second;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keywordflow">if</span>(entry.second)</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    {</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;methods&quot;</span>);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;lines&quot;</span>);</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    }</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    std::pair&lt;file_recordst::iterator, bool&gt; entry = file_records.insert(</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      std::make_pair(func_cov.<a class="code" href="classgoto__program__coverage__recordt.html#aad3a4b18e453c28e952017ecff0c62c5">get_file</a>(), <a class="code" href="classcoverage__recordt.html">coverage_recordt</a>(<span class="stringliteral">&quot;class&quot;</span>)));</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> &amp;file_record = entry.first-&gt;second;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">if</span>(entry.second)</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    {</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;methods&quot;</span>);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;lines&quot;</span>);</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    }</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <span class="comment">// copy the &quot;method&quot; node</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.front().new_element(func_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>);</div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="comment">// copy the &quot;method&quot; node</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.front().new_element(func_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="comment">// copy any lines</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">for</span>(xmlt::elementst::const_iterator it =</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;          func_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.front().elements.begin();</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        it != func_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.front().elements.end();</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;        ++it)</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.back().new_element(*it);</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="comment">// merge line/branch info</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>;</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  }</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;classes = dest.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;classes&quot;</span>);</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  <span class="comment">// &lt;class name=&quot;MyProject.GameRules&quot; filename=&quot;MyProject/GameRules.java&quot;</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="comment">//        line-rate=&quot;1.0&quot; branch-rate=&quot;1.0&quot; complexity=&quot;1.4&quot;&gt;</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <span class="keywordflow">for</span>(file_recordst::const_iterator it = file_records.begin();</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;      it != file_records.end();</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      ++it)</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  {</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsource__locationt.html#a1d98e7e236dd3ead60adb40972f822f7">source_locationt::is_built_in</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first)))</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160; </div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> &amp;f_cov = it-&gt;second;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <a class="code" href="classxmlt.html">xmlt</a> &amp;class_xml = classes.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(f_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>);</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;name&quot;</span>, <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first));</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;filename&quot;</span>, <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first));</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      <span class="stringliteral">&quot;line-rate&quot;</span>, <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(f_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>, f_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>));</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <span class="stringliteral">&quot;branch-rate&quot;</span>, <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(f_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>, f_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>));</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;complexity&quot;</span>, <span class="stringliteral">&quot;0.0&quot;</span>);</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="comment">// merge line/branch info</span></div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>;</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>;</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  }</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;}</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
-<div class="line"><a name="l00367"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">  367</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">symex_coveraget::build_cobertura</a>(</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;xml_coverage)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> overall_cov(<span class="stringliteral">&quot;package&quot;</span>);</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <a class="code" href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">compute_overall_coverage</a>(goto_functions, overall_cov);</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  std::string overall_line_rate_str =</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>, overall_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>);</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  std::string overall_branch_rate_str =</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>, overall_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>);</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  <span class="keyword">auto</span> now = std::chrono::system_clock::now();</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keyword">auto</span> current_time = std::chrono::time_point_cast&lt;std::chrono::seconds&gt;(now);</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  std::time_t tt = std::chrono::system_clock::to_time_t(current_time);</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160; </div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="comment">// &lt;coverage line-rate=&quot;0.0&quot; branch-rate=&quot;0.0&quot; lines-covered=&quot;1&quot;</span></div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="comment">//           lines-valid=&quot;1&quot; branches-covered=&quot;1&quot;</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  <span class="comment">//           branches-valid=&quot;1&quot; complexity=&quot;0.0&quot;</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="comment">//           version=&quot;2.1.1&quot; timestamp=&quot;0&quot;&gt;</span></div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;line-rate&quot;</span>, overall_line_rate_str);</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;branch-rate&quot;</span>, overall_branch_rate_str);</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="stringliteral">&quot;lines-covered&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>));</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="stringliteral">&quot;lines-valid&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>));</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="stringliteral">&quot;branches-covered&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>));</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <span class="stringliteral">&quot;branches-valid&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>));</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;complexity&quot;</span>, <span class="stringliteral">&quot;0.0&quot;</span>);</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;version&quot;</span>, <span class="stringliteral">&quot;2.1.1&quot;</span>);</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;timestamp&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(tt));</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;packages = xml_coverage.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;packages&quot;</span>);</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160; </div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  <span class="comment">// &lt;package name=&quot;&quot; line-rate=&quot;0.0&quot; branch-rate=&quot;0.0&quot; complexity=&quot;0.0&quot;&gt;</span></div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;<span class="keyword">package </span>= packages.new_element(overall_cov.xml);</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  package.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  package.set_attribute(<span class="stringliteral">&quot;line-rate&quot;</span>, overall_line_rate_str);</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  package.set_attribute(<span class="stringliteral">&quot;branch-rate&quot;</span>, overall_branch_rate_str);</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  package.set_attribute(<span class="stringliteral">&quot;complexity&quot;</span>, <span class="stringliteral">&quot;0.0&quot;</span>);</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;}</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
-<div class="line"><a name="l00411"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">  411</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">symex_coveraget::output_report</a>(</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  std::ostream &amp;os)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> xml_coverage(<span class="stringliteral">&quot;coverage&quot;</span>);</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  <a class="code" href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">build_cobertura</a>(goto_functions, xml_coverage);</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  os &lt;&lt; <span class="stringliteral">&quot;&lt;?xml version=\&quot;1.0\&quot;?&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  os &lt;&lt; <span class="stringliteral">&quot;&lt;!DOCTYPE coverage SYSTEM \&quot;&quot;</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;     &lt;&lt; <span class="stringliteral">&quot;http://cobertura.sourceforge.net/xml/coverage-04.dtd\&quot;&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  os &lt;&lt; xml_coverage;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="comment">// copy any lines</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordflow">for</span>(xmlt::elementst::const_iterator it =</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;          func_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.front().elements.begin();</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        it != func_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.front().elements.end();</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        ++it)</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      file_record.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">elements</a>.back().new_element(*it);</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="comment">// merge line/branch info</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    file_record.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a> += func_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  }</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;classes = dest.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;classes&quot;</span>);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160; </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  <span class="comment">// &lt;class name=&quot;MyProject.GameRules&quot; filename=&quot;MyProject/GameRules.java&quot;</span></div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <span class="comment">//        line-rate=&quot;1.0&quot; branch-rate=&quot;1.0&quot; complexity=&quot;1.4&quot;&gt;</span></div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <span class="keywordflow">for</span>(file_recordst::const_iterator it = file_records.begin();</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      it != file_records.end();</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      ++it)</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  {</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classsource__locationt.html#a1d98e7e236dd3ead60adb40972f822f7">source_locationt::is_built_in</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first)))</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keyword">const</span> <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> &amp;f_cov = it-&gt;second;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160; </div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <a class="code" href="classxmlt.html">xmlt</a> &amp;class_xml = classes.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(f_cov.<a class="code" href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">xml</a>);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;name&quot;</span>, <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first));</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;filename&quot;</span>, <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first));</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;      <span class="stringliteral">&quot;line-rate&quot;</span>, <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(f_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>, f_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>));</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      <span class="stringliteral">&quot;branch-rate&quot;</span>, <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(f_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>, f_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>));</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    class_xml.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;complexity&quot;</span>, <span class="stringliteral">&quot;0.0&quot;</span>);</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="comment">// merge line/branch info</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>;</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    dest.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a> += f_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>;</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  }</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;}</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160; </div>
+<div class="line"><a name="l00364"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">  364</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">symex_coveraget::build_cobertura</a>(</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;xml_coverage)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <a class="code" href="classcoverage__recordt.html">coverage_recordt</a> overall_cov(<span class="stringliteral">&quot;package&quot;</span>);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <a class="code" href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">compute_overall_coverage</a>(goto_functions, overall_cov);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160; </div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  std::string overall_line_rate_str =</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>, overall_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  std::string overall_branch_rate_str =</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <a class="code" href="symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6">rate</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>, overall_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <span class="keyword">auto</span> now = std::chrono::system_clock::now();</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  <span class="keyword">auto</span> current_time = std::chrono::time_point_cast&lt;std::chrono::seconds&gt;(now);</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  std::time_t tt = std::chrono::system_clock::to_time_t(current_time);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160; </div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="comment">// &lt;coverage line-rate=&quot;0.0&quot; branch-rate=&quot;0.0&quot; lines-covered=&quot;1&quot;</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  <span class="comment">//           lines-valid=&quot;1&quot; branches-covered=&quot;1&quot;</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  <span class="comment">//           branches-valid=&quot;1&quot; complexity=&quot;0.0&quot;</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="comment">//           version=&quot;2.1.1&quot; timestamp=&quot;0&quot;&gt;</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;line-rate&quot;</span>, overall_line_rate_str);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;branch-rate&quot;</span>, overall_branch_rate_str);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="stringliteral">&quot;lines-covered&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">lines_covered</a>));</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="stringliteral">&quot;lines-valid&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a73bd306e917664ffe6ad0e87ab83e33d">lines_total</a>));</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="stringliteral">&quot;branches-covered&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a7c51a4ada1843ae7bd3c110d0ba775e2">branches_covered</a>));</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <span class="stringliteral">&quot;branches-valid&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(overall_cov.<a class="code" href="classcoverage__recordt.html#a68369c2a564861195faec9030a5be5dd">branches_total</a>));</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;complexity&quot;</span>, <span class="stringliteral">&quot;0.0&quot;</span>);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;version&quot;</span>, <span class="stringliteral">&quot;2.1.1&quot;</span>);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  xml_coverage.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;timestamp&quot;</span>, <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(tt));</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;packages = xml_coverage.<a class="code" href="classxmlt.html#a8c035f7c702c26511f5f56cdb8073960">new_element</a>(<span class="stringliteral">&quot;packages&quot;</span>);</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160; </div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <span class="comment">// &lt;package name=&quot;&quot; line-rate=&quot;0.0&quot; branch-rate=&quot;0.0&quot; complexity=&quot;0.0&quot;&gt;</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;<span class="keyword">package </span>= packages.new_element(overall_cov.xml);</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  package.<a class="code" href="classxmlt.html#a67bc17db924168790f945aa6fb64c2db">set_attribute</a>(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  package.set_attribute(<span class="stringliteral">&quot;line-rate&quot;</span>, overall_line_rate_str);</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  package.set_attribute(<span class="stringliteral">&quot;branch-rate&quot;</span>, overall_branch_rate_str);</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  package.set_attribute(<span class="stringliteral">&quot;complexity&quot;</span>, <span class="stringliteral">&quot;0.0&quot;</span>);</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;}</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
+<div class="line"><a name="l00408"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">  408</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">symex_coveraget::output_report</a>(</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  std::ostream &amp;os)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> xml_coverage(<span class="stringliteral">&quot;coverage&quot;</span>);</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <a class="code" href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">build_cobertura</a>(goto_functions, xml_coverage);</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160; </div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  os &lt;&lt; <span class="stringliteral">&quot;&lt;?xml version=\&quot;1.0\&quot;?&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  os &lt;&lt; <span class="stringliteral">&quot;&lt;!DOCTYPE coverage SYSTEM \&quot;&quot;</span></div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;     &lt;&lt; <span class="stringliteral">&quot;http://cobertura.sourceforge.net/xml/coverage-04.dtd\&quot;&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  os &lt;&lt; xml_coverage;</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160; </div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keywordflow">return</span> !os.good();</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;}</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="keywordflow">return</span> !os.good();</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;}</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160; </div>
-<div class="line"><a name="l00426"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#a60214ce49e4f7d50ccb9f702c6aac59e">  426</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsymex__coveraget.html#a60214ce49e4f7d50ccb9f702c6aac59e">symex_coveraget::generate_report</a>(</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  <span class="keyword">const</span> std::string &amp;path)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!path.empty());</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  <span class="keywordflow">if</span>(path == <span class="stringliteral">&quot;-&quot;</span>)</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">output_report</a>(goto_functions, std::cout);</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  {</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    std::ofstream out(path.c_str());</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">output_report</a>(goto_functions, out);</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  }</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;}</div>
+<div class="line"><a name="l00423"></a><span class="lineno"><a class="line" href="classsymex__coveraget.html#a60214ce49e4f7d50ccb9f702c6aac59e">  423</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classsymex__coveraget.html#a60214ce49e4f7d50ccb9f702c6aac59e">symex_coveraget::generate_report</a>(</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <span class="keyword">const</span> std::string &amp;path)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!path.empty());</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160; </div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="keywordflow">if</span>(path == <span class="stringliteral">&quot;-&quot;</span>)</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">output_report</a>(goto_functions, std::cout);</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  {</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    std::ofstream out(path.c_str());</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">output_report</a>(goto_functions, out);</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  }</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;}</div>
 <div class="ttc" id="aclasscoverage__recordt_html"><div class="ttname"><a href="classcoverage__recordt.html">coverage_recordt</a></div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00030">symex_coverage.cpp:31</a></div></div>
 <div class="ttc" id="aclasscoverage__recordt_html_a028bcff32eef078b5eff27c85554a484"><div class="ttname"><a href="classcoverage__recordt.html#a028bcff32eef078b5eff27c85554a484">coverage_recordt::xml</a></div><div class="ttdeci">xmlt xml</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00042">symex_coverage.cpp:42</a></div></div>
 <div class="ttc" id="aclasscoverage__recordt_html_a2b5551bedb04c83a39d3629159bbcf47"><div class="ttname"><a href="classcoverage__recordt.html#a2b5551bedb04c83a39d3629159bbcf47">coverage_recordt::lines_covered</a></div><div class="ttdeci">std::size_t lines_covered</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00043">symex_coverage.cpp:43</a></div></div>
@@ -553,11 +550,11 @@ $(document).ready(function(){initNavTree('symex__coverage_8cpp_source.html','');
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
 <div class="ttc" id="aclassnamespacet_html_a564f54a32d91e10781812a6681e62c39"><div class="ttname"><a href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">namespacet::lookup</a></div><div class="ttdeci">bool lookup(const irep_idt &amp;name, const symbolt *&amp;symbol) const override</div><div class="ttdoc">See documentation for namespace_baset::lookup().</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00138">namespace.cpp:138</a></div></div>
 <div class="ttc" id="aclasssource__locationt_html_a1d98e7e236dd3ead60adb40972f822f7"><div class="ttname"><a href="classsource__locationt.html#a1d98e7e236dd3ead60adb40972f822f7">source_locationt::is_built_in</a></div><div class="ttdeci">bool is_built_in() const</div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00178">source_location.h:178</a></div></div>
-<div class="ttc" id="aclasssymex__coveraget_html_a464308ac230d9fe94da1ce1883a92991"><div class="ttname"><a href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">symex_coveraget::compute_overall_coverage</a></div><div class="ttdeci">void compute_overall_coverage(const goto_functionst &amp;goto_functions, coverage_recordt &amp;dest) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00290">symex_coverage.cpp:290</a></div></div>
-<div class="ttc" id="aclasssymex__coveraget_html_a60214ce49e4f7d50ccb9f702c6aac59e"><div class="ttname"><a href="classsymex__coveraget.html#a60214ce49e4f7d50ccb9f702c6aac59e">symex_coveraget::generate_report</a></div><div class="ttdeci">bool generate_report(const goto_functionst &amp;goto_functions, const std::string &amp;path) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00426">symex_coverage.cpp:426</a></div></div>
+<div class="ttc" id="aclasssymex__coveraget_html_a464308ac230d9fe94da1ce1883a92991"><div class="ttname"><a href="classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991">symex_coveraget::compute_overall_coverage</a></div><div class="ttdeci">void compute_overall_coverage(const goto_functionst &amp;goto_functions, coverage_recordt &amp;dest) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00287">symex_coverage.cpp:287</a></div></div>
+<div class="ttc" id="aclasssymex__coveraget_html_a60214ce49e4f7d50ccb9f702c6aac59e"><div class="ttname"><a href="classsymex__coveraget.html#a60214ce49e4f7d50ccb9f702c6aac59e">symex_coveraget::generate_report</a></div><div class="ttdeci">bool generate_report(const goto_functionst &amp;goto_functions, const std::string &amp;path) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00423">symex_coverage.cpp:423</a></div></div>
 <div class="ttc" id="aclasssymex__coveraget_html_a9fe5c6268cfba8a63003f63c2a55fdf8"><div class="ttname"><a href="classsymex__coveraget.html#a9fe5c6268cfba8a63003f63c2a55fdf8">symex_coveraget::coveraget</a></div><div class="ttdeci">std::map&lt; goto_programt::const_targett, coverage_innert &gt; coveraget</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8h_source.html#l00069">symex_coverage.h:69</a></div></div>
-<div class="ttc" id="aclasssymex__coveraget_html_ab5ee0e9872e79a82bfd5ca6cfb42304a"><div class="ttname"><a href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">symex_coveraget::output_report</a></div><div class="ttdeci">bool output_report(const goto_functionst &amp;goto_functions, std::ostream &amp;os) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00411">symex_coverage.cpp:411</a></div></div>
-<div class="ttc" id="aclasssymex__coveraget_html_ac7211d61baf646b1c15ad4aaeb373324"><div class="ttname"><a href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">symex_coveraget::build_cobertura</a></div><div class="ttdeci">void build_cobertura(const goto_functionst &amp;goto_functions, xmlt &amp;xml_coverage) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00367">symex_coverage.cpp:367</a></div></div>
+<div class="ttc" id="aclasssymex__coveraget_html_ab5ee0e9872e79a82bfd5ca6cfb42304a"><div class="ttname"><a href="classsymex__coveraget.html#ab5ee0e9872e79a82bfd5ca6cfb42304a">symex_coveraget::output_report</a></div><div class="ttdeci">bool output_report(const goto_functionst &amp;goto_functions, std::ostream &amp;os) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00408">symex_coverage.cpp:408</a></div></div>
+<div class="ttc" id="aclasssymex__coveraget_html_ac7211d61baf646b1c15ad4aaeb373324"><div class="ttname"><a href="classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324">symex_coveraget::build_cobertura</a></div><div class="ttdeci">void build_cobertura(const goto_functionst &amp;goto_functions, xmlt &amp;xml_coverage) const</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8cpp_source.html#l00364">symex_coverage.cpp:364</a></div></div>
 <div class="ttc" id="aclasssymex__coveraget_html_accc0497c9983ba50dd6583957c6f62b0"><div class="ttname"><a href="classsymex__coveraget.html#accc0497c9983ba50dd6583957c6f62b0">symex_coveraget::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8h_source.html#l00050">symex_coverage.h:50</a></div></div>
 <div class="ttc" id="aclasssymex__coveraget_html_ae15ab9f69ea2fcdb27774e3d26fc1cf3"><div class="ttname"><a href="classsymex__coveraget.html#ae15ab9f69ea2fcdb27774e3d26fc1cf3">symex_coveraget::coverage</a></div><div class="ttdeci">coveraget coverage</div><div class="ttdef"><b>Definition:</b> <a href="symex__coverage_8h_source.html#l00070">symex_coverage.h:70</a></div></div>
 <div class="ttc" id="aclassxmlt_html"><div class="ttname"><a href="classxmlt.html">xmlt</a></div><div class="ttdef"><b>Definition:</b> <a href="xml_8h_source.html#l00020">xml.h:21</a></div></div>
@@ -573,6 +570,7 @@ $(document).ready(function(){initNavTree('symex__coverage_8cpp_source.html','');
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00510">invariant.h:510</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_ad2f8f636b117b529e2660a3e0c05293c"><div class="ttname"><a href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a></div><div class="ttdeci">#define DATA_INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON,...)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00511">invariant.h:511</a></div></div>
 <div class="ttc" id="astatic__lifetime__init_8h_html"><div class="ttname"><a href="static__lifetime__init_8h.html">static_lifetime_init.h</a></div></div>
 <div class="ttc" id="astatic__lifetime__init_8h_html_a2f0ae8a1c812a7205d351da820888c98"><div class="ttname"><a href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a></div><div class="ttdeci">#define INITIALIZE_FUNCTION</div><div class="ttdef"><b>Definition:</b> <a href="static__lifetime__init_8h_source.html#l00022">static_lifetime_init.h:22</a></div></div>
 <div class="ttc" id="astring2int_8cpp_html_a84de42ad824073cff5f4f4850da021d6"><div class="ttname"><a href="string2int_8cpp.html#a84de42ad824073cff5f4f4850da021d6">safe_string2unsigned</a></div><div class="ttdeci">unsigned safe_string2unsigned(const std::string &amp;str, int base)</div><div class="ttdef"><b>Definition:</b> <a href="string2int_8cpp_source.html#l00016">string2int.cpp:16</a></div></div>
