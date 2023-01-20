@@ -546,7 +546,7 @@ Private Attributes</h2></td></tr>
 <p>Replace <code>value</code> by an expression of type <code>to_type</code> corresponding to the value at memory address <code>value + offset</code>. </p>
 <p>If <code>value</code> is a bitvector or pointer of the same size as <code>to_type</code>, make <code>value</code> into the typecast expression <code>(to_type)value</code>. Otherwise perform the same operation as <a class="el" href="classvalue__set__dereferencet.html#a12a8eda24dfd0858c882b59a7a7b8fcc" title="Replace value by an expression of type to_type corresponding to the value at memory address value + o...">value_set_dereferencet::memory_model_bytes</a> </p><dl class="section return"><dt>Returns</dt><dd>true on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00685">685</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00689">689</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ Private Attributes</h2></td></tr>
 <p>Replace <code>value</code> by an expression of type <code>to_type</code> corresponding to the value at memory address <code>value + offset</code>. </p>
 <p>If the type of value is an array of bitvectors of size 1 byte, and <code>to_type</code> also is bitvector of size 1 byte, then the resulting expression is <code>value[offset]</code> or <code>(to_type)value[offset]</code> when typecast is required. Otherwise the expression is <code>byte_extract(value, offset)</code>. </p><dl class="section return"><dt>Returns</dt><dd>false if the conversion cannot be made </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00732">732</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00736">736</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>

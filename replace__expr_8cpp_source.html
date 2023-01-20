@@ -105,51 +105,64 @@ $(document).ready(function(){initNavTree('replace__expr_8cpp_source.html',''); i
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">   12</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;what, <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;by, <a class="code" href="classexprt.html">exprt</a> &amp;dest)</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keywordtype">bool</span> no_change = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = dest.<a class="code" href="classexprt.html#a646970b782ea26d0500e73c6d1661edd">depth_begin</a>(), itend = dest.<a class="code" href="classexprt.html#a4af54500fcfe5f819d04bd560b405943">depth_end</a>();</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      it != itend;) <span class="comment">// no ++it</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordflow">if</span>(*it == what)</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      it.mutate() = by;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      no_change = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      it.next_sibling_or_parent();</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    }</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      ++it;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  }</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordflow">return</span> no_change;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="replace__expr_8cpp.html#a0dbd90590278e24405b65fa8071912a9">   32</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(<span class="keyword">const</span> <a class="code" href="replace__expr_8h.html#a987a3e6e8750283db39e6bfd8d126d19">replace_mapt</a> &amp;what, <a class="code" href="classexprt.html">exprt</a> &amp;dest)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordtype">bool</span> no_change = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = dest.<a class="code" href="classexprt.html#a646970b782ea26d0500e73c6d1661edd">depth_begin</a>(), itend = dest.<a class="code" href="classexprt.html#a4af54500fcfe5f819d04bd560b405943">depth_end</a>();</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      it != itend;) <span class="comment">// No ++it</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    replace_mapt::const_iterator findit = what.find(*it);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">if</span>(findit != what.end())</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      it.mutate() = findit-&gt;second;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      no_change = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      it.next_sibling_or_parent();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      ++it;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">return</span> no_change;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a374614a855cdf4de2b5e5361cf5ec700">PRECONDITION_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    what.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == by.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(),</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="stringliteral">&quot;types to be replaced should match. old type:\n&quot;</span> + what.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>() +</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      <span class="stringliteral">&quot;\nnew type:\n&quot;</span> + by.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keywordtype">bool</span> no_change = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = dest.<a class="code" href="classexprt.html#a646970b782ea26d0500e73c6d1661edd">depth_begin</a>(), itend = dest.<a class="code" href="classexprt.html#a4af54500fcfe5f819d04bd560b405943">depth_end</a>();</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      it != itend;) <span class="comment">// no ++it</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordflow">if</span>(*it == what)</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      it.mutate() = by;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      no_change = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      it.next_sibling_or_parent();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    }</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      ++it;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  }</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">return</span> no_change;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;}</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="replace__expr_8cpp.html#a0dbd90590278e24405b65fa8071912a9">   37</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(<span class="keyword">const</span> <a class="code" href="replace__expr_8h.html#a987a3e6e8750283db39e6bfd8d126d19">replace_mapt</a> &amp;what, <a class="code" href="classexprt.html">exprt</a> &amp;dest)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordtype">bool</span> no_change = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = dest.<a class="code" href="classexprt.html#a646970b782ea26d0500e73c6d1661edd">depth_begin</a>(), itend = dest.<a class="code" href="classexprt.html#a4af54500fcfe5f819d04bd560b405943">depth_end</a>();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      it != itend;) <span class="comment">// No ++it</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    replace_mapt::const_iterator findit = what.find(*it);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">if</span>(findit != what.end())</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a374614a855cdf4de2b5e5361cf5ec700">PRECONDITION_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        it-&gt;type() == findit-&gt;second.type(),</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="stringliteral">&quot;types to be replaced should match. old type:\n&quot;</span> + it-&gt;type().pretty() +</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;          <span class="stringliteral">&quot;\nnew type:\n&quot;</span> + findit-&gt;second.type().pretty());</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      it.mutate() = findit-&gt;second;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      no_change = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      it.next_sibling_or_parent();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      ++it;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">return</span> no_change;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassexprt_html_a4af54500fcfe5f819d04bd560b405943"><div class="ttname"><a href="classexprt.html#a4af54500fcfe5f819d04bd560b405943">exprt::depth_end</a></div><div class="ttdeci">depth_iteratort depth_end()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00249">expr.cpp:249</a></div></div>
 <div class="ttc" id="aclassexprt_html_a646970b782ea26d0500e73c6d1661edd"><div class="ttname"><a href="classexprt.html#a646970b782ea26d0500e73c6d1661edd">exprt::depth_begin</a></div><div class="ttdeci">depth_iteratort depth_begin()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00247">expr.cpp:247</a></div></div>
+<div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
+<div class="ttc" id="aclassirept_html_a0fd0f0b7d9f7e9a01f503d596333eb06"><div class="ttname"><a href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">irept::pretty</a></div><div class="ttdeci">std::string pretty(unsigned indent=0, unsigned max_indent=0) const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00494">irep.cpp:494</a></div></div>
 <div class="ttc" id="aexpr__iterator_8h_html"><div class="ttname"><a href="expr__iterator_8h.html">expr_iterator.h</a></div><div class="ttdoc">Forward depth-first search iterators These iterators' copy operations are expensive,...</div></div>
 <div class="ttc" id="areplace__expr_8cpp_html_aab92a05844d0a7899fc516fe37f4e786"><div class="ttname"><a href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a></div><div class="ttdeci">bool replace_expr(const exprt &amp;what, const exprt &amp;by, exprt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="replace__expr_8cpp_source.html#l00012">replace_expr.cpp:12</a></div></div>
 <div class="ttc" id="areplace__expr_8h_html"><div class="ttname"><a href="replace__expr_8h.html">replace_expr.h</a></div></div>
 <div class="ttc" id="areplace__expr_8h_html_a987a3e6e8750283db39e6bfd8d126d19"><div class="ttname"><a href="replace__expr_8h.html#a987a3e6e8750283db39e6bfd8d126d19">replace_mapt</a></div><div class="ttdeci">std::unordered_map&lt; exprt, exprt, irep_hash &gt; replace_mapt</div><div class="ttdef"><b>Definition:</b> <a href="replace__expr_8h_source.html#l00022">replace_expr.h:22</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a374614a855cdf4de2b5e5361cf5ec700"><div class="ttname"><a href="src_2util_2invariant_8h.html#a374614a855cdf4de2b5e5361cf5ec700">PRECONDITION_WITH_DIAGNOSTICS</a></div><div class="ttdeci">#define PRECONDITION_WITH_DIAGNOSTICS(CONDITION,...)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00464">invariant.h:464</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
