@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 
 ^file main.c line \d+ function main: Found enable and disable pragmas for pointer-primitive-check

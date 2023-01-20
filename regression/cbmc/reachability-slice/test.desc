@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 test.c
 --reachability-slice --show-goto-functions --cover location --property foo.coverage.2
 ^EXIT=0$

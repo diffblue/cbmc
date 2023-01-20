@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 leftshift_overflow.c
 --signed-overflow-check --c99 --full-slice
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --unwind 10 --show-goto-functions
 activate-multi-line-match

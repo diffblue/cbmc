@@ -1,4 +1,4 @@
-CORE thorough-paths
+CORE thorough-paths new-smt-backend
 main.c
 --arrays-uf-always --no-propagation --refine-arrays --unwind 11
 ^EXIT=0$

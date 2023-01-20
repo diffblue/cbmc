@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure
+CORE paths-lifo-expected-failure new-smt-backend
 access.c
 --program-only
 ^EXIT=0$

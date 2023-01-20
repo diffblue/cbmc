@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 double_deref_with_member.c
 --show-vcc
 ^\{1\} \(main::1::cptr!0@1#2 = address_of\(main::1::container2!0@1\) \? main::argc!0@1#1 = 2 : main::argc!0@1#1 = 1\)

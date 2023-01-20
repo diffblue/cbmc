@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --unwindset main.0:2,main.2:2
 ^loop identifier main.2 provided with unwindset does not match any loop$

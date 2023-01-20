@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --arrays-uf-always --bounds-check
 ^VERIFICATION FAILED$

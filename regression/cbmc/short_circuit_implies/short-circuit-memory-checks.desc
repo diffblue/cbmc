@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 short-circuit-memory-checks.c
 --pointer-check
 ^EXIT=10$

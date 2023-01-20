@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --malloc-may-fail --malloc-fail-null
 ^EXIT=10$

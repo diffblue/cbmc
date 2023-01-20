@@ -1,4 +1,4 @@
-CORE smt-backend
+CORE smt-backend new-smt-backend
 short.c
 --smt2
 ^EXIT=0$

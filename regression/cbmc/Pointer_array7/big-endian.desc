@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --big-endian -D__BIG_ENDIAN__
 ^EXIT=0$

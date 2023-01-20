@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 test.c
 --malloc-may-fail --malloc-fail-null
 ^\[main.precondition_instance.\d+] line \d+ double free: SUCCESS$

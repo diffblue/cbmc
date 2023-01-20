@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --property main.assertion.1 --property main.assertion.3
 activate-multi-line-match
