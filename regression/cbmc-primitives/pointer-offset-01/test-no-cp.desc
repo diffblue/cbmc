@@ -3,11 +3,11 @@ main.c
 --no-simplify --no-propagation
 ^EXIT=10$
 ^SIGNAL=0$
-\[main.assertion.1\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) >= 0: FAILURE
+\[main.assertion.1\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) >= 0: SUCCESS
 \[main.assertion.2\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) < 0: FAILURE
 --
 ^warning: ignoring
 --
-Check that both positive and negative offsets can be chosen for uninitialized
-pointers. We use --no-simplify and --no-propagation to ensure that the case is
-not solved by the constant propagation and thus tests the constraint encoding.
+Check that positive offsets can be chosen for uninitialized pointers.  We
+use --no-simplify and --no-propagation to ensure that the case is not solved
+by the constant propagation and thus tests the constraint encoding.

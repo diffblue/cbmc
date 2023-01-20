@@ -10,7 +10,7 @@ Assumption:
   file byte_update\.c line \d+ function main
   offset >= 0u && offset < 4u
 State \d+ file byte_update\.c function main line \d+ thread \d+
-  byte_extract_little_endian\(x, \(signed long( long)? int\)offset, uint8_t\)=1 \(00000001\)
+  byte_extract_little_endian\(x, \(.*\)offset, uint8_t\)=1 \(00000001\)
 Violated property:
   file byte_update.c function main line \d+ thread \d+
   assertion x != 256u

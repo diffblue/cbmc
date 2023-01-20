@@ -434,17 +434,20 @@ static exprt::operandst instantiate_byte_array(
       src.operands().begin() + narrow_cast<std::ptrdiff_t>(upper_bound)};
   }
 
-  PRECONDITION(src.type().id() == ID_array || src.type().id() == ID_vector);
+  const typet &element_type = src.type().id() == ID_array
+                                ? to_array_type(src.type()).element_type()
+                                : to_vector_type(src.type()).element_type();
+  const typet index_type = src.type().id() == ID_array
+                             ? to_array_type(src.type()).index_type()
+                             : to_vector_type(src.type()).index_type();
   PRECONDITION(
-    can_cast_type<bitvector_typet>(
-      to_type_with_subtype(src.type()).subtype()) &&
-    to_bitvector_type(to_type_with_subtype(src.type()).subtype()).get_width() ==
-      bits_per_byte);
+    can_cast_type<bitvector_typet>(element_type) &&
+    to_bitvector_type(element_type).get_width() == bits_per_byte);
   exprt::operandst bytes;
   bytes.reserve(upper_bound - lower_bound);
   for(std::size_t i = lower_bound; i < upper_bound; ++i)
   {
-    const index_exprt idx{src, from_integer(i, c_index_type())};
+    const index_exprt idx{src, from_integer(i, index_type)};
     bytes.push_back(simplify_expr(idx, ns));
   }
   return bytes;
@@ -465,6 +468,10 @@ static exprt unpack_array_vector_no_known_bounds(
   const std::size_t bits_per_byte,
   const namespacet &ns)
 {
+  const typet index_type = src.type().id() == ID_array
+                             ? to_array_type(src.type()).index_type()
+                             : to_vector_type(src.type()).index_type();
+
   // TODO we either need a symbol table here or make array comprehensions
   // introduce a scope
   static std::size_t array_comprehension_index_counter = 0;
@@ -472,12 +479,11 @@ static exprt unpack_array_vector_no_known_bounds(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_a_v" +
       std::to_string(array_comprehension_index_counter),
-    c_index_type()};
+    index_type};
 
   index_exprt element{
     src,
-    div_exprt{
-      array_comprehension_index, from_integer(el_bytes, c_index_type())}};
+    div_exprt{array_comprehension_index, from_integer(el_bytes, index_type)}};
 
   exprt sub =
     unpack_rec(element, little_endian, {}, {}, bits_per_byte, ns, false);
@@ -577,6 +583,9 @@ static exprt unpack_array_vector(
     num_elements = *max_bytes;
 
   const exprt src_simp = simplify_expr(src, ns);
+  const typet index_type = src_simp.type().id() == ID_array
+                             ? to_array_type(src_simp.type()).index_type()
+                             : to_vector_type(src_simp.type()).index_type();
 
   for(mp_integer i = first_element; i < *num_elements; ++i)
   {
@@ -591,7 +600,7 @@ static exprt unpack_array_vector(
     }
     else
     {
-      element = index_exprt(src_simp, from_integer(i, c_index_type()));
+      element = index_exprt(src_simp, from_integer(i, index_type));
     }
 
     // recursively unpack each element so that we eventually just have an array
@@ -1022,14 +1031,17 @@ static exprt unpack_rec(
       src, bv_typet{numeric_cast_v<std::size_t>(total_bits)});
     auto const byte_type = bv_typet{bits_per_byte};
     exprt::operandst byte_operands;
+    array_typet array_type{
+      bv_typet{bits_per_byte}, from_integer(0, size_type())};
+
     for(; bit_offset < last_bit; bit_offset += bits_per_byte)
     {
       PRECONDITION(
         pointer_offset_bits(src_as_bitvector.type(), ns).has_value());
       extractbits_exprt extractbits(
         src_as_bitvector,
-        from_integer(bit_offset + bits_per_byte - 1, c_index_type()),
-        from_integer(bit_offset, c_index_type()),
+        from_integer(bit_offset + bits_per_byte - 1, array_type.index_type()),
+        from_integer(bit_offset, array_type.index_type()),
         byte_type);
 
       // endianness_mapt should be the point of reference for mapping out
@@ -1042,9 +1054,8 @@ static exprt unpack_rec(
     }
 
     const std::size_t size = byte_operands.size();
-    return array_exprt(
-      std::move(byte_operands),
-      array_typet{bv_typet{bits_per_byte}, from_integer(size, size_type())});
+    array_type.size() = from_integer(size, size_type());
+    return array_exprt{std::move(byte_operands), std::move(array_type)};
   }
 
   return array_exprt(
@@ -1112,7 +1123,7 @@ static exprt lower_byte_extract_array_vector(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_a" +
       std::to_string(array_comprehension_index_counter),
-    c_index_type()};
+    array_type.index_type()};
 
   plus_exprt new_offset{
     unpacked.offset(),
@@ -1347,10 +1358,17 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   const exprt &offset = unpacked.offset();
 
   optionalt<typet> subtype;
+  optionalt<typet> index_type;
   if(root.type().id() == ID_vector)
+  {
     subtype = to_vector_type(root.type()).element_type();
+    index_type = to_vector_type(root.type()).index_type();
+  }
   else
+  {
     subtype = to_array_type(root.type()).element_type();
+    index_type = to_array_type(root.type()).index_type();
+  }
 
   auto subtype_bits = pointer_offset_bits(*subtype, ns);
 
@@ -1383,7 +1401,9 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     // the most significant byte comes first in the concatenation!
     std::size_t offset_int = little_endian ? (width_bytes - i - 1) : i;
 
-    plus_exprt offset_i(from_integer(offset_int, offset.type()), offset);
+    plus_exprt offset_i{
+      from_integer(offset_int, *index_type),
+      typecast_exprt::conditional_cast(offset, *index_type)};
     simplify(offset_i, ns);
 
     mp_integer index = 0;
@@ -1447,7 +1467,7 @@ static exprt lower_byte_update_byte_array_vector_non_const(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_u_a_v" +
       std::to_string(array_comprehension_index_counter),
-    c_index_type()};
+    to_array_type(src.type()).index_type()};
 
   binary_predicate_exprt lower_bound{
     typecast_exprt::conditional_cast(
@@ -1514,6 +1534,10 @@ static exprt lower_byte_update_byte_array_vector(
     src.id() == ID_byte_update_big_endian);
   const bool little_endian = src.id() == ID_byte_update_little_endian;
 
+  const typet index_type = src.type().id() == ID_array
+                             ? to_array_type(src.type()).index_type()
+                             : to_vector_type(src.type()).index_type();
+
   // apply 'array-update-with' num_elements times
   exprt result = src.op();
 
@@ -1522,7 +1546,10 @@ static exprt lower_byte_update_byte_array_vector(
     const exprt &element = value_as_byte_array.operands()[i];
 
     exprt where = simplify_expr(
-      plus_exprt{src.offset(), from_integer(i, src.offset().type())}, ns);
+      plus_exprt{
+        typecast_exprt::conditional_cast(src.offset(), index_type),
+        from_integer(i, index_type)},
+      ns);
 
     // skip elements that wouldn't change (skip over typecasts as we might have
     // some signed/unsigned char conversions)
@@ -1593,9 +1620,10 @@ static exprt lower_byte_update_array_vector_unbounded(
   symbol_exprt array_comprehension_index{
     "$array_comprehension_index_u_a_v_u" +
       std::to_string(array_comprehension_index_counter),
-    c_index_type()};
+    to_array_type(src.type()).index_type()};
 
   // all arithmetic uses offset/index types
+  PRECONDITION(array_comprehension_index.type() == src.offset().type());
   PRECONDITION(subtype_size.type() == src.offset().type());
   PRECONDITION(initial_bytes.type() == src.offset().type());
   PRECONDITION(first_index.type() == src.offset().type());
@@ -1644,10 +1672,12 @@ static exprt lower_byte_update_array_vector_unbounded(
 
   // The size of a partial update at the end of the updated range, may be zero.
   mod_exprt tail_size{
-    minus_exprt{
-      typecast_exprt::conditional_cast(
-        non_const_update_bound, initial_bytes.type()),
-      initial_bytes},
+    typecast_exprt::conditional_cast(
+      minus_exprt{
+        typecast_exprt::conditional_cast(
+          non_const_update_bound, initial_bytes.type()),
+        initial_bytes},
+      subtype_size.type()),
     subtype_size};
 
   // The bound where updates end, which is conditional on the partial update
@@ -1727,6 +1757,8 @@ static exprt lower_byte_update_array_vector_non_const(
 
   // compute the index of the first element of the array/vector that may be
   // updated
+  PRECONDITION(
+    src.offset().type() == to_array_type(src.op().type()).index_type());
   exprt first_index = div_exprt{src.offset(), subtype_size};
   simplify(first_index, ns);
 
@@ -1862,10 +1894,17 @@ static exprt lower_byte_update_array_vector(
 {
   const bool is_array = src.type().id() == ID_array;
   exprt size;
+  typet index_type;
   if(is_array)
+  {
     size = to_array_type(src.type()).size();
+    index_type = to_array_type(src.type()).index_type();
+  }
   else
+  {
     size = to_vector_type(src.type()).size();
+    index_type = to_vector_type(src.type()).index_type();
+  }
 
   auto subtype_bits = pointer_offset_bits(subtype, ns);
 
@@ -1894,7 +1933,7 @@ static exprt lower_byte_update_array_vector(
         (i + 1) * *subtype_bits <= offset_bytes * src.get_bits_per_byte();
       ++i)
   {
-    elements.push_back(index_exprt{src.op(), from_integer(i, c_index_type())});
+    elements.push_back(index_exprt{src.op(), from_integer(i, index_type)});
   }
 
   // the modified elements
@@ -1932,7 +1971,7 @@ static exprt lower_byte_update_array_vector(
 
     const byte_update_exprt bu{
       src.id(),
-      index_exprt{src.op(), from_integer(i, c_index_type())},
+      index_exprt{src.op(), from_integer(i, index_type)},
       from_integer(update_offset < 0 ? 0 : update_offset, src.offset().type()),
       array_exprt{
         std::move(update_values),
@@ -1945,7 +1984,7 @@ static exprt lower_byte_update_array_vector(
 
   // copy the tail not affected by the update
   for(; i < num_elements; ++i)
-    elements.push_back(index_exprt{src.op(), from_integer(i, c_index_type())});
+    elements.push_back(index_exprt{src.op(), from_integer(i, index_type)});
 
   if(is_array)
     return simplify_expr(

@@ -1,7 +1,7 @@
 CORE
 test.c
 --string-abstraction --show-goto-functions
-ASSIGN strlen#return_value := cast\(cast\(\*strlen::s::s#str\.length, signedbv\[.*\]\) - pointer_offset\(strlen::s\), unsignedbv\[.*\]\)
+ASSIGN strlen#return_value := \*strlen::s::s#str\.length - pointer_offset\(strlen::s\)
 ^EXIT=0$
 ^SIGNAL=0$
 --
