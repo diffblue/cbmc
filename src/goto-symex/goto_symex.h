@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 #include "complexity_limiter.h"
+#include "shadow_memory.h"
 #include "symex_config.h"
 #include "symex_target_equation.h"
 
@@ -66,7 +67,16 @@ public:
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
-      complexity_module(mh, options)
+      complexity_module(mh, options),
+      shadow_memory(
+        std::bind(
+          &goto_symext::symex_assign,
+          this,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3),
+        ns,
+        mh)
   {
   }
 
@@ -823,6 +833,9 @@ protected:
   ///@}
 
   complexity_limitert complexity_module;
+
+  /// Shadow memory instrumentation API
+  shadow_memoryt shadow_memory;
 
 public:
   unsigned get_total_vccs() const
