@@ -242,6 +242,76 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j2
 
+  # This job takes approximately N minutes
+  check-ubuntu-22_04-make-clang:
+    runs-on: ubuntu-22.04
+    env:
+      CC: "ccache /usr/bin/clang"
+      CXX: "ccache /usr/bin/clang++"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          make -C src minisat2-download
+          cpanm Thread::Pool::Simple
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
+      - name: Prepare ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-22.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-22.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-22.04-make-clang
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Perform C/C++ library syntax check
+        run: |
+          make -C src/ansi-c library_check
+          make -C src/cpp library_check
+      - name: Build with make
+        run: |
+          make -C src       -j2
+          make -C unit      -j2
+          make -C jbmc/src  -j2
+          make -C jbmc/unit -j2
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run unit tests
+        run: |
+          make -C unit      test
+          make -C jbmc/unit test
+          make TAGS="[z3]" -C unit test
+      - name: Run expected failure unit tests
+        run: |
+          make TAGS="[!shouldfail]" -C unit test
+          make TAGS="[!shouldfail]" -C jbmc/unit test
+      - name: Run regression tests
+        run: |
+          make -C regression test-parallel JOBS=2
+          make -C regression/cbmc test-paths-lifo
+          env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+          make -C jbmc/regression test-parallel JOBS=2
+
   # This job takes approximately 41 minutes
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
