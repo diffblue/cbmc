@@ -256,7 +256,7 @@ if(WITH_JBMC)
     add_subdirectory(jbmc)
 endif()
 
-option(WITH_RUST_API "Build with the CPROVER Rust API" ON)
+option(WITH_RUST_API "Build with the CPROVER Rust API" OFF)
 if(${CMAKE_VERSION} VERSION_LESS "3.19.0")
     message("Unable to build the Rust API without version CMake 3.19.0")
     message("(The Rust build depends on CMake plugins with dependencies on CMake 3.19.0 and above)")
