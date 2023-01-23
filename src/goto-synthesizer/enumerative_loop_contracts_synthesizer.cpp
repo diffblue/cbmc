@@ -379,7 +379,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
       new_invariant_clause = synthesize_strengthening_clause(
         terminal_symbols,
         return_cex->cause_loop_ids.front(),
-        verifier.target_violation);
+        verifier.target_violation_id);
       break;
 
     case cext::violation_typet::cex_assignable:
