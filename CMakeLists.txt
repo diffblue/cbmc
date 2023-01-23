@@ -257,7 +257,7 @@ if(WITH_JBMC)
 endif()
 
 option(WITH_RUST_API "Build with the CPROVER Rust API" OFF)
-if(${CMAKE_VERSION} VERSION_LESS "3.19.0")
+if(${CMAKE_VERSION} VERSION_LESS "3.19.0" AND WITH_RUST_API)
     message("Unable to build the Rust API without version CMake 3.19.0")
     message("(The Rust build depends on CMake plugins with dependencies on CMake 3.19.0 and above)")
 else()
