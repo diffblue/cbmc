@@ -100,13 +100,13 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
       // we only synthesize invariants and assigns for unannotated loops
       if(loop_end->condition().find(ID_C_spec_loop_invariant).is_nil())
       {
-        // Store the loop guard.
-        exprt guard =
-          get_loop_head(
-            loop_end->loop_number,
-            goto_model.goto_functions.function_map[function_p.first])
-            ->condition();
-        neg_guards[new_id] = guard;
+        // Store the loop guard if exists.
+        auto loop_head = get_loop_head(
+          loop_end->loop_number,
+          goto_model.goto_functions.function_map[function_p.first]);
+
+        if(loop_head->has_condition())
+          neg_guards[new_id] = loop_head->condition();
 
         // Initialize invariant clauses as `true`.
         in_invariant_clause_map[new_id] = true_exprt();
