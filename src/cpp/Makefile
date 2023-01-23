@@ -69,7 +69,7 @@ cprover_library$(OBJEXT): cprover_library.inc
 	$(MAKE) -C ../ansi-c library/converter$(EXEEXT)
 
 library_check: library/*.c
-	../ansi-c/library_check.sh $(CC) $^
+	../ansi-c/library_check.sh "$(CC)" $^
 	touch $@
 
 cprover_library.inc: ../ansi-c/library/converter$(EXEEXT) library/*.c

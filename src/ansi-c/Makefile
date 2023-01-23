@@ -109,7 +109,7 @@ else
   platform_unavail = library/java.io.c library/threads.c
 endif
 library_check: library/*.c
-	./library_check.sh $(CC) $(filter-out $(platform_unavail), $^)
+	./library_check.sh "$(CC)" $(filter-out $(platform_unavail), $^)
 	touch $@
 
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
