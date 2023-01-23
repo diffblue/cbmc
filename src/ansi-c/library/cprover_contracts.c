@@ -210,8 +210,8 @@ __CPROVER_HIDE:;
 CAR_SET_CONTAINS_LOOP:
   while(idx != 0)
   {
-    incl |= candidate.is_writable & elem->is_writable &
-            __CPROVER_same_object(elem->lb, candidate.lb) &
+    incl |= (int)candidate.is_writable & (int)elem->is_writable &
+            (int)__CPROVER_same_object(elem->lb, candidate.lb) &
             (__CPROVER_POINTER_OFFSET(elem->lb) <=
              __CPROVER_POINTER_OFFSET(candidate.lb)) &
             (__CPROVER_POINTER_OFFSET(candidate.ub) <=
@@ -798,7 +798,7 @@ SET_CHECK_ASSIGNMENT_LOOP:
   while(idx != 0)
   {
     incl |=
-      elem->is_writable & __CPROVER_same_object(elem->lb, ptr) &
+      (int)elem->is_writable & (int)__CPROVER_same_object(elem->lb, ptr) &
       (__CPROVER_POINTER_OFFSET(elem->lb) <= offset) &
       (__CPROVER_POINTER_OFFSET(ub) <= __CPROVER_POINTER_OFFSET(elem->ub));
     ++elem;
@@ -1045,8 +1045,9 @@ SET_DEALLOCATE_FREEABLE_LOOP:
     // call free only iff the pointer is valid preconditions are met
     // skip checks on r_ok, dynamic_object and pointer_offset
     __CPROVER_bool preconditions =
-      (ptr == 0) | (__CPROVER_r_ok(ptr, 0) & __CPROVER_DYNAMIC_OBJECT(ptr) &
-                    (__CPROVER_POINTER_OFFSET(ptr) == 0));
+      (ptr == 0) |
+      ((int)__CPROVER_r_ok(ptr, 0) & (int)__CPROVER_DYNAMIC_OBJECT(ptr) &
+       (__CPROVER_POINTER_OFFSET(ptr) == 0));
     // If there is aliasing between the pointers in the freeable set,
     // and we attempt to free again one of the already freed pointers,
     // the r_ok condition above will fail, preventing us to deallocate
