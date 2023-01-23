@@ -5,6 +5,7 @@ Author: Qinheping Hu
 
 #include "expr_enumerator.h"
 
+#include <util/bitvector_types.h>
 #include <util/format_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -310,70 +311,95 @@ bool binary_functional_enumeratort::is_equivalence_class_representation(
   return true;
 }
 
+// Handle mix of unsigned and signed leafs in one expression.
+// From the C99 standard, section 6.3.1.8:
+// "if the operand that has unsigned integer type has rank greater or equal to
+//  the rank of the type of the other operand, then the operand with signed
+//  integer type is converted to the type of the operand with unsigned integer
+//  type."
+static std::pair<const exprt, const exprt>
+widen_bitvector(const exprt &lhs, const exprt &rhs)
+{
+  // Widening conversion.
+  if(
+    lhs.type() != rhs.type() &&
+    (lhs.type().id() == ID_unsignedbv || lhs.type().id() == ID_signedbv) &&
+    (rhs.type().id() == ID_unsignedbv || rhs.type().id() == ID_signedbv))
+  {
+    const auto &lhs_type = type_try_dynamic_cast<bitvector_typet>(lhs.type());
+    const auto &rhs_type = type_try_dynamic_cast<bitvector_typet>(rhs.type());
+
+    // Same rank, unsigned win.
+    if(lhs_type->get_width() == rhs_type->get_width())
+    {
+      if((lhs.type().id() == ID_unsignedbv || rhs.type().id() == ID_unsignedbv))
+      {
+        return std::pair<const exprt, const exprt>(
+          typecast_exprt::conditional_cast(
+            lhs, unsignedbv_typet(lhs_type->get_width())),
+          typecast_exprt::conditional_cast(
+            rhs, unsignedbv_typet(lhs_type->get_width())));
+      }
+      else
+      {
+        return std::pair<const exprt, const exprt>(
+          typecast_exprt::conditional_cast(
+            lhs, signedbv_typet(lhs_type->get_width())),
+          typecast_exprt::conditional_cast(
+            rhs, signedbv_typet(lhs_type->get_width())));
+      }
+    }
+
+    // Different rank, higher rank win.
+    if(lhs_type->get_width() > rhs_type->get_width())
+    {
+      return std::pair<const exprt, const exprt>(
+        lhs, typecast_exprt::conditional_cast(rhs, *lhs_type));
+    }
+    else
+    {
+      return std::pair<const exprt, const exprt>(
+        typecast_exprt::conditional_cast(lhs, *rhs_type), rhs);
+    }
+  }
+  // no need of bitvector conversion.
+  else
+  {
+    return std::pair<const exprt, const exprt>(lhs, rhs);
+  }
+}
+
 exprt binary_functional_enumeratort::instantiate(const expr_listt &exprs) const
 {
   INVARIANT(
     exprs.size() == 2,
     "number of arguments should be 2: " + integer2string(exprs.size()));
+
+  // Make two operands the same type if they are of different bitvector types.
+  auto operands = widen_bitvector(exprs.front(), exprs.back());
+
   if(op_id == ID_equal)
-  {
-    auto &lhs = exprs.front();
-    auto &rhs = exprs.back();
-
-    // Widening conversion.
-    if(
-      lhs.type() != rhs.type() &&
-      (lhs.type().id() == ID_unsignedbv || lhs.type().id() == ID_signedbv) &&
-      (rhs.type().id() == ID_unsignedbv || rhs.type().id() == ID_signedbv))
-    {
-      const auto &lhs_type = type_try_dynamic_cast<bitvector_typet>(lhs.type());
-      const auto &rhs_type = type_try_dynamic_cast<bitvector_typet>(rhs.type());
-      if(lhs_type->get_width() >= rhs_type->get_width())
-        return equal_exprt(lhs, typecast_exprt(rhs, lhs.type()));
-      else
-        return equal_exprt(typecast_exprt(lhs, rhs.type()), rhs);
-    }
-
-    return equal_exprt(exprs.front(), exprs.back());
-  }
+    return equal_exprt(operands.first, operands.second);
   if(op_id == ID_notequal)
-  {
-    auto &lhs = exprs.front();
-    auto &rhs = exprs.back();
-
-    // Widening conversion.
-    if(
-      lhs.type() != rhs.type() &&
-      (lhs.type().id() == ID_unsignedbv || lhs.type().id() == ID_signedbv) &&
-      (rhs.type().id() == ID_unsignedbv || rhs.type().id() == ID_signedbv))
-    {
-      const auto &lhs_type = type_try_dynamic_cast<bitvector_typet>(lhs.type());
-      const auto &rhs_type = type_try_dynamic_cast<bitvector_typet>(rhs.type());
-      if(lhs_type->get_width() >= rhs_type->get_width())
-        return notequal_exprt(lhs, typecast_exprt(rhs, lhs.type()));
-      else
-        return notequal_exprt(typecast_exprt(lhs, rhs.type()), rhs);
-    }
-
-    return notequal_exprt(exprs.front(), exprs.back());
-  }
+    return notequal_exprt(operands.first, operands.second);
   if(op_id == ID_le)
-    return less_than_or_equal_exprt(exprs.front(), exprs.back());
+    return less_than_or_equal_exprt(operands.first, operands.second);
   if(op_id == ID_lt)
-    return less_than_exprt(exprs.front(), exprs.back());
+    return less_than_exprt(operands.first, operands.second);
   if(op_id == ID_gt)
-    return greater_than_exprt(exprs.front(), exprs.back());
+    return greater_than_exprt(operands.first, operands.second);
   if(op_id == ID_ge)
-    return greater_than_or_equal_exprt(exprs.front(), exprs.back());
+    return greater_than_or_equal_exprt(operands.first, operands.second);
   if(op_id == ID_and)
     return and_exprt(exprs.front(), exprs.back());
   if(op_id == ID_or)
     return or_exprt(exprs.front(), exprs.back());
   if(op_id == ID_plus)
-    return plus_exprt(exprs.front(), exprs.back());
+    return plus_exprt(operands.first, operands.second);
   if(op_id == ID_minus)
-    return minus_exprt(exprs.front(), exprs.back());
-  return binary_exprt(exprs.front(), op_id, exprs.back());
+    return minus_exprt(operands.first, operands.second);
+
+  return binary_exprt(operands.first, op_id, operands.second);
 }
 
 expr_sett alternatives_enumeratort::enumerate(const std::size_t size) const
