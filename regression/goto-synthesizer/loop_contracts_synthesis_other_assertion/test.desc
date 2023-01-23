@@ -1,0 +1,14 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.assigns.\d+\] .* Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that y is assignable: SUCCESS$
+^\[main.assertion.\d+\] .* assertion y \=\=
+^VERIFICATION SUCCESSFUL$
+--
+--
+Check whether loop invariant are synthesized for checks other than
+pointer checks.

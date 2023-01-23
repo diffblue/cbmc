@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stdlib.h>
 
 void main()
@@ -12,6 +11,5 @@ void main()
     x = 1;
     y = y - 1;
   }
-
-  assert(false);
+  assert(y == 0);
 }

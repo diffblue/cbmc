@@ -73,8 +73,8 @@ std::vector<exprt> construct_terminals(const std::set<symbol_exprt> &symbols)
         unary_exprt(ID_loop_entry, e, e.type()), size_type()));
     }
   }
-  result.push_back(from_integer(1, unsigned_int_type()));
-  result.push_back(from_integer(1, unsigned_long_int_type()));
+  result.push_back(from_integer(1, signed_short_int_type()));
+  result.push_back(from_integer(0, signed_short_int_type()));
   return result;
 }
 
@@ -310,8 +310,11 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
       invariant_mapt new_in_clauses = invariant_mapt(in_invariant_clause_map);
       new_in_clauses[cause_loop_id] =
         and_exprt(new_in_clauses[cause_loop_id], strengthening_candidate);
+      invariant_mapt new_pos_clauses = invariant_mapt(pos_invariant_clause_map);
+      new_pos_clauses[cause_loop_id] =
+        and_exprt(new_pos_clauses[cause_loop_id], strengthening_candidate);
       const auto &combined_invariant = combine_in_and_post_invariant_clauses(
-        new_in_clauses, pos_invariant_clause_map, neg_guards);
+        new_in_clauses, new_pos_clauses, neg_guards);
 
       // The verifier we use to check current invariant candidates.
       cegis_verifiert verifier(
@@ -326,7 +329,9 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
         (verifier.properties.at(violation_id).status !=
            property_statust::FAIL &&
          return_cex->violation_type !=
-           cext::violation_typet::cex_not_hold_upon_entry))
+           cext::violation_typet::cex_not_hold_upon_entry &&
+         return_cex->violation_type !=
+           cext::violation_typet::cex_not_preserved))
       {
         return strengthening_candidate;
       }
@@ -374,6 +379,17 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
         synthesize_same_object_predicate(return_cex->checked_pointer);
       break;
 
+    case cext::violation_typet::cex_assignable:
+      synthesize_assigns(
+        return_cex->checked_pointer, return_cex->cause_loop_ids);
+      break;
+
+    case cext::violation_typet::cex_other:
+      // Update the dependent symbols.
+      dependent_symbols = compute_dependent_symbols(
+        return_cex->cause_loop_ids.front(),
+        new_invariant_clause,
+        return_cex->live_variables);
     case cext::violation_typet::cex_not_preserved:
       terminal_symbols = construct_terminals(dependent_symbols);
       new_invariant_clause = synthesize_strengthening_clause(
@@ -382,12 +398,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
         verifier.target_violation_id);
       break;
 
-    case cext::violation_typet::cex_assignable:
-      synthesize_assigns(
-        return_cex->checked_pointer, return_cex->cause_loop_ids);
-      break;
     case cext::violation_typet::cex_not_hold_upon_entry:
-    case cext::violation_typet::cex_other:
       INVARIANT(false, "unsupported violation type");
       break;
     }
