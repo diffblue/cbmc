@@ -120,6 +120,7 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
       }
     }
   }
+  log.debug() << "Finished candidates initialization." << messaget::eom;
 }
 
 void enumerative_loop_contracts_synthesizert::synthesize_assigns(
@@ -303,6 +304,8 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
     // generate candidate and verify
     for(auto strengthening_candidate : start_bool_ph.enumerate(size_bound))
     {
+      log.progress() << "Verifying candidate: "
+                     << format(strengthening_candidate) << messaget::eom;
       seen_terms++;
       invariant_mapt new_in_clauses = invariant_mapt(in_invariant_clause_map);
       new_in_clauses[cause_loop_id] =
@@ -351,6 +354,7 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
   // Set of symbols we used to enumerate strengthening clauses.
   std::vector<exprt> terminal_symbols;
 
+  log.debug() << "Start the first synthesis iteration." << messaget::eom;
   auto return_cex = verifier.verify();
 
   while(return_cex.has_value())

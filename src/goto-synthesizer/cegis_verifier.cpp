@@ -600,11 +600,11 @@ optionalt<cext> cegis_verifiert::verify()
   // Annotate assigns
   annotate_assigns(assigns_map, goto_model);
 
-  // Control verbosity.
-  // We allow non-error output message only when verbosity is set to at least 9.
+  // Control verbosity. We allow non-error output message only when verbosity
+  // is set to larger than messaget::M_DEBUG.
   const unsigned original_verbosity = log.get_message_handler().get_verbosity();
-  if(original_verbosity < 9)
-    log.get_message_handler().set_verbosity(1);
+  if(original_verbosity < messaget::M_DEBUG)
+    log.get_message_handler().set_verbosity(messaget::M_ERROR);
 
   // Apply loop contracts we annotated.
   code_contractst cont(goto_model, log);
@@ -630,7 +630,7 @@ optionalt<cext> cegis_verifiert::verify()
   // Run the checker to get the result.
   const resultt result = (*checker)();
 
-  if(original_verbosity >= 9)
+  if(original_verbosity >= messaget::M_DEBUG)
     checker->report();
 
   // Restore the verbosity.
@@ -698,6 +698,8 @@ optionalt<cext> cegis_verifiert::verify()
   // although there can be multiple ones.
 
   log.debug() << "Start to compute cause loop ids." << messaget::eom;
+  log.debug() << "Violation description: " << target_violation_info.description
+              << messaget::eom;
 
   const auto &trace = checker->get_traces()[target_violation];
   // Doing assigns-synthesis or invariant-synthesis
