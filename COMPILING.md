@@ -570,6 +570,8 @@ CBMC, you need two things:
 
 - Rust/Cargo, instructions the installation of which can be found [here](https://www.rust-lang.org/tools/install), and
 - CMake (the Rust API doesn't support being built with `Make` yet)
+  - Version `3.19.0`+ is required for the build, because of a dependency on CMake modules
+    that need the higher version themselves.
 
 Provided these two are available, you can perform a CBMC build *including*
 the Rust API by passing in the option `WITH_RUST_API` to `CMake` like this:
