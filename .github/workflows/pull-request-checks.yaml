@@ -521,9 +521,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-Release-Glucose${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-Release-${{ github.ref }}
+            ${{ runner.os }}-Release-Glucose${{ github.ref }}
             ${{ runner.os }}-Release
       - name: ccache environment
         run: |
