@@ -231,6 +231,34 @@ void smt2_convt::write_footer()
       << "\n";
 }
 
+/// Returns true iff \p type has effective width of zero bits.
+static bool is_zero_width(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_empty)
+    return true;
+  else if(type.id() == ID_struct_tag)
+    return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
+  else if(type.id() == ID_union_tag)
+    return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    for(const auto &comp : to_struct_union_type(type).components())
+    {
+      if(!is_zero_width(comp.type(), ns))
+        return false;
+    }
+    return true;
+  }
+  else if(auto array_type = type_try_dynamic_cast<array_typet>(type))
+  {
+    // we ignore array_type->size().is_zero() for now as there may be
+    // out-of-bounds accesses that we need to model
+    return is_zero_width(array_type->element_type(), ns);
+  }
+  else
+    return false;
+}
+
 void smt2_convt::define_object_size(
   const irep_idt &id,
   const object_size_exprt &expr)
@@ -584,14 +612,21 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
   {
     // Structs look like:
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
-
-    if(src.get_sub().size()!=components.size()+1)
-      return result; // give up
-
+    std::size_t j = 1;
     for(std::size_t i=0; i<components.size(); i++)
     {
       const struct_typet::componentt &c=components[i];
-      result.operands()[i]=parse_rec(src.get_sub()[i+1], c.type());
+      if(is_zero_width(components[i].type(), ns))
+      {
+        result.operands()[i] = nil_exprt{};
+      }
+      else
+      {
+        DATA_INVARIANT(
+          src.get_sub().size() > j, "insufficient number of component values");
+        result.operands()[i] = parse_rec(src.get_sub()[j], c.type());
+        ++j;
+      }
     }
   }
   else
@@ -609,6 +644,9 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
 
     for(std::size_t i=0; i<components.size(); i++)
     {
+      if(is_zero_width(components[i].type(), ns))
+        continue;
+
       std::size_t component_width=boolbv_width(components[i].type());
 
       INVARIANT(
@@ -970,28 +1008,6 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   result += '|';
 
   return result;
-}
-
-/// Returns true iff \p type has effective width of zero bits.
-static bool is_zero_width(const typet &type, const namespacet &ns)
-{
-  if(type.id() == ID_empty)
-    return true;
-  else if(type.id() == ID_struct_tag)
-    return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
-  else if(type.id() == ID_union_tag)
-    return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    for(const auto &comp : to_struct_union_type(type).components())
-    {
-      if(!is_zero_width(comp.type(), ns))
-        return false;
-    }
-    return true;
-  }
-  else
-    return false;
 }
 
 std::string smt2_convt::type2id(const typet &type) const
@@ -3224,6 +3240,8 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         it!=components.end();
         it++, i++)
     {
+      if(is_zero_width(it->type(), ns))
+        continue;
       out << " ";
       convert_expr(expr.operands()[i]);
     }
@@ -3246,9 +3264,16 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
     else
     {
       // SMT-LIB 2 concat is binary only
+      std::size_t n_concat = 0;
       for(std::size_t i=components.size(); i>1; i--)
       {
-        out << "(concat ";
+        if(is_zero_width(components[i - 1].type(), ns))
+          continue;
+        else if(i > 2 || !is_zero_width(components[0].type(), ns))
+        {
+          ++n_concat;
+          out << "(concat ";
+        }
 
         exprt op=expr.operands()[i-1];
 
@@ -3263,10 +3288,10 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         out << " ";
       }
 
-      convert_expr(expr.op0());
+      if(!is_zero_width(components[0].type(), ns))
+        convert_expr(expr.op0());
 
-      for(std::size_t i=1; i<components.size(); i++)
-        out << ")";
+      out << std::string(n_concat, ')');
     }
   }
 }
@@ -4701,19 +4726,30 @@ void smt2_convt::flatten2bv(const exprt &expr)
         struct_type.components();
 
       // SMT-LIB 2 concat is binary only
+      std::size_t n_concat = 0;
       for(std::size_t i=components.size(); i>1; i--)
       {
-        out << "(concat (" << smt_typename << "."
-            << components[i-1].get_name() << " ?sflop)";
+        if(is_zero_width(components[i - 1].type(), ns))
+          continue;
+        else if(i > 2 || !is_zero_width(components[0].type(), ns))
+        {
+          ++n_concat;
+          out << "(concat ";
+        }
+
+        out << "(" << smt_typename << "." << components[i - 1].get_name()
+            << " ?sflop)";
 
         out << " ";
       }
 
-      out << "(" << smt_typename << "."
-          << components[0].get_name() << " ?sflop)";
+      if(!is_zero_width(components[0].type(), ns))
+      {
+        out << "(" << smt_typename << "." << components[0].get_name()
+            << " ?sflop)";
+      }
 
-      for(std::size_t i=1; i<components.size(); i++)
-        out << ")"; // concat
+      out << std::string(n_concat, ')'); // concat
 
       out << ")"; // let
     }
@@ -4812,6 +4848,9 @@ void smt2_convt::unflatten(
             it!=components.end();
             it++, i++)
         {
+          if(is_zero_width(it->type(), ns))
+            continue;
+
           std::size_t member_width=boolbv_width(it->type());
 
           out << " ";
@@ -5037,6 +5076,9 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
 
 void smt2_convt::find_symbols(const exprt &expr)
 {
+  if(is_zero_width(expr.type(), ns))
+    return;
+
   // recursive call on type
   find_symbols(expr.type());
 
@@ -5821,6 +5863,9 @@ void smt2_convt::find_symbols_rec(
 
       for(const auto &component : components)
       {
+        if(is_zero_width(component.type(), ns))
+          continue;
+
         out << "(" << smt_typename << "." << component.get_name()
                       << " ";
         convert_type(component.type());
@@ -5849,6 +5894,9 @@ void smt2_convt::find_symbols_rec(
           it!=components.end();
           ++it)
       {
+        if(is_zero_width(it->type(), ns))
+          continue;
+
         const struct_union_typet::componentt &component=*it;
         out << "(define-fun update-" << smt_typename << "."
             << component.get_name() << " "
@@ -5866,7 +5914,7 @@ void smt2_convt::find_symbols_rec(
         {
           if(it==it2)
             out << "v ";
-          else
+          else if(!is_zero_width(it2->type(), ns))
           {
             out << "(" << smt_typename << "."
                 << it2->get_name() << " s) ";
