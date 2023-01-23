@@ -824,6 +824,8 @@ void perror(const char *s)
 
 /* FUNCTION: fscanf */
 
+#if !defined(__USE_ISOC99) || !defined(__REDIRECT)
+
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
@@ -843,6 +845,8 @@ __CPROVER_HIDE:;
   va_end(list);
   return result;
 }
+
+#endif
 
 /* FUNCTION: __isoc99_fscanf */
 
@@ -868,6 +872,8 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: scanf */
 
+#if !defined(__USE_ISOC99) || !defined(__REDIRECT)
+
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
@@ -887,6 +893,8 @@ __CPROVER_HIDE:;
   va_end(list);
   return result;
 }
+
+#endif
 
 /* FUNCTION: __isoc99_scanf */
 
@@ -912,6 +920,8 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: sscanf */
 
+#if !defined(__USE_ISOC99) || !defined(__REDIRECT)
+
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
@@ -931,6 +941,8 @@ __CPROVER_HIDE:;
   va_end(list);
   return result;
 }
+
+#endif
 
 /* FUNCTION: __isoc99_sscanf */
 
@@ -955,6 +967,8 @@ __CPROVER_HIDE:;
 }
 
 /* FUNCTION: vfscanf */
+
+#if !defined(__USE_ISOC99) || !defined(__REDIRECT)
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
@@ -997,6 +1011,8 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 
   return result;
 }
+
+#endif
 
 /* FUNCTION: __isoc99_vfscanf */
 
@@ -1098,6 +1114,8 @@ int __stdio_common_vfscanf(
 
 /* FUNCTION: vscanf */
 
+#if !defined(__USE_ISOC99) || !defined(__REDIRECT)
+
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
@@ -1113,6 +1131,8 @@ int vscanf(const char *restrict format, va_list arg)
   __CPROVER_HIDE:;
   return vfscanf(stdin, format, arg);
 }
+
+#endif
 
 /* FUNCTION: __isoc99_vscanf */
 
@@ -1133,6 +1153,8 @@ __CPROVER_HIDE:;
 }
 
 /* FUNCTION: vsscanf */
+
+#if !defined(__USE_ISOC99) || !defined(__REDIRECT)
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
@@ -1161,6 +1183,8 @@ __CPROVER_HIDE:;
 
   return result;
 }
+
+#endif
 
 /* FUNCTION: __isoc99_vsscanf */
 
