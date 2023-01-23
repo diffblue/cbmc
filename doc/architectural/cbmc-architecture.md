@@ -71,9 +71,10 @@ To be documented.
 
 To be documented.
 
-## Goto functions &rarr; BMC &rarr; Counterexample (trace) ##
+## Goto functions &rarr; BMC &rarr; Counterexample (trace)
 
-To be documented.
+For an explanation of part of how the BMC (Symex) process works, please refer
+to [Symex and GOTO program instructions](symex-instructions.md)
 
 ## Trace &rarr; interpreter &rarr; memory map ##
 
