@@ -562,3 +562,29 @@ then run make as follows.
 cd unit
 make test
 ```
+
+## Rust API
+
+CBMC is now offering a [Rust API](src/libcprover-rust/). To build that along with
+CBMC, you need two things:
+
+- Rust/Cargo, instructions the installation of which can be found [here](https://www.rust-lang.org/tools/install), and
+- CMake (the Rust API doesn't support being built with `Make` yet)
+
+Provided these two are available, you can perform a CBMC build *including*
+the Rust API by passing in the option `WITH_RUST_API` to `CMake` like this:
+
+```sh
+$ cmake -S. -Bbuild -DWITH_RUST_API=ON <other_options>
+[...]
+-- Rust Target: aarch64-apple-darwin
+-- Found Rust: /opt/homebrew/bin/rustc (found version "1.66.1") 
+-- Using Corrosion as a subdirectory
+-- Configuring done
+-- Generating done
+-- Build files have been written to: cbmc/build
+```
+
+If you come across any issues during the configuration or the build of the Rust API,
+please let us know by filing a [bug report](https://github.com/diffblue/cbmc/issues/new)
+and mark it with the label `Rust API` if possible.
