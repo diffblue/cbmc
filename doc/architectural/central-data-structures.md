@@ -6,7 +6,7 @@ CBMC and the assorted CProver tools.
 
 ## goto_modelt
 
-The `goto_modelt` is the main data structure that CBMC (and the other tools) used
+The `goto_modelt` is the main data structure that CBMC (and the other tools) use
 for the GOTO intermediate representation.
 
 A `goto_modelt` is effectively a pair, consisting of:
