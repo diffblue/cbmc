@@ -588,6 +588,8 @@ optionalt<cext> cegis_verifiert::verify()
   // 3. construct the formatted counterexample from the violated property and
   //    its trace.
 
+  const namespacet ns(goto_model.symbol_table);
+
   // Store the original functions. We will restore them after the verification.
   for(const auto &fun_entry : goto_model.goto_functions.function_map)
   {
@@ -600,11 +602,11 @@ optionalt<cext> cegis_verifiert::verify()
   // Annotate assigns
   annotate_assigns(assigns_map, goto_model);
 
-  // Control verbosity.
-  // We allow non-error output message only when verbosity is set to at least 9.
+  // Control verbosity. We allow non-error output message only when verbosity
+  // is set to larger than messaget::M_DEBUG.
   const unsigned original_verbosity = log.get_message_handler().get_verbosity();
-  if(original_verbosity < 9)
-    log.get_message_handler().set_verbosity(1);
+  if(original_verbosity < messaget::M_DEBUG)
+    log.get_message_handler().set_verbosity(messaget::M_ERROR);
 
   // Apply loop contracts we annotated.
   code_contractst cont(goto_model, log);
@@ -630,7 +632,7 @@ optionalt<cext> cegis_verifiert::verify()
   // Run the checker to get the result.
   const resultt result = (*checker)();
 
-  if(original_verbosity >= 9)
+  if(original_verbosity >= messaget::M_DEBUG)
     checker->report();
 
   // Restore the verbosity.
@@ -652,38 +654,48 @@ optionalt<cext> cegis_verifiert::verify()
   }
 
   properties = checker->get_properties();
-  bool target_violation_found = false;
-  auto target_violation_info = properties.begin()->second;
+  auto target_violation = properties.end();
 
   // Find target violation---the violation we want to fix next.
   // A target violation is an assignable violation or the first violation that
   // is not assignable violation.
-  for(const auto &property : properties)
+  for(auto it_property = properties.begin(); it_property != properties.end();
+      it_property++)
   {
-    if(property.second.status != property_statust::FAIL)
+    if(it_property->second.status != property_statust::FAIL)
       continue;
 
     // assignable violation found
-    if(property.second.description.find("assignable") != std::string::npos)
+    if(it_property->second.description.find("assignable") != std::string::npos)
     {
-      target_violation = property.first;
-      target_violation_info = property.second;
+      target_violation = it_property;
       break;
     }
 
     // Store the violation that we want to fix with synthesized
     // assigns/invariant.
-    if(!target_violation_found)
+    // ignore ASSERT FALSE
+    if(
+      target_violation == properties.end() &&
+      simplify_expr(it_property->second.pc->condition(), ns) != false_exprt())
     {
-      target_violation = property.first;
-      target_violation_info = property.second;
-      target_violation_found = true;
+      target_violation = it_property;
     }
   }
 
+  // All violations are
+  // ASSERT FALSE
+  if(target_violation == properties.end())
+  {
+    restore_functions();
+    return optionalt<cext>();
+  }
+
+  target_violation_id = target_violation->first;
+
   // Decide the violation type from the description of violation
   cext::violation_typet violation_type =
-    extract_violation_type(target_violation_info.description);
+    extract_violation_type(target_violation->second.description);
 
   // Compute the cause loop---the loop for which we synthesize loop contracts,
   // and the counterexample.
@@ -698,15 +710,17 @@ optionalt<cext> cegis_verifiert::verify()
   // although there can be multiple ones.
 
   log.debug() << "Start to compute cause loop ids." << messaget::eom;
+  log.debug() << "Violation description: "
+              << target_violation->second.description << messaget::eom;
 
-  const auto &trace = checker->get_traces()[target_violation];
+  const auto &trace = checker->get_traces()[target_violation->first];
   // Doing assigns-synthesis or invariant-synthesis
   if(violation_type == cext::violation_typet::cex_assignable)
   {
     cext result(violation_type);
     result.cause_loop_ids = get_cause_loop_id_for_assigns(trace);
     result.checked_pointer = static_cast<const exprt &>(
-      target_violation_info.pc->condition().find(ID_checked_assigns));
+      target_violation->second.pc->condition().find(ID_checked_assigns));
     restore_functions();
     return result;
   }
@@ -717,7 +731,7 @@ optionalt<cext> cegis_verifiert::verify()
   // Although there can be multiple cause loop ids. We only synthesize
   // loop invariants for the first cause loop.
   const std::list<loop_idt> cause_loop_ids =
-    get_cause_loop_id(trace, target_violation_info.pc);
+    get_cause_loop_id(trace, target_violation->second.pc);
 
   if(cause_loop_ids.empty())
   {
@@ -741,7 +755,7 @@ optionalt<cext> cegis_verifiert::verify()
     violation_location = get_violation_location(
       cause_loop_ids.front(),
       goto_model.get_goto_function(cause_loop_ids.front().function_id),
-      target_violation_info.pc->location_number);
+      target_violation->second.pc->location_number);
   }
 
   restore_functions();
@@ -753,7 +767,7 @@ optionalt<cext> cegis_verifiert::verify()
       goto_model.goto_functions
         .function_map[cause_loop_ids.front().function_id])
       ->source_location());
-  return_cex.violated_predicate = target_violation_info.pc->condition();
+  return_cex.violated_predicate = target_violation->second.pc->condition();
   return_cex.cause_loop_ids = cause_loop_ids;
   return_cex.violation_location = violation_location;
   return_cex.violation_type = violation_type;
@@ -762,7 +776,7 @@ optionalt<cext> cegis_verifiert::verify()
   if(violation_type == cext::violation_typet::cex_null_pointer)
   {
     return_cex.checked_pointer = get_checked_pointer_from_null_pointer_check(
-      target_violation_info.pc->condition());
+      target_violation->second.pc->condition());
   }
 
   return return_cex;

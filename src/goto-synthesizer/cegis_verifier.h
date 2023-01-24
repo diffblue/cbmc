@@ -117,7 +117,7 @@ public:
 
   /// Result counterexample.
   propertiest properties;
-  irep_idt target_violation;
+  irep_idt target_violation_id;
 
 protected:
   // Get the options same as using CBMC api without any flag, and

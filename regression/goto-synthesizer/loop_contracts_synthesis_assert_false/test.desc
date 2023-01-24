@@ -1,0 +1,13 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.assigns.\d+\] .* Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that y is assignable: SUCCESS$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+--
+--
+Check whether loop invariant are synthesized when there is ASSERT FALSE.
