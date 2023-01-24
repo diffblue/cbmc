@@ -7,7 +7,7 @@ CBMC and the assorted CProver tools.
 ## goto_modelt
 
 The `goto_modelt` is the main data structure that CBMC (and the other tools) used
-for the GOTO-IR (the `GOTO` Intermediate Representation).
+for the GOTO intermediate representation.
 
 A `goto_modelt` is effectively a pair, consisting of:
 
@@ -29,7 +29,7 @@ The abstract interface of `goto_modelt` is outlined in the file
 ## goto_functiont
 
 A `goto_functiont` is also defined as a pair. It's designed to represent a function
-at the IR level, and effectively it's the following data type (in pseudocode):
+at the goto level, and effectively it's the following data type (in pseudocode):
 
 ```js
 type goto_functiont {
@@ -46,7 +46,7 @@ in the symbol-table for their values.
 
 ## goto_programt
 
-A `goto_programt` is a list of GOTO-IR instructions. In pseudocode, it would
+A `goto_programt` is a list of GOTO instructions. In pseudocode, it would
 look like `type goto_programt = list<goto_instructiont>`.
 
 An instruction (`goto_instructiont`) is a triple (an element with three subcomponents),
@@ -88,7 +88,7 @@ tree that ends up modeling graphs like ASTs, CFGs, etc.
 various expressions, usually the result of some early processing, e.g. the result of the
 frontend parsing a file).
 
-This means that `codet`s, representing GOTO-IR instructions *also* have a `source_locationt`
+This means that `codet`s, representing GOTO instructions *also* have a `source_locationt`
 attached to them, by virtue of inheriting from `exprt`.
 
 For the most part, `source_locationt` is something that is only being used when we print
