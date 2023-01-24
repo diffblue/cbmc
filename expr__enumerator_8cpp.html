@@ -95,6 +95,7 @@ $(document).ready(function(){initNavTree('expr__enumerator_8cpp.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="expr__enumerator_8h_source.html">expr_enumerator.h</a>&quot;</code><br />
+<code>#include &lt;<a class="el" href="bitvector__types_8h_source.html">util/bitvector_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="format__expr_8h_source.html">util/format_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
@@ -104,7 +105,7 @@ $(document).ready(function(){initNavTree('expr__enumerator_8cpp.html',''); initR
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="expr__enumerator_8cpp__incl.svg" width="1303" height="888"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="expr__enumerator_8cpp__incl.svg" width="1328" height="888"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -120,6 +121,8 @@ Functions</h2></td></tr>
 <tr class="memitem:aa051a13543d87a01c3eed5cf1909f39c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="expr__enumerator_8h.html#a8921939ff87fb7a1aefb8c6afd3e5482">partitiont</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__enumerator_8cpp.html#aa051a13543d87a01c3eed5cf1909f39c">from_bits_to_partition</a> (std::size_t v, std::size_t n)</td></tr>
 <tr class="memdesc:aa051a13543d87a01c3eed5cf1909f39c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct partition of <code>n</code> elements from a bit vector <code>v</code>.  <a href="expr__enumerator_8cpp.html#aa051a13543d87a01c3eed5cf1909f39c">More...</a><br /></td></tr>
 <tr class="separator:aa051a13543d87a01c3eed5cf1909f39c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a416e7585fcfb2959d729bcdf3d478a8e"><td class="memItemLeft" align="right" valign="top">static std::pair&lt; const <a class="el" href="classexprt.html">exprt</a>, const <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__enumerator_8cpp.html#a416e7585fcfb2959d729bcdf3d478a8e">widen_bitvector</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs)</td></tr>
+<tr class="separator:a416e7585fcfb2959d729bcdf3d478a8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="aa051a13543d87a01c3eed5cf1909f39c"></a>
@@ -151,7 +154,7 @@ Functions</h2></td></tr>
 <p>Construct partition of <code>n</code> elements from a bit vector <code>v</code>. </p>
 <p>For a bit vector with ones at positions (computed by <code>get_ones_pos</code>) (ones[0], ones[1], ..., ones[k-2]), the corresponding partition is (ones[0], ones[1]-ones[0], ..., ones[k-2]-ones[k-3], n-ones[k-2]). </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00216">216</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00217">217</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
 
 </div>
 </div>
@@ -173,7 +176,7 @@ Functions</h2></td></tr>
 
 <p>Compute all positions of ones in the bit vector <code>v</code> (1-indexed). </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00189">189</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00190">190</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
 
 </div>
 </div>
@@ -203,7 +206,45 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00101">101</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00102">102</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a416e7585fcfb2959d729bcdf3d478a8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a416e7585fcfb2959d729bcdf3d478a8e">&#9670;&nbsp;</a></span>widen_bitvector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::pair&lt;const <a class="el" href="classexprt.html">exprt</a>, const <a class="el" href="classexprt.html">exprt</a>&gt; widen_bitvector </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="expr__enumerator_8cpp_source.html#l00321">321</a> of file <a class="el" href="expr__enumerator_8cpp_source.html">expr_enumerator.cpp</a>.</p>
 
 </div>
 </div>

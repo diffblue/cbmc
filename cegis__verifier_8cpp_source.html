@@ -680,185 +680,199 @@ $(document).ready(function(){initNavTree('cegis__verifier_8cpp_source.html','');
 <div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;  <span class="comment">// 3. construct the formatted counterexample from the violated property and</span></div>
 <div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;  <span class="comment">//    its trace.</span></div>
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160; </div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;  <span class="comment">// Store the original functions. We will restore them after the verification.</span></div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;fun_entry : <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;  {</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    <a class="code" href="classcegis__verifiert.html#a77c1b658edcb9402995a022ffc3b1d4d">original_functions</a>[fun_entry.first].copy_from(fun_entry.second.body);</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;  }</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160; </div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  <span class="comment">// Annotate the candidates to the goto_model for checking.</span></div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;  <a class="code" href="synthesizer__utils_8cpp.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a>(<a class="code" href="classcegis__verifiert.html#a5a1c4797e9a09fef05edc972b9d9fcb4">invariant_candidates</a>, <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>);</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160; </div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  <span class="comment">// Annotate assigns</span></div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;  <a class="code" href="synthesizer__utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a">annotate_assigns</a>(<a class="code" href="classcegis__verifiert.html#a2e28a83accd0ea7a31fd758a23ca5037">assigns_map</a>, <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>);</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160; </div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  <span class="comment">// Control verbosity.</span></div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;  <span class="comment">// We allow non-error output message only when verbosity is set to at least 9.</span></div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> original_verbosity = <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>().<a class="code" href="classmessage__handlert.html#adcfadd749647c670c1c723d946ecfc6c">get_verbosity</a>();</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  <span class="keywordflow">if</span>(original_verbosity &lt; 9)</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;    <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>().<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(1);</div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160; </div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;  <span class="comment">// Apply loop contracts we annotated.</span></div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <a class="code" href="classcode__contractst.html">code_contractst</a> cont(<a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>, <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>);</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;  cont.<a class="code" href="classcode__contractst.html#a481adf4209178c6c05270908690c2bff">apply_loop_contracts</a>();</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  <a class="code" href="classcegis__verifiert.html#a620992ff45b297ddb6bd1eeb2d12f639">original_loop_number_map</a> = cont.<a class="code" href="classcode__contractst.html#a1ceb590513994843b3b44cc150e3b66f">get_original_loop_number_map</a>();</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  <a class="code" href="classcegis__verifiert.html#a4c4ca334afa517c6e0bb49e7b8bfecc5">loop_havoc_set</a> = cont.<a class="code" href="classcode__contractst.html#a4d4d990fa744c9116a1fe5395b502138">get_loop_havoc_set</a>();</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160; </div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;  <span class="comment">// Get the checker same as CBMC api without any flag.</span></div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  <span class="comment">// TODO: replace the checker with CBMC api once it is implemented.</span></div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  <a class="code" href="classui__message__handlert.html">ui_message_handlert</a> ui_message_handler(<a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>());</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> options = <a class="code" href="classcegis__verifiert.html#a168b2b41cac3a107f7bb7a622aa99bd9">get_options</a>();</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  std::unique_ptr&lt;</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;    <a class="code" href="classall__properties__verifier__with__trace__storaget.html">all_properties_verifier_with_trace_storaget&lt;multi_path_symex_checkert&gt;</a>&gt;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    checker = <a class="code" href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a>&lt;</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;      <a class="code" href="classall__properties__verifier__with__trace__storaget.html">all_properties_verifier_with_trace_storaget&lt;multi_path_symex_checkert&gt;</a>&gt;(</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;      options, ui_message_handler, <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>);</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160; </div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;  <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;    <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>,</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>());</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160; </div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  <span class="comment">// Run the checker to get the result.</span></div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  <span class="keyword">const</span> <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00cca">resultt</a> result = (*checker)();</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160; </div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;  <span class="keywordflow">if</span>(original_verbosity &gt;= 9)</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    checker-&gt;report();</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160; </div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;  <span class="comment">// Restore the verbosity.</span></div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>().<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(original_verbosity);</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160; </div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  <span class="comment">//</span></div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;  <span class="comment">// Start to construct the counterexample.</span></div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(<a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160; </div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;  <span class="comment">// Store the original functions. We will restore them after the verification.</span></div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;fun_entry : <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;  {</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <a class="code" href="classcegis__verifiert.html#a77c1b658edcb9402995a022ffc3b1d4d">original_functions</a>[fun_entry.first].copy_from(fun_entry.second.body);</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  }</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160; </div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  <span class="comment">// Annotate the candidates to the goto_model for checking.</span></div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  <a class="code" href="synthesizer__utils_8cpp.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a>(<a class="code" href="classcegis__verifiert.html#a5a1c4797e9a09fef05edc972b9d9fcb4">invariant_candidates</a>, <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>);</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160; </div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  <span class="comment">// Annotate assigns</span></div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  <a class="code" href="synthesizer__utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a">annotate_assigns</a>(<a class="code" href="classcegis__verifiert.html#a2e28a83accd0ea7a31fd758a23ca5037">assigns_map</a>, <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>);</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160; </div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  <span class="comment">// Control verbosity. We allow non-error output message only when verbosity</span></div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  <span class="comment">// is set to larger than messaget::M_DEBUG.</span></div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> original_verbosity = <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>().<a class="code" href="classmessage__handlert.html#adcfadd749647c670c1c723d946ecfc6c">get_verbosity</a>();</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  <span class="keywordflow">if</span>(original_verbosity &lt; <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3a0d70025bdac15942d1940b047768fb51">messaget::M_DEBUG</a>)</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>().<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(<a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41">messaget::M_ERROR</a>);</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160; </div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;  <span class="comment">// Apply loop contracts we annotated.</span></div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  <a class="code" href="classcode__contractst.html">code_contractst</a> cont(<a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>, <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>);</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  cont.<a class="code" href="classcode__contractst.html#a481adf4209178c6c05270908690c2bff">apply_loop_contracts</a>();</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;  <a class="code" href="classcegis__verifiert.html#a620992ff45b297ddb6bd1eeb2d12f639">original_loop_number_map</a> = cont.<a class="code" href="classcode__contractst.html#a1ceb590513994843b3b44cc150e3b66f">get_original_loop_number_map</a>();</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;  <a class="code" href="classcegis__verifiert.html#a4c4ca334afa517c6e0bb49e7b8bfecc5">loop_havoc_set</a> = cont.<a class="code" href="classcode__contractst.html#a4d4d990fa744c9116a1fe5395b502138">get_loop_havoc_set</a>();</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160; </div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  <span class="comment">// Get the checker same as CBMC api without any flag.</span></div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  <span class="comment">// TODO: replace the checker with CBMC api once it is implemented.</span></div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  <a class="code" href="classui__message__handlert.html">ui_message_handlert</a> ui_message_handler(<a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>());</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> options = <a class="code" href="classcegis__verifiert.html#a168b2b41cac3a107f7bb7a622aa99bd9">get_options</a>();</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;  std::unique_ptr&lt;</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <a class="code" href="classall__properties__verifier__with__trace__storaget.html">all_properties_verifier_with_trace_storaget&lt;multi_path_symex_checkert&gt;</a>&gt;</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    checker = <a class="code" href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a>&lt;</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;      <a class="code" href="classall__properties__verifier__with__trace__storaget.html">all_properties_verifier_with_trace_storaget&lt;multi_path_symex_checkert&gt;</a>&gt;(</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;      options, ui_message_handler, <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>);</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160; </div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;  <a class="code" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>,</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>());</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160; </div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  <span class="comment">// Run the checker to get the result.</span></div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;  <span class="keyword">const</span> <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00cca">resultt</a> result = (*checker)();</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160; </div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;  <span class="keywordflow">if</span>(original_verbosity &gt;= <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3a0d70025bdac15942d1940b047768fb51">messaget::M_DEBUG</a>)</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    checker-&gt;report();</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160; </div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;  <span class="comment">// Restore the verbosity.</span></div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">get_message_handler</a>().<a class="code" href="classmessage__handlert.html#a512e6c5fad1bd1f04a0deb4b1f055ecf">set_verbosity</a>(original_verbosity);</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160; </div>
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;  <span class="comment">//</span></div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160; </div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;  <span class="keywordflow">if</span>(result == <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00ccaa7a95bf926a0333f57705aeac07a362a2">resultt::PASS</a>)</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;  {</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;cext&gt;</a>();</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;  }</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160; </div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;  <span class="keywordflow">if</span>(result == <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00ccaabb1ca97ec761fc37101737ba0aa2e7c5">resultt::ERROR</a> || result == <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00ccaa696b031073e74bf2cb98e5ef201d4aa3">resultt::UNKNOWN</a>)</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;  {</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(<span class="keyword">false</span>, <span class="stringliteral">&quot;Verification failed during loop contract synthesis.&quot;</span>);</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  }</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160; </div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;  <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a> = checker-&gt;get_properties();</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  <span class="keywordtype">bool</span> target_violation_found = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  <span class="keyword">auto</span> target_violation_info = <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>.begin()-&gt;second;</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160; </div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="comment">// Find target violation---the violation we want to fix next.</span></div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  <span class="comment">// A target violation is an assignable violation or the first violation that</span></div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;  <span class="comment">// is not assignable violation.</span></div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;property : <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>)</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;  {</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    <span class="keywordflow">if</span>(property.second.status != <a class="code" href="properties_8h.html#a6a3450b5a7e86762bcb726f2cb000b4eac2759effffc94bb9acc71d69fe3e8a1f">property_statust::FAIL</a>)</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160; </div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    <span class="comment">// assignable violation found</span></div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="keywordflow">if</span>(property.second.description.find(<span class="stringliteral">&quot;assignable&quot;</span>) != std::string::npos)</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    {</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;      <a class="code" href="classcegis__verifiert.html#a818f9f0dc661f60c9249043f61c88913">target_violation</a> = <span class="keyword">property</span>.first;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;      target_violation_info = <span class="keyword">property</span>.second;</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    }</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160; </div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="comment">// Store the violation that we want to fix with synthesized</span></div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="comment">// assigns/invariant.</span></div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="keywordflow">if</span>(!target_violation_found)</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;    {</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;      <a class="code" href="classcegis__verifiert.html#a818f9f0dc661f60c9249043f61c88913">target_violation</a> = <span class="keyword">property</span>.first;</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;      target_violation_info = <span class="keyword">property</span>.second;</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;      target_violation_found = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    }</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;  }</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160; </div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;  <span class="comment">// Decide the violation type from the description of violation</span></div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;  <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18c">cext::violation_typet</a> violation_type =</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    <a class="code" href="classcegis__verifiert.html#a69530cf71e1fc012ea4244022d13df1a">extract_violation_type</a>(target_violation_info.description);</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160; </div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;  <span class="comment">// Compute the cause loop---the loop for which we synthesize loop contracts,</span></div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;  <span class="comment">// and the counterexample.</span></div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160; </div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;  <span class="comment">// If the violation is an assignable check, we synthesize assigns targets.</span></div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;  <span class="comment">// In the case, cause loops are all loops the violation is in. We keep</span></div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;  <span class="comment">// adding the new assigns target to the most-inner loop that does not</span></div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;  <span class="comment">// contain the new target until the assignable violation is resolved.</span></div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  <span class="comment">// Start to construct the counterexample.</span></div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;  <span class="comment">//</span></div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160; </div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;  <span class="keywordflow">if</span>(result == <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00ccaa7a95bf926a0333f57705aeac07a362a2">resultt::PASS</a>)</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;  {</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;cext&gt;</a>();</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;  }</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160; </div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;  <span class="keywordflow">if</span>(result == <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00ccaabb1ca97ec761fc37101737ba0aa2e7c5">resultt::ERROR</a> || result == <a class="code" href="properties_8h.html#a76d6f8501ac142de9dd47e69e3d00ccaa696b031073e74bf2cb98e5ef201d4aa3">resultt::UNKNOWN</a>)</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  {</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(<span class="keyword">false</span>, <span class="stringliteral">&quot;Verification failed during loop contract synthesis.&quot;</span>);</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;  }</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160; </div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a> = checker-&gt;get_properties();</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;  <span class="keyword">auto</span> target_violation = <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>.end();</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160; </div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  <span class="comment">// Find target violation---the violation we want to fix next.</span></div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;  <span class="comment">// A target violation is an assignable violation or the first violation that</span></div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;  <span class="comment">// is not assignable violation.</span></div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it_property = <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>.begin(); it_property != <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>.end();</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;      it_property++)</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;  {</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    <span class="keywordflow">if</span>(it_property-&gt;second.status != <a class="code" href="properties_8h.html#a6a3450b5a7e86762bcb726f2cb000b4eac2759effffc94bb9acc71d69fe3e8a1f">property_statust::FAIL</a>)</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160; </div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="comment">// assignable violation found</span></div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    <span class="keywordflow">if</span>(it_property-&gt;second.description.find(<span class="stringliteral">&quot;assignable&quot;</span>) != std::string::npos)</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    {</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;      target_violation = it_property;</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    }</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160; </div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="comment">// Store the violation that we want to fix with synthesized</span></div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="comment">// assigns/invariant.</span></div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;    <span class="comment">// ignore ASSERT FALSE</span></div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;      target_violation == <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>.end() &amp;&amp;</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;      <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(it_property-&gt;second.pc-&gt;condition(), ns) != <a class="code" href="classfalse__exprt.html">false_exprt</a>())</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    {</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;      target_violation = it_property;</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    }</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;  }</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160; </div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;  <span class="comment">// All violations are</span></div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;  <span class="comment">// ASSERT FALSE</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;  <span class="keywordflow">if</span>(target_violation == <a class="code" href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">properties</a>.end())</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;  {</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;cext&gt;</a>();</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;  }</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160; </div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;  <a class="code" href="classcegis__verifiert.html#a1482aaef32279763a545c950de61e7b2">target_violation_id</a> = target_violation-&gt;first;</div>
 <div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160; </div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;  <span class="comment">// For other cases, we synthesize loop invariant clauses. We synthesize</span></div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;  <span class="comment">// invariants for one loop at a time. So we return only the first cause loop</span></div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;  <span class="comment">// although there can be multiple ones.</span></div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;  <span class="comment">// Decide the violation type from the description of violation</span></div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;  <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18c">cext::violation_typet</a> violation_type =</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    <a class="code" href="classcegis__verifiert.html#a69530cf71e1fc012ea4244022d13df1a">extract_violation_type</a>(target_violation-&gt;second.description);</div>
 <div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160; </div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;Start to compute cause loop ids.&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160; </div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;trace = checker-&gt;get_traces()[<a class="code" href="classcegis__verifiert.html#a818f9f0dc661f60c9249043f61c88913">target_violation</a>];</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <span class="comment">// Doing assigns-synthesis or invariant-synthesis</span></div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  <span class="keywordflow">if</span>(violation_type == <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa89431bbe23277f3636288002650c3ff">cext::violation_typet::cex_assignable</a>)</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  {</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    <a class="code" href="classcext.html">cext</a> result(violation_type);</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    result.<a class="code" href="classcext.html#a5303cfb94b158e5d854c9d577a3ee101">cause_loop_ids</a> = <a class="code" href="classcegis__verifiert.html#ab07e404670c61c1457815578e2d315c3">get_cause_loop_id_for_assigns</a>(trace);</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    result.<a class="code" href="classcext.html#a487ef6e6fa30107c78ed945d5a02ae7a">checked_pointer</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;      target_violation_info.pc-&gt;condition().find(ID_checked_assigns));</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;  }</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160; </div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;  <span class="comment">// We construct the full counterexample only for violations other than</span></div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;  <span class="comment">// assignable checks.</span></div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160; </div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;  <span class="comment">// Although there can be multiple cause loop ids. We only synthesize</span></div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;  <span class="comment">// loop invariants for the first cause loop.</span></div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;  <span class="keyword">const</span> std::list&lt;loop_idt&gt; cause_loop_ids =</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <a class="code" href="classcegis__verifiert.html#a4325ee20b8e9fe4955d49245f8501f96">get_cause_loop_id</a>(trace, target_violation_info.pc);</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160; </div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;  <span class="keywordflow">if</span>(cause_loop_ids.empty())</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;  {</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;No cause loop found!&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160; </div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcext.html">cext</a>(violation_type);</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;  }</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160; </div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;Found cause loop with function id: &quot;</span></div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;              &lt;&lt; cause_loop_ids.front().function_id</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;              &lt;&lt; <span class="stringliteral">&quot;, and loop number: &quot;</span> &lt;&lt; cause_loop_ids.front().loop_number</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160; </div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;  <span class="keyword">auto</span> violation_location = <a class="code" href="classcext.html#a84c0cfe748f052827a590667485f56dda0bfe34f63d3786e7709cc6ffb3539df6">cext::violation_locationt::in_loop</a>;</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  <span class="comment">// We always strengthen in_clause if the violation is</span></div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;  <span class="comment">// invariant-not-preserved.</span></div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;  <span class="keywordflow">if</span>(violation_type != <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa7e00247c04f7315a59255c0f6a91fe1">cext::violation_typet::cex_not_preserved</a>)</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;  {</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    <span class="comment">// Get the location of the violation</span></div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    violation_location = <a class="code" href="classcegis__verifiert.html#a397aba104c629331f2b15db6ca14454e">get_violation_location</a>(</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;      cause_loop_ids.front(),</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;      <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#a1f8f7881910ecc023259da818d6ba0bd">get_goto_function</a>(cause_loop_ids.front().function_id),</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;      target_violation_info.pc-&gt;location_number);</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;  }</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160; </div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;  <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <span class="comment">// Compute the cause loop---the loop for which we synthesize loop contracts,</span></div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;  <span class="comment">// and the counterexample.</span></div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160; </div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <span class="comment">// If the violation is an assignable check, we synthesize assigns targets.</span></div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  <span class="comment">// In the case, cause loops are all loops the violation is in. We keep</span></div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <span class="comment">// adding the new assigns target to the most-inner loop that does not</span></div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;  <span class="comment">// contain the new target until the assignable violation is resolved.</span></div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160; </div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;  <span class="comment">// For other cases, we synthesize loop invariant clauses. We synthesize</span></div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;  <span class="comment">// invariants for one loop at a time. So we return only the first cause loop</span></div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;  <span class="comment">// although there can be multiple ones.</span></div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160; </div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;Start to compute cause loop ids.&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;Violation description: &quot;</span></div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;              &lt;&lt; target_violation-&gt;second.description &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160; </div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;trace = checker-&gt;get_traces()[target_violation-&gt;first];</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;  <span class="comment">// Doing assigns-synthesis or invariant-synthesis</span></div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;  <span class="keywordflow">if</span>(violation_type == <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa89431bbe23277f3636288002650c3ff">cext::violation_typet::cex_assignable</a>)</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;  {</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <a class="code" href="classcext.html">cext</a> result(violation_type);</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    result.<a class="code" href="classcext.html#a5303cfb94b158e5d854c9d577a3ee101">cause_loop_ids</a> = <a class="code" href="classcegis__verifiert.html#ab07e404670c61c1457815578e2d315c3">get_cause_loop_id_for_assigns</a>(trace);</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    result.<a class="code" href="classcext.html#a487ef6e6fa30107c78ed945d5a02ae7a">checked_pointer</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;      target_violation-&gt;second.pc-&gt;condition().find(ID_checked_assigns));</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;  }</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160; </div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;  <span class="comment">// We construct the full counterexample only for violations other than</span></div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;  <span class="comment">// assignable checks.</span></div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160; </div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;  <span class="comment">// Although there can be multiple cause loop ids. We only synthesize</span></div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;  <span class="comment">// loop invariants for the first cause loop.</span></div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="keyword">const</span> std::list&lt;loop_idt&gt; cause_loop_ids =</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    <a class="code" href="classcegis__verifiert.html#a4325ee20b8e9fe4955d49245f8501f96">get_cause_loop_id</a>(trace, target_violation-&gt;second.pc);</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160; </div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;  <span class="keywordflow">if</span>(cause_loop_ids.empty())</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;  {</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;No cause loop found!&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160; </div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classcext.html">cext</a>(violation_type);</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;  }</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160; </div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;  <a class="code" href="classcegis__verifiert.html#a444275d0835b98eaf4e7c831f1abfe7d">log</a>.<a class="code" href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">debug</a>() &lt;&lt; <span class="stringliteral">&quot;Found cause loop with function id: &quot;</span></div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;              &lt;&lt; cause_loop_ids.front().function_id</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;              &lt;&lt; <span class="stringliteral">&quot;, and loop number: &quot;</span> &lt;&lt; cause_loop_ids.front().loop_number</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160; </div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;  <span class="keyword">auto</span> return_cex = <a class="code" href="classcegis__verifiert.html#a37e3ce371a5f157829639eb385eb86c4">build_cex</a>(</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    trace,</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <a class="code" href="synthesizer__utils_8cpp.html#a4b21d66b7d3f8e1c90243bfb0e30a23c">get_loop_head</a>(</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;      cause_loop_ids.front().loop_number,</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;      <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a></div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;        .<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>[cause_loop_ids.front().function_id])</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;      -&gt;source_location());</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;  return_cex.violated_predicate = target_violation_info.pc-&gt;condition();</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;  return_cex.cause_loop_ids = cause_loop_ids;</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;  return_cex.violation_location = violation_location;</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  return_cex.violation_type = violation_type;</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;  <span class="keyword">auto</span> violation_location = <a class="code" href="classcext.html#a84c0cfe748f052827a590667485f56dda0bfe34f63d3786e7709cc6ffb3539df6">cext::violation_locationt::in_loop</a>;</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;  <span class="comment">// We always strengthen in_clause if the violation is</span></div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;  <span class="comment">// invariant-not-preserved.</span></div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;  <span class="keywordflow">if</span>(violation_type != <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18caa7e00247c04f7315a59255c0f6a91fe1">cext::violation_typet::cex_not_preserved</a>)</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;  {</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    <span class="comment">// Get the location of the violation</span></div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    violation_location = <a class="code" href="classcegis__verifiert.html#a397aba104c629331f2b15db6ca14454e">get_violation_location</a>(</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;      cause_loop_ids.front(),</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;      <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#a1f8f7881910ecc023259da818d6ba0bd">get_goto_function</a>(cause_loop_ids.front().function_id),</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;      target_violation-&gt;second.pc-&gt;location_number);</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;  }</div>
 <div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160; </div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;  <span class="comment">// The pointer checked in the null-pointer-check violation.</span></div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;  <span class="keywordflow">if</span>(violation_type == <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca06f8b744d23c57ea4a0be2ed9a2584e5">cext::violation_typet::cex_null_pointer</a>)</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;  {</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    return_cex.checked_pointer = <a class="code" href="cegis__verifier_8cpp.html#aeff293cd401b49f0abdc09d32949d133">get_checked_pointer_from_null_pointer_check</a>(</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;      target_violation_info.pc-&gt;condition());</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;  }</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160; </div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;  <span class="keywordflow">return</span> return_cex;</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;}</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;  <a class="code" href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">restore_functions</a>();</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160; </div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;  <span class="keyword">auto</span> return_cex = <a class="code" href="classcegis__verifiert.html#a37e3ce371a5f157829639eb385eb86c4">build_cex</a>(</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    trace,</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    <a class="code" href="synthesizer__utils_8cpp.html#a4b21d66b7d3f8e1c90243bfb0e30a23c">get_loop_head</a>(</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;      cause_loop_ids.front().loop_number,</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;      <a class="code" href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a></div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;        .<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>[cause_loop_ids.front().function_id])</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;      -&gt;source_location());</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;  return_cex.violated_predicate = target_violation-&gt;second.pc-&gt;condition();</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;  return_cex.cause_loop_ids = cause_loop_ids;</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;  return_cex.violation_location = violation_location;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;  return_cex.violation_type = violation_type;</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160; </div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;  <span class="comment">// The pointer checked in the null-pointer-check violation.</span></div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;  <span class="keywordflow">if</span>(violation_type == <a class="code" href="classcext.html#a6f187d25029f8f00bc9910e09c9ad18ca06f8b744d23c57ea4a0be2ed9a2584e5">cext::violation_typet::cex_null_pointer</a>)</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;  {</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    return_cex.checked_pointer = <a class="code" href="cegis__verifier_8cpp.html#aeff293cd401b49f0abdc09d32949d133">get_checked_pointer_from_null_pointer_check</a>(</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;      target_violation-&gt;second.pc-&gt;condition());</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;  }</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160; </div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;  <span class="keywordflow">return</span> return_cex;</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;}</div>
 <div class="ttc" id="aadd__failed__symbols_8cpp_html_ab68ffa57618f58dede0d56727c087329"><div class="ttname"><a href="add__failed__symbols_8cpp.html#ab68ffa57618f58dede0d56727c087329">add_failed_symbols</a></div><div class="ttdeci">void add_failed_symbols(symbol_table_baset &amp;symbol_table)</div><div class="ttdoc">Create a failed-dereference symbol for all symbols in the given table that need one (i....</div><div class="ttdef"><b>Definition:</b> <a href="add__failed__symbols_8cpp_source.html#l00077">add_failed_symbols.cpp:77</a></div></div>
 <div class="ttc" id="aadd__failed__symbols_8h_html"><div class="ttname"><a href="add__failed__symbols_8h.html">add_failed_symbols.h</a></div><div class="ttdoc">Pointer Dereferencing.</div></div>
 <div class="ttc" id="aall__properties__verifier__with__trace__storage_8h_html"><div class="ttname"><a href="all__properties__verifier__with__trace__storage_8h.html">all_properties_verifier_with_trace_storage.h</a></div><div class="ttdoc">Goto verifier for verifying all properties that stores traces.</div></div>
@@ -874,6 +888,7 @@ $(document).ready(function(){initNavTree('cegis__verifier_8cpp_source.html','');
 <div class="ttc" id="aclassall__properties__verifier__with__trace__storaget_html"><div class="ttname"><a href="classall__properties__verifier__with__trace__storaget.html">all_properties_verifier_with_trace_storaget</a></div><div class="ttdef"><b>Definition:</b> <a href="all__properties__verifier__with__trace__storage_8h_source.html#l00024">all_properties_verifier_with_trace_storage.h:25</a></div></div>
 <div class="ttc" id="aclassbinary__exprt_html_a63c08782a0df40613746d95adf8db773"><div class="ttname"><a href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">binary_exprt::lhs</a></div><div class="ttdeci">exprt &amp; lhs()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00613">std_expr.h:613</a></div></div>
 <div class="ttc" id="aclassbinary__exprt_html_ac3fddb731e038db235b5b69edc110f39"><div class="ttname"><a href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">binary_exprt::rhs</a></div><div class="ttdeci">exprt &amp; rhs()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00623">std_expr.h:623</a></div></div>
+<div class="ttc" id="aclasscegis__verifiert_html_a1482aaef32279763a545c950de61e7b2"><div class="ttname"><a href="classcegis__verifiert.html#a1482aaef32279763a545c950de61e7b2">cegis_verifiert::target_violation_id</a></div><div class="ttdeci">irep_idt target_violation_id</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8h_source.html#l00120">cegis_verifier.h:120</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_a168b2b41cac3a107f7bb7a622aa99bd9"><div class="ttname"><a href="classcegis__verifiert.html#a168b2b41cac3a107f7bb7a622aa99bd9">cegis_verifiert::get_options</a></div><div class="ttdeci">optionst get_options()</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8cpp_source.html#l00084">cegis_verifier.cpp:84</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_a17f6c17a94ff0fb1607683b8e7e8879d"><div class="ttname"><a href="classcegis__verifiert.html#a17f6c17a94ff0fb1607683b8e7e8879d">cegis_verifiert::restore_functions</a></div><div class="ttdeci">void restore_functions()</div><div class="ttdoc">Restore transformed functions to original functions.</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8cpp_source.html#l00566">cegis_verifier.cpp:566</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_a18506db293cab361acb168a8652c50bd"><div class="ttname"><a href="classcegis__verifiert.html#a18506db293cab361acb168a8652c50bd">cegis_verifiert::verify</a></div><div class="ttdeci">optionalt&lt; cext &gt; verify()</div><div class="ttdoc">Verify goto_model.</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8cpp_source.html#l00576">cegis_verifier.cpp:576</a></div></div>
@@ -889,7 +904,6 @@ $(document).ready(function(){initNavTree('cegis__verifier_8cpp_source.html','');
 <div class="ttc" id="aclasscegis__verifiert_html_a69530cf71e1fc012ea4244022d13df1a"><div class="ttname"><a href="classcegis__verifiert.html#a69530cf71e1fc012ea4244022d13df1a">cegis_verifiert::extract_violation_type</a></div><div class="ttdeci">cext::violation_typet extract_violation_type(const std::string &amp;description)</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8cpp_source.html#l00126">cegis_verifier.cpp:126</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_a76d361a5436123ecbcb110cb6a7dedbb"><div class="ttname"><a href="classcegis__verifiert.html#a76d361a5436123ecbcb110cb6a7dedbb">cegis_verifiert::goto_model</a></div><div class="ttdeci">goto_modelt &amp; goto_model</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8h_source.html#l00173">cegis_verifier.h:173</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_a77c1b658edcb9402995a022ffc3b1d4d"><div class="ttname"><a href="classcegis__verifiert.html#a77c1b658edcb9402995a022ffc3b1d4d">cegis_verifiert::original_functions</a></div><div class="ttdeci">std::unordered_map&lt; irep_idt, goto_programt &gt; original_functions</div><div class="ttdoc">Map from function names to original functions.</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8h_source.html#l00178">cegis_verifier.h:178</a></div></div>
-<div class="ttc" id="aclasscegis__verifiert_html_a818f9f0dc661f60c9249043f61c88913"><div class="ttname"><a href="classcegis__verifiert.html#a818f9f0dc661f60c9249043f61c88913">cegis_verifiert::target_violation</a></div><div class="ttdeci">irep_idt target_violation</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8h_source.html#l00120">cegis_verifier.h:120</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_a9d9cbdc4ef3c55000eadf6ad6924c9d8"><div class="ttname"><a href="classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8">cegis_verifiert::properties</a></div><div class="ttdeci">propertiest properties</div><div class="ttdoc">Result counterexample.</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8h_source.html#l00119">cegis_verifier.h:119</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_ab07e404670c61c1457815578e2d315c3"><div class="ttname"><a href="classcegis__verifiert.html#ab07e404670c61c1457815578e2d315c3">cegis_verifiert::get_cause_loop_id_for_assigns</a></div><div class="ttdeci">std::list&lt; loop_idt &gt; get_cause_loop_id_for_assigns(const goto_tracet &amp;goto_trace)</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8cpp_source.html#l00164">cegis_verifier.cpp:164</a></div></div>
 <div class="ttc" id="aclasscegis__verifiert_html_ab2f8ffcc5742e4aaa4dea7a21745b80e"><div class="ttname"><a href="classcegis__verifiert.html#ab2f8ffcc5742e4aaa4dea7a21745b80e">cegis_verifiert::is_instruction_in_transformed_loop_condition</a></div><div class="ttdeci">bool is_instruction_in_transformed_loop_condition(const loop_idt &amp;loop_id, const goto_functiont &amp;function, unsigned location_number_of_target)</div><div class="ttdoc">Decide whether the target instruction is between the loop-havoc and the evaluation of the loop guard.</div><div class="ttdef"><b>Definition:</b> <a href="cegis__verifier_8cpp_source.html#l00300">cegis_verifier.cpp:300</a></div></div>
@@ -921,6 +935,7 @@ $(document).ready(function(){initNavTree('cegis__verifier_8cpp_source.html','');
 <div class="ttc" id="aclassexprt_html_a646970b782ea26d0500e73c6d1661edd"><div class="ttname"><a href="classexprt.html#a646970b782ea26d0500e73c6d1661edd">exprt::depth_begin</a></div><div class="ttdeci">depth_iteratort depth_begin()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00247">expr.cpp:247</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
+<div class="ttc" id="aclassfalse__exprt_html"><div class="ttname"><a href="classfalse__exprt.html">false_exprt</a></div><div class="ttdoc">The Boolean constant false.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03016">std_expr.h:3017</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a75fd5a161012d70279ba54f9bac5bda2"><div class="ttname"><a href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a></div><div class="ttdeci">::goto_functiont goto_functiont</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00027">goto_functions.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__functiont_html"><div class="ttname"><a href="classgoto__functiont.html">goto_functiont</a></div><div class="ttdoc">A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden...</div><div class="ttdef"><b>Definition:</b> <a href="goto__function_8h_source.html#l00023">goto_function.h:24</a></div></div>
@@ -958,6 +973,8 @@ $(document).ready(function(){initNavTree('cegis__verifier_8cpp_source.html','');
 <div class="ttc" id="aclassmessage__handlert_html_adcfadd749647c670c1c723d946ecfc6c"><div class="ttname"><a href="classmessage__handlert.html#adcfadd749647c670c1c723d946ecfc6c">message_handlert::get_verbosity</a></div><div class="ttdeci">unsigned get_verbosity() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00054">message.h:54</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a9b00d066828dcda2059ead6b91f55d86"><div class="ttname"><a href="classmessaget.html#a9b00d066828dcda2059ead6b91f55d86">messaget::debug</a></div><div class="ttdeci">mstreamt &amp; debug() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00429">message.h:429</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a9b8e1bf66846146916ea4a06c5fc9f90"><div class="ttname"><a href="classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90">messaget::get_message_handler</a></div><div class="ttdeci">message_handlert &amp; get_message_handler()</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00184">message.h:184</a></div></div>
+<div class="ttc" id="aclassmessaget_html_aafd48890242d69e048f60af604a72bd3a0d70025bdac15942d1940b047768fb51"><div class="ttname"><a href="classmessaget.html#aafd48890242d69e048f60af604a72bd3a0d70025bdac15942d1940b047768fb51">messaget::M_DEBUG</a></div><div class="ttdeci">@ M_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00172">message.h:171</a></div></div>
+<div class="ttc" id="aclassmessaget_html_aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41"><div class="ttname"><a href="classmessaget.html#aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41">messaget::M_ERROR</a></div><div class="ttdeci">@ M_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00170">message.h:170</a></div></div>
 <div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
 <div class="ttc" id="aclassoptionst_html"><div class="ttname"><a href="classoptionst.html">optionst</a></div><div class="ttdef"><b>Definition:</b> <a href="util_2options_8h_source.html#l00022">options.h:23</a></div></div>
@@ -1007,6 +1024,7 @@ $(document).ready(function(){initNavTree('cegis__verifier_8cpp_source.html','');
 <div class="ttc" id="aremove__skip_8h_html"><div class="ttname"><a href="remove__skip_8h.html">remove_skip.h</a></div><div class="ttdoc">Program Transformation.</div></div>
 <div class="ttc" id="aset__properties_8cpp_html_abc9825c32f9fdd47e1094a6b72e544f0"><div class="ttname"><a href="set__properties_8cpp.html#abc9825c32f9fdd47e1094a6b72e544f0">label_properties</a></div><div class="ttdeci">void label_properties(goto_modelt &amp;goto_model)</div><div class="ttdef"><b>Definition:</b> <a href="set__properties_8cpp_source.html#l00045">set_properties.cpp:45</a></div></div>
 <div class="ttc" id="aset__properties_8h_html"><div class="ttname"><a href="set__properties_8h.html">set_properties.h</a></div><div class="ttdoc">Set the properties to check.</div></div>
+<div class="ttc" id="asimplify__expr_8cpp_html_adebe9c3e4a7aac67777c20e448f6f2bc"><div class="ttname"><a href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a></div><div class="ttdeci">exprt simplify_expr(exprt src, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03024">simplify_expr.cpp:3024</a></div></div>
 <div class="ttc" id="asmt2__incremental__decision__procedure_8cpp_html_ac39a0adbcad4c2c02388ed215fe82ea0"><div class="ttname"><a href="smt2__incremental__decision__procedure_8cpp.html#ac39a0adbcad4c2c02388ed215fe82ea0">get_identifier</a></div><div class="ttdeci">static optionalt&lt; smt_termt &gt; get_identifier(const exprt &amp;expr, const std::unordered_map&lt; exprt, smt_identifier_termt, irep_hash &gt; &amp;expression_handle_identifiers, const std::unordered_map&lt; exprt, smt_identifier_termt, irep_hash &gt; &amp;expression_identifiers)</div><div class="ttdef"><b>Definition:</b> <a href="smt2__incremental__decision__procedure_8cpp_source.html#l00344">smt2_incremental_decision_procedure.cpp:344</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>

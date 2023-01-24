@@ -19,5 +19,5 @@ var classcegis__verifiert =
     [ "original_functions", "classcegis__verifiert.html#a77c1b658edcb9402995a022ffc3b1d4d", null ],
     [ "original_loop_number_map", "classcegis__verifiert.html#a620992ff45b297ddb6bd1eeb2d12f639", null ],
     [ "properties", "classcegis__verifiert.html#a9d9cbdc4ef3c55000eadf6ad6924c9d8", null ],
-    [ "target_violation", "classcegis__verifiert.html#a818f9f0dc661f60c9249043f61c88913", null ]
+    [ "target_violation_id", "classcegis__verifiert.html#a1482aaef32279763a545c950de61e7b2", null ]
 ];
