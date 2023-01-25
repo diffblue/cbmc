@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test only fails when using SMT solvers as back-end on Windows ("TODO
+typecast3 floatbv -> pointer", same problem as va_list3).

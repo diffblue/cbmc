@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-cprover-smt-backend
 main.c
 --xml-ui --function test --little-endian
 activate-multi-line-match
