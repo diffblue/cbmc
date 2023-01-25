@@ -1,6 +1,5 @@
 var NAVTREEINDEX78 =
 {
-"fixed__keys__map__wrapper_8h.html":[7,0,2,30,57],
 "fixed__keys__map__wrapper_8h_source.html":[7,0,2,30,57],
 "fixedbv_8cpp.html":[7,0,2,30,58],
 "fixedbv_8cpp_source.html":[7,0,2,30,58],
@@ -249,5 +248,6 @@ var NAVTREEINDEX78 =
 "functions_func_d.html":[6,2,1,4],
 "functions_func_e.html":[6,2,1,5],
 "functions_func_f.html":[6,2,1,6],
-"functions_func_g.html":[6,2,1,7]
+"functions_func_g.html":[6,2,1,7],
+"functions_func_h.html":[6,2,1,8]
 };
