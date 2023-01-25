@@ -537,14 +537,6 @@ void smt2_convt::walk_array_tree(
     exprt value = parse_rec(src.get_sub()[3], type.element_type());
     operands_map->emplace(index, value);
   }
-  else if(src.get_sub().size() == 3 && src.get_sub()[0].id() == "let")
-  {
-    // This is produced by Z3
-    // (let (....) (....))
-    walk_array_tree(
-      operands_map, src.get_sub()[1].get_sub()[0].get_sub()[1], type);
-    walk_array_tree(operands_map, src.get_sub()[2], type);
-  }
   else if(src.get_sub().size()==2 &&
           src.get_sub()[0].get_sub().size()==3 &&
           src.get_sub()[0].get_sub()[0].id()=="as" &&
@@ -553,6 +545,12 @@ void smt2_convt::walk_array_tree(
     // (as const type_info default_value)
     exprt default_value = parse_rec(src.get_sub()[1], type.element_type());
     operands_map->emplace(-1, default_value);
+  }
+  else
+  {
+    auto bindings_it = current_bindings.find(src.id());
+    if(bindings_it != current_bindings.end())
+      walk_array_tree(operands_map, bindings_it->second, type);
   }
 }
 
@@ -633,6 +631,27 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
 
 exprt smt2_convt::parse_rec(const irept &src, const typet &type)
 {
+  if(src.get_sub().size() == 3 && src.get_sub()[0].id() == ID_let)
+  {
+    // This is produced by Z3
+    // (let (....) (....))
+    auto previous_bindings = current_bindings;
+    for(const auto &binding : src.get_sub()[1].get_sub())
+    {
+      const irep_idt &name = binding.get_sub()[0].id();
+      current_bindings.emplace(name, binding.get_sub()[1]);
+    }
+    exprt result = parse_rec(src.get_sub()[2], type);
+    current_bindings = std::move(previous_bindings);
+    return result;
+  }
+
+  auto bindings_it = current_bindings.find(src.id());
+  if(bindings_it != current_bindings.end())
+  {
+    return parse_rec(bindings_it->second, type);
+  }
+
   if(
     type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
     type.id() == ID_integer || type.id() == ID_rational ||
