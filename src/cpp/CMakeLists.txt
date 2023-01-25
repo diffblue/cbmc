@@ -24,13 +24,24 @@ endif()
 
 ################################################################################
 
+set(extra_dependencies
+    ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
+)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    list(REMOVE_ITEM
+         extra_dependencies
+         ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp)
+endif()
+
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 add_library(cpp ${sources})
 
 set_source_files_properties(
         ${sources}
         PROPERTIES
-        OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+        OBJECT_DEPENDS "${extra_dependencies}"
 )
 
 generic_includes(cpp)

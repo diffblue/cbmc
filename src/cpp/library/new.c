@@ -27,8 +27,10 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
 /* FUNCTION: __new_array */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
 const void *__CPROVER_new_object = 0;
 __CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
 {
@@ -63,9 +65,12 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
 
 /* FUNCTION: __delete */
 
+void __CPROVER_deallocate(void *);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
 const void *__CPROVER_new_object = 0;
 __CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void __delete(void *ptr)
 {
@@ -98,9 +103,12 @@ inline void __delete(void *ptr)
 
 /* FUNCTION: __delete_array */
 
+void __CPROVER_deallocate(void *);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
 const void *__CPROVER_new_object = 0;
 __CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void __delete_array(void *ptr)
 {
