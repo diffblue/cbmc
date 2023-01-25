@@ -55,7 +55,7 @@ mod tests {
     #[test]
     fn translate_vector_of_rust_string_to_cpp() {
         let vec: Vec<String> = vec![
-            "/tmp/example.c".to_owned(),
+            "other/example.c".to_owned(),
             "/tmp/example2.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
@@ -71,7 +71,7 @@ mod tests {
         };
     
         let vec: Vec<String> = vec![
-            "/tmp/example.c".to_owned()];
+            "other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
@@ -91,7 +91,7 @@ mod tests {
         let client = ffi::new_api_session();
     
         let vec: Vec<String> = vec![
-            "/tmp/example.c".to_owned()];
+            "other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         client.load_model_from_files(vect);
@@ -114,7 +114,7 @@ mod tests {
         };
     
         let vec: Vec<String> = vec![
-            "/tmp/example.c".to_owned()];
+            "other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
