@@ -7,7 +7,48 @@ CBMC and the assorted CProver tools.
 ## goto_modelt
 
 The `goto_modelt` is the top-level data structure that CBMC (and the other
-tools) use for holding the GOTO intermediate representation.
+tools) use for holding the GOTO intermediate representation. The following
+diagram is a simplified view of how the data structures relate to each other -
+
+```mermaid
+erDiagram
+  goto_modelt {
+    symbol_tablet symbol_table
+    goto_functionst goto_functions
+  }
+  goto_modelt ||--|| symbol_tablet : ""
+  goto_modelt ||--|| goto_functionst : ""
+  symbol_tablet {
+    symbol_map symbols
+  }
+  symbol_tablet ||--o{ symbolt : ""
+  symbolt {
+    string name
+  }
+  goto_functionst {
+    function_map functions
+  }
+  goto_functionst ||--o{ goto_functiont : ""
+  goto_functiont {
+    goto_programt body
+    ordered_collection_of parameter_identifiers
+  }
+  goto_functiont ||--|| goto_programt : ""
+  goto_programt {
+    ordered_collection_of instructions
+  }
+  goto_programt ||--o{ instructiont : ""
+  instructiont {
+    enumeration instruction_type
+    goto_program_codet code
+    boolean_expression guard
+    source_locationt source_location
+  }
+  instructiont ||--|| goto_program_instruction_typet : ""
+  instructiont ||--o| goto_program_codet : ""
+  instructiont ||--o| source_locationt : ""
+  goto_program_codet ||--o| source_locationt : ""
+```
 
 A `goto_modelt` is effectively a pair, consisting of:
 
