@@ -4820,6 +4820,61 @@ void smt2_convt::unflatten(
       // nop, already a bv
     }
   }
+  else if(type.id() == ID_array)
+  {
+    if(use_datatypes)
+    {
+      PRECONDITION(use_as_const);
+
+      if(where == wheret::BEGIN)
+        out << "(let ((?ufop" << nesting << " ";
+      else
+      {
+        out << ")) ";
+
+        const array_typet &array_type = to_array_type(type);
+
+        std::size_t subtype_width = boolbv_width(array_type.element_type());
+
+        DATA_INVARIANT(
+          array_type.size().is_constant(),
+          "cannot unflatten arrays of non-constant size");
+        mp_integer size =
+          numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
+        for(mp_integer i = 1; i < size; ++i)
+          out << "(store ";
+
+        out << "((as const ";
+        convert_type(array_type);
+        out << ") ";
+        // use element at index 0 as default value
+        unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+        out << "((_ extract " << subtype_width - 1 << " "
+            << "0) ?ufop" << nesting << ")";
+        unflatten(wheret::END, array_type.element_type(), nesting + 1);
+        out << ") ";
+
+        std::size_t offset = subtype_width;
+        for(mp_integer i = 1; i < size; ++i, offset += subtype_width)
+        {
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << ' ';
+          unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+          out << "((_ extract " << offset + subtype_width - 1 << " " << offset
+              << ") ?ufop" << nesting << ")";
+          unflatten(wheret::END, array_type.element_type(), nesting + 1);
+          out << ")"; // store
+        }
+
+        out << ")"; // let
+      }
+    }
+    else
+    {
+      // nop, already a bv
+    }
+  }
   else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
     if(use_datatypes)
@@ -5605,18 +5660,11 @@ bool smt2_convt::use_array_theory(const exprt &expr)
   const typet &type = expr.type();
   PRECONDITION(type.id()==ID_array);
 
-  // a union is always flattened; else always use array theory when we have
-  // datatypes
+  // arrays inside structs get flattened, unless we have datatypes
   if(expr.id() == ID_with)
     return use_array_theory(to_with_expr(expr).old());
-  else if(auto member = expr_try_dynamic_cast<member_exprt>(expr))
-  {
-    // arrays inside structs get flattened, unless we have datatypes
-    return use_datatypes && member->compound().type().id() != ID_union &&
-           member->compound().type().id() != ID_union_tag;
-  }
   else
-    return true;
+    return use_datatypes || expr.id() != ID_member;
 }
 
 void smt2_convt::convert_type(const typet &type)
