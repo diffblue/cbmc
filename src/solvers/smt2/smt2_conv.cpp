@@ -2687,10 +2687,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
         if(use_FPA_theory)
         {
-          // This conversion is non-trivial as it requires creating a
-          // new bit-vector variable and then asserting that it converts
-          // to the required floating-point number.
-          SMT2_TODO("bit-wise floatbv to bv");
+          defined_expressionst::const_iterator it =
+            defined_expressions.find(expr);
+          CHECK_RETURN(it != defined_expressions.end());
+          out << it->second;
         }
         else
         {
@@ -5438,6 +5438,35 @@ void smt2_convt::find_symbols(const exprt &expr)
       convert_expr(tmp2);
 
       out << ")\n"; // define-fun
+    }
+  }
+  else if(
+    use_FPA_theory && expr.id() == ID_typecast &&
+    to_typecast_expr(expr).op().type().id() == ID_floatbv &&
+    expr.type().id() == ID_bv)
+  {
+    // This is _NOT_ a semantic conversion, but bit-wise.
+    if(defined_expressions.find(expr) == defined_expressions.end())
+    {
+      // This conversion is non-trivial as it requires creating a
+      // new bit-vector variable and then asserting that it converts
+      // to the required floating-point number.
+      const irep_idt id =
+        "bvfromfloat." + std::to_string(defined_expressions.size());
+      out << "(declare-fun " << id << " () ";
+      convert_type(expr.type());
+      out << ')' << '\n';
+
+      const typecast_exprt &tc = to_typecast_expr(expr);
+      const auto &floatbv_type = to_floatbv_type(tc.op().type());
+      out << "(assert (= ";
+      out << "((_ to_fp " << floatbv_type.get_e() << " "
+          << floatbv_type.get_f() + 1 << ") " << id << ')';
+      convert_expr(tc.op());
+      out << ')'; // =
+      out << ')' << '\n';
+
+      defined_expressions[expr] = id;
     }
   }
   else if(expr.id() == ID_initial_state)
