@@ -1,3 +1,7 @@
+\ingroup module_hidden
+
+\page central-data-structures Central Data Structures
+
 # Central Data Structures
 
 The following is some light technical documentation of the major data structures

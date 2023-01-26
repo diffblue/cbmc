@@ -61,7 +61,7 @@ transformation tools (see \ref other-tools).
 
 For an explanation of the data structures involved in the modeling of a GOTO
 program (the GOTO Intermediate Representation used by CBMC and assorted tools)
-please have a look [here](central-data-structures.md).
+please see \subpage central-data-structures .
 
 ## {C, java bytecode} &rarr; Parse tree &rarr; Symbol table &rarr; GOTO programs &rarr; GOTO program transformations &rarr; BMC &rarr; counterexample (goto_tracet) &rarr; printing ##
 
