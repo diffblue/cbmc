@@ -4691,20 +4691,22 @@ void smt2_convt::flatten2bv(const exprt &expr)
       mp_integer size =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      out << "(let ((?aflop ";
-      convert_expr(expr);
-      out << ")) ";
-
-      out << "(concat";
-
-      for(mp_integer i = 0; i != size; ++i)
+      // SMT-LIB 2 concat is binary only
+      std::size_t n_concat = 0;
+      for(mp_integer i = size; i > 1; --i)
       {
-        out << " (select ?aflop ";
-        convert_expr(from_integer(i, array_type.index_type()));
-        out << ')';
+        ++n_concat;
+        out << "(concat ";
+
+        flatten2bv(
+          index_exprt{expr, from_integer(i - 1, array_type.index_type())});
+
+        out << " ";
       }
 
-      out << "))"; // concat, let
+      flatten2bv(index_exprt{expr, from_integer(0, array_type.index_type())});
+
+      out << std::string(n_concat, ')'); // concat
     }
     else
       convert_expr(expr);
@@ -4713,14 +4715,8 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_datatypes)
     {
-      const std::string &smt_typename = datatype_map.at(type);
-
       // concatenate elements
       const struct_typet &struct_type = to_struct_type(ns.follow(type));
-
-      out << "(let ((?sflop ";
-      convert_expr(expr);
-      out << ")) ";
 
       const struct_typet::componentst &components=
         struct_type.components();
@@ -4737,21 +4733,17 @@ void smt2_convt::flatten2bv(const exprt &expr)
           out << "(concat ";
         }
 
-        out << "(" << smt_typename << "." << components[i - 1].get_name()
-            << " ?sflop)";
+        flatten2bv(member_exprt{expr, components[i - 1]});
 
         out << " ";
       }
 
       if(!is_zero_width(components[0].type(), ns))
       {
-        out << "(" << smt_typename << "." << components[0].get_name()
-            << " ?sflop)";
+        flatten2bv(member_exprt{expr, components[0]});
       }
 
       out << std::string(n_concat, ')'); // concat
-
-      out << ")"; // let
     }
     else
       convert_expr(expr);
