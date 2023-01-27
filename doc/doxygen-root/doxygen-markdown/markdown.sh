@@ -34,6 +34,21 @@ $BINDIR/append-last-modified-dates.py $FILES
 #         $BINDIR/pandoc-codeblock-repair.sh > $file
 # done
 
+echo
+echo "Rendering mermaid diagrams"
+FILES=$(grep --include=\*.md -rl . -e "\`\`\`mermaid")
+for file in $FILES; do
+    echo $file
+    tmp=/tmp/${file%.*}2.md
+    mkdir -p $(dirname $tmp)
+    cp $file $tmp
+    # Note that gfm is GitHub Flavour Markdown. The double \\ at the start of
+    # lines is unescaped using sed in order to fix doxygen tags, which are
+    # broken by pandoc.
+    pandoc --read=gfm --write=gfm --wrap=none --filter=mermaid-filter $tmp |
+        $BINDIR/pandoc-codeblock-repair.sh | sed 's/^\\\\/\\/' > $file
+done
+
 cprovers=$(find . -name cprover-manual)
 cprover=${cprovers[0]}
 
@@ -49,7 +64,7 @@ echo "Running pandoc filter over cprover-manual markdown files"
 FILES=$(find $cprover -name '*.md')
 for file in $FILES; do
     echo $file
-    tmp=/tmp/${file%.*}2.md
+    tmp=/tmp/${file%.*}3.md
     mkdir -p $(dirname $tmp)
     cp $file $tmp
     pandoc  --write=markdown_phpextra --wrap=none --filter=$BINDIR/pandoc-cprover-link-filter.py $tmp |
