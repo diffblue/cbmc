@@ -1,0 +1,12 @@
+CORE
+main.c
+--apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^\[main.assigns.\d+\] .* Check that x is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks transformed loop won't be skipped by a jump to the loop head.

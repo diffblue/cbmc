@@ -154,6 +154,19 @@ void insert_before_swap_and_advance(
   std::advance(target, offset);
 }
 
+void insert_before_and_update_jumps(
+  goto_programt &destination,
+  goto_programt::targett &target,
+  const goto_programt::instructiont &i)
+{
+  const auto new_target = destination.insert_before(target, i);
+  for(auto it : target->incoming_edges)
+  {
+    if(it->is_goto())
+      it->set_target(new_target);
+  }
+}
+
 const symbolt &new_tmp_symbol(
   const typet &type,
   const source_locationt &location,

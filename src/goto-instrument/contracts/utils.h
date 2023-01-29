@@ -11,11 +11,11 @@ Date: September 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 
-#include <vector>
+#include <goto-programs/goto_convert_class.h>
 
 #include <goto-instrument/havoc_utils.h>
 
-#include <goto-programs/goto_convert_class.h>
+#include <vector>
 
 #define IN_BASE_CASE "__in_base_case"
 #define ENTERED_LOOP "__entered_loop"
@@ -110,6 +110,30 @@ void insert_before_swap_and_advance(
   goto_programt::targett &target,
   goto_programt &payload);
 
+/// \brief Insert a goto instruction before a target instruction iterator
+///        and update targets of all jumps that points to the iterator to
+///        jumping to the inserted instruction. This method is intended
+///        to keep external instruction::targett stable, i.e. they will
+///        still point to the same instruction after inserting the new one
+///
+/// This function inserts a instruction `i` into a destination program
+/// `destination` immediately before a specified instruction iterator `target`.
+/// After insertion, update all jumps that pointing to `target` to jumping to
+/// `i` instead.
+///
+/// Different from `insert_before_swap_and_advance`, this function doesn't
+/// invalidate the iterator `target` after insertion. That is, `target` and
+/// all other instruction iterators same as `target` will still point to the
+/// same instruction after insertion.
+///
+/// \param destination: The destination program for inserting the `i`.
+/// \param target: The instruction iterator at which to insert the `i`.
+/// \param i: The goto instruction to be inserted into the `destination`.
+void insert_before_and_update_jumps(
+  goto_programt &destination,
+  goto_programt::targett &target,
+  const goto_programt::instructiont &i);
+
 /// \brief Adds a fresh and uniquely named symbol to the symbol table.
 ///
 /// \param type: The type of the new symbol.
@@ -192,7 +216,7 @@ void add_quantified_variable(
   const irep_idt &mode);
 
 /// This function recursively identifies the "old" expressions within expr
-/// and replaces them with correspoding history variables.
+/// and replaces them with corresponding history variables.
 void replace_history_parameter(
   symbol_table_baset &symbol_table,
   exprt &expr,

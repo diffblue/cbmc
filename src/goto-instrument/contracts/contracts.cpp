@@ -890,6 +890,17 @@ void code_contractst::apply_loop_contract(
       throw 0;
     }
 
+    // After loop-contract instrumentation, jumps to the `loop_head` will skip
+    // some instrumented instructions. So we want to make sure that there is
+    // only one jump targeting `loop_head` from `loop_end` before loop-contract
+    // instrumentation.
+    // Add a skip before `loop_head` and let all jumps (except for the
+    // `loop_end`) that target to the `loop_head` target to the skip
+    // instead.
+    insert_before_and_update_jumps(
+      goto_function.body, loop_head, goto_programt::make_skip());
+    loop_end->set_target(loop_head);
+
     exprt assigns_clause =
       static_cast<const exprt &>(loop_end->condition().find(ID_C_spec_assigns));
     exprt invariant = static_cast<const exprt &>(
