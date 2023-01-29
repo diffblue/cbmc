@@ -13,6 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/ui_message.h>
 
+#include <goto-symex/solver_hardness.h>
 #include <solvers/prop/prop.h> // IWYU pragma: keep
 
 goto_symex_property_decidert::goto_symex_property_decidert(
@@ -83,6 +84,7 @@ void goto_symex_property_decidert::add_constraint_from_goals(
   std::function<bool(const irep_idt &)> select_property)
 {
   exprt::operandst disjuncts;
+  decision_proceduret &decision_procedure = solver->decision_procedure();
 
   for(const auto &goal_pair : goal_map)
   {
@@ -95,7 +97,16 @@ void goto_symex_property_decidert::add_constraint_from_goals(
   }
 
   // this is 'false' if there are no disjuncts
-  solver->decision_procedure().set_to_true(disjunction(disjuncts));
+  exprt goal_disjunction = disjunction(disjuncts);
+  decision_procedure.set_to_true(goal_disjunction);
+
+  with_solver_hardness(decision_procedure, [](solver_hardnesst &hardness) {
+    // SSA expr and involved steps have already been collected
+    // in symex_target_equationt::convert_assertions
+    exprt ssa_expr_unused;
+    std::vector<goto_programt::const_targett> involved_steps_unused;
+    hardness.register_assertion_ssas(ssa_expr_unused, involved_steps_unused);
+  });
 }
 
 decision_proceduret::resultt goto_symex_property_decidert::solve()
