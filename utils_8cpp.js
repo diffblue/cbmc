@@ -6,6 +6,7 @@ var utils_8cpp =
     [ "generate_history_variables_initialization", "utils_8cpp.html#a0e4c1d1b019f583c464308badc770bb2", null ],
     [ "generate_lexicographic_less_than_check", "utils_8cpp.html#af6a986e8441ef1b9d54624ed38b5d79c", null ],
     [ "get_suffix_unsigned", "utils_8cpp.html#aee6f5807b16202ac30acc0e9f1c419f8", null ],
+    [ "insert_before_and_update_jumps", "utils_8cpp.html#a2636321c60f87bb1a79d8e8ba0d59dac", null ],
     [ "insert_before_swap_and_advance", "utils_8cpp.html#a7d81c043b086199641b0e686cdd27234", null ],
     [ "is_assignment_to_instrumented_variable", "utils_8cpp.html#a11be635da37bb659aab648c67bc8c6ca", null ],
     [ "is_assigns_clause_replacement_tracking_comment", "utils_8cpp.html#a5da8544cddc0cac684c91b55b4d2ab4f", null ],
