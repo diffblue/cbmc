@@ -77,11 +77,12 @@ void solver_hardnesst::register_assertion_ssas(
   const std::vector<goto_programt::const_targett> &pcs)
 {
   if(assertion_stats.empty())
-    return;
+  {
+    assertion_stats.ssa_expression = expr2string(ssa_expression);
+    assertion_stats.pcs = pcs;
+  }
 
-  assertion_stats.sat_hardness = current_hardness;
-  assertion_stats.ssa_expression = expr2string(ssa_expression);
-  assertion_stats.pcs = pcs;
+  assertion_stats.sat_hardness += current_hardness;
   current_ssa_key = {};
   current_hardness = {};
 }
