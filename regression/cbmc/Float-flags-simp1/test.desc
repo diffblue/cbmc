@@ -6,3 +6,7 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test only fails when running with the SMT solver on MacOS (with an
+invariant failure: "floatbv expressions should be flattened when using FPA
+theory").

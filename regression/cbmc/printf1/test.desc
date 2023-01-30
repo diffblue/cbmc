@@ -9,3 +9,6 @@ main.c
 ^PRINT f1 123\.000000, -123\.000000, 123\.123000, 0\.123000$
 --
 ^warning: ignoring
+--
+This test only fails when using SMT solvers as back-end on Windows ("TODO
+typecast3 floatbv -> pointer", same problem as va_list3).

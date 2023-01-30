@@ -187,6 +187,7 @@ protected:
     std::unordered_map<int64_t, exprt> *operands_map,
     const irept &src,
     const array_typet &type);
+  std::unordered_map<irep_idt, irept> current_bindings;
 
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);

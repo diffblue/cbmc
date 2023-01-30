@@ -231,6 +231,34 @@ void smt2_convt::write_footer()
       << "\n";
 }
 
+/// Returns true iff \p type has effective width of zero bits.
+static bool is_zero_width(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_empty)
+    return true;
+  else if(type.id() == ID_struct_tag)
+    return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
+  else if(type.id() == ID_union_tag)
+    return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    for(const auto &comp : to_struct_union_type(type).components())
+    {
+      if(!is_zero_width(comp.type(), ns))
+        return false;
+    }
+    return true;
+  }
+  else if(auto array_type = type_try_dynamic_cast<array_typet>(type))
+  {
+    // we ignore array_type->size().is_zero() for now as there may be
+    // out-of-bounds accesses that we need to model
+    return is_zero_width(array_type->element_type(), ns);
+  }
+  else
+    return false;
+}
+
 void smt2_convt::define_object_size(
   const irep_idt &id,
   const object_size_exprt &expr)
@@ -537,14 +565,6 @@ void smt2_convt::walk_array_tree(
     exprt value = parse_rec(src.get_sub()[3], type.element_type());
     operands_map->emplace(index, value);
   }
-  else if(src.get_sub().size() == 3 && src.get_sub()[0].id() == "let")
-  {
-    // This is produced by Z3
-    // (let (....) (....))
-    walk_array_tree(
-      operands_map, src.get_sub()[1].get_sub()[0].get_sub()[1], type);
-    walk_array_tree(operands_map, src.get_sub()[2], type);
-  }
   else if(src.get_sub().size()==2 &&
           src.get_sub()[0].get_sub().size()==3 &&
           src.get_sub()[0].get_sub()[0].id()=="as" &&
@@ -553,6 +573,12 @@ void smt2_convt::walk_array_tree(
     // (as const type_info default_value)
     exprt default_value = parse_rec(src.get_sub()[1], type.element_type());
     operands_map->emplace(-1, default_value);
+  }
+  else
+  {
+    auto bindings_it = current_bindings.find(src.id());
+    if(bindings_it != current_bindings.end())
+      walk_array_tree(operands_map, bindings_it->second, type);
   }
 }
 
@@ -586,14 +612,21 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
   {
     // Structs look like:
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
-
-    if(src.get_sub().size()!=components.size()+1)
-      return result; // give up
-
+    std::size_t j = 1;
     for(std::size_t i=0; i<components.size(); i++)
     {
       const struct_typet::componentt &c=components[i];
-      result.operands()[i]=parse_rec(src.get_sub()[i+1], c.type());
+      if(is_zero_width(components[i].type(), ns))
+      {
+        result.operands()[i] = nil_exprt{};
+      }
+      else
+      {
+        DATA_INVARIANT(
+          src.get_sub().size() > j, "insufficient number of component values");
+        result.operands()[i] = parse_rec(src.get_sub()[j], c.type());
+        ++j;
+      }
     }
   }
   else
@@ -611,6 +644,9 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
 
     for(std::size_t i=0; i<components.size(); i++)
     {
+      if(is_zero_width(components[i].type(), ns))
+        continue;
+
       std::size_t component_width=boolbv_width(components[i].type());
 
       INVARIANT(
@@ -633,6 +669,27 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
 
 exprt smt2_convt::parse_rec(const irept &src, const typet &type)
 {
+  if(src.get_sub().size() == 3 && src.get_sub()[0].id() == ID_let)
+  {
+    // This is produced by Z3
+    // (let (....) (....))
+    auto previous_bindings = current_bindings;
+    for(const auto &binding : src.get_sub()[1].get_sub())
+    {
+      const irep_idt &name = binding.get_sub()[0].id();
+      current_bindings.emplace(name, binding.get_sub()[1]);
+    }
+    exprt result = parse_rec(src.get_sub()[2], type);
+    current_bindings = std::move(previous_bindings);
+    return result;
+  }
+
+  auto bindings_it = current_bindings.find(src.id());
+  if(bindings_it != current_bindings.end())
+  {
+    return parse_rec(bindings_it->second, type);
+  }
+
   if(
     type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
     type.id() == ID_integer || type.id() == ID_rational ||
@@ -951,28 +1008,6 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   result += '|';
 
   return result;
-}
-
-/// Returns true iff \p type has effective width of zero bits.
-static bool is_zero_width(const typet &type, const namespacet &ns)
-{
-  if(type.id() == ID_empty)
-    return true;
-  else if(type.id() == ID_struct_tag)
-    return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
-  else if(type.id() == ID_union_tag)
-    return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    for(const auto &comp : to_struct_union_type(type).components())
-    {
-      if(!is_zero_width(comp.type(), ns))
-        return false;
-    }
-    return true;
-  }
-  else
-    return false;
 }
 
 std::string smt2_convt::type2id(const typet &type) const
@@ -2652,10 +2687,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
         if(use_FPA_theory)
         {
-          // This conversion is non-trivial as it requires creating a
-          // new bit-vector variable and then asserting that it converts
-          // to the required floating-point number.
-          SMT2_TODO("bit-wise floatbv to bv");
+          defined_expressionst::const_iterator it =
+            defined_expressions.find(expr);
+          CHECK_RETURN(it != defined_expressions.end());
+          out << it->second;
         }
         else
         {
@@ -3205,6 +3240,8 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         it!=components.end();
         it++, i++)
     {
+      if(is_zero_width(it->type(), ns))
+        continue;
       out << " ";
       convert_expr(expr.operands()[i]);
     }
@@ -3227,9 +3264,16 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
     else
     {
       // SMT-LIB 2 concat is binary only
+      std::size_t n_concat = 0;
       for(std::size_t i=components.size(); i>1; i--)
       {
-        out << "(concat ";
+        if(is_zero_width(components[i - 1].type(), ns))
+          continue;
+        else if(i > 2 || !is_zero_width(components[0].type(), ns))
+        {
+          ++n_concat;
+          out << "(concat ";
+        }
 
         exprt op=expr.operands()[i-1];
 
@@ -3244,10 +3288,10 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         out << " ";
       }
 
-      convert_expr(expr.op0());
+      if(!is_zero_width(components[0].type(), ns))
+        convert_expr(expr.op0());
 
-      for(std::size_t i=1; i<components.size(); i++)
-        out << ")";
+      out << std::string(n_concat, ')');
     }
   }
 }
@@ -4647,20 +4691,22 @@ void smt2_convt::flatten2bv(const exprt &expr)
       mp_integer size =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      out << "(let ((?aflop ";
-      convert_expr(expr);
-      out << ")) ";
-
-      out << "(concat";
-
-      for(mp_integer i = 0; i != size; ++i)
+      // SMT-LIB 2 concat is binary only
+      std::size_t n_concat = 0;
+      for(mp_integer i = size; i > 1; --i)
       {
-        out << " (select ?aflop ";
-        convert_expr(from_integer(i, array_type.index_type()));
-        out << ')';
+        ++n_concat;
+        out << "(concat ";
+
+        flatten2bv(
+          index_exprt{expr, from_integer(i - 1, array_type.index_type())});
+
+        out << " ";
       }
 
-      out << "))"; // concat, let
+      flatten2bv(index_exprt{expr, from_integer(0, array_type.index_type())});
+
+      out << std::string(n_concat, ')'); // concat
     }
     else
       convert_expr(expr);
@@ -4669,34 +4715,35 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_datatypes)
     {
-      const std::string &smt_typename = datatype_map.at(type);
-
       // concatenate elements
       const struct_typet &struct_type = to_struct_type(ns.follow(type));
-
-      out << "(let ((?sflop ";
-      convert_expr(expr);
-      out << ")) ";
 
       const struct_typet::componentst &components=
         struct_type.components();
 
       // SMT-LIB 2 concat is binary only
+      std::size_t n_concat = 0;
       for(std::size_t i=components.size(); i>1; i--)
       {
-        out << "(concat (" << smt_typename << "."
-            << components[i-1].get_name() << " ?sflop)";
+        if(is_zero_width(components[i - 1].type(), ns))
+          continue;
+        else if(i > 2 || !is_zero_width(components[0].type(), ns))
+        {
+          ++n_concat;
+          out << "(concat ";
+        }
+
+        flatten2bv(member_exprt{expr, components[i - 1]});
 
         out << " ";
       }
 
-      out << "(" << smt_typename << "."
-          << components[0].get_name() << " ?sflop)";
+      if(!is_zero_width(components[0].type(), ns))
+      {
+        flatten2bv(member_exprt{expr, components[0]});
+      }
 
-      for(std::size_t i=1; i<components.size(); i++)
-        out << ")"; // concat
-
-      out << ")"; // let
+      out << std::string(n_concat, ')'); // concat
     }
     else
       convert_expr(expr);
@@ -4765,6 +4812,61 @@ void smt2_convt::unflatten(
       // nop, already a bv
     }
   }
+  else if(type.id() == ID_array)
+  {
+    if(use_datatypes)
+    {
+      PRECONDITION(use_as_const);
+
+      if(where == wheret::BEGIN)
+        out << "(let ((?ufop" << nesting << " ";
+      else
+      {
+        out << ")) ";
+
+        const array_typet &array_type = to_array_type(type);
+
+        std::size_t subtype_width = boolbv_width(array_type.element_type());
+
+        DATA_INVARIANT(
+          array_type.size().is_constant(),
+          "cannot unflatten arrays of non-constant size");
+        mp_integer size =
+          numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
+        for(mp_integer i = 1; i < size; ++i)
+          out << "(store ";
+
+        out << "((as const ";
+        convert_type(array_type);
+        out << ") ";
+        // use element at index 0 as default value
+        unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+        out << "((_ extract " << subtype_width - 1 << " "
+            << "0) ?ufop" << nesting << ")";
+        unflatten(wheret::END, array_type.element_type(), nesting + 1);
+        out << ") ";
+
+        std::size_t offset = subtype_width;
+        for(mp_integer i = 1; i < size; ++i, offset += subtype_width)
+        {
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << ' ';
+          unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+          out << "((_ extract " << offset + subtype_width - 1 << " " << offset
+              << ") ?ufop" << nesting << ")";
+          unflatten(wheret::END, array_type.element_type(), nesting + 1);
+          out << ")"; // store
+        }
+
+        out << ")"; // let
+      }
+    }
+    else
+    {
+      // nop, already a bv
+    }
+  }
   else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
     if(use_datatypes)
@@ -4793,6 +4895,9 @@ void smt2_convt::unflatten(
             it!=components.end();
             it++, i++)
         {
+          if(is_zero_width(it->type(), ns))
+            continue;
+
           std::size_t member_width=boolbv_width(it->type());
 
           out << " ";
@@ -5018,6 +5123,9 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
 
 void smt2_convt::find_symbols(const exprt &expr)
 {
+  if(is_zero_width(expr.type(), ns))
+    return;
+
   // recursive call on type
   find_symbols(expr.type());
 
@@ -5324,6 +5432,35 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")\n"; // define-fun
     }
   }
+  else if(
+    use_FPA_theory && expr.id() == ID_typecast &&
+    to_typecast_expr(expr).op().type().id() == ID_floatbv &&
+    expr.type().id() == ID_bv)
+  {
+    // This is _NOT_ a semantic conversion, but bit-wise.
+    if(defined_expressions.find(expr) == defined_expressions.end())
+    {
+      // This conversion is non-trivial as it requires creating a
+      // new bit-vector variable and then asserting that it converts
+      // to the required floating-point number.
+      const irep_idt id =
+        "bvfromfloat." + std::to_string(defined_expressions.size());
+      out << "(declare-fun " << id << " () ";
+      convert_type(expr.type());
+      out << ')' << '\n';
+
+      const typecast_exprt &tc = to_typecast_expr(expr);
+      const auto &floatbv_type = to_floatbv_type(tc.op().type());
+      out << "(assert (= ";
+      out << "((_ to_fp " << floatbv_type.get_e() << " "
+          << floatbv_type.get_f() + 1 << ") " << id << ')';
+      convert_expr(tc.op());
+      out << ')'; // =
+      out << ')' << '\n';
+
+      defined_expressions[expr] = id;
+    }
+  }
   else if(expr.id() == ID_initial_state)
   {
     irep_idt function = "initial-state";
@@ -5544,18 +5681,11 @@ bool smt2_convt::use_array_theory(const exprt &expr)
   const typet &type = expr.type();
   PRECONDITION(type.id()==ID_array);
 
-  // a union is always flattened; else always use array theory when we have
-  // datatypes
+  // arrays inside structs get flattened, unless we have datatypes
   if(expr.id() == ID_with)
     return use_array_theory(to_with_expr(expr).old());
-  else if(auto member = expr_try_dynamic_cast<member_exprt>(expr))
-  {
-    // arrays inside structs get flattened, unless we have datatypes
-    return use_datatypes && member->compound().type().id() != ID_union &&
-           member->compound().type().id() != ID_union_tag;
-  }
   else
-    return true;
+    return use_datatypes || expr.id() != ID_member;
 }
 
 void smt2_convt::convert_type(const typet &type)
@@ -5802,6 +5932,9 @@ void smt2_convt::find_symbols_rec(
 
       for(const auto &component : components)
       {
+        if(is_zero_width(component.type(), ns))
+          continue;
+
         out << "(" << smt_typename << "." << component.get_name()
                       << " ";
         convert_type(component.type());
@@ -5830,6 +5963,9 @@ void smt2_convt::find_symbols_rec(
           it!=components.end();
           ++it)
       {
+        if(is_zero_width(it->type(), ns))
+          continue;
+
         const struct_union_typet::componentt &component=*it;
         out << "(define-fun update-" << smt_typename << "."
             << component.get_name() << " "
@@ -5847,7 +5983,7 @@ void smt2_convt::find_symbols_rec(
         {
           if(it==it2)
             out << "v ";
-          else
+          else if(!is_zero_width(it2->type(), ns))
           {
             out << "(" << smt_typename << "."
                 << it2->get_name() << " s) ";
