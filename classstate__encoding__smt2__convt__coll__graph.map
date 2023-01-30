@@ -1,50 +1,51 @@
 <map id="state_encoding_smt2_convt" name="state_encoding_smt2_convt">
-<area shape="rect" id="node1" title=" " alt="" coords="2393,871,2555,913"/>
-<area shape="rect" id="node2" href="$classsmt2__convt.html" title=" " alt="" coords="2245,879,2344,905"/>
-<area shape="rect" id="node3" href="$classstack__decision__proceduret.html" title=" " alt="" coords="1911,20,2105,47"/>
-<area shape="rect" id="node4" href="$classdecision__proceduret.html" title=" " alt="" coords="1611,5,1764,32"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1237,477,1409,518"/>
-<area shape="rect" id="node6" href="$structsmt2__convt_1_1identifiert.html" title=" " alt="" coords="852,356,1021,383"/>
-<area shape="rect" id="node7" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="529,447,585,473"/>
-<area shape="rect" id="node27" title=" " alt="" coords="859,717,1015,758"/>
-<area shape="rect" id="node35" title=" " alt="" coords="861,636,1013,692"/>
-<area shape="rect" id="node8" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="265,340,317,367"/>
-<area shape="rect" id="node10" href="$classexprt.html" title="Base class for all expressions." alt="" coords="529,141,585,168"/>
-<area shape="rect" id="node9" href="$classsharing__treet.html" title=" " alt="" coords="5,325,172,381"/>
-<area shape="rect" id="node15" title=" " alt="" coords="856,263,1017,305"/>
-<area shape="rect" id="node39" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="874,31,999,57"/>
-<area shape="rect" id="node43" title=" " alt="" coords="859,585,1014,612"/>
-<area shape="rect" id="node11" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="521,649,593,676"/>
-<area shape="rect" id="node17" title=" " alt="" coords="848,782,1025,853"/>
-<area shape="rect" id="node21" title=" " alt="" coords="860,929,1013,970"/>
-<area shape="rect" id="node36" title=" " alt="" coords="1925,126,2091,167"/>
-<area shape="rect" id="node40" title=" " alt="" coords="861,877,1012,904"/>
-<area shape="rect" id="node44" title=" " alt="" coords="861,1138,1013,1179"/>
-<area shape="rect" id="node12" title=" " alt="" coords="481,910,633,951"/>
-<area shape="rect" id="node20" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1247,988,1400,1015"/>
-<area shape="rect" id="node31" title=" " alt="" coords="855,1057,1018,1113"/>
-<area shape="rect" id="node13" title=" " alt="" coords="271,947,310,973"/>
-<area shape="rect" id="node16" title=" " alt="" coords="490,357,625,384"/>
-<area shape="rect" id="node22" title=" " alt="" coords="473,1083,641,1109"/>
-<area shape="rect" id="node26" title=" " alt="" coords="503,992,612,1019"/>
-<area shape="rect" id="node14" title=" " alt="" coords="271,1063,310,1089"/>
-<area shape="rect" id="node33" title=" " alt="" coords="493,1272,622,1299"/>
-<area shape="rect" id="node18" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1636,957,1739,984"/>
-<area shape="rect" id="node28" href="$classpointer__logict.html" title=" " alt="" coords="1953,1019,2063,1045"/>
-<area shape="rect" id="node34" href="$classboolbv__widtht.html" title=" " alt="" coords="1951,688,2065,715"/>
-<area shape="rect" id="node19" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1253,937,1393,964"/>
-<area shape="rect" id="node23" title=" " alt="" coords="854,1255,1019,1281"/>
-<area shape="rect" id="node24" title=" " alt="" coords="514,1391,601,1417"/>
-<area shape="rect" id="node25" title=" " alt="" coords="221,1383,360,1425"/>
-<area shape="rect" id="node29" href="$classnumberingt.html" title=" " alt="" coords="1612,1045,1763,1086"/>
-<area shape="rect" id="node30" href="$classnumberingt.html" title=" " alt="" coords="1224,1055,1423,1081"/>
-<area shape="rect" id="node32" title=" " alt="" coords="847,1204,1027,1231"/>
-<area shape="rect" id="node41" title=" " alt="" coords="1051,1341,1200,1368"/>
-<area shape="rect" id="node37" href="$classobject__size__exprt.html" title="Expression for finding the size (in bytes) of the object a pointer points to." alt="" coords="1619,56,1755,83"/>
-<area shape="rect" id="node38" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="1273,35,1373,61"/>
-<area shape="rect" id="node42" href="$classletifyt.html" title="Introduce LET for common subexpressions." alt="" coords="1978,1257,2038,1284"/>
-<area shape="rect" id="node45" title=" " alt="" coords="1956,1487,2060,1513"/>
-<area shape="rect" id="node46" title=" " alt="" coords="1615,1486,1760,1527"/>
-<area shape="rect" id="node47" title=" " alt="" coords="1238,1493,1409,1520"/>
-<area shape="rect" id="node48" title=" " alt="" coords="883,1493,990,1520"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2393,833,2555,874"/>
+<area shape="rect" id="node2" href="$classsmt2__convt.html" title=" " alt="" coords="2245,840,2344,867"/>
+<area shape="rect" id="node3" href="$classstack__decision__proceduret.html" title=" " alt="" coords="1911,25,2105,52"/>
+<area shape="rect" id="node4" href="$classdecision__proceduret.html" title=" " alt="" coords="1611,24,1764,51"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1237,606,1409,647"/>
+<area shape="rect" id="node6" href="$structsmt2__convt_1_1identifiert.html" title=" " alt="" coords="852,588,1021,615"/>
+<area shape="rect" id="node7" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="529,901,585,928"/>
+<area shape="rect" id="node27" title=" " alt="" coords="859,1173,1015,1214"/>
+<area shape="rect" id="node35" title=" " alt="" coords="861,869,1013,925"/>
+<area shape="rect" id="node8" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="265,524,317,551"/>
+<area shape="rect" id="node10" href="$classexprt.html" title="Base class for all expressions." alt="" coords="529,524,585,551"/>
+<area shape="rect" id="node45" title=" " alt="" coords="861,18,1013,59"/>
+<area shape="rect" id="node9" href="$classsharing__treet.html" title=" " alt="" coords="5,509,172,565"/>
+<area shape="rect" id="node15" title=" " alt="" coords="856,753,1017,794"/>
+<area shape="rect" id="node39" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="874,319,999,345"/>
+<area shape="rect" id="node43" title=" " alt="" coords="859,819,1014,845"/>
+<area shape="rect" id="node11" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="521,189,593,216"/>
+<area shape="rect" id="node17" title=" " alt="" coords="848,167,1025,238"/>
+<area shape="rect" id="node21" title=" " alt="" coords="860,950,1013,991"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1925,434,2091,475"/>
+<area shape="rect" id="node40" title=" " alt="" coords="861,701,1012,728"/>
+<area shape="rect" id="node44" title=" " alt="" coords="861,102,1013,143"/>
+<area shape="rect" id="node12" title=" " alt="" coords="481,835,633,877"/>
+<area shape="rect" id="node20" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1247,959,1400,985"/>
+<area shape="rect" id="node31" title=" " alt="" coords="855,1084,1018,1140"/>
+<area shape="rect" id="node13" title=" " alt="" coords="271,992,310,1019"/>
+<area shape="rect" id="node16" title=" " alt="" coords="490,952,625,979"/>
+<area shape="rect" id="node22" title=" " alt="" coords="473,1173,641,1200"/>
+<area shape="rect" id="node26" title=" " alt="" coords="503,1037,612,1064"/>
+<area shape="rect" id="node14" title=" " alt="" coords="271,1151,310,1177"/>
+<area shape="rect" id="node33" title=" " alt="" coords="493,1299,622,1325"/>
+<area shape="rect" id="node18" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1636,963,1739,989"/>
+<area shape="rect" id="node28" href="$classpointer__logict.html" title=" " alt="" coords="1953,1024,2063,1051"/>
+<area shape="rect" id="node34" href="$classboolbv__widtht.html" title=" " alt="" coords="1951,884,2065,911"/>
+<area shape="rect" id="node19" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1253,1009,1393,1036"/>
+<area shape="rect" id="node23" title=" " alt="" coords="854,1289,1019,1316"/>
+<area shape="rect" id="node24" title=" " alt="" coords="514,1467,601,1493"/>
+<area shape="rect" id="node25" title=" " alt="" coords="221,1459,360,1501"/>
+<area shape="rect" id="node29" href="$classnumberingt.html" title=" " alt="" coords="1612,1062,1763,1103"/>
+<area shape="rect" id="node30" href="$classnumberingt.html" title=" " alt="" coords="1224,1091,1423,1117"/>
+<area shape="rect" id="node32" title=" " alt="" coords="847,1239,1027,1265"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1051,1373,1200,1400"/>
+<area shape="rect" id="node37" href="$classobject__size__exprt.html" title="Expression for finding the size (in bytes) of the object a pointer points to." alt="" coords="1619,377,1755,404"/>
+<area shape="rect" id="node38" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="1273,355,1373,381"/>
+<area shape="rect" id="node42" href="$classletifyt.html" title="Introduce LET for common subexpressions." alt="" coords="1978,1561,2038,1588"/>
+<area shape="rect" id="node46" title=" " alt="" coords="1956,1612,2060,1639"/>
+<area shape="rect" id="node47" title=" " alt="" coords="1615,1605,1760,1646"/>
+<area shape="rect" id="node48" title=" " alt="" coords="1238,1612,1409,1639"/>
+<area shape="rect" id="node49" title=" " alt="" coords="883,1612,990,1639"/>
 </map>
