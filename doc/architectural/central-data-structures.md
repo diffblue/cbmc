@@ -57,7 +57,9 @@ erDiagram
 A `goto_modelt` is effectively a pair, consisting of:
 
 * A collection of GOTO functions.
-* A symbol table containing symbol references for the symbols contained in the GOTO functions.
+* A symbol table containing symbols which may be referred to by symbol
+  expressions. Symbol expressions are found in the goto functions and the
+  (sub-)expressions for the values of symbols.
 
 In pseudocode, the type looks this:
 
