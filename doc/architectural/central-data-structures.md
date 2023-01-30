@@ -93,8 +93,7 @@ in the symbol-table for their values.
 
 ## goto_programt
 
-A `goto_programt` is a list of GOTO instructions. In pseudocode, it would
-look like `type goto_programt = list<goto_instructiont>`.
+A `goto_programt` is a sequence of GOTO instructions (`goto_instructiont`).
 
 An instruction (`goto_instructiont`) is a triple (an element with three subcomponents),
 describing a GOTO level instruction with the following 3 component subtypes,
