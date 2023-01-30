@@ -612,21 +612,14 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
   {
     // Structs look like:
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
-    std::size_t j = 1;
+
+    if(src.get_sub().size()!=components.size()+1)
+      return result; // give up
+
     for(std::size_t i=0; i<components.size(); i++)
     {
       const struct_typet::componentt &c=components[i];
-      if(is_zero_width(components[i].type(), ns))
-      {
-        result.operands()[i] = nil_exprt{};
-      }
-      else
-      {
-        DATA_INVARIANT(
-          src.get_sub().size() > j, "insufficient number of component values");
-        result.operands()[i] = parse_rec(src.get_sub()[j], c.type());
-        ++j;
-      }
+      result.operands()[i]=parse_rec(src.get_sub()[i+1], c.type());
     }
   }
   else
@@ -3225,8 +3218,6 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
     "number of struct components as indicated by the struct type shall be equal"
     "to the number of operands of the struct expression");
 
-  DATA_INVARIANT(!components.empty(), "struct shall have struct components");
-
   if(use_datatypes)
   {
     const std::string &smt_typename = datatype_map.at(struct_type);
@@ -3240,16 +3231,29 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         it!=components.end();
         it++, i++)
     {
-      if(is_zero_width(it->type(), ns))
+      if(
+        it->type().id() != ID_struct_tag && it->type().id() != ID_struct &&
+        is_zero_width(it->type(), ns))
+      {
         continue;
+      }
+
       out << " ";
       convert_expr(expr.operands()[i]);
+    }
+
+    if(components.empty())
+    {
+      out << " ";
+      convert_expr(from_integer(0, unsignedbv_typet{1}));
     }
 
     out << ")";
   }
   else
   {
+    DATA_INVARIANT(!components.empty(), "struct shall have struct components");
+
     if(components.size()==1)
     {
       const exprt &op = expr.op0();
@@ -4903,9 +4907,6 @@ void smt2_convt::unflatten(
             it!=components.end();
             it++, i++)
         {
-          if(is_zero_width(it->type(), ns))
-            continue;
-
           std::size_t member_width=boolbv_width(it->type());
 
           out << " ";
@@ -4914,6 +4915,12 @@ void smt2_convt::unflatten(
               << offset << ") ?ufop" << nesting << ")";
           unflatten(wheret::END, it->type(), nesting+1);
           offset+=member_width;
+        }
+
+        if(components.empty())
+        {
+          out << " ";
+          convert_expr(from_integer(0, unsignedbv_typet{1}));
         }
 
         out << "))"; // mk-, let
@@ -5940,12 +5947,24 @@ void smt2_convt::find_symbols_rec(
 
       for(const auto &component : components)
       {
-        if(is_zero_width(component.type(), ns))
+        if(
+          component.type().id() != ID_struct_tag &&
+          component.type().id() != ID_struct &&
+          is_zero_width(component.type(), ns))
+        {
           continue;
+        }
 
         out << "(" << smt_typename << "." << component.get_name()
                       << " ";
         convert_type(component.type());
+        out << ") ";
+      }
+
+      if(components.empty())
+      {
+        out << "(" << smt_typename << ".0 ";
+        convert_type(unsignedbv_typet{1});
         out << ") ";
       }
 
