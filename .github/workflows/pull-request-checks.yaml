@@ -885,6 +885,7 @@ jobs:
       - name: Upload coverage statistics to Codecov
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: build/html/coverage.info
           fail_ci_if_error: true
           verbose: true
