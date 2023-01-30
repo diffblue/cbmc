@@ -93,7 +93,8 @@ in the symbol-table for their values.
 
 ## goto_programt
 
-A `goto_programt` is a sequence of GOTO instructions (`goto_instructiont`).
+A  goto program  is a sequence of GOTO instructions (`goto_instructiont`). For
+details see the documentation of the `goto_programt` class.
 
 An instruction (`goto_instructiont`) is a triple (an element with three subcomponents),
 describing a GOTO level instruction with the following 3 component subtypes,
