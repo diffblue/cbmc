@@ -21,13 +21,6 @@ class data_dependency_contextt : public write_location_contextt
 public:
   // These constructors mirror those in the base abstract_objectt, but with
   // the addition of an extra argument which is the abstract_objectt to wrap.
-  explicit data_dependency_contextt(
-    const abstract_object_pointert child,
-    const typet &type)
-    : write_location_contextt(child, type)
-  {
-  }
-
   data_dependency_contextt(
     const abstract_object_pointert child,
     const typet &type,

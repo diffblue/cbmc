@@ -24,9 +24,6 @@ private:
 
 public:
   /// \param type: the type the abstract_object is representing
-  explicit constant_pointer_abstract_objectt(const typet &type);
-
-  /// \param type: the type the abstract_object is representing
   /// \param top: is the abstract_object starting as top
   /// \param bottom: is the abstract_object starting as bottom
   ///

@@ -72,9 +72,6 @@ using abstract_object_visitedt = std::set<abstract_object_pointert>;
 class abstract_objectt : public std::enable_shared_from_this<abstract_objectt>
 {
 public:
-  /// \param type: the type the abstract_object is representing
-  explicit abstract_objectt(const typet &type);
-
   /// Start the abstract object at either top or bottom or neither
   /// Asserts if both top and bottom are true
   ///
@@ -91,19 +88,6 @@ public:
   ///   being created in
   /// \param ns: The namespace
   abstract_objectt(
-    const exprt &expr,
-    const abstract_environmentt &environment,
-    const namespacet &ns);
-
-  /// Ctor for building object of types that differ from the types of input
-  /// expressions
-  ///
-  /// \param type explicitly declared type the resulting object should have
-  /// \param expr expression used to build the object
-  /// \param environment abstract environment to evaluate the expression
-  /// \param ns namespace to uncover names inside the expression
-  abstract_objectt(
-    const typet &type,
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);

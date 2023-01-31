@@ -19,9 +19,6 @@ class value_set_abstract_objectt : public abstract_value_objectt,
                                    public value_set_tag
 {
 public:
-  /// \copydoc abstract_objectt::abstract_objectt(const typet&)
-  explicit value_set_abstract_objectt(const typet &type);
-
   /// \copydoc abstract_objectt::abstract_objectt(const typet &, bool, bool)
   value_set_abstract_objectt(const typet &type, bool top, bool bottom);
 

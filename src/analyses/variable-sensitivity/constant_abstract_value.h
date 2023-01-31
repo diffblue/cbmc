@@ -19,7 +19,6 @@
 class constant_abstract_valuet : public abstract_value_objectt
 {
 public:
-  explicit constant_abstract_valuet(const typet &t);
   explicit constant_abstract_valuet(const exprt &t);
   constant_abstract_valuet(const typet &t, bool tp, bool bttm);
   constant_abstract_valuet(

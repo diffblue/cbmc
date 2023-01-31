@@ -112,7 +112,8 @@ std::shared_ptr<const value_set_abstract_objectt> make_bottom_value_set()
 
 std::shared_ptr<const value_set_abstract_objectt> make_top_value_set()
 {
-  return std::make_shared<const value_set_abstract_objectt>(integer_typet());
+  return std::make_shared<const value_set_abstract_objectt>(
+    integer_typet(), true, false);
 }
 
 abstract_object_pointert make_bottom_object()

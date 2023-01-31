@@ -30,13 +30,6 @@ static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
 
 value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
-  const typet &type)
-  : abstract_pointer_objectt(type)
-{
-  values.insert(std::make_shared<constant_pointer_abstract_objectt>(type));
-}
-
-value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
   const typet &new_type,
   bool top,
   bool bottom,

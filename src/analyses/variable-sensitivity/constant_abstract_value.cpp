@@ -37,11 +37,6 @@ make_constant_index_range(const exprt &val)
   return util_make_unique<constant_index_ranget>(val);
 }
 
-constant_abstract_valuet::constant_abstract_valuet(const typet &t)
-  : abstract_value_objectt(t), value()
-{
-}
-
 constant_abstract_valuet::constant_abstract_valuet(const exprt &e)
   : abstract_value_objectt(e.type(), false, false), value(e)
 {

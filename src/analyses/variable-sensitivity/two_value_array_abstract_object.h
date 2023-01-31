@@ -24,10 +24,6 @@ public:
     array_aggregate_typet>
     abstract_aggregate_baset;
 
-  explicit two_value_array_abstract_objectt(const typet &type)
-    : abstract_aggregate_baset(type)
-  {
-  }
   two_value_array_abstract_objectt(const typet &type, bool top, bool bottom)
     : abstract_aggregate_baset(type, top, bottom)
   {

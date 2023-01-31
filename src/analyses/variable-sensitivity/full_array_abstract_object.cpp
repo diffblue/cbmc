@@ -64,12 +64,6 @@ abstract_object_pointert apply_to_index_range(
   return result;
 }
 
-full_array_abstract_objectt::full_array_abstract_objectt(typet type)
-  : abstract_aggregate_baset(type)
-{
-  DATA_INVARIANT(verify(), "Structural invariants maintained");
-}
-
 full_array_abstract_objectt::full_array_abstract_objectt(
   typet type,
   bool top,

@@ -33,13 +33,6 @@
 class liveness_contextt : public write_location_contextt
 {
 public:
-  explicit liveness_contextt(
-    const abstract_object_pointert child,
-    const typet &type)
-    : write_location_contextt(child, type)
-  {
-  }
-
   liveness_contextt(
     const abstract_object_pointert child,
     const typet &type,

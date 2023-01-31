@@ -127,13 +127,6 @@ static abstract_object_sett widen_value_set(
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs);
 
-value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
-  : abstract_value_objectt(type)
-{
-  values.insert(std::make_shared<constant_abstract_valuet>(type));
-  verify();
-}
-
 value_set_abstract_objectt::value_set_abstract_objectt(
   const typet &type,
   bool top,
@@ -293,7 +286,8 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 void value_set_abstract_objectt::set_top_internal()
 {
   values.clear();
-  values.insert(std::make_shared<constant_abstract_valuet>(type()));
+  values.insert(
+    std::make_shared<constant_abstract_valuet>(type(), true, false));
 }
 
 void value_set_abstract_objectt::set_values(

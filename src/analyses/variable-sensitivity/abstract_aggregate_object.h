@@ -30,12 +30,6 @@ class abstract_aggregate_objectt : public abstract_objectt,
                                    public abstract_aggregate_tag
 {
 public:
-  explicit abstract_aggregate_objectt(const typet &type)
-    : abstract_objectt(type)
-  {
-    PRECONDITION(type.id() == aggregate_traitst::TYPE_ID());
-  }
-
   abstract_aggregate_objectt(const typet &type, bool tp, bool bttm)
     : abstract_objectt(type, tp, bttm)
   {
