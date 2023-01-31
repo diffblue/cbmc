@@ -1,0 +1,105 @@
+name: Build and Test the Rust API
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+env:
+  default_build_dir: "build/"
+  default_solver: "minisat2"
+
+# For now, we support two jobs: A Linux and a MacOS based one.
+# Both of the jobs use CMake, as we only support building the Rust
+# API with CMake (due to dependencies on CMake plugins).
+jobs:
+  check-ubuntu-22_04-cmake-clang-rust:
+    runs-on: ubuntu-22.04
+    env:
+      CC: "ccache /usr/bin/clang-13"
+      CXX: "ccache /usr/bin/clang++-13"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-13 clang++-13 maven flex bison libxml2-utils ccache
+      - name: Log cargo/rust version
+        run: cargo --version
+      - name: Prepare ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-22.04-cmake-clang-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-22.04-cmake-clang-${{ github.ref }}
+            ${{ runner.os }}-22.04-cmake-clang
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      # In our experiments while building this action script, the Ubuntu 22.04 build was failing with
+      # the compiler indicating that it wanted the libraries to be built with `-fPIE` while it was
+      # trying to link the Rust project. This was remedied by adding the `Position Independent Code`
+      # directive during CBMC build time. It's worth mentioning that this wasn't observed on our
+      # local experiments on the same platform, but it seems to be doing no harm to the build overall
+      # and allows us to test the Rust API on Linux without issues.
+      - name: Configure using CMake
+        run: cmake -S. -B${{env.default_build_dir}} -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_COMPILER=/usr/bin/clang-13 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-13 -DWITH_RUST_API=ON
+      - name: Build with CMake
+        run: cmake --build ${{env.default_build_dir}} -j2
+      - name: Print ccache stats
+        run: ccache -s
+      # We won't be running any of the regular regression tests, as these are covered
+      # by the other jobs already present in `pull-request-checks.yaml`.
+      - name: Run Rust API tests
+        run: |
+          cd src/libcprover-rust;\
+          cargo clean;\
+          CBMC_BUILD_DIR=../../${{env.default_build_dir}} SAT_IMPL=${{env.default_solver}} cargo test -- --test-threads=1
+
+
+  check-macos-12-cmake-clang-rust:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: brew install cmake ninja maven flex bison ccache
+      - name: Log cargo/rust version
+        run: cargo --version
+      - name: Prepare ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
+          restore-keys: |
+            ${{ runner.os }}-Release-${{ github.ref }}
+            ${{ runner.os }}-Release
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Configure using CMake
+        run: cmake -S. -B${{env.default_build_dir}} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DWITH_RUST_API=ON
+      - name: Build with Ninja
+        run: cd ${{env.default_build_dir}}; ninja -j3
+      - name: Print ccache stats
+        run: ccache -s
+      # We won't be running any of the regular regression tests, as these are covered
+      # by the other jobs already present in `pull-request-checks.yaml`.
+      - name: Run Rust API tests
+        run: |
+          cd src/libcprover-rust;\
+          cargo clean;\
+          CBMC_BUILD_DIR=../../${{env.default_build_dir}} SAT_IMPL=${{env.default_solver}} cargo test -- --test-threads=1
