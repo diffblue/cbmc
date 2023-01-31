@@ -1,6 +1,5 @@
 var classabstract__aggregate__objectt =
 [
-    [ "abstract_aggregate_objectt", "classabstract__aggregate__objectt.html#a7c6a1fc71f728c2df6d119a574ad1657", null ],
     [ "abstract_aggregate_objectt", "classabstract__aggregate__objectt.html#a1f0b60606357b2e7e6f02a0d98850a6a", null ],
     [ "abstract_aggregate_objectt", "classabstract__aggregate__objectt.html#a4ef8257dbab6a0458de6c48ccca569a0", null ],
     [ "expression_transform", "classabstract__aggregate__objectt.html#ae93c2a460e4292388c0b98dfc5318c67", null ],

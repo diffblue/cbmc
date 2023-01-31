@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('variable__sensitivity__object__factory
 <div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="variable__sensitivity__object__factory_8cpp.html#a07afc3e2576490a39c9ef5600a4858de">   29</a></span>&#160;<a class="code" href="variable__sensitivity__object__factory_8cpp.html#a07afc3e2576490a39c9ef5600a4858de">create_context_abstract_object</a>(<span class="keyword">const</span> <a class="code" href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a> &amp;abstract_object)</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="abstract__object_8h.html#ace6b57280e6bcbef1506199e2cb87617">abstract_object_pointert</a>(</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">new</span> context_classt{abstract_object, abstract_object-&gt;type()});</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">new</span> context_classt{abstract_object, abstract_object-&gt;type(), <span class="keyword">true</span>, <span class="keyword">false</span>});</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;}</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> abstract_<span class="keywordtype">object</span>_<span class="keyword">class</span>t&gt;</div>

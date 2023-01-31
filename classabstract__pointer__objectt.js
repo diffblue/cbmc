@@ -1,6 +1,5 @@
 var classabstract__pointer__objectt =
 [
-    [ "abstract_pointer_objectt", "classabstract__pointer__objectt.html#af9f375ae3e7b613bd996fccbf7e83b19", null ],
     [ "abstract_pointer_objectt", "classabstract__pointer__objectt.html#a0ad10064157350e2249946b804fb2e46", null ],
     [ "abstract_pointer_objectt", "classabstract__pointer__objectt.html#af3234d9167f30bc6876a62675747e088", null ],
     [ "eval_ptr_comparison", "classabstract__pointer__objectt.html#af079220a496132bdd26b224ca04cbe3a", null ],

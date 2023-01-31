@@ -1,6 +1,5 @@
 var classtwo__value__pointer__abstract__objectt =
 [
-    [ "two_value_pointer_abstract_objectt", "classtwo__value__pointer__abstract__objectt.html#a7393d3ae3afc18ed697fae2696f0d9b1", null ],
     [ "two_value_pointer_abstract_objectt", "classtwo__value__pointer__abstract__objectt.html#a8db07be9050dcaafe26cb6c90b630c9d", null ],
     [ "two_value_pointer_abstract_objectt", "classtwo__value__pointer__abstract__objectt.html#a111e77ea55571c48b32a338601894865", null ],
     [ "ptr_comparison_expr", "classtwo__value__pointer__abstract__objectt.html#adda8114f780152aa9d0736291cb7c2c0", null ],

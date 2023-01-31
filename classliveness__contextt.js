@@ -1,7 +1,6 @@
 var classliveness__contextt =
 [
     [ "liveness_context_ptrt", "classliveness__contextt.html#ab0599d6f0d43d5095ccac417d780d956", null ],
-    [ "liveness_contextt", "classliveness__contextt.html#a139e5a7ee097ba4aed7ec5b7dc00a6e6", null ],
     [ "liveness_contextt", "classliveness__contextt.html#a4f9555f3968d0ca680cf455bece71c34", null ],
     [ "liveness_contextt", "classliveness__contextt.html#a433135d58d7c2f6e2232b641446ae2fa", null ],
     [ "abstract_object_merge_internal", "classliveness__contextt.html#a4e0330ab8a08e90a2ebc664bb2b97d3c", null ],

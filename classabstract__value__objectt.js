@@ -1,7 +1,6 @@
 var classabstract__value__objectt =
 [
     [ "abstract_value_pointert", "classabstract__value__objectt.html#aa7484344990c34cd15a9953cc170bfe1", null ],
-    [ "abstract_value_objectt", "classabstract__value__objectt.html#a48c61bb4064415a20bdf5f0a23bbe3c9", null ],
     [ "abstract_value_objectt", "classabstract__value__objectt.html#a0d09bba2140bd274778e3586e884948c", null ],
     [ "abstract_value_objectt", "classabstract__value__objectt.html#a3523e9b9e8ec2ba141f084688f800fdd", null ],
     [ "as_value", "classabstract__value__objectt.html#a2c6a9ac33c2c0da45350d519f8aeb439", null ],

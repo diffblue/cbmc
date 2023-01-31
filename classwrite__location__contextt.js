@@ -2,7 +2,6 @@ var classwrite__location__contextt =
 [
     [ "combine_fn", "classwrite__location__contextt.html#a075922d3b80cadfe128108dc59853a71", null ],
     [ "write_location_context_ptrt", "classwrite__location__contextt.html#adc2b23eedb04fea2eab27acf52826659", null ],
-    [ "write_location_contextt", "classwrite__location__contextt.html#ac4a29b0f95ec4e6576ad67a291f65229", null ],
     [ "write_location_contextt", "classwrite__location__contextt.html#a333ac059cb67f218205d8a8ccd728a23", null ],
     [ "write_location_contextt", "classwrite__location__contextt.html#aacacd6076c748e767554d635d75ac808", null ],
     [ "~write_location_contextt", "classwrite__location__contextt.html#aa93acd763099eb65bb32c9029f6dfaae", null ],
