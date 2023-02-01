@@ -131,7 +131,8 @@ detail to illuminate some details at the code level:
 * The `instruction` is a statement represented by a `goto_instruction_codet`.
   * A `goto_instruction_codet` is an alias of `codet` (a data structure broadly representing
     a statement inside CBMC) that contains the actual code to be executed.
-  * You can distinguish different statements by inspecting the `irep` element `ID_statement`.
+  * You can distinguish different statements by using the result of the
+    `get_statement` member function of the `codet` class.
 * The `guard` is an `exprt` (a data structure broadly representing an expression inside CBMC)
   that is expected to have type `bool`.
   * This is optional - not every instruction is expected to have a `guard` associated with it.
@@ -140,10 +141,6 @@ detail to illuminate some details at the code level:
 
 Another important data structure that needs to be discussed at this point is
 `source_locationt`.
-
-This is an `irept`. `irep`s are the central data structure that model most entities inside
-CBMC and the assorted tools - effectively a node/map like data structure that forms a hierachical
-tree that ends up modeling graphs like ASTs, CFGs, etc.
 
 `source_locationt` are attached into various `exprt`s (the data structure representing
 various expressions, usually the result of some early processing, e.g. the result of the
@@ -159,3 +156,13 @@ It might be possible that a specific source location might point to a CBMC instr
 primitive (which might be reported as a `built-in-addition`) or there might even be no-source
 location (because it might be part of harnesses generated as an example, that have no presence
 in the user code).
+
+## irept
+
+`irep`s are the underlying data structure used to implement many of the data
+structures in CBMC and the assorted tools. These include the `exprt`, `typet`,
+`codet` and `source_locationt` classes. This is a tree data structure where
+each node is expected to contain a string/ID and may have child nodes stored in
+both a sequence of child nodes and a map of strings/IDs to child nodes. This
+enables the singular `irept` data structure to be used to model graphs such as
+ASTs, CFGs, etc.
