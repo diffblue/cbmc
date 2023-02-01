@@ -6,7 +6,7 @@ env:
 
 name: Upload additional release assets
 jobs:
-  ubuntu-22.04-package:
+  ubuntu-22_04-package:
     runs-on: ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
