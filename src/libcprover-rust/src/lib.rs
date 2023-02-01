@@ -11,10 +11,10 @@ pub mod ffi {
         // API Functions
         fn new_api_session() -> UniquePtr<api_sessiont>;
         fn get_api_version(&self) -> UniquePtr<CxxString>;
-        fn load_model_from_files(&self, files: &CxxVector<CxxString>);
-        fn verify_model(&self);
-        fn validate_goto_model(&self);
-        fn drop_unused_functions(&self);
+        fn load_model_from_files(&self, files: &CxxVector<CxxString>) -> Result<()>;
+        fn verify_model(&self) -> Result<()>;
+        fn validate_goto_model(&self) -> Result<()>;
+        fn drop_unused_functions(&self) -> Result<()>;
 
         // Helper/Utility functions
         fn translate_vector_of_string(elements: Vec<String>) -> &'static CxxVector<CxxString>;
@@ -37,11 +37,12 @@ fn print_response(vec: &CxxVector<CxxString>) {
     }
 }
 
-// To test run "CBMC_LIB_DIR=<path_to_build/libs> cargo test -- --test-threads=1 --nocapture"
+// To test run "CBMC_LIB_DIR=<path_to_build/libs> SAT_IMPL=minisat2 cargo test -- --test-threads=1 --nocapture"
 #[cfg(test)]
 mod tests {
     use super::*;
     use cxx::let_cxx_string;
+    use std::process;
 
     #[test]
     fn it_works() {
@@ -75,7 +76,11 @@ mod tests {
 
         // Invoke load_model_from_files and see if the model
         // has been loaded.
-        client.load_model_from_files(vect);
+        if let Err(_) = client.load_model_from_files(vect) {
+            eprintln!("Failed to load model from files: {:?}", vect);
+            process::exit(1);
+        }
+
         // Validate integrity of passed goto-model.
         client.validate_goto_model();
 
@@ -90,12 +95,19 @@ mod tests {
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
-        client.load_model_from_files(vect);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            eprintln!("Failed to load model from files: {:?}", vect);
+            process::exit(1);
+        }
 
         // Validate integrity of goto-model
         client.validate_goto_model();
 
-        client.verify_model();
+        if let Err(_) = client.verify_model() {
+            eprintln!("Failed to verify model from files: {:?}", vect);
+            process::exit(1);
+        }
 
         let msgs = ffi::get_messages();
         print_response(msgs);
@@ -114,10 +126,17 @@ mod tests {
         let vect = ffi::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
 
-        client.load_model_from_files(vect);
+        if let Err(_) = client.load_model_from_files(vect) {
+            eprintln!("Failed to load model from files: {:?}", vect);
+            process::exit(1);
+        }
         // Perform a drop of any unused functions.
-        client.drop_unused_functions();
+        if let Err(err) = client.drop_unused_functions() {
+            eprintln!("Error during client call: {:?}", err);
+            process::exit(1);
+        }
 
+        println!("Just before we print the messages");
         let msgs = ffi::get_messages();
         print_response(msgs);
     }

@@ -17,6 +17,8 @@
 
 std::vector<std::string> output;
 
+extern bool cbmc_invariants_should_throw;
+
 std::vector<std::string> const &
 translate_vector_of_string(rust::Vec<rust::String> elements)
 {
@@ -35,6 +37,9 @@ std::unique_ptr<api_sessiont> new_api_session()
 {
   // Create a new API session and register the default API callback for that.
   api_sessiont *api{new api_sessiont()};
+  // We need to configure invariants to be throwing exceptions instead of
+  // reporting to stderr and calling abort()
+  cbmc_invariants_should_throw = true;
 
   // This lambda needs to be non-capturing in order for it to be convertible
   // to a function pointer, to pass to the API.
