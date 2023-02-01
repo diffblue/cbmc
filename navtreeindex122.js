@@ -1,5 +1,6 @@
 var NAVTREEINDEX122 =
 {
+"structbv__pointerst_1_1postponedt.html":[6,0,131,0],
 "structbv__pointerst_1_1postponedt.html#a19ebd650f5e5c0f25fab61e0ccb1afb7":[6,0,131,0,2],
 "structbv__pointerst_1_1postponedt.html#a7b2ac377a210b82af83ffa0671292699":[6,0,131,0,3],
 "structbv__pointerst_1_1postponedt.html#ac38d063c2c0604a24b14e8d2d7cf66e7":[6,0,131,0,1],
@@ -77,7 +78,6 @@ var NAVTREEINDEX122 =
 "structc__wranglert_1_1function__contract__clauset.html#a8cb32fc84cc244e6dccc14ab99f14d45":[6,0,151,1,2],
 "structc__wranglert_1_1function__contract__clauset.html#adb5ca8c3e73d2f2a3fd65a3ce7e557d3":[6,0,151,1,0],
 "structc__wranglert_1_1function__contract__clauset.html#aed46383628acf6f93a9f51e596f135bb":[6,0,151,1,1],
-"":[5,0,10],
 "structc__wranglert_1_1functiont.html":[6,0,151,2],
 "structc__wranglert_1_1functiont.html#a005d725c42100a68acab5eb862f7bda6":[6,0,151,2,2],
 "structc__wranglert_1_1functiont.html#a28efa1f2fb7a3d1c3a4d6f3715444cda":[6,0,151,2,3],
