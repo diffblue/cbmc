@@ -80,6 +80,11 @@ See the `lazy_goto_modelt` class which is defined and documented in
 [`jbmc/src/java_bytecode/lazy_goto_model.h`](../../jbmc/src/java_bytecode/lazy_goto_model.h)
 for details of lazy loading.
 
+For further information about symbols see the `symbolt` class which is defined
+and documented in [`src/util/symbol.h`](../../src/util/symbol.h) and the
+`symbol_exprt` (symbol expression) class which is defined and documented in
+[`src/util/std_expr.h`](../../src/util/std_expr.h).
+
 ## goto_functiont
 
 A `goto_functiont` is also defined as a pair. It's designed to represent a function
