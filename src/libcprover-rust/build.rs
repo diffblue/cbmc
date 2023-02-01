@@ -20,7 +20,10 @@ fn get_library_build_dir() -> std::io::Result<PathBuf> {
         path.push("lib/");
         return Ok(path);
     }
-    Err(Error::new(ErrorKind::Other, "failed to get build output directory"))
+    Err(Error::new(
+        ErrorKind::Other,
+        "failed to get build output directory",
+    ))
 }
 
 fn get_cadical_build_dir() -> std::io::Result<PathBuf> {
@@ -31,7 +34,10 @@ fn get_cadical_build_dir() -> std::io::Result<PathBuf> {
         path.push("cadical-src/build/");
         return Ok(path);
     }
-    Err(Error::new(ErrorKind::Other, "failed to get build output directory"))
+    Err(Error::new(
+        ErrorKind::Other,
+        "failed to get build output directory",
+    ))
 }
 
 fn get_sat_library() -> std::io::Result<&'static str> {
@@ -40,13 +46,19 @@ fn get_sat_library() -> std::io::Result<&'static str> {
     if let Ok(sat_impl) = env_var_fetch_result {
         let solver_lib = match sat_impl.as_str() {
             "minisat2" => Ok("minisat2-condensed"),
-            "glucose"  => Ok("glucose-condensed"),
-            "cadical"  => Ok("cadical"),
-            _          => Err(Error::new(ErrorKind::Other, "no identifiable solver detected"))
+            "glucose" => Ok("glucose-condensed"),
+            "cadical" => Ok("cadical"),
+            _ => Err(Error::new(
+                ErrorKind::Other,
+                "no identifiable solver detected",
+            )),
         };
         return solver_lib;
     }
-    Err(Error::new(ErrorKind::Other, "SAT_IMPL environment variable not set"))
+    Err(Error::new(
+        ErrorKind::Other,
+        "SAT_IMPL environment variable not set",
+    ))
 }
 
 fn main() {
@@ -65,12 +77,12 @@ fn main() {
 
     let libraries_path = match get_library_build_dir() {
         Ok(path) => path,
-        Err(err) => panic!("Error: {}", err)
+        Err(err) => panic!("Error: {}", err),
     };
 
     let solver_lib = match get_sat_library() {
         Ok(solver) => solver,
-        Err(err) => panic!("Error: {}", err)
+        Err(err) => panic!("Error: {}", err),
     };
 
     // Cadical is being built in its own directory, with the resultant artefacts being
@@ -79,12 +91,18 @@ fn main() {
     if solver_lib == "cadical" {
         let cadical_build_dir = match get_cadical_build_dir() {
             Ok(cadical_directory) => cadical_directory,
-            Err(err) => panic!("Error: {}", err)
+            Err(err) => panic!("Error: {}", err),
         };
-        println!("cargo:rustc-link-search=native={}", cadical_build_dir.display());
+        println!(
+            "cargo:rustc-link-search=native={}",
+            cadical_build_dir.display()
+        );
     }
 
-    println!("cargo:rustc-link-search=native={}", libraries_path.display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        libraries_path.display()
+    );
     println!("cargo:rustc-link-lib=static=goto-programs");
     println!("cargo:rustc-link-lib=static=util");
     println!("cargo:rustc-link-lib=static=langapi");

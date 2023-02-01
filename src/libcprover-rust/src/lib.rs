@@ -1,4 +1,4 @@
-use cxx::{CxxVector, CxxString};
+use cxx::{CxxString, CxxVector};
 #[cxx::bridge]
 pub mod ffi {
 
@@ -31,7 +31,7 @@ fn print_response(vec: &CxxVector<CxxString>) {
         .iter()
         .map(|s| s.to_string_lossy().into_owned())
         .collect();
-    
+
     for s in vec {
         println!("{}", s);
     }
@@ -54,14 +54,12 @@ mod tests {
 
     #[test]
     fn translate_vector_of_rust_string_to_cpp() {
-        let vec: Vec<String> = vec![
-            "other/example.c".to_owned(),
-            "/tmp/example2.c".to_owned()];
+        let vec: Vec<String> = vec!["other/example.c".to_owned(), "/tmp/example2.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 2);
     }
-    
+
     #[test]
     fn it_can_load_model_from_file() {
         let binding = ffi::new_api_session();
@@ -69,9 +67,8 @@ mod tests {
             Some(api_ref) => api_ref,
             None => panic!("Failed to acquire API session handle"),
         };
-    
-        let vec: Vec<String> = vec![
-            "other/example.c".to_owned()];
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
@@ -87,11 +84,10 @@ mod tests {
     }
 
     #[test]
-    fn it_can_verify_the_loaded_model() {        
+    fn it_can_verify_the_loaded_model() {
         let client = ffi::new_api_session();
-    
-        let vec: Vec<String> = vec![
-            "other/example.c".to_owned()];
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         client.load_model_from_files(vect);
@@ -112,9 +108,8 @@ mod tests {
             Some(api_ref) => api_ref,
             None => panic!("Failed to acquire API session handle"),
         };
-    
-        let vec: Vec<String> = vec![
-            "other/example.c".to_owned()];
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
         let vect = ffi::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
