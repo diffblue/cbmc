@@ -8,9 +8,9 @@ The following is some light technical documentation of the major data structures
 used in the input transformation to Intermediate Representation (IR) inside
 CBMC and the assorted CProver tools.
 
-## goto_modelt
+## GOTO models
 
-The `goto_modelt` is the top-level data structure that CBMC (and the other
+The `goto_modelt` class is the top-level data structure that CBMC (and the other
 tools) use for holding the GOTO intermediate representation. The following
 diagram is a simplified view of how the data structures relate to each other -
 
@@ -70,8 +70,15 @@ type goto_modelt {
 }
 ```
 
-The abstract interface of `goto_modelt` is outlined in the file
+There is an abstract interface for goto models provided by the
+`abstract_goto_modelt` class. This is defined and documented in the file
 [`src/goto-programs/abstract_goto_model.h`](../../src/goto-programs/abstract_goto_model.h).
+Ideally code which takes a goto model as input should accept any implementation
+of the abstract interface rather than accepting the concrete `goto_modelt`
+exclusively. This helps with compatibility with `jbmc` which uses lazy loading.
+See the `lazy_goto_modelt` class which is defined and documented in
+[`jbmc/src/java_bytecode/lazy_goto_model.h`](../../jbmc/src/java_bytecode/lazy_goto_model.h)
+for details of lazy loading.
 
 ## goto_functiont
 
