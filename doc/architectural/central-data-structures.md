@@ -98,7 +98,9 @@ type goto_functiont {
 ```
 
 The `goto_programt` denoting the `body` of the function will be the subject of
-a more elaborate explanation in the next section.
+a more elaborate explanation in the next section. The in-memory structure of a
+goto function allows the `body` to be optional, but only functions with bodies
+are included in the serialised goto binaries.
 
 The `parameters` subcomponent is a list of identifiers that are to be looked-up
 in the symbol-table for their definitions.
