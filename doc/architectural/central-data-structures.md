@@ -166,3 +166,17 @@ each node is expected to contain a string/ID and may have child nodes stored in
 both a sequence of child nodes and a map of strings/IDs to child nodes. This
 enables the singular `irept` data structure to be used to model graphs such as
 ASTs, CFGs, etc.
+
+The classes extending `irept` define how the higher level concepts are mapped
+onto the underlying tree data structure. For this reason it is usually advised
+that the member functions of the sub-classes should be used to access the data
+held, rather than the member functions of the base `irept` class. This aids
+potential future restructuring and associates accesses of the data with the
+member functions which have the doxygen explaining what the data is.
+
+The strings/IDs held within `irept` are of type `irep_idt`. These can be
+converted to `std::string` using the `id2string` function. There is a mechanism
+provided for casting expressions and types in
+[`src/util/expr_cast.h`](../../src/util/expr_cast.h). In depth documentation
+of the `irept` class itself can be found in
+[`src/util/irep.h`](../../src/util/irep.h).
