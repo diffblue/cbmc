@@ -2,7 +2,7 @@
 // Author: Dirk Zoller
 // References:
 //
-// [1] Hüttenhofer/Lesch/Peyerimhoff, Mathematik in Anwendung mit C++
+// [1] HÃ¼ttenhofer/Lesch/Peyerimhoff, Mathematik in Anwendung mit C++
 //     Heidelberg, Wiesbaden 1994
 
 #include "bigint.hh"
