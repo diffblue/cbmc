@@ -57,9 +57,9 @@ erDiagram
 A `goto_modelt` is effectively a pair, consisting of:
 
 * A collection of GOTO functions.
-* A symbol table containing symbols which may be referred to by symbol
-  expressions. Symbol expressions are found in the goto functions and the
-  (sub-)expressions for the values of symbols.
+* A symbol table containing symbol definitions which may be referred to by
+  symbol expressions. Symbol expressions are found in the goto functions and the
+  (sub-)expressions for the definitions of symbols.
 
 In pseudocode, the type looks this:
 
@@ -96,7 +96,7 @@ The `goto_programt` denoting the `body` of the function will be the subject of
 a more elaborate explanation in the next section.
 
 The `parameters` subcomponent is a list of identifiers that are to be looked-up
-in the symbol-table for their values.
+in the symbol-table for their definitions.
 
 ## goto_programt
 
