@@ -65,7 +65,7 @@ In pseudocode, the type looks this:
 
 ```js
 type goto_modelt {
-  type goto_functionst = list<goto_functiont>
+  type goto_functionst = map<identifier, goto_functiont>
   type symbol_tablet = map<identifier, symbolt>
 }
 ```
