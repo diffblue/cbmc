@@ -96,23 +96,59 @@ $(document).ready(function(){initNavTree('c__api_8h_source.html',''); initResiza
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="exception__utils_8h.html">util/exception_utils.h</a>&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">// NOLINTNEXTLINE(build/include)</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;rust/cxx.h&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">struct </span><a class="code" href="structapi__sessiont.html">api_sessiont</a>;</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// NOLINTNEXTLINE(build/include)</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;rust/cxx.h&quot;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// Helper function</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;</div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="c__api_8h.html#a37f2b7fe39903a443ba2758db46afd3f">   14</a></span>&#160;<a class="code" href="c__api_8h.html#a37f2b7fe39903a443ba2758db46afd3f">translate_vector_of_string</a>(rust::Vec&lt;rust::String&gt; elements);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">// Exposure of the C++ object oriented API through free-standing functions.</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="c__api_8h.html#a38df5c9067730560413887bbd987e848">   17</a></span>&#160;std::unique_ptr&lt;api_sessiont&gt; <a class="code" href="c__api_8h.html#a38df5c9067730560413887bbd987e848">new_api_session</a>();</div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="c__api_8h.html#afa6f17e0c0db689461b4e3acf7ae10dc">   18</a></span>&#160;std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;<a class="code" href="c__api_8h.html#afa6f17e0c0db689461b4e3acf7ae10dc">get_messages</a>();</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">struct </span><a class="code" href="structapi__sessiont.html">api_sessiont</a>;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// Helper function</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="c__api_8h.html#a37f2b7fe39903a443ba2758db46afd3f">   16</a></span>&#160;<a class="code" href="c__api_8h.html#a37f2b7fe39903a443ba2758db46afd3f">translate_vector_of_string</a>(rust::Vec&lt;rust::String&gt; elements);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">// Exposure of the C++ object oriented API through free-standing functions.</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="c__api_8h.html#a38df5c9067730560413887bbd987e848">   19</a></span>&#160;std::unique_ptr&lt;api_sessiont&gt; <a class="code" href="c__api_8h.html#a38df5c9067730560413887bbd987e848">new_api_session</a>();</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="c__api_8h.html#afa6f17e0c0db689461b4e3acf7ae10dc">   20</a></span>&#160;std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;<a class="code" href="c__api_8h.html#afa6f17e0c0db689461b4e3acf7ae10dc">get_messages</a>();</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">// NOLINTNEXTLINE(readability/namespace)</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="namespacerust.html">   23</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacerust.html">rust</a></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">// NOLINTNEXTLINE(readability/namespace)</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="namespacerust_1_1behavior.html">   26</a></span>&#160;<span class="keyword">namespace </span>behavior</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Try, <span class="keyword">typename</span> Fail&gt;</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="namespacerust_1_1behavior.html#a21ff5bf9e7f38edc407311580a62acfa">   29</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="namespacerust_1_1behavior.html#a21ff5bf9e7f38edc407311580a62acfa">trycatch</a>(Try &amp;&amp;func, Fail &amp;&amp;fail) noexcept</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    func();</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    fail(e.<a class="code" href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">what</a>());</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classinvariant__failedt.html">invariant_failedt</a> &amp;i)</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    fail(i.<a class="code" href="classinvariant__failedt.html#a88f0ca833a83a29f697cd7161c474af2">what</a>());</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;} <span class="comment">// namespace behavior</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;} <span class="comment">// namespace rust</span></div>
 <div class="ttc" id="ac__api_8h_html_a37f2b7fe39903a443ba2758db46afd3f"><div class="ttname"><a href="c__api_8h.html#a37f2b7fe39903a443ba2758db46afd3f">translate_vector_of_string</a></div><div class="ttdeci">std::vector&lt; std::string &gt; const  &amp; translate_vector_of_string(rust::Vec&lt; rust::String &gt; elements)</div></div>
 <div class="ttc" id="ac__api_8h_html_a38df5c9067730560413887bbd987e848"><div class="ttname"><a href="c__api_8h.html#a38df5c9067730560413887bbd987e848">new_api_session</a></div><div class="ttdeci">std::unique_ptr&lt; api_sessiont &gt; new_api_session()</div></div>
 <div class="ttc" id="ac__api_8h_html_afa6f17e0c0db689461b4e3acf7ae10dc"><div class="ttname"><a href="c__api_8h.html#afa6f17e0c0db689461b4e3acf7ae10dc">get_messages</a></div><div class="ttdeci">std::vector&lt; std::string &gt; const  &amp; get_messages()</div></div>
+<div class="ttc" id="aclasscprover__exception__baset_html"><div class="ttname"><a href="classcprover__exception__baset.html">cprover_exception_baset</a></div><div class="ttdoc">Base class for exceptions thrown in the cprover project.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00024">exception_utils.h:25</a></div></div>
+<div class="ttc" id="aclasscprover__exception__baset_html_adfa34194a22e105cf3ee5af8340da3ca"><div class="ttname"><a href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">cprover_exception_baset::what</a></div><div class="ttdeci">virtual std::string what() const</div><div class="ttdoc">A human readable description of what went wrong.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8cpp_source.html#l00012">exception_utils.cpp:12</a></div></div>
+<div class="ttc" id="aclassinvariant__failedt_html"><div class="ttname"><a href="classinvariant__failedt.html">invariant_failedt</a></div><div class="ttdoc">A logic error, augmented with a distinguished field to hold a backtrace.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00109">invariant.h:110</a></div></div>
+<div class="ttc" id="aclassinvariant__failedt_html_a88f0ca833a83a29f697cd7161c474af2"><div class="ttname"><a href="classinvariant__failedt.html#a88f0ca833a83a29f697cd7161c474af2">invariant_failedt::what</a></div><div class="ttdeci">virtual std::string what() const noexcept</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8cpp_source.html#l00156">invariant.cpp:156</a></div></div>
+<div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
+<div class="ttc" id="anamespacerust_1_1behavior_html_a21ff5bf9e7f38edc407311580a62acfa"><div class="ttname"><a href="namespacerust_1_1behavior.html#a21ff5bf9e7f38edc407311580a62acfa">rust::behavior::trycatch</a></div><div class="ttdeci">static void trycatch(Try &amp;&amp;func, Fail &amp;&amp;fail) noexcept</div><div class="ttdef"><b>Definition:</b> <a href="c__api_8h_source.html#l00029">c_api.h:29</a></div></div>
+<div class="ttc" id="anamespacerust_html"><div class="ttname"><a href="namespacerust.html">rust</a></div><div class="ttdef"><b>Definition:</b> <a href="c__api_8h_source.html#l00023">c_api.h:24</a></div></div>
 <div class="ttc" id="astructapi__sessiont_html"><div class="ttname"><a href="structapi__sessiont.html">api_sessiont</a></div><div class="ttdef"><b>Definition:</b> <a href="api_8h_source.html#l00052">api.h:53</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -24,6 +24,7 @@ var namespaces_dup =
       [ "require_symbol_exists", "namespacerequire__symbol.html#a375679dc47384bf743bc3367c6321df3", null ]
     ] ],
     [ "require_type", "namespacerequire__type.html", "namespacerequire__type" ],
+    [ "rust", "namespacerust.html", "namespacerust" ],
     [ "std", null, [
       [ "hash< solver_hardnesst::hardness_ssa_keyt >", "structstd_1_1hash_3_01solver__hardnesst_1_1hardness__ssa__keyt_01_4.html", "structstd_1_1hash_3_01solver__hardnesst_1_1hardness__ssa__keyt_01_4" ],
       [ "hash< string_not_contains_constraintt >", "structstd_1_1hash_3_01string__not__contains__constraintt_01_4.html", "structstd_1_1hash_3_01string__not__contains__constraintt_01_4" ],

@@ -1,5 +1,9 @@
 var NAVTREEINDEX112 =
 {
+"qbf__qube_8h.html":[7,0,2,27,5,6],
+"qbf__qube_8h_source.html":[7,0,2,27,5,6],
+"qbf__qube__core_8cpp.html":[7,0,2,27,5,7],
+"qbf__qube__core_8cpp_source.html":[7,0,2,27,5,7],
 "qbf__qube__core_8h.html":[7,0,2,27,5,8],
 "qbf__qube__core_8h_source.html":[7,0,2,27,5,8],
 "qbf__skizzo_8cpp.html":[7,0,2,27,5,9],
@@ -245,9 +249,5 @@ var NAVTREEINDEX112 =
 "remove__internal__symbols_8cpp.html#a3760d2ecc4ff4dacfffc75125b0b82a6":[7,0,2,23,3,2],
 "remove__internal__symbols_8cpp.html#a5c3e4e7da5a4f874a6adb3e48a5a2c99":[7,0,2,23,3,0],
 "remove__internal__symbols_8cpp.html#af24e984d10e87325924d01beaea3d56b":[7,0,2,23,3,1],
-"remove__internal__symbols_8cpp_source.html":[7,0,2,23,3],
-"remove__internal__symbols_8h.html":[7,0,2,23,4],
-"remove__internal__symbols_8h.html#a073835dd8f3541377218232c372bbdd6":[7,0,2,23,4,1],
-"remove__internal__symbols_8h.html#aa040adf30085f0cd39a90c27ca3bb597":[7,0,2,23,4,0],
-"remove__internal__symbols_8h_source.html":[7,0,2,23,4]
+"remove__internal__symbols_8cpp_source.html":[7,0,2,23,3]
 };
