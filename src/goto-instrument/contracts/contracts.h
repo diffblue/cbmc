@@ -75,7 +75,7 @@ public:
   /// with an assertion that the `requires` clause holds followed by an
   /// assumption that the `ensures` clause holds. In order to ensure that `F`
   /// actually abides by its `ensures` and `requires` clauses, you should
-  /// separately call `code_constractst::enforce_contracts()` on `F` and verify
+  /// separately call `code_contractst::enforce_contracts()` on `F` and verify
   /// it using `cbmc --function F`.
   void replace_calls(const std::set<std::string> &to_replace);
 
@@ -159,7 +159,7 @@ protected:
   std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
     original_loop_number_map;
 
-  /// Loop havoc instructions instrumneted during applying loop contracts.
+  /// Loop havoc instructions instrumented during applying loop contracts.
   std::unordered_set<goto_programt::const_targett, const_target_hash>
     loop_havoc_set;
 
