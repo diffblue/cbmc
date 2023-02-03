@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['release_20process_5',['Release Process',['../release-process.html',1,'index']]]
+  ['homebrew_20tap_20instructions_6',['Homebrew tap instructions',['../homebrew-tap-instructions.html',1,'index']]]
 ];

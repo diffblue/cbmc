@@ -70,7 +70,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Date</b>: 2020-10-08 <b>Updated</b>: 2022-06-23 <b>Author</b>: Fotis Koutoulakis, <a href="#" onclick="location.href='mai'+'lto:'+'fot'+'is'+'.ko'+'ut'+'oul'+'ak'+'is@'+'di'+'ffb'+'lu'+'e.c'+'om'; return false;">fotis<span style="display: none;">.nosp@m.</span>.kou<span style="display: none;">.nosp@m.</span>toula<span style="display: none;">.nosp@m.</span>kis@<span style="display: none;">.nosp@m.</span>diffb<span style="display: none;">.nosp@m.</span>lue.<span style="display: none;">.nosp@m.</span>com</a> <b>Domain</b>: Release &amp; Packaging</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Process</h2>
 <p>The current process we follow through to make a new release is the following:</p>
 <ol type="1">
@@ -86,18 +86,18 @@ Process</h2>
 <p class="startli">It also makes a PR to the homebrew repository that updates the version of CBMC in homebrew. That's then approved and merged by the maintainers of homebrew.</p>
 </li>
 </ol>
-<h2><a class="anchor" id="autotoc_md7"></a>
+<h2><a class="anchor" id="autotoc_md8"></a>
 Versioning</h2>
 <p>We adopt an approach approximating SemVer. That is, our version numbers should be major.minor.patch. Regular releases (as of 2022-06-23: every other week) should normally increment the minor version number. This is also where we can deprecate undesired features, i.e., mark as deprecated, warn existing users.</p>
 <p>Patch version increments should not be done as part of the regular releases, and instead should be reserved for critical bugfixes and issues noticed in the process of doing a regular release. Don't make a patch release if you're not confident your release contains nothing but bugfixes.</p>
 <p>Major version increments should be reserved for changes which we expect will break downstream users scripts and/or workflows. This includes things like changing the goto binary format in such a way that old outputs can't be read by new version of our tools or vice versa, or removing deprecated functionality (removal of functionality should generally be preceded by deprecation!). Note that incrementing the major version every time a change technically could break a downstream users scripts would lead to a weak signal, as basically any detectable change including bugfixes can do that. Instead, major version increments should signal that we expect many users will have to review their workflows for potential breakages, not just any.</p>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md9"></a>
 Constraints</h2>
 <p>Initial design of the release process suggested that the release cadence of CBMC was going to be one regular release (incrementing the <code>y</code> part of the version) every two weeks, on Thursday.</p>
 <p>Originally we wanted to automate this part, but we were limited by the fact that we needed to update <code>src/config.inc</code> before doing the release, and that couldn't be done in an automated fashion, as any update needs to go through a PR, and gets stuck on code-owners approvals, making the whole process more manual than intended.</p>
 <p>Following this original limitation, we decided to settle on doing manual releases every two weeks, but having the process being initiated by a developer manually making the change to <code>src/config.inc</code>, and after that has been merged, mark that specific commit as with a version tag, and push that version tag to Github. At that point, the rest of the process is automated.</p>
 <p>The change to the current implementation was part of <a href="https://github.com/diffblue/cbmc/pull/5517">https://github.com/diffblue/cbmc/pull/5517</a>.</p>
-<p>Last modified: 2023-02-02 17:05:08 +0000 </p>
+<p>Last modified: 2023-02-03 11:32:24 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

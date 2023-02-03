@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['homebrew_20tap_20instructions_4',['Homebrew tap instructions',['../homebrew-tap-instructions.html',1,'index']]]
+  ['core_20goto_20definition_5',['Core goto definition',['../core-goto.html',1,'index']]]
 ];
