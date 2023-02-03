@@ -8,10 +8,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include "linker_script_merge.h"
 
-#include <algorithm>
-#include <fstream>
-#include <iterator>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cmdline.h>
@@ -21,15 +17,18 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 #include <util/run.h>
 #include <util/tempfile.h>
 
-#include <json/json_parser.h>
-
-#include <linking/static_lifetime_init.h>
-
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 
+#include <json/json_parser.h>
+#include <linking/static_lifetime_init.h>
+
 #include "compile.h"
+
+#include <algorithm>
+#include <fstream> // IWYU pragma: keep
+#include <iterator>
 
 int linker_script_merget::add_linker_script_definitions()
 {
@@ -165,8 +164,8 @@ linker_script_merget::linker_script_merget(
                       .id() == ID_array &&
 
                   to_index_expr(to_address_of_expr(expr).object())
-                      .index()
-                      .id() == ID_constant &&
+                    .index()
+                    .is_constant() &&
                   to_index_expr(to_address_of_expr(expr).object())
                       .index()
                       .type()
@@ -462,12 +461,10 @@ int linker_script_merget::ls_data2instructions(
     CHECK_RETURN(zi.has_value());
 
     // Add the array to the symbol table.
-    symbolt array_sym;
+    symbolt array_sym{array_name.str(), array_type, ID_C};
     array_sym.is_static_lifetime = true;
     array_sym.is_lvalue = true;
     array_sym.is_state_var = true;
-    array_sym.name = array_name.str();
-    array_sym.type = array_type;
     array_sym.value = *zi;
     array_sym.location = array_loc;
 
@@ -479,12 +476,10 @@ int linker_script_merget::ls_data2instructions(
     address_of_exprt  array_start(zero_idx);
 
     // Linker-defined symbol_exprt pointing to start address
-    symbolt start_sym;
+    symbolt start_sym{d["start-symbol"].value, pointer_type(char_type()), ID_C};
     start_sym.is_static_lifetime = true;
     start_sym.is_lvalue = true;
     start_sym.is_state_var = true;
-    start_sym.name = d["start-symbol"].value;
-    start_sym.type = pointer_type(char_type());
     start_sym.value = array_start;
     linker_values.emplace(
       d["start-symbol"].value,
@@ -522,12 +517,10 @@ int linker_script_merget::ls_data2instructions(
     {
       plus_exprt array_end(array_start, array_size_expr);
 
-      symbolt end_sym;
+      symbolt end_sym{d["end-symbol"].value, pointer_type(char_type()), ID_C};
       end_sym.is_static_lifetime = true;
       end_sym.is_lvalue = true;
       end_sym.is_state_var = true;
-      end_sym.name = d["end-symbol"].value;
-      end_sym.type = pointer_type(char_type());
       end_sym.value = array_end;
       linker_values.emplace(
         d["end-symbol"].value,
@@ -640,12 +633,11 @@ int linker_script_merget::ls_data2instructions(
 
   if(!symbol_table.has_symbol(CPROVER_PREFIX "allocated_memory"))
   {
-    symbolt sym;
-    sym.name=CPROVER_PREFIX "allocated_memory";
-    sym.pretty_name=CPROVER_PREFIX "allocated_memory";
+    symbolt sym{
+      CPROVER_PREFIX "allocated_memory",
+      code_typet({}, empty_typet()),
+      ID_C} sym.pretty_name = CPROVER_PREFIX "allocated_memory";
     sym.is_lvalue=sym.is_static_lifetime=true;
-    const code_typet void_t({}, empty_typet());
-    sym.type=void_t;
     symbol_table.add(sym);
   }
 

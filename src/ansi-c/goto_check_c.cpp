@@ -42,7 +42,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include <algorithm>
-#include <optional>
 
 class goto_check_ct
 {
@@ -56,6 +55,8 @@ public:
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
     enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
+    enable_memory_cleanup_check =
+      _options.get_bool_option("memory-cleanup-check");
     enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
     enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check =
@@ -182,6 +183,7 @@ protected:
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const binary_exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
+  void memory_leak_check(const irep_idt &function_id);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
   /// \param expr the expression to be checked
@@ -257,6 +259,7 @@ protected:
   bool enable_bounds_check;
   bool enable_pointer_check;
   bool enable_memory_leak_check;
+  bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
   bool enable_enum_range_check;
   bool enable_signed_overflow_check;
@@ -276,6 +279,7 @@ protected:
     {"bounds-check", &enable_bounds_check},
     {"pointer-check", &enable_pointer_check},
     {"memory-leak-check", &enable_memory_leak_check},
+    {"memory-cleanup-check", &enable_memory_cleanup_check},
     {"div-by-zero-check", &enable_div_by_zero_check},
     {"enum-range-check", &enable_enum_range_check},
     {"signed-overflow-check", &enable_signed_overflow_check},
@@ -1567,7 +1571,7 @@ void goto_check_ct::bounds_check_index(
               effective_offset, p_offset.type())};
         }
 
-        exprt zero = from_integer(0, ode.offset().type());
+        exprt zero = from_integer(0, effective_offset.type());
 
         // the final offset must not be negative
         binary_relation_exprt inequality(
@@ -1932,8 +1936,8 @@ void goto_check_ct::check_rec(const exprt &expr, const guardt &guard)
       return;
   }
 
-  forall_operands(it, expr)
-    check_rec(*it, guard);
+  for(const auto &op : expr.operands())
+    check_rec(op, guard);
 
   if(expr.type().id() == ID_c_enum_tag)
     enum_range_check(expr, guard);
@@ -2044,6 +2048,28 @@ optionalt<exprt> goto_check_ct::expand_pointer_checks(exprt expr)
     return std::move(expr);
   else
     return {};
+}
+
+void goto_check_ct::memory_leak_check(const irep_idt &function_id)
+{
+  const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
+  const symbol_exprt leak_expr = leak.symbol_expr();
+
+  // add self-assignment to get helpful counterexample output
+  new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
+
+  source_locationt source_location;
+  source_location.set_function(function_id);
+
+  equal_exprt eq(leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
+
+  add_guarded_property(
+    eq,
+    "dynamically allocated memory never freed",
+    "memory-leak",
+    source_location,
+    eq,
+    identity);
 }
 
 void goto_check_ct::goto_check(
@@ -2197,6 +2223,19 @@ void goto_check_ct::goto_check(
       // this has no successor
       assertions.clear();
     }
+    else if(i.is_assume())
+    {
+      // These are further 'exit points' of the program
+      const exprt simplified_guard = simplify_expr(i.condition(), ns);
+      if(
+        enable_memory_cleanup_check && simplified_guard.is_false() &&
+        (function_identifier == "abort" || function_identifier == "exit" ||
+         function_identifier == "_Exit" ||
+         (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
+      {
+        memory_leak_check(function_identifier);
+      }
+    }
     else if(i.is_dead())
     {
       if(enable_pointer_check || enable_pointer_primitive_check)
@@ -2226,24 +2265,7 @@ void goto_check_ct::goto_check(
         function_identifier == goto_functionst::entry_point() &&
         enable_memory_leak_check)
       {
-        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
-        const symbol_exprt leak_expr = leak.symbol_expr();
-
-        // add self-assignment to get helpful counterexample output
-        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
-
-        source_locationt source_location;
-        source_location.set_function(function_identifier);
-
-        equal_exprt eq(
-          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
-        add_guarded_property(
-          eq,
-          "dynamically allocated memory never freed",
-          "memory-leak",
-          source_location,
-          eq,
-          identity);
+        memory_leak_check(function_identifier);
       }
     }
 
@@ -2383,7 +2405,7 @@ goto_check_ct::get_pointer_is_null_condition(
     return {conditiont{
       or_exprt{
         is_in_bounds_of_some_explicit_allocation(address, size),
-        not_exprt(null_pointer(address))},
+        not_exprt(null_object(address))},
       "pointer NULL"}};
   }
 

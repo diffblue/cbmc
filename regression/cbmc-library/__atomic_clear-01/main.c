@@ -1,5 +1,9 @@
 #include <assert.h>
 
+#ifndef __GNUC__
+void __atomic_clear(_Bool *, int);
+#endif
+
 int main()
 {
   _Bool n;

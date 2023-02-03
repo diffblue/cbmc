@@ -264,15 +264,15 @@ void interval_domaint::assume_rec(
   // we now have lhs <  rhs or
   //             lhs <= rhs
 
-  assert(id==ID_lt || id==ID_le);
+  DATA_INVARIANT(id == ID_lt || id == ID_le, "unexpected comparison operator");
 
-  #ifdef DEBUG
+#ifdef DEBUG
   std::cout << "assume_rec: "
             << from_expr(lhs) << " " << id << " "
             << from_expr(rhs) << "\n";
   #endif
 
-  if(lhs.id()==ID_symbol && rhs.id()==ID_constant)
+  if(lhs.id() == ID_symbol && rhs.is_constant())
   {
     irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
 
@@ -297,7 +297,7 @@ void interval_domaint::assume_rec(
         make_bottom();
     }
   }
-  else if(lhs.id()==ID_constant && rhs.id()==ID_symbol)
+  else if(lhs.is_constant() && rhs.id() == ID_symbol)
   {
     irep_idt rhs_identifier=to_symbol_expr(rhs).get_identifier();
 
@@ -390,14 +390,18 @@ void interval_domaint::assume_rec(
   else if(cond.id()==ID_and)
   {
     if(!negation)
-      forall_operands(it, cond)
-        assume_rec(*it, false);
+    {
+      for(const auto &op : cond.operands())
+        assume_rec(op, false);
+    }
   }
   else if(cond.id()==ID_or)
   {
     if(negation)
-      forall_operands(it, cond)
-        assume_rec(*it, true);
+    {
+      for(const auto &op : cond.operands())
+        assume_rec(op, true);
+    }
   }
 }
 

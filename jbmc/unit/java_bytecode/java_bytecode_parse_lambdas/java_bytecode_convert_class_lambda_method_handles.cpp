@@ -6,8 +6,6 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <algorithm>
-
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
 #include <testing-utils/run_test_with_compilers.h>

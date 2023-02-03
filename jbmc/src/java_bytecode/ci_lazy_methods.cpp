@@ -7,16 +7,18 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "ci_lazy_methods.h"
-#include "java_bytecode_language.h"
-#include "java_class_loader.h"
-#include "java_entry_point.h"
-#include "remove_exceptions.h"
 
 #include <util/expr_iterator.h>
 #include <util/namespace.h>
 #include <util/suffix.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/resolve_inherited_component.h>
+
+#include "java_bytecode_language.h"
+#include "java_class_loader.h"
+#include "java_entry_point.h"
+#include "remove_exceptions.h"
 
 /// Constructor for lazy-method loading
 /// \param symbol_table: the symbol table to use
@@ -34,7 +36,7 @@ Author: Diffblue Ltd.
 ///   these method bodies are produced internally, rather than generated from
 ///   Java bytecode.
 ci_lazy_methodst::ci_lazy_methodst(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &main_class,
   const std::vector<irep_idt> &main_jar_classes,
   const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points,
@@ -96,7 +98,7 @@ static bool references_class_model(const exprt &expr)
 /// \param message_handler: the message handler to use for output
 /// \return Returns false on success
 bool ci_lazy_methodst::operator()(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   method_bytecodet &method_bytecode,
   const method_convertert &method_converter,
   message_handlert &message_handler)
@@ -221,7 +223,16 @@ bool ci_lazy_methodst::operator()(
               << symbol_table.symbols.size() - keep_symbols.symbols.size()
               << " unreachable methods and globals" << messaget::eom;
 
-  symbol_table.swap(keep_symbols);
+  auto sorted_to_keep = keep_symbols.sorted_symbol_names();
+  auto all_sorted = symbol_table.sorted_symbol_names();
+  auto it = sorted_to_keep.cbegin();
+  for(const auto &id : all_sorted)
+  {
+    if(it == sorted_to_keep.cend() || id != *it)
+      symbol_table.remove(id);
+    else
+      ++it;
+  }
 
   return false;
 }
@@ -238,7 +249,7 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
   std::unordered_set<irep_idt> &instantiated_classes,
   const std::unordered_set<class_method_descriptor_exprt, irep_hash>
     &virtual_functions,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   ci_lazy_methods_neededt lazy_methods_loader(
     methods_to_convert_later,
@@ -321,7 +332,7 @@ ci_lazy_methodst::convert_and_analyze_method(
   std::unordered_set<irep_idt> &methods_already_populated,
   const bool class_initializer_already_seen,
   const irep_idt &method_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   std::unordered_set<irep_idt> &methods_to_convert_later,
   std::unordered_set<irep_idt> &instantiated_classes,
   std::unordered_set<class_method_descriptor_exprt, irep_hash>
@@ -367,7 +378,7 @@ ci_lazy_methodst::convert_and_analyze_method(
 ///   * all the methods of the main jar file
 /// \return set of identifiers of entry point methods
 std::unordered_set<irep_idt> ci_lazy_methodst::entry_point_methods(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   std::unordered_set<irep_idt> methods_to_convert_later;
@@ -481,7 +492,7 @@ void ci_lazy_methodst::get_virtual_method_targets(
   const class_method_descriptor_exprt &called_function,
   const std::unordered_set<irep_idt> &instantiated_classes,
   std::unordered_set<irep_idt> &callable_methods,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   const auto &call_class = called_function.class_id();
   const auto &method_name = called_function.mangled_method_name();
@@ -506,8 +517,8 @@ void ci_lazy_methodst::get_virtual_method_targets(
 ///   `e` or its children.
 void ci_lazy_methodst::gather_needed_globals(
   const exprt &e,
-  const symbol_tablet &symbol_table,
-  symbol_tablet &needed)
+  const symbol_table_baset &symbol_table,
+  symbol_table_baset &needed)
 {
   if(e.id()==ID_symbol)
   {
@@ -526,8 +537,10 @@ void ci_lazy_methodst::gather_needed_globals(
     }
   }
   else
-    forall_operands(opit, e)
-      gather_needed_globals(*opit, symbol_table, needed);
+  {
+    for(const auto &op : e.operands())
+      gather_needed_globals(op, symbol_table, needed);
+  }
 }
 
 /// Find a virtual callee, if one is defined and the callee type is known to
@@ -546,7 +559,7 @@ irep_idt ci_lazy_methodst::get_virtual_method_target(
   const std::unordered_set<irep_idt> &instantiated_classes,
   const irep_idt &call_basename,
   const irep_idt &classname,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   // Program-wide, is this class ever instantiated?
   if(!instantiated_classes.count(classname))

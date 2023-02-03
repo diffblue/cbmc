@@ -382,6 +382,9 @@ protected:
 
   struct targetst
   {
+    goto_programt *prefix = nullptr;
+    goto_programt *suffix = nullptr;
+
     bool return_set, has_return_value, break_set, continue_set,
          default_set, throw_set, leave_set;
 
@@ -683,6 +686,12 @@ protected:
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_havoc_slice(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode);
+  void do_alloca(
     const exprt &lhs,
     const symbol_exprt &function,
     const exprt::operandst &arguments,

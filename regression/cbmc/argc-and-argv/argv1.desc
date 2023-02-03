@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 argv1.c
 --bounds-check --pointer-check
 ^EXIT=0$

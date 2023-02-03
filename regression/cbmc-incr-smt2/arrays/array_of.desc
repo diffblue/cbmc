@@ -1,6 +1,6 @@
 CORE
 array_of.c
-
+--slice-formula
 Passing problem to incremental SMT2 solving
 line \d+ False array condition: FAILURE
 line \d+ Valid array condition: SUCCESS
@@ -10,4 +10,5 @@ line \d+ Valid array condition: SUCCESS
 --
 Test using __CPROVER_array_set consisting in an `array_of` node which sets all values of a given
 array to a given value.
-This test uses a forall SMT statement.
+This test uses a forall SMT statement. Requires --slice-formula for the time
+being, but this is a workaround.

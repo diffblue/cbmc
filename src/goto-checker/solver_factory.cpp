@@ -331,7 +331,8 @@ solver_factoryt::get_string_refinement()
 
 std::unique_ptr<std::ofstream> open_outfile_and_check(
   const std::string &filename,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const std::string &arg_name)
 {
   if(filename.empty())
     return nullptr;
@@ -345,7 +346,7 @@ std::unique_ptr<std::ofstream> open_outfile_and_check(
   if(!*out)
   {
     throw invalid_command_line_argument_exceptiont(
-      "failed to open file: " + filename, "--outfile");
+      "failed to open file: " + filename, arg_name);
   }
 
   messaget log(message_handler);
@@ -360,6 +361,14 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
   no_beautification();
 
   const std::string outfile_arg = options.get_option("outfile");
+  const std::string dump_smt_formula = options.get_option("dump-smt-formula");
+
+  if(!outfile_arg.empty() && !dump_smt_formula.empty())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "Argument --outfile is incompatible with --dump-smt-formula. ",
+      "--outfile");
+  }
 
   std::unique_ptr<smt_base_solver_processt> solver_process = nullptr;
 
@@ -367,15 +376,23 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
   {
     bool on_std_out = outfile_arg == "-";
     std::unique_ptr<std::ostream> outfile =
-      on_std_out ? nullptr
-                 : open_outfile_and_check(outfile_arg, message_handler);
+      on_std_out
+        ? nullptr
+        : open_outfile_and_check(outfile_arg, message_handler, "--outfile");
     solver_process = util_make_unique<smt_incremental_dry_run_solvert>(
       message_handler, on_std_out ? std::cout : *outfile, std::move(outfile));
   }
   else
   {
+    const auto out_filename = options.get_option("dump-smt-formula");
+
+    // If no out_filename is provided `open_outfile_and_check` will return
+    // `nullptr`, and the solver will work normally without any logging.
     solver_process = util_make_unique<smt_piped_solver_processt>(
-      std::move(solver_command), message_handler);
+      std::move(solver_command),
+      message_handler,
+      open_outfile_and_check(
+        out_filename, message_handler, "--dump-smt-formula"));
   }
 
   return util_make_unique<solvert>(
@@ -432,7 +449,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
   }
   else
   {
-    auto out = open_outfile_and_check(filename, message_handler);
+    auto out = open_outfile_and_check(filename, message_handler, "--outfile");
 
     auto smt2_conv = util_make_unique<smt2_convt>(
       ns,
@@ -573,6 +590,10 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
 
   if(cmdline.isset("outfile"))
     options.set_option("outfile", cmdline.get_value("outfile"));
+
+  if(cmdline.isset("dump-smt-formula"))
+    options.set_option(
+      "dump-smt-formula", cmdline.get_value("dump-smt-formula"));
 
   if(cmdline.isset("write-solver-stats-to"))
   {

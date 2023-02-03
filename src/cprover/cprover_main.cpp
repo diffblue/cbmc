@@ -9,11 +9,11 @@ Author: Daniel Kroening, dkr@amazon.com
 /// \file
 /// cprover Main Module
 
-#include <util/unicode.h>
-
 #include "cprover_parse_options.h"
 
 #ifdef _MSC_VER
+#  include <util/unicode.h>
+
 #  include <windows.h>
 #endif
 

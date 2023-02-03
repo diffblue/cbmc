@@ -21,13 +21,13 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 class address_of_exprt;
 class dereference_exprt;
-class index_exprt;
-class member_exprt;
+class index_exprt;  // IWYU pragma: keep
+class member_exprt; // IWYU pragma: keep
 class namespacet;
-class struct_exprt;
-class symbol_exprt;
-class symbol_tablet;
-class typecast_exprt;
+class struct_exprt; // IWYU pragma: keep
+class symbol_exprt; // IWYU pragma: keep
+class symbol_table_baset;
+class typecast_exprt; // IWYU pragma: keep
 
 class remove_const_function_pointerst
 {
@@ -37,7 +37,7 @@ public:
   remove_const_function_pointerst(
     message_handlert &message_handler,
     const namespacet &ns,
-    const symbol_tablet &symbol_table);
+    const symbol_table_baset &symbol_table);
 
   bool operator()(const exprt &base_expression, functionst &out_functions);
 
@@ -103,7 +103,7 @@ private:
 
   messaget log;
   const namespacet &ns;
-  const symbol_tablet &symbol_table;
+  const symbol_table_baset &symbol_table;
 };
 
 #define OPT_REMOVE_CONST_FUNCTION_POINTERS \

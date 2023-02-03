@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo _ --pointer-check --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that user defined predicates assumed in ensures clauses for replaced
+contracts build a state such that the predicates holds.

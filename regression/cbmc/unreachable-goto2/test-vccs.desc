@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure
+CORE paths-lifo-expected-failure new-smt-backend
 test.c
 --show-vcc
 ^Generated 1 VCC\(s\), 1 remaining after simplification$

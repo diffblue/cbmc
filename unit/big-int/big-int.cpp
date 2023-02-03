@@ -126,7 +126,7 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
   SECTION("clisp tests")
   {
     const std::vector<std::string> number_tst = {
-#include "number.tst"
+#include "number.tst" // IWYU pragma: keep
     };
 
     for(std::size_t i = 0; i < number_tst.size(); i += 4)

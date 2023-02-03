@@ -2,10 +2,12 @@
 
 /// \file Tests for symbol_tablet
 
+#include <util/exception_utils.h> // IWYU pragma: keep
+#include <util/journalling_symbol_table.h>
+#include <util/symbol_table.h>
+
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
-#include <util/exception_utils.h>
-#include <util/journalling_symbol_table.h>
 
 TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
 {
@@ -74,12 +76,10 @@ SCENARIO(
   {
     symbol_tablet symbol_table;
 
-    symbolt symbol;
     irep_idt symbol_name = "Test_TestBase";
-    symbol.name = symbol_name;
+    symbolt symbol{symbol_name, typet{}, ID_C};
     symbol.base_name = "TestBase";
     symbol.module = "TestModule";
-    symbol.mode = "C";
 
     symbol_table.insert(symbol);
 

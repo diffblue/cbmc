@@ -1,4 +1,4 @@
-CORE smt-backend
+CORE smt-backend new-smt-backend
 valid.c
 --trace --smt2 --z3
 ^EXIT=0$

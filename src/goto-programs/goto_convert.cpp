@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
 #include "goto_convert_class.h"
@@ -243,7 +242,7 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
 
   // mark the goto targets
   unsigned cnt = 0;
-  for(const auto &i : dest.instructions)
+  for(auto &i : dest.instructions)
     if(i.is_goto())
       i.get_target()->target_number = (++cnt);
 
@@ -523,8 +522,8 @@ void goto_convertt::convert(
     copy(code, DEAD, dest);
   else if(statement==ID_decl_block)
   {
-    forall_operands(it, code)
-      convert(to_code(*it), dest, mode);
+    for(const auto &op : code.operands())
+      convert(to_code(op), dest, mode);
   }
   else if(statement==ID_push_catch ||
           statement==ID_pop_catch ||
@@ -1491,8 +1490,8 @@ void goto_convertt::collect_operands(
   else
   {
     // left-to-right is important
-    forall_operands(it, expr)
-      collect_operands(*it, id, dest);
+    for(const auto &op : expr.operands())
+      collect_operands(op, id, dest);
   }
 }
 
@@ -1652,9 +1651,11 @@ void goto_convertt::generate_ifthenelse(
 /// if(guard) goto target;
 static bool has_and_or(const exprt &expr)
 {
-  forall_operands(it, expr)
-    if(has_and_or(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(has_and_or(op))
       return true;
+  }
 
   if(expr.id()==ID_and || expr.id()==ID_or)
     return true;
@@ -1793,16 +1794,18 @@ bool goto_convertt::get_string_constant(
     else if(index_op.id()==ID_array)
     {
       std::string result;
-      forall_operands(it, index_op)
-        if(it->is_constant())
+      for(const auto &op : as_const(index_op).operands())
+      {
+        if(op.is_constant())
         {
-          const auto i = numeric_cast<std::size_t>(*it);
+          const auto i = numeric_cast<std::size_t>(op);
           if(!i.has_value())
             return true;
 
           if(i.value() != 0) // to skip terminating 0
             result += static_cast<char>(i.value());
         }
+      }
 
       return value=result, false;
     }
@@ -1920,7 +1923,7 @@ void goto_convert(
   message_handlert &message_handler)
 {
   // find main symbol
-  const symbol_tablet::symbolst::const_iterator s_it=
+  const symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find("main");
 
   DATA_INVARIANT(

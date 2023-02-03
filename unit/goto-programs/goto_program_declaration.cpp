@@ -6,12 +6,13 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/bitvector_types.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_function.h>
+
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "Validation of well-formed declaration codes",
@@ -26,11 +27,8 @@ SCENARIO(
     irep_idt fun_name = "foo";
     fun_symbol.name = fun_name;
 
-    symbolt var_symbol;
-    irep_idt var_symbol_name = "a";
-    var_symbol.type = type1;
-    var_symbol.name = var_symbol_name;
-    symbol_exprt var_a(var_symbol_name, type1);
+    symbolt var_symbol{"a", type1, irep_idt{}};
+    symbol_exprt var_a = var_symbol.symbol_expr();
 
     goto_functiont goto_function;
     goto_function.body.add(goto_programt::make_decl(var_a));

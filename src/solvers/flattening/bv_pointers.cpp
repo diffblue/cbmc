@@ -121,7 +121,7 @@ bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   const exprt::operandst &operands=expr.operands();
 
@@ -194,13 +194,14 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       if(same_object_lit.is_false())
         return same_object_lit;
 
+      // The comparison is UNSIGNED, to match the type of pointer_offsett
       return prop.land(
         same_object_lit,
         bv_utils.rel(
           offset_bv0,
           expr.id(),
           offset_bv1,
-          bv_utilst::representationt::SIGNED));
+          bv_utilst::representationt::UNSIGNED));
     }
   }
 
@@ -322,9 +323,9 @@ optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
 
     return std::move(bv);
   }
-  else if(expr.id()==ID_constant ||
-          expr.id()==ID_string_constant ||
-          expr.id()==ID_array)
+  else if(
+    expr.is_constant() || expr.id() == ID_string_constant ||
+    expr.id() == ID_array)
   { // constant
     return add_addr(expr);
   }
@@ -415,7 +416,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const auto &object_address_expr = to_object_address_expr(expr);
     return add_addr(object_address_expr.object_expr());
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     const constant_exprt &c = to_constant_expr(expr);
 
@@ -438,28 +439,21 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     mp_integer size=0;
     std::size_t count=0;
 
-    forall_operands(it, plus_expr)
+    for(const auto &op : plus_expr.operands())
     {
-      if(it->type().id()==ID_pointer)
+      if(op.type().id() == ID_pointer)
       {
         count++;
-        bv=convert_bv(*it);
+        bv = convert_bv(op);
         CHECK_RETURN(bv.size()==bits);
 
-        typet pointer_base_type = to_pointer_type(it->type()).base_type();
-
-        if(pointer_base_type.id() == ID_empty)
-        {
-          // This is a gcc extension.
-          // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-          size = 1;
-        }
-        else
-        {
-          auto size_opt = pointer_offset_size(pointer_base_type, ns);
-          CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
-          size = *size_opt;
-        }
+        typet pointer_base_type = to_pointer_type(op.type()).base_type();
+        DATA_INVARIANT(
+          pointer_base_type.id() != ID_empty,
+          "no pointer arithmetic over void pointers");
+        auto size_opt = pointer_offset_size(pointer_base_type, ns);
+        CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
+        size = *size_opt;
       }
     }
 
@@ -470,22 +464,23 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const std::size_t offset_bits = get_offset_width(type);
     bvt sum = bv_utils.build_constant(0, offset_bits);
 
-    forall_operands(it, plus_expr)
+    for(const auto &operand : plus_expr.operands())
     {
-      if(it->type().id()==ID_pointer)
+      if(operand.type().id() == ID_pointer)
         continue;
 
-      if(it->type().id()!=ID_unsignedbv &&
-         it->type().id()!=ID_signedbv)
+      if(
+        operand.type().id() != ID_unsignedbv &&
+        operand.type().id() != ID_signedbv)
       {
         return conversion_failed(plus_expr);
       }
 
-      bv_utilst::representationt rep=
-        it->type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
-                                     bv_utilst::representationt::UNSIGNED;
+      bv_utilst::representationt rep = operand.type().id() == ID_signedbv
+                                         ? bv_utilst::representationt::SIGNED
+                                         : bv_utilst::representationt::UNSIGNED;
 
-      bvt op=convert_bv(*it);
+      bvt op = convert_bv(operand);
       CHECK_RETURN(!op.empty());
 
       op = bv_utils.extension(op, offset_bits, rep);
@@ -518,22 +513,12 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     typet pointer_base_type =
       to_pointer_type(minus_expr.lhs().type()).base_type();
-    mp_integer element_size;
-
-    if(pointer_base_type.id() == ID_empty)
-    {
-      // This is a gcc extension.
-      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      element_size = 1;
-    }
-    else
-    {
-      auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
-      element_size = *element_size_opt;
-    }
-
-    return offset_arithmetic(type, bv, element_size, neg_op1);
+    DATA_INVARIANT(
+      pointer_base_type.id() != ID_empty,
+      "no pointer arithmetic over void pointers");
+    auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
+    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+    return offset_arithmetic(type, bv, *element_size_opt, neg_op1);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -624,11 +609,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     const exprt same_object = ::same_object(minus_expr.lhs(), minus_expr.rhs());
     const literalt same_object_lit = convert(same_object);
 
-    // compute the object size (again, possibly using cached results)
-    const exprt object_size = ::object_size(minus_expr.lhs());
-    const bvt object_size_bv =
-      bv_utils.zero_extension(convert_bv(object_size), width);
-
     bvt bv = prop.new_variables(width);
 
     if(!same_object_lit.is_false())
@@ -636,51 +616,61 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
       const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
       const bvt &lhs = convert_bv(minus_expr.lhs());
       const bvt lhs_offset =
-        bv_utils.sign_extension(offset_literals(lhs, lhs_pt), width);
-
-      const literalt lhs_in_bounds = prop.land(
-        !bv_utils.sign_bit(lhs_offset),
-        bv_utils.rel(
-          lhs_offset,
-          ID_le,
-          object_size_bv,
-          bv_utilst::representationt::UNSIGNED));
+        bv_utils.zero_extension(offset_literals(lhs, lhs_pt), width);
 
       const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
       const bvt &rhs = convert_bv(minus_expr.rhs());
       const bvt rhs_offset =
-        bv_utils.sign_extension(offset_literals(rhs, rhs_pt), width);
-
-      const literalt rhs_in_bounds = prop.land(
-        !bv_utils.sign_bit(rhs_offset),
-        bv_utils.rel(
-          rhs_offset,
-          ID_le,
-          object_size_bv,
-          bv_utilst::representationt::UNSIGNED));
+        bv_utils.zero_extension(offset_literals(rhs, rhs_pt), width);
 
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
 
-      // Support for void* is a gcc extension, with the size treated as 1 byte
-      // (no division required below).
-      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      if(lhs_pt.base_type().id() != ID_empty)
-      {
-        auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
-        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+      DATA_INVARIANT(
+        lhs_pt.base_type().id() != ID_empty,
+        "no pointer arithmetic over void pointers");
+      auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
+      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
 
-        if(*element_size_opt != 1)
-        {
-          bvt element_size_bv =
-            bv_utils.build_constant(*element_size_opt, width);
-          difference = bv_utils.divider(
-            difference, element_size_bv, bv_utilst::representationt::SIGNED);
-        }
+      if(*element_size_opt != 1)
+      {
+        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        difference = bv_utils.divider(
+          difference, element_size_bv, bv_utilst::representationt::SIGNED);
+      }
+
+      // test for null object (integer constants)
+      const exprt null_object = ::null_object(minus_expr.lhs());
+      literalt in_bounds = convert(null_object);
+
+      if(!in_bounds.is_true())
+      {
+        // compute the object size (again, possibly using cached results)
+        const exprt object_size = ::object_size(minus_expr.lhs());
+        const bvt object_size_bv =
+          bv_utils.zero_extension(convert_bv(object_size), width);
+
+        const literalt lhs_in_bounds = prop.land(
+          !bv_utils.sign_bit(lhs_offset),
+          bv_utils.rel(
+            lhs_offset,
+            ID_le,
+            object_size_bv,
+            bv_utilst::representationt::UNSIGNED));
+
+        const literalt rhs_in_bounds = prop.land(
+          !bv_utils.sign_bit(rhs_offset),
+          bv_utils.rel(
+            rhs_offset,
+            ID_le,
+            object_size_bv,
+            bv_utilst::representationt::UNSIGNED));
+
+        in_bounds =
+          prop.lor(in_bounds, prop.land(lhs_in_bounds, rhs_in_bounds));
       }
 
       prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_lit, prop.land(lhs_in_bounds, rhs_in_bounds)),
-        bv_utils.equal(difference, bv)));
+        prop.land(same_object_lit, in_bounds), bv_utils.equal(difference, bv)));
     }
 
     return bv;
@@ -697,8 +687,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     bvt offset_bv =
       offset_literals(pointer_bv, to_pointer_type(pointer.type()));
 
-    // we do a sign extension to permit negative offsets
-    return bv_utils.sign_extension(offset_bv, width);
+    return bv_utils.zero_extension(offset_bv, width);
   }
   else if(
     const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
@@ -794,10 +783,9 @@ exprt bv_pointerst::bv_get_rec(
 
   constant_exprt result(bvrep, type);
 
-  pointer_logict::pointert pointer;
-  pointer.object =
-    numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
-  pointer.offset=binary2integer(value_offset, true);
+  pointer_logict::pointert pointer{
+    numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
+    binary2integer(value_offset, false)};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};
@@ -883,7 +871,7 @@ bvt bv_pointerst::offset_arithmetic(
   }
 
   const std::size_t offset_bits = get_offset_width(type);
-  bv_index = bv_utils.sign_extension(bv_index, offset_bits);
+  bv_index = bv_utils.zero_extension(bv_index, offset_bits);
 
   bvt offset_bv = offset_literals(bv, type);
 

@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend new-smt-backend
 main.c
 --pointer-check
 ^EXIT=10$
@@ -11,3 +11,5 @@ main.c
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
+--
+This test only fails when using SMT solvers as back-end on Windows.

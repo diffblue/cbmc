@@ -187,6 +187,10 @@ enable pointer checks
 \fB\-\-memory\-leak\-check\fR
 enable memory leak checks
 .TP
+\fB\-\-memory\-cleanup\-check\fR
+Enable memory cleanup checks: assert that all dynamically allocated memory is
+explicitly freed before terminating the program.
+.TP
 \fB\-\-div\-by\-zero\-check\fR
 enable division by zero checks
 .TP
@@ -994,9 +998,6 @@ force aggressive slicer to preserve all direct paths
 .TP
 \fB\-\-apply\-loop\-contracts\fR
 check and use loop contracts when provided
-.TP
-\fB\-\-synthesize\-loop\-invariants\fR
-synthesize and apply loop invariants
 .TP
 \fB\-\-replace\-call\-with\-contract\fR \fIfun\fR
 replace calls to \fIfun\fR with \fIfun\fR's contract

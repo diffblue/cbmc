@@ -125,12 +125,16 @@ enum class dfcc_funt
   LINK_DEALLOCATED,
   /// \see __CPROVER_contracts_is_fresh
   IS_FRESH,
+  /// \see __CPROVER_contracts_pointer_in_range_dfcc
+  POINTER_IN_RANGE_DFCC,
   /// \see __CPROVER_contracts_is_freeable
   IS_FREEABLE,
   /// \see __CPROVER_contracts_was_freed
   WAS_FREED,
   /// \see __CPROVER_contracts_check_replace_ensures_was_freed_preconditions
-  REPLACE_ENSURES_WAS_FREED_PRECONDITIONS
+  REPLACE_ENSURES_WAS_FREED_PRECONDITIONS,
+  /// \see __CPROVER_contracts_obeys_contract
+  OBEYS_CONTRACT,
 };
 
 class goto_modelt;
@@ -237,12 +241,17 @@ public:
   /// __CPROVER_object_from
   /// __CPROVER_assignable
   /// __CPROVER_freeable
-  /// To make sure they cannot be used in a proof unexpectedly
-  /// without causing verification errors.
+  /// An error will be triggered in case calls to these functions occur outside
+  /// of a contrat clause and were hence not mapped to their library
+  /// implementation.
   void inhibit_front_end_builtins();
 
   /// Sets the given hide flag on all instructions of all library functions
   void set_hide(bool hide);
+
+  /// Adds "checked" pragmas to instructions of all library functions
+  /// instructions. By default checks are not disabled.
+  void disable_checks();
 
   /// Returns true iff the given function_id is one of `__CPROVER_assignable`,
   /// `__CPROVER_object_whole`, `__CPROVER_object_from`,

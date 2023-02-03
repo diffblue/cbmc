@@ -175,10 +175,10 @@ bool remove_returnst::do_function_calls(
         optionalt<symbol_exprt> return_value;
 
         if(!is_stub)
-        {
           return_value = get_or_create_return_value_symbol(function_id);
-          CHECK_RETURN(return_value.has_value());
 
+        if(return_value.has_value())
+        {
           // The return type in the definition of the function may differ
           // from the return type in the declaration.  We therefore do a
           // cast.
@@ -199,7 +199,7 @@ bool remove_returnst::do_function_calls(
         // fry the previous assignment
         i_it->call_lhs().make_nil();
 
-        if(!is_stub)
+        if(return_value.has_value())
         {
           goto_program.insert_after(
             t_a,

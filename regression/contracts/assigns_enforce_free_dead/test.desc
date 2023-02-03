@@ -10,7 +10,7 @@ main.c
 ^\[foo.assigns.\d+\] line \d+ Check that \*q is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that \*w is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line \d+ Check that __CPROVER_POINTER_OBJECT\(\(void \*\)z\) is assignable: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -19,7 +19,7 @@ main.c
 ^\[foo.assigns.\d+\] line \d+ Check that \*q is assignable: FAILURE$
 ^\[foo.assigns.\d+\] line \d+ Check that \*w is assignable: FAILURE$
 ^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: FAILURE$
-^\[foo.assigns.\d+\] line \d+ Check that POINTER_OBJECT\(\(void \*\)z\) is assignable: FAILURE$
+^\[foo.assigns.\d+\] line \d+ Check that __CPROVER_POINTER_OBJECT\(\(void \*\)z\) is assignable: FAILURE$
 --
 Checks that invalidated CARs are correctly tracked on `free` and `DEAD`.
 

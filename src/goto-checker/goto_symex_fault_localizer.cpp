@@ -69,10 +69,10 @@ const SSA_stept &goto_symex_fault_localizert::collect_guards(
         localization_points.emplace(l, emplace_result.first);
       }
     }
-
-    // reached failed assertion?
-    if(step.is_assert() && step.get_property_id() == failed_property_id)
+    else if(step.is_assert() && step.property_id == failed_property_id)
+    {
       return step;
+    }
   }
   UNREACHABLE;
 }

@@ -113,6 +113,7 @@ struct decision_procedure_test_environmentt final
   std::vector<smt_commandt> sent_commands;
   null_message_handlert message_handler;
   smt_object_sizet object_size_function;
+  smt_is_dynamic_objectt is_dynamic_object_function;
   smt2_incremental_decision_proceduret procedure{
     ns,
     util_make_unique<smt_mock_solver_processt>(
@@ -150,17 +151,12 @@ smt_responset decision_procedure_test_environmentt::receive_response()
 
 static symbolt make_test_symbol(irep_idt id, typet type)
 {
-  symbolt new_symbol;
-  new_symbol.name = std::move(id);
-  new_symbol.type = std::move(type);
-  return new_symbol;
+  return symbolt{std::move(id), std::move(type), irep_idt{}};
 }
 
 static symbolt make_test_symbol(irep_idt id, exprt value)
 {
-  symbolt new_symbol;
-  new_symbol.name = std::move(id);
-  new_symbol.type = value.type();
+  symbolt new_symbol{std::move(id), value.type(), irep_idt{}};
   new_symbol.value = std::move(value);
   return new_symbol;
 }
@@ -177,7 +173,8 @@ TEST_CASE(
       std::vector<smt_commandt>{
         smt_set_option_commandt{smt_option_produce_modelst{true}},
         smt_set_logic_commandt{smt_logic_allt{}},
-        test.object_size_function.declaration});
+        test.object_size_function.declaration,
+        test.is_dynamic_object_function.declaration});
     test.sent_commands.clear();
     SECTION("Set symbol to true.")
     {
@@ -464,6 +461,10 @@ TEST_CASE(
   const auto invalid_pointer_object_size_definition =
     test.object_size_function.make_definition(
       1, smt_bit_vector_constant_termt{0, 32});
+  const auto null_object_dynamic_definition =
+    test.is_dynamic_object_function.make_definition(0, false);
+  const auto invalid_pointer_object_dynamic_definition =
+    test.is_dynamic_object_function.make_definition(1, false);
   const symbolt foo = make_test_symbol("foo", signedbv_typet{16});
   const smt_identifier_termt foo_term{"foo", smt_bit_vector_sortt{16}};
   const exprt expr_42 = from_integer({42}, signedbv_typet{16});
@@ -480,6 +481,8 @@ TEST_CASE(
       smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
       invalid_pointer_object_size_definition,
       null_object_size_definition,
+      null_object_dynamic_definition,
+      invalid_pointer_object_dynamic_definition,
       smt_check_sat_commandt{}};
     REQUIRE(
       (test.sent_commands.size() == expected_commands.size() &&
@@ -502,25 +505,18 @@ TEST_CASE(
         test.sent_commands ==
         std::vector<smt_commandt>{smt_get_value_commandt{foo_term}});
     }
-    SECTION("Get value of non-set symbol")
+    SECTION("Invariant violation due to non-set symbol")
     {
-      // smt2_incremental_decision_proceduret is used this way when cbmc is
-      // invoked with the combination of `--trace` and `--slice-formula`.
       test.sent_commands.clear();
       const exprt bar =
         make_test_symbol("bar", signedbv_typet{16}).symbol_expr();
-      REQUIRE(test.procedure.get(bar) == bar);
       REQUIRE(test.sent_commands.empty());
-    }
-    SECTION("Get value of type less symbol back")
-    {
-      // smt2_incremental_decision_proceduret is used this way as part of
-      // building the goto trace, to get the partial order concurrency clock
-      // values.
-      test.sent_commands.clear();
-      const symbol_exprt baz = symbol_exprt::typeless("baz");
-      REQUIRE(test.procedure.get(baz) == baz);
-      REQUIRE(test.sent_commands.empty());
+      cbmc_invariants_should_throwt invariants_throw;
+      REQUIRE_THROWS_MATCHES(
+        test.procedure.get(bar),
+        invariant_failedt,
+        invariant_failure_containing(
+          "symbol expressions must have a known value"));
     }
     SECTION("Get value of trivially solved expression")
     {
@@ -536,13 +532,26 @@ TEST_CASE(
     }
     SECTION("Invariant violated due to expression in unexpected form.")
     {
-      const mult_exprt unexpected{foo.symbol_expr(), from_integer(2, foo.type)};
-      const cbmc_invariants_should_throwt invariants_throw;
-      REQUIRE_THROWS_MATCHES(
-        test.procedure.get(unexpected),
-        invariant_failedt,
-        invariant_failure_containing(
-          "Unhandled expressions are expected to be symbols"));
+      const auto offset = from_integer(2, signedbv_typet{64});
+      const byte_extract_exprt byte_extract_expr{
+        ID_byte_extract_little_endian,
+        foo.symbol_expr(),
+        offset,
+        8,
+        unsignedbv_typet{8}};
+      test.mock_responses.push_back(
+        smt_get_value_responset{{{foo_term, term_42}}});
+      test.mock_responses.push_back(smt_get_value_responset{
+        {{smt_bit_vector_constant_termt{2, 64},
+          smt_bit_vector_constant_termt{2, 64}}}});
+      REQUIRE(
+        test.procedure.get(byte_extract_expr) ==
+        byte_extract_exprt{
+          ID_byte_extract_little_endian,
+          expr_42,
+          offset,
+          8,
+          unsignedbv_typet{8}});
     }
     SECTION("Error handling of mismatched response.")
     {

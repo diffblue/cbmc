@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks if user-defined memory predicates in requires clauses are succesfully
+assumed when enforcing a contract.

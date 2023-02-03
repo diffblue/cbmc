@@ -28,9 +28,8 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
     const symbol_exprt symbol_nonshared{"nonShared", int_type};
     const ssa_exprt ssa_nonshared{symbol_nonshared};
     symbol_table.insert([&] {
-      symbolt symbol;
-      symbol.name = symbol_nonshared.get_identifier();
-      symbol.type = symbol_nonshared.type();
+      symbolt symbol{
+        symbol_nonshared.get_identifier(), symbol_nonshared.type(), irep_idt{}};
       symbol.value = symbol_nonshared;
       symbol.is_thread_local = true;
       return symbol;
@@ -39,9 +38,8 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
     const symbol_exprt symbol_shared{"shared", int_type};
     const ssa_exprt ssa_shared{symbol_shared};
     symbol_table.insert([&] {
-      symbolt symbol;
-      symbol.name = symbol_shared.get_identifier();
-      symbol.type = symbol_shared.type();
+      symbolt symbol{
+        symbol_shared.get_identifier(), symbol_shared.type(), irep_idt{}};
       symbol.value = symbol_shared;
       symbol.is_thread_local = false;
       return symbol;
@@ -51,9 +49,8 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
                                     bool_typet{}};
     const ssa_exprt ssa_guard{symbol_guard};
     symbol_table.insert([&] {
-      symbolt symbol;
-      symbol.name = symbol_guard.get_identifier();
-      symbol.type = symbol_guard.type();
+      symbolt symbol{
+        symbol_guard.get_identifier(), symbol_guard.type(), irep_idt{}};
       symbol.value = symbol_guard;
       symbol.is_thread_local = false;
       return symbol;
@@ -63,9 +60,8 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
     const symbol_exprt symbol_fun{"fun", code_type};
     const ssa_exprt ssa_fun{symbol_fun};
     symbol_table.insert([&] {
-      symbolt fun_symbol;
-      fun_symbol.name = symbol_fun.get_identifier();
-      fun_symbol.type = symbol_fun.type();
+      symbolt fun_symbol{
+        symbol_fun.get_identifier(), symbol_fun.type(), irep_idt{}};
       fun_symbol.value = symbol_fun;
       fun_symbol.is_thread_local = true;
       return fun_symbol;

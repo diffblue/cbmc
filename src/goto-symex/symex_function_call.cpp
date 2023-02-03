@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
-#include <util/prefix.h>
 #include <util/range.h>
 #include <util/std_code.h>
 
@@ -246,7 +245,13 @@ void goto_symext::symex_function_call_post_clean(
   if(stop_recursing)
   {
     if(symex_config.unwinding_assertions)
-      vcc(false_exprt(), "recursion unwinding assertion", state);
+    {
+      vcc(
+        false_exprt(),
+        id2string(identifier) + ".recursion",
+        "recursion unwinding assertion",
+        state);
+    }
     if(!symex_config.partial_loops)
     {
       // Rule out this path:

@@ -86,7 +86,8 @@ int make_identifier()
   {
     parser_stack(yyansi_clval).id(ID_symbol);
     parser_stack(yyansi_clval).set(ID_C_base_name, final_base_name);
-    return TOK_IDENTIFIER;
+    return PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ?
+      TOK_MSC_IDENTIFIER : TOK_GCC_IDENTIFIER;
   }
   else
   {
@@ -112,7 +113,8 @@ int make_identifier()
     else
     {
       parser_stack(yyansi_clval).id(ID_symbol);
-      return TOK_IDENTIFIER;
+      return PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ?
+        TOK_MSC_IDENTIFIER : TOK_GCC_IDENTIFIER;
     }
   }
 }
@@ -176,9 +178,9 @@ int cpp_operator(int token)
   }
 }
 
-#include <util/pragma_wsign_compare.def>
-#include <util/pragma_wnull_conversion.def>
-#include <util/pragma_wdeprecated_register.def>
+#include <util/pragma_wsign_compare.def> // IWYU pragma: keep
+#include <util/pragma_wnull_conversion.def> // IWYU pragma: keep
+#include <util/pragma_wdeprecated_register.def> // IWYU pragma: keep
 
 /*** macros for easier rule definition **********************************/
 %}
@@ -1293,8 +1295,6 @@ __decltype          { if(PARSER.cpp98 &&
 {CPROVER_PREFIX}"ensures"      { loc(); return TOK_CPROVER_ENSURES; }
 {CPROVER_PREFIX}"assigns"      { loc(); return TOK_CPROVER_ASSIGNS; }
 {CPROVER_PREFIX}"frees"        { loc(); return TOK_CPROVER_FREES; }
-{CPROVER_PREFIX}"requires_contract" { loc(); return TOK_CPROVER_REQUIRES_CONTRACT; }
-{CPROVER_PREFIX}"ensures_contract" { loc(); return TOK_CPROVER_ENSURES_CONTRACT; }
 
 "\xe2\x88\x80" |
 "\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */

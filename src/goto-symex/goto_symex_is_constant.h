@@ -17,6 +17,11 @@ Author: Michael Tautschig, tautschn@amazon.com
 
 class goto_symex_is_constantt : public is_constantt
 {
+public:
+  explicit goto_symex_is_constantt(const namespacet &ns) : is_constantt(ns)
+  {
+  }
+
 protected:
   bool is_constant(const exprt &expr) const override
   {
@@ -25,11 +30,11 @@ protected:
       bool found_non_constant = false;
 
       // propagate stuff with sizeof in it
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        if(it->find(ID_C_c_sizeof_type).is_not_nil())
+        if(op.find(ID_C_c_sizeof_type).is_not_nil())
           return true;
-        else if(!is_constant(*it))
+        else if(!is_constant(op))
           found_non_constant = true;
       }
 
@@ -38,14 +43,17 @@ protected:
     else if(expr.id() == ID_with)
     {
       // this is bad
-      /*
-      forall_operands(it, expr)
-      if(!is_constant(expr.op0()))
-      return false;
+#if 0
+      for(const auto &op : expr.operands())
+      {
+        if(!is_constant(op))
+          return false;
+      }
 
       return true;
-      */
+#else
       return false;
+#endif
     }
 
     return is_constantt::is_constant(expr);

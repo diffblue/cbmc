@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/find_symbols.h>
 #include <util/pointer_expr.h>
-#include <util/range.h>
 #include <util/std_expr.h>
 
 #include <pointer-analysis/value_set.h>
@@ -174,9 +173,13 @@ bool postconditiont::is_used(
     return false;
   }
   else
-    forall_operands(it, expr)
-      if(is_used(*it, identifier))
+  {
+    for(const auto &op : expr.operands())
+    {
+      if(is_used(op, identifier))
         return true;
+    }
+  }
 
   return false;
 }

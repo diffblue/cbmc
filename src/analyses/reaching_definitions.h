@@ -44,7 +44,7 @@ class sparse_bitvector_analysist
 public:
   const V &get(const std::size_t value_index) const
   {
-    assert(value_index<values.size());
+    PRECONDITION(value_index < values.size());
     return values[value_index]->first;
   }
 
@@ -143,7 +143,8 @@ inline bool operator<(
 
   // we do not expect comparison of unrelated definitions
   // as this operator< is only used in sparse_bitvector_analysist
-  assert(a.identifier==b.identifier);
+  INVARIANT(
+    a.identifier == b.identifier, "comparison of unrelated definitions");
 
   return false;
 }
@@ -365,19 +366,19 @@ public:
 
   value_setst &get_value_sets() const
   {
-    assert(value_sets);
+    PRECONDITION(value_sets);
     return *value_sets;
   }
 
   const is_threadedt &get_is_threaded() const
   {
-    assert(is_threaded);
+    PRECONDITION(is_threaded);
     return *is_threaded;
   }
 
   const dirtyt &get_is_dirty() const
   {
-    assert(is_dirty);
+    PRECONDITION(is_dirty);
     return *is_dirty;
   }
 

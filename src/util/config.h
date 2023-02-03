@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "optional.h"
 
 class cmdlinet;
-class symbol_tablet;
+class symbol_table_baset;
 
 // Configt is the one place beyond *_parse_options where options are ... parsed.
 // Options that are handled by configt are documented here.
@@ -342,11 +342,11 @@ public:
 
   void set_arch(const irep_idt &);
 
-  void set_from_symbol_table(const symbol_tablet &);
+  void set_from_symbol_table(const symbol_table_baset &);
 
   bool set(const cmdlinet &cmdline);
 
-  void set_object_bits_from_symbol_table(const symbol_tablet &);
+  void set_object_bits_from_symbol_table(const symbol_table_baset &);
   std::string object_bits_info();
 
   static irep_idt this_architecture();

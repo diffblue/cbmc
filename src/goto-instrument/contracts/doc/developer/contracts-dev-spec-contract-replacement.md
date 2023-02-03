@@ -37,7 +37,6 @@ ret_t foo(foo_params, write_set_t caller_write_set) {
 
   // assert requires clauses
   assert(contract::requires(foo_params, requires_write_set));
-  assert(contract::requires_contract(foo_params, requires_write_set));
 
   // snapshot history variables
   hist1_t hist1 = ...;
@@ -82,7 +81,6 @@ ret_t foo(foo_params, write_set_t caller_write_set) {
 
   // assume post conditions
   assume(contract::ensures(foo_params, ensures_write_set));
-  assume(contract::ensures_contract(foo_params, ensures_write_set));
 
   // postamble
   assert(__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(ensures_write_set));

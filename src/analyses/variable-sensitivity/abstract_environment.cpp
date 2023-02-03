@@ -6,15 +6,14 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
-#include <analyses/variable-sensitivity/abstract_object_statistics.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-
 #include <util/expr_util.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/simplify_expr_class.h>
 #include <util/simplify_utils.h>
 #include <util/symbol_table.h>
+
+#include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 
 #include <algorithm>
 #include <map>
@@ -24,6 +23,10 @@
 #ifdef DEBUG
 #  include <iostream>
 #endif
+
+#include "abstract_object_statistics.h"
+#include "context_abstract_object.h"
+#include "interval_abstract_value.h"
 
 typedef exprt (
   *assume_function)(abstract_environmentt &, const exprt &, const namespacet &);
@@ -259,7 +262,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   // We should only attempt to assume Boolean things
   // This should be enforced by the well-structured-ness of the
   // goto-program and the way assume is used.
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   auto simplified = simplify_expr(expr, ns);
   auto assumption = do_assume(simplified, ns);
@@ -267,8 +270,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
   if(assumption.id() != ID_nil) // I.E. actually a value
   {
     // Should be of the right type
-    INVARIANT(
-      assumption.type().id() == ID_bool, "simplification preserves type");
+    INVARIANT(assumption.is_boolean(), "simplification preserves type");
 
     if(assumption.is_false())
     {

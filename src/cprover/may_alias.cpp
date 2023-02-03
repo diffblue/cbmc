@@ -12,15 +12,11 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "may_alias.h"
 
 #include <util/c_types.h>
-#include <util/format_expr.h>
-#include <util/format_type.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-
-#include <iostream>
 
 bool permitted_by_strict_aliasing(const typet &a, const typet &b)
 {

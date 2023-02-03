@@ -8,13 +8,14 @@ Author: Diffblue Ltd.
 
 #include "solver_hardness.h"
 
-#include <iomanip>
-
 #include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/json_irep.h>
 #include <util/json_stream.h>
 #include <util/std_code.h>
+
+#include <fstream>
+#include <iomanip>
 
 solver_hardnesst::sat_hardnesst &solver_hardnesst::sat_hardnesst::
 operator+=(const solver_hardnesst::sat_hardnesst &other)
@@ -43,7 +44,7 @@ bool solver_hardnesst::assertion_statst::empty() const
 
 void solver_hardnesst::register_ssa(
   std::size_t ssa_index,
-  const exprt ssa_expression,
+  const exprt &ssa_expression,
   goto_programt::const_targett pc)
 {
   PRECONDITION(ssa_index < hardness_stats.size());
@@ -72,15 +73,16 @@ void solver_hardnesst::register_ssa_size(std::size_t size)
 }
 
 void solver_hardnesst::register_assertion_ssas(
-  const exprt ssa_expression,
+  const exprt &ssa_expression,
   const std::vector<goto_programt::const_targett> &pcs)
 {
   if(assertion_stats.empty())
-    return;
+  {
+    assertion_stats.ssa_expression = expr2string(ssa_expression);
+    assertion_stats.pcs = pcs;
+  }
 
-  assertion_stats.sat_hardness = current_hardness;
-  assertion_stats.ssa_expression = expr2string(ssa_expression);
-  assertion_stats.pcs = pcs;
+  assertion_stats.sat_hardness += current_hardness;
   current_ssa_key = {};
   current_hardness = {};
 }
@@ -377,7 +379,7 @@ solver_hardnesst::goto_instruction2string(goto_programt::const_targett pc)
   return out.str();
 }
 
-std::string solver_hardnesst::expr2string(const exprt expr)
+std::string solver_hardnesst::expr2string(const exprt &expr)
 {
   std::stringstream ss;
   ss << format(expr);

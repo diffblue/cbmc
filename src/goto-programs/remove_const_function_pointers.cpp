@@ -17,7 +17,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #define LOG(message, irep)                                                     \
   do                                                                           \
@@ -34,7 +34,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
   const namespacet &ns,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
   : log(message_handler), ns(ns), symbol_table(symbol_table)
 {}
 
@@ -168,7 +168,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
       resolved=false;
     }
   }
-  else if(simplified_expr.id()==ID_constant)
+  else if(simplified_expr.is_constant())
   {
     if(simplified_expr.is_zero())
     {
@@ -470,8 +470,9 @@ bool remove_const_function_pointerst::try_resolve_index_value(
   bool resolved=try_resolve_expression(expr, index_value_expressions, is_const);
   if(resolved)
   {
-    if(index_value_expressions.size()==1 &&
-       index_value_expressions.front().id()==ID_constant)
+    if(
+      index_value_expressions.size() == 1 &&
+      index_value_expressions.front().is_constant())
     {
       const constant_exprt &constant_expr=
         to_constant_expr(index_value_expressions.front());

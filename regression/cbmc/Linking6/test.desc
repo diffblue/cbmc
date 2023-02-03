@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 module.c --pointer-check
 ^EXIT=0$

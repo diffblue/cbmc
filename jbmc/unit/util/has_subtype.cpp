@@ -68,10 +68,7 @@ SCENARIO("has_subtype", "[core][utils][has_subtype]")
     struct_tag_typet struct_tag("A-struct");
     struct_typet struct_type({{"ptr", pointer_type(struct_tag)}});
 
-    symbolt s;
-    s.type = struct_type;
-    s.name = "A-struct";
-    s.is_type = true;
+    type_symbolt s{"A-struct", struct_type, ID_java};
     symbol_table.add(s);
 
     THEN("has_subtype terminates")

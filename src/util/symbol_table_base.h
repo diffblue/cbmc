@@ -6,10 +6,10 @@
 #ifndef CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 #define CPROVER_UTIL_SYMBOL_TABLE_BASE_H
 
+#include "symbol.h" // IWYU pragma: keep
+
 #include <map>
 #include <unordered_map>
-
-#include "symbol.h"
 
 typedef std::multimap<irep_idt, irep_idt> symbol_base_mapt;
 typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
@@ -107,6 +107,33 @@ public:
     INVARIANT(
       symbol, "`" + id2string(name) + "' must exist in the symbol table.");
     return *symbol;
+  }
+
+  /// Collect all symbols the name of which matches \p id or the base name of
+  /// which matches \p id.
+  std::list<symbolst::const_iterator>
+  match_name_or_base_name(const irep_idt &id) const
+  {
+    std::list<symbolst::const_iterator> results;
+
+    auto name_it = symbols.find(id);
+    if(name_it != symbols.end())
+      results.push_back(name_it);
+
+    auto base_name_it_pair = symbol_base_map.equal_range(id);
+    for(auto base_name_it = base_name_it_pair.first;
+        base_name_it != base_name_it_pair.second;
+        ++base_name_it)
+    {
+      name_it = symbols.find(base_name_it->second);
+      CHECK_RETURN(name_it != symbols.end());
+      // don't add entries where name and base name match as this amounts to the
+      // case already covered above
+      if(base_name_it->first != base_name_it->second)
+        results.push_back(name_it);
+    }
+
+    return results;
   }
 
   /// Find a symbol in the symbol table for read-write access.
@@ -239,6 +266,9 @@ public:
 
   virtual const_iteratort begin() const;
   virtual const_iteratort end() const;
+
+  virtual void
+  validate(const validation_modet vm = validation_modet::INVARIANT) const = 0;
 };
 
 std::ostream &

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
@@ -23,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rational.h>
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <langapi/language_util.h>
 
@@ -139,8 +140,7 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
-  if(arguments[0].type().id()!=ID_unsignedbv ||
-     arguments[0].id()!=ID_constant)
+  if(arguments[0].type().id() != ID_unsignedbv || !arguments[0].is_constant())
   {
     error().source_location=function.find_source_location();
     error() << "'" << identifier << "' expected first operand to be "
@@ -148,9 +148,7 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
-  if(
-    arguments[1].type().id() != ID_unsignedbv ||
-    arguments[1].id() != ID_constant)
+  if(arguments[1].type().id() != ID_unsignedbv || !arguments[1].is_constant())
   {
     error().source_location = function.find_source_location();
     error() << "'" << identifier << "' expected second operand to be "
@@ -430,8 +428,9 @@ void goto_convertt::do_cpp_new(
     const typet &return_type=
       code_type.return_type();
 
-    assert(code_type.parameters().size()==1 ||
-           code_type.parameters().size()==2);
+    DATA_INVARIANT(
+      code_type.parameters().size() == 1 || code_type.parameters().size() == 2,
+      "new has one or two parameters");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -461,8 +460,9 @@ void goto_convertt::do_cpp_new(
 
     const typet &return_type=code_type.return_type();
 
-    assert(code_type.parameters().size()==2 ||
-           code_type.parameters().size()==3);
+    DATA_INVARIANT(
+      code_type.parameters().size() == 2 || code_type.parameters().size() == 3,
+      "placement new has two or three parameters");
 
     const symbolt &tmp_symbol =
       new_tmp_symbol(return_type, "new", dest, rhs.source_location(), ID_cpp);
@@ -721,6 +721,97 @@ void goto_convertt::do_havoc_slice(
   dest.add(goto_programt::make_other(array_replace, source_location));
 }
 
+/// alloca allocates memory that is freed when leaving the function (and not the
+/// block, as regular destructors would do).
+void goto_convertt::do_alloca(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  const source_locationt &source_location = function.source_location();
+  exprt new_lhs = lhs;
+
+  // make sure we have a left-hand side to track the allocation even when the
+  // original program did not
+  if(lhs.is_nil())
+  {
+    new_lhs = new_tmp_symbol(
+                to_code_type(function.type()).return_type(),
+                "alloca",
+                dest,
+                source_location,
+                mode)
+                .symbol_expr();
+  }
+
+  // do the actual function call
+  code_function_callt function_call(new_lhs, function, arguments);
+  function_call.add_source_location() = source_location;
+  copy(function_call, FUNCTION_CALL, dest);
+
+  // Don't add instrumentation when we're in alloca (which might in turn call
+  // __builtin_alloca) -- the instrumentation will be done for the call of
+  // alloca. Also, we can only add instrumentation when we're in a function
+  // context.
+  if(
+    function.source_location().get_function() == "alloca" || !targets.prefix ||
+    !targets.suffix)
+  {
+    return;
+  }
+
+  // create a symbol to eventually (and non-deterministically) mark the
+  // allocation as dead; this symbol has function scope and is initialised to
+  // NULL
+  symbol_exprt this_alloca_ptr =
+    get_fresh_aux_symbol(
+      to_code_type(function.type()).return_type(),
+      id2string(function.source_location().get_function()),
+      "tmp_alloca",
+      source_location,
+      mode,
+      symbol_table)
+      .symbol_expr();
+  goto_programt decl_prg;
+  decl_prg.add(goto_programt::make_decl(this_alloca_ptr, source_location));
+  decl_prg.add(goto_programt::make_assignment(
+    this_alloca_ptr,
+    null_pointer_exprt{to_pointer_type(this_alloca_ptr.type())},
+    source_location));
+  targets.prefix->destructive_insert(
+    targets.prefix->instructions.begin(), decl_prg);
+
+  // non-deterministically update this_alloca_ptr
+  if_exprt rhs{
+    side_effect_expr_nondett{bool_typet(), source_location},
+    new_lhs,
+    this_alloca_ptr};
+  dest.add(goto_programt::make_assignment(
+    this_alloca_ptr, std::move(rhs), source_location));
+
+  // mark pointer to alloca result as dead, unless the alloca result (in
+  // this_alloca_ptr)  is still NULL
+  symbol_exprt dead_object_sym =
+    ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+  exprt alloca_result =
+    typecast_exprt::conditional_cast(this_alloca_ptr, dead_object_sym.type());
+  if_exprt not_null{
+    equal_exprt{
+      this_alloca_ptr,
+      null_pointer_exprt{to_pointer_type(this_alloca_ptr.type())}},
+    dead_object_sym,
+    std::move(alloca_result)};
+  auto assign = goto_programt::make_assignment(
+    std::move(dead_object_sym), std::move(not_null), source_location);
+  targets.suffix->insert_before_swap(
+    targets.suffix->instructions.begin(), assign);
+  targets.suffix->insert_after(
+    targets.suffix->instructions.begin(),
+    goto_programt::make_dead(this_alloca_ptr, source_location));
+}
+
 /// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
@@ -759,8 +850,22 @@ void goto_convertt::do_function_call_symbol(
   {
     do_function_call_symbol(*symbol);
 
-    code_function_callt function_call(lhs, function, arguments);
+    // use symbol->symbol_expr() to ensure we use the type from the symbol table
+    code_function_callt function_call(
+      lhs,
+      symbol->symbol_expr().with_source_location<symbol_exprt>(function),
+      arguments);
     function_call.add_source_location() = function.source_location();
+
+    // remove void-typed assignments, which may have been created when the
+    // front-end was unable to detect them in type checking for a lack of
+    // available declarations
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_empty)
+    {
+      function_call.lhs().make_nil();
+    }
 
     copy(function_call, FUNCTION_CALL, dest);
 
@@ -821,6 +926,7 @@ void goto_convertt::do_function_call_symbol(
     annotated_location = function.source_location();
     annotated_location.set("user-provided", true);
     dest.add(goto_programt::make_assumption(false_exprt(), annotated_location));
+    dest.instructions.back().labels.push_back("__VERIFIER_abort");
   }
   else if(
     identifier == "assert" &&
@@ -1368,6 +1474,10 @@ void goto_convertt::do_function_call_symbol(
     // append d or f for double/float
     name+=use_double?'d':'f';
 
+    DATA_INVARIANT(
+      ns.lookup(name).type == f_type,
+      "builtin declaration should match constructed type");
+
     symbol_exprt new_function=function;
     new_function.set_identifier(name);
     new_function.type()=f_type;
@@ -1375,65 +1485,33 @@ void goto_convertt::do_function_call_symbol(
     code_function_callt function_call(lhs, new_function, new_arguments);
     function_call.add_source_location()=function.source_location();
 
-    if(!symbol_table.has_symbol(name))
-    {
-      symbolt new_symbol;
-      new_symbol.base_name=name;
-      new_symbol.name=name;
-      new_symbol.type=f_type;
-      new_symbol.location=function.source_location();
-      symbol_table.add(new_symbol);
-    }
-
     copy(function_call, FUNCTION_CALL, dest);
   }
-  else if(
-    (identifier == "alloca" || identifier == "__builtin_alloca") &&
-    function.source_location().get_function() != "alloca")
+  else if(identifier == "alloca" || identifier == "__builtin_alloca")
   {
-    const source_locationt &source_location = function.source_location();
-    exprt new_lhs = lhs;
-
-    if(lhs.is_nil())
-    {
-      new_lhs = new_tmp_symbol(
-                  to_code_type(function.type()).return_type(),
-                  "alloca",
-                  dest,
-                  source_location,
-                  mode)
-                  .symbol_expr();
-    }
-
-    code_function_callt function_call(new_lhs, function, arguments);
-    function_call.add_source_location() = source_location;
-    copy(function_call, FUNCTION_CALL, dest);
-
-    // create a backup copy to ensure that no assignments to the pointer affect
-    // the destructor code that will execute eventually
-    if(!lhs.is_nil())
-      make_temp_symbol(new_lhs, "alloca", dest, mode);
-
-    // mark pointer to alloca result as dead
-    symbol_exprt dead_object_sym =
-      ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-    exprt alloca_result =
-      typecast_exprt::conditional_cast(new_lhs, dead_object_sym.type());
-    if_exprt rhs{
-      side_effect_expr_nondett{bool_typet(), source_location},
-      std::move(alloca_result),
-      dead_object_sym};
-    code_assignt assign{
-      std::move(dead_object_sym), std::move(rhs), source_location};
-    targets.destructor_stack.add(assign);
+    do_alloca(lhs, function, arguments, dest, mode);
   }
   else
   {
     do_function_call_symbol(*symbol);
 
     // insert function call
-    code_function_callt function_call(lhs, function, arguments);
+    // use symbol->symbol_expr() to ensure we use the type from the symbol table
+    code_function_callt function_call(
+      lhs,
+      symbol->symbol_expr().with_source_location<symbol_exprt>(function),
+      arguments);
     function_call.add_source_location()=function.source_location();
+
+    // remove void-typed assignments, which may have been created when the
+    // front-end was unable to detect them in type checking for a lack of
+    // available declarations
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_empty)
+    {
+      function_call.lhs().make_nil();
+    }
 
     copy(function_call, FUNCTION_CALL, dest);
   }

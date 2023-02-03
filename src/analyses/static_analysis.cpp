@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
-#include <util/std_code.h>
 
 #include "is_threaded.h"
 
@@ -41,8 +40,7 @@ exprt static_analysis_baset::get_return_lhs(locationt to)
   if(to->is_end_function())
     return static_cast<const exprt &>(get_nil_irep());
 
-  // must be the function call
-  assert(to->is_function_call());
+  DATA_INVARIANT(to->is_function_call(), "must be the function call");
 
   return to->call_lhs();
 }
@@ -146,7 +144,7 @@ void static_analysis_baset::update(
 static_analysis_baset::locationt static_analysis_baset::get_next(
   working_sett &working_set)
 {
-  assert(!working_set.empty());
+  PRECONDITION(!working_set.empty());
 
   working_sett::iterator i=working_set.begin();
   locationt l=i->second;
@@ -250,7 +248,7 @@ void static_analysis_baset::do_function_call(
   if(!goto_function.body_available())
     return; // do nothing
 
-  assert(!goto_function.body.instructions.empty());
+  CHECK_RETURN(!goto_function.body.instructions.empty());
 
   {
     // get the state at the beginning of the function
@@ -288,7 +286,7 @@ void static_analysis_baset::do_function_call(
     // get location at end of procedure
     locationt l_end=--goto_function.body.instructions.end();
 
-    assert(l_end->is_end_function());
+    DATA_INVARIANT(l_end->is_end_function(), "must be end of function");
 
     statet &end_of_function=get_state(l_end);
 

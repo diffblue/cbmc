@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep.h>
 
 class message_handlert;
-class symbol_tablet;
+class symbol_table_baset;
 
 struct cprover_library_entryt
 {
@@ -25,7 +25,7 @@ struct cprover_library_entryt
 
 std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
-  const symbol_tablet &,
+  const symbol_table_baset &,
   const struct cprover_library_entryt[],
   const std::string &prologue,
   const bool force_load = false);
@@ -35,13 +35,14 @@ std::string get_cprover_library_text(
 /// the symbol table cleanup pass and be found in the symbol_table.
 void add_library(
   const std::string &src,
-  symbol_tablet &,
+  symbol_table_baset &,
   message_handlert &,
   const std::set<irep_idt> &keep = {});
 
 void cprover_c_library_factory(
   const std::set<irep_idt> &functions,
-  symbol_tablet &,
+  const symbol_table_baset &,
+  symbol_table_baset &,
   message_handlert &);
 
 /// Load the requested function symbols from the cprover library
@@ -49,6 +50,6 @@ void cprover_c_library_factory(
 /// the library config flags and usage.
 void cprover_c_library_factory_force_load(
   const std::set<irep_idt> &functions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 #endif // CPROVER_ANSI_C_CPROVER_LIBRARY_H

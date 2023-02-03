@@ -11,17 +11,16 @@ Author: Diffblue Ltd.
 
 #include "lambda_synthesis.h"
 
-#include "jar_file.h"
+#include <util/message.h>
+#include <util/namespace.h>
+#include <util/symbol_table_base.h>
+
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_static_initializers.h"
 #include "java_types.h"
 #include "java_utils.h"
 #include "synthetic_methods_map.h"
-
-#include <util/message.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <string.h>
 
@@ -76,7 +75,7 @@ get_lambda_method_handle(
 
 static optionalt<java_class_typet::java_lambda_method_handlet>
 lambda_method_handle(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &method_identifier,
   const java_method_typet &dynamic_method_type)
 {
@@ -203,7 +202,7 @@ get_interface_methods(const irep_idt &interface_id, const namespacet &ns)
 }
 
 static const java_class_typet::methodt *try_get_unique_unimplemented_method(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const struct_tag_typet &functional_interface_tag,
   const irep_idt &method_identifier,
   const int instruction_address,
@@ -293,10 +292,7 @@ symbolt synthetic_class_symbol(
     }
   }
 
-  symbolt synthetic_class_symbol = type_symbolt{synthetic_class_type};
-  synthetic_class_symbol.name = synthetic_class_name;
-  synthetic_class_symbol.mode = ID_java;
-  return synthetic_class_symbol;
+  return type_symbolt{synthetic_class_name, synthetic_class_type, ID_java};
 }
 
 static symbolt constructor_symbol(
@@ -304,12 +300,10 @@ static symbolt constructor_symbol(
   const irep_idt &synthetic_class_name,
   java_method_typet constructor_type) // dynamic_method_type
 {
-  symbolt constructor_symbol;
   irep_idt constructor_name = id2string(synthetic_class_name) + ".<init>";
-  constructor_symbol.name = constructor_name;
+  symbolt constructor_symbol{constructor_name, typet{}, ID_java};
   constructor_symbol.pretty_name = constructor_symbol.name;
   constructor_symbol.base_name = "<init>";
-  constructor_symbol.mode = ID_java;
 
   synthetic_methods[constructor_name] =
     synthetic_method_typet::INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR;
@@ -350,14 +344,12 @@ static symbolt implemented_method_symbol(
     id2string(method_to_implement.get_base_name()) + ":" +
     id2string(method_to_implement.get_descriptor());
 
-  symbolt implemented_method_symbol;
-  implemented_method_symbol.name = implemented_method_name;
+  symbolt implemented_method_symbol{
+    implemented_method_name, method_to_implement.type(), ID_java};
   synthetic_methods[implemented_method_symbol.name] =
     synthetic_method_typet::INVOKEDYNAMIC_METHOD;
   implemented_method_symbol.pretty_name = implemented_method_symbol.name;
   implemented_method_symbol.base_name = method_to_implement.get_base_name();
-  implemented_method_symbol.mode = ID_java;
-  implemented_method_symbol.type = method_to_implement.type();
   auto &implemented_method_type = to_code_type(implemented_method_symbol.type);
   implemented_method_type.parameters()[0].type() =
     java_reference_type(struct_tag_typet(synthetic_class_name));
@@ -403,7 +395,7 @@ static symbolt implemented_method_symbol(
 void create_invokedynamic_synthetic_classes(
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   message_handlert &message_handler)
 {
@@ -629,7 +621,7 @@ get_unboxing_method(const pointer_typet &maybe_boxed_type)
 /// (i.e., if it is non-static and its 'this' parameter is a non-final type)
 exprt make_function_expr(
   const symbolt &function_symbol,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   const auto &method_type = to_java_method_type(function_symbol.type);
   if(!method_type.has_this())

@@ -21,9 +21,7 @@ Author: Matt Lewis
 #include <ansi-c/expr2c.h>
 
 #include <util/c_types.h>
-#include <util/symbol_table.h>
 #include <util/std_code.h>
-#include <util/find_symbols.h>
 #include <util/simplify_expr.h>
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
@@ -334,7 +332,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
   }
 
   std::size_t width=to_bitvector_type(var.type()).get_width();
-  assert(width>0);
+  CHECK_RETURN(width > 0);
 
   for(std::vector<expr_listt>::iterator it=parameters.begin();
       it!=parameters.end();

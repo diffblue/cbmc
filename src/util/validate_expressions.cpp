@@ -13,8 +13,8 @@ Author: Daniel Poetzl
 #include <iostream>
 #endif
 
-#include "bitvector_expr.h"
-#include "pointer_expr.h"
+#include "bitvector_expr.h" // IWYU pragma: keep
+#include "pointer_expr.h"   // IWYU pragma: keep
 #include "ssa_expr.h"
 
 #define CALL_ON_EXPR(expr_type)                                                \
@@ -43,7 +43,7 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
     CALL_ON_EXPR(dereference_exprt);
   }
-  else if(expr.id() == ID_constant)
+  else if(expr.is_constant())
   {
     CALL_ON_EXPR(constant_exprt);
   }

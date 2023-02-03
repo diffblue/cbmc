@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 
 __CPROVER_[rw]_ok\(arbitrary_size, n \+ 1\): FAILURE$

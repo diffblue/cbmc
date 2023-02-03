@@ -385,6 +385,21 @@ public:
     PRECONDITION(op2().type().id() == ID_pointer);
   }
 
+  const exprt &lower_bound() const
+  {
+    return op0();
+  }
+
+  const exprt &pointer() const
+  {
+    return op1();
+  }
+
+  const exprt &upper_bound() const
+  {
+    return op2();
+  }
+
   // translate into equivalent conjunction
   exprt lower() const;
 };
@@ -414,7 +429,7 @@ inline pointer_in_range_exprt &to_pointer_in_range_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_pointer_in_range);
   DATA_INVARIANT(
-    expr.operands().size() == 3, "pointer_in_range must have one operand");
+    expr.operands().size() == 3, "pointer_in_range must have three operands");
   return static_cast<pointer_in_range_exprt &>(expr);
 }
 
@@ -818,6 +833,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<r_or_w_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_r_ok || base.id() == ID_w_ok || base.id() == ID_rw_ok;
+}
+
+inline void validate_expr(const r_or_w_ok_exprt &value)
+{
+  validate_operands(value, 2, "r_or_w_ok must have two operands");
+}
+
 inline const r_or_w_ok_exprt &to_r_or_w_ok_expr(const exprt &expr)
 {
   PRECONDITION(
@@ -837,6 +863,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<r_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_r_ok;
+}
+
+inline void validate_expr(const r_ok_exprt &value)
+{
+  validate_operands(value, 2, "r_ok must have two operands");
+}
+
 inline const r_ok_exprt &to_r_ok_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_r_ok);
@@ -854,6 +891,17 @@ public:
   {
   }
 };
+
+template <>
+inline bool can_cast_expr<w_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_w_ok;
+}
+
+inline void validate_expr(const w_ok_exprt &value)
+{
+  validate_operands(value, 2, "w_ok must have two operands");
+}
 
 inline const w_ok_exprt &to_w_ok_expr(const exprt &expr)
 {

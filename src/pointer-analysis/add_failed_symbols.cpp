@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "add_failed_symbols.h"
 
-#include <util/c_types.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
@@ -36,14 +36,13 @@ void add_failed_symbol(symbolt &symbol, symbol_table_baset &symbol_table)
 {
   if(symbol.type.id()==ID_pointer)
   {
-    symbolt new_symbol;
+    symbolt new_symbol{
+      failed_symbol_id(symbol.name),
+      to_pointer_type(symbol.type).base_type(),
+      symbol.mode};
     new_symbol.is_lvalue=true;
     new_symbol.module=symbol.module;
-    new_symbol.mode=symbol.mode;
     new_symbol.base_name=failed_symbol_id(symbol.base_name);
-    new_symbol.name=failed_symbol_id(symbol.name);
-    new_symbol.type = to_pointer_type(symbol.type).base_type();
-    new_symbol.value.make_nil();
     new_symbol.type.set(ID_C_is_failed_symbol, true);
 
     symbol.type.set(ID_C_failed_symbol, new_symbol.name);

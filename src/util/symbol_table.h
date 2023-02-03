@@ -118,7 +118,8 @@ public:
   using symbol_table_baset::end;
 
   /// Check that the symbol table is well-formed
-  void validate(const validation_modet vm = validation_modet::INVARIANT) const;
+  void validate(
+    const validation_modet vm = validation_modet::INVARIANT) const override;
 
   bool operator==(const symbol_tablet &other) const;
 };

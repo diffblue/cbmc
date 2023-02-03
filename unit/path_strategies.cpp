@@ -446,11 +446,10 @@ void _check_with_strategy(
       unwindset);
     setup_symex(symex, ns, options, ui_message_handler);
 
-    symex.resume_symex_from_saved_state(
+    symex_symbol_table = symex.resume_symex_from_saved_state(
       goto_symext::get_goto_function(goto_model),
       resume.state,
-      &resume.equation,
-      symex_symbol_table);
+      &resume.equation);
     postprocess_equation(
       symex, resume.equation, options, ns, ui_message_handler);
 

@@ -35,73 +35,6 @@ dfcc_spec_functionst::dfcc_spec_functionst(
 {
 }
 
-std::set<irep_idt> dfcc_spec_functionst::collect_spec_assigns_functions(
-  const std::vector<irep_idt> &candidates)
-{
-  const std::set<irep_idt> functions = {
-    CPROVER_PREFIX "assignable",
-    CPROVER_PREFIX "object_whole",
-    CPROVER_PREFIX "object_from",
-    CPROVER_PREFIX "object_upto"};
-  std::set<irep_idt> dest;
-  collect_functions_that_call(candidates, functions, dest);
-  return dest;
-}
-
-std::set<irep_idt> dfcc_spec_functionst::collect_spec_frees_functions(
-  const std::vector<irep_idt> &candidates)
-{
-  std::set<irep_idt> dest;
-  const std::set<irep_idt> functions = {CPROVER_PREFIX "freeable"};
-  collect_functions_that_call(candidates, functions, dest);
-  return dest;
-}
-
-void dfcc_spec_functionst::collect_functions_that_call(
-  const std::vector<irep_idt> &candidates,
-  const std::set<irep_idt> &functions,
-  std::set<irep_idt> &dest)
-{
-  bool changed = true;
-  while(changed)
-  {
-    changed = false;
-    for(const auto &function_id : candidates)
-    {
-      const auto &it = goto_model.goto_functions.function_map.find(function_id);
-      if(dest.find(function_id) == dest.end() && it->second.body_available())
-      {
-        changed |=
-          insert_if_calls(function_id, it->second.body, functions, dest);
-      }
-    }
-  }
-}
-
-bool dfcc_spec_functionst::insert_if_calls(
-  const irep_idt &function_id,
-  const goto_programt &goto_program,
-  const std::set<irep_idt> &functions,
-  std::set<irep_idt> &dest)
-{
-  PRECONDITION(dest.find(function_id) == dest.end());
-  bool insert = false;
-  for(const auto &it : goto_program.instructions)
-  {
-    if(it.is_function_call() && it.call_function().id() == ID_symbol)
-    {
-      const irep_idt &called_function =
-        to_symbol_expr(it.call_function()).get_identifier();
-
-      insert = functions.find(called_function) != functions.end() ||
-               dest.find(called_function) != dest.end();
-    }
-  }
-  if(insert)
-    dest.insert(function_id);
-  return insert;
-}
-
 const typet &dfcc_spec_functionst::get_target_type(const exprt &expr)
 {
   INVARIANT(
@@ -200,10 +133,9 @@ void dfcc_spec_functionst::generate_havoc_function(
       // Use same source location as original call
       source_locationt location(ins_it->source_location());
       auto hook = hook_opt.value();
-      auto write_set_var = write_set_symbol.symbol_expr();
       code_function_callt call(
         library.dfcc_fun_symbol.at(hook).symbol_expr(),
-        {write_set_var, from_integer(next_idx, size_type())});
+        {write_set_symbol.symbol_expr(), from_integer(next_idx, size_type())});
 
       if(hook == dfcc_funt::WRITE_SET_HAVOC_GET_ASSIGNABLE_TARGET)
       {
@@ -233,7 +165,8 @@ void dfcc_spec_functionst::generate_havoc_function(
         body.add(goto_programt::make_function_call(call, location));
 
         auto goto_instruction = body.add(goto_programt::make_incomplete_goto(
-          utils.make_null_check_expr(write_set_var)));
+          utils.make_null_check_expr(target_expr), location));
+
         // create nondet assignment to the target
         side_effect_expr_nondett nondet(target_type, location);
         body.add(goto_programt::make_assignment(
@@ -358,7 +291,11 @@ void dfcc_spec_functionst::to_spec_assigns_function(
   goto_model.goto_functions.update();
 
   // instrument for side-effects checking
-  instrument.instrument_function(function_id);
+  std::set<irep_idt> function_pointer_contracts;
+  instrument.instrument_function(function_id, function_pointer_contracts);
+  INVARIANT(
+    function_pointer_contracts.size() == 0,
+    "discovered function pointer contracts unexpectedly");
   utils.set_hide(function_id, true);
 }
 
@@ -412,7 +349,11 @@ void dfcc_spec_functionst::to_spec_frees_function(
   goto_model.goto_functions.update();
 
   // instrument for side-effects checking
-  instrument.instrument_function(function_id);
+  std::set<irep_idt> function_pointer_contracts;
+  instrument.instrument_function(function_id, function_pointer_contracts);
+  INVARIANT(
+    function_pointer_contracts.size() == 0,
+    "discovered function pointer contracts unexpectedly");
 
   utils.set_hide(function_id, true);
 }

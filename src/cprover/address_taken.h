@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_ADDRESS_TAKEN_H
 #define CPROVER_CPROVER_ADDRESS_TAKEN_H
 
-#include <util/std_expr.h>
+#include <util/std_expr.h> // IWYU pragma: keep
 
 #include <unordered_set>
 

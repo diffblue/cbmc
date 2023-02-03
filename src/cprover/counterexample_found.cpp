@@ -12,7 +12,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "counterexample_found.h"
 
 #include <util/cout_message.h>
-#include <util/format_expr.h>
 #include <util/simplify_expr.h>
 
 #include <solvers/sat/satcheck.h>
@@ -21,8 +20,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "bv_pointers_wide.h"
 #include "simplify_state_expr.h"
 #include "state.h"
-
-#include <iostream>
 
 void show_assignment(const bv_pointers_widet &solver)
 {

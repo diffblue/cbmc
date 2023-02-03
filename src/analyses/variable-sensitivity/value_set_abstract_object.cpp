@@ -9,16 +9,17 @@
 /// \file
 /// Value Set Abstract Object
 
+#include <util/arith_tools.h>
+#include <util/make_unique.h>
+#include <util/simplify_expr.h>
+
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
-#include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/widened_range.h>
 
-#include <util/arith_tools.h>
-#include <util/make_unique.h>
-#include <util/simplify_expr.h>
+#include "context_abstract_object.h" // IWYU pragma: keep
 
 #include <algorithm>
 
@@ -125,13 +126,6 @@ static abstract_object_sett widen_value_set(
   const abstract_object_sett &values,
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs);
-
-value_set_abstract_objectt::value_set_abstract_objectt(const typet &type)
-  : abstract_value_objectt(type)
-{
-  values.insert(std::make_shared<constant_abstract_valuet>(type));
-  verify();
-}
 
 value_set_abstract_objectt::value_set_abstract_objectt(
   const typet &type,
@@ -292,7 +286,8 @@ abstract_object_pointert value_set_abstract_objectt::resolve_values(
 void value_set_abstract_objectt::set_top_internal()
 {
   values.clear();
-  values.insert(std::make_shared<constant_abstract_valuet>(type()));
+  values.insert(
+    std::make_shared<constant_abstract_valuet>(type(), true, false));
 }
 
 void value_set_abstract_objectt::set_values(

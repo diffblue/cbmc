@@ -7,7 +7,7 @@ main.c
 ^\[f2.assigns.\d+\] line 12 Check that __CPROVER_object_whole\(\(.* \*\)a\) is valid: SUCCESS$
 ^\[f2.assigns.\d+\] line 14 Check that a\[.*0\] is assignable: SUCCESS$
 ^\[f2.assigns.\d+\] line 15 Check that a\[.*5\] is assignable: SUCCESS$
-^\[f2.assigns.\d+\] line 16 Check that POINTER_OBJECT\(\(.* \*\)a\) is assignable: SUCCESS$
+^\[f2.assigns.\d+\] line 16 Check that __CPROVER_POINTER_OBJECT\(\(.* \*\)a\) is assignable: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

@@ -4,10 +4,15 @@
 # These owners will be the default owners for everything in the repo.
 *       @kroening @tautschnig @peterschrammel @chris-ryder
 
+# Documentation can be reviewed by people with broad project responsibility
+
+/doc/ @jimgrundy @TGWDB @kroening @tautschnig @peterschrammel @nlightnfotis
+
+
 # These files should rarely change
 
 /src/big-int/ @kroening
-/src/ansi-c/ @kroening @tautschnig @chris-ryder
+/src/ansi-c/ @kroening @tautschnig @chris-ryder @peterschrammel @remi-delmas-3000
 /src/assembler/ @kroening @tautschnig @chris-ryder
 /src/goto-cc/ @kroening @tautschnig @chris-ryder
 /src/linking/ @kroening @tautschnig @chris-ryder
@@ -26,6 +31,7 @@
 /src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
 /src/symtab2gb/ @martin-cs
 /jbmc/src/miniz/ @peterschrammel
+/src/crangler/ @kroening @tautschnig @qinheping
 
 
 # These files change frequently and changes are high-risk
@@ -38,7 +44,8 @@
 /jbmc/src/java_bytecode/ @romainbrenguier @peterschrammel
 /src/analyses/ @martin-cs @peterschrammel @chris-ryder
 /src/pointer-analysis/ @martin-cs @peterschrammel @chris-ryder
-
+/src/libcprover-cpp @NlightNFotis @thomasspriggs @esteffin @TGWDB @peterschrammel
+/src/libcprover-rust @NlightNFotis @thomasspriggs @TGWDB @peterschrammel
 
 # These files change frequently and changes are medium-risk
 
@@ -46,10 +53,10 @@
 /src/goto-harness/ @martin-cs @chris-ryder @peterschrammel
 /src/goto-instrument/ @martin-cs @chris-ryder @peterschrammel @tautschnig @kroening
 /src/goto-instrument/contracts/ @tautschnig @feliperodri @remi-delmas-3000
-/doc/cprover-manual/contracts* @tautschnig @feliperodri @remi-delmas-3000
+/src/goto-synthesizer/ @qinheping @tautschnig @feliperodri @remi-delmas-3000
 /src/goto-diff/ @tautschnig @peterschrammel
 /src/jsil/ @kroening @tautschnig
-/src/memory-analyzer/ @tautschnig @chris-ryder
+/src/memory-analyzer/ @tautschnig @chris-ryder @kroening
 /jbmc/src/jbmc/ @peterschrammel @romainbrenguier
 /jbmc/src/janalyzer/ @peterschrammel @romainbrenguier
 /jbmc/src/jdiff/ @peterschrammel
@@ -57,7 +64,7 @@
 /src/solvers/smt2 @kroening @martin-cs @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
 /src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB @chris-ryder
 /src/solvers/Makefile @kroening @tautschnig @peterschrammel @chris-ryder @thomasspriggs @NlightNFotis @TGWDB
-/src/statement-list/ @kroening @tautschnig @peterschrammel @pkesseli
+/src/statement-list/ @kroening @tautschnig @peterschrammel
 
 /cmake/        @diffblue/diffblue-opensource
 CMakeLists.txt @diffblue/diffblue-opensource
@@ -72,7 +79,6 @@ CMakeLists.txt @diffblue/diffblue-opensource
 /jbmc/regression/
 
 /scripts/ @diffblue/diffblue-opensource
-/scripts/expected_doxygen_warnings.txt
 
 # CI pipeline is the responsibility of the Open Source maintenance team at Diffblue.
 /.github/ @diffblue/diffblue-opensource

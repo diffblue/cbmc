@@ -1,4 +1,5 @@
-void *malloc(unsigned);
+#include <stdlib.h>
+// string.h intentionally omitted
 
 char *make_str()
 {

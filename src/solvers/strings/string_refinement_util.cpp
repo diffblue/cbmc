@@ -8,8 +8,6 @@ Author: Diffblue Ltd.
 
 #include "string_refinement_util.h"
 
-#include <algorithm>
-#include <iostream>
 #include <numeric>
 
 #include <util/arith_tools.h>
@@ -53,8 +51,10 @@ bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
 std::string
 utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
 {
-  for(const auto &op : arr.operands())
-    PRECONDITION(op.id() == ID_constant);
+  PRECONDITION(std::all_of(
+    arr.operands().begin(),
+    arr.operands().end(),
+    can_cast_expr<constant_exprt>));
 
   std::wstring out(length, '?');
 

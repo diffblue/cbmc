@@ -14,11 +14,12 @@ Author: Michael Tautschnig
 #include <util/irep.h>
 
 class message_handlert;
-class symbol_tablet;
+class symbol_table_baset;
 
 void cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
-  symbol_tablet &,
+  const symbol_table_baset &,
+  symbol_table_baset &,
   message_handlert &);
 
 #endif // CPROVER_CPP_CPROVER_LIBRARY_H

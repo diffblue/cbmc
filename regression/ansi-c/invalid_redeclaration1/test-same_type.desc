@@ -1,0 +1,12 @@
+CORE
+main.c
+-Dsame_return_type
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant check failed
+^CONVERSION ERROR$
+--
+This previously triggered the following (undesired) invariant violation:
+File: ../src/goto-programs/goto_convert_functions.cpp:167 function: convert_function
+Condition: parameter identifier should not be empty

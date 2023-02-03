@@ -233,14 +233,16 @@ public:
   /// Record an assertion.
   /// \param guard: Precondition for reaching this assertion
   /// \param cond: Condition this assertion represents
+  /// \param property_id: Unique property identifier of this assertion
   /// \param msg: The message associated with this assertion
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assertion
   virtual void assertion(
     const exprt &guard,
     const exprt &cond,
+    const irep_idt &property_id,
     const std::string &msg,
-    const sourcet &source)=0;
+    const sourcet &source) = 0;
 
   /// Record a goto instruction.
   /// \param guard: Precondition for reaching this goto instruction

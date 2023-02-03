@@ -79,7 +79,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class message_handlert;
 class select_pointer_typet;
-class symbol_tablet;
+class symbol_table_baset;
 struct java_object_factory_parameterst;
 
 exprt object_factory(
@@ -97,7 +97,7 @@ exprt object_factory(
   const typet &type,
   const irep_idt base_name,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
   lifetimet lifetime,
   const source_locationt &location,
@@ -164,7 +164,7 @@ code_blockt gen_nondet_array_init(
   const source_locationt &location,
   const array_element_generatort &element_generator,
   const allocate_local_symbolt &allocate_local_symbol,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   size_t max_nondet_array_length);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

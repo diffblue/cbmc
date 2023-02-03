@@ -20,8 +20,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table_base.h>
 #include <util/unicode.h>
 
-#include <sstream>
-
 /// Convert UCS-2 or UTF-16 to an array expression.
 /// \param in: wide string to convert
 /// \return Returns a Java char array containing the same wchars.
@@ -59,14 +57,10 @@ symbol_exprt get_or_create_string_literal_symbol(
 #endif
 
   // Create a new symbol:
-  symbolt new_symbol;
-  new_symbol.name = escaped_symbol_name_with_prefix;
-  new_symbol.type = string_type;
+  symbolt new_symbol{escaped_symbol_name_with_prefix, string_type, ID_java};
   new_symbol.type.set(ID_C_constant, true);
   new_symbol.base_name = escaped_symbol_name;
   new_symbol.pretty_name = value;
-  new_symbol.mode = ID_java;
-  new_symbol.is_type = false;
   new_symbol.is_lvalue = true;
   new_symbol.is_state_var = true;
   new_symbol.is_static_lifetime = true;
@@ -99,18 +93,15 @@ symbol_exprt get_or_create_string_literal_symbol(
     literal_init.operands()[length_nb] = length;
 
     // Initialize the string with a constant utf-16 array:
-    symbolt array_symbol;
-    array_symbol.name = escaped_symbol_name_with_prefix + "_constarray";
+    symbolt array_symbol{
+      escaped_symbol_name_with_prefix + "_constarray", data.type(), ID_java};
     array_symbol.base_name = escaped_symbol_name + "_constarray";
     array_symbol.pretty_name = value;
-    array_symbol.mode = ID_java;
-    array_symbol.is_type = false;
     array_symbol.is_lvalue = true;
     // These are basically const global data:
     array_symbol.is_static_lifetime = true;
     array_symbol.is_state_var = true;
     array_symbol.value = data;
-    array_symbol.type = array_symbol.value.type();
     array_symbol.type.set(ID_C_constant, true);
 
     if(symbol_table.add(array_symbol))
@@ -124,15 +115,13 @@ symbol_exprt get_or_create_string_literal_symbol(
     literal_init.operands()[data_nb] = array_pointer;
 
     // Associate array with pointer
-    symbolt return_symbol;
-    return_symbol.name = escaped_symbol_name_with_prefix + "_return_value";
+    symbolt return_symbol{
+      escaped_symbol_name_with_prefix + "_return_value", typet{}, ID_java};
     return_symbol.base_name = escaped_symbol_name + "_return_value";
     return_symbol.pretty_name =
       escaped_symbol_name.length() > 10
         ? escaped_symbol_name.substr(0, 10) + "..._return_value"
         : escaped_symbol_name + "_return_value";
-    return_symbol.mode = ID_java;
-    return_symbol.is_type = false;
     return_symbol.is_lvalue = true;
     return_symbol.is_static_lifetime = true;
     return_symbol.is_state_var = true;

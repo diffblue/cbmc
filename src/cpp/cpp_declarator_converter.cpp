@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/source_location.h>
 #include <util/std_types.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
@@ -38,7 +39,7 @@ symbolt &cpp_declarator_convertert::convert(
   const cpp_member_spect &member_spec,
   cpp_declaratort &declarator)
 {
-  assert(declaration_type.is_not_nil());
+  PRECONDITION(declaration_type.is_not_nil());
 
   if(declaration_type.id()=="cpp-cast-operator")
   {
@@ -50,9 +51,9 @@ symbolt &cpp_declarator_convertert::convert(
     declarator.name().get_sub().back().swap(name);
   }
 
-  assert(declarator.id()==ID_cpp_declarator);
+  PRECONDITION(declarator.id() == ID_cpp_declarator);
   final_type=declarator.merge_type(declaration_type);
-  assert(final_type.is_not_nil());
+  CHECK_RETURN(final_type.is_not_nil());
 
   cpp_storage_spect final_storage_spec = storage_spec;
   final_storage_spec |= cpp_storage_spect(final_type);
@@ -414,8 +415,8 @@ void cpp_declarator_convertert::get_final_identifier()
     {
       // Is there already an `extern "C"' function with the same name
       // and the same signature?
-      symbol_tablet::symbolst::const_iterator
-        c_it=cpp_typecheck.symbol_table.symbols.find(identifier);
+      symbol_table_baset::symbolst::const_iterator c_it =
+        cpp_typecheck.symbol_table.symbols.find(identifier);
 
       if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
          c_it->second.type.id()==ID_code &&
@@ -442,18 +443,17 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 {
   irep_idt pretty_name=get_pretty_name();
 
-  symbolt symbol;
-
-  symbol.name=final_identifier;
+  symbolt symbol{
+    final_identifier,
+    final_type,
+    linkage_spec == ID_auto ? ID_cpp : linkage_spec};
   symbol.base_name=base_name;
   symbol.value=declarator.value();
   symbol.location=declarator.name().source_location();
   symbol.is_extern = storage_spec.is_extern();
   symbol.is_parameter = declarator.get_is_parameter();
   symbol.is_weak = storage_spec.is_weak();
-  symbol.mode=linkage_spec==ID_auto?ID_cpp:linkage_spec;
   symbol.module=cpp_typecheck.module;
-  symbol.type=final_type;
   symbol.is_type=is_typedef;
   symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;
@@ -478,10 +478,9 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   }
   else
   {
-    symbol.is_lvalue =
-      !is_reference(symbol.type) &&
-      !(symbol.type.get_bool(ID_C_constant) && is_number(symbol.type) &&
-        symbol.value.id() == ID_constant);
+    symbol.is_lvalue = !is_reference(symbol.type) &&
+                       !(symbol.type.get_bool(ID_C_constant) &&
+                         is_number(symbol.type) && symbol.value.is_constant());
 
     symbol.is_static_lifetime =
       !symbol.is_macro && !symbol.is_type &&

@@ -620,14 +620,14 @@ bool compilet::write_bin_object_file(
 optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
 {
   language_filest language_files;
-  language_files.set_message_handler(log.get_message_handler());
 
   if(parse(file_name, language_files))
     return {};
 
   // we just typecheck one file here
   symbol_tablet file_symbol_table;
-  if(language_files.typecheck(file_symbol_table, keep_file_local))
+  if(language_files.typecheck(
+       file_symbol_table, keep_file_local, log.get_message_handler()))
   {
     log.error() << "CONVERSION ERROR" << messaget::eom;
     return {};
@@ -743,6 +743,9 @@ bool compilet::add_written_cprover_symbols(const symbol_tablet &symbol_table)
     const irep_idt &name=pair.second.name;
     const typet &new_type=pair.second.type;
     if(!(has_prefix(id2string(name), CPROVER_PREFIX) && new_type.id()==ID_code))
+      continue;
+
+    if(has_prefix(id2string(name), FILE_LOCAL_PREFIX))
       continue;
 
     bool inserted;

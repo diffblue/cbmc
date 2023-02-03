@@ -15,13 +15,11 @@ Author: Matt Lewis
 #include <map>
 #include <set>
 #include <string>
-#include <algorithm>
 
 #include <goto-programs/goto_program.h>
 
 #include <ansi-c/expr2c.h>
 
-#include <util/symbol_table.h>
 #include <util/options.h>
 #include <util/std_code.h>
 #include <util/find_symbols.h>
@@ -47,9 +45,9 @@ void acceleration_utilst::gather_rvalues(
   }
   else
   {
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      gather_rvalues(*it, rvalues);
+      gather_rvalues(op, rvalues);
     }
   }
 }
@@ -691,7 +689,7 @@ bool acceleration_utilst::do_arrays(
         }
         else
         {
-          assert(!"ITSALLGONEWRONG");
+          UNREACHABLE;
         }
 
         or_exprt unchanged_by_this_one(
@@ -1190,9 +1188,9 @@ void acceleration_utilst::gather_array_accesses(
     arrays.insert(to_dereference_expr(e).pointer());
   }
 
-  forall_operands(it, e)
+  for(const auto &op : e.operands())
   {
-    gather_array_accesses(*it, arrays);
+    gather_array_accesses(op, arrays);
   }
 }
 
@@ -1250,12 +1248,10 @@ symbolt acceleration_utilst::fresh_symbol(std::string base, typet type)
   static int num_symbols=0;
 
   std::string name=base + "_" + std::to_string(num_symbols++);
-  symbolt ret;
+  symbolt ret{name, std::move(type), irep_idt{}};
   ret.module="scratch";
-  ret.name=name;
   ret.base_name=name;
   ret.pretty_name=name;
-  ret.type=type;
 
   symbol_table.add(ret);
 

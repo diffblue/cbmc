@@ -14,7 +14,6 @@ Author: Diffblue Ltd
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
-#include <util/symbol_table.h>
 
 /// Return structure for `get_null_checked_expr` and
 /// `get_conditional_checked_expr`

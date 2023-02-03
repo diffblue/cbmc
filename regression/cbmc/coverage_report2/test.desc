@@ -1,0 +1,10 @@
+CORE
+main.c
+--symex-coverage-report - --unwind 1
+<line branch="true" condition-coverage="50% \(1/2\)" hits="2" number="3">
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Invariant check failed

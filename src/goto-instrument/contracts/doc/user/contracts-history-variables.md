@@ -56,5 +56,6 @@ TODO: Document `__CPROVER_loop_entry` and `__CPROVER_loop_old`.
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-memory-predicates
+- @ref contracts-function-pointer-predicates
 - @ref contracts-history-variables
 - @ref contracts-quantifiers

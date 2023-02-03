@@ -1,0 +1,7 @@
+CORE
+pointer-to-bv.c
+
+bitvector must have width that is a multiple of CHAR_BIT$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--

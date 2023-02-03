@@ -9,30 +9,28 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
-#include "goto_symex.h"
-
+#include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+
+#include "goto_symex.h"
 
 exprt goto_symext::make_auto_object(const typet &type, statet &state)
 {
-  dynamic_counter++;
-
   // produce auto-object symbol
-  symbolt symbol;
+  symbolt &symbol = get_fresh_aux_symbol(
+    type,
+    "symex",
+    "auto_object",
+    state.source.pc->source_location(),
+    ID_C,
+    state.symbol_table);
+  symbol.is_thread_local = false;
+  symbol.is_file_local = false;
 
-  symbol.base_name="auto_object"+std::to_string(dynamic_counter);
-  symbol.name="symex::"+id2string(symbol.base_name);
-  symbol.is_lvalue=true;
-  symbol.type=type;
-  symbol.mode=ID_C;
-
-  state.symbol_table.add(symbol);
-
-  return symbol_exprt(symbol.name, symbol.type);
+  return symbol.symbol_expr();
 }
 
 void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
@@ -86,7 +84,7 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
       {
         const symbolt &symbol = ns.lookup(obj_identifier);
 
-        if(has_prefix(id2string(symbol.base_name), "auto_object"))
+        if(has_prefix(id2string(symbol.base_name), "symex::auto_object"))
         {
           // done already?
           if(!state.get_level2().current_names.has_key(

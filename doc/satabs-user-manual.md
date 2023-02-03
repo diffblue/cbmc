@@ -57,7 +57,7 @@ and the directories that contain the header files. You must run SATABS
 from within the *Visual Studio Command Prompt*.
 
 Note that the distribution files for the [Eclipse
-plugin](installation-plugin.shtml) include the command-line tools.
+plugin](http://www.cprover.org/eclipse-plugin/) include the command-line tools.
 Therefore, if you intend to run SATABS exclusively within Eclipse, you
 can skip the installation of the command-line tools. However, you still
 have to install the compiler environment as described above.

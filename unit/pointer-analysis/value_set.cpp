@@ -9,13 +9,13 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for value_sett
 
-#include <testing-utils/use_catch.h>
-
-#include <pointer-analysis/value_set.h>
-
 #include <util/arith_tools.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/symbol_table.h>
+
+#include <pointer-analysis/value_set.h>
+#include <testing-utils/use_catch.h>
 
 static bool object_descriptor_matches(
   const exprt &descriptor_expr, const exprt &target)
@@ -62,8 +62,7 @@ SCENARIO(
     A_y.set_base_name("y");
     A_y.set_pretty_name("y");
 
-    type_symbolt A_symbol(struct_A);
-    A_symbol.name = "A";
+    type_symbolt A_symbol{"A", struct_A, irep_idt{}};
     A_symbol.base_name = "A";
     A_symbol.pretty_name = "A";
 
@@ -71,27 +70,21 @@ SCENARIO(
 
     // Create global symbols struct A a1, a2, a3;
 
-    symbolt a1_symbol;
-    a1_symbol.name = "a1";
+    symbolt a1_symbol{"a1", struct_tag_typet(A_symbol.name), irep_idt{}};
     a1_symbol.base_name = "a1";
     a1_symbol.pretty_name = "a1";
-    a1_symbol.type = struct_tag_typet(A_symbol.name);
     a1_symbol.is_static_lifetime = true;
     symbol_table.add(a1_symbol);
 
-    symbolt a2_symbol;
-    a2_symbol.name = "a2";
+    symbolt a2_symbol{"a2", struct_tag_typet(A_symbol.name), irep_idt{}};
     a2_symbol.base_name = "a2";
     a2_symbol.pretty_name = "a2";
-    a2_symbol.type = struct_tag_typet(A_symbol.name);
     a2_symbol.is_static_lifetime = true;
     symbol_table.add(a2_symbol);
 
-    symbolt a3_symbol;
-    a3_symbol.name = "a3";
+    symbolt a3_symbol{"a3", struct_tag_typet(A_symbol.name), irep_idt{}};
     a3_symbol.base_name = "a3";
     a3_symbol.pretty_name = "a3";
-    a3_symbol.type = struct_tag_typet(A_symbol.name);
     a3_symbol.is_static_lifetime = true;
     symbol_table.add(a3_symbol);
 
@@ -234,27 +227,21 @@ SCENARIO(
     signedbv_typet int32_type(32);
     pointer_typet int32_ptr(int32_type, 64);
 
-    symbolt i1;
-    i1.name = "i1";
+    symbolt i1{"i1", int32_type, irep_idt{}};
     i1.base_name = "i1";
     i1.pretty_name = "i1";
-    i1.type = int32_type;
     i1.is_static_lifetime = true;
     symbol_table.add(i1);
 
-    symbolt i2;
-    i2.name = "i2";
+    symbolt i2{"i2", int32_type, irep_idt{}};
     i2.base_name = "i2";
     i2.pretty_name = "i2";
-    i2.type = int32_type;
     i2.is_static_lifetime = true;
     symbol_table.add(i2);
 
-    symbolt i3;
-    i3.name = "i3";
+    symbolt i3{"i3", int32_type, irep_idt{}};
     i3.base_name = "i3";
     i3.pretty_name = "i3";
-    i3.type = int32_type;
     i3.is_static_lifetime = true;
     symbol_table.add(i3);
 

@@ -95,7 +95,8 @@ void arrayst::collect_indices(const exprt &expr)
       array_comprehension_args.insert(
         to_array_comprehension_expr(expr).arg().get_identifier());
 
-    forall_operands(op, expr) collect_indices(*op);
+    for(const auto &op : expr.operands())
+      collect_indices(op);
   }
   else
   {
@@ -201,9 +202,7 @@ void arrayst::collect_arrays(const exprt &a)
       "unexpected array expression: member with '" + struct_op.id_string() +
         "'");
   }
-  else if(a.id()==ID_constant ||
-          a.id()==ID_array ||
-          a.id()==ID_string_constant)
+  else if(a.is_constant() || a.id() == ID_array || a.id() == ID_string_constant)
   {
   }
   else if(a.id()==ID_array_of)
@@ -486,11 +485,10 @@ void arrayst::add_array_constraints(
     return add_array_constraints_comprehension(
       index_set, to_array_comprehension_expr(expr));
   }
-  else if(expr.id()==ID_symbol ||
-          expr.id()==ID_nondet_symbol ||
-          expr.id()==ID_constant ||
-          expr.id()=="zero_string" ||
-          expr.id()==ID_string_constant)
+  else if(
+    expr.id() == ID_symbol || expr.id() == ID_nondet_symbol ||
+    expr.is_constant() || expr.id() == "zero_string" ||
+    expr.id() == ID_string_constant)
   {
   }
   else if(

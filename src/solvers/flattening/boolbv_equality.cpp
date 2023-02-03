@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
-#include <util/std_expr.h>
+#include <util/byte_operators.h>
 #include <util/invariant.h>
+#include <util/std_expr.h>
 
-#include <solvers/lowering/expr_lowering.h>
+#include "boolbv.h"
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {

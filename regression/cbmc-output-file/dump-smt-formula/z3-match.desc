@@ -1,0 +1,11 @@
+CORE
+test.c
+--incremental-smt2-solver 'z3 --smt2 -in' --dump-smt-formula %out-file-name%
+Passing problem to incremental SMT2 solving via "z3 --smt2 -in"
+\[main.assertion.\d+\] line \d+ Nondeterministic int assert.: FAILURE
+Output file matches.
+^EXIT=0$
+^SIGNAL=0$
+--
+Test to check that the --dump-smt-formula argument is used correctly and that the output file
+matches the rules defined in test-outfile-rules.txt

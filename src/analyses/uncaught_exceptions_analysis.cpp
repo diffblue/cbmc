@@ -16,7 +16,6 @@ Author: Cristina David
 
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_functions.h>
 

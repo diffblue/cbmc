@@ -48,7 +48,10 @@ static void remove_l1_object_rec(
     // identifier is still live.
     state.drop_l1_name(l1_identifier);
   }
-  else if(l1_expr.id() == ID_array || l1_expr.id() == ID_struct)
+  else if(
+    l1_expr.type().id() == ID_array || l1_expr.type().id() == ID_struct ||
+    l1_expr.type().id() == ID_struct_tag || l1_expr.type().id() == ID_union ||
+    l1_expr.type().id() == ID_union_tag)
   {
     for(const auto &op : l1_expr.operands())
       remove_l1_object_rec(state, op, ns);
@@ -63,6 +66,7 @@ void goto_symext::symex_dead(statet &state, const symbol_exprt &symbol_expr)
                                                  : ssa_exprt{symbol_expr};
   ssa_exprt ssa = state.rename_ssa<L1>(to_rename, ns).get();
 
-  const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
+  const exprt fields =
+    state.field_sensitivity.get_fields(ns, state, ssa, false);
   remove_l1_object_rec(state, fields, ns);
 }

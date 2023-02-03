@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure
+CORE paths-lifo-expected-failure new-smt-backend
 test.c
 --show-vcc
 ^\{1\} main::argc!0@1#1 = 1$

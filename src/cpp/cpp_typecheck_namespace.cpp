@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/source_location.h>
+#include <util/symbol_table_base.h>
+
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 {
@@ -33,7 +34,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   std::string identifier=
     cpp_scopes.current_scope().prefix+id2string(final_name);
 
-  symbol_tablet::symbolst::const_iterator it=
+  symbol_table_baset::symbolst::const_iterator it =
     symbol_table.symbols.find(identifier);
 
   if(it!=symbol_table.symbols.end())
@@ -61,15 +62,10 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   }
   else
   {
-    symbolt symbol;
-
-    symbol.name=identifier;
+    symbolt symbol{identifier, typet(ID_namespace), ID_cpp};
     symbol.base_name=final_name;
-    symbol.value.make_nil();
     symbol.location=namespace_spec.source_location();
-    symbol.mode=ID_cpp;
     symbol.module=module;
-    symbol.type=typet(ID_namespace);
 
     if(!symbol_table.insert(std::move(symbol)).second)
     {

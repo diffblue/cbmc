@@ -21,10 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/deprecate.h>
 #include <util/invariant.h>
-#include <util/namespace.h>
 #include <util/source_location.h>
 
 class code_gotot;
+class namespacet;
 enum class validation_modet;
 
 /// The type of an instruction in a GOTO program.
@@ -395,7 +395,15 @@ public:
 
     /// Returns the first (and only) successor for the usual case of a single
     /// target
-    targett get_target() const
+    const_targett get_target() const
+    {
+      PRECONDITION(targets.size() == 1);
+      return targets.front();
+    }
+
+    /// Returns the first (and only) successor for the usual case of a single
+    /// target
+    targett get_target()
     {
       PRECONDITION(targets.size()==1);
       return targets.front();
@@ -1003,7 +1011,7 @@ public:
     const exprt &_cond,
     const source_locationt &l = source_locationt::nil())
   {
-    PRECONDITION(_cond.type().id() == ID_bool);
+    PRECONDITION(_cond.is_boolean());
     return instructiont(
       static_cast<const goto_instruction_codet &>(get_nil_irep()),
       l,

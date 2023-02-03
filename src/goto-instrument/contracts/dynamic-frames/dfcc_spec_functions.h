@@ -133,17 +133,6 @@ public:
   void
   to_spec_frees_function(const irep_idt &function_id, std::size_t &nof_targets);
 
-  /// \brief Returns the subset of \p candidates that call built-ins
-  /// `assignable`, `object_from`, `object_upto`, `object_whole` directly or
-  /// indirectly.
-  std::set<irep_idt>
-  collect_spec_assigns_functions(const std::vector<irep_idt> &candidates);
-
-  /// \brief Returns the subset of \p candidates that call the built-in
-  /// `freeable` directly or indirectly.
-  std::set<irep_idt>
-  collect_spec_frees_functions(const std::vector<irep_idt> &candidates);
-
 protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
@@ -157,24 +146,6 @@ protected:
   /// The expression must be of the form:
   /// `expr = cast(address_of(target), empty*)`
   const typet &get_target_type(const exprt &expr);
-
-  /// \brief Collect functions that call one of the given \p functions directly
-  /// or indirectly into \p dest. May miss functions if function pointers
-  /// calls are not already removed.
-  void collect_functions_that_call(
-    const std::vector<irep_idt> &candidates,
-    const std::set<irep_idt> &functions,
-    std::set<irep_idt> &dest);
-
-  /// \brief Adds \p function_id to \p dest if a call to a function that's
-  /// either in \p functions or in \p dest is found in \p goto_program.
-  /// \return true if \p function_id was added to \p dest, false otherwise.
-  /// \pre dest does not already contain \p function_id
-  bool insert_if_calls(
-    const irep_idt &function_id,
-    const goto_programt &goto_program,
-    const std::set<irep_idt> &functions,
-    std::set<irep_idt> &dest);
 };
 
 #endif

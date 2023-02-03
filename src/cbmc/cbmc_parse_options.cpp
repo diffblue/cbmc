@@ -11,16 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cbmc_parse_options.h"
 
-#include <cstdlib> // exit()
-#include <fstream>
-#include <iostream>
-#include <memory>
-
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/version.h>
+
+#include <cstdlib> // exit()
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
+#include <memory>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>

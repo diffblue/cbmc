@@ -24,8 +24,9 @@ label_three:
     x = 42;
 label_four:
   assert(foo() == 1);
+  fptr_t fp;
 label_five:
-  fptr_t fp = foo;
+  fp = foo;
   assert(fp() == 1);
 label_six:
   return *p;

@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program2code.h"
 
-#include <sstream>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
@@ -20,6 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
+
+#include <sstream>
 
 void goto_program2codet::operator()()
 {
@@ -59,7 +60,7 @@ void goto_program2codet::build_loop_map()
       l_it!=loops.loop_map.end();
       ++l_it)
   {
-    assert(!l_it->second.empty());
+    PRECONDITION(!l_it->second.empty());
 
     // l_it->first need not be the program-order first instruction in the
     // natural loop, because a natural loop may have multiple entries. But we
@@ -136,7 +137,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  assert(target!=goto_program.instructions.end());
+  PRECONDITION(target != goto_program.instructions.end());
 
   if(
     target->type() != ASSERT &&
@@ -309,7 +310,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   const exprt this_va_list_expr = target->assign_lhs();
   const exprt &r = skip_typecast(target->assign_rhs());
 
-  if(r.id() == ID_constant && is_null_pointer(to_constant_expr(r)))
+  if(r.is_constant() && is_null_pointer(to_constant_expr(r)))
   {
     code_function_callt f(
       symbol_exprt("va_end", code_typet({}, empty_typet())),
@@ -345,7 +346,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     // if the return value is used, the next instruction will be assign
     goto_programt::const_targett next=target;
     ++next;
-    assert(next!=goto_program.instructions.end());
+    CHECK_RETURN(next != goto_program.instructions.end());
     if(next!=upper_bound &&
        next->is_assign())
     {
@@ -365,7 +366,8 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     }
 
     // assignment not found, still need a proper typeof expression
-    assert(r.find(ID_C_va_arg_type).is_not_nil());
+    DATA_INVARIANT(
+      r.find(ID_C_va_arg_type).is_not_nil(), "#va_arg_type must be set");
     const typet &va_arg_type=
       static_cast<typet const&>(r.find(ID_C_va_arg_type));
 
@@ -401,13 +403,13 @@ void goto_program2codet::convert_assign_rec(
     const array_typet &type = to_array_type(assign.rhs().type());
 
     unsigned i=0;
-    forall_operands(it, assign.rhs())
+    for(const auto &op : assign.rhs().operands())
     {
       index_exprt index(
         assign.lhs(),
         from_integer(i++, type.index_type()),
         type.element_type());
-      convert_assign_rec(code_assignt(index, *it), dest);
+      convert_assign_rec(code_assignt(index, op), dest);
     }
   }
   else
@@ -430,7 +432,7 @@ goto_programt::const_targett goto_program2codet::convert_set_return_value(
   // all v3 (or later) goto programs have an explicit GOTO after return
   goto_programt::const_targett next=target;
   ++next;
-  assert(next!=goto_program.instructions.end());
+  CHECK_RETURN(next != goto_program.instructions.end());
 
   // skip goto (and possibly dead), unless crossing the current boundary
   while(next!=upper_bound && next->is_dead() && !next->is_target())
@@ -454,7 +456,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
 
   goto_programt::const_targett next=target;
   ++next;
-  assert(next!=goto_program.instructions.end());
+  CHECK_RETURN(next != goto_program.instructions.end());
 
   // see if decl can go in current dest block
   dead_mapt::const_iterator entry=dead_map.find(symbol.get_identifier());
@@ -512,7 +514,7 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   goto_programt::const_targett loop_end,
   code_blockt &dest)
 {
-  assert(loop_end->is_goto() && loop_end->is_backwards_goto());
+  PRECONDITION(loop_end->is_goto() && loop_end->is_backwards_goto());
 
   code_dowhilet d(loop_end->condition(), code_blockt());
   simplify(d.cond(), ns);
@@ -537,9 +539,9 @@ goto_programt::const_targett goto_program2codet::convert_goto(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  assert(target->is_goto());
+  PRECONDITION(target->is_goto());
   // we only do one target for now
-  assert(target->targets.size()==1);
+  PRECONDITION(target->targets.size() == 1);
 
   loopt::const_iterator loop_entry=loop_map.find(target);
 
@@ -560,7 +562,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   goto_programt::const_targett loop_end,
   code_blockt &dest)
 {
-  assert(loop_end->is_goto() && loop_end->is_backwards_goto());
+  PRECONDITION(loop_end->is_goto() && loop_end->is_backwards_goto());
 
   if(target==loop_end) // 1: GOTO 1
     return convert_goto_goto(target, dest);
@@ -568,7 +570,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   code_whilet w(true_exprt{}, code_blockt{});
   goto_programt::const_targett after_loop=loop_end;
   ++after_loop;
-  assert(after_loop!=goto_program.instructions.end());
+  CHECK_RETURN(after_loop != goto_program.instructions.end());
 
   copy_source_location(target, w);
 
@@ -712,7 +714,7 @@ goto_programt::const_targett goto_program2codet::get_cases(
             to_equal_expr(*e_it).rhs(),
             cases_it,
             cases_it->get_target()));
-        assert(cases.back().value.is_not_nil());
+        DATA_INVARIANT(cases.back().value.is_not_nil(), "cases should be set");
 
         if(first_target==goto_program.instructions.end() ||
            first_target->location_number>
@@ -954,8 +956,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     // as in case 1: case 2: code; we build a nested code_switch_caset
     if(targets_done.find(it->case_start)!=targets_done.end())
     {
-      assert(it->case_selector==orig_target ||
-             !it->case_selector->is_target());
+      DATA_INVARIANT(
+        it->case_selector == orig_target || !it->case_selector->is_target(),
+        "valid case selector required");
 
       // maintain the order to ensure convergence -> go to the innermost
       code_switch_caset *cscp=&to_code_switch_case(
@@ -1032,12 +1035,12 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   goto_programt::const_targett else_case=target->get_target();
   goto_programt::const_targett before_else=else_case;
   goto_programt::const_targett end_if=target->get_target();
-  assert(end_if!=goto_program.instructions.end());
+  PRECONDITION(end_if != goto_program.instructions.end());
   bool has_else=false;
 
   if(!target->is_backwards_goto())
   {
-    assert(else_case!=goto_program.instructions.begin());
+    PRECONDITION(else_case != goto_program.instructions.begin());
     --before_else;
 
     // goto 1
@@ -1106,7 +1109,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  assert(!loop_last_stack.empty());
+  PRECONDITION(!loop_last_stack.empty());
   const cfg_dominatorst &dominators=loops.get_dominator_info();
 
   // goto 1
@@ -1232,14 +1235,14 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  assert(target->is_start_thread());
+  PRECONDITION(target->is_start_thread());
 
   goto_programt::const_targett thread_start=target->get_target();
-  assert(thread_start->location_number > target->location_number);
+  PRECONDITION(thread_start->location_number > target->location_number);
 
   goto_programt::const_targett next=target;
   ++next;
-  assert(next!=goto_program.instructions.end());
+  CHECK_RETURN(next != goto_program.instructions.end());
 
   // first check for old-style code:
   // __CPROVER_DUMP_0: START THREAD 1
@@ -1250,8 +1253,10 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   {
     goto_programt::const_targett this_end=next;
     ++this_end;
-    assert(this_end->is_end_thread());
-    assert(thread_start->location_number > this_end->location_number);
+    DATA_INVARIANT(this_end->is_end_thread(), "should be end-of-thread");
+    DATA_INVARIANT(
+      thread_start->location_number > this_end->location_number,
+      "start of new thread must precede end of thread");
 
     codet b=code_blockt();
     convert_instruction(next, this_end, to_code_block(b));
@@ -1269,7 +1274,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
         b = std::move(l);
       }
 
-    assert(b.get_statement()==ID_label);
+    DATA_INVARIANT(b.get_statement() == ID_label, "must be label statement");
     dest.add(std::move(b));
     return this_end;
   }
@@ -1292,11 +1297,15 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
   goto_programt::const_targett thread_end=next->get_target();
   --thread_end;
-  assert(thread_start->location_number < thread_end->location_number);
-  assert(thread_end->is_end_thread());
+  DATA_INVARIANT(
+    thread_start->location_number < thread_end->location_number,
+    "monotone location numbers");
+  DATA_INVARIANT(thread_end->is_end_thread(), "should be end-of-thread");
 
-  assert(upper_bound==goto_program.instructions.end() ||
-      thread_end->location_number < upper_bound->location_number);
+  DATA_INVARIANT(
+    upper_bound == goto_program.instructions.end() ||
+      thread_end->location_number < upper_bound->location_number,
+    "end or monotone location numbers");
   /* end structure check */
 
   // use pthreads if "code in new thread" is a function call to a function with
@@ -1338,7 +1347,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       b = std::move(l);
     }
 
-  assert(b.get_statement()==ID_label);
+  DATA_INVARIANT(b.get_statement() == ID_label, "should be label statement");
   dest.add(std::move(b));
   return thread_end;
 }
@@ -1390,7 +1399,7 @@ void goto_program2codet::add_local_types(const typet &type)
        !type_names_set.insert(identifier).second)
       return;
 
-    assert(!identifier.empty());
+    DATA_INVARIANT(!identifier.empty(), "identifier required");
     type_names.push_back(identifier);
   }
   else if(type.id()==ID_pointer ||
@@ -1460,7 +1469,7 @@ void goto_program2codet::cleanup_code(
     code_labelt &cl=to_code_label(code);
     const irep_idt &label=cl.get_label();
 
-    assert(!label.empty());
+    DATA_INVARIANT(!label.empty(), "label must be set");
 
     if(labels_in_use.find(label)==labels_in_use.end())
     {
@@ -1525,7 +1534,7 @@ void goto_program2codet::cleanup_code_block(
     codet &code,
     const irep_idt parent_stmt)
 {
-  assert(code.get_statement()==ID_block);
+  PRECONDITION(code.get_statement() == ID_block);
 
   exprt::operandst &operands=code.operands();
   for(exprt::operandst::size_type i=0;
@@ -1541,12 +1550,14 @@ void goto_program2codet::cleanup_code_block(
     else if(to_code(*it).get_statement()==ID_block)
     {
       bool has_decl=false;
-      forall_operands(it2, *it)
-        if(it2->id()==ID_code && to_code(*it2).get_statement()==ID_decl)
+      for(const auto &op : as_const(*it).operands())
+      {
+        if(op.id() == ID_code && to_code(op).get_statement() == ID_decl)
         {
           has_decl=true;
           break;
         }
+      }
 
       if(!has_decl)
       {
@@ -1616,9 +1627,11 @@ static bool has_labels(const codet &code)
   if(code.get_statement()==ID_label)
     return true;
 
-  forall_operands(it, code)
-    if(it->id()==ID_code && has_labels(to_code(*it)))
+  for(const auto &op : code.operands())
+  {
+    if(op.id() == ID_code && has_labels(to_code(op)))
       return true;
+  }
 
   return false;
 }
@@ -1867,10 +1880,8 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           base_name="nondet_"+std::to_string(count);
         }
 
-        symbolt symbol;
+        symbolt symbol{base_name, code_typet({}, expr.type()), ID_C};
         symbol.base_name=base_name;
-        symbol.name=base_name;
-        symbol.type = code_typet({}, expr.type());
         id=symbol.name;
 
         symbol_table.insert(std::move(symbol));
@@ -1890,7 +1901,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   else if(expr.id()==ID_isnan ||
           expr.id()==ID_sign)
     system_headers.insert("math.h");
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     if(expr.type().id()==ID_floatbv)
     {
@@ -1919,8 +1930,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
          typedef_names.find(typedef_str)==typedef_names.end())
         expr.type().remove(ID_C_typedef);
 
-      assert(expr.type().id()!=ID_union &&
-             expr.type().id()!=ID_struct);
+      DATA_INVARIANT(
+        !can_cast_type<struct_union_typet>(expr.type()),
+        "typedef must not be that of a struct or union type");
     }
   }
   else if(expr.id()==ID_symbol)

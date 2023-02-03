@@ -9,8 +9,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "code_with_references.h"
 #include "java_types.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 
 codet allocate_array(

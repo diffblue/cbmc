@@ -61,7 +61,11 @@ std::string c_definest::operator()(const std::string &src) const
     }
     else
       out << t.text;
+    out << " ";
   }
 
-  return out.str();
+  auto result = out.str();
+  result.pop_back();
+
+  return result;
 }

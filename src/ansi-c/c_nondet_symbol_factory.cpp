@@ -11,8 +11,6 @@ Author: Diffblue Ltd.
 
 #include "c_nondet_symbol_factory.h"
 
-#include <ansi-c/c_object_factory_parameters.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
@@ -20,9 +18,12 @@ Author: Diffblue Ltd.
 #include <util/nondet_bool.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
 
 #include <goto-programs/allocate_objects.h>
 #include <goto-programs/goto_functions.h>
+
+#include <ansi-c/c_object_factory_parameters.h>
 
 /// Creates a nondet for expr, including calling itself recursively to make
 /// appropriate symbols to point to if expr is a pointer.
@@ -171,7 +172,7 @@ void symbol_factoryt::gen_nondet_array_init(
 {
   auto const &array_type = to_array_type(expr.type());
   const auto &size = array_type.size();
-  PRECONDITION(size.id() == ID_constant);
+  PRECONDITION(size.is_constant());
   auto const array_size = numeric_cast<mp_integer>(to_constant_expr(size));
   DATA_INVARIANT(
     array_size.has_value() && *array_size >= 0,
@@ -201,7 +202,7 @@ void symbol_factoryt::gen_nondet_array_init(
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt base_name,
   const typet &type,
   const source_locationt &loc,

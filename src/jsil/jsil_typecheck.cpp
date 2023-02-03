@@ -162,13 +162,14 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_symbol)
     typecheck_symbol_expr(to_symbol_expr(expr));
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
   }
   else
   {
-    // expressions are expected not to have type set just yet
-    assert(expr.type().is_nil() || expr.type().id().empty());
+    DATA_INVARIANT(
+      expr.type().is_nil() || expr.type().id().empty(),
+      "expressions are expected not to have type set just yet");
 
     if(expr.id()==ID_null ||
         expr.id()=="undefined" ||
@@ -273,7 +274,7 @@ void jsil_typecheckt::typecheck_expr_side_effect_throw(
   side_effect_expr_throwt &expr)
 {
   irept &excep_list=expr.add(ID_exception_list);
-  assert(excep_list.id()==ID_symbol);
+  PRECONDITION(excep_list.id() == ID_symbol);
   symbol_exprt &s=static_cast<symbol_exprt &>(excep_list);
   typecheck_symbol_expr(s);
 }
@@ -567,7 +568,7 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
      identifier=="eval" ||
      identifier=="nan")
   {
-    symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table_baset::symbolst::const_iterator s_it =
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
@@ -595,18 +596,14 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
       symbol_expr.set_identifier(identifier);
     }
 
-    symbol_tablet::symbolst::const_iterator s_it=
-    symbol_table.symbols.find(identifier);
+    symbol_table_baset::symbolst::const_iterator s_it =
+      symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
     {
       // create new symbol
-      symbolt new_symbol;
-      new_symbol.name=identifier;
-      new_symbol.type=symbol_expr.type();
+      symbolt new_symbol{identifier, symbol_expr.type(), "jsil"};
       new_symbol.base_name=identifier_base;
-      new_symbol.mode="jsil";
-      new_symbol.is_type=false;
       new_symbol.is_lvalue=new_symbol.type.id()!=ID_code;
 
       // mark as already typechecked
@@ -622,7 +619,7 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
     else
     {
       // symbol already exists
-      assert(!s_it->second.is_type);
+      DATA_INVARIANT(!s_it->second.is_type, "non-type symbol expected");
 
       const symbolt &symbol=s_it->second;
 
@@ -786,11 +783,7 @@ void jsil_typecheckt::typecheck_function_call(
     else
     {
       // Should be function, declaration not found yet
-      symbolt new_symbol;
-      new_symbol.name=id;
-      new_symbol.type = code_typet({}, typet());
-      new_symbol.mode="jsil";
-      new_symbol.is_type=false;
+      symbolt new_symbol{id, code_typet({}, typet()), "jsil"};
       new_symbol.value=exprt("no-body-just-yet");
 
       make_type_compatible(lhs, jsil_any_type(), true);
@@ -837,7 +830,7 @@ void jsil_typecheckt::typecheck_assign(code_assignt &code)
 /// \par parameters: any symbol
 void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
-  assert(!symbol.is_type);
+  PRECONDITION(!symbol.is_type);
 
   // Using is_extern to check if symbol was already typechecked
   if(symbol.is_extern)
@@ -898,7 +891,7 @@ void jsil_typecheckt::typecheck()
 }
 
 bool jsil_typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   jsil_typecheckt jsil_typecheck(symbol_table, message_handler);

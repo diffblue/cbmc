@@ -49,7 +49,7 @@ string_format_builtin_functiont::string_format_builtin_functiont(
 
   // format_string is only initialized if the expression is constant
   if(
-    array_pool.get_or_create_length(format_string_expr).id() == ID_constant &&
+    array_pool.get_or_create_length(format_string_expr).is_constant() &&
     format_string_expr.content().id() == ID_array)
   {
     const auto length = numeric_cast_v<std::size_t>(

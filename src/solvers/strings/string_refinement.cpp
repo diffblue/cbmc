@@ -282,7 +282,7 @@ replace_expr_copy(const union_find_replacet &symbol_resolve, exprt expr)
 /// \param value: the boolean value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
   PRECONDITION(equality_propagation);
   if(!value)
     equations.push_back(not_exprt{expr});
@@ -967,14 +967,14 @@ static optionalt<exprt> get_valid_array_size(
   {
     const exprt size = size_from_pool.value();
     size_val = simplify_expr(super_get(size), ns);
-    if(size_val.id() != ID_constant)
+    if(!size_val.is_constant())
     {
       stream << "(sr::get_valid_array_size) string of unknown size: "
              << format(size_val) << messaget::eom;
       return {};
     }
   }
-  else if(to_array_type(arr.type()).size().id() == ID_constant)
+  else if(to_array_type(arr.type()).size().is_constant())
     size_val = simplify_expr(to_array_type(arr.type()).size(), ns);
   else
     return {};
@@ -1577,7 +1577,7 @@ static void add_to_index_set(
 {
   simplify(i, ns);
   const bool is_size_t = numeric_cast<std::size_t>(i).has_value();
-  if(i.id() != ID_constant || is_size_t)
+  if(!i.is_constant() || is_size_t)
   {
     std::vector<exprt> sub_arrays;
     get_sub_arrays(s, sub_arrays);
@@ -1711,8 +1711,8 @@ static void update_index_set(
     }
     else
     {
-      forall_operands(it, cur)
-        to_process.push_back(*it);
+      for(const auto &op : as_const(cur).operands())
+        to_process.push_back(op);
     }
   }
 }

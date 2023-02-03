@@ -232,7 +232,7 @@ void cpp_typecheckt::default_cpctor(
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
-      assert(address.type() == mem_c.type());
+      CHECK_RETURN(address.type() == mem_c.type());
 
       already_typechecked_exprt::make_already_typechecked(address);
 
@@ -422,11 +422,11 @@ void cpp_typecheckt::check_member_initializers(
   const struct_typet::componentst &components,
   const irept &initializers)
 {
-  assert(initializers.id()==ID_member_initializers);
+  PRECONDITION(initializers.id() == ID_member_initializers);
 
   for(const auto &initializer : initializers.get_sub())
   {
-    assert(initializer.is_not_nil());
+    PRECONDITION(initializer.is_not_nil());
 
     const cpp_namet &member_name=
       to_cpp_name(initializer.find(ID_member));
@@ -549,7 +549,7 @@ void cpp_typecheckt::full_member_initialization(
   const struct_union_typet::componentst &components=
     struct_union_type.components();
 
-  assert(initializers.id()==ID_member_initializers);
+  PRECONDITION(initializers.id() == ID_member_initializers);
 
   irept final_initializers(ID_member_initializers);
 
@@ -687,7 +687,7 @@ void cpp_typecheckt::full_member_initialization(
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
-      assert(address.type() == c.type());
+      CHECK_RETURN(address.type() == c.type());
 
       already_typechecked_exprt::make_already_typechecked(address);
 

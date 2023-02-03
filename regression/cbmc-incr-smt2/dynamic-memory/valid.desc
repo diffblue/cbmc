@@ -1,0 +1,10 @@
+CORE
+valid.c
+--trace
+Passing problem to incremental SMT2 solving
+line 16 assertion make_dynamic \|\| \!__CPROVER_DYNAMIC_OBJECT\(pointer\)\: SUCCESS
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+--

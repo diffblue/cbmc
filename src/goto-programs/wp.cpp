@@ -21,9 +21,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool has_nondet(const exprt &dest)
 {
-  forall_operands(it, dest)
-    if(has_nondet(*it))
+  for(const auto &op : dest.operands())
+  {
+    if(has_nondet(op))
       return true;
+  }
 
   if(dest.id()==ID_side_effect)
   {

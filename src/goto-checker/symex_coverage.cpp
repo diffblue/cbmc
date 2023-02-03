@@ -13,20 +13,19 @@ Date: March 2016
 
 #include "symex_coverage.h"
 
-#include <chrono>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-
+#include <util/namespace.h>
 #include <util/string2int.h>
 #include <util/symbol.h>
 #include <util/xml.h>
 
-#include <langapi/language_util.h>
-
 #include <goto-programs/goto_functions.h>
 
+#include <langapi/language_util.h>
 #include <linking/static_lifetime_init.h>
+
+#include <chrono> // IWYU pragma: keep
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 class coverage_recordt
 {
@@ -237,15 +236,12 @@ void goto_program_coverage_recordt::compute_coverage_lines(
     symex_coveraget::coveraget::const_iterator c_entry = coverage.find(it);
     if(c_entry != coverage.end())
     {
-      if(!(c_entry->second.size() == 1 || is_branch))
-      {
-        std::cerr << it->location_number << '\n';
-        for(const auto &cov : c_entry->second)
-          std::cerr << cov.second.succ->location_number << '\n';
-      }
-      DATA_INVARIANT(
-        c_entry->second.size() == 1 || is_branch,
-        "instructions other than branch instructions have exactly 1 successor");
+      DATA_INVARIANT_WITH_DIAGNOSTICS(
+        c_entry->second.size() == 1 || is_branch || it->is_function_call(),
+        "instructions other than branch instructions or function calls have "
+        "exactly 1 successor",
+        "found at goto program instruction number " +
+          std::to_string(it->location_number));
 
       for(const auto &cov : c_entry->second)
       {

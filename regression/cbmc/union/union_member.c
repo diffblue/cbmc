@@ -2,7 +2,7 @@
 
 struct s
 {
-  union U
+  union
   {
     char b[2];
   };

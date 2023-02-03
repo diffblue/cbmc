@@ -1,6 +1,6 @@
 CORE
 byte-extract-small.c
---slice-formula
+
 \[main.assertion\.1\] line \d+ assertion z == 257: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$

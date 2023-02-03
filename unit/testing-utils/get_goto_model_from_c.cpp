@@ -44,7 +44,6 @@ goto_modelt get_goto_model_from_c(std::istream &in)
   }
 
   language_filest language_files;
-  language_files.set_message_handler(null_message_handler);
 
   language_filet &language_file = language_files.add_file("");
 
@@ -66,7 +65,8 @@ goto_modelt get_goto_model_from_c(std::istream &in)
   goto_modelt goto_model;
 
   {
-    const bool error = language_files.typecheck(goto_model.symbol_table);
+    const bool error =
+      language_files.typecheck(goto_model.symbol_table, null_message_handler);
 
     if(error)
       throw invalid_input_exceptiont("typechecking failed");

@@ -6,13 +6,24 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
+
+#include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+
+// NOLINTNEXTLINE(whitespace/line_length)
+#include <analyses/variable-sensitivity/constant_abstract_value.h> // IWYU pragma: keep
+
+// NOLINTNEXTLINE(whitespace/line_length)
+#include <analyses/variable-sensitivity/interval_abstract_value.h> // IWYU pragma: keep
+
+// NOLINTNEXTLINE(whitespace/line_length)
+#include <analyses/variable-sensitivity/value_set_abstract_object.h> // IWYU pragma: keep
+#include <testing-utils/use_catch.h>
 
 static merge_result<const constant_abstract_valuet>
 merge(abstract_object_pointert op1, abstract_object_pointert op2)

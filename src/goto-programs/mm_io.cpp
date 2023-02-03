@@ -20,7 +20,6 @@ Date:   April 2017
 #include <util/replace_expr.h>
 
 #include "goto_model.h"
-#include "remove_returns.h"
 
 #include <set>
 

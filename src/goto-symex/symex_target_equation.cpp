@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_target_equation.h"
 
-#include <chrono>
-
 #include <util/std_expr.h>
 
 #include "solver_hardness.h"
 #include "ssa_step.h"
+
+#include <chrono> // IWYU pragma: keep
 
 static std::function<void(solver_hardnesst &)>
 hardness_register_ssa(std::size_t step_index, const SSA_stept &step)
@@ -282,6 +282,7 @@ void symex_target_equationt::assumption(
 void symex_target_equationt::assertion(
   const exprt &guard,
   const exprt &cond,
+  const irep_idt &property_id,
   const std::string &msg,
   const sourcet &source)
 {
@@ -291,6 +292,7 @@ void symex_target_equationt::assertion(
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.comment=msg;
+  SSA_step.property_id = property_id;
 
   merge_ireps(SSA_step);
 }

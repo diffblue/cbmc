@@ -11,8 +11,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 #include "graphml.h"
 
-#include <util/message.h>
-
 // include last to make sure #define stack(x) of parser.h does not
 // collide with std::stack included by graph.h
 #include "xml_parser.h"
@@ -56,7 +54,7 @@ static bool build_graph_rec(
         e_it!=xml.elements.end();
         e_it++)
     {
-      assert(e_it->name=="data");
+      DATA_INVARIANT(e_it->name == "data", "expected data node");
 
       if(e_it->get_attribute("key")=="violation" &&
          e_it->data=="true")
@@ -145,7 +143,7 @@ static bool build_graph(
   graphmlt &dest,
   graphmlt::node_indext &entry)
 {
-  assert(dest.empty());
+  PRECONDITION(dest.empty());
 
   name_mapt name_to_node;
   std::map<std::string, std::map<std::string, std::string> > defaults;
@@ -158,6 +156,7 @@ static bool build_graph(
       defaults,
       dest,
       entrynode);
+  CHECK_RETURN(!entrynode.empty());
 
   for(std::size_t i=0; !err && i<dest.size(); ++i)
   {
@@ -166,9 +165,8 @@ static bool build_graph(
     INVARIANT(!n.node_name.empty(), "node should be named");
   }
 
-  assert(!entrynode.empty());
   name_mapt::const_iterator it=name_to_node.find(entrynode);
-  assert(it!=name_to_node.end());
+  CHECK_RETURN(it != name_to_node.end());
   entry=it->second;
 
   return err;

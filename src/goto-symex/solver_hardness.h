@@ -12,15 +12,12 @@ Author: Diffblue Ltd.
 #include <solvers/hardness_collector.h>
 #include <solvers/prop/prop_conv_solver.h>
 
-#include <fstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include <goto-programs/goto_program.h>
-
-#include <util/optional.h>
 
 /// A structure that facilitates collecting the complexity statistics from a
 /// decision procedure. The idea is to associate some solver complexity metric
@@ -85,7 +82,7 @@ struct solver_hardnesst : public clause_hardness_collectort
   /// \param pc: the GOTO instruction iterator for this SSA step
   void register_ssa(
     std::size_t ssa_index,
-    const exprt ssa_expression,
+    const exprt &ssa_expression,
     goto_programt::const_targett pc);
 
   void register_ssa_size(std::size_t size);
@@ -98,7 +95,7 @@ struct solver_hardnesst : public clause_hardness_collectort
   /// \param pcs: all GOTO instruction iterators that contributed in the
   ///   disjunction
   void register_assertion_ssas(
-    const exprt ssa_expression,
+    const exprt &ssa_expression,
     const std::vector<goto_programt::const_targett> &pcs);
 
   /// Called e.g. from the `satcheck_minisat2::lcnf`, this function adds the
@@ -133,7 +130,7 @@ private:
   // A minor modification of \ref goto_programt::output_instruction
   static std::string goto_instruction2string(goto_programt::const_targett pc);
 
-  static std::string expr2string(const exprt expr);
+  static std::string expr2string(const exprt &expr);
 
   std::string outfile;
   std::vector<std::unordered_map<hardness_ssa_keyt, sat_hardnesst>>

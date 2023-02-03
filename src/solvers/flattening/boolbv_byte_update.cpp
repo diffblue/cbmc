@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/invariant.h>
 
-#include <solvers/lowering/expr_lowering.h>
-
 bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {
   // if we update (from) an unbounded array, lower the expression as the array

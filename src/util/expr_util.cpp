@@ -9,12 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
+#include "byte_operators.h"
 #include "c_types.h"
 #include "config.h"
 #include "expr_iterator.h"
 #include "namespace.h"
 #include "pointer_expr.h"
-#include "std_expr.h"
+#include "pointer_offset_size.h"
 
 #include <algorithm>
 #include <unordered_set>
@@ -238,7 +240,6 @@ bool is_constantt::is_constant(const exprt &expr) const
     expr.id() == ID_plus || expr.id() == ID_mult || expr.id() == ID_array ||
     expr.id() == ID_with || expr.id() == ID_struct || expr.id() == ID_union ||
     expr.id() == ID_empty_union ||
-    // byte_update works, byte_extract may be out-of-bounds
     expr.id() == ID_byte_update_big_endian ||
     expr.id() == ID_byte_update_little_endian)
   {
@@ -246,6 +247,46 @@ bool is_constantt::is_constant(const exprt &expr) const
       expr.operands().begin(), expr.operands().end(), [this](const exprt &e) {
         return is_constant(e);
       });
+  }
+  else if(auto be = expr_try_dynamic_cast<byte_extract_exprt>(expr))
+  {
+    if(!is_constant(be->op()) || !be->offset().is_constant())
+      return false;
+
+    const auto op_bits = pointer_offset_bits(be->op().type(), ns);
+    if(!op_bits.has_value())
+      return false;
+
+    const auto extract_bits = pointer_offset_bits(be->type(), ns);
+    if(!extract_bits.has_value())
+      return false;
+
+    const mp_integer offset_bits =
+      numeric_cast_v<mp_integer>(to_constant_expr(be->offset())) *
+      be->get_bits_per_byte();
+
+    return offset_bits + *extract_bits <= *op_bits;
+  }
+  else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
+  {
+    if(
+      !is_constant(eb->src()) || !eb->lower().is_constant() ||
+      !eb->upper().is_constant())
+    {
+      return false;
+    }
+
+    const auto src_bits = pointer_offset_bits(eb->src().type(), ns);
+    if(!src_bits.has_value())
+      return false;
+
+    const mp_integer lower_bound =
+      numeric_cast_v<mp_integer>(to_constant_expr(eb->lower()));
+    const mp_integer upper_bound =
+      numeric_cast_v<mp_integer>(to_constant_expr(eb->upper()));
+
+    return lower_bound >= 0 && lower_bound <= upper_bound &&
+           upper_bound < src_bits;
   }
 
   return false;
@@ -291,7 +332,7 @@ constant_exprt make_boolean_expr(bool value)
 
 exprt make_and(exprt a, exprt b)
 {
-  PRECONDITION(a.type().id() == ID_bool && b.type().id() == ID_bool);
+  PRECONDITION(a.is_boolean() && b.is_boolean());
   if(b.is_constant())
   {
     if(b.get(ID_value) == ID_false)

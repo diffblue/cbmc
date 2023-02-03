@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <type_traits>
 
 #include <util/invariant.h>
-#include <util/std_code.h>
 
 void ai_baset::output(
   const namespacet &ns,

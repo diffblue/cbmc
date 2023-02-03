@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include "anonymous_member.h"
 #include "c_typecheck_base.h"
@@ -272,7 +273,12 @@ void c_typecheck_baset::designator_enter(
 
     for(const auto &c : struct_type.components())
     {
-      if(c.type().id() != ID_code && !c.get_is_padding())
+      DATA_INVARIANT(
+        c.type().id() != ID_code, "struct member must not be of code type");
+
+      if(
+        !c.get_is_padding() &&
+        (c.type().id() != ID_c_bit_field || !c.get_anonymous()))
       {
         entry.subtype = c.type();
         break;
@@ -355,18 +361,18 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
   // copy the value, we may need to adjust it
   exprt value=*init_it;
 
-  assert(!designator.empty());
+  PRECONDITION(!designator.empty());
 
   if(value.id()==ID_designated_initializer)
   {
-    assert(value.operands().size()==1);
+    PRECONDITION(value.operands().size() == 1);
 
     designator=
       make_designator(
         designator.front().type,
         static_cast<const exprt &>(value.find(ID_designator)));
 
-    assert(!designator.empty());
+    CHECK_RETURN(!designator.empty());
 
     // discard the return value
     do_designated_initializer(
@@ -457,9 +463,12 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       DATA_INVARIANT(index<components.size(),
                      "member designator is bounded by components size");
-      DATA_INVARIANT(components[index].type().id()!=ID_code &&
-                     !components[index].get_is_padding(),
-                     "member designator points at data member");
+      DATA_INVARIANT(
+        components[index].type().id() != ID_code,
+        "struct member must not be of code type");
+      DATA_INVARIANT(
+        !components[index].get_is_padding(),
+        "member designator points at non-padding member");
 
       dest=&(dest->operands()[index]);
     }
@@ -586,7 +595,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       else
         *dest=do_initializer_rec(value, type, force_constant);
 
-      assert(full_type==follow(dest->type()));
+      DATA_INVARIANT(full_type == follow(dest->type()), "matching types");
 
       return ++init_it; // done
     }
@@ -654,10 +663,10 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       }
     }
 
-    assert(full_type.id()==ID_struct ||
-           full_type.id()==ID_union ||
-           full_type.id()==ID_array ||
-           full_type.id()==ID_vector);
+    DATA_INVARIANT(
+      full_type.id() == ID_struct || full_type.id() == ID_union ||
+        full_type.id() == ID_array || full_type.id() == ID_vector,
+      "full type must be composite");
 
     // we are initializing a compound type, and enter it!
     // this may change the type, full_type might not be valid any more
@@ -708,7 +717,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
 void c_typecheck_baset::increment_designator(designatort &designator)
 {
-  assert(!designator.empty());
+  PRECONDITION(!designator.empty());
 
   while(true)
   {
@@ -729,16 +738,15 @@ void c_typecheck_baset::increment_designator(designatort &designator)
         to_struct_type(full_type);
       const struct_typet::componentst &components=
         struct_type.components();
-      assert(components.size()==entry.size);
+      DATA_INVARIANT(
+        components.size() == entry.size, "matching component numbers");
 
-      // we skip over any padding or code
-      // we also skip over anonymous members
+      // we skip over any padding
+      // we also skip over anonymous members that are bit fields
       while(entry.index < entry.size &&
             (components[entry.index].get_is_padding() ||
              (components[entry.index].get_anonymous() &&
-              components[entry.index].type().id() != ID_struct_tag &&
-              components[entry.index].type().id() != ID_union_tag) ||
-             components[entry.index].type().id() == ID_code))
+              components[entry.index].type().id() == ID_c_bit_field)))
       {
         entry.index++;
       }
@@ -756,7 +764,7 @@ void c_typecheck_baset::increment_designator(designatort &designator)
     // pop entry
     designator.pop_entry();
 
-    assert(!designator.empty());
+    INVARIANT(!designator.empty(), "designator had more than one entry");
   }
 }
 
@@ -764,14 +772,13 @@ designatort c_typecheck_baset::make_designator(
   const typet &src_type,
   const exprt &src)
 {
-  assert(!src.operands().empty());
+  PRECONDITION(!src.operands().empty());
 
   typet type=src_type;
   designatort designator;
 
-  forall_operands(it, src)
+  for(const auto &d_op : src.operands())
   {
-    const exprt &d_op=*it;
     designatort::entryt entry(type);
     const typet &full_type=follow(entry.type);
 
@@ -837,8 +844,9 @@ designatort c_typecheck_baset::make_designator(
       }
       else
       {
-        // We will search for anonymous members,
-        // in a loop. This isn't supported by gcc, but icc does allow it.
+        // We will search for anonymous members, in a loop. This isn't supported
+        // by GCC (unless the anonymous member is within an unnamed union or
+        // struct), but Visual Studio does allow it.
 
         bool found=false, repeat;
         typet tmp_type=entry.type;
@@ -864,6 +872,9 @@ designatort c_typecheck_baset::make_designator(
               c.get_anonymous() &&
               (c.type().id() == ID_struct_tag ||
                c.type().id() == ID_union_tag) &&
+              (config.ansi_c.mode ==
+                 configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+               follow(c.type()).find(ID_tag).is_nil()) &&
               has_component_rec(c.type(), component_name, *this))
             {
               entry.index=number;
@@ -903,7 +914,7 @@ designatort c_typecheck_baset::make_designator(
     designator.push_entry(entry);
   }
 
-  assert(!designator.empty());
+  INVARIANT(!designator.empty(), "expected an entry to be added");
 
   return designator;
 }
@@ -913,7 +924,7 @@ exprt c_typecheck_baset::do_initializer_list(
   const typet &type,
   bool force_constant)
 {
-  assert(value.id()==ID_initializer_list);
+  PRECONDITION(value.id() == ID_initializer_list);
 
   const typet &full_type=follow(type);
 
@@ -1033,13 +1044,11 @@ exprt c_typecheck_baset::do_initializer_list(
 
         // mimic bits of typecheck_compound_type to produce a new struct tag
         actual_struct_type.remove(ID_tag);
-        type_symbolt compound_symbol{actual_struct_type};
-        compound_symbol.mode = mode;
-        compound_symbol.location = value.source_location();
-        std::string typestr = type2name(compound_symbol.type, *this);
+        std::string typestr = type2name(actual_struct_type, *this);
+        irep_idt tag_identifier = "tag-#anon#" + typestr;
+        type_symbolt compound_symbol{tag_identifier, actual_struct_type, mode};
         compound_symbol.base_name = "#anon#" + typestr;
-        compound_symbol.name = "tag-#anon#" + typestr;
-        irep_idt tag_identifier = compound_symbol.name;
+        compound_symbol.location = value.source_location();
 
         // We might already have the same anonymous struct, which is fine as it
         // will be exactly the same type.

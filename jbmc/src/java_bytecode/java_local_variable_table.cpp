@@ -11,12 +11,12 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "java_bytecode_convert_method_class.h"
 
-#include "java_types.h"
-
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/string2int.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include "java_types.h"
 
 #include <iostream>
 
@@ -488,7 +488,7 @@ static java_bytecode_convert_methodt::method_offsett get_common_dominator(
       ++domit;
       ++repeats;
     }
-    assert(repeats<=merge_vars.size());
+    INVARIANT(repeats <= merge_vars.size(), "out of bounds");
     if(repeats==merge_vars.size())
       return dom;
   }
@@ -832,13 +832,9 @@ void java_bytecode_convert_methodt::setup_local_variables(
       result, v.var.start_pc, v.var.length, false, std::move(v.holes));
 
     // Register the local variable in the symbol table
-    symbolt new_symbol;
-    new_symbol.name=identifier;
-    new_symbol.type=t;
+    symbolt new_symbol{identifier, t, ID_java};
     new_symbol.base_name=v.var.name;
     new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
     new_symbol.is_file_local=true;
     new_symbol.is_thread_local=true;
     new_symbol.is_lvalue=true;

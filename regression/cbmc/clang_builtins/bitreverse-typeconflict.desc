@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 bitreverse-typeconflict.c
 file bitreverse-typeconflict.c line 5 function main: error: __builtin_bitreverse8 expects one operand
 ^EXIT=6$

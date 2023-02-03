@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^.*error: expected 2 arguments for __CPROVER_obeys_contract, found 3$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that malformed __CPROVER_obeys_contract predicate expressions are rejected.

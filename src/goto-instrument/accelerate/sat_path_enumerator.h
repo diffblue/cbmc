@@ -14,8 +14,6 @@ Author: Matt Lewis
 
 #include <map>
 
-#include <util/symbol_table.h>
-
 #include <goto-programs/goto_program.h>
 
 #include <analyses/natural_loops.h>
@@ -30,7 +28,7 @@ class sat_path_enumeratort:public path_enumeratort
 public:
   sat_path_enumeratort(
     message_handlert &message_handler,
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     goto_functionst &_goto_functions,
     goto_programt &_goto_program,
     natural_loops_mutablet::natural_loopt &_loop,
@@ -61,7 +59,7 @@ protected:
 
   void record_path(scratch_programt &scratch_program);
 
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   goto_functionst &goto_functions;
   goto_programt &goto_program;

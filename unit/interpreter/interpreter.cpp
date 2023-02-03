@@ -6,14 +6,16 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <goto-programs/goto_functions.h>
 #include <goto-programs/interpreter_class.h>
 
 #include <util/message.h>
 #include <util/mp_arith.h>
 #include <util/pointer_expr.h>
+#include <util/symbol_table.h>
+
+#include <goto-programs/goto_functions.h>
+
+#include <testing-utils/use_catch.h>
 
 typedef interpretert::mp_vectort mp_vectort;
 

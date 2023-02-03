@@ -13,6 +13,9 @@ file 'object.intel' was compiled from 'source.c' with goto-cc on a
 
   goto-cc -c source.c -o object.intel
 
+Use `make build_goto_binaries` in the parent directory to run the above for this
+and all other directories containing binaries.
+
 preproc.i is already pre-processed so that it can be linked in without
 needing to invoke a pre-processor from a cross-compile toolchain on your
 local machine. Linking it together with the Intel object file, while

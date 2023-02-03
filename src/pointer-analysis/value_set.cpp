@@ -12,18 +12,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 
 #include <ostream>
 
@@ -586,20 +588,18 @@ void value_sett::get_value_set_rec(
 
     if(op_type.id()==ID_pointer)
     {
-      // pointer-to-pointer -- we just ignore these
+      // pointer-to-something -- we just ignore the type cast
       get_value_set_rec(op, dest, suffix, original_type, ns);
     }
-    else if(op_type.id()==ID_unsignedbv ||
-            op_type.id()==ID_signedbv)
+    else if(
+      op_type.id() == ID_unsignedbv || op_type.id() == ID_signedbv ||
+      op_type.id() == ID_bv)
     {
-      // integer-to-pointer
+      // integer-to-something
 
       if(op.is_zero())
       {
-        insert(
-          dest,
-          exprt(ID_null_object, to_type_with_subtype(expr_type).subtype()),
-          mp_integer{0});
+        insert(dest, exprt(ID_null_object, empty_typet{}), mp_integer{0});
       }
       else
       {
@@ -713,10 +713,9 @@ void value_sett::get_value_set_rec(
     else
     {
       // we get the points-to for all operands, even integers
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        get_value_set_rec(
-          *it, pointer_expr_set, "", it->type(), ns);
+        get_value_set_rec(op, pointer_expr_set, "", op.type(), ns);
       }
     }
 
@@ -747,10 +746,9 @@ void value_sett::get_value_set_rec(
     object_mapt pointer_expr_set;
 
     // we get the points-to for all operands, even integers
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      get_value_set_rec(
-        *it, pointer_expr_set, "", it->type(), ns);
+      get_value_set_rec(op, pointer_expr_set, "", op.type(), ns);
     }
 
     for(object_map_dt::const_iterator
@@ -810,7 +808,7 @@ void value_sett::get_value_set_rec(
             statement==ID_cpp_new_array)
     {
       PRECONDITION(suffix.empty());
-      assert(expr_type.id()==ID_pointer);
+      PRECONDITION(expr_type.id() == ID_pointer);
 
       dynamic_object_exprt dynamic_object(
         to_pointer_type(expr_type).base_type());
@@ -833,7 +831,7 @@ void value_sett::get_value_set_rec(
 
     // a struct constructor, which may contain addresses
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       const std::string &component_name =
         id2string(component_iter->get_name());
@@ -841,7 +839,7 @@ void value_sett::get_value_set_rec(
       {
         std::string remaining_suffix =
           strip_first_field_from_suffix(suffix, component_name);
-        get_value_set_rec(*it, dest, remaining_suffix, original_type, ns);
+        get_value_set_rec(op, dest, remaining_suffix, original_type, ns);
         found_component = true;
       }
       ++component_iter;
@@ -852,8 +850,8 @@ void value_sett::get_value_set_rec(
       // Struct field doesn't appear as expected -- this has probably been
       // cast from an incompatible type. Conservatively assume all fields may
       // be of interest.
-      forall_operands(it, expr)
-        get_value_set_rec(*it, dest, suffix, original_type, ns);
+      for(const auto &op : expr.operands())
+        get_value_set_rec(op, dest, suffix, original_type, ns);
     }
   }
   else if(expr.id() == ID_union)
@@ -922,8 +920,8 @@ void value_sett::get_value_set_rec(
     // Otherwise we're probably reinterpreting some other type -- try persisting
     // with the current suffix for want of a better idea.
 
-    forall_operands(it, expr)
-      get_value_set_rec(*it, dest, new_suffix, original_type, ns);
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, dest, new_suffix, original_type, ns);
   }
   else if(expr.id()==ID_array_of)
   {
@@ -1052,9 +1050,39 @@ void value_sett::get_value_set_rec(
     value_set_with_local_definition.get_value_set_rec(
       let_expr.where(), dest, suffix, original_type, ns);
   }
+  else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
+  {
+    object_mapt pointer_expr_set;
+    get_value_set_rec(eb->src(), pointer_expr_set, "", eb->src().type(), ns);
+
+    for(const auto &object_map_entry : pointer_expr_set.read())
+    {
+      offsett offset = object_map_entry.second;
+
+      // kill any offset
+      offset.reset();
+
+      insert(dest, object_map_entry.first, offset);
+    }
+  }
   else
   {
-    insert(dest, exprt(ID_unknown, original_type));
+    object_mapt pointer_expr_set;
+    for(const auto &op : expr.operands())
+      get_value_set_rec(op, pointer_expr_set, "", original_type, ns);
+
+    for(const auto &object_map_entry : pointer_expr_set.read())
+    {
+      offsett offset = object_map_entry.second;
+
+      // kill any offset
+      offset.reset();
+
+      insert(dest, object_map_entry.first, offset);
+    }
+
+    if(pointer_expr_set.read().empty())
+      insert(dest, exprt(ID_unknown, original_type));
   }
 
   #ifdef DEBUG
@@ -1075,7 +1103,7 @@ void value_sett::dereference_rec(
   // remove pointer typecasts
   if(src.id()==ID_typecast)
   {
-    assert(src.type().id()==ID_pointer);
+    PRECONDITION(src.type().id() == ID_pointer);
 
     dereference_rec(to_typecast_expr(src).op(), dest);
   }
@@ -1286,8 +1314,10 @@ void value_sett::assign(
       const typet &subtype = c.type();
       const irep_idt &name = c.get_name();
 
-      // ignore methods and padding
-      if(subtype.id() == ID_code || c.get_is_padding())
+      // ignore padding
+      DATA_INVARIANT(
+        subtype.id() != ID_code, "struct member must not be of code type");
+      if(c.get_is_padding())
         continue;
 
       member_exprt lhs_member(lhs, name, subtype);
@@ -1359,12 +1389,11 @@ void value_sett::assign(
           is_simplified,
           add_to_sets);
       }
-      else if(rhs.id()==ID_array ||
-              rhs.id()==ID_constant)
+      else if(rhs.id() == ID_array || rhs.is_constant())
       {
-        forall_operands(o_it, rhs)
+        for(const auto &op : rhs.operands())
         {
-          assign(lhs_index, *o_it, ns, is_simplified, add_to_sets);
+          assign(lhs_index, op, ns, is_simplified, add_to_sets);
           add_to_sets=true;
         }
       }
@@ -1598,8 +1627,8 @@ void value_sett::apply_code_rec(
 
   if(statement==ID_block)
   {
-    forall_operands(it, code)
-      apply_code_rec(to_code(*it), ns);
+    for(const auto &op : code.operands())
+      apply_code_rec(to_code(op), ns);
   }
   else if(statement==ID_function_call)
   {
@@ -1721,8 +1750,8 @@ void value_sett::guard(
 {
   if(expr.id()==ID_and)
   {
-    forall_operands(it, expr)
-      guard(*it, ns);
+    for(const auto &op : expr.operands())
+      guard(op, ns);
   }
   else if(expr.id()==ID_equal)
   {
@@ -1792,8 +1821,10 @@ void value_sett::erase_struct_union_symbol(
     const typet &subtype = c.type();
     const irep_idt &name = c.get_name();
 
-    // ignore methods and padding
-    if(subtype.id() == ID_code || c.get_is_padding())
+    // ignore padding
+    DATA_INVARIANT(
+      subtype.id() != ID_code, "struct/union member must not be of code type");
+    if(c.get_is_padding())
       continue;
 
     erase_symbol_rec(subtype, erase_prefix + "." + id2string(name), ns);

@@ -22,6 +22,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
+#include <util/string_utils.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_functions.h>
@@ -45,6 +46,74 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <langapi/mode.h>
 #include <linking/static_lifetime_init.h>
 
+#include "dfcc_lift_memory_predicates.h"
+
+invalid_function_contract_pair_exceptiont::
+  invalid_function_contract_pair_exceptiont(
+    std::string reason,
+    std::string correct_format)
+  : cprover_exception_baset(std::move(reason)),
+    correct_format(std::move(correct_format))
+{
+}
+
+std::string invalid_function_contract_pair_exceptiont::what() const
+{
+  std::string res;
+
+  res += "Invalid function-contract mapping";
+  res += "\nReason: " + reason;
+
+  if(!correct_format.empty())
+  {
+    res += "\nFormat: " + correct_format;
+  }
+
+  return res;
+}
+
+#include <iostream>
+
+static std::pair<irep_idt, irep_idt>
+parse_function_contract_pair(const irep_idt &cli_flag)
+{
+  auto const correct_format_message =
+    "the format for function and contract pairs is "
+    "`<function_name>[/<contract_name>]`";
+
+  std::string cli_flag_str = id2string(cli_flag);
+
+  auto split = split_string(cli_flag_str, '/', true, false);
+
+  if(split.size() == 1)
+  {
+    return std::make_pair(cli_flag, cli_flag);
+  }
+  else if(split.size() == 2)
+  {
+    auto function_name = split[0];
+    if(function_name.size() == 0)
+    {
+      throw invalid_function_contract_pair_exceptiont{
+        "couldn't find function name before '/' in '" + cli_flag_str + "'",
+        correct_format_message};
+    }
+    auto contract_name = split[1];
+    if(contract_name.size() == 0)
+    {
+      throw invalid_function_contract_pair_exceptiont{
+        "couldn't find contract name after '/' in '" + cli_flag_str + "'",
+        correct_format_message};
+    }
+    return std::make_pair(function_name, contract_name);
+  }
+  else
+  {
+    throw invalid_function_contract_pair_exceptiont{
+      "couldn't parse '" + cli_flag_str + "'", correct_format_message};
+  }
+}
+
 void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
@@ -57,17 +126,15 @@ void dfcc(
   message_handlert &message_handler)
 {
   std::map<irep_idt, irep_idt> to_replace_map;
-  for(const auto &function_id : to_replace)
-    to_replace_map.insert({function_id, function_id});
+  for(const auto &cli_flag : to_replace)
+    to_replace_map.insert(parse_function_contract_pair(cli_flag));
 
   dfcc(
     options,
     goto_model,
     harness_id,
-    to_check.has_value()
-      ? optionalt<std::pair<irep_idt, irep_idt>>(
-          std::pair<irep_idt, irep_idt>(to_check.value(), to_check.value()))
-      : optionalt<std::pair<irep_idt, irep_idt>>{},
+    to_check.has_value() ? parse_function_contract_pair(to_check.value())
+                         : optionalt<std::pair<irep_idt, irep_idt>>{},
     allow_recursive_calls,
     to_replace_map,
     apply_loop_contracts,
@@ -122,6 +189,7 @@ dfcct::dfcct(
     library(goto_model, utils, message_handler),
     ns(goto_model.symbol_table),
     instrument(goto_model, message_handler, utils, library),
+    memory_predicates(goto_model, utils, library, instrument, message_handler),
     spec_functions(goto_model, message_handler, utils, library, instrument),
     contract_handler(
       goto_model,
@@ -129,6 +197,7 @@ dfcct::dfcct(
       utils,
       library,
       instrument,
+      memory_predicates,
       spec_functions),
     swap_and_wrap(
       goto_model,
@@ -160,7 +229,7 @@ void dfcct::check_transform_goto_model_preconditions()
         "' either not found or has no body");
 
     // triggers signature compatibility checking
-    contract_handler.get_pure_contract_symbol(pair.second);
+    contract_handler.get_pure_contract_symbol(pair.second, pair.first);
 
     PRECONDITION_WITH_DIAGNOSTICS(
       pair.first != harness_id,
@@ -192,7 +261,7 @@ void dfcct::check_transform_goto_model_preconditions()
       "Function to replace '" + id2string(pair.first) + "' not found");
 
     // triggers signature compatibility checking
-    contract_handler.get_pure_contract_symbol(pair.second);
+    contract_handler.get_pure_contract_symbol(pair.second, pair.first);
 
     PRECONDITION_WITH_DIAGNOSTICS(
       pair.first != harness_id,
@@ -248,6 +317,9 @@ void dfcct::link_model_and_load_dfcc_library()
   // load the dfcc library before instrumentation starts
   library.load(other_symbols);
 
+  // disable checks on all library functions
+  library.disable_checks();
+
   // add C prover lib again to fetch any dependencies of the dfcc functions
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);
@@ -259,9 +331,23 @@ void dfcct::instrument_harness_function()
   // load the cprover library to make sure the model is complete
   log.status() << "Instrumenting harness function '" << harness_id << "'"
                << messaget::eom;
-  instrument.instrument_harness_function(harness_id);
+
+  instrument.instrument_harness_function(
+    harness_id, function_pointer_contracts);
 
   other_symbols.erase(harness_id);
+}
+
+void dfcct::lift_memory_predicates()
+{
+  std::set<irep_idt> predicates =
+    memory_predicates.lift_predicates(function_pointer_contracts);
+  for(const auto &predicate : predicates)
+  {
+    log.debug() << "Memory predicate" << predicate << messaget::eom;
+    if(other_symbols.find(predicate) != other_symbols.end())
+      other_symbols.erase(predicate);
+  }
 }
 
 void dfcct::wrap_checked_function()
@@ -311,62 +397,71 @@ void dfcct::wrap_replaced_functions()
 
 void dfcct::wrap_discovered_function_pointer_contracts()
 {
-  // swap-and-wrap function pointer contracts with themselves
-  for(const auto &fp_contract : function_pointer_contracts)
+  std::set<irep_idt> swapped;
+  while(!function_pointer_contracts.empty())
   {
-    log.status() << "Discovered function pointer contract '" << fp_contract
-                 << "'" << messaget::eom;
-
-    // contracts for function pointers must be replaced with themselves
-    // so we need to check that:
-    // - the symbol exists as a function symbol
-    // - the symbol exists as a pure contract symbol
-    // - the function symbol is not already swapped for contract checking
-    // - the function symbol is not already swapped with another contract for
-    // replacement
-
-    const auto str = id2string(fp_contract);
-
-    // Is it already swapped with another function for contract checking ?
-    PRECONDITION_WITH_DIAGNOSTICS(
-      !to_check.has_value() || to_check.value().first != str,
-      "Function '" + str +
-        "' used as contract for function pointer cannot be itself the object "
-        "of a contract check.");
-
-    // Is it already swapped with another function for contract checking ?
-    auto found = to_replace.find(str);
-    if(found != to_replace.end())
+    std::set<irep_idt> new_contracts;
+    // swap-and-wrap function pointer contracts with themselves
+    for(const auto &fp_contract : function_pointer_contracts)
     {
+      if(swapped.find(fp_contract) != swapped.end())
+        continue;
+
+      // contracts for function pointers must be replaced with themselves
+      // so we need to check that:
+      // - the symbol exists as a function symbol
+      // - the symbol exists as a pure contract symbol
+      // - the function symbol is not already swapped for contract checking
+      // - the function symbol is not already swapped with another contract for
+      // replacement
+
+      const auto str = id2string(fp_contract);
+
+      // Is it already swapped with another function for contract checking ?
       PRECONDITION_WITH_DIAGNOSTICS(
-        found->first == found->second,
+        !to_check.has_value() || to_check.value().first != str,
         "Function '" + str +
-          "' used as contract for function pointer already the object of a "
-          "contract replacement with '" +
-          id2string(found->second) + "'");
-      log.status() << "Function pointer contract '" << fp_contract
-                   << "' already wrapped with itself in REPLACE mode"
-                   << messaget::eom;
+          "' used as contract for function pointer cannot be itself the object "
+          "of a contract check.");
+
+      // Is it already swapped with another function for contract checking ?
+      auto found = to_replace.find(str);
+      if(found != to_replace.end())
+      {
+        PRECONDITION_WITH_DIAGNOSTICS(
+          found->first == found->second,
+          "Function '" + str +
+            "' used as contract for function pointer already the object of a "
+            "contract replacement with '" +
+            id2string(found->second) + "'");
+        log.status() << "Function pointer contract '" << fp_contract
+                     << "' already wrapped with itself in REPLACE mode"
+                     << messaget::eom;
+      }
+      else
+      {
+        // we need to swap it with itself
+        PRECONDITION_WITH_DIAGNOSTICS(
+          utils.function_symbol_exists(str),
+          "Function pointer contract '" + str + "' not found.");
+
+        // triggers signature compatibility checking
+        contract_handler.get_pure_contract_symbol(str);
+
+        log.status() << "Wrapping function pointer contract '" << fp_contract
+                     << "' with itself in REPLACE mode" << messaget::eom;
+
+        swap_and_wrap.swap_and_wrap_replace(
+          fp_contract, fp_contract, new_contracts);
+        swapped.insert(fp_contract);
+
+        // remove it from the set of symbols to process
+        if(other_symbols.find(fp_contract) != other_symbols.end())
+          other_symbols.erase(fp_contract);
+      }
     }
-    else
-    {
-      // we need to swap it with itself
-      PRECONDITION_WITH_DIAGNOSTICS(
-        utils.function_symbol_exists(str),
-        "Function pointer contract '" + str + "' not found.");
-
-      // triggers signature compatibility checking
-      contract_handler.get_pure_contract_symbol(str);
-
-      log.status() << "Wrapping function pointer contract '" << fp_contract
-                   << "' with itself in REPLACE mode" << messaget::eom;
-
-      swap_and_wrap.swap_and_wrap_replace(
-        fp_contract, fp_contract, function_pointer_contracts);
-      // remove it from the set of symbols to process
-      if(other_symbols.find(fp_contract) != other_symbols.end())
-        other_symbols.erase(fp_contract);
-    }
+    // process newly discovered contracts
+    function_pointer_contracts = new_contracts;
   }
 }
 
@@ -383,7 +478,7 @@ void dfcct::instrument_other_functions()
 
     log.status() << "Instrumenting '" << function_id << "'" << messaget::eom;
 
-    instrument.instrument_function(function_id);
+    instrument.instrument_function(function_id, function_pointer_contracts);
   }
 
   goto_model.goto_functions.update();
@@ -401,6 +496,7 @@ void dfcct::transform_goto_model()
 {
   check_transform_goto_model_preconditions();
   link_model_and_load_dfcc_library();
+  lift_memory_predicates();
   instrument_harness_function();
   wrap_checked_function();
   wrap_replaced_functions();

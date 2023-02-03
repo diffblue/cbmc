@@ -91,14 +91,14 @@ void dump_ct::operator()(std::ostream &os)
       (symbol.type.id() == ID_union || symbol.type.id() == ID_struct) &&
       !symbol.is_type)
     {
-      type_symbolt ts{symbol.type};
-      ts.mode = symbol.mode;
+      std::string tag_name;
       if(mode == ID_C)
-        ts.name = "tag-" + type2name(symbol.type, ns);
+        tag_name = "tag-" + type2name(symbol.type, ns);
       else if(mode == ID_cpp)
-        ts.name = "tag-" + cpp_type2name(symbol.type);
+        tag_name = "tag-" + cpp_type2name(symbol.type);
       else
         UNREACHABLE;
+      type_symbolt ts{tag_name, symbol.type, symbol.mode};
       typet &type =
         copied_symbol_table.get_writeable_ref(named_symbol.first).type;
       if(ts.type.id() == ID_union)
@@ -326,10 +326,13 @@ void dump_ct::operator()(std::ostream &os)
 
     if(
       symbol.is_type &&
-      (symbol.type.id() == ID_struct || symbol.type.id() == ID_union))
+      (symbol.type.id() == ID_struct || symbol.type.id() == ID_union) &&
+      !to_struct_union_type(symbol.type).is_incomplete())
+    {
       convert_compound_declaration(
           symbol,
           compound_body_stream);
+    }
   }
 
   // Dump the code to the target stream;
@@ -532,9 +535,10 @@ void dump_ct::convert_compound(
   {
     const typet &comp_type = comp.type();
 
-    if(comp_type.id()==ID_code ||
-       comp.get_bool(ID_from_base) ||
-       comp.get_is_padding())
+    DATA_INVARIANT(
+      comp_type.id() != ID_code, "struct member must not be of code type");
+
+    if(comp.get_bool(ID_from_base) || comp.get_is_padding())
       continue;
 
     const typet *non_array_type = &comp_type;
@@ -1385,7 +1389,7 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
     // add a typecast for NULL
     else if(
-      u.op().id() == ID_constant && is_null_pointer(to_constant_expr(u.op())) &&
+      u.op().is_constant() && is_null_pointer(to_constant_expr(u.op())) &&
       to_pointer_type(u.op().type()).base_type().id() == ID_empty)
     {
       const struct_union_typet::componentt &comp=
@@ -1441,7 +1445,7 @@ void dump_ct::cleanup_expr(exprt &expr)
 
             // add a typecast for NULL or 0
             if(
-              argument.id() == ID_constant &&
+              argument.is_constant() &&
               is_null_pointer(to_constant_expr(argument)))
             {
               const typet &comp_type=
@@ -1457,8 +1461,7 @@ void dump_ct::cleanup_expr(exprt &expr)
       }
     }
   }
-  else if(expr.id()==ID_constant &&
-          expr.type().id()==ID_signedbv)
+  else if(expr.is_constant() && expr.type().id() == ID_signedbv)
   {
     #if 0
     const irep_idt &cformat=expr.get(ID_C_cformat);

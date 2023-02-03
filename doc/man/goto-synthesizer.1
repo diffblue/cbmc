@@ -1,0 +1,46 @@
+.TH GOTO-SYNTHESIZER "1" "December 2022" "goto-synthesizer-5.59.0" "User Commands"
+.SH NAME
+goto\-synthesizer \- Synthesize and apply loop contracts of goto binaries.
+.SH SYNOPSIS
+.TP
+.B goto\-synthesizer [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B goto\-synthesizer \-\-version
+show version and exit
+.TP
+.B goto\-synthesizer [options] \fIin\fR [\fIout\fR]
+perform synthesis and loop-contracts transformation
+.SH DESCRIPTION
+\fBgoto-synthesis\fR reads a GOTO binary, performs loop-contracts synthesis and
+program transformation for the synthesized contracts, and then writes the
+resulting program as GOTO binary on disk.
+.SH OPTIONS
+.TP
+\fB\-\-dump\-loop\-contracts
+Dump the synthesized loop contracts as JSON.
+.TP
+\fB\-\-json-\output\fR \fIfile\fR
+Specify the output destination of the loop-contracts JSON.
+.SS "User-interface options:"
+.TP
+\fB\-\-xml\-ui\fR
+use XML\-formatted output
+.TP
+\fB\-\-json\-ui\fR
+use JSON\-formatted output
+.TP
+\fB\-\-verbosity\fR \fIn\fR
+verbosity level
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto-cc (1)
+.BR goto-instrument (1)
+.SH COPYRIGHT
+2022, Qinheping Hu

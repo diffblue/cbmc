@@ -200,6 +200,7 @@ struct OpenEthState$link4
 
 struct device
 {
+  int dummy;
 };
 
 struct napi_struct

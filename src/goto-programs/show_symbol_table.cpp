@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_symbol_table.h"
 
-#include <algorithm>
 #include <iostream>
 #include <memory>
 
@@ -46,7 +45,7 @@ void show_symbol_table_xml_ui()
 }
 
 void show_symbol_table_brief_plain(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   std::ostream &out)
 {
   // we want to sort alphabetically
@@ -68,7 +67,7 @@ void show_symbol_table_brief_plain(
 }
 
 void show_symbol_table_plain(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   std::ostream &out)
 {
   out << '\n' << "Symbols:" << '\n' << '\n';
@@ -140,7 +139,7 @@ void show_symbol_table_plain(
 }
 
 static void show_symbol_table_json_ui(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   ui_message_handlert &message_handler)
 {
   json_stream_arrayt &out = message_handler.get_json_stream();
@@ -202,7 +201,7 @@ static void show_symbol_table_json_ui(
 }
 
 static void show_symbol_table_brief_json_ui(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   ui_message_handlert &message_handler)
 {
   json_stream_arrayt &out = message_handler.get_json_stream();
@@ -240,7 +239,7 @@ static void show_symbol_table_brief_json_ui(
 }
 
 void show_symbol_table(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   ui_message_handlert &ui)
 {
   switch(ui.get_ui())
@@ -267,7 +266,7 @@ void show_symbol_table(
 }
 
 void show_symbol_table_brief(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   ui_message_handlert &ui)
 {
   switch(ui.get_ui())

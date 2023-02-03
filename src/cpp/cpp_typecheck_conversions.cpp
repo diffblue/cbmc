@@ -47,7 +47,7 @@ bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
   const exprt &expr,
   exprt &new_expr) const
 {
-  assert(expr.get_bool(ID_C_lvalue));
+  PRECONDITION(expr.get_bool(ID_C_lvalue));
 
   if(expr.type().id() == ID_code)
     return false;
@@ -78,7 +78,7 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
   const exprt &expr,
   exprt &new_expr) const
 {
-  assert(expr.type().id()==ID_array);
+  PRECONDITION(expr.type().id() == ID_array);
 
   index_exprt index(expr, from_integer(0, c_index_type()));
 
@@ -221,7 +221,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     return true;
   }
 
-  if(expr.type().id() == ID_bool || expr.type().id() == ID_c_bool)
+  if(expr.is_boolean() || expr.type().id() == ID_c_bool)
   {
     new_expr = typecast_exprt(expr, int_type);
     return true;
@@ -308,7 +308,7 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
 
   if(
     expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
-    expr.type().id() != ID_c_bool && expr.type().id() != ID_bool &&
+    expr.type().id() != ID_c_bool && !expr.is_boolean() &&
     expr.type().id() != ID_c_enum_tag)
   {
     return false;
@@ -575,13 +575,13 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
       to_pointer_type(expr.type()).base_type().id() == ID_code)
     {
       code_typet code1 = to_code_type(to_pointer_type(expr.type()).base_type());
-      assert(!code1.parameters().empty());
+      DATA_INVARIANT(!code1.parameters().empty(), "must have parameters");
       code_typet::parametert this1=code1.parameters()[0];
       INVARIANT(this1.get_this(), "first parameter should be `this'");
       code1.parameters().erase(code1.parameters().begin());
 
       code_typet code2 = to_code_type(to_pointer_type(type).base_type());
-      assert(!code2.parameters().empty());
+      DATA_INVARIANT(!code2.parameters().empty(), "must have parameters");
       code_typet::parametert this2=code2.parameters()[0];
       INVARIANT(this2.get_this(), "first parameter should be `this'");
       code2.parameters().erase(code2.parameters().begin());
@@ -602,7 +602,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.id() == ID_constant && is_null_pointer(to_constant_expr(expr)))
+  if(expr.is_constant() && is_null_pointer(to_constant_expr(expr)))
   {
     new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;
@@ -640,7 +640,7 @@ bool cpp_typecheckt::standard_conversion_boolean(
 
   if(
     expr.type().id() != ID_signedbv && expr.type().id() != ID_unsignedbv &&
-    expr.type().id() != ID_pointer && expr.type().id() != ID_bool &&
+    expr.type().id() != ID_pointer && !expr.is_boolean() &&
     expr.type().id() != ID_c_enum_tag)
   {
     return false;
@@ -682,7 +682,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
   exprt &new_expr,
   unsigned &rank)
 {
-  assert(!is_reference(expr.type()) && !is_reference(type));
+  PRECONDITION(!is_reference(expr.type()) && !is_reference(type));
 
   exprt curr_expr=expr;
 
@@ -862,8 +862,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   exprt &new_expr,
   unsigned &rank)
 {
-  assert(!is_reference(expr.type()));
-  assert(!is_reference(type));
+  PRECONDITION(!is_reference(expr.type()));
+  PRECONDITION(!is_reference(type));
 
   const typet &from=follow(expr.type());
   const typet &to=follow(type);
@@ -985,9 +985,9 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
                 uninitialized_typet{},
                 expr.source_location());
               typecheck_side_effect_function_call(ctor_expr);
+              CHECK_RETURN(ctor_expr.get(ID_statement) == ID_temporary_object);
 
               new_expr.swap(ctor_expr);
-              assert(new_expr.get(ID_statement)==ID_temporary_object);
 
               if(to.get_bool(ID_C_constant))
                 new_expr.type().set(ID_C_constant, true);
@@ -1119,8 +1119,8 @@ bool cpp_typecheckt::reference_related(
   const exprt &expr,
   const typet &type) const
 {
-  assert(is_reference(type));
-  assert(!is_reference(expr.type()));
+  PRECONDITION(is_reference(type));
+  PRECONDITION(!is_reference(expr.type()));
 
   typet from=follow(expr.type());
   typet to = follow(to_reference_type(type).base_type());
@@ -1157,8 +1157,8 @@ bool cpp_typecheckt::reference_compatible(
   const typet &type,
   unsigned &rank) const
 {
-  assert(is_reference(type));
-  assert(!is_reference(expr.type()));
+  PRECONDITION(is_reference(type));
+  PRECONDITION(!is_reference(expr.type()));
 
   if(!reference_related(expr, type))
     return false;
@@ -1221,8 +1221,8 @@ bool cpp_typecheckt::reference_binding(
   exprt &new_expr,
   unsigned &rank)
 {
-  assert(is_reference(type));
-  assert(!is_reference(expr.type()));
+  PRECONDITION(is_reference(type));
+  PRECONDITION(!is_reference(expr.type()));
 
   unsigned backup_rank=rank;
 
@@ -1301,7 +1301,8 @@ bool cpp_typecheckt::reference_binding(
       if(!is_reference(component_type.return_type()))
         continue;
 
-      assert(component_type.parameters().size()==1);
+      DATA_INVARIANT(
+        component_type.parameters().size() == 1, "exactly one parameter");
 
       typet this_type =
         component_type.parameters().front().type();
@@ -1585,7 +1586,7 @@ void cpp_typecheckt::reference_initializer(
   exprt &expr,
   const typet &type)
 {
-  assert(is_reference(type));
+  PRECONDITION(is_reference(type));
   add_implicit_dereference(expr);
 
   unsigned rank=0;
@@ -1605,7 +1606,7 @@ bool cpp_typecheckt::cast_away_constness(
   const typet &t1,
   const typet &t2) const
 {
-  assert(t1.id()==ID_pointer && t2.id()==ID_pointer);
+  PRECONDITION(t1.id() == ID_pointer && t2.id() == ID_pointer);
   typet nt1=t1;
   typet nt2=t2;
 
@@ -1837,7 +1838,7 @@ bool cpp_typecheckt::reinterpret_typecast(
 
   if(
     (e.type().id() == ID_unsignedbv || e.type().id() == ID_signedbv ||
-     e.type().id() == ID_c_bool || e.type().id() == ID_bool) &&
+     e.type().id() == ID_c_bool || e.is_boolean()) &&
     type.id() == ID_pointer && !is_reference(type))
   {
     // integer to pointer

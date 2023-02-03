@@ -136,7 +136,7 @@ void polynomialt::from_expr(const exprt &expr)
       mult(poly2);
     }
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
   {
     monomialt monomial;
     monomial.coeff = numeric_cast_v<int>(to_constant_expr(expr));
@@ -367,7 +367,7 @@ int monomialt::compare(monomialt &other)
     }
     else
     {
-      assert(it->var==jt->var);
+      INVARIANT(it->var == jt->var, "must match");
       // Variables are equal, compare exponents.
       if(e1 < e2)
       {
@@ -379,7 +379,7 @@ int monomialt::compare(monomialt &other)
       }
       else
       {
-        assert(e1==e2);
+        INVARIANT(e1 == e2, "must match");
         // v1==v2 && e1 == e2.  Look at the next term in the power product.
         ++it;
         ++jt;

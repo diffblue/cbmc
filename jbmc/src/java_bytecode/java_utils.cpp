@@ -6,10 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "java_utils.h"
-
 #include "java_root_class.h"
-#include "java_string_library_preprocess.h"
 
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -19,6 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/string_utils.h>
+#include <util/symbol_table_base.h>
+
+#include "java_string_library_preprocess.h"
+#include "java_utils.h"
 
 #include <set>
 #include <unordered_set>
@@ -170,14 +171,11 @@ void generate_class_stub(
   class_type.set_is_stub(true);
 
   // produce class symbol
-  symbolt new_symbol;
+  irep_idt qualified_class_name = "java::" + id2string(class_name);
+  class_type.set_name(qualified_class_name);
+  type_symbolt new_symbol{qualified_class_name, std::move(class_type), ID_java};
   new_symbol.base_name=class_name;
   new_symbol.pretty_name=class_name;
-  new_symbol.name="java::"+id2string(class_name);
-  class_type.set_name(new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
 
   std::pair<symbolt &, bool> res=symbol_table.insert(std::move(new_symbol));
 
@@ -451,7 +449,7 @@ optionalt<resolve_inherited_componentt::inherited_componentt>
 get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   bool include_interfaces)
 {
   resolve_inherited_componentt component_resolver{symbol_table};

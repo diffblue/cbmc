@@ -1,0 +1,18 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main.\d+\] .* Check loop invariant before entry: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that j is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that result is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that arr\[(.*)0\] is assignable: SUCCESS$
+^\[main.\d+\] .* Check that loop invariant is preserved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test is a variation of contracts/loop_assigns-01.
+It shows that we can synthesize loop assigns pointer_object(b->data) that
+cannot be inferred by goto-instrument.

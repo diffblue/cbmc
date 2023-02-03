@@ -1,0 +1,14 @@
+CORE
+main.c
+--trace
+^\s*ub.*=\(char \*\)&dynamic_object \+ \d+
+^\s*offset_ubp1=\d+ul* \(00000000 1[0 ]+1\)$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\s*ub.*=\(char \*\)&dynamic_object \+ -\d+
+^\s*offset_ubp1=\d+ul* \(11111111 1
+--
+Verifies that all offsets use unsigned arithmetic.

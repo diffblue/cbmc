@@ -1,10 +1,10 @@
 CORE
 main.c
---write-solver-stats-to 'solver_hardness.json'
+--write-solver-stats-to 'solver_hardness.json' --stop-on-fail
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.\d+\] line \d+ assertion a \+ b \< 10: FAILURE$
 ^VERIFICATION FAILED$
 \"SAT_hardness\":\{(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+)\}
+\"GOTO_ID\":32,\"SAT_hardness\":\{\"ClauseSet\":\[.*,571\],\"Clauses\":571
 --
 ^warning: ignoring

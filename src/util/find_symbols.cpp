@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "find_symbols.h"
 
 #include "c_types.h"
-#include "expr_iterator.h"
-#include "range.h"
 #include "std_expr.h"
 
 /// Kinds of symbols to be considered by \ref find_symbols.
@@ -72,9 +70,9 @@ static bool find_symbols(
     }
   }
 
-  forall_operands(it, src)
+  for(const auto &src_op : src.operands())
   {
-    if(!find_symbols(kind, *it, op, bindings))
+    if(!find_symbols(kind, src_op, op, bindings))
       return false;
   }
 

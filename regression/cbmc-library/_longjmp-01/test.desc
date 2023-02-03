@@ -1,8 +1,8 @@
 CORE
 main.c
 --pointer-check --bounds-check
-^\[_longjmp.assertion.1\] line 12 _longjmp requires instrumentation: FAILURE$
-^\[main.assertion.1\] line 8 unreachable: SUCCESS$
+^\[_?longjmp.assertion.1\] line 12 _?longjmp requires instrumentation: FAILURE$
+^\[main.assertion.1\] line 12 unreachable: SUCCESS$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

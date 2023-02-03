@@ -1,0 +1,10 @@
+CORE
+test.c
+--string-abstraction --show-goto-functions
+ASSIGN strlen#return_value := \*strlen::s::s#str\.length - pointer_offset\(strlen::s\)
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Ensure that the --string-abstraction flag enables the string abstraction
+version of string functions

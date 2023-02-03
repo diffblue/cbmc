@@ -31,8 +31,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
   elaborate_class_template(object_tc.type());
 
   typet tmp_type(follow(object_tc.type()));
-
-  assert(!is_reference(tmp_type));
+  CHECK_RETURN(!is_reference(tmp_type));
 
   if(tmp_type.id()==ID_array)
   {
@@ -50,7 +49,9 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       throw 0;
     }
 
-    assert(operands.empty() || operands.size()==1);
+    DATA_INVARIANT(
+      operands.empty() || operands.size() == 1,
+      "array constructor must have at most one operand");
 
     if(operands.empty() && cpp_is_pod(tmp_type))
       return {};
@@ -224,13 +225,15 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       source_location);
 
     typecheck_side_effect_function_call(function_call);
-    assert(function_call.get(ID_statement)==ID_temporary_object);
+    CHECK_RETURN(function_call.get(ID_statement) == ID_temporary_object);
 
     exprt &initializer =
       static_cast<exprt &>(function_call.add(ID_initializer));
 
-    assert(initializer.id()==ID_code &&
-           initializer.get(ID_statement)==ID_expression);
+    DATA_INVARIANT(
+      initializer.id() == ID_code &&
+        initializer.get(ID_statement) == ID_expression,
+      "initializer must be expression statement");
 
     auto &statement_expr = to_code_expression(to_code(initializer));
 

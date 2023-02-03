@@ -19,12 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class java_string_library_preprocesst;
 class method_bytecodet;
-class symbol_tablet;
+class symbol_table_baset;
 
 /// See class \ref java_bytecode_convert_classt
 bool java_bytecode_convert_class(
   const java_class_loadert::parse_tree_with_overlayst &parse_trees,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
   method_bytecodet &,
@@ -41,14 +41,14 @@ void convert_java_annotations(
 
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 /// Register in the \p symbol_table new symbols for the objects
 /// java::array[X] where X is byte, short, int, long, char, boolean, float,
 /// double and reference.
 /// Also registers a java::array[X].clone():Ljava/lang/Object; method for each
 /// type.
-void add_java_array_types(symbol_tablet &symbol_table);
+void add_java_array_types(symbol_table_baset &symbol_table);
 
 /// An exception that is raised checking whether a class is implicitly
 /// generic if a symbol for an outer class is missing

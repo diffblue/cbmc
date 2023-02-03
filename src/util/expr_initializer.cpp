@@ -14,8 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "c_types.h"
 #include "magic.h"
-#include "namespace.h"
-#include "pointer_offset_size.h"
+#include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
 
 template <bool nondet>
@@ -188,20 +187,14 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
 
     for(const auto &c : components)
     {
-      if(c.type().id() == ID_code)
-      {
-        constant_exprt code_value(ID_nil, c.type());
-        code_value.add_source_location()=source_location;
-        value.add_to_operands(std::move(code_value));
-      }
-      else
-      {
-        const auto member = expr_initializer_rec(c.type(), source_location);
-        if(!member.has_value())
-          return {};
+      DATA_INVARIANT(
+        c.type().id() != ID_code, "struct member must not be of code type");
 
-        value.add_to_operands(std::move(*member));
-      }
+      const auto member = expr_initializer_rec(c.type(), source_location);
+      if(!member.has_value())
+        return {};
+
+      value.add_to_operands(std::move(*member));
     }
 
     value.add_source_location()=source_location;

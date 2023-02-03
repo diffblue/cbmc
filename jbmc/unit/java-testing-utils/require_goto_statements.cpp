@@ -8,18 +8,18 @@ Author: Diffblue Ltd.
 
 #include "require_goto_statements.h"
 
-#include <testing-utils/use_catch.h>
+#include <util/expr_iterator.h>
+#include <util/expr_util.h>
+#include <util/namespace.h>
+#include <util/pointer_expr.h>
+#include <util/std_code.h>
+#include <util/suffix.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_functions.h>
 
 #include <java_bytecode/java_types.h>
-
-#include <util/expr_iterator.h>
-#include <util/expr_util.h>
-#include <util/pointer_expr.h>
-#include <util/std_code.h>
-#include <util/suffix.h>
-#include <util/symbol_table.h>
+#include <testing-utils/use_catch.h>
 
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up
@@ -46,7 +46,7 @@ require_goto_statements::get_all_statements(const exprt &function_value)
 /// \return All codet statements of the __CPROVER_start function
 const std::vector<codet>
 require_goto_statements::require_entry_point_statements(
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   // Retrieve __CPROVER_start
   const symbolt *entry_point_function =
@@ -73,7 +73,7 @@ require_goto_statements::find_struct_component_assignments(
   const irep_idt &structure_name,
   const optionalt<irep_idt> &superclass_name,
   const irep_idt &component_name,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   pointer_assignment_locationt locations{};
 
@@ -388,7 +388,7 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
   const irep_idt &component_type_name,
   const optionalt<irep_idt> &typecast_name,
   const std::vector<codet> &entry_point_instructions,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   namespacet ns(symbol_table);
 
@@ -449,7 +449,7 @@ require_goto_statements::require_struct_array_component_assignment(
   const irep_idt &array_component_name,
   const irep_idt &array_type_name,
   const std::vector<codet> &entry_point_instructions,
-  const symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   // First we need to find the assignments to the component belonging to
   // the structure_name object

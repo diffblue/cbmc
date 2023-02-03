@@ -18,8 +18,6 @@ Author: Matt Lewis
 #include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/std_code.h>
-
 #include "scratch_program.h"
 
 bool sat_path_enumeratort::next(patht &path)
@@ -121,7 +119,7 @@ void sat_path_enumeratort::build_path(
 
     // We should have a looping path, so we should never hit a location
     // with no successors.
-    assert(succs.size() > 0);
+    CHECK_RETURN(succs.size() > 0);
 
     if(succs.size()==1)
     {
@@ -152,7 +150,7 @@ void sat_path_enumeratort::build_path(
       }
     }
 
-    assert(found_branch);
+    INVARIANT(found_branch, "no branch taken");
 
     exprt cond=nil_exprt();
 
@@ -266,7 +264,7 @@ void sat_path_enumeratort::build_fixed()
 
     if(t->is_goto())
     {
-      assert(fixedt->is_goto());
+      DATA_INVARIANT(fixedt->is_goto(), "inconsistent programs");
       // If this is a forwards jump, it's either jumping inside the loop
       // (in which case we leave it alone), or it jumps outside the loop.
       // If it jumps out of the loop, it's on a path we don't care about

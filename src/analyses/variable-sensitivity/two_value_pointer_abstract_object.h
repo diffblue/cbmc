@@ -13,9 +13,6 @@
 class two_value_pointer_abstract_objectt : public abstract_pointer_objectt
 {
 public:
-  /// \param type: the type the abstract_object is representing
-  explicit two_value_pointer_abstract_objectt(const typet &type);
-
   /// Start the abstract object at either top or bottom or neither
   /// Asserts if both top and bottom are true
   ///

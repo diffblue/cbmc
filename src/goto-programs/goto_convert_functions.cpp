@@ -12,7 +12,6 @@ Date: June 2003
 
 #include <util/prefix.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
 #include <linking/static_lifetime_init.h>
@@ -197,6 +196,8 @@ void goto_convert_functionst::convert_function(
     tmp_end_function.add(goto_programt::make_end_function(end_location));
 
   targets = targetst();
+  targets.prefix = &f.body;
+  targets.suffix = &tmp_end_function;
   targets.set_return(end_function);
   targets.has_return_value = code_type.return_type().id() != ID_empty &&
                              code_type.return_type().id() != ID_constructor &&
@@ -236,6 +237,9 @@ void goto_convert_functionst::convert_function(
     f.make_hidden();
 
   lifetime = parent_lifetime;
+
+  targets.prefix = nullptr;
+  targets.suffix = nullptr;
 }
 
 void goto_convert(goto_modelt &goto_model, message_handlert &message_handler)

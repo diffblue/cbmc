@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test only fails when running with the SMT solver on MacOS (with an
+invariant failure: "floatbv expressions should be flattened when using FPA
+theory").

@@ -5,7 +5,7 @@ main.c
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
-Base name\.+: fun\nMode\.+: C\nType\.+: union tag_union_name \(\)
-Base name\.+: fun2\nMode\.+: C\nType\.+: MYUNION \(\)
+Base name\.+: fun\nMode\.+: C\nType\.+: union tag_union_name \(void\)
+Base name\.+: fun2\nMode\.+: C\nType\.+: MYUNION \(void\)
 --
 warning: ignoring

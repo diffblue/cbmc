@@ -290,20 +290,21 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   }
 }
 
-void bv_utilst::adder(
-  bvt &sum,
-  const bvt &op,
-  literalt carry_in,
-  literalt &carry_out)
+std::pair<bvt, literalt>
+bv_utilst::adder(const bvt &op0, const bvt &op1, literalt carry_in)
 {
-  PRECONDITION(sum.size() == op.size());
+  PRECONDITION(op0.size() == op1.size());
 
-  carry_out=carry_in;
+  std::pair<bvt, literalt> result{bvt{}, carry_in};
+  result.first.reserve(op0.size());
+  literalt &carry_out = result.second;
 
-  for(std::size_t i=0; i<sum.size(); i++)
+  for(std::size_t i = 0; i < op0.size(); i++)
   {
-    sum[i] = full_adder(sum[i], op[i], carry_out, carry_out);
+    result.first.push_back(full_adder(op0[i], op1[i], carry_out, carry_out));
   }
+
+  return result;
 }
 
 literalt bv_utilst::carry_out(
@@ -327,9 +328,7 @@ bvt bv_utilst::add_sub_no_overflow(
   bool subtract,
   representationt rep)
 {
-  bvt sum=op0;
-  adder_no_overflow(sum, op1, subtract, rep);
-  return sum;
+  return adder_no_overflow(op0, op1, subtract, rep);
 }
 
 bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
@@ -337,14 +336,11 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
   PRECONDITION(op0.size() == op1.size());
 
   literalt carry_in=const_literal(subtract);
-  literalt carry_out;
 
-  bvt result=op0;
   bvt tmp_op1=subtract?inverted(op1):op1;
 
-  adder(result, tmp_op1, carry_in, carry_out);
-
-  return result;
+  // we ignore the carry-out
+  return adder(op0, tmp_op1, carry_in).first;
 }
 
 bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
@@ -352,12 +348,8 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
   const bvt op1_sign_applied=
     select(subtract, inverted(op1), op1);
 
-  bvt result=op0;
-  literalt carry_out;
-
-  adder(result, op1_sign_applied, subtract, carry_out);
-
-  return result;
+  // we ignore the carry-out
+  return adder(op0, op1_sign_applied, subtract).first;
 }
 
 bvt bv_utilst::saturating_add_sub(
@@ -371,15 +363,14 @@ bvt bv_utilst::saturating_add_sub(
     rep == representationt::SIGNED || rep == representationt::UNSIGNED);
 
   literalt carry_in = const_literal(subtract);
-  literalt carry_out;
 
-  bvt add_sub_result = op0;
   bvt tmp_op1 = subtract ? inverted(op1) : op1;
 
-  adder(add_sub_result, tmp_op1, carry_in, carry_out);
+  auto add_sub_result = adder(op0, tmp_op1, carry_in);
+  literalt carry_out = add_sub_result.second;
 
   bvt result;
-  result.reserve(add_sub_result.size());
+  result.reserve(add_sub_result.first.size());
   if(rep == representationt::UNSIGNED)
   {
     // An unsigned overflow has occurred when carry_out is not equal to
@@ -387,7 +378,7 @@ bvt bv_utilst::saturating_add_sub(
     // representable value, subtraction without a carry-out means an underflow
     // below zero. For saturating arithmetic the former implies that all bits
     // should be set to 1, in the latter case all bits should be set to zero.
-    for(const auto &literal : add_sub_result)
+    for(const auto &literal : add_sub_result.first)
     {
       result.push_back(
         subtract ? prop.land(literal, carry_out)
@@ -403,7 +394,7 @@ bvt bv_utilst::saturating_add_sub(
     literalt overflow_to_max_int = prop.land(bvt{
       !sign_bit(op0),
       subtract ? sign_bit(op1) : !sign_bit(op1),
-      sign_bit(add_sub_result)});
+      sign_bit(add_sub_result.first)});
     // A signed underflow below the minimum representable value occurs when
     // adding two negative numbers and arriving at a positive result, or
     // subtracting a positive from a negative number (and, again, obtaining a
@@ -411,19 +402,19 @@ bvt bv_utilst::saturating_add_sub(
     literalt overflow_to_min_int = prop.land(bvt{
       sign_bit(op0),
       subtract ? !sign_bit(op1) : sign_bit(op1),
-      !sign_bit(add_sub_result)});
+      !sign_bit(add_sub_result.first)});
 
     // set all bits except for the sign bit
-    PRECONDITION(!add_sub_result.empty());
-    for(std::size_t i = 0; i < add_sub_result.size() - 1; ++i)
+    PRECONDITION(!add_sub_result.first.empty());
+    for(std::size_t i = 0; i < add_sub_result.first.size() - 1; ++i)
     {
-      const auto &literal = add_sub_result[i];
+      const auto &literal = add_sub_result.first[i];
       result.push_back(prop.land(
         prop.lor(overflow_to_max_int, literal), !overflow_to_min_int));
     }
     // finally add the sign bit
     result.push_back(prop.land(
-      prop.lor(overflow_to_min_int, add_sub_result.back()),
+      prop.lor(overflow_to_min_int, sign_bit(add_sub_result.first)),
       !overflow_to_max_int));
   }
 
@@ -479,48 +470,44 @@ literalt bv_utilst::overflow_sub(
     UNREACHABLE;
 }
 
-void bv_utilst::adder_no_overflow(
-  bvt &sum,
-  const bvt &op,
+bvt bv_utilst::adder_no_overflow(
+  const bvt &op0,
+  const bvt &op1,
   bool subtract,
   representationt rep)
 {
-  const bvt tmp_op=subtract?inverted(op):op;
+  const bvt tmp_op = subtract ? inverted(op1) : op1;
 
   if(rep==representationt::SIGNED)
   {
     // an overflow occurs if the signs of the two operands are the same
     // and the sign of the sum is the opposite
 
-    literalt old_sign=sum[sum.size()-1];
-    literalt sign_the_same=
-      prop.lequal(sum[sum.size()-1], tmp_op[tmp_op.size()-1]);
+    literalt old_sign = sign_bit(op0);
+    literalt sign_the_same = prop.lequal(sign_bit(op0), sign_bit(tmp_op));
 
-    literalt carry;
-    adder(sum, tmp_op, const_literal(subtract), carry);
+    // we ignore the carry-out
+    bvt sum = adder(op0, tmp_op, const_literal(subtract)).first;
 
-    // result of addition in sum
     prop.l_set_to_false(
-      prop.land(sign_the_same, prop.lxor(sum[sum.size()-1], old_sign)));
+      prop.land(sign_the_same, prop.lxor(sign_bit(sum), old_sign)));
+
+    return sum;
   }
   else
   {
     INVARIANT(
       rep == representationt::UNSIGNED,
       "representation has either value signed or unsigned");
-    literalt carry_out;
-    adder(sum, tmp_op, const_literal(subtract), carry_out);
-    prop.l_set_to(carry_out, subtract);
+    auto result = adder(op0, tmp_op, const_literal(subtract));
+    prop.l_set_to(result.second, subtract);
+    return std::move(result.first);
   }
 }
 
-void bv_utilst::adder_no_overflow(bvt &sum, const bvt &op)
+bvt bv_utilst::adder_no_overflow(const bvt &op0, const bvt &op1)
 {
-  literalt carry_out=const_literal(false);
-
-  adder(sum, op, carry_out, carry_out);
-
-  prop.l_set_to_false(carry_out); // enforce no overflow
+  return adder_no_overflow(op0, op1, false, representationt::UNSIGNED);
 }
 
 bvt bv_utilst::shift(const bvt &op, const shiftt s, const bvt &dist)
@@ -790,7 +777,7 @@ bvt bv_utilst::unsigned_multiplier_no_overflow(
       for(std::size_t idx=sum; idx<product.size(); idx++)
         tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
 
-      adder_no_overflow(product, tmpop);
+      product = adder_no_overflow(product, tmpop);
 
       for(std::size_t idx=op1.size()-sum; idx<op1.size(); idx++)
         prop.l_set_to_false(prop.land(op1[idx], op0[sum]));
@@ -1006,9 +993,7 @@ void bv_utilst::unsigned_divider(
 
   // res*op1 + rem = op0
 
-  bvt sum=product;
-
-  adder_no_overflow(sum, rem);
+  bvt sum = adder_no_overflow(product, rem);
 
   literalt is_equal=equal(sum, op0);
 

@@ -20,11 +20,9 @@ Author: Diffblue Ltd.
 TEST_CASE("Return-value removal", "[core][goto-programs][remove_returns]")
 {
   symbol_tablet symbol_table;
-  symbolt function_symbol;
-  function_symbol.name = "a";
+  symbolt function_symbol{"a", code_typet({}, signedbv_typet(32)), irep_idt{}};
   function_symbol.pretty_name = "a";
   function_symbol.base_name = "a";
-  function_symbol.type = code_typet({}, signedbv_typet(32));
 
   symbol_table.add(function_symbol);
 
@@ -50,14 +48,12 @@ TEST_CASE(
   symbol_tablet symbol_table;
   goto_functionst goto_functions;
 
-  symbolt foo_function_symbol;
-  foo_function_symbol.name = "foo_function";
-  foo_function_symbol.type = code_typet{{}, empty_typet{}};
+  symbolt foo_function_symbol{
+    "foo_function", code_typet{{}, empty_typet{}}, irep_idt{}};
   symbol_table.insert(foo_function_symbol);
 
-  symbolt bar_function_symbol;
-  bar_function_symbol.name = "bar_function";
-  bar_function_symbol.type = code_typet{{}, signedbv_typet{32}};
+  symbolt bar_function_symbol{
+    "bar_function", code_typet{{}, signedbv_typet{32}}, irep_idt{}};
   symbol_table.insert(bar_function_symbol);
 
   *goto_functions.function_map["foo_function"].body.add_instruction() =

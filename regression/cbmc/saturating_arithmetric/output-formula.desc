@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --program-only
 ASSERT\(__CPROVER_saturating_minus\(.*\)

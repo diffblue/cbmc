@@ -1,6 +1,8 @@
 /* FUNCTION: __new */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+const void *__CPROVER_new_object = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
 
 inline void *__new(__typeof__(sizeof(int)) malloc_size)
 {
@@ -9,9 +11,6 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   __CPROVER_HIDE:;
   void *res;
   res = __CPROVER_allocate(malloc_size, 0);
-
-  // ensure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
@@ -28,6 +27,10 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
 /* FUNCTION: __new_array */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
 {
@@ -36,9 +39,6 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   __CPROVER_HIDE:;
   void *res;
   res = __CPROVER_allocate(size*count, 0);
-
-  // ensure it's not recorded as deallocated
-  __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // non-deterministically record the object for delete/delete[] checking
   __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
@@ -65,7 +65,12 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
 
 /* FUNCTION: __delete */
 
+void __CPROVER_deallocate(void *);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void __delete(void *ptr)
 {
@@ -98,7 +103,12 @@ inline void __delete(void *ptr)
 
 /* FUNCTION: __delete_array */
 
+void __CPROVER_deallocate(void *);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+#ifndef LIBRARY_CHECK
+const void *__CPROVER_new_object = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+#endif
 
 inline void __delete_array(void *ptr)
 {

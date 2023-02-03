@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check _ --dump-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+\"sources"\: \[ \"main\.c\" \]
+i \=\= .*j.*loop 1 assigns
+--
+This test case checks if synthesized contracts are correctly dumped.

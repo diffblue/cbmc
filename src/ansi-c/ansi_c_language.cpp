@@ -8,21 +8,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
-#include <fstream>
-
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/symbol_table.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 
 #include "ansi_c_entry_point.h"
-#include "ansi_c_typecheck.h"
-#include "ansi_c_parser.h"
-#include "expr2c.h"
-#include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
+#include "ansi_c_parser.h"
+#include "ansi_c_typecheck.h"
+#include "c_preprocess.h"
+#include "expr2c.h"
 #include "type2name.h"
+
+#include <fstream>
 
 std::set<std::string> ansi_c_languaget::extensions() const
 {
@@ -71,7 +72,7 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.clear();
   ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&codestr;
-  ansi_c_parser.set_message_handler(get_message_handler());
+  ansi_c_parser.log.set_message_handler(get_message_handler());
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
   ansi_c_parser.cpp98=false; // it's not C++
@@ -101,7 +102,7 @@ bool ansi_c_languaget::parse(
 }
 
 bool ansi_c_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local)
 {
@@ -109,7 +110,7 @@ bool ansi_c_languaget::typecheck(
 }
 
 bool ansi_c_languaget::typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
@@ -135,7 +136,7 @@ bool ansi_c_languaget::typecheck(
 }
 
 bool ansi_c_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // This creates __CPROVER_start and __CPROVER_initialize:
   return ansi_c_entry_point(
@@ -197,7 +198,7 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.clear();
   ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
-  ansi_c_parser.set_message_handler(get_message_handler());
+  ansi_c_parser.log.set_message_handler(get_message_handler());
   ansi_c_parser.mode=config.ansi_c.mode;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
   ansi_c_scanner_init();

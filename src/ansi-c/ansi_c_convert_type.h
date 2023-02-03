@@ -12,15 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 #define CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 
-#include <list>
-
-#include <util/expr.h>
-#include <util/message.h>
+#include <util/std_expr.h>
 
 #include "c_qualifiers.h"
 #include "c_storage_spec.h"
 
-class ansi_c_convert_typet:public messaget
+#include <list>
+
+class message_handlert;
+
+class ansi_c_convert_typet
 {
 public:
   unsigned unsigned_cnt, signed_cnt, char_cnt,
@@ -47,8 +48,7 @@ public:
   bool constructor, destructor;
 
   // contracts
-  exprt::operandst assigns, frees, ensures, requires, ensures_contract,
-    requires_contract;
+  exprt::operandst assigns, frees, ensures, requires;
 
   // storage spec
   c_storage_spect c_storage_spec;
@@ -56,49 +56,68 @@ public:
   // qualifiers
   c_qualifierst c_qualifiers;
 
-  virtual void read(const typet &type);
   virtual void write(typet &type);
 
   source_locationt source_location;
 
   std::list<typet> other;
 
-  explicit ansi_c_convert_typet(message_handlert &_message_handler):
-    messaget(_message_handler)
-    // class members are initialized by calling read()
+  ansi_c_convert_typet(message_handlert &_message_handler, const typet &type)
+    : ansi_c_convert_typet(_message_handler)
   {
-  }
-
-  virtual void clear()
-  {
-    unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
-    long_cnt=double_cnt=float_cnt=c_bool_cnt=proper_bool_cnt=complex_cnt=
-    int8_cnt=int16_cnt=int32_cnt=int64_cnt=
-    ptr32_cnt=ptr64_cnt=
-    gcc_float16_cnt=
-    gcc_float32_cnt=gcc_float32x_cnt=
-    gcc_float64_cnt=gcc_float64x_cnt=
-    gcc_float128_cnt=gcc_float128x_cnt=
-    gcc_int128_cnt=bv_cnt=floatbv_cnt=fixedbv_cnt=0;
-    vector_size.make_nil();
-    alignment.make_nil();
-    bv_width.make_nil();
-    fraction_width.make_nil();
-    msc_based.make_nil();
-    gcc_attribute_mode.make_nil();
-
-    assigns.clear();
-    requires.clear();
-    ensures.clear();
-
-    packed=aligned=constructor=destructor=false;
-
-    other.clear();
-    c_storage_spec.clear();
-    c_qualifiers.clear();
+    source_location = type.source_location();
+    read_rec(type);
   }
 
 protected:
+  message_handlert &message_handler;
+
+  // Default-initialize all members. To be used by classes deriving from this
+  // one to make sure additional members can be initialized before invoking
+  // read_rec.
+  explicit ansi_c_convert_typet(message_handlert &_message_handler)
+    : unsigned_cnt(0),
+      signed_cnt(0),
+      char_cnt(0),
+      int_cnt(0),
+      short_cnt(0),
+      long_cnt(0),
+      double_cnt(0),
+      float_cnt(0),
+      c_bool_cnt(0),
+      proper_bool_cnt(0),
+      complex_cnt(0),
+      int8_cnt(0),
+      int16_cnt(0),
+      int32_cnt(0),
+      int64_cnt(0),
+      ptr32_cnt(0),
+      ptr64_cnt(0),
+      gcc_float16_cnt(0),
+      gcc_float32_cnt(0),
+      gcc_float32x_cnt(0),
+      gcc_float64_cnt(0),
+      gcc_float64x_cnt(0),
+      gcc_float128_cnt(0),
+      gcc_float128x_cnt(0),
+      gcc_int128_cnt(0),
+      bv_cnt(0),
+      floatbv_cnt(0),
+      fixedbv_cnt(0),
+      gcc_attribute_mode(static_cast<const typet &>(get_nil_irep())),
+      packed(false),
+      aligned(false),
+      vector_size(nil_exprt{}),
+      alignment(nil_exprt{}),
+      bv_width(nil_exprt{}),
+      fraction_width(nil_exprt{}),
+      msc_based(nil_exprt{}),
+      constructor(false),
+      destructor(false),
+      message_handler(_message_handler)
+  {
+  }
+
   virtual void read_rec(const typet &type);
   virtual void build_type_with_subtype(typet &type) const;
   virtual void set_attributes(typet &type) const;

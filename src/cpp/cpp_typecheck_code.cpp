@@ -124,7 +124,7 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
           code_frontend_declt &decl = to_code_frontend_decl(statements.front());
           cpp_declarationt &cpp_declaration = to_cpp_declaration(decl.symbol());
 
-          assert(cpp_declaration.declarators().size()==1);
+          PRECONDITION(cpp_declaration.declarators().size() == 1);
           cpp_declaratort &declarator=cpp_declaration.declarators().front();
 
           if(is_reference(declarator.type()))
@@ -197,8 +197,8 @@ void cpp_typecheckt::typecheck_switch(codet &code)
     codet decl = to_code(value);
     typecheck_decl(decl);
 
-    assert(decl.get_statement()==ID_decl_block);
-    assert(decl.operands().size()==1);
+    CHECK_RETURN(decl.get_statement() == ID_decl_block);
+    CHECK_RETURN(decl.operands().size() == 1);
 
     // replace declaration by its symbol
     value = to_code_frontend_decl(to_code(to_unary_expr(decl).op())).symbol();
@@ -245,7 +245,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   {
     const code_typet &code_type=to_code_type(symbol_expr.type());
 
-    assert(code_type.parameters().size()>=1);
+    DATA_INVARIANT(
+      code_type.parameters().size() >= 1, "at least one parameter");
 
     // It's a parent. Call the constructor that we got.
     side_effect_expr_function_callt function_call(
@@ -254,7 +255,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
     // we have to add 'this'
     exprt this_expr = cpp_scopes.current_scope().this_expr;
-    assert(this_expr.is_not_nil());
+    PRECONDITION(this_expr.is_not_nil());
 
     make_ptr_typecast(
       this_expr,
@@ -262,8 +263,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
     function_call.arguments().push_back(this_expr);
 
-    forall_operands(it, code)
-      function_call.arguments().push_back(*it);
+    for(const auto &op : as_const(code).operands())
+      function_call.arguments().push_back(op);
 
     // done building the expression, check the argument types
     typecheck_function_call_arguments(function_call);
@@ -406,7 +407,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     throw 0;
   }
 
-  assert(code.op0().id()==ID_cpp_declaration);
+  PRECONDITION(code.op0().id() == ID_cpp_declaration);
 
   cpp_declarationt &declaration=
     to_cpp_declaration(code.op0());
@@ -418,7 +419,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   if(declaration.declarators().empty() || !has_auto(type))
     typecheck_type(type);
 
-  assert(type.is_not_nil());
+  CHECK_RETURN(type.is_not_nil());
 
   if(declaration.declarators().empty() &&
      follow(type).get_bool(ID_C_is_anonymous))

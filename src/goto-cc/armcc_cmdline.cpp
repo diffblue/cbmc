@@ -11,7 +11,6 @@ Author: Daniel Kroening
 
 #include "armcc_cmdline.h"
 
-#include <util/optional.h>
 #include <util/prefix.h>
 
 #include <algorithm>

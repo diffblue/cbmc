@@ -48,6 +48,8 @@ The following built-in constructs can also be used with functions contracts:
 - @ref contracts-history-variables allow to refer to past versions of function parameters,
 - @ref contracts-quantifiers allow to express quantified formulas,
 - @ref contracts-memory-predicates allow to describe simple heap structures;
+- @ref contracts-function-pointer-predicates allow to describe function pointer properties;
+
 
 In our example, the developer may require from the caller to properly allocate
 all arguments, thus, pointers must be valid. We can specify the preconditions of
@@ -162,5 +164,6 @@ program using contracts.
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-memory-predicates
+- @ref contracts-function-pointer-predicates
 - @ref contracts-history-variables
 - @ref contracts-quantifiers

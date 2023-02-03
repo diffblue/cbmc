@@ -11,12 +11,13 @@ Author: CM Wintersteiger, 2006
 
 #include "gcc_cmdline.h"
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
+#include <util/invariant.h>
 #include <util/prefix.h>
+
+#include <cstring>
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
+#include <sstream> // IWYU pragma: keep
 
 // clang-format off
 // non-gcc options
@@ -228,7 +229,7 @@ const char *gcc_options_without_argument[]=
 /// \return none
 bool gcc_cmdlinet::parse(int argc, const char **argv)
 {
-  assert(argc>0);
+  PRECONDITION(argc > 0);
   add_arg(argv[0]);
 
   argst current_args;
@@ -447,8 +448,8 @@ bool gcc_cmdlinet::parse_arguments(
 void gcc_cmdlinet::parse_specs_line(const std::string &line, bool in_spec_file)
 {
   // initial whitespace has been stripped
-  assert(!line.empty());
-  assert(line[0]!=' ' && line[0]!='\t');
+  PRECONDITION(!line.empty());
+  PRECONDITION(line[0] != ' ' && line[0] != '\t');
 
   argst args_from_specs;
 

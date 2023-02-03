@@ -12,6 +12,7 @@ endif()
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 
 file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
+file(GLOB_RECURSE libcprover_sources "libcprover-cpp/*.cpp" "libcprover-cpp/*.h")
 
 if(NOT WITH_MEMORY_ANALYZER)
     file(GLOB_RECURSE memory_analyzer_sources "memory-analyzer/*.cpp")
@@ -62,9 +63,13 @@ list(REMOVE_ITEM sources
 
     # Intended to fail to compile
     ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
+
+    # Built into separate binary
+    ${libcprover_sources}
 )
 
 add_subdirectory(testing-utils)
+add_subdirectory(libcprover-cpp)
 
 add_executable(unit ${sources})
 target_include_directories(unit
@@ -84,11 +89,15 @@ target_link_libraries(
         goto-checker
         goto-programs
         goto-instrument-lib
+        goto-synthesizer-lib
         goto-symex
         cbmc-lib
         json-symtab-language
         statement-list
 )
+if(WITH_MEMORY_ANALYZER)
+  target_link_libraries(unit memory-analyzer-lib)
+endif()
 
 add_test(
     NAME unit

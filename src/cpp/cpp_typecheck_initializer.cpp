@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
@@ -271,7 +269,7 @@ void cpp_typecheckt::zero_initializer(
 
     for(const auto &component : union_type.components())
     {
-      assert(component.type().is_not_nil());
+      DATA_INVARIANT(component.type().is_not_nil(), "missing component type");
 
       if(component.type().id()==ID_code)
         continue;

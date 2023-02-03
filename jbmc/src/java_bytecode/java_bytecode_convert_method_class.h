@@ -12,23 +12,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 
-#include "ci_lazy_methods_needed.h"
-#include "java_bytecode_parse_tree.h"
 #include "java_bytecode_convert_class.h"
 
 #include <util/expanding_vector.h>
 #include <util/message.h>
+#include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
 #include <analyses/cfg_dominators.h>
 
-#include <vector>
+#include "ci_lazy_methods_needed.h"
+#include "java_bytecode_parse_tree.h"
+
 #include <list>
+#include <vector>
 
 class class_hierarchyt;
 class prefix_filtert;
-class symbol_tablet;
 class symbolt;
 
 class java_bytecode_convert_methodt

@@ -22,7 +22,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <cstdlib>
 
 gdb_value_extractort::gdb_value_extractort(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const std::vector<std::string> &args)
   : gdb_api(args),
     symbol_table(symbol_table),
@@ -493,7 +493,7 @@ exprt gdb_value_extractort::get_pointer_value(
   const exprt &zero_expr,
   const source_locationt &location)
 {
-  PRECONDITION(zero_expr.id() == ID_constant);
+  PRECONDITION(zero_expr.is_constant());
 
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type() == zero_expr.type());
@@ -703,7 +703,10 @@ exprt gdb_value_extractort::get_struct_value(
   {
     const struct_typet::componentt &component = struct_type.components()[i];
 
-    if(component.get_is_padding() || component.type().id() == ID_code)
+    DATA_INVARIANT(
+      component.type().id() != ID_code,
+      "struct member must not be of code type");
+    if(component.get_is_padding())
     {
       continue;
     }

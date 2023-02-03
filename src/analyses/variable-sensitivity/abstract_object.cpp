@@ -16,11 +16,6 @@
 
 #include "abstract_object.h"
 
-abstract_objectt::abstract_objectt(const typet &type)
-  : t(type), bottom(false), top(true)
-{
-}
-
 abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom)
   : t(type), bottom(bottom), top(top)
 {
@@ -32,15 +27,6 @@ abstract_objectt::abstract_objectt(
   const abstract_environmentt &environment,
   const namespacet &ns)
   : t(expr.type()), bottom(false), top(true)
-{
-}
-
-abstract_objectt::abstract_objectt(
-  const typet &type,
-  const exprt &expr,
-  const abstract_environmentt &environment,
-  const namespacet &ns)
-  : t(type), bottom(false), top(true)
 {
 }
 

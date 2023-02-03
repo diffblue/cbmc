@@ -39,7 +39,7 @@ struct numeric_castt<mp_integer> final
 {
   optionalt<mp_integer> operator()(const exprt &expr) const
   {
-    if(expr.id() != ID_constant)
+    if(!expr.is_constant())
       return {};
     else
       return operator()(to_constant_expr(expr));
@@ -100,7 +100,7 @@ public:
   // Conversion from expression
   optionalt<T> operator()(const exprt &expr) const
   {
-    if(expr.id() == ID_constant)
+    if(expr.is_constant())
       return numeric_castt<T>{}(to_constant_expr(expr));
     else
       return {};

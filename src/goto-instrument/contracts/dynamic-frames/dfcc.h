@@ -29,12 +29,14 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_H
 
+#include <util/exception_utils.h>
 #include <util/irep.h>
 #include <util/message.h>
 
 #include "dfcc_contract_handler.h"
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
+#include "dfcc_lift_memory_predicates.h"
 #include "dfcc_spec_functions.h"
 #include "dfcc_swap_and_wrap.h"
 #include "dfcc_utils.h"
@@ -55,18 +57,31 @@ class optionst;
 
 // clang-format off
 #define HELP_DFCC                                                              \
-  "--dfcc             activate dynamic frame condition checking for function\n"\
-  "                   contracts using given function as entry point"
-// clang-format on
+  "--dfcc <harness>   activate dynamic frame condition checking for function\n"\
+  "                   contracts using the given harness as entry point"
 
-// clang-format off
 #define FLAG_ENFORCE_CONTRACT_REC "enforce-contract-rec"
 #define OPT_ENFORCE_CONTRACT_REC "(" FLAG_ENFORCE_CONTRACT_REC "):"
 #define HELP_ENFORCE_CONTRACT_REC                                              \
-  " --enforce-contract-rec <fun>  wrap fun with an assertion of its contract\n"\
+  " --enforce-contract-rec <function>[/<contract>]"                            \
+  "                               wrap fun with an assertion of the contract\n"\
   "                               and assume recursive calls to fun satisfy \n"\
   "                               the contract"
 // clang-format on
+
+/// Exception thrown for bad function/contract specification pairs passed on
+/// the CLI.
+class invalid_function_contract_pair_exceptiont : public cprover_exception_baset
+{
+public:
+  explicit invalid_function_contract_pair_exceptiont(
+    std::string reason,
+    std::string correct_format = "");
+
+  std::string what() const override;
+
+  std::string correct_format;
+};
 
 /// \ingroup dfcc-module
 /// \brief Applies function contracts transformation to GOTO model,
@@ -198,6 +213,7 @@ protected:
   dfcc_libraryt library;
   namespacet ns;
   dfcc_instrumentt instrument;
+  dfcc_lift_memory_predicatest memory_predicates;
   dfcc_spec_functionst spec_functions;
   dfcc_contract_handlert contract_handler;
   dfcc_swap_and_wrapt swap_and_wrap;
@@ -235,6 +251,7 @@ protected:
 
   void link_model_and_load_dfcc_library();
   void instrument_harness_function();
+  void lift_memory_predicates();
   void wrap_checked_function();
   void wrap_replaced_functions();
   void wrap_discovered_function_pointer_contracts();

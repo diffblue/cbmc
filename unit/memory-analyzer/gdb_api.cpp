@@ -7,20 +7,18 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
+#include <util/run.h>
+#include <util/tempfile.h>
+
+#include <memory-analyzer/gdb_api.h>
 #include <testing-utils/use_catch.h>
 
 #include <cstdio>
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
-
-#include <fstream>
-#include <iostream>
-
-#include <memory-analyzer/gdb_api.cpp>
-
-#include <util/run.h>
-#include <util/tempfile.h>
 
 struct compile_test_filet
 {
@@ -31,8 +29,8 @@ struct compile_test_filet
     REQUIRE(of.is_open());
 
     of <<
-#include <memory-analyzer/test.inc>
-      ; // NOLINT(whitespace/semicolon)
+#include <memory-analyzer/test.inc> // IWYU pragma: keep
+      ;                             // NOLINT(whitespace/semicolon)
     of.close();
 
     REQUIRE(run("gcc", {"gcc", "-g", "-o", compiled(), tmp()}) == 0);
@@ -87,8 +85,8 @@ void gdb_api_internals_test()
     REQUIRE(of.is_open());
 
     of <<
-#include <memory-analyzer/input.inc>
-      ; // NOLINT(whitespace/semicolon)
+#include <memory-analyzer/input.inc> // IWYU pragma: keep
+      ;                              // NOLINT(whitespace/semicolon)
     of.close();
 
     gdb_api_testt gdb_api(args);

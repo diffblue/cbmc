@@ -21,7 +21,6 @@
 class interval_abstract_valuet : public abstract_value_objectt
 {
 public:
-  explicit interval_abstract_valuet(const typet &t);
   interval_abstract_valuet(const typet &t, bool tp, bool bttm);
 
   explicit interval_abstract_valuet(const constant_interval_exprt &e);

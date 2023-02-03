@@ -10,6 +10,8 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/c_types.h>
 
+#include "state.h"
+
 exprt flatten(const state_ok_exprt &ok_expr)
 {
   const auto &state = ok_expr.state();

@@ -12,16 +12,16 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "axioms.h"
 
 #include <util/arith_tools.h>
-#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/format_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
-#include <util/simplify_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol.h>
+
+#include <solvers/decision_procedure.h>
 
 #include "simplify_state_expr.h"
 
@@ -474,8 +474,8 @@ void axiomst::node(const exprt &src)
 
     {
       // live_object(ς, p) --> p!=0
-      auto instance = replace(implies_exprt(
-        src, not_exprt(null_pointer(live_object_expr.address()))));
+      auto instance = replace(
+        implies_exprt(src, not_exprt(null_object(live_object_expr.address()))));
       if(verbose)
         std::cout << "AXIOMc: " << format(instance) << "\n";
       dest << instance;
@@ -691,7 +691,7 @@ void axiomst::add(const state_ok_exprt &ok_expr)
   {
     // X_ok(ς, p) --> p!=0
     auto instance =
-      replace(implies_exprt(ok_expr, not_exprt(null_pointer(pointer))));
+      replace(implies_exprt(ok_expr, not_exprt(null_object(pointer))));
     if(verbose)
       std::cout << "AXIOMe: " << format(instance) << "\n";
     dest << instance;

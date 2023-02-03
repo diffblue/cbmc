@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 type-conflict.c
 -DCONFLICT1
 line 12 function main: error: __builtin_add_overflow has signature __builtin_add_overflow\(integral, integral, integral\*\), but argument 3 \(r\) has type `signed int`$

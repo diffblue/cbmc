@@ -29,9 +29,6 @@ public:
     array_aggregate_typet>
     abstract_aggregate_baset;
 
-  /// \param type: the type the abstract_object is representing
-  explicit full_array_abstract_objectt(typet type);
-
   /// Start the abstract object at either top or bottom or neither
   /// Asserts if both top and bottom are true
   ///

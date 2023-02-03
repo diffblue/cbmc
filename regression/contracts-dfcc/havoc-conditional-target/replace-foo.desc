@@ -1,0 +1,9 @@
+CORE
+replace-foo.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo _ --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks conditional havocs are behaving as expected.

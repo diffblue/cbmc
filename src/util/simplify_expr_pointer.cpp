@@ -376,7 +376,7 @@ simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
 
     return changed(simplify_plus(new_expr));
   }
-  else if(ptr.id()==ID_constant)
+  else if(ptr.is_constant())
   {
     const constant_exprt &c_ptr = to_constant_expr(ptr);
 
@@ -481,13 +481,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
   const binary_relation_exprt &expr)
 {
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   exprt::operandst new_inequality_ops;
-  forall_operands(it, expr)
+  for(const auto &operand : expr.operands())
   {
-    PRECONDITION(it->id() == ID_pointer_object);
-    const exprt &op = to_pointer_object_expr(*it).pointer();
+    PRECONDITION(operand.id() == ID_pointer_object);
+    const exprt &op = to_pointer_object_expr(operand).pointer();
 
     if(op.id()==ID_address_of)
     {
@@ -499,7 +499,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
         return unchanged(expr);
       }
     }
-    else if(op.id() != ID_constant || !op.is_zero())
+    else if(!op.is_constant() || !op.is_zero())
     {
       return unchanged(expr);
     }
@@ -580,7 +580,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
   }
 
   // NULL is not dynamic
-  if(op.id() == ID_constant && is_null_pointer(to_constant_expr(op)))
+  if(op.is_constant() && is_null_pointer(to_constant_expr(op)))
     return false_exprt();
 
   // &something depends on the something
@@ -594,7 +594,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
 
       // this is for the benefit of symex
       return make_boolean_expr(
-        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX));
+        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "::"));
     }
     else if(op_object.id() == ID_string_constant)
     {
@@ -628,7 +628,7 @@ simplify_exprt::simplify_is_invalid_pointer(const unary_exprt &expr)
   }
 
   // NULL is not invalid
-  if(op.id() == ID_constant && is_null_pointer(to_constant_expr(op)))
+  if(op.is_constant() && is_null_pointer(to_constant_expr(op)))
   {
     return false_exprt();
   }
@@ -691,14 +691,4 @@ simplify_exprt::simplify_object_size(const object_size_exprt &expr)
     return unchanged(expr);
   else
     return std::move(new_expr);
-}
-
-simplify_exprt::resultt<>
-simplify_exprt::simplify_good_pointer(const unary_exprt &expr)
-{
-  // we expand the definition
-  exprt def = good_pointer_def(expr.op(), ns);
-
-  // recursive call
-  return changed(simplify_rec(def));
 }

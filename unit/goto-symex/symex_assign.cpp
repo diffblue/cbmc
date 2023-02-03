@@ -6,30 +6,27 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
+#include <util/namespace.h>
+#include <util/options.h>
+#include <util/symbol_table.h>
 
 #include <analyses/dirty.h>
 #include <analyses/guard.h>
-
 #include <goto-symex/expr_skeleton.h>
 #include <goto-symex/goto_symex_state.h>
 #include <goto-symex/symex_assign.h>
 #include <goto-symex/symex_config.h>
-#include <goto-symex/symex_target.h>
-
-#include <util/arith_tools.h>
-#include <util/bitvector_types.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
+#include <goto-symex/symex_target_equation.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 static void add_to_symbol_table(
   symbol_tablet &symbol_table,
   const symbol_exprt &symbol_expr)
 {
-  symbolt symbol;
-  symbol.name = symbol_expr.get_identifier();
-  symbol.type = symbol_expr.type();
+  symbolt symbol{symbol_expr.get_identifier(), symbol_expr.type(), irep_idt{}};
   symbol.value = symbol_expr;
   symbol.is_thread_local = true;
   symbol_table.insert(symbol);

@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --unwindset main.for_loop:2 --unwinding-assertions
 ^loop identifier main.for_loop provided with unwindset is ambiguous$

@@ -15,6 +15,7 @@ Author: Daniel Kroening
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
 
@@ -137,8 +138,8 @@ static void set_internal_dynamic_object(
   }
   else
   {
-    forall_operands(it, expr)
-      set_internal_dynamic_object(*it, goto_trace_step, ns);
+    for(const auto &op : expr.operands())
+      set_internal_dynamic_object(op, goto_trace_step, ns);
   }
 }
 
@@ -219,6 +220,7 @@ void build_goto_trace(
   time_mapt time_map;
 
   mp_integer current_time=0;
+  const bool has_threads = target.has_threads();
 
   ssa_step_iteratort last_step_to_keep = target.SSA_steps.end();
   bool last_step_was_kept = false;
@@ -257,6 +259,9 @@ void build_goto_trace(
     else if(it->is_shared_read() || it->is_shared_write() ||
             it->is_atomic_end())
     {
+      if(!has_threads)
+        continue;
+
       mp_integer time_before=current_time;
 
       if(it->is_shared_read() || it->is_shared_write())
@@ -345,7 +350,7 @@ void build_goto_trace(
       if(SSA_step.is_assert())
       {
         goto_trace_step.comment = SSA_step.comment;
-        goto_trace_step.property_id = SSA_step.get_property_id();
+        goto_trace_step.property_id = SSA_step.property_id;
       }
       goto_trace_step.type = SSA_step.type;
       goto_trace_step.hidden = SSA_step.hidden;
@@ -353,10 +358,12 @@ void build_goto_trace(
       goto_trace_step.io_id = SSA_step.io_id;
       goto_trace_step.formatted = SSA_step.formatted;
       goto_trace_step.called_function = SSA_step.called_function;
-      goto_trace_step.function_arguments = SSA_step.converted_function_arguments;
 
-      for(auto &arg : goto_trace_step.function_arguments)
-        arg = decision_procedure.get(arg);
+      for(const auto &arg : SSA_step.converted_function_arguments)
+      {
+        goto_trace_step.function_arguments.push_back(
+          simplify_expr(decision_procedure.get(arg), ns));
+      }
 
       // update internal field for specific variables in the counterexample
       update_internal_field(SSA_step, goto_trace_step, ns);
@@ -394,15 +401,8 @@ void build_goto_trace(
 
       for(const auto &j : SSA_step.converted_io_args)
       {
-        if(j.is_constant() || j.id() == ID_string_constant)
-        {
-          goto_trace_step.io_args.push_back(j);
-        }
-        else
-        {
-          exprt tmp = decision_procedure.get(j);
-          goto_trace_step.io_args.push_back(tmp);
-        }
+        goto_trace_step.io_args.push_back(
+          simplify_expr(decision_procedure.get(j), ns));
       }
 
       if(SSA_step.is_assert() || SSA_step.is_assume() || SSA_step.is_goto())

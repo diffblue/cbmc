@@ -8,6 +8,6 @@ main.c
 ^VERIFICATION FAILED$
 --
 --
-Checks whether CBMC successfuly assert __CPROVER_is_fresh for arrays.
+Checks whether CBMC successfully assert __CPROVER_is_fresh for arrays.
 Test fails because allocated array was smaller then the one required
 in the contract.

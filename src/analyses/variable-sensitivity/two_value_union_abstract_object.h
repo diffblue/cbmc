@@ -24,12 +24,6 @@ public:
     union_aggregate_typet>
     abstract_aggregate_baset;
 
-  /// \param type: the type the abstract_object is representing
-  explicit two_value_union_abstract_objectt(const typet &type)
-    : abstract_aggregate_baset(type)
-  {
-  }
-
   /// Start the abstract object at either top or bottom or neither
   /// Asserts if both top and bottom are true
   ///

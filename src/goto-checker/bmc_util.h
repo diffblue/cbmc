@@ -12,15 +12,14 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_BMC_UTIL_H
 #define CPROVER_GOTO_CHECKER_BMC_UTIL_H
 
-#include <chrono>
-#include <memory>
-
-#include <goto-symex/build_goto_trace.h>
-
 #include <goto-instrument/unwindset.h>
+#include <goto-symex/build_goto_trace.h>
 
 #include "incremental_goto_checker.h"
 #include "properties.h"
+
+#include <chrono> // IWYU pragma: keep
+#include <memory>
 
 class decision_proceduret;
 class goto_symex_property_decidert;

@@ -4,29 +4,38 @@ Back to @ref contracts-user
 
 @tableofcontents
 
-## Syntax
+The built-in and user-defined predicates discussed in this section are meant to
+let users describe the shape of the memory accessed through pointers in
+_requires clauses_ and _ensures clauses_. Attempting to call these predicates
+outside of a requires or ensures clause context will result in a verification
+error.
+## The __CPROVER_is_fresh predicate
+### Syntax
 
 ```c
 bool __CPROVER_is_fresh(void *p, size_t size);
 ```
 
-To specify memory footprint we use a special function called `__CPROVER_is_fresh `. The meaning of `__CPROVER_is_fresh` is that we are borrowing a pointer from the
-external environment (in a precondition), or returning it to the calling context (in a postcondition).
+To specify memory footprint we use a special function called `__CPROVER_is_fresh `.
+The meaning of `__CPROVER_is_fresh` is that we are borrowing a pointer from the
+external environment (in a precondition), or returning it to the calling context
+(in a postcondition).
 
-### Parameters
+#### Parameters
 
 `__CPROVER_is_fresh` takes two arguments: a pointer and an allocation size.
 The first argument is the pointer to be checked for "freshness" (i.e., not previously
 allocated), and the second is the expected size in bytes for the memory
-available at the pointer.  
+available at the pointer.
 
-### Return Value
+#### Return Value
 
 It returns a `bool` value, indicating whether the pointer is fresh.
 
-## Semantics
+### Semantics
 
-To illustrate the semantics for `__CPROVER_is_fresh`, consider the following implementation of `sum` function.
+To illustrate the semantics for `__CPROVER_is_fresh`, consider the following
+implementation of `sum` function.
 
 ```c
 int *err_signal; // Global variable
@@ -45,7 +54,7 @@ __CPROVER_assigns(*out, err_signal)
 }
 ```
 
-### Enforcement
+#### Enforcement
 
 When checking the contract abstracts a function a `__CPROVER_is_fresh`
 in a _requires_ clause will cause fresh memory to be allocated.
@@ -74,7 +83,7 @@ int sum(const uint32_t a, const uint32_t b, uint32_t* out)
 }
 ```
 
-### Replacement
+#### Replacement
 
 In our example, consider that a function `foo` may call `sum`.
 
@@ -120,6 +129,146 @@ int foo()
 }
 ```
 
+#### Influence of memory allocation failure modes flags in assumption contexts
+
+CBMC models
+[memory allocation failure modes](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/memory-primitives.md#malloc-modelling).
+When activated, these modesl result in different
+behaviours for `__CPROVER_is_fresh` in assumption contexts (i.e. when used in a
+requires clause of a contract being checked against a function, or in an
+ensures clause of a contract being used to abstract a function call).
+
+1. **No failure mode** (no flags):
+  In this mode, `malloc` and `__CPROVER_is_fresh` never fail
+  and will accept a size parameter up to `SIZE_MAX` without triggerring errors.
+  However, pointer overflow and assigns clause checking errors will happen any
+  time one tries to access such objects beyond an offset of
+  `__CPROVER_max_malloc_size` (in bytes), by executing `ptr[size-1]` or
+  `ptr[size]` in user-code, or by writing
+  `__CPROVER_assigns(__CPROVER_object_from(ptr))` in a contract;
+1. **Fail with NULL** (flags: `--malloc-may-fail --malloc-fail-null`):
+  In this mode, if `size` is larger than
+  `__CPROVER_max_malloc_size`, `malloc` returns a NULL pointer, and imposes an
+  implicit assumption that size is less than `__CPROVER_max_malloc_size` when
+  returning a non-NULL pointer. `__CPROVER_is_fresh` never fails in assumption
+  contexts, so it adds an implicit assumption that `size` is less
+  than `__CPROVER_max_malloc_size`.
+1. **Fail assert** (flags: `--malloc-may-fail --malloc-fail-assert`):
+  In this mode, if `size` is larger
+  than `__CPROVER_max_malloc_size`, an `max allocation size exceeded` assertion
+  is triggered in `malloc` and execution continues under the assumption that
+  `size` is less than `__CPROVER_max_malloc_size`, with `malloc` returning a
+  non-NULL pointer. `__CPROVER_is_fresh` never fails in assumption contexts,
+  so it will trigger a `max allocation size exceeded` assertion and continue
+  execution under the implicit assumption that `size` is less than
+  `__CPROVER_max_malloc_size`.
+
+## The __CPROVER_pointer_in_range_dfcc predicate
+### Syntax
+
+```c
+bool __CPROVER_pointer_in_range_dfcc(void *lb, void *p, void *ub);
+```
+
+This predicate holds if `lb`, `p` and `ub` are valid pointers within the same
+object and the pointers are ordered such that `lb <= p && p <= ub` holds.
+
+### Semantics
+In assertion contexts, the predicate checks the conditions described above.
+In assumption contexts, the predicate checks that `lb` and `ub` are valid pointers
+into the same object, and updates `p` using a side effect to be a non-deterministic
+pointer ranging between `lb` and `ub`.
+
+## User defined memory predicates
+
+Users can write their own memory predicates based on the core predicates described above.
+`__CPROVER_is_fresh` allows to specify pointer validity and separation.
+`__CPROVER_pointer_in_range` allows to specify aliasing constraints.
+
+For instance, one could write a predicate defining linked lists of at most `len`
+elements as follows:
+
+```c
+typedef struct list_t
+{
+  int value;
+  struct list_t *next;
+} list_t;
+
+// true iff list of len nodes with values in [-10,10]
+bool is_list(list_t *l, size_t len)
+{
+  if(len == 0)
+    return l == NULL;
+  else
+    return __CPROVER_is_fresh(l, sizeof(*l)) && -10 <= l->value &&
+           l->value <= 10 && is_list(l->next, len - 1);
+}
+```
+
+One can also simply describe finite nested structures:
+
+```c
+typedef struct buffer_t
+{
+  size_t size;
+  char *arr;
+  char *cursor;
+} buffer_t;
+
+typedef struct double_buffer_t
+{
+  buffer_t *first;
+  buffer_t *second;
+} double_buffer_t;
+
+bool is_sized_array(char *arr, size_t size)
+{
+  return __CPROVER_is_fresh(arr, size);
+}
+
+bool is_buffer(buffer_t *b)
+{
+  return __CPROVER_is_fresh(b, sizeof(*b)) && (0 < b->size && b->size <= 10) &&
+         is_sized_array(b->arr, b->size) &&
+}
+
+bool is_double_buffer(double_buffer_t *b)
+{
+  return __CPROVER_is_fresh(b, sizeof(*b)) && is_buffer(b->first) &&
+         is_buffer(b->second);
+}
+```
+
+And one can then use these predicates in requires or ensures clauses for function
+contracts.
+
+```c
+int foo(list_t *l, double_buffer_t *b)
+  // clang-format off
+  __CPROVER_requires(is_list(l, 3))
+  __CPROVER_requires(is_double_buffer(b))
+  __CPROVER_ensures(-28 <= __CPROVER_return_value &&
+                    __CPROVER_return_value <= 50)
+// clang-format on
+{
+  // access the assumed data structure
+  return l->value + l->next->value + l->next->next->value + b->first->size +
+         b->second->size;
+}
+```
+
+### Limitations
+
+The main limitation with user defined predicates are:
+- their evaluation must terminate;
+- self-recursive predicates are supported, but mutually recursive predicates are
+  not supported for the moment.
+
+For instance, in the `is_list` example above, recursion is bounded by the use of
+the explicit `len` parameter. The `is_double_buffer` predicate also describes
+a bounded structure.
+
 ## Additional Resources
 
 - @ref contracts-functions
@@ -132,5 +281,6 @@ int foo()
   - @ref contracts-assigns
   - @ref contracts-frees
 - @ref contracts-memory-predicates
+- @ref contracts-function-pointer-predicates
 - @ref contracts-history-variables
 - @ref contracts-quantifiers

@@ -19,10 +19,6 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <iostream>
-#include <fstream>
-#include <numeric>
-
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
@@ -38,6 +34,10 @@ Author: CM Wintersteiger, 2006
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
 #include "linker_script_merge.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
+#include <numeric>
 
 static std::string compiler_name(
   const cmdlinet &cmdline,

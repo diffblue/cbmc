@@ -2,7 +2,9 @@
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/namespace.h>
+#include <util/pointer_predicates.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -156,4 +158,74 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
   {
     CHECK(objects_are_already_tracked(compound_expression, object_map));
   }
+}
+
+static symbolt make_size_variable()
+{
+  symbolt size_variable;
+  size_variable.name = "size_variable";
+  size_variable.base_name = "size_variable";
+  size_variable.type = size_type();
+  return size_variable;
+}
+
+TEST_CASE("Tracking object sizes.", "[core][smt2_incremental]")
+{
+  // Configuration needs to be performed before tracking because the size_type()
+  // width depends on the global configuration.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  smt_object_mapt object_map = initial_smt_object_map();
+  symbol_tablet symbol_table;
+  const symbolt size_variable = make_size_variable();
+  symbol_table.insert(size_variable);
+  const symbol_exprt size_expr = size_variable.symbol_expr();
+  namespacet ns{symbol_table};
+  exprt base_object;
+  exprt expected_size;
+  using rowt = std::pair<decltype(base_object), decltype(expected_size)>;
+  std::tie(base_object, expected_size) = GENERATE_REF(
+    rowt{from_integer(0, unsignedbv_typet{(8)}), from_integer(1, size_type())},
+    rowt{from_integer(42, signedbv_typet{16}), from_integer(2, size_type())},
+    rowt{from_integer(-24, signedbv_typet{32}), from_integer(4, size_type())},
+    rowt{from_integer(2, unsignedbv_typet{64}), from_integer(8, size_type())},
+    rowt{
+      symbol_exprt{"array", array_typet{unsignedbv_typet{8}, size_expr}},
+      size_expr},
+    rowt{
+      symbol_exprt{"array", array_typet{signedbv_typet{32}, size_expr}},
+      mult_exprt{size_expr, from_integer(4, size_type())}});
+  track_expression_objects(address_of_exprt{base_object}, ns, object_map);
+  const auto object = object_map.find(base_object);
+  REQUIRE(object != object_map.end());
+  REQUIRE(object->second.size == expected_size);
+}
+
+static typet make_type_dynamic(typet base_type)
+{
+  base_type.set(ID_C_dynamic, true);
+  return base_type;
+}
+
+TEST_CASE("Tracking dynamic object status.", "[core][smt2_incremental]")
+{
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  smt_object_mapt object_map = initial_smt_object_map();
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  exprt base_object;
+  bool expected_dynamic_status;
+  using rowt =
+    std::pair<decltype(base_object), decltype(expected_dynamic_status)>;
+  std::tie(base_object, expected_dynamic_status) = GENERATE_REF(
+    rowt{from_integer(0, unsignedbv_typet{(8)}), false},
+    rowt{symbol_exprt{"foo", bool_typet{}}, false},
+    rowt{symbol_exprt{SYMEX_DYNAMIC_PREFIX "bar", bool_typet{}}, true},
+    rowt{from_integer(42, make_type_dynamic(signedbv_typet{16})), true});
+  INFO("base_object is - " + base_object.pretty(1, 0));
+  track_expression_objects(address_of_exprt{base_object}, ns, object_map);
+  const auto object = object_map.find(base_object);
+  REQUIRE(object != object_map.end());
+  REQUIRE(object->second.is_dynamic == expected_dynamic_status);
 }

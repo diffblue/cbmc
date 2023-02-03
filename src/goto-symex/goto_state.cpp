@@ -91,7 +91,7 @@ void goto_statet::apply_condition(
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
-    if(is_ssa_expr(lhs) && goto_symex_is_constantt()(rhs))
+    if(is_ssa_expr(lhs) && goto_symex_is_constantt(ns)(rhs))
     {
       const ssa_exprt &ssa_lhs = to_ssa_expr(lhs);
       INVARIANT(
@@ -141,7 +141,7 @@ void goto_statet::apply_condition(
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
-    if(!is_ssa_expr(lhs) || !goto_symex_is_constantt()(rhs))
+    if(!is_ssa_expr(lhs) || !goto_symex_is_constantt(ns)(rhs))
       return;
 
     if(rhs.is_true())

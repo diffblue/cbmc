@@ -6,6 +6,6 @@ activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
 Base name\.+: return'\nMode\.+: C\nType\.+: MYSTRUCT
-Base name\.+: fun\nMode\.+: C\nType\.+: MYSTRUCT \(\)
+Base name\.+: fun\nMode\.+: C\nType\.+: MYSTRUCT \(void\)
 --
 warning: ignoring

@@ -4,7 +4,7 @@ Module: Bounded Model Checking Utils for Java
 
 Author: Daniel Kroening, Peter Schrammel
 
- \*******************************************************************/
+\*******************************************************************/
 
 /// \file
 /// Bounded Model Checking Utils for Java

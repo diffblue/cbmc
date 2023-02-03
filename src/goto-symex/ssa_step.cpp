@@ -9,6 +9,7 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 #include "ssa_step.h"
 
 #include <util/format_expr.h>
+#include <util/namespace.h>
 
 void SSA_stept::output(std::ostream &out) const
 {
@@ -132,6 +133,7 @@ void SSA_stept::validate(const namespacet &ns, const validation_modet vm) const
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
+    DATA_CHECK(vm, !property_id.empty(), "missing property id in assert step");
   case goto_trace_stept::typet::ASSUME:
   case goto_trace_stept::typet::GOTO:
   case goto_trace_stept::typet::CONSTRAINT:
@@ -182,36 +184,6 @@ void SSA_stept::validate(const namespacet &ns, const validation_modet vm) const
   case goto_trace_stept::typet::ATOMIC_END:
     break;
   }
-}
-
-irep_idt SSA_stept::get_property_id() const
-{
-  PRECONDITION(is_assert());
-
-  irep_idt property_id;
-
-  if(source.pc->is_assert())
-  {
-    property_id = source.pc->source_location().get_property_id();
-  }
-  else if(source.pc->is_goto())
-  {
-    // this is likely an unwinding assertion
-    property_id = id2string(source.pc->source_location().get_function()) +
-                  ".unwind." + std::to_string(source.pc->loop_number);
-  }
-  else if(source.pc->is_function_call())
-  {
-    // this is likely a recursion unwinding assertion
-    property_id =
-      id2string(source.pc->source_location().get_function()) + ".recursion";
-  }
-  else
-  {
-    UNREACHABLE;
-  }
-
-  return property_id;
 }
 
 SSA_assignment_stept::SSA_assignment_stept(

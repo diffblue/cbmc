@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+GCC does not permit labelling declarations as they are not considered
+statements, and would result in ambiguity in case of label attributes. We used
+to run into this problem, treating the function call in this test as a KnR
+function declaration.
+
+Visual Studio, on the other hand, happily accepts labelled declarations.

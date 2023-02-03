@@ -19,7 +19,6 @@ Author: Diffblue Ltd.
 class message_handlert;
 class codet;
 class symbol_table_baset;
-class symbol_tablet;
 
 irep_idt lambda_synthetic_class_name(
   const irep_idt &method_identifier,
@@ -28,7 +27,7 @@ irep_idt lambda_synthetic_class_name(
 void create_invokedynamic_synthetic_classes(
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt::instructionst &instructions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   message_handlert &message_handler);
 

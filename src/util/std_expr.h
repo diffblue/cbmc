@@ -696,7 +696,7 @@ public:
 
     DATA_CHECK(
       vm,
-      expr.type().id() == ID_bool,
+      expr.is_boolean(),
       "result of binary predicate expression should be of type bool");
   }
 };
@@ -2279,7 +2279,7 @@ class not_exprt:public unary_exprt
 public:
   explicit not_exprt(exprt _op) : unary_exprt(ID_not, std::move(_op))
   {
-    PRECONDITION(as_const(*this).op().type().id() == ID_bool);
+    PRECONDITION(as_const(*this).op().is_boolean());
   }
 };
 
@@ -2975,7 +2975,7 @@ public:
 template <>
 inline bool can_cast_expr<constant_exprt>(const exprt &base)
 {
-  return base.id() == ID_constant;
+  return base.is_constant();
 }
 
 inline void validate_expr(const constant_exprt &value)
@@ -2991,14 +2991,14 @@ inline void validate_expr(const constant_exprt &value)
 /// \return Object of type \ref constant_exprt
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
-  PRECONDITION(expr.id()==ID_constant);
+  PRECONDITION(expr.is_constant());
   return static_cast<const constant_exprt &>(expr);
 }
 
 /// \copydoc to_constant_expr(const exprt &)
 inline constant_exprt &to_constant_expr(exprt &expr)
 {
-  PRECONDITION(expr.id()==ID_constant);
+  PRECONDITION(expr.is_constant());
   return static_cast<constant_exprt &>(expr);
 }
 
@@ -3098,6 +3098,13 @@ public:
   /// by a set of different symbols
   exprt instantiate(const variablest &) const;
 };
+
+template <>
+inline bool can_cast_expr<binding_exprt>(const exprt &base)
+{
+  return base.id() == ID_forall || base.id() == ID_exists ||
+         base.id() == ID_lambda || base.id() == ID_array_comprehension;
+}
 
 inline void validate_expr(const binding_exprt &binding_expr)
 {
@@ -3297,7 +3304,7 @@ public:
   /// \param value: the value for the case
   void add_case(const exprt &condition, const exprt &value)
   {
-    PRECONDITION(condition.type().id() == ID_bool);
+    PRECONDITION(condition.is_boolean());
     operands().reserve(operands().size() + 2);
     operands().push_back(condition);
     operands().push_back(value);

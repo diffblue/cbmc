@@ -9,14 +9,16 @@
 /// \file
 /// Value Set of Pointer Abstract Object
 
-#include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/context_abstract_object.h>
-#include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
-#include <numeric>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 
+#include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h>
+
 #include "abstract_environment.h"
+#include "context_abstract_object.h" // IWYU pragma: keep
+
+#include <numeric>
 
 static abstract_object_sett
 unwrap_and_extract_values(const abstract_object_sett &values);
@@ -26,13 +28,6 @@ unwrap_and_extract_values(const abstract_object_sett &values);
 /// \return an abstract value without context
 static abstract_object_pointert
 maybe_extract_single_value(const abstract_object_pointert &maybe_singleton);
-
-value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
-  const typet &type)
-  : abstract_pointer_objectt(type)
-{
-  values.insert(std::make_shared<constant_pointer_abstract_objectt>(type));
-}
 
 value_set_pointer_abstract_objectt::value_set_pointer_abstract_objectt(
   const typet &new_type,

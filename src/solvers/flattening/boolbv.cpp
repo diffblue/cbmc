@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mp_arith.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/string2int.h>
 #include <util/string_constant.h>
 
 #include <solvers/floatbv/float_utils.h>
@@ -96,7 +95,7 @@ bvt boolbvt::conversion_failed(const exprt &expr)
 ///   circuit
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
-  if(expr.type().id()==ID_bool)
+  if(expr.is_boolean())
     return {convert(expr)};
 
   if(expr.id()==ID_index)
@@ -115,7 +114,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_cond(to_cond_expr(expr));
   else if(expr.id()==ID_if)
     return convert_if(to_if_expr(expr));
-  else if(expr.id()==ID_constant)
+  else if(expr.is_constant())
     return convert_constant(to_constant_expr(expr));
   else if(expr.id()==ID_typecast)
     return convert_bv_typecast(to_typecast_expr(expr));
@@ -318,7 +317,7 @@ bvt boolbvt::convert_function_application(
 
 literalt boolbvt::convert_rest(const exprt &expr)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   if(expr.id()==ID_typecast)
     return convert_typecast(to_typecast_expr(expr));
@@ -507,7 +506,7 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
 void boolbvt::set_to(const exprt &expr, bool value)
 {
-  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.is_boolean());
 
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))

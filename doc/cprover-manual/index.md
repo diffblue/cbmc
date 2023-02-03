@@ -32,4 +32,8 @@
    * [Integration into Build Systems with goto-cc](goto-cc/)
    * [Integration with Visual Studio builds](visual-studio/)
 
-10. [The CPROVER API Reference](api/)
+10. Solvers
+
+    * [Incremental SMT solver](smt2-incr/)
+
+11. [The CPROVER API Reference](api/)

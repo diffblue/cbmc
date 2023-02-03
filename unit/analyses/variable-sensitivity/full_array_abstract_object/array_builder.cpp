@@ -6,7 +6,6 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/full_array_abstract_object/array_builder.h>
 #include <util/arith_tools.h>

@@ -1,14 +1,10 @@
 CORE
 main.c
---replace-call-with-contract foo
-^\[foo.precondition.\d+] line 19 Assert function pointer 'infun' obeys contract 'contract': SUCCESS$
-^\[main.assertion.\d+].* assertion outfun1 == contract: SUCCESS$
-^\[main.assertion.\d+].* assertion outfun2 == contract: SUCCESS$
-^EXIT=0$
+ --restrict-function-pointer foo.CALL/arr_fun_contract --enforce-contract foo --replace-call-with-contract get_arr_fun
+^file main.c line 19 function get_arr_fun: __CPROVER_obeys_contract is not supported in this version$
+^EXIT=6$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 --
-This test checks that, when replacing a call by its contract,
-requires_contract clauses are translated to equality checks
-and that ensures_contract are translated to assignments.
+This test checks uses of the unsupported __CPROVER_obeys_contract predicate
+trigger errors.

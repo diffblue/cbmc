@@ -97,7 +97,6 @@ ret_t foo(foo-parameters, write_set_t caller_write_set) {
 
   // assume requires clauses
   assume(contract::requires(foo_params, requires_write_set));
-  assume(contract::requires_contract(foo_params, requires_write_set));
 
   // check that requires clause do not allocate or deallocate dynamic memory
   assert(__CPROVER_contracts_write_set_allocated_deallocated_is_empty(requires_write_set));
@@ -128,7 +127,6 @@ ret_t foo(foo-parameters, write_set_t caller_write_set) {
 
   // check post conditions
   assert(contract::ensures(foo_params, ensures_write_set));
-  assert(contract::ensures_contract(foo_params, ensures_write_set));
 
   // check that requires clause do not allocate or deallocate dynamic memory
   assert(__CPROVER_contracts_write_set_allocated_deallocated_is_empty(ensures_write_set));

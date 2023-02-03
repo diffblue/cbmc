@@ -7,16 +7,18 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <iostream>
+#include <java_bytecode/java_root_class.h>
+
+#include <util/namespace.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_object_factory.h>
-#include <java_bytecode/java_root_class.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
-#include <util/namespace.h>
-#include <util/std_code.h>
 
 #include <regex>
 
@@ -34,10 +36,7 @@ SCENARIO(
     java_class_typet jlo_class_type;
     jlo_class_type.set_tag("java.lang.Object");
     jlo_class_type.set_name("java::java.lang.Object");
-    symbolt jlo_sym;
-    jlo_sym.name = "java::java.lang.Object";
-    jlo_sym.type = jlo_class_type;
-    jlo_sym.is_type = true;
+    type_symbolt jlo_sym{"java::java.lang.Object", jlo_class_type, ID_java};
     java_root_class(jlo_sym);
     bool failed = symbol_table.add(jlo_sym);
     CHECK_RETURN(!failed);

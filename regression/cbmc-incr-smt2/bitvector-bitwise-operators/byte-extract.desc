@@ -1,6 +1,6 @@
 CORE
 byte-extract.c
---slice-formula
+
 \[main.assertion\.1\] line \d+ assertion y\[0\] == 0: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$

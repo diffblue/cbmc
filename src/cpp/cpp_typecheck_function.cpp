@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/c_types.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &current_mode,
@@ -111,7 +111,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
      !function_scope.is_static_member)
   {
     code_typet::parameterst &parameters=function_type.parameters();
-    assert(parameters.size()>=1);
+    DATA_INVARIANT(parameters.size() >= 1, "parameters expected");
     code_typet::parametert &this_parameter_expr=parameters.front();
     function_scope.this_expr = symbol_exprt{
       this_parameter_expr.get_identifier(), this_parameter_expr.type()};

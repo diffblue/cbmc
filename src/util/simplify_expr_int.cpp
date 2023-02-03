@@ -463,9 +463,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
 
     // count the constants
     size_t count=0;
-    forall_operands(it, expr)
-      if(is_number(it->type()) && it->is_constant())
+    for(const auto &op : expr.operands())
+    {
+      if(is_number(op.type()) && op.is_constant())
         count++;
+    }
 
     // merge constants?
     if(count>=2)
@@ -595,10 +597,60 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     is_number(minus_expr.type()) && operands[0].type().id() == ID_pointer &&
     operands[1].type().id() == ID_pointer)
   {
-    // pointer arithmetic: rewrite "p-p" to "0"
+    exprt ptr_op0 = simplify_object(operands[0]).expr;
+    exprt ptr_op1 = simplify_object(operands[1]).expr;
 
-    if(operands[0]==operands[1])
-      return from_integer(0, minus_expr.type());
+    auto address_of = expr_try_dynamic_cast<address_of_exprt>(ptr_op0);
+    if(ptr_op0 == ptr_op1 && address_of)
+    {
+      exprt offset_op0 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[0], minus_expr.type()});
+      exprt offset_op1 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[1], minus_expr.type()});
+
+      const auto object_size =
+        pointer_offset_size(address_of->object().type(), ns);
+      auto element_size =
+        size_of_expr(to_pointer_type(operands[0].type()).base_type(), ns);
+
+      if(
+        offset_op0.is_constant() && offset_op1.is_constant() &&
+        object_size.has_value() && element_size.has_value() &&
+        element_size->is_constant() && !element_size->is_zero() &&
+        numeric_cast_v<mp_integer>(to_constant_expr(offset_op0)) <=
+          *object_size &&
+        numeric_cast_v<mp_integer>(to_constant_expr(offset_op1)) <=
+          *object_size)
+      {
+        return changed(simplify_rec(div_exprt{
+          minus_exprt{offset_op0, offset_op1},
+          typecast_exprt{*element_size, minus_expr.type()}}));
+      }
+    }
+
+    const exprt &ptr_op0_skipped_tc = skip_typecast(ptr_op0);
+    const exprt &ptr_op1_skipped_tc = skip_typecast(ptr_op1);
+    if(
+      is_number(ptr_op0_skipped_tc.type()) &&
+      is_number(ptr_op1_skipped_tc.type()))
+    {
+      exprt offset_op0 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[0], minus_expr.type()});
+      exprt offset_op1 = simplify_pointer_offset(
+        pointer_offset_exprt{operands[1], minus_expr.type()});
+
+      auto element_size =
+        size_of_expr(to_pointer_type(operands[0].type()).base_type(), ns);
+
+      if(
+        element_size.has_value() && element_size->is_constant() &&
+        !element_size->is_zero())
+      {
+        return changed(simplify_rec(div_exprt{
+          minus_exprt{offset_op0, offset_op1},
+          typecast_exprt{*element_size, minus_expr.type()}}));
+      }
+    }
   }
 
   return unchanged(expr);
@@ -611,18 +663,16 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
     return unchanged(expr);
 
   // check if these are really boolean
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
   {
     bool all_bool=true;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      if(
-        it->id() == ID_typecast &&
-        to_typecast_expr(*it).op().type().id() == ID_bool)
+      if(op.id() == ID_typecast && to_typecast_expr(op).op().is_boolean())
       {
       }
-      else if(it->is_zero() || it->is_one())
+      else if(op.is_zero() || op.is_one())
       {
       }
       else
@@ -862,6 +912,40 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
         new_expr.operands().erase(new_expr.operands().begin() + i + 1);
         no_change = false;
       }
+      else if(
+        skip_typecast(opi).id() == ID_extractbits &&
+        skip_typecast(opn).id() == ID_extractbits)
+      {
+        const extractbits_exprt &eb_i = to_extractbits_expr(skip_typecast(opi));
+        const extractbits_exprt &eb_n = to_extractbits_expr(skip_typecast(opn));
+
+        if(
+          eb_i.src() == eb_n.src() && eb_i.lower().is_constant() &&
+          eb_n.upper().is_constant() &&
+          numeric_cast_v<mp_integer>(to_constant_expr(eb_i.lower())) ==
+            numeric_cast_v<mp_integer>(to_constant_expr(eb_n.upper())) + 1)
+        {
+          extractbits_exprt eb_merged = eb_i;
+          eb_merged.lower() = eb_n.lower();
+          to_bitvector_type(eb_merged.type())
+            .set_width(
+              to_bitvector_type(eb_i.type()).get_width() +
+              to_bitvector_type(eb_n.type()).get_width());
+          if(expr.type().id() != eb_merged.type().id())
+          {
+            bitvector_typet bt = to_bitvector_type(expr.type());
+            bt.set_width(to_bitvector_type(eb_merged.type()).get_width());
+            opi = simplify_typecast(typecast_exprt{eb_merged, bt});
+          }
+          else
+            opi = eb_merged;
+          // erase opn
+          new_expr.operands().erase(new_expr.operands().begin() + i + 1);
+          no_change = false;
+        }
+        else
+          ++i;
+      }
       else
         i++;
     }
@@ -929,7 +1013,7 @@ simplify_exprt::simplify_shifts(const shift_exprt &expr)
 
   if(
     !value.has_value() && expr.op().type().id() == ID_bv &&
-    expr.op().id() == ID_constant)
+    expr.op().is_constant())
   {
     const std::size_t width = to_bitvector_type(expr.op().type()).get_width();
     value =
@@ -1093,24 +1177,44 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
     // count down
     mp_integer offset = *width;
 
-    forall_operands(it, expr.src())
+    for(const auto &op : expr.src().operands())
     {
-      auto op_width = pointer_offset_bits(it->type(), ns);
+      auto op_width = pointer_offset_bits(op.type(), ns);
 
       if(!op_width.has_value() || *op_width <= 0)
         return unchanged(expr);
 
-      if(*start + 1 == offset && *end + *op_width == offset)
+      if(*start < offset && offset <= *end + *op_width)
       {
-        exprt tmp = *it;
-        if(tmp.type() != expr.type())
-          return unchanged(expr);
-
-        return std::move(tmp);
+        extractbits_exprt result = expr;
+        result.src() = op;
+        result.lower() =
+          from_integer(*end - (offset - *op_width), expr.lower().type());
+        result.upper() =
+          from_integer(*start - (offset - *op_width), expr.upper().type());
+        return changed(simplify_extractbits(result));
       }
 
       offset -= *op_width;
     }
+  }
+  else if(auto eb_src = expr_try_dynamic_cast<extractbits_exprt>(expr.src()))
+  {
+    if(eb_src->upper().is_constant() && eb_src->lower().is_constant())
+    {
+      extractbits_exprt result = *eb_src;
+      result.type() = expr.type();
+      const mp_integer src_lower =
+        numeric_cast_v<mp_integer>(to_constant_expr(eb_src->lower()));
+      result.lower() = from_integer(src_lower + *end, eb_src->lower().type());
+      result.upper() = from_integer(src_lower + *start, eb_src->lower().type());
+      return changed(simplify_extractbits(result));
+    }
+  }
+  else if(*end == 0 && *start + 1 == *width)
+  {
+    typecast_exprt tc{expr.src(), expr.type()};
+    return changed(simplify_typecast(tc));
   }
 
   return unchanged(expr);
@@ -1142,7 +1246,7 @@ simplify_exprt::simplify_unary_minus(const unary_minus_exprt &expr)
 
     return to_unary_minus_expr(operand).op();
   }
-  else if(operand.id()==ID_constant)
+  else if(operand.is_constant())
   {
     const irep_idt &type_id=expr.type().id();
     const auto &constant_expr = to_constant_expr(operand);
@@ -1198,7 +1302,7 @@ simplify_exprt::simplify_bitnot(const bitnot_exprt &expr)
 
     if(op.type() == type)
     {
-      if(op.id()==ID_constant)
+      if(op.is_constant())
       {
         const auto &value = to_constant_expr(op).get_value();
         const auto new_value =
@@ -1217,7 +1321,7 @@ simplify_exprt::simplify_bitnot(const bitnot_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     return unchanged(expr);
 
   exprt tmp0=expr.op0();
@@ -1545,6 +1649,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
       new_expr.rhs() = simplify_node(new_expr.rhs());
       return changed(simplify_inequality(new_expr)); // recursive call
     }
+    else if(expr.op0().type().id() == ID_pointer)
+    {
+      exprt ptr_op0 = simplify_object(expr.op0()).expr;
+      exprt ptr_op1 = simplify_object(expr.op1()).expr;
+
+      if(ptr_op0 == ptr_op1)
+      {
+        pointer_offset_exprt offset_op0{expr.op0(), size_type()};
+        pointer_offset_exprt offset_op1{expr.op1(), size_type()};
+
+        return changed(simplify_rec(equal_exprt{offset_op0, offset_op1}));
+      }
+    }
   }
 
   return unchanged(expr);
@@ -1641,17 +1758,26 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
       }
       else if(expr.op0().id() == ID_plus)
       {
-        // NULL + 1 == NULL is false
-        const plus_exprt &plus = to_plus_expr(expr.op0());
-        if(
-          plus.operands().size() == 2 && plus.op0().is_constant() &&
-          plus.op1().is_constant() &&
-          ((is_null_pointer(to_constant_expr(plus.op0())) &&
-            !plus.op1().is_zero()) ||
-           (is_null_pointer(to_constant_expr(plus.op1())) &&
-            !plus.op0().is_zero())))
+        exprt offset =
+          simplify_rec(pointer_offset_exprt{expr.op0(), size_type()}).expr;
+        if(!offset.is_constant())
+          return unchanged(expr);
+
+        exprt ptr = simplify_object(expr.op0()).expr;
+        // NULL + N == NULL is N == 0
+        if(ptr.is_constant() && is_null_pointer(to_constant_expr(ptr)))
+          return make_boolean_expr(offset.is_zero());
+        // &x + N == NULL is false when the offset is in bounds
+        else if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(ptr))
         {
-          return false_exprt();
+          const auto object_size =
+            pointer_offset_size(address_of->object().type(), ns);
+          if(
+            object_size.has_value() &&
+            numeric_cast_v<mp_integer>(to_constant_expr(offset)) < *object_size)
+          {
+            return false_exprt();
+          }
         }
       }
     }
@@ -1774,7 +1900,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
   // are we comparing with a typecast from bool?
   if(
     expr.op0().id() == ID_typecast &&
-    to_typecast_expr(expr.op0()).op().type().id() == ID_bool)
+    to_typecast_expr(expr.op0()).op().is_boolean())
   {
     const auto &lhs_typecast_op = to_typecast_expr(expr.op0()).op();
 

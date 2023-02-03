@@ -147,28 +147,30 @@ static bool sort_and_join(exprt &expr, bool do_sort)
 
   // check operand types
 
-  forall_operands(it, expr)
-    if(!is_associative_and_commutative_for_type(saj_entry, it->type().id()))
+  for(const auto &op : as_const(expr).operands())
+  {
+    if(!is_associative_and_commutative_for_type(saj_entry, op.type().id()))
       return true;
+  }
 
   // join expressions
 
   exprt::operandst new_ops;
   new_ops.reserve(as_const(expr).operands().size());
 
-  forall_operands(it, expr)
+  for(const auto &op : as_const(expr).operands())
   {
-    if(it->id()==expr.id())
+    if(op.id() == expr.id())
     {
-      new_ops.reserve(new_ops.capacity()+it->operands().size()-1);
+      new_ops.reserve(new_ops.capacity() + op.operands().size() - 1);
 
-      forall_operands(it2, *it)
-        new_ops.push_back(*it2);
+      for(const auto &sub_op : op.operands())
+        new_ops.push_back(sub_op);
 
       no_change = false;
     }
     else
-      new_ops.push_back(*it);
+      new_ops.push_back(op);
   }
 
   // sort it
@@ -414,7 +416,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
   // extract bits from lowest to highest memory address
   const typet &type = expr.type();
 
-  if(expr.id() == ID_constant)
+  if(expr.is_constant())
   {
     const auto &value = to_constant_expr(expr).get_value();
 
@@ -469,9 +471,9 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     expr.id() == ID_complex)
   {
     std::string result;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      auto tmp = expr2bits(*it, little_endian, ns);
+      auto tmp = expr2bits(op, little_endian, ns);
       if(!tmp.has_value())
         return {}; // failed
       result += tmp.value();

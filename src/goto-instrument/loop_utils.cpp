@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 goto_programt::targett get_loop_exit(const loopt &loop)
 {
-  assert(!loop.empty());
+  PRECONDITION(!loop.empty());
 
   // find the last instruction in the loop
   std::map<unsigned, goto_programt::targett> loop_map;

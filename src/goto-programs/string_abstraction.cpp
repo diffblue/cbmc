@@ -597,9 +597,11 @@ bool string_abstractiont::has_string_macros(const exprt &expr)
      expr.id()=="buffer_size")
     return true;
 
-  forall_operands(it, expr)
-    if(has_string_macros(*it))
+  for(const auto &op : expr.operands())
+  {
+    if(has_string_macros(op))
       return true;
+  }
 
   return false;
 }

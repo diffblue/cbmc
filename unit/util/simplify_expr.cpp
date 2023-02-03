@@ -38,7 +38,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 
   exprt simp=simplify_expr(p_o, ns);
 
-  REQUIRE(simp.id()==ID_constant);
+  REQUIRE(simp.is_constant());
   const mp_integer offset_value =
     numeric_cast_v<mp_integer>(to_constant_expr(simp));
   REQUIRE(offset_value==1);
@@ -59,7 +59,7 @@ TEST_CASE("Simplify const pointer offset", "[core][util]")
 
   exprt simp=simplify_expr(p_o, ns);
 
-  REQUIRE(simp.id()==ID_constant);
+  REQUIRE(simp.is_constant());
   const mp_integer offset_value =
     numeric_cast_v<mp_integer>(to_constant_expr(simp));
   REQUIRE(offset_value==1234);
@@ -455,17 +455,13 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
   const auto long_type = signedbv_typet(64);
   array_typet array_type(int_type, from_integer(5, int_type));
 
-  symbolt a_symbol;
+  symbolt a_symbol{"a", array_type, irep_idt{}};
   a_symbol.base_name = "a";
-  a_symbol.name = "a";
-  a_symbol.type = array_type;
   a_symbol.is_lvalue = true;
   symbol_table.add(a_symbol);
 
-  symbolt i_symbol;
+  symbolt i_symbol{"i", int_type, irep_idt{}};
   i_symbol.base_name = "i";
-  i_symbol.name = "i";
-  i_symbol.type = int_type;
   i_symbol.is_lvalue = true;
   symbol_table.add(i_symbol);
 

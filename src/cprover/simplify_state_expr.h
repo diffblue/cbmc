@@ -12,10 +12,11 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_SIMPLIFY_STATE_EXPR_H
 #define CPROVER_CPROVER_SIMPLIFY_STATE_EXPR_H
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
+#include <util/std_expr.h> // IWYU pragma: keep
 
 #include <unordered_set>
+
+class namespacet;
 
 exprt simplify_state_expr(
   exprt,

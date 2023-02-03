@@ -16,39 +16,41 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
-#include <util/std_code.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_model.h>
 
 code_function_callt function_to_call(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &id,
   const irep_idt &argument)
 {
   // already there?
 
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(id);
 
   if(s_it==symbol_table.symbols.end())
   {
+    // This has to be dead code: a symbol table must contain all functions that
+    // appear in goto_functions.
+    UNREACHABLE;
+#if 0
+
     // not there
     auto p = pointer_type(char_type());
     p.base_type().set(ID_C_constant, true);
 
     const code_typet function_type({code_typet::parametert(p)}, empty_typet());
 
-    symbolt new_symbol;
-    new_symbol.name=id;
+    symbolt new_symbol{id, function_type, irep_idt{}};
     new_symbol.base_name=id;
-    new_symbol.type=function_type;
 
     symbol_table.insert(std::move(new_symbol));
 
     s_it=symbol_table.symbols.find(id);
-    assert(s_it!=symbol_table.symbols.end());
+    DATA_INVARIANT(s_it != symbol_table.symbols.end(), "symbol not found");
+#endif
   }
 
   // signature is expected to be
@@ -139,7 +141,7 @@ void function_exit(
     // exiting without return
     goto_programt::targett last=body.instructions.end();
     last--;
-    assert(last->is_end_function());
+    DATA_INVARIANT(last->is_end_function(), "must be end of function");
 
     // is there already a return?
     bool has_set_return_value = false;

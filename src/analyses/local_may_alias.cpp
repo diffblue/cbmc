@@ -117,8 +117,7 @@ std::set<exprt> local_may_aliast::get(
   const exprt &rhs) const
 {
   local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
-
-  assert(loc_it!=cfg.loc_map.end());
+  CHECK_RETURN(loc_it != cfg.loc_map.end());
 
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
 
@@ -143,8 +142,7 @@ bool local_may_aliast::aliases(
   const exprt &src1, const exprt &src2) const
 {
   local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
-
-  assert(loc_it!=cfg.loc_map.end());
+  CHECK_RETURN(loc_it != cfg.loc_map.end());
 
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
 
@@ -171,7 +169,7 @@ void local_may_aliast::get_rec(
   const exprt &rhs,
   const loc_infot &loc_info_src) const
 {
-  if(rhs.id()==ID_constant)
+  if(rhs.is_constant())
   {
     if(rhs.is_zero())
       dest.insert(objects.number(exprt(ID_null_object)));
@@ -484,7 +482,7 @@ void local_may_aliast::output(
         for(std::size_t j=0; j<loc_info.aliases.size(); j++)
           if(loc_info.aliases.find(j)==i)
           {
-            assert(j<objects.size());
+            INVARIANT(j < objects.size(), "invalid object index");
             irep_idt identifier;
             if(objects[j].id() == ID_symbol)
               identifier = to_symbol_expr(objects[j]).get_identifier();

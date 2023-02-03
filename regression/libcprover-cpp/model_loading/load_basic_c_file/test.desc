@@ -1,0 +1,12 @@
+CORE
+test.c
+
+^EXIT=0$
+^SIGNAL=0$
+Parsing test.c
+Converting
+Type\-checking test
+Generating GOTO Program
+Successfully initialised goto_model
+--
+--

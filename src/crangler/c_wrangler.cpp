@@ -11,27 +11,21 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "c_wrangler.h"
 
+#include <util/cprover_prefix.h>
+#include <util/exception_utils.h>
+#include <util/json.h>
+#include <util/run.h>
+#include <util/string_utils.h>
+
 #include "c_defines.h"
 #include "ctokenit.h"
 #include "mini_c_parser.h"
 
-#include <util/cprover_prefix.h>
-#include <util/exception_utils.h>
-#include <util/file_util.h>
-#include <util/json.h>
-#include <util/optional.h>
-#include <util/prefix.h>
-#include <util/run.h>
-#include <util/string_utils.h>
-#include <util/suffix.h>
-#include <util/tempdir.h>
-
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <map>
 #include <regex>
 #include <sstream>
-#include <unordered_map>
 
 struct c_wranglert
 {

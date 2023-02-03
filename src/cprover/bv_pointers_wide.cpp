@@ -268,7 +268,7 @@ optionalt<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
     return std::move(bv);
   }
   else if(
-    expr.id() == ID_constant || expr.id() == ID_string_constant ||
+    expr.is_constant() || expr.id() == ID_string_constant ||
     expr.id() == ID_array)
   { // constant
     return add_addr(expr);
@@ -382,7 +382,7 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
     const auto &object_address_expr = to_object_address_expr(expr);
     return add_addr(object_address_expr.object_expr());
   }
-  else if(expr.id() == ID_constant)
+  else if(expr.is_constant())
   {
     const constant_exprt &c = to_constant_expr(expr);
 
@@ -405,28 +405,21 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
     mp_integer size = 0;
     std::size_t count = 0;
 
-    forall_operands(it, plus_expr)
+    for(const auto &op : plus_expr.operands())
     {
-      if(it->type().id() == ID_pointer)
+      if(op.type().id() == ID_pointer)
       {
         count++;
-        bv = convert_bv(*it);
+        bv = convert_bv(op);
         CHECK_RETURN(bv.size() == bits);
 
-        typet pointer_base_type = to_pointer_type(it->type()).base_type();
-
-        if(pointer_base_type.id() == ID_empty)
-        {
-          // This is a gcc extension.
-          // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-          size = 1;
-        }
-        else
-        {
-          auto size_opt = pointer_offset_size(pointer_base_type, ns);
-          CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
-          size = *size_opt;
-        }
+        typet pointer_base_type = to_pointer_type(op.type()).base_type();
+        DATA_INVARIANT(
+          pointer_base_type.id() != ID_empty,
+          "no pointer arithmetic over void pointers");
+        auto size_opt = pointer_offset_size(pointer_base_type, ns);
+        CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
+        size = *size_opt;
       }
     }
 
@@ -437,26 +430,26 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
     const std::size_t offset_bits = get_offset_width(type);
     bvt sum = bv_utils.build_constant(0, offset_bits);
 
-    forall_operands(it, plus_expr)
+    for(const auto &op : plus_expr.operands())
     {
-      if(it->type().id() == ID_pointer)
+      if(op.type().id() == ID_pointer)
         continue;
 
-      if(it->type().id() != ID_unsignedbv && it->type().id() != ID_signedbv)
+      if(op.type().id() != ID_unsignedbv && op.type().id() != ID_signedbv)
       {
         return conversion_failed(plus_expr);
       }
 
-      bv_utilst::representationt rep = it->type().id() == ID_signedbv
+      bv_utilst::representationt rep = op.type().id() == ID_signedbv
                                          ? bv_utilst::representationt::SIGNED
                                          : bv_utilst::representationt::UNSIGNED;
 
-      bvt op = convert_bv(*it);
-      CHECK_RETURN(!op.empty());
+      bvt op_bv = convert_bv(op);
+      CHECK_RETURN(!op_bv.empty());
 
-      op = bv_utils.extension(op, offset_bits, rep);
+      op_bv = bv_utils.extension(op_bv, offset_bits, rep);
 
-      sum = bv_utils.add(sum, op);
+      sum = bv_utils.add(sum, op_bv);
     }
 
     return offset_arithmetic(type, bv, size, sum);
@@ -484,22 +477,12 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
     typet pointer_base_type =
       to_pointer_type(minus_expr.lhs().type()).base_type();
-    mp_integer element_size;
-
-    if(pointer_base_type.id() == ID_empty)
-    {
-      // This is a gcc extension.
-      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      element_size = 1;
-    }
-    else
-    {
-      auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
-      element_size = *element_size_opt;
-    }
-
-    return offset_arithmetic(type, bv, element_size, neg_op1);
+    DATA_INVARIANT(
+      pointer_base_type.id() != ID_empty,
+      "no pointer arithmetic over void pointers");
+    auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
+    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+    return offset_arithmetic(type, bv, *element_size_opt, neg_op1);
   }
   else if(
     expr.id() == ID_byte_extract_little_endian ||
@@ -631,21 +614,17 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
 
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
 
-      // Support for void* is a gcc extension, with the size treated as 1 byte
-      // (no division required below).
-      // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-      if(lhs_pt.base_type().id() != ID_empty)
-      {
-        auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
-        CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+      DATA_INVARIANT(
+        lhs_pt.base_type().id() != ID_empty,
+        "no pointer arithmetic over void pointers");
+      auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
+      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
 
-        if(*element_size_opt != 1)
-        {
-          bvt element_size_bv =
-            bv_utils.build_constant(*element_size_opt, width);
-          difference = bv_utils.divider(
-            difference, element_size_bv, bv_utilst::representationt::SIGNED);
-        }
+      if(*element_size_opt != 1)
+      {
+        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        difference = bv_utils.divider(
+          difference, element_size_bv, bv_utilst::representationt::SIGNED);
       }
 
       prop.l_set_to_true(prop.limplies(
@@ -788,10 +767,9 @@ exprt bv_pointers_widet::bv_get_rec(
 
   constant_exprt result(bvrep, type);
 
-  pointer_logict::pointert pointer;
-  pointer.object =
-    numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
-  pointer.offset = binary2integer(value_offset, true);
+  pointer_logict::pointert pointer{
+    numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
+    binary2integer(value_offset, false)};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};

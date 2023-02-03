@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/natural_loops.h>
 
-#include <util/std_code.h>
+class code_blockt;
 
 class goto_program2codet
 {
@@ -66,7 +66,7 @@ public:
       typedef_names(_typedef_names),
       system_headers(_system_headers)
   {
-    assert(local_static.empty());
+    PRECONDITION(local_static.empty());
 
     for(id_listt::const_iterator
         it=type_names.begin();

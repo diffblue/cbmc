@@ -14,10 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
 #include <util/typecheck.h>
 
 #include "designator.h"
+
+#include <map>
 
 class ansi_c_declarationt;
 class c_bit_field_typet;
@@ -29,33 +31,33 @@ class c_typecheck_baset:
 {
 public:
   c_typecheck_baset(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const std::string &_module,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    namespacet(_symbol_table),
-    symbol_table(_symbol_table),
-    module(_module),
-    mode(ID_C),
-    break_is_allowed(false),
-    continue_is_allowed(false),
-    case_is_allowed(false)
+    message_handlert &_message_handler)
+    : typecheckt(_message_handler),
+      namespacet(_symbol_table),
+      symbol_table(_symbol_table),
+      module(_module),
+      mode(ID_C),
+      break_is_allowed(false),
+      continue_is_allowed(false),
+      case_is_allowed(false)
   {
   }
 
   c_typecheck_baset(
-    symbol_tablet &_symbol_table1,
-    const symbol_tablet &_symbol_table2,
+    symbol_table_baset &_symbol_table1,
+    const symbol_table_baset &_symbol_table2,
     const std::string &_module,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    namespacet(_symbol_table1, _symbol_table2),
-    symbol_table(_symbol_table1),
-    module(_module),
-    mode(ID_C),
-    break_is_allowed(false),
-    continue_is_allowed(false),
-    case_is_allowed(false)
+    message_handlert &_message_handler)
+    : typecheckt(_message_handler),
+      namespacet(_symbol_table1, _symbol_table2),
+      symbol_table(_symbol_table1),
+      module(_module),
+      mode(ID_C),
+      break_is_allowed(false),
+      continue_is_allowed(false),
+      case_is_allowed(false)
   {
   }
 
@@ -65,7 +67,7 @@ public:
   virtual void typecheck_expr(exprt &expr);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const irep_idt module;
   const irep_idt mode;
   symbolt current_symbol;
@@ -148,6 +150,9 @@ protected:
   // contracts
   virtual void
   typecheck_typed_target_call(side_effect_expr_function_callt &expr);
+  /// Checks an obeys_contract predicate occurrence
+  virtual void
+  typecheck_obeys_contract_call(side_effect_expr_function_callt &expr);
   /// Checks that no history expr or return_value exists in expr
   virtual void
   check_history_expr_return_value(const exprt &expr, std::string &clause_type);
@@ -155,7 +160,6 @@ protected:
   /// is found in expr.
   virtual void check_was_freed(const exprt &expr, std::string &clause_type);
 
-  virtual void typecheck_spec_function_pointer_obeys_contract(exprt &expr);
   virtual void typecheck_spec_assigns(exprt::operandst &targets);
   virtual void typecheck_spec_frees(exprt::operandst &targets);
   virtual void typecheck_conditional_targets(
@@ -192,7 +196,7 @@ protected:
   virtual void typecheck_expr_binary_arithmetic(exprt &expr);
   virtual void typecheck_expr_shifts(shift_exprt &expr);
   virtual void typecheck_expr_pointer_arithmetic(exprt &expr);
-  virtual void typecheck_arithmetic_pointer(const exprt &expr);
+  virtual void typecheck_arithmetic_pointer(exprt &expr);
   virtual void typecheck_expr_binary_boolean(exprt &expr);
   virtual void typecheck_expr_trinary(if_exprt &expr);
   virtual void typecheck_expr_address_of(exprt &expr);

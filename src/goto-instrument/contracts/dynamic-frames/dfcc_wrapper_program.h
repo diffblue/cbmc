@@ -30,14 +30,14 @@ class messaget;
 class message_handlert;
 class dfcc_instrumentt;
 class dfcc_libraryt;
+class dfcc_lift_memory_predicatest;
 class dfcc_utilst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
-class function_pointer_obeys_contract_exprt;
 
 /// \brief Generates the body of a wrapper function from a contract
-/// specified using requires, requires_contract, assigns, frees, ensures,
-/// ensures_contract clauses attached to a function symbol. The desired mode
+/// specified using requires, assigns, frees, ensures,
+/// clauses attached to a function symbol. The desired mode
 /// CHECK or REPLACE is given to the constructor of the class.
 ///
 /// \details The body of the wrapper is divided into a number of sections
@@ -109,6 +109,9 @@ public:
   /// \param utils utility functions for contracts transformation
   /// \param library the contracts instrumentation library
   /// \param instrument the instrumenter class for goto functions/goto programs
+  /// \param memory_predicates handler for user-defed memory predicates, used to
+  /// adjust call parameters for user defined predicates used in requires and
+  /// ensures clauses.
   dfcc_wrapper_programt(
     const dfcc_contract_modet contract_mode,
     const symbolt &wrapper_symbol,
@@ -119,7 +122,8 @@ public:
     message_handlert &message_handler,
     dfcc_utilst &utils,
     dfcc_libraryt &library,
-    dfcc_instrumentt &instrument);
+    dfcc_instrumentt &instrument,
+    dfcc_lift_memory_predicatest &memory_predicates);
 
   /// Adds the whole program to `dest` and the discovered function pointer
   /// contracts `dest_fp_contracts`.
@@ -174,6 +178,7 @@ protected:
   dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
+  dfcc_lift_memory_predicatest &memory_predicates;
   namespacet ns;
   goto_convertt converter;
 
@@ -233,37 +238,8 @@ protected:
   /// Encodes preconditions, instruments them to check for side effects
   void encode_requires_clauses();
 
-  /// Encodes function pointer preconditions
-  void encode_requires_contract_clauses();
-
   /// Encodes postconditions, instruments them to check for side effects
   void encode_ensures_clauses();
-
-  /// Encodes function pointer postconditions
-  void encode_ensures_contract_clauses();
-
-  /// Translates a function_pointer_obeys_contract_exprt into an assertion
-  /// ```
-  /// ASSERT function_pointer == contract;
-  /// ```
-  ///
-  /// \param expr expression to translate
-  /// \param property_class property class to use for the generated assertions
-  /// \param dest goto_program where generated instructions are appended
-  void assert_function_pointer_obeys_contract(
-    const function_pointer_obeys_contract_exprt &expr,
-    const irep_idt &property_class,
-    goto_programt &dest);
-
-  /// Translates a function_pointer_obeys_contract_exprt into an assignment
-  /// ```
-  /// ASSIGN function_pointer = contract;
-  /// ```
-  /// \param expr expression to translate
-  /// \param dest goto_program where generated instructions are appended
-  void assume_function_pointer_obeys_contract(
-    const function_pointer_obeys_contract_exprt &expr,
-    goto_programt &dest);
 
   /// Encodes the function call section of the wrapper program.
   void encode_function_call();

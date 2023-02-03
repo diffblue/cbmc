@@ -50,12 +50,10 @@ void create_java_initialize(symbol_table_baset &symbol_table)
   // if a GOTO binary provided it. This behaviour mirrors the ANSI-C frontend.
   symbol_table.remove(INITIALIZE_FUNCTION);
 
-  symbolt initialize;
-  initialize.name=INITIALIZE_FUNCTION;
+  symbolt initialize{
+    INITIALIZE_FUNCTION, java_method_typet({}, java_void_type()), ID_java};
   initialize.base_name=INITIALIZE_FUNCTION;
-  initialize.mode=ID_java;
 
-  initialize.type = java_method_typet({}, java_void_type());
   symbol_table.add(initialize);
 }
 
@@ -623,7 +621,7 @@ bool java_entry_point(
     return true;
   symbolt symbol=res.main_function;
 
-  assert(symbol.type.id()==ID_code);
+  DATA_INVARIANT(symbol.type.id() == ID_code, "expected code-typed symbol");
 
   return generate_java_start_function(
     symbol,
@@ -649,7 +647,7 @@ bool generate_java_start_function(
 
   // build call to initialization function
   {
-    symbol_tablet::symbolst::const_iterator init_it=
+    symbol_table_baset::symbolst::const_iterator init_it =
       symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())
@@ -764,13 +762,12 @@ bool generate_java_start_function(
 
   // create a symbol for the __CPROVER__start function, associate the code that
   // we just built and register it in the symbol table
-  symbolt new_symbol;
-
-  new_symbol.name=goto_functionst::entry_point();
+  symbolt new_symbol{
+    goto_functionst::entry_point(),
+    java_method_typet{{}, java_void_type()},
+    ID_java};
   new_symbol.base_name = goto_functionst::entry_point();
-  new_symbol.type = java_method_typet({}, java_void_type());
   new_symbol.value.swap(init_code);
-  new_symbol.mode=ID_java;
 
   if(!symbol_table.insert(std::move(new_symbol)).second)
   {

@@ -1,0 +1,10 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/my_contract _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test demonstrates the ability to specify a function_name/contract_name
+mapping for contract checking.

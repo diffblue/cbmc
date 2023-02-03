@@ -8,7 +8,6 @@
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
-#include <util/options.h>
 
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/read_goto_binary.h>
@@ -22,8 +21,6 @@
 #endif
 
 #include <langapi/language.h>
-
-#include <fstream>
 
 //! @cond Doxygen_suppress_Lambda_in_initializer_list
 lazy_goto_modelt::lazy_goto_modelt(
@@ -60,7 +57,6 @@ lazy_goto_modelt::lazy_goto_modelt(
       driver_program_generate_function_body),
     message_handler(message_handler)
 {
-  language_files.set_message_handler(message_handler);
 }
 
 lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
@@ -157,7 +153,7 @@ void lazy_goto_modelt::initialize(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(symbol_table))
+    if(language_files.typecheck(symbol_table, message_handler))
     {
       throw invalid_input_exceptiont("CONVERSION ERROR");
     }

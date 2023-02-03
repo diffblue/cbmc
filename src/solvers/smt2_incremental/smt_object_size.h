@@ -3,8 +3,8 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_OBJECT_SIZE_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_OBJECT_SIZE_H
 
-#include <solvers/smt2_incremental/ast/smt_commands.h>
-#include <solvers/smt2_incremental/ast/smt_terms.h>
+#include <solvers/smt2_incremental/ast/smt_commands.h> // IWYU pragma: keep
+#include <solvers/smt2_incremental/ast/smt_terms.h>    // IWYU pragma: keep
 
 /// Specifics of how the object size lookup is implemented in SMT terms.
 /// This uses an uninterpreted function as a lookup. Because these functions

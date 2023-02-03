@@ -19,12 +19,12 @@ Author: Daniel Kroening
 class message_handlert;
 
 void remove_internal_symbols(
-  class symbol_tablet &symbol_table,
+  class symbol_table_baset &symbol_table,
   message_handlert &,
   const bool);
 
 void remove_internal_symbols(
-  class symbol_tablet &symbol_table,
+  class symbol_table_baset &symbol_table,
   message_handlert &,
   const bool keep_file_local,
   const std::set<irep_idt> &keep);

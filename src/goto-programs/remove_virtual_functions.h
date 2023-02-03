@@ -26,7 +26,6 @@ class class_hierarchyt;
 class goto_functionst;
 class goto_model_functiont;
 class goto_modelt;
-class symbol_tablet;
 class symbol_table_baset;
 
 // For all of the following the class-hierarchy and non-class-hierarchy
@@ -113,7 +112,7 @@ goto_programt::targett remove_virtual_function(
   virtual_dispatch_fallback_actiont fallback_action);
 
 goto_programt::targett remove_virtual_function(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,

@@ -311,7 +311,7 @@ bool interpretert::memory_offset_to_byte_offset(
 /// \return vector in which the result of the evaluation is stored
 interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 {
-  if(expr.id()==ID_constant)
+  if(expr.is_constant())
   {
     if(expr.type().id()==ID_struct)
     {
@@ -319,16 +319,16 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
       dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
       bool error=false;
 
-      forall_operands(it, expr)
+      for(const auto &op : expr.operands())
       {
-        if(it->type().id()==ID_code)
+        if(op.type().id() == ID_code)
           continue;
 
-        mp_integer sub_size=get_size(it->type());
+        mp_integer sub_size = get_size(op.type());
         if(sub_size==0)
           continue;
 
-        mp_vectort tmp = evaluate(*it);
+        mp_vectort tmp = evaluate(op);
 
         if(tmp.size()==sub_size)
         {
@@ -380,7 +380,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
       const auto width = to_c_bool_type(expr.type()).get_width();
       return {bvrep2integer(value, width, false)};
     }
-    else if(expr.type().id()==ID_bool)
+    else if(expr.is_boolean())
     {
       return {expr.is_true()};
     }
@@ -407,18 +407,18 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 
     bool error=false;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      if(it->type().id()==ID_code)
+      if(op.type().id() == ID_code)
         continue;
 
-      mp_integer sub_size=get_size(it->type());
+      mp_integer sub_size = get_size(op.type());
       if(sub_size==0)
         continue;
 
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
 
-      if(unbounded_size(it->type()) || tmp.size()==sub_size)
+      if(unbounded_size(op.type()) || tmp.size() == sub_size)
       {
         for(std::size_t i=0; i<tmp.size(); i++)
           dest.push_back(tmp[i]);
@@ -467,9 +467,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
       throw id2string(expr.id())+" expects at least two operands";
 
     mp_integer final=0;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
       if(tmp.size()==1)
         final=bitwise_or(final, tmp.front());
     }
@@ -481,9 +481,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
       throw id2string(expr.id())+" expects at least two operands";
 
     mp_integer final=-1;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
       if(tmp.size()==1)
         final=bitwise_and(final, tmp.front());
     }
@@ -496,9 +496,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
       throw id2string(expr.id())+" expects at least two operands";
 
     mp_integer final=0;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
       if(tmp.size()==1)
         final=bitwise_xor(final, tmp.front());
     }
@@ -620,9 +620,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 
     bool result=false;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
 
       if(tmp.size()==1 && tmp.front()!=0)
       {
@@ -660,9 +660,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 
     bool result=true;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
 
       if(tmp.size()==1 && tmp.front()==0)
       {
@@ -686,9 +686,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
   {
     mp_integer result=0;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
       if(tmp.size()==1)
         result+=tmp.front();
     }
@@ -716,16 +716,16 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
     else
       result=1;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
       if(tmp.size()==1)
       {
         if(expr.type().id()==ID_fixedbv)
         {
           fixedbvt f1, f2;
           f1.spec=fixedbv_spect(to_fixedbv_type(expr.type()));
-          f2.spec=fixedbv_spect(to_fixedbv_type(it->type()));
+          f2.spec = fixedbv_spect(to_fixedbv_type(op.type()));
           f1.set_value(result);
           f2.set_value(tmp.front());
           f1*=f2;
@@ -734,7 +734,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
         else if(expr.type().id()==ID_floatbv)
         {
           ieee_floatt f1(to_floatbv_type(expr.type()));
-          ieee_floatt f2(to_floatbv_type(it->type()));
+          ieee_floatt f2(to_floatbv_type(op.type()));
           f1.unpack(result);
           f2.unpack(tmp.front());
           f1*=f2;
@@ -910,16 +910,16 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
         const auto s = integer2bvrep(value, width);
         return {bvrep2integer(s, width, false)};
       }
-      else if((expr.type().id()==ID_bool) || (expr.type().id()==ID_c_bool))
+      else if(expr.is_boolean() || expr.type().id() == ID_c_bool)
         return {value != 0};
     }
   }
   else if(expr.id()==ID_array)
   {
     mp_vectort dest;
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
-      mp_vectort tmp = evaluate(*it);
+      mp_vectort tmp = evaluate(op);
       dest.insert(dest.end(), tmp.begin(), tmp.end());
     }
     return dest;

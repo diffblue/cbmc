@@ -170,7 +170,7 @@ public:
       case operationt::Lwfence: return "f";
       case operationt::ASMfence: return "asm:";
     }
-    assert(false);
+    UNREACHABLE;
     return "?";
   }
 

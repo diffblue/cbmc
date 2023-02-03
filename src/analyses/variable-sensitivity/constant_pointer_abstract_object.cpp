@@ -8,22 +8,17 @@
 
 #include "constant_pointer_abstract_object.h"
 
-#include <analyses/variable-sensitivity/abstract_environment.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
-#include <ostream>
+#include <analyses/variable-sensitivity/abstract_environment.h>
 
 #include "abstract_object_statistics.h"
 
-constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const typet &type)
-  : abstract_pointer_objectt(type)
-{
-  PRECONDITION(type.id() == ID_pointer);
-}
+#include <ostream>
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const typet &type,
@@ -179,7 +174,7 @@ void constant_pointer_abstract_objectt::output(
         {
           auto const &array_symbol = to_symbol_expr(array);
           out << array_symbol.get_identifier() << "[";
-          if(array_index.index().id() == ID_constant)
+          if(array_index.index().is_constant())
             out << to_constant_expr(array_index.index()).get_value();
           else
             out << "?";

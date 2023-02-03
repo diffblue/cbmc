@@ -10,12 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "goto_symex_state.h"
-#include "goto_symex_is_constant.h"
-
-#include <iostream>
 
 #include <util/as_const.h>
-#include <util/base_exceptions.h>
+#include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
@@ -25,6 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 #include <pointer-analysis/add_failed_symbols.h>
+
+#include "goto_symex_is_constant.h"
+#include "symex_target_equation.h"
 
 static void get_l1_name(exprt &expr);
 
@@ -110,7 +110,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
       "pointer handling for concurrency is unsound");
 
   // Update constant propagation map -- the RHS is L2
-  if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
+  if(!is_shared && record_value && goto_symex_is_constantt(ns)(rhs))
   {
     const auto propagation_entry = propagation.find(l1_identifier);
     if(!propagation_entry.has_value())
@@ -261,14 +261,15 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       *it = rename<level>(std::move(*it), ns).get();
 
     const exprt &c_expr = as_const(expr);
-    INVARIANT(
+    INVARIANT_WITH_DIAGNOSTICS(
       (expr.id() != ID_with ||
        c_expr.type() == to_with_expr(c_expr).old().type()) &&
         (expr.id() != ID_if ||
          (c_expr.type() == to_if_expr(c_expr).true_case().type() &&
           c_expr.type() == to_if_expr(c_expr).false_case().type())),
       "Type of renamed expr should be the same as operands for with_exprt and "
-      "if_exprt");
+      "if_exprt",
+      irep_pretty_diagnosticst{expr});
 
     if(level == L2)
       expr = field_sensitivity.apply(ns, *this, std::move(expr), false);
@@ -372,7 +373,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivity.is_divisible(expr))
+  if(field_sensitivity.is_divisible(expr, true))
     return false;
 
   const ssa_exprt ssa_l1 = remove_level_2(expr);
@@ -508,7 +509,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivity.is_divisible(expr))
+  if(field_sensitivity.is_divisible(expr, true))
     return write_is_shared_resultt::NOT_SHARED;
 
   if(atomic_section_id != 0)
@@ -836,13 +837,20 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
   }
 
   // L2 renaming
-  const exprt fields = field_sensitivity.get_fields(ns, *this, ssa);
+  exprt fields = field_sensitivity.get_fields(ns, *this, ssa, false);
   fields.visit_pre([this](const exprt &e) {
     if(auto l1_symbol = expr_try_dynamic_cast<symbol_exprt>(e))
     {
       const ssa_exprt &field_ssa = to_ssa_expr(*l1_symbol);
       const std::size_t field_generation = level2.increase_generation(
         l1_symbol->get_identifier(), field_ssa, fresh_l2_name_provider);
+      CHECK_RETURN(field_generation == 1);
+    }
+    else if(auto fs_ssa = expr_try_dynamic_cast<field_sensitive_ssa_exprt>(e))
+    {
+      const ssa_exprt &ssa = fs_ssa->get_object_ssa();
+      const std::size_t field_generation = level2.increase_generation(
+        ssa.get_identifier(), ssa, fresh_l2_name_provider);
       CHECK_RETURN(field_generation == 1);
     }
   });

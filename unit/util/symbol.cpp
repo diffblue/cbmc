@@ -10,7 +10,6 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <util/exception_utils.h>
 #include <util/symbol.h>
 
 SCENARIO(
@@ -19,12 +18,10 @@ SCENARIO(
 {
   GIVEN("A valid symbol")
   {
-    symbolt symbol;
     irep_idt symbol_name = "Test_TestBase";
-    symbol.name = symbol_name;
+    symbolt symbol{symbol_name, typet{}, ID_C};
     symbol.base_name = "TestBase";
     symbol.module = "TestModule";
-    symbol.mode = "C";
 
     THEN("Symbol should be well formed")
     {

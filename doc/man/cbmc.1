@@ -178,6 +178,10 @@ enable pointer checks
 \fB\-\-memory\-leak\-check\fR
 enable memory leak checks
 .TP
+\fB\-\-memory\-cleanup\-check\fR
+Enable memory cleanup checks: assert that all dynamically allocated memory is
+explicitly freed before terminating the program.
+.TP
 \fB\-\-div\-by\-zero\-check\fR
 enable division by zero checks
 .TP
@@ -457,11 +461,12 @@ The solver name must be in the "PATH" or be an executable with full path.
 The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.
 .br
 The SMT solver should support the QF_AUFBV logic.
-.br
-The flag \fB\-\-slice\-formula\fR should be added to remove some not-yet supported features.
 .TP
 \fB\-\-outfile\fR filename
 output formula to given file
+.TP
+\fB\-\-dump\-smt\-formula\fR filename
+output smt incremental formula to the given file
 .TP
 \fB\-\-write\-solver\-stats\-to\fR json\-file
 collect the solver query complexity

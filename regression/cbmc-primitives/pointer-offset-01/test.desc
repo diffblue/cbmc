@@ -1,17 +1,15 @@
-CORE
+CORE new-smt-backend
 main.c
 
 ^EXIT=10$
 ^SIGNAL=0$
-\[main.assertion.1\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) >= 0: FAILURE
+\[main.assertion.1\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) >= 0: SUCCESS
 \[main.assertion.2\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) < 0: FAILURE
 --
 ^warning: ignoring
 --
-For uninitialised pointers, CBMC chooses a nondeterministic value (though no memory
-is allocated). Since the offset of pointers is signed, negative offsets should be
-able to be chosen (along with positive ones) non-deterministically.
-`__CPROVER_POINTER_OFFSET` is the CBMC primitive that gets the pointer offset
-from the base address of the object. This test guards this, and especially
-against the case where we could only observe some cases where offsets were only
-positive (in some CI configurations, for instance).
+For uninitialised pointers, CBMC chooses a nondeterministic value (though no
+memory is allocated).  Since the offset of pointers is unsigned, negative
+offsets cannot be chosen.  `__CPROVER_POINTER_OFFSET` is the CBMC primitive
+that gets the pointer offset from the base address of the object.  This test
+guards this.

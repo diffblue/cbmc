@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 test.c
 --depth 1000
 ^\[main\.assertion\.[0-9]+\] line [0-9]+ assertion argc == 1: FAILURE$

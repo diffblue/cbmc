@@ -13,10 +13,10 @@ Date: July 2021
 
 #include "havoc_utils.h"
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
+
+#include <goto-programs/goto_program.h>
 
 void havoc_utilst::append_full_havoc_code(
   const source_locationt location,

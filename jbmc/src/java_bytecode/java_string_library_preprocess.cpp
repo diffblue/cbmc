@@ -16,22 +16,24 @@ Date:   April 2017
 ///   java standard library. In particular methods from java.lang.String,
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
-#include <goto-programs/allocate_objects.h>
-#include <goto-programs/class_identifier.h>
+#include "java_string_library_preprocess.h"
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/floatbv_expr.h>
+#include <util/ieee_float.h>
 #include <util/refined_string_type.h>
 #include <util/std_code.h>
 #include <util/string_expr.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/allocate_objects.h>
+#include <goto-programs/class_identifier.h>
 
 #include "java_types.h"
 #include "java_utils.h"
-
-#include "java_string_library_preprocess.h"
 
 /// \return tag of a struct prefixed by "java::" or symbolic tag
 ///   empty string if not symbol or struct
@@ -215,11 +217,11 @@ java_string_library_preprocesst::get_string_type_base_classes(
 /// \param class_name: a name for the class such as "java.lang.String"
 /// \param symbol_table: symbol table to which the class will be added
 void java_string_library_preprocesst::add_string_type(
-  const irep_idt &class_name, symbol_tablet &symbol_table)
+  const irep_idt &class_name,
+  symbol_table_baset &symbol_table)
 {
   irep_idt class_symbol_name = "java::" + id2string(class_name);
-  symbolt tmp_string_symbol;
-  tmp_string_symbol.name = class_symbol_name;
+  type_symbolt tmp_string_symbol{class_symbol_name, typet{}, ID_java};
   symbolt *string_symbol = nullptr;
   bool already_exists = symbol_table.move(tmp_string_symbol, string_symbol);
 
@@ -247,8 +249,6 @@ void java_string_library_preprocesst::add_string_type(
     string_symbol->base_name = id2string(class_name);
     string_symbol->pretty_name = id2string(class_name);
     string_symbol->type = new_string_type;
-    string_symbol->is_type = true;
-    string_symbol->mode = ID_java;
   }
 
   auto &string_type = to_java_class_type(string_symbol->type);
@@ -364,7 +364,7 @@ exprt::operandst java_string_library_preprocesst::process_operands(
 /// \param symbol_table: symbol table
 /// \return type of the "data" component
 static const typet &
-get_data_type(const typet &type, const symbol_tablet &symbol_table)
+get_data_type(const typet &type, const symbol_table_baset &symbol_table)
 {
   PRECONDITION(type.id() == ID_struct || type.id() == ID_struct_tag);
   if(type.id() == ID_struct_tag)
@@ -384,7 +384,7 @@ get_data_type(const typet &type, const symbol_tablet &symbol_table)
 /// \param symbol_table: symbol table
 /// \return type of the "length" component
 static const typet &
-get_length_type(const typet &type, const symbol_tablet &symbol_table)
+get_length_type(const typet &type, const symbol_table_baset &symbol_table)
 {
   PRECONDITION(type.id() == ID_struct || type.id() == ID_struct_tag);
   if(type.id() == ID_struct_tag)
@@ -403,7 +403,8 @@ get_length_type(const typet &type, const symbol_tablet &symbol_table)
 /// \param expr: an expression of structured type with length component
 /// \param symbol_table: symbol table
 /// \return expression representing the "length" member
-static exprt get_length(const exprt &expr, const symbol_tablet &symbol_table)
+static exprt
+get_length(const exprt &expr, const symbol_table_baset &symbol_table)
 {
   return member_exprt(
     expr, "length", get_length_type(expr.type(), symbol_table));
@@ -413,7 +414,7 @@ static exprt get_length(const exprt &expr, const symbol_tablet &symbol_table)
 /// \param expr: an expression of structured type with data component
 /// \param symbol_table: symbol table
 /// \return expression representing the "data" member
-static exprt get_data(const exprt &expr, const symbol_tablet &symbol_table)
+static exprt get_data(const exprt &expr, const symbol_table_baset &symbol_table)
 {
   return member_exprt(expr, "data", get_data_type(expr.type(), symbol_table));
 }

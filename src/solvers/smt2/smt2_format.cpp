@@ -44,7 +44,7 @@ std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
 
 std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
 {
-  if(expr.id() == ID_constant)
+  if(expr.is_constant())
   {
     const auto &constant_expr = to_constant_expr(expr);
     const auto &value = constant_expr.get_value();

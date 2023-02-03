@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check _ --dump-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+loop 1 invariant.*\_\_CPROVER\_POINTER\_OFFSET
+assigns i
+--
+Checks if synthesized contracts are dumped correctly.

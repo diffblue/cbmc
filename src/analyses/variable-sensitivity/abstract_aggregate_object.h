@@ -12,11 +12,14 @@
 #ifndef CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 #define CBMC_ABSTRACT_AGGREGATE_OBJECT_H
 
+#include <util/namespace.h>
+
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
-#include <stack>
 
 #include "abstract_object_statistics.h"
+
+#include <stack>
 
 class abstract_aggregate_tag
 {
@@ -27,12 +30,6 @@ class abstract_aggregate_objectt : public abstract_objectt,
                                    public abstract_aggregate_tag
 {
 public:
-  explicit abstract_aggregate_objectt(const typet &type)
-    : abstract_objectt(type)
-  {
-    PRECONDITION(type.id() == aggregate_traitst::TYPE_ID());
-  }
-
   abstract_aggregate_objectt(const typet &type, bool tp, bool bttm)
     : abstract_objectt(type, tp, bttm)
   {

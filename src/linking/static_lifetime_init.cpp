@@ -14,12 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <set>
 
-static optionalt<codet>
-static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
+static optionalt<codet> static_lifetime_init(
+  const irep_idt &identifier,
+  symbol_table_baset &symbol_table)
 {
   const namespacet ns(symbol_table);
   const symbolt &symbol = ns.lookup(identifier);
@@ -92,7 +93,7 @@ static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
 }
 
 void static_lifetime_init(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &source_location)
 {
   PRECONDITION(symbol_table.has_symbol(INITIALIZE_FUNCTION));

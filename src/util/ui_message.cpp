@@ -8,9 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ui_message.h"
 
-#include <fstream>
-#include <iostream>
-
 #include "cmdline.h"
 #include "cout_message.h"
 #include "json.h"
@@ -20,6 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "structured_data.h"
 #include "xml.h"
 #include "xml_irep.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 ui_message_handlert::ui_message_handlert(
   message_handlert *_message_handler,

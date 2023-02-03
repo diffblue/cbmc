@@ -9,20 +9,20 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
-#include "c_typecheck_base.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_instruction_code.h>
 
-#include <atomic>
-
 #include "c_expr.h"
+#include "c_typecheck_base.h"
+
+#include <atomic>
 
 static symbol_exprt typecheck_sync_with_pointer_parameter(
   const irep_idt &identifier,
@@ -610,13 +610,10 @@ static symbolt result_symbol(
   const irep_idt &identifier,
   const typet &type,
   const source_locationt &source_location,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
-  symbolt symbol;
-  symbol.name = id2string(identifier) + "::1::result";
+  symbolt symbol{id2string(identifier) + "::1::result", type, ID_C};
   symbol.base_name = "result";
-  symbol.type = type;
-  symbol.mode = ID_C;
   symbol.location = source_location;
   symbol.is_file_local = true;
   symbol.is_lvalue = true;
@@ -633,7 +630,7 @@ static void instantiate_atomic_fetch_op(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // type __sync_fetch_and_OP(type *ptr, type value, ...)
@@ -695,7 +692,7 @@ static void instantiate_atomic_op_fetch(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // type __sync_OP_and_fetch(type *ptr, type value, ...)
@@ -808,7 +805,7 @@ static void instantiate_sync_val_compare_and_swap(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // type __sync_val_compare_and_swap(type *ptr, type old, type new, ...)
@@ -858,7 +855,7 @@ static void instantiate_sync_lock_test_and_set(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // type __sync_lock_test_and_set (type *ptr, type value, ...)
@@ -987,7 +984,7 @@ static void instantiate_atomic_load_n(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // type __atomic_load_n (type *ptr, int memorder)
@@ -1102,7 +1099,7 @@ static void instantiate_atomic_exchange_n(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // type __atomic_exchange_n (type *ptr, type val, int memorder)
@@ -1132,7 +1129,7 @@ static void instantiate_atomic_compare_exchange(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &block)
 {
   // bool __atomic_compare_exchange (type *ptr, type *expected, type *desired,

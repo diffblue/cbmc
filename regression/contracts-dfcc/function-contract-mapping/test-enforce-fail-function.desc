@@ -1,0 +1,10 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract /my_contract _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+^Invalid function-contract mapping$
+^Reason: couldn't find function name before '/' in '/my_contract'$
+^EXIT=(10|6)$
+^SIGNAL=0$
+--
+--
+Checks that when the function name is missing an error is triggered.

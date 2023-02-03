@@ -18,9 +18,9 @@ Author: Diffblue Ltd.
 #include <functional>
 #include <vector>
 
-class symbol_tablet;
+class symbol_table_baset;
 
-std::function<std::vector<irep_idt>(const symbol_tablet &symbol_table)>
+std::function<std::vector<irep_idt>(const symbol_table_baset &symbol_table)>
 build_load_method_by_regex(const std::string &pattern);
 
 bool does_pattern_miss_descriptor(const std::string &pattern);

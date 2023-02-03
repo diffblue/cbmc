@@ -19,6 +19,7 @@ Author: Daniel Kroening
 #include <util/config.h>
 #include <util/format_expr.h>
 #include <util/merge_irep.h>
+#include <util/namespace.h>
 #include <util/range.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>
@@ -212,7 +213,7 @@ std::string trace_numeric_value(
 {
   const typet &type = expr.type();
 
-  if(expr.id()==ID_constant)
+  if(expr.is_constant())
   {
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
@@ -256,13 +257,13 @@ std::string trace_numeric_value(
   {
     std::string result;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       if(result.empty())
         result="{ ";
       else
         result+=", ";
-      result+=trace_numeric_value(*it, ns, options);
+      result += trace_numeric_value(op, ns, options);
     }
 
     return result+" }";

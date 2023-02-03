@@ -61,13 +61,13 @@ public:
 
 inline const cpp_enum_typet &to_cpp_enum_type(const irept &irep)
 {
-  assert(irep.id()==ID_c_enum);
+  PRECONDITION(irep.id() == ID_c_enum);
   return static_cast<const cpp_enum_typet &>(irep);
 }
 
 inline cpp_enum_typet &to_cpp_enum_type(irept &irep)
 {
-  assert(irep.id()==ID_c_enum);
+  PRECONDITION(irep.id() == ID_c_enum);
   return static_cast<cpp_enum_typet &>(irep);
 }
 

@@ -6,14 +6,22 @@
 
 \*******************************************************************/
 
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
-
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
+
+#include <analyses/variable-sensitivity/abstract_environment.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+
+// NOLINTNEXTLINE(whitespace/line_length)
+#include <analyses/variable-sensitivity/constant_abstract_value.h> // IWYU pragma: keep
+
+// NOLINTNEXTLINE(whitespace/line_length)
+#include <analyses/variable-sensitivity/interval_abstract_value.h> // IWYU pragma: keep
+#include <analyses/variable-sensitivity/value_set_abstract_object.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+#include <testing-utils/use_catch.h>
 
 exprt binary_expression(
   dstringt const &exprId,
@@ -794,7 +802,7 @@ void ASSUME_TRUE(
   {
     auto assumption = env.do_assume(expr, ns);
     REQUIRE(assumption.id() != ID_nil);
-    REQUIRE(assumption.type().id() == ID_bool);
+    REQUIRE(assumption.is_boolean());
     REQUIRE(assumption.is_true());
   }
 }
@@ -808,7 +816,7 @@ void ASSUME_FALSE(
   {
     auto assumption = env.do_assume(expr, ns);
     REQUIRE(assumption.id() != ID_nil);
-    REQUIRE(assumption.type().id() == ID_bool);
+    REQUIRE(assumption.is_boolean());
     REQUIRE(assumption.is_false());
   }
 }

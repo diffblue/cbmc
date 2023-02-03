@@ -12,13 +12,13 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
 
-#include <chrono>
-
 #include "fault_localization_provider.h"
 #include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "multi_path_symex_only_checker.h"
 #include "witness_provider.h"
+
+#include <chrono> // IWYU pragma: keep
 
 /// Performs a multi-path symbolic execution using goto-symex
 /// and calls a SAT/SMT solver to check the status of the properties.

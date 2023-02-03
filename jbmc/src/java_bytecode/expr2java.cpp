@@ -117,7 +117,9 @@ std::string expr2javat::convert_struct(
   const struct_typet::componentst &components=
     struct_type.components();
 
-  assert(components.size()==src.operands().size());
+  DATA_INVARIANT(
+    components.size() == src.operands().size(),
+    "inconsistent number of components");
 
   exprt::operandst::const_iterator o_it=src.operands().begin();
 
@@ -126,33 +128,33 @@ std::string expr2javat::convert_struct(
 
   for(const auto &c : components)
   {
-    if(c.type().id() != ID_code)
+    DATA_INVARIANT(
+      c.type().id() != ID_code, "struct member must not be of code type");
+
+    std::string tmp = convert(*o_it);
+    std::string sep;
+
+    if(first)
+      first = false;
+    else
     {
-      std::string tmp=convert(*o_it);
-      std::string sep;
-
-      if(first)
-        first=false;
-      else
+      if(last_size + 40 < dest.size())
       {
-        if(last_size+40<dest.size())
-        {
-          sep=",\n    ";
-          last_size=dest.size();
-        }
-        else
-          sep=", ";
+        sep = ",\n    ";
+        last_size = dest.size();
       }
-
-      dest+=sep;
-      dest+='.';
-      irep_idt field_name = c.get_pretty_name();
-      if(field_name.empty())
-        field_name = c.get_name();
-      dest += id2string(field_name);
-      dest+='=';
-      dest+=tmp;
+      else
+        sep = ", ";
     }
+
+    dest += sep;
+    dest += '.';
+    irep_idt field_name = c.get_pretty_name();
+    if(field_name.empty())
+      field_name = c.get_name();
+    dest += id2string(field_name);
+    dest += '=';
+    dest += tmp;
 
     o_it++;
   }
@@ -173,7 +175,7 @@ std::string expr2javat::convert_constant(
     else
       return "false";
   }
-  else if(src.type().id()==ID_bool)
+  else if(src.is_boolean())
   {
     if(src.is_true())
       return "true";
@@ -425,7 +427,7 @@ std::string expr2javat::convert_with_precedence(
   {
     return '"' + MetaString(id2string(literal->value())) + '"';
   }
-  else if(src.id()==ID_constant)
+  else if(src.is_constant())
     return convert_constant(to_constant_expr(src), precedence=16);
   else
     return expr2ct::convert_with_precedence(src, precedence);

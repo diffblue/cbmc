@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_utils.h>
 #include <util/version.h>
 
-#include <fstream>
+#include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <memory>
 
@@ -662,6 +662,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-lexical-loops"))
     {
       show_lexical_loops(goto_model, std::cout);
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("print-internal-representation"))
@@ -1144,17 +1145,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
-  }
-
-  if(cmdline.isset("synthesize-loop-invariants"))
-  {
-    log.warning() << "Loop invariant synthesizer is still work in progress. "
-                     "It only generates TRUE as invariants."
-                  << messaget::eom;
-
-    // Synthesize loop invariants and annotate them into `goto_model`
-    enumerative_loop_invariant_synthesizert synthesizer(goto_model, log);
-    annotate_invariants(synthesizer.synthesize_all(), goto_model, log);
   }
 
   bool use_dfcc = cmdline.isset(FLAG_DFCC);
@@ -1976,7 +1966,6 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_DFCC
     HELP_LOOP_CONTRACTS
-    HELP_LOOP_INVARIANT_SYNTHESIZER
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     HELP_ENFORCE_CONTRACT_REC

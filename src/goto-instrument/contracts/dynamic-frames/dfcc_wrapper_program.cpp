@@ -26,9 +26,8 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include "dfcc_contract_functions.h"
 #include "dfcc_instrument.h"
-#include "dfcc_is_freeable.h"
-#include "dfcc_is_fresh.h"
 #include "dfcc_library.h"
+#include "dfcc_lift_memory_predicates.h"
 #include "dfcc_utils.h"
 
 /// Generate the contract write set
@@ -185,7 +184,8 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
   message_handlert &message_handler,
   dfcc_utilst &utils,
   dfcc_libraryt &library,
-  dfcc_instrumentt &instrument)
+  dfcc_instrumentt &instrument,
+  dfcc_lift_memory_predicatest &memory_predicates)
   : contract_mode(contract_mode),
     wrapper_symbol(wrapper_symbol),
     wrapped_symbol(wrapped_symbol),
@@ -216,6 +216,7 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
     utils(utils),
     library(library),
     instrument(instrument),
+    memory_predicates(memory_predicates),
     ns(goto_model.symbol_table),
     converter(goto_model.symbol_table, log.get_message_handler())
 {
@@ -249,11 +250,9 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
   encode_ensures_write_set();
   encode_is_fresh_set();
   encode_requires_clauses();
-  encode_requires_contract_clauses();
   encode_contract_write_set();
   encode_function_call();
   encode_ensures_clauses();
-  encode_ensures_contract_clauses();
 }
 
 void dfcc_wrapper_programt::add_to_dest(
@@ -702,20 +701,17 @@ void dfcc_wrapper_programt::encode_requires_clauses()
     codet requires_statement(statement_type, {std::move(requires)}, sl);
     converter.goto_convert(requires_statement, requires_program, language_mode);
   }
-
   const auto address_of_requires_write_set = addr_of_requires_write_set;
 
-  // rewrite is_fresh predicates
-  dfcc_is_fresht is_fresh(library, message_handler);
-  is_fresh.rewrite_calls(requires_program, address_of_requires_write_set);
-
-  // rewrite is_freeable predicates
-  dfcc_is_freeablet is_freeable(library, message_handler);
-  is_freeable.rewrite_calls(requires_program, address_of_requires_write_set);
+  // fix calls to user-defined memory predicates
+  memory_predicates.fix_calls(requires_program);
 
   // instrument for side effects
   instrument.instrument_goto_program(
-    wrapper_id, requires_program, address_of_requires_write_set);
+    wrapper_id,
+    requires_program,
+    address_of_requires_write_set,
+    function_pointer_contracts);
 
   // append resulting program to preconditions section
   preconditions.destructive_append(requires_program);
@@ -765,158 +761,32 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
 
   const auto address_of_ensures_write_set = addr_of_ensures_write_set;
 
-  // rewrite is_fresh predicates
-  dfcc_is_fresht is_fresh(library, message_handler);
-  is_fresh.rewrite_calls(ensures_program, address_of_ensures_write_set);
-
-  // rewrite was_freed predicates
   // When checking an ensures clause we link the contract write set to the
-  // ensures write set to know what was deallocated by the function and pass
-  // it to the was_freed predicate and perform the checks
-  {
-    auto function_symbol =
-      library.dfcc_fun_symbol[dfcc_funt::LINK_DEALLOCATED].symbol_expr();
-    code_function_callt call(function_symbol);
-    auto &arguments = call.arguments();
-    arguments.emplace_back(address_of_ensures_write_set);
-    arguments.emplace_back(addr_of_contract_write_set);
-    link_deallocated_contract.add(
-      goto_programt::make_function_call(call, wrapper_sl));
-  }
+  // ensures write set to know what was deallocated by the function so that
+  // the was_freed predicate can perform its checks
+  code_function_callt call(
+    library.dfcc_fun_symbol[dfcc_funt::LINK_DEALLOCATED].symbol_expr());
+  auto &arguments = call.arguments();
+  arguments.emplace_back(address_of_ensures_write_set);
+  arguments.emplace_back(addr_of_contract_write_set);
+  link_deallocated_contract.add(
+    goto_programt::make_function_call(call, wrapper_sl));
 
-  dfcc_is_freeablet is_freeable(library, message_handler);
-  is_freeable.rewrite_calls(ensures_program, address_of_ensures_write_set);
+  // fix calls to user-defined user-defined memory predicates
+  memory_predicates.fix_calls(ensures_program);
 
   // instrument for side effects
   instrument.instrument_goto_program(
-    wrapper_id, ensures_program, address_of_ensures_write_set);
+    wrapper_id,
+    ensures_program,
+    address_of_ensures_write_set,
+    function_pointer_contracts);
 
   // add the snapshot program in the history section
   history.destructive_append(history_snapshot_program);
 
   // add the ensures program to the postconditions section
   postconditions.destructive_append(ensures_program);
-}
-
-void dfcc_wrapper_programt::encode_requires_contract_clauses()
-{
-  const auto &requires_contract = contract_code_type.requires_contract();
-
-  if(contract_mode == dfcc_contract_modet::CHECK)
-  {
-    for(auto &expr : requires_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-
-      assume_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance), preconditions);
-    }
-  }
-  else
-  {
-    for(auto &expr : requires_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-
-      assert_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance),
-        ID_precondition,
-        preconditions);
-    }
-  }
-}
-
-void dfcc_wrapper_programt::encode_ensures_contract_clauses()
-{
-  const auto &ensures_contract = contract_code_type.ensures_contract();
-
-  if(contract_mode == dfcc_contract_modet::CHECK)
-  {
-    for(auto &expr : ensures_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-      assert_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance),
-        ID_postcondition,
-        postconditions);
-    }
-  }
-  else
-  {
-    for(auto &expr : ensures_contract)
-    {
-      auto instance =
-        to_lambda_expr(expr).application(contract_lambda_parameters);
-      instance.add_source_location() = expr.source_location();
-      INVARIANT(
-        can_cast_expr<function_pointer_obeys_contract_exprt>(instance),
-        "instance ok");
-      assume_function_pointer_obeys_contract(
-        to_function_pointer_obeys_contract_expr(instance), postconditions);
-    }
-  }
-}
-
-void dfcc_wrapper_programt::assert_function_pointer_obeys_contract(
-  const function_pointer_obeys_contract_exprt &expr,
-  const irep_idt &property_class,
-  goto_programt &dest)
-{
-  function_pointer_contracts.insert(
-    expr.contract_symbol_expr().get_identifier());
-  source_locationt loc(expr.source_location());
-  loc.set_property_class(property_class);
-  std::stringstream comment;
-  comment << "Assert function pointer '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.address_of_contract())
-          << "'";
-  loc.set_comment(comment.str());
-  code_assertt assert_expr(
-    equal_exprt{expr.function_pointer(), expr.address_of_contract()});
-  assert_expr.add_source_location() = loc;
-  goto_programt instructions;
-  converter.goto_convert(assert_expr, instructions, contract_symbol.mode);
-  dest.destructive_append(instructions);
-}
-
-void dfcc_wrapper_programt::assume_function_pointer_obeys_contract(
-  const function_pointer_obeys_contract_exprt &expr,
-  goto_programt &dest)
-{
-  function_pointer_contracts.insert(
-    expr.contract_symbol_expr().get_identifier());
-
-  source_locationt loc(expr.source_location());
-  std::stringstream comment;
-  comment << "Assume function pointer '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.function_pointer())
-          << "' obeys contract '"
-          << from_expr_using_mode(
-               ns, contract_symbol.mode, expr.contract_symbol_expr())
-          << "'";
-  loc.set_comment(comment.str());
-  dest.add(goto_programt::make_assignment(
-    expr.function_pointer(), expr.address_of_contract(), loc));
 }
 
 void dfcc_wrapper_programt::encode_function_call()

@@ -9,15 +9,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol_table_base.h>
+
+#include "cpp_typecheck.h"
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 {
-  assert(symbol.type.id()==ID_struct);
+  PRECONDITION(symbol.type.id() == ID_struct);
 
   // builds virtual-table value maps: (class x virtual_name x value)
   std::map<irep_idt, std::map<irep_idt, exprt> > vt_value_maps;
@@ -31,7 +32,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
       continue;
 
     const code_typet &code_type=to_code_type(compo.type());
-    assert(code_type.parameters().size() > 0);
+    DATA_INVARIANT(code_type.parameters().size() > 0, "parameters expected");
 
     const pointer_typet &parameter_pointer_type=
       to_pointer_type(code_type.parameters()[0].type());
@@ -67,15 +68,14 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     const symbolt &vt_symb_type =
       lookup("virtual_table::" + id2string(late_cast_symb.name));
 
-    symbolt vt_symb_var;
-    vt_symb_var.name=
-      id2string(vt_symb_type.name) + "@"+ id2string(symbol.name);
+    symbolt vt_symb_var{
+      id2string(vt_symb_type.name) + "@" + id2string(symbol.name),
+      struct_tag_typet(vt_symb_type.name),
+      symbol.mode};
     vt_symb_var.base_name=
       id2string(vt_symb_type.base_name) + "@" + id2string(symbol.base_name);
-    vt_symb_var.mode = symbol.mode;
     vt_symb_var.module=module;
     vt_symb_var.location=vt_symb_type.location;
-    vt_symb_var.type = struct_tag_typet(vt_symb_type.name);
     vt_symb_var.is_lvalue=true;
     vt_symb_var.is_static_lifetime=true;
 
@@ -88,9 +88,9 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     {
       std::map<irep_idt, exprt>::const_iterator cit2 =
         value_map.find(compo.get_base_name());
-      assert(cit2!=value_map.end());
+      CHECK_RETURN(cit2 != value_map.end());
       const exprt &value=cit2->second;
-      assert(value.type()==compo.type());
+      DATA_INVARIANT(value.type() == compo.type(), "component type mismatch");
       values.operands().push_back(value);
     }
     vt_symb_var.value=values;

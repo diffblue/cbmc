@@ -204,7 +204,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   if(!symbol_expr_lhs)
     return {};
 
-  if(!goto_symex_is_constantt()(rhs))
+  if(!goto_symex_is_constantt(ns)(rhs))
     return {};
 
   return try_evaluate_pointer_comparison(
@@ -764,7 +764,7 @@ static void merge_names(
   }
 
   // field sensitivity: only merge on individual fields
-  if(dest_state.field_sensitivity.is_divisible(ssa))
+  if(dest_state.field_sensitivity.is_divisible(ssa, true))
     return;
 
   // shared variables are renamed on every access anyway, we don't need to
@@ -927,7 +927,7 @@ void goto_symext::loop_bound_exceeded(
   statet &state,
   const exprt &guard)
 {
-  const unsigned loop_number=state.source.pc->loop_number;
+  const std::string loop_number = std::to_string(state.source.pc->loop_number);
 
   exprt negated_cond;
 
@@ -939,9 +939,13 @@ void goto_symext::loop_bound_exceeded(
   if(symex_config.unwinding_assertions)
   {
     // Generate VCC for unwinding assertion.
+    const std::string property_id =
+      id2string(state.source.pc->source_location().get_function()) +
+      ".unwind." + loop_number;
     vcc(
       negated_cond,
-      "unwinding assertion loop " + std::to_string(loop_number),
+      property_id,
+      "unwinding assertion loop " + loop_number,
       state);
   }
 

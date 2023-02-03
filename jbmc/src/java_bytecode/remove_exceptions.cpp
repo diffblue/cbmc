@@ -18,12 +18,9 @@ Date:   December 2016
 #include <iostream>
 #endif
 
-#include <algorithm>
-
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>

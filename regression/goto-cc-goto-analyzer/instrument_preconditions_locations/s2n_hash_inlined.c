@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 // This file is highly reduced from some open source projects.
 // The following four lines are adapted from the openssl library
 // Full repository here:
@@ -17,6 +19,7 @@ struct s2n_evp_digest
   const void *ctx;
 };
 union s2n_hash_low_level_digest {
+  void *dummy; // for MSVC compatibility
 };
 struct s2n_hash_evp_digest
 {

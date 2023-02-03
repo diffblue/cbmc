@@ -118,7 +118,8 @@ extern char *yyansi_ctext;
 
 /*** scanner parsed tokens (these have a value!) ***/
 
-%token TOK_IDENTIFIER
+%token TOK_GCC_IDENTIFIER
+%token TOK_MSC_IDENTIFIER
 %token TOK_TYPEDEFNAME
 %token TOK_INTEGER
 %token TOK_FLOATING
@@ -204,9 +205,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_ID  "__CPROVER_ID"
 %token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
 %token TOK_CPROVER_DECREASES "__CPROVER_decreases"
-%token TOK_CPROVER_REQUIRES_CONTRACT "__CPROVER_requires_contract"
 %token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
-%token TOK_CPROVER_ENSURES_CONTRACT "__CPROVER_ensures_contract"
 %token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
 %token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
 %token TOK_CPROVER_FREES "__CPROVER_frees"
@@ -295,7 +294,8 @@ grammar:
 /*** Token with values **************************************************/
 
 identifier:
-          TOK_IDENTIFIER
+          TOK_GCC_IDENTIFIER
+        | TOK_MSC_IDENTIFIER
         | TOK_CPROVER_ID TOK_STRING
         {
           // construct an identifier from a string that would otherwise not be a
@@ -1364,7 +1364,7 @@ atomic_type_specifier:
         ;
 
 msc_decl_identifier:
-          TOK_IDENTIFIER
+          TOK_MSC_IDENTIFIER
         {
           parser_stack($$).id(parser_stack($$).get(ID_identifier));
         }
@@ -2287,9 +2287,14 @@ designator:
 /*** Statements *********************************************************/
 
 statement:
+          declaration_statement
+        | statement_attribute
+        | stmt_not_decl_or_attr
+        ;
+
+stmt_not_decl_or_attr:
           labeled_statement
         | compound_statement
-        | declaration_statement
         | expression_statement
         | selection_statement
         | iteration_statement
@@ -2299,7 +2304,6 @@ statement:
         | msc_asm_statement
         | msc_seh_statement
         | cprover_exception_statement
-        | statement_attribute
         ;
 
 declaration_statement:
@@ -2311,8 +2315,30 @@ declaration_statement:
         }
         ;
 
+gcc_attribute_specifier_opt:
+          /* empty */
+        {
+          init($$);
+        }
+        | gcc_attribute_specifier
+        ;
+
+msc_label_identifier:
+          TOK_MSC_IDENTIFIER
+        | TOK_TYPEDEFNAME
+        ;
+
 labeled_statement:
-        identifier_or_typedef_name ':' statement
+          TOK_GCC_IDENTIFIER ':' gcc_attribute_specifier_opt stmt_not_decl_or_attr
+        {
+          // we ignore the GCC attribute
+          $$=$2;
+          statement($$, ID_label);
+          irep_idt identifier=PARSER.lookup_label(parser_stack($1).get(ID_C_base_name));
+          parser_stack($$).set(ID_label, identifier);
+          mto($$, $4);
+        }
+        | msc_label_identifier ':' statement
         {
           $$=$2;
           statement($$, ID_label);
@@ -2570,10 +2596,10 @@ gcc_local_label_statement:
           statement($$, ID_gcc_local_label);
           
           // put these into the scope
-          forall_operands(it, parser_stack($2))
+          for(const auto &op : as_const(parser_stack($2)).operands())
           {
             // labels have a separate name space
-            irep_idt base_name=it->get(ID_identifier);
+            irep_idt base_name = op.get(ID_identifier);
             irep_idt id="label-"+id2string(base_name);
             ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
             i.id_class=ansi_c_id_classt::ANSI_C_LOCAL_LABEL;
@@ -2921,7 +2947,9 @@ function_definition:
           ansi_c_declarationt &ansi_c_declaration=
             to_ansi_c_declaration(parser_stack($$));
             
-          assert(ansi_c_declaration.declarators().size()==1);
+          INVARIANT(
+            ansi_c_declaration.declarators().size()==1,
+            "exactly one declarator");
           ansi_c_declaration.add_initializer(parser_stack($2));
           
           // Kill the scope that 'function_head' creates.
@@ -3298,26 +3326,6 @@ cprover_function_contract:
           $$=$1;
           set($$, ID_C_spec_requires);
           mto($$, $3);
-        }
-        | TOK_CPROVER_ENSURES_CONTRACT '(' unary_expression ',' unary_expression ')'
-        {
-          $$=$1;
-          set($$, ID_C_spec_ensures_contract);
-          exprt tmp(ID_function_pointer_obeys_contract);
-          tmp.add_to_operands(std::move(parser_stack($3)));
-          tmp.add_to_operands(std::move(parser_stack($5)));
-          tmp.add_source_location()=parser_stack($$).source_location();
-          parser_stack($$).add_to_operands(std::move(tmp));
-        }
-        | TOK_CPROVER_REQUIRES_CONTRACT '(' unary_expression ',' unary_expression ')'
-        {
-          $$=$1;
-          set($$, ID_C_spec_requires_contract);
-          exprt tmp(ID_function_pointer_obeys_contract);
-          tmp.add_to_operands(std::move(parser_stack($3)));
-          tmp.add_to_operands(std::move(parser_stack($5)));
-          tmp.add_source_location()=parser_stack($$).source_location();
-          parser_stack($$).add_to_operands(std::move(tmp));
         }
         | cprover_contract_assigns
         | cprover_contract_frees

@@ -187,6 +187,7 @@ protected:
     std::unordered_map<int64_t, exprt> *operands_map,
     const irept &src,
     const array_typet &type);
+  std::unordered_map<irep_idt, irept> current_bindings;
 
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
@@ -213,7 +214,7 @@ protected:
 
   const smt2_symbolt &to_smt2_symbol(const exprt &expr)
   {
-    assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
+    PRECONDITION(expr.id() == ID_smt2_symbol && !expr.has_operands());
     return static_cast<const smt2_symbolt&>(expr);
   }
 

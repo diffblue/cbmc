@@ -12,7 +12,9 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CPROVER_VARIABLE_ENCODING_H
 #define CPROVER_CPROVER_VARIABLE_ENCODING_H
 
-#include <util/expr.h>
+#include <vector>
+
+class exprt;
 
 void variable_encoding(std::vector<exprt> &);
 

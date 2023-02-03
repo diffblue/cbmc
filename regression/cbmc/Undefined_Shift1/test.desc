@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --undefined-shift-check
 ^EXIT=10$

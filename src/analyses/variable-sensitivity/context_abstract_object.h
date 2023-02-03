@@ -23,14 +23,6 @@ class context_abstract_objectt : public abstract_objectt
 public:
   // These constructors mirror those in the base abstract_objectt, but with
   // the addition of an extra argument which is the abstract_objectt to wrap.
-  explicit context_abstract_objectt(
-    const abstract_object_pointert child,
-    const typet &type)
-    : abstract_objectt(type)
-  {
-    child_abstract_object = child;
-  }
-
   context_abstract_objectt(
     const abstract_object_pointert child,
     const typet &type,

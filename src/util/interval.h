@@ -84,7 +84,7 @@ public:
     const exprt &lower = get_lower();
     const exprt &upper = get_upper();
 
-    b &= is_numeric() || type.id() == ID_bool || type.is_nil();
+    b &= is_numeric() || is_boolean() || type.is_nil();
 
     b &= type == lower.type();
     b &= type == upper.type();
@@ -97,15 +97,15 @@ public:
     return b;
   }
 
-  bool is_valid_bound(const exprt &expr) const
+  static bool is_valid_bound(const exprt &expr)
   {
     const irep_idt &id = expr.id();
 
     bool b = true;
 
-    b &= id == ID_constant || id == ID_min || id == ID_max;
+    b &= expr.is_constant() || id == ID_min || id == ID_max;
 
-    if(type().id() == ID_bool && id == ID_constant)
+    if(expr.is_boolean() && id == ID_constant)
     {
       b &= expr == true_exprt() || expr == false_exprt();
     }

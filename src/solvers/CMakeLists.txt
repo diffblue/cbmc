@@ -56,6 +56,8 @@ list(REMOVE_ITEM sources
     ${booleforce_source}
     ${minibdd_source}
     # ${ipasir_source}
+    ${CMAKE_CURRENT_SOURCE_DIR}/bdd/example.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/smt2/smt2_solver.cpp
 )
 
 add_library(solvers ${sources})

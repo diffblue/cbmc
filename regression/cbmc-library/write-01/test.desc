@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE unix
 main.c
---pointer-check --bounds-check
+--pointer-check --bounds-check --conversion-check --unwind 1
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 typeconflict.c
 file typeconflict.c line 3 function main: error: __CPROVER_saturating_minus takes exactly two arguments, but 1 were provided
 ^EXIT=6$

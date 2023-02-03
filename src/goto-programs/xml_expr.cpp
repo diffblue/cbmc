@@ -131,7 +131,7 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 {
   xmlt result;
 
-  if(expr.id() == ID_constant)
+  if(expr.is_constant())
   {
     const auto &constant_expr = to_constant_expr(expr);
     const auto &value = constant_expr.get_value();
@@ -241,11 +241,11 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 
     unsigned index = 0;
 
-    forall_operands(it, expr)
+    for(const auto &op : expr.operands())
     {
       xmlt &e = result.new_element("element");
       e.set_attribute("index", index);
-      e.new_element(xml(*it, ns));
+      e.new_element(xml(op, ns));
       index++;
     }
   }

@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo --replace-call-with-contract get_arr_fun
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that when a function returning a function pointer satisfying a given
+contract is replaced by its contract, the returned function pointer can be
+passed to another function requiring the same contract.

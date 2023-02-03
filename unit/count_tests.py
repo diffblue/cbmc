@@ -56,6 +56,9 @@ def tests_in_file(file_path):
 def count_tests_in_directory(directory_path, exclude_files):
     test_count = 0
     for root, sub_directories, files in os.walk("."):
+        # Excluded from count as built into separate binary.
+        if root.endswith("libcprover-cpp"):
+            continue
         for file_name in files:
             if any(file_name == excluded_file for excluded_file in exclude_files):
                 continue

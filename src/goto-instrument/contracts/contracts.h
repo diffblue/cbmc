@@ -18,21 +18,18 @@ Date: February 2016
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/optional.h>
-#include <util/pointer_expr.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 
 #include <goto-instrument/loop_utils.h>
 
-#include <list>
 #include <map>
 #include <set>
 #include <string>
 #include <unordered_set>
 
+// clang-format off
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
   " --apply-loop-contracts\n"                                                  \
@@ -40,17 +37,16 @@ Date: February 2016
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
-  " --replace-call-with-contract <fun>\n"                                      \
-  "                              replace calls to fun with fun's contract\n"
+  " --replace-call-with-contract <function>[/contract]\n"                      \
+  "                              replace calls to function with contract\n"
 
 #define FLAG_ENFORCE_CONTRACT "enforce-contract"
 #define HELP_ENFORCE_CONTRACT                                                  \
-  " --enforce-contract <fun>     wrap fun with an assertion of its contract\n"
+  " --enforce-contract <function>[/contract]"                                  \
+  "                              wrap function with an assertion of contract\n"
+// clang-format on
 
 class local_may_aliast;
-class instrument_spec_assignst;
-class cfg_infot;
-class function_pointer_obeys_contract_exprt;
 
 class code_contractst
 {
@@ -129,6 +125,18 @@ public:
   symbol_tablet &get_symbol_table();
   goto_functionst &get_goto_functions();
 
+  std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
+  get_original_loop_number_map() const
+  {
+    return original_loop_number_map;
+  }
+
+  std::unordered_set<goto_programt::const_targett, const_target_hash>
+  get_loop_havoc_set() const
+  {
+    return loop_havoc_set;
+  }
+
   namespacet ns;
 
 protected:
@@ -141,33 +149,21 @@ protected:
 
   std::unordered_set<irep_idt> summarized;
 
+  /// Name of loops we are going to unwind.
+  std::list<std::string> loop_names;
+
+  /// Store the map from instrumented instructions for loop contracts to their
+  /// original loop numbers. Following instrumented instructions are stored.
+  /// 1. loop-havoc   ---   begin of transformed loops
+  /// 2. ASSIGN ENTERED_LOOP = TRUE   ---   end of transformed loops
+  std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
+    original_loop_number_map;
+
+  /// Loop havoc instructions instrumneted during applying loop contracts.
+  std::unordered_set<goto_programt::const_targett, const_target_hash>
+    loop_havoc_set;
+
 public:
-  /// Translates a function_pointer_obeys_contract_exprt into an assertion
-  /// ```
-  /// ASSERT function_pointer == contract;
-  /// ```
-  /// \param expr expression to translate
-  /// \param property_class property class to use for the generated assertions
-  /// \param mode language mode to use for goto_conversion and prints
-  /// \param dest goto_program where generated instructions are appended
-  void assert_function_pointer_obeys_contract(
-    const function_pointer_obeys_contract_exprt &expr,
-    const irep_idt &property_class,
-    const irep_idt &mode,
-    goto_programt &dest);
-
-  /// Translates a function_pointer_obeys_contract_exprt into an assignment
-  /// ```
-  /// ASSIGN function_pointer = contract;
-  /// ```
-  /// \param expr expression to translate
-  /// \param mode language mode to use for goto_conversion and prints
-  /// \param dest goto_program where generated instructions are appended
-  void assume_function_pointer_obeys_contract(
-    const function_pointer_obeys_contract_exprt &expr,
-    const irep_idt &mode,
-    goto_programt &dest);
-
   /// \brief Enforce contract of a single function
   void enforce_contract(const irep_idt &function);
 

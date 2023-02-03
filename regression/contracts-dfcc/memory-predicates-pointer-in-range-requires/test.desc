@@ -1,0 +1,10 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Checks that assuming pointer-in-range as preconditions establishes a state
+in which the definition of the predicate holds.

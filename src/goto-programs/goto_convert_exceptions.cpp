@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_class.h"
 
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 void goto_convertt::convert_msc_try_finally(
   const codet &code,
@@ -237,19 +237,15 @@ symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 {
   irep_idt id="$exception_flag";
 
-  symbol_tablet::symbolst::const_iterator s_it=
+  symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(id);
 
   if(s_it==symbol_table.symbols.end())
   {
-    symbolt new_symbol;
+    symbolt new_symbol{id, bool_typet{}, mode};
     new_symbol.base_name="$exception_flag";
-    new_symbol.name=id;
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=true;
-    new_symbol.is_file_local=false;
-    new_symbol.type=bool_typet();
-    new_symbol.mode = mode;
     symbol_table.insert(std::move(new_symbol));
   }
 

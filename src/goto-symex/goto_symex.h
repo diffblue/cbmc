@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "complexity_limiter.h"
 #include "symex_config.h"
+#include "symex_target_equation.h"
 
 class address_of_exprt;
-class code_function_callt;
 class function_application_exprt;
 class goto_symex_statet;
 class path_storaget;
@@ -48,7 +48,7 @@ public:
   /// \param guard_manager: Manager for creating guards
   goto_symext(
     message_handlert &mh,
-    const symbol_tablet &outer_symbol_table,
+    const symbol_table_baset &outer_symbol_table,
     symex_target_equationt &_target,
     const optionst &options,
     path_storaget &path_storage,
@@ -98,16 +98,16 @@ public:
   /// having the state around afterwards.
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  /// symbolic execution
-  virtual void symex_from_entry_point_of(
-    const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+  /// \return A symbol table holding the symbols added during symbolic
+  ///   execution.
+  NODISCARD
+  virtual symbol_tablet
+  symex_from_entry_point_of(const get_goto_functiont &get_goto_function);
 
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_table_baset &new_symbol_table);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -117,13 +117,13 @@ public:
   ///   \ref get_goto_functiont)
   /// \param saved_state: The symbolic execution state to resume from
   /// \param saved_equation: The equation as previously built up
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  ///   symbolic execution
-  virtual void resume_symex_from_saved_state(
+  /// \return A symbol table holding the symbols added during symbolic
+  ///   execution.
+  NODISCARD
+  virtual symbol_tablet resume_symex_from_saved_state(
     const get_goto_functiont &get_goto_function,
     const statet &saved_state,
-    symex_target_equationt *saved_equation,
-    symbol_tablet &new_symbol_table);
+    symex_target_equationt *saved_equation);
 
   //// \brief Symbolically execute the entire program starting from entry point
   ///
@@ -135,12 +135,11 @@ public:
   /// \param state: The symbolic execution state to use for the execution
   /// \param get_goto_functions: A functor to retrieve function bodies to
   ///   execute
-  /// \param new_symbol_table: A symbol table to store the symbols added during
-  ///   symbolic execution
-  virtual void symex_with_state(
-    statet &state,
-    const get_goto_functiont &get_goto_functions,
-    symbol_tablet &new_symbol_table);
+  /// \return A symbol table holding the symbols added during symbolic
+  ///   execution.
+  NODISCARD
+  virtual symbol_tablet
+  symex_with_state(statet &state, const get_goto_functiont &get_goto_functions);
 
   /// \brief Set when states are pushed onto the workqueue
   /// If this flag is set at the end of a symbolic execution run, it means that
@@ -231,7 +230,7 @@ protected:
   /// part of symbolic execution added to it; those object are stored in the
   /// symbol table passed as the `new_symbol_table` argument to the `symex_*`
   /// methods.
-  const symbol_tablet &outer_symbol_table;
+  const symbol_table_baset &outer_symbol_table;
 
   /// Initialized just before symbolic execution begins, to point to
   /// both `outer_symbol_table` and the symbol table owned by the
@@ -377,10 +376,16 @@ protected:
     value_sett *jump_not_taken_value_set,
     const namespacet &ns);
 
+  /// Symbolically execute a verification condition (assertion).
+  /// \param cond: The guard of the assumption
+  /// \param property_id: Unique property identifier of this assertion
+  /// \param msg: The message associated with this assertion
+  /// \param state: Symbolic execution state for current instruction
   virtual void vcc(
-    const exprt &,
+    const exprt &cond,
+    const irep_idt &property_id,
     const std::string &msg,
-    statet &);
+    statet &state);
 
   /// Symbolically execute an ASSUME instruction or simulate such an execution
   /// for a synthetic assumption
@@ -775,9 +780,6 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   /// \param code: The cleaned up output instruction
   virtual void symex_output(statet &state, const codet &code);
-
-  /// A monotonically increasing index for each created dynamic object
-  static unsigned dynamic_counter;
 
   void rewrite_quantifiers(exprt &, statet &);
 

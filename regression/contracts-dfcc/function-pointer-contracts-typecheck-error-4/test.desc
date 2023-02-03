@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo
+^.*error: the first and second arguments of __CPROVER_obeys_contract must have the same function pointer type$
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that malformed __CPROVER_obeys_contract predicate expressions are rejected.

@@ -59,7 +59,7 @@ SRC += analyses/ai/ai.cpp \
        goto-checker/report_util/is_property_less_than.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
-       goto-instrument/expr_enumerator/expr_enumerator.cpp \
+       goto-synthesizer/expr_enumerator/expr_enumerator.cpp \
        goto-programs/allocate_objects.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
@@ -94,7 +94,6 @@ SRC += analyses/ai/ai.cpp \
        pointer-analysis/value_set.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \
        solvers/floatbv/float_utils.cpp \
-       solvers/lowering/byte_operators.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
        solvers/sat/satcheck_cadical.cpp \
@@ -110,6 +109,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/smt2_incremental/convert_expr_to_smt.cpp \
        solvers/smt2_incremental/object_tracking.cpp \
        solvers/smt2_incremental/smt2_incremental_decision_procedure.cpp \
+       solvers/smt2_incremental/smt_is_dynamic_object.cpp \
        solvers/smt2_incremental/smt_object_size.cpp \
        solvers/smt2_incremental/smt_response_validation.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \
@@ -159,6 +159,7 @@ SRC += analyses/ai/ai.cpp \
        util/json_array.cpp \
        util/json_object.cpp \
        util/lazy.cpp \
+       util/lower_byte_operators.cpp \
        util/memory_info.cpp \
        util/message.cpp \
        util/optional.cpp \
@@ -247,7 +248,7 @@ BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/goto-instrument/nondet_static$(OBJEXT) \
           ../src/goto-instrument/full_slicer$(OBJEXT) \
           ../src/goto-instrument/unwindset$(OBJEXT) \
-          ../src/goto-instrument/synthesizer/expr_enumerator$(OBJEXT) \
+          ../src/goto-synthesizer/expr_enumerator$(OBJEXT) \
           ../src/xmllang/xmllang$(LIBEXT) \
           ../src/goto-symex/goto-symex$(LIBEXT) \
           ../src/jsil/jsil$(LIBEXT) \
@@ -277,6 +278,8 @@ CATCH_TEST = unit_tests$(EXEEXT)
 EXCLUDED_TESTS=expr_undefined_casts.cpp
 ifneq ($(WITH_MEMORY_ANALYZER),1)
 EXCLUDED_TESTS += gdb_api.cpp
+else
+CPROVER_LIBS += ../src/memory-analyzer/gdb_api$(OBJEXT)
 endif
 ifeq ($(MINISAT2),)
 EXCLUDED_TESTS += satcheck_minisat2.cpp

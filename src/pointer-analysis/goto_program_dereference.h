@@ -22,7 +22,7 @@ class goto_functionst;
 class goto_modelt;
 class namespacet;
 class optionst;
-class symbol_tablet;
+class symbol_table_baset;
 class symbolt;
 class value_setst;
 
@@ -45,7 +45,7 @@ public:
   // _log to be a default messaget instance.
   goto_program_dereferencet(
     const namespacet &_ns,
-    symbol_tablet &_new_symbol_table,
+    symbol_table_baset &_new_symbol_table,
     const optionst &_options,
     value_setst &_value_sets,
     const messaget &_log = messaget())

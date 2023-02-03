@@ -48,8 +48,10 @@ void language_filest::show_parse(std::ostream &out)
     file.second.language->show_parse(out);
 }
 
-bool language_filest::parse()
+bool language_filest::parse(message_handlert &message_handler)
 {
+  messaget log(message_handler);
+
   for(auto &file : file_map)
   {
     // open file
@@ -58,7 +60,7 @@ bool language_filest::parse()
 
     if(!infile)
     {
-      error() << "Failed to open " << file.first << eom;
+      log.error() << "Failed to open " << file.first << messaget::eom;
       return true;
     }
 
@@ -68,7 +70,7 @@ bool language_filest::parse()
 
     if(language.parse(infile, file.first))
     {
-      error() << "Parsing of " << file.first << " failed" << eom;
+      log.error() << "Parsing of " << file.first << " failed" << messaget::eom;
       return true;
     }
 
@@ -81,8 +83,9 @@ bool language_filest::parse()
 }
 
 bool language_filest::typecheck(
-  symbol_tablet &symbol_table,
-  const bool keep_file_local)
+  symbol_table_baset &symbol_table,
+  const bool keep_file_local,
+  message_handlert &message_handler)
 {
   // typecheck interfaces
 
@@ -153,7 +156,8 @@ bool language_filest::typecheck(
 
   for(auto &module : module_map)
   {
-    if(typecheck_module(symbol_table, module.second, keep_file_local))
+    if(typecheck_module(
+         symbol_table, module.second, keep_file_local, message_handler))
       return true;
   }
 
@@ -161,7 +165,7 @@ bool language_filest::typecheck(
 }
 
 bool language_filest::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   std::set<std::string> languages;
 
@@ -189,8 +193,7 @@ bool language_filest::final(symbol_table_baset &symbol_table)
   return false;
 }
 
-bool language_filest::interfaces(
-  symbol_tablet &symbol_table)
+bool language_filest::interfaces(symbol_table_baset &symbol_table)
 {
   for(auto &file : file_map)
   {
@@ -202,9 +205,10 @@ bool language_filest::interfaces(
 }
 
 bool language_filest::typecheck_module(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
-  const bool keep_file_local)
+  const bool keep_file_local,
+  message_handlert &message_handler)
 {
   // check module map
 
@@ -212,28 +216,34 @@ bool language_filest::typecheck_module(
 
   if(it==module_map.end())
   {
-    error() << "found no file that provides module " << module << eom;
+    messaget log(message_handler);
+    log.error() << "found no file that provides module " << module
+                << messaget::eom;
     return true;
   }
 
-  return typecheck_module(symbol_table, it->second, keep_file_local);
+  return typecheck_module(
+    symbol_table, it->second, keep_file_local, message_handler);
 }
 
 bool language_filest::typecheck_module(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   language_modulet &module,
-  const bool keep_file_local)
+  const bool keep_file_local,
+  message_handlert &message_handler)
 {
   // already typechecked?
 
   if(module.type_checked)
     return false;
 
+  messaget log(message_handler);
+
   // already in progress?
 
   if(module.in_progress)
   {
-    error() << "circular dependency in " << module.name << eom;
+    log.error() << "circular dependency in " << module.name << messaget::eom;
     return true;
   }
 
@@ -250,14 +260,15 @@ bool language_filest::typecheck_module(
       it!=dependency_set.end();
       it++)
   {
-    module.in_progress = !typecheck_module(symbol_table, *it, keep_file_local);
+    module.in_progress =
+      !typecheck_module(symbol_table, *it, keep_file_local, message_handler);
     if(module.in_progress == false)
       return true;
   }
 
   // type check it
 
-  status() << "Type-checking " << module.name << eom;
+  log.status() << "Type-checking " << module.name << messaget::eom;
 
   if(module.file->language->can_keep_file_local())
   {

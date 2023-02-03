@@ -11,24 +11,25 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_convert.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/message.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_instruction_code.h>
 
 #include "jsil_parse_tree.h"
 
 class jsil_convertt
 {
 public:
-  jsil_convertt(symbol_tablet &_symbol_table) : symbol_table(_symbol_table)
+  explicit jsil_convertt(symbol_table_baset &_symbol_table)
+    : symbol_table(_symbol_table)
   {
   }
 
   bool operator()(const jsil_parse_treet &parse_tree, message_handlert &);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 
   bool convert_code(const symbolt &symbol, codet &code);
 };
@@ -42,8 +43,7 @@ bool jsil_convertt::operator()(
       it!=parse_tree.items.end();
       ++it)
   {
-    symbolt new_symbol;
-    it->to_symbol(new_symbol);
+    symbolt new_symbol = it->to_symbol();
 
     if(convert_code(new_symbol, to_code(new_symbol.value)))
       return true;
@@ -116,7 +116,7 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 
 bool jsil_convert(
   const jsil_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
   jsil_convertt jsil_convert{symbol_table};

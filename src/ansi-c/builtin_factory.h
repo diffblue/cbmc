@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep.h>
 
 class message_handlert;
-class symbol_tablet;
+class symbol_table_baset;
 
 //! \return 'true' in case of error
 bool builtin_factory(
   const irep_idt &identifier,
-  symbol_tablet &,
+  symbol_table_baset &,
   message_handlert &);
 
 #endif // CPROVER_ANSI_C_BUILTIN_FACTORY_H

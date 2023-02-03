@@ -3,15 +3,14 @@
 #include "smt2_incremental_decision_procedure.h"
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/expr.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>
 #include <util/std_expr.h>
-#include <util/string_utils.h>
 #include <util/symbol.h>
 
-#include <solvers/lowering/expr_lowering.h>
 #include <solvers/smt2_incremental/ast/smt_commands.h>
 #include <solvers/smt2_incremental/ast/smt_responses.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>
@@ -23,6 +22,7 @@
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
 #include <stack>
+#include <unordered_set>
 
 /// Issues a command to the solving process which is expected to optionally
 /// return a success status followed by the actual response of interest.
@@ -255,6 +255,7 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
   solver_process->send(smt_set_logic_commandt{smt_logic_allt{}});
   solver_process->send(object_size_function.declaration);
+  solver_process->send(is_dynamic_object_function.declaration);
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
@@ -321,12 +322,14 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
     ns,
     pointer_sizes_map,
     object_map,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
   return ::convert_expr_to_smt(
     substituted,
     object_map,
     pointer_sizes_map,
-    object_size_function.make_application);
+    object_size_function.make_application,
+    is_dynamic_object_function.make_application);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -376,7 +379,8 @@ array_exprt smt2_incremental_decision_proceduret::get_expr(
           from_integer(index, index_type),
           object_map,
           pointer_sizes_map,
-          object_size_function.make_application)),
+          object_size_function.make_application,
+          is_dynamic_object_function.make_application)),
       type.element_type()));
   }
   return array_exprt{elements, type};
@@ -407,6 +411,29 @@ exprt smt2_incremental_decision_proceduret::get_expr(
     get_value_response->pairs()[0].get().value(), type);
 }
 
+// This is a fall back which builds resulting expression based on getting the
+// values of its operands. It is used during trace building in the case where
+// certain kinds of expression appear on the left hand side of an
+// assignment. For example in the following trace assignment -
+//   `byte_extract_little_endian(x, offset) = 1`
+// `::get` will be called on `byte_extract_little_endian(x, offset)` and
+// we build a resulting expression where `x` and `offset` are substituted
+// with their values.
+static exprt build_expr_based_on_getting_operands(
+  const exprt &expr,
+  const stack_decision_proceduret &decision_procedure)
+{
+  exprt copy = expr;
+  for(auto &op : copy.operands())
+  {
+    exprt eval_op = decision_procedure.get(op);
+    if(eval_op.is_nil())
+      return nil_exprt{};
+    op = std::move(eval_op);
+  }
+  return copy;
+}
+
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
@@ -427,40 +454,34 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         return {};
       return smt_array_theoryt::select(*array, *index);
     }
-    return get_identifier(
-      expr, expression_handle_identifiers, expression_identifiers);
-  }();
-  if(!descriptor)
-  {
+    if(
+      auto identifier_descriptor = get_identifier(
+        expr, expression_handle_identifiers, expression_identifiers))
+    {
+      return identifier_descriptor;
+    }
     if(gather_dependent_expressions(expr).empty())
     {
       INVARIANT(
         objects_are_already_tracked(expr, object_map),
         "Objects in expressions being read should already be tracked from "
         "point of being set/handled.");
-      descriptor = ::convert_expr_to_smt(
+      return ::convert_expr_to_smt(
         expr,
         object_map,
         pointer_sizes_map,
-        object_size_function.make_application);
+        object_size_function.make_application,
+        is_dynamic_object_function.make_application);
     }
-    else
-    {
-      const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
-      INVARIANT(
-        symbol_expr, "Unhandled expressions are expected to be symbols");
-      // Note this case is currently expected to be encountered during trace
-      // generation for -
-      //  * Steps which were removed via --slice-formula.
-      //  * Getting concurrency clock values.
-      // The below implementation which returns the given expression was chosen
-      // based on the implementation of `smt2_convt::get` in the non-incremental
-      // smt2 decision procedure.
-      log.warning()
-        << "`get` attempted for unknown symbol, with identifier - \n"
-        << symbol_expr->get_identifier() << messaget::eom;
-      return expr;
-    }
+    return {};
+  }();
+  if(!descriptor)
+  {
+    INVARIANT_WITH_DIAGNOSTICS(
+      !can_cast_expr<symbol_exprt>(expr),
+      "symbol expressions must have a known value",
+      irep_pretty_diagnosticst{expr});
+    return build_expr_based_on_getting_operands(expr, *this);
   }
   if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
   {
@@ -548,26 +569,28 @@ static decision_proceduret::resultt lookup_decision_procedure_result(
   UNREACHABLE;
 }
 
-void smt2_incremental_decision_proceduret::define_object_sizes()
+void smt2_incremental_decision_proceduret::define_object_properties()
 {
-  object_size_defined.resize(object_map.size());
+  object_properties_defined.resize(object_map.size());
   for(const auto &key_value : object_map)
   {
     const decision_procedure_objectt &object = key_value.second;
-    if(object_size_defined[object.unique_id])
+    if(object_properties_defined[object.unique_id])
       continue;
     else
-      object_size_defined[object.unique_id] = true;
+      object_properties_defined[object.unique_id] = true;
     define_dependent_functions(object.size);
     solver_process->send(object_size_function.make_definition(
       object.unique_id, convert_expr_to_smt(object.size)));
+    solver_process->send(is_dynamic_object_function.make_definition(
+      object.unique_id, object.is_dynamic));
   }
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
 {
   ++number_of_solver_calls;
-  define_object_sizes();
+  define_object_properties();
   const smt_responset result = get_response_to_command(
     *solver_process, smt_check_sat_commandt{}, identifier_table);
   if(const auto check_sat_response = result.cast<smt_check_sat_responset>())

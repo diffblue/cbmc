@@ -17,7 +17,7 @@ Author: Daniel Kroening
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_types.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 
@@ -71,25 +71,16 @@ static void get_symbols(
         find_type_and_expr_symbols(a, new_symbols);
       for(const exprt &e : maybe_contract.ensures())
         find_type_and_expr_symbols(e, new_symbols);
-      for(const exprt &e : maybe_contract.ensures_contract())
-        find_type_and_expr_symbols(e, new_symbols);
       for(const exprt &r : maybe_contract.requires())
-        find_type_and_expr_symbols(r, new_symbols);
-      for(const exprt &r : maybe_contract.requires_contract())
         find_type_and_expr_symbols(r, new_symbols);
 
       for(const auto &s : new_symbols)
       {
-        // keep functions called in contracts within scope.
-        // should we keep local variables from the contract as well?
-        const symbolt *new_symbol = nullptr;
-        if(!ns.lookup(s, new_symbol))
-        {
-          if(new_symbol->type.id() == ID_code)
-          {
-            working_set.push_back(new_symbol);
-          }
-        }
+        const symbolt *symbol_ptr;
+        // identifiers for parameters of prototypes need not exist, and neither
+        // does __CPROVER_return_value
+        if(!ns.lookup(s, symbol_ptr))
+          working_set.push_back(symbol_ptr);
       }
     }
   }
@@ -109,7 +100,7 @@ static void get_symbols(
 /// \param keep_file_local: keep file-local functions with bodies even if we
 ///                         would otherwise remove them
 void remove_internal_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &mh,
   const bool keep_file_local)
 {
@@ -132,7 +123,7 @@ void remove_internal_symbols(
 /// \param keep: set of symbol names to keep in the symbol table regardless
 ///              of usage or kind
 void remove_internal_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &mh,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
@@ -168,9 +159,9 @@ void remove_internal_symbols(
   // plus any extra symbols we wish to keep
   special.insert(keep.begin(), keep.end());
 
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
+  for(symbol_table_baset::symbolst::const_iterator it =
+        symbol_table.symbols.begin();
+      it != symbol_table.symbols.end();
       it++)
   {
     // already marked?
@@ -236,14 +227,14 @@ void remove_internal_symbols(
   }
 
   // remove all that are _not_ exported!
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
-      ) // no it++
+  for(symbol_table_baset::symbolst::const_iterator it =
+        symbol_table.symbols.begin();
+      it != symbol_table.symbols.end();) // no it++
   {
     if(exported.find(it->first)==exported.end())
     {
-      symbol_tablet::symbolst::const_iterator next=std::next(it);
+      symbol_table_baset::symbolst::const_iterator next = std::next(it);
+      log.debug() << "Removing unused symbol " << it->first << messaget::eom;
       symbol_table.erase(it);
       it=next;
     }

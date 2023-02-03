@@ -23,7 +23,6 @@ Solver response - sat
 ^EXIT=10$
 ^SIGNAL=0$
 --
-type: pointer
 --
 Test that running cbmc with the `--incremental-smt2-solver` argument can be used
 to send a valid SMT2 formula to a sub-process solver for an example input file

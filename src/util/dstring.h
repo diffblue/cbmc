@@ -15,9 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <string>
 
-#include "invariant.h"
 #include "magic.h"
 #include "string_container.h"
+
+template <typename T>
+struct diagnostics_helpert;
 
 /// \ref dstringt has one field, an unsigned integer \ref no which is an index
 /// into a static table of strings. This makes it expensive to create a new

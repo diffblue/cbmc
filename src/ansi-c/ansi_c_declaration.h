@@ -58,13 +58,13 @@ public:
 
 inline ansi_c_declaratort &to_ansi_c_declarator(exprt &expr)
 {
-  assert(expr.id()==ID_declarator);
+  PRECONDITION(expr.id() == ID_declarator);
   return static_cast<ansi_c_declaratort &>(expr);
 }
 
 inline const ansi_c_declaratort &to_ansi_c_declarator(const exprt &expr)
 {
-  assert(expr.id()==ID_declarator);
+  PRECONDITION(expr.id() == ID_declarator);
   return static_cast<const ansi_c_declaratort &>(expr);
 }
 
@@ -195,19 +195,7 @@ public:
     set(ID_is_weak, is_weak);
   }
 
-  bool get_is_used() const
-  {
-    return get_bool(ID_is_used);
-  }
-
-  void set_is_used(bool is_used)
-  {
-    set(ID_is_used, is_used);
-  }
-
-  void to_symbol(
-    const ansi_c_declaratort &,
-    symbolt &symbol) const;
+  symbolt to_symbol(const ansi_c_declaratort &) const;
 
   typet full_type(const ansi_c_declaratort &) const;
 
@@ -226,13 +214,13 @@ public:
   // special case of a declaration with exactly one declarator
   const ansi_c_declaratort &declarator() const
   {
-    assert(declarators().size()==1);
+    PRECONDITION(declarators().size() == 1);
     return declarators()[0];
   }
 
   ansi_c_declaratort &declarator()
   {
-    assert(declarators().size()==1);
+    PRECONDITION(declarators().size() == 1);
     return declarators()[0];
   }
 
@@ -240,20 +228,20 @@ public:
 
   void add_initializer(exprt &value)
   {
-    assert(!declarators().empty());
+    PRECONDITION(!declarators().empty());
     declarators().back().value().swap(value);
   }
 };
 
 inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
 {
-  assert(expr.id()==ID_declaration);
+  PRECONDITION(expr.id() == ID_declaration);
   return static_cast<ansi_c_declarationt &>(expr);
 }
 
 inline const ansi_c_declarationt &to_ansi_c_declaration(const exprt &expr)
 {
-  assert(expr.id()==ID_declaration);
+  PRECONDITION(expr.id() == ID_declaration);
   return static_cast<const ansi_c_declarationt &>(expr);
 }
 

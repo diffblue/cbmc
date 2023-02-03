@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/pointer_expr.h>
 
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
@@ -31,8 +29,7 @@ void cpp_typecheckt::default_dtor(
   const symbolt &symbol,
   cpp_declarationt &dtor)
 {
-  assert(symbol.type.id()==ID_struct ||
-         symbol.type.id()==ID_union);
+  PRECONDITION(symbol.type.id() == ID_struct || symbol.type.id() == ID_union);
 
   cpp_declaratort decl;
   decl.name() = cpp_namet("~" + id2string(symbol.base_name), symbol.location);
@@ -51,8 +48,7 @@ void cpp_typecheckt::default_dtor(
 /// produces destructor code for a class object
 codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
 {
-  assert(symbol.type.id()==ID_struct ||
-         symbol.type.id()==ID_union);
+  PRECONDITION(symbol.type.id() == ID_struct || symbol.type.id() == ID_union);
 
   source_locationt source_location=symbol.type.source_location();
 
@@ -81,7 +77,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
-      assert(address.type() == c.type());
+      DATA_INVARIANT(address.type() == c.type(), "type mismatch");
 
       already_typechecked_exprt::make_already_typechecked(address);
 

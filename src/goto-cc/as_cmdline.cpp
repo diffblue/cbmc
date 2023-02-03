@@ -11,9 +11,10 @@ Author: Michael Tautschnig
 
 #include "as_cmdline.h"
 
-#include <iostream>
-
+#include <util/invariant.h>
 #include <util/prefix.h>
+
+#include <iostream>
 
 // non-as options
 const char *goto_as_options_with_argument[]=
@@ -78,7 +79,7 @@ const char *as_options_with_argument[]=
 
 bool as_cmdlinet::parse(int argc, const char **argv)
 {
-  assert(argc>0);
+  PRECONDITION(argc > 0);
   add_arg(argv[0]);
 
   for(int i=1; i<argc; i++)

@@ -12,9 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_code.h"
 
 #include "arith_tools.h"
-#include "c_types.h"
-#include "pointer_expr.h"
-#include "string_constant.h"
 
 /// In the case of a `codet` type that represents multiple statements, return
 /// the first of them. Otherwise return the `codet` itself.

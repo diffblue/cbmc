@@ -9,7 +9,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_UTIL_GOTO_INSTRUCTION_CODE_H
 #define CPROVER_UTIL_GOTO_INSTRUCTION_CODE_H
 
-#include <util/cprover_prefix.h>
 #include <util/std_code_base.h>
 #include <util/std_expr.h>
 

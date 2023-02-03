@@ -11,9 +11,10 @@ Author: Daniel Kroening, 2013
 
 #include "ld_cmdline.h"
 
-#include <iostream>
-
+#include <util/invariant.h>
 #include <util/prefix.h>
+
+#include <iostream>
 
 // clang-format off
 const char *goto_ld_options_with_argument[]=
@@ -253,7 +254,7 @@ const char *ld_options_without_argument[]=
 /// \return none
 bool ld_cmdlinet::parse(int argc, const char **argv)
 {
-  assert(argc>0);
+  PRECONDITION(argc > 0);
   add_arg(argv[0]);
 
   for(int i=1; i<argc; i++)

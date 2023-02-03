@@ -6,13 +6,14 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_TYPE_SIZE_MAPPING_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_TYPE_SIZE_MAPPING_H
 
-#include <util/expr.h>
+#include <util/expr.h> // IWYU pragma: keep
 
-#include <solvers/smt2_incremental/ast/smt_terms.h>
-#include <solvers/smt2_incremental/object_tracking.h>
-#include <solvers/smt2_incremental/smt_object_size.h>
+#include <solvers/smt2_incremental/ast/smt_terms.h>   // IWYU pragma: keep
+#include <solvers/smt2_incremental/object_tracking.h> // IWYU pragma: keep
+#include <solvers/smt2_incremental/smt_is_dynamic_object.h>
+#include <solvers/smt2_incremental/smt_object_size.h> // IWYU pragma: keep
 
-#include <unordered_map>
+#include <unordered_map> // IWYU pragma: keep
 
 using type_size_mapt = std::unordered_map<typet, smt_termt, irep_full_hash>;
 
@@ -28,11 +29,13 @@ using type_size_mapt = std::unordered_map<typet, smt_termt, irep_full_hash>;
 ///   from \p expression which are not already keys in the map.
 /// \param object_map: passed through to convert_expr_to_smt
 /// \param object_size: passed through to convert_expr_to_smt
+/// \param is_dynamic_object: passed through to convert_expr_to_smt
 void associate_pointer_sizes(
   const exprt &expression,
   const namespacet &ns,
   type_size_mapt &type_size_map,
   const smt_object_mapt &object_map,
-  const smt_object_sizet::make_applicationt &object_size);
+  const smt_object_sizet::make_applicationt &object_size,
+  const smt_is_dynamic_objectt::make_applicationt &is_dynamic_object);
 
 #endif

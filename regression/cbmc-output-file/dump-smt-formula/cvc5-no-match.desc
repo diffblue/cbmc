@@ -1,0 +1,11 @@
+CORE
+test.c
+--incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --dump-smt-formula %out-file-name%
+Passing problem to incremental SMT2 solving via "cvc5 --lang=smtlib2.6 --incremental"
+\[main.assertion.\d+\] line \d+ Nondeterministic int assert.: FAILURE
+Output file does not match.
+^EXIT=1$
+^SIGNAL=0$
+--
+Test to check that the --dump-smt-formula argument is used correctly and that the output file does
+not match the rules defined in test-outfile-rules.txt

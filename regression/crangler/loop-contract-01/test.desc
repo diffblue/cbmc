@@ -1,7 +1,7 @@
 CORE
 test.json
 
-^\s+while\(i \< 2\) \_\_CPROVER\_assigns.*\_\_CPROVER\_loop\_invariant.*\_\_CPROVER_decreases
+^\s+while\(i \< 2\) \_\_CPROVER\_assigns.*\_\_CPROVER\_loop\_invariant\(\( unsigned long int \).*\_\_CPROVER_decreases
 ^EXIT=0$
 ^SIGNAL=0$
 --

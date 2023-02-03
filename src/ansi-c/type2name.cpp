@@ -40,7 +40,8 @@ static std::string type2name_tag(
   if(ns.lookup(identifier, symbol))
     return "SYM#"+id2string(identifier)+"#";
 
-  assert(symbol && symbol->is_type);
+  DATA_INVARIANT(symbol, "symbol not found");
+  DATA_INVARIANT(symbol->is_type, "not a type symbol");
 
   if(symbol->type.id()!=ID_struct &&
      symbol->type.id()!=ID_union)

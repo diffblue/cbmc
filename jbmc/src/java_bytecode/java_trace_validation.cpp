@@ -104,19 +104,15 @@ bool check_struct_structure(const struct_exprt &expr)
   {
     return false;
   }
-  if(
-    expr.operands().size() > 1 && std::any_of(
-                                    ++expr.operands().begin(),
-                                    expr.operands().end(),
-                                    [&](const exprt &operand) {
-                                      return operand.id() != ID_constant &&
-                                             operand.id() !=
-                                               ID_annotated_pointer_constant;
-                                    }))
-  {
-    return false;
-  }
-  return true;
+
+  return expr.operands().size() == 1 ||
+         std::all_of(
+           std::next(expr.operands().begin()),
+           expr.operands().end(),
+           [&](const exprt &operand) {
+             return can_cast_expr<constant_exprt>(operand) ||
+                    can_cast_expr<annotated_pointer_constant_exprt>(operand);
+           });
 }
 
 bool check_address_structure(const address_of_exprt &address)
@@ -285,18 +281,7 @@ static void check_rhs_assumptions(
   // check byte extract rhs structure
   else if(const auto byte = expr_try_dynamic_cast<byte_extract_exprt>(rhs))
   {
-    DATA_CHECK_WITH_DIAGNOSTICS(
-      vm,
-      byte->operands().size() == 2,
-      "RHS",
-      rhs.pretty(),
-      "Expecting a byte extract with two operands.");
-    DATA_CHECK_WITH_DIAGNOSTICS(
-      vm,
-      can_cast_expr<constant_exprt>(simplify_expr(byte->op(), ns)),
-      "RHS",
-      rhs.pretty(),
-      "Expecting a byte extract with constant value.");
+    check_rhs_assumptions(simplify_expr(byte->op(), ns), ns, vm);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
       can_cast_expr<constant_exprt>(simplify_expr(byte->offset(), ns)),

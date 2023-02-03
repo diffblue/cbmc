@@ -4,6 +4,6 @@ call_no_body1.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\*\*\*\* WARNING: no body for function function_without_body$
-^\(\d+\) ∀ ς : state, nondet::S28\.2-0 : signedbv\[32\] \. S28\.1\(ς\) ⇒ S28\.2\(ς\[❝main::\$tmp::return_value_function_without_body❞:=nondet::S28\.2-0\]\)$
-^\(\d+\) ∀ ς : state \. S28\.2\(ς\) ⇒ S28\.3\(ς\[❝main::1::x❞:=ς\(❝main::\$tmp::return_value_function_without_body❞\)\]\)$
+^\(\d+\) ∀ ς : state, nondet::S18\.2-0 : signedbv\[32\] \. S18\.1\(ς\) ⇒ S18\.2\(ς\[❝main::\$tmp::return_value_function_without_body❞:=nondet::S18\.2-0\]\)$
+^\(\d+\) ∀ ς : state \. S18\.2\(ς\) ⇒ S18\.3\(ς\[❝main::1::x❞:=ς\(❝main::\$tmp::return_value_function_without_body❞\)\]\)$
 --

@@ -9,12 +9,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
+#include <util/c_types.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_declarator_converter.h"
-
-#include <util/c_types.h>
-
+#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
@@ -99,7 +98,7 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
 void cpp_typecheckt::convert_non_template_declaration(
   cpp_declarationt &declaration)
 {
-  assert(!declaration.is_template());
+  PRECONDITION(!declaration.is_template());
 
   // we first check if this is a typedef
   typet &declaration_type=declaration.type();

@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract foo
+^\[main.assertion.\d+\].*assertion outfun1 == arr_fun_contract: SUCCESS$
+^\[main.assertion.\d+\].*assertion outfun2 == arr_fun_contract: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that, when replacing a call by its contract,
+requires_contract clauses are translated to equality checks
+and that ensures_contract are translated to assignments of the function pointer
+variable to the contract symbol.

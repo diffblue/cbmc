@@ -1,0 +1,10 @@
+CORE
+main.c
+--malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+^.*error: __CPROVER_pointer_in_range_dfcc expects three arguments$
+^EXIT=(1|64)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+--
+Checks that badly typed occurrences of __CPROVER_pointer_in_range_dfcc are detected.

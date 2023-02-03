@@ -11,8 +11,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "guard_bdd.h"
 
-#include <algorithm>
-
 #include <solvers/prop/bdd_expr.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>

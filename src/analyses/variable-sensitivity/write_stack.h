@@ -13,7 +13,14 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_STACK_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_WRITE_STACK_H
 
-#include <analyses/variable-sensitivity/write_stack_entry.h>
+#include <memory>
+#include <vector>
+
+class abstract_environmentt;
+class exprt;
+class index_exprt;
+class namespacet;
+class write_stack_entryt;
 
 class write_stackt
 {

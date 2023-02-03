@@ -28,7 +28,7 @@ bool pointer_logict::is_dynamic_object(const exprt &expr) const
          (expr.id() == ID_symbol &&
           has_prefix(
             id2string(to_symbol_expr(expr).get_identifier()),
-            SYMEX_DYNAMIC_PREFIX));
+            SYMEX_DYNAMIC_PREFIX "::"));
 }
 
 void pointer_logict::get_dynamic_objects(std::vector<mp_integer> &o) const
@@ -95,7 +95,8 @@ exprt pointer_logict::pointer_expr(
     objects[numeric_cast_v<std::size_t>(pointer.object)];
 
   typet subtype = type.base_type();
-  // This is a gcc extension.
+  // In a counterexample we may up with void pointers with an offset; handle
+  // this just like GCC does and treat them as char pointers:
   // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
   if(subtype.id() == ID_empty)
     subtype = char_type();

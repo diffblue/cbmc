@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+memcpy of objects with zero-width fields at a non-constant offset and with a
+non-constant copy width must not result in spurious verification failures.
+Example constructed from https://github.com/model-checking/kani/issues/1911.

@@ -9,16 +9,19 @@ Author: Daniel Poetzl
 #ifndef CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H
 #define CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H
 
-#include <list>
-#include <string>
+#include <util/optional.h>
+
+#include <goto-programs/goto_program.h>
 
 #include "goto_harness_generator.h"
 #include "recursive_initialization.h"
 
-#include <goto-programs/goto_model.h>
+#include <list>
+#include <string>
 
-#include <util/message.h>
-#include <util/optional.h>
+class goto_functionst;
+class message_handlert;
+class symbol_table_baset;
 
 /// Generates a harness which first assigns global variables with values from
 /// a given memory snapshot and then calls a specified function. The called
@@ -193,8 +196,9 @@ protected:
   /// Parse the snapshot JSON file and initialise the symbol table
   /// \param file: the snapshot JSON file
   /// \param snapshot: the resulting symbol table built from the snapshot
-  void
-  get_memory_snapshot(const std::string &file, symbol_tablet &snapshot) const;
+  void get_memory_snapshot(
+    const std::string &file,
+    symbol_table_baset &snapshot) const;
 
   /// Modify the entry-point function to start from the user-specified initial
   ///   location.
@@ -237,7 +241,7 @@ protected:
   /// \return the new symbol
   const symbolt &fresh_symbol_copy(
     const symbolt &snapshot_symbol,
-    symbol_tablet &symbol_table) const;
+    symbol_table_baset &symbol_table) const;
 
   /// For each global symbol in the \p snapshot symbol table either:
   /// 1) add \ref code_assignt assigning a value from the \p snapshot to the
@@ -251,7 +255,7 @@ protected:
   /// \param goto_model: model to initialise the havoc-ing
   /// \return the block of code where the assignments are added
   code_blockt add_assignments_to_globals(
-    const symbol_tablet &snapshot,
+    const symbol_table_baset &snapshot,
     goto_modelt &goto_model) const;
 
   /// Create as many non-deterministic arguments as there are arguments of the

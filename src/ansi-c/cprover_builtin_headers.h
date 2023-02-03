@@ -49,6 +49,9 @@ void __CPROVER_fence(const char *kind, ...);
 __CPROVER_bool __CPROVER_is_freeable(const void *mem);
 __CPROVER_bool __CPROVER_was_freed(const void *mem);
 __CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size);
+__CPROVER_bool __CPROVER_obeys_contract(void (*)(void), void (*)(void));
+// same as pointer_in_range with experimental support in contracts
+__CPROVER_bool __CPROVER_pointer_in_range_dfcc(void *lb, void *ptr, void *ub);
 void __CPROVER_old(const void *);
 void __CPROVER_loop_entry(const void *);
 
@@ -56,7 +59,7 @@ void __CPROVER_loop_entry(const void *);
 __CPROVER_bool __CPROVER_LIVE_OBJECT(const void *);
 __CPROVER_bool __CPROVER_WRITEABLE_OBJECT(const void *);
 __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *);
-__CPROVER_ssize_t __CPROVER_POINTER_OFFSET(const void *);
+__CPROVER_size_t __CPROVER_POINTER_OFFSET(const void *);
 __CPROVER_size_t __CPROVER_OBJECT_SIZE(const void *);
 __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *);
 __CPROVER_bool __CPROVER_pointer_in_range(const void *, const void *, const void *);

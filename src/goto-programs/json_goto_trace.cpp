@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include "json_goto_trace.h"
 
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
 

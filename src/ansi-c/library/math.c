@@ -2400,7 +2400,7 @@ float fabsf (float d);
 
 float copysignf(float x, float y)
 {
-  float abs = fabs(x);
+  float abs = fabsf(x);
   return (signbit(y)) ? -abs : abs;
 }
 

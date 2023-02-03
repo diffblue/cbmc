@@ -11,17 +11,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant_set.h"
 
-#include <iostream>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
-#include <util/std_code.h>
+#include <util/std_code_base.h>
 
 #include <langapi/language_util.h>
+
+#include <iostream>
 
 void inv_object_storet::output(std::ostream &out) const
 {
@@ -77,7 +77,7 @@ unsigned inv_object_storet::add(const exprt &expr)
 
 bool inv_object_storet::is_constant(unsigned n) const
 {
-  assert(n<entries.size());
+  PRECONDITION(n < entries.size());
   return entries[n].is_constant;
 }
 
@@ -381,7 +381,7 @@ void invariant_sett::strengthen(const exprt &expr)
 
 void invariant_sett::strengthen_rec(const exprt &expr)
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     throw "non-Boolean argument to strengthen()";
 
   #if 0
@@ -409,8 +409,8 @@ void invariant_sett::strengthen_rec(const exprt &expr)
   }
   else if(expr.id()==ID_and)
   {
-    forall_operands(it, expr)
-      strengthen_rec(*it);
+    for(const auto &op : expr.operands())
+      strengthen_rec(op);
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt)
@@ -424,10 +424,10 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     {
       const exprt &bitand_op = rel.op1();
 
-      forall_operands(it, bitand_op)
+      for(const auto &op : bitand_op.operands())
       {
         auto tmp(rel);
-        tmp.op1()=*it;
+        tmp.op1() = op;
         strengthen_rec(tmp);
       }
 
@@ -499,10 +499,10 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     {
       const exprt &bitand_op = equal_expr.op1();
 
-      forall_operands(it, bitand_op)
+      for(const auto &op : bitand_op.operands())
       {
         auto tmp(equal_expr);
-        tmp.op1()=*it;
+        tmp.op1() = op;
         tmp.id(ID_le);
         strengthen_rec(tmp);
       }
@@ -584,7 +584,7 @@ tvt invariant_sett::implies(const exprt &expr) const
 
 tvt invariant_sett::implies_rec(const exprt &expr) const
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     throw "implies: non-Boolean expression";
 
   #if 0
@@ -602,17 +602,21 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
   }
   else if(expr.id()==ID_and)
   {
-    forall_operands(it, expr)
-      if(implies_rec(*it)!=tvt(true))
+    for(const auto &op : expr.operands())
+    {
+      if(implies_rec(op) != tvt(true))
         return tvt::unknown();
+    }
 
     return tvt(true);
   }
   else if(expr.id()==ID_or)
   {
-    forall_operands(it, expr)
-      if(implies_rec(*it)==tvt(true))
+    for(const auto &op : expr.operands())
+    {
+      if(implies_rec(op) == tvt(true))
         return tvt(true);
+    }
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt ||
@@ -692,7 +696,7 @@ void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
 
 void invariant_sett::nnf(exprt &expr, bool negate)
 {
-  if(expr.type().id()!=ID_bool)
+  if(!expr.is_boolean())
     throw "nnf: non-Boolean expression";
 
   if(expr.is_true())
@@ -1049,8 +1053,8 @@ void invariant_sett::apply_code(const codet &code)
 
   if(statement==ID_block)
   {
-    forall_operands(it, code)
-      apply_code(to_code(*it));
+    for(const auto &op : code.operands())
+      apply_code(to_code(op));
   }
   else if(statement==ID_assign)
   {

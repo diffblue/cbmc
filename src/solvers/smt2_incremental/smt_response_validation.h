@@ -5,7 +5,7 @@
 
 #include <util/nodiscard.h>
 
-#include <solvers/smt2_incremental/ast/smt_responses.h>
+#include <solvers/smt2_incremental/ast/smt_responses.h> // IWYU pragma: keep
 #include <solvers/smt2_incremental/response_or_error.h>
 
 NODISCARD response_or_errort<smt_responset> validate_smt_response(

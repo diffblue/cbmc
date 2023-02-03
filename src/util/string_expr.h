@@ -13,6 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_UTIL_STRING_EXPR_H
 
 #include "arith_tools.h"
+#include "pointer_expr.h"
 #include "refined_string_type.h"
 #include "std_expr.h"
 

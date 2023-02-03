@@ -3,7 +3,7 @@
 For a quick start with CBMC on simple problems, read
 
 * The \ref installation_guide
-* A [short tutorial](cprover-manual/md_cbmc-tutorial.html)
+* A [short tutorial](cprover-manual/md_cbmc_tutorial.html)
 * A [short manual](cprover-manual/index.html)
 
 For a quick start with CBMC on large software projects, read
@@ -23,7 +23,7 @@ Key concepts:
 
 * The \ref reference_guide describes CBMC and the CBMC tool chain
 * CBMC [primitives](cprover-manual/md_api.html) and
-  [memory primitives](cprover-manual/md_memory-primitives.html)
+  [memory primitives](cprover-manual/md_memory_primitives.html)
   are useful when writing CBMC assumptions and CBMC assertions.
 * \ref goto-programs "goto programs" are the intermediate representation
   of C code used by the CBMC tool chain

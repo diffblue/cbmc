@@ -6,16 +6,16 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include "satcheck_cadical.h"
-
-#include <util/exception_utils.h>
-#include <util/invariant.h>
-#include <util/narrow.h>
-#include <util/threeval.h>
-
 #ifdef HAVE_CADICAL
 
-#include <cadical.hpp>
+#  include "satcheck_cadical.h"
+
+#  include <util/exception_utils.h>
+#  include <util/invariant.h>
+#  include <util/narrow.h>
+#  include <util/threeval.h>
+
+#  include <cadical.hpp>
 
 tvt satcheck_cadicalt::l_get(literalt a) const
 {

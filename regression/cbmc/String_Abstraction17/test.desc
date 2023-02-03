@@ -1,11 +1,13 @@
 CORE
 strcpy-no-decl.c
 --string-abstraction --validate-goto-model
-Condition: strlen type inconsistency
-^EXIT=(127|134)$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 --
-While this test currently passes when omitting --validate-goto-model, we should
-expect a report of type inconsistencies as no forward declarations are present.
+The linker is able to fix up type inconsistencies of the missing function
+declarations, but the absence of a declaration of strlen results in not picking
+up the library model. Consequently the assumption does not work as intended, and
+verification fails. Adding #include <string.h> makes verification pass as
+expected.

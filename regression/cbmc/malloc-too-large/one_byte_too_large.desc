@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 one_byte_too_large.c
 --malloc-fail-null
 ^EXIT=10$

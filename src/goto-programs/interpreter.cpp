@@ -27,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_container.h>
-#include <util/symbol_table.h>
 
 #include "goto_model.h"
 #include "interpreter_class.h"
@@ -489,7 +488,7 @@ exprt interpretert::get_value(
     const exprt &size_expr = to_array_type(type).size();
     mp_integer subtype_size = get_size(to_array_type(type).element_type());
     mp_integer count;
-    if(size_expr.id()!=ID_constant)
+    if(!size_expr.is_constant())
     {
       count=base_address_to_actual_size(offset)/subtype_size;
     }
@@ -976,10 +975,9 @@ mp_integer interpretert::get_size(const typet &type)
 
     for(const auto &comp : components)
     {
-      const typet &sub_type=comp.type();
-
-      if(sub_type.id()!=ID_code)
-        sum+=get_size(sub_type);
+      DATA_INVARIANT(
+        comp.type().id() != ID_code, "struct member must not be of code type");
+      sum += get_size(comp.type());
     }
 
     return sum;
@@ -993,10 +991,9 @@ mp_integer interpretert::get_size(const typet &type)
 
     for(const auto &comp : components)
     {
-      const typet &sub_type=comp.type();
-
-      if(sub_type.id()!=ID_code)
-        max_size=std::max(max_size, get_size(sub_type));
+      DATA_INVARIANT(
+        comp.type().id() != ID_code, "union member must not be of code type");
+      max_size = std::max(max_size, get_size(comp.type()));
     }
 
     return max_size;

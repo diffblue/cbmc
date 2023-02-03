@@ -125,14 +125,11 @@ typet ansi_c_declarationt::full_type(
   return result;
 }
 
-void ansi_c_declarationt::to_symbol(
-  const ansi_c_declaratort &declarator,
-  symbolt &symbol) const
+symbolt
+ansi_c_declarationt::to_symbol(const ansi_c_declaratort &declarator) const
 {
-  symbol.clear();
+  symbolt symbol{declarator.get_name(), full_type(declarator), ID_C};
   symbol.value=declarator.value();
-  symbol.type=full_type(declarator);
-  symbol.name=declarator.get_name();
   symbol.pretty_name=symbol.name;
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
@@ -173,10 +170,6 @@ void ansi_c_declarationt::to_symbol(
         else  if(get_is_extern()) // traditional GCC
           symbol.is_file_local=true;
       }
-
-      // GCC __attribute__((__used__)) - do not treat those as file-local
-      if(get_is_used())
-        symbol.is_file_local = false;
     }
   }
   else // non-function
@@ -190,10 +183,10 @@ void ansi_c_declarationt::to_symbol(
       (!symbol.is_static_lifetime && !get_is_extern()) ||
       get_is_thread_local();
 
-    symbol.is_file_local=
-      symbol.is_macro ||
-      (!get_is_global() && !get_is_extern()) ||
-      (get_is_global() && get_is_static() && !get_is_used()) ||
-      symbol.is_parameter;
+    symbol.is_file_local =
+      symbol.is_macro || (!get_is_global() && !get_is_extern()) ||
+      (get_is_global() && get_is_static()) || symbol.is_parameter;
   }
+
+  return symbol;
 }

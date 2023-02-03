@@ -12,8 +12,6 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H
 
-#include <chrono>
-
 #include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "single_path_symex_only_checker.h"

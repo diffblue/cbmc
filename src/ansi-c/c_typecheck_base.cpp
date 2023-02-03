@@ -13,9 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/mathematical_expr.h>
 #include <util/std_types.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/name_mangler.h>
 
 #include "ansi_c_declaration.h"
 #include "c_storage_spec.h"
@@ -69,13 +73,14 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     new_name=root_name;
     symbol.is_static_lifetime=true;
 
-    if(symbol.value.is_not_nil())
+    if(symbol.value.is_not_nil() && !symbol.is_macro)
     {
       // According to the C standard this should be an error, but at least some
       // versions of Visual Studio insist to use this in their C library, and
       // GCC just warns as well.
       warning().source_location = symbol.value.find_source_location();
-      warning() << "`extern' symbol should not have an initializer" << eom;
+      warning() << "'extern' symbol '" << new_name
+                << "' should not have an initializer" << eom;
     }
   }
   else if(!is_function && symbol.value.id()==ID_code)
@@ -111,7 +116,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
 
   // see if we have it already
-  symbol_tablet::symbolst::const_iterator old_it=
+  symbol_table_baset::symbolst::const_iterator old_it =
     symbol_table.symbols.find(symbol.name);
 
   if(old_it==symbol_table.symbols.end())
@@ -368,6 +373,17 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     code_typet &old_ct=to_code_type(old_symbol.type);
     code_typet &new_ct=to_code_type(new_symbol.type);
 
+    if(
+      old_ct.return_type() != new_ct.return_type() &&
+      !old_ct.get_bool(ID_C_incomplete))
+    {
+      throw invalid_source_file_exceptiont{
+        "function symbol '" + id2string(new_symbol.display_name()) +
+          "' redefined with a different type:\n" +
+          "Original: " + to_string(old_symbol.type) + "\n" +
+          "     New: " + to_string(new_symbol.type),
+        new_symbol.location};
+    }
     const bool inlined = old_ct.get_inlined() || new_ct.get_inlined();
 
     if(old_ct.has_ellipsis() && !new_ct.has_ellipsis())
@@ -414,7 +430,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           {
             const irep_idt &identifier = old_parameter.get_identifier();
 
-            symbol_tablet::symbolst::const_iterator p_s_it=
+            symbol_table_baset::symbolst::const_iterator p_s_it =
               symbol_table.symbols.find(identifier);
             if(p_s_it!=symbol_table.symbols.end())
               symbol_table.erase(p_s_it);
@@ -584,6 +600,12 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   labels_used.clear();
   labels_defined.clear();
 
+  // A function declaration int foo(); does not specify the parameter list, but
+  // a function definition int foo() { ... } does fix the parameter list to be
+  // empty.
+  if(code_type.parameters().empty() && code_type.has_ellipsis())
+    code_type.remove_ellipsis();
+
   // fix type
   symbol.value.type()=code_type;
 
@@ -669,7 +691,9 @@ void c_typecheck_baset::apply_asm_label(
 
       if(!asm_label_map.insert(
           std::make_pair(p_id, p_new_id)).second)
-        assert(asm_label_map[p_id]==p_new_id);
+      {
+        CHECK_RETURN(asm_label_map[p_id] == p_new_id);
+      }
     }
   }
 }
@@ -756,10 +780,8 @@ void c_typecheck_baset::typecheck_declaration(
       declaration.set_is_register(full_spec.is_register);
       declaration.set_is_typedef(full_spec.is_typedef);
       declaration.set_is_weak(full_spec.is_weak);
-      declaration.set_is_used(full_spec.is_used);
 
-      symbolt symbol;
-      declaration.to_symbol(declarator, symbol);
+      symbolt symbol = declaration.to_symbol(declarator);
       current_symbol=symbol;
 
       // now check other half of type
@@ -784,6 +806,20 @@ void c_typecheck_baset::typecheck_declaration(
         else
           symbol.value = symbol_exprt::typeless(renaming_entry->second);
         symbol.is_macro=true;
+      }
+
+      if(full_spec.is_used && symbol.is_file_local)
+      {
+        // GCC __attribute__((__used__)) - do not treat those as file-local, but
+        // make sure the name is unique
+        symbol.is_file_local = false;
+
+        symbolt symbol_for_renaming = symbol;
+        if(!full_spec.asm_label.empty())
+          symbol_for_renaming.name = full_spec.asm_label;
+        full_spec.asm_label = djb_manglert{}(
+          symbol_for_renaming,
+          id2string(symbol_for_renaming.location.get_file()));
       }
 
       if(full_spec.section.empty())
@@ -858,16 +894,6 @@ void c_typecheck_baset::typecheck_declaration(
             parameter_identifier, p.type());
         }
 
-        for(auto &expr : code_type.requires_contract())
-        {
-          typecheck_spec_function_pointer_obeys_contract(expr);
-          std::string clause_type = "function pointer preconditions";
-          check_history_expr_return_value(expr, clause_type);
-          lambda_exprt lambda{temporary_parameter_symbols, expr};
-          lambda.add_source_location() = expr.source_location();
-          expr.swap(lambda);
-        }
-
         for(auto &requires : code_type.requires())
         {
           typecheck_expr(requires);
@@ -896,18 +922,6 @@ void c_typecheck_baset::typecheck_declaration(
           lambda_exprt lambda{temporary_parameter_symbols, frees};
           lambda.add_source_location() = frees.source_location();
           frees.swap(lambda);
-        }
-
-        for(auto &expr : code_type.ensures_contract())
-        {
-          typecheck_spec_function_pointer_obeys_contract(expr);
-          disallow_subexpr_by_id(
-            expr,
-            ID_loop_entry,
-            CPROVER_PREFIX "loop_entry is not allowed in postconditions.");
-          lambda_exprt lambda{temporary_parameter_symbols, expr};
-          lambda.add_source_location() = expr.source_location();
-          expr.swap(lambda);
         }
 
         for(auto &ensures : code_type.ensures())
@@ -952,9 +966,7 @@ void c_typecheck_baset::typecheck_declaration(
         new_symbol.type.remove(ID_C_spec_assigns);
         new_symbol.type.remove(ID_C_spec_frees);
         new_symbol.type.remove(ID_C_spec_ensures);
-        new_symbol.type.remove(ID_C_spec_ensures_contract);
         new_symbol.type.remove(ID_C_spec_requires);
-        new_symbol.type.remove(ID_C_spec_requires_contract);
       }
     }
   }

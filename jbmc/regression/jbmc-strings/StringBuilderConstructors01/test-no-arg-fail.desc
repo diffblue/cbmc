@@ -4,9 +4,9 @@ StringBuilderConstructors01
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-dynamic_object2=\{\s*\}
+dynamic_object\$0=\{\s*\}
 --
 ^warning: ignoring
 --
-The check for dynamic_object2 is to make sure the array is created empty and
+The check for dynamic_object\$0 is to make sure the array is created empty and
 is not given arbitrary content before its final assignment.

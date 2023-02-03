@@ -6,13 +6,14 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/namespace.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_function.h>
+
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "Validation of well-formed assert/assume codes",
@@ -22,13 +23,11 @@ SCENARIO(
   {
     symbol_tablet symbol_table;
     const typet type1 = signedbv_typet(32);
-    symbolt symbol;
-    symbolt fun_symbol;
+    symbolt symbol{"a", type1, ID_C};
     irep_idt fun_name = "foo";
+    symbolt fun_symbol;
     fun_symbol.name = fun_name;
-    irep_idt symbol_name = "a";
-    symbol.name = symbol_name;
-    symbol_exprt varx(symbol_name, type1);
+    symbol_exprt varx = symbol.symbol_expr();
     exprt val10 = from_integer(10, type1);
     binary_relation_exprt x_le_10(varx, ID_le, val10);
 
@@ -36,7 +35,6 @@ SCENARIO(
     auto assertion =
       goto_function.body.add(goto_programt::make_assertion(x_le_10));
 
-    symbol.type = type1;
     symbol_table.insert(symbol);
     symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);

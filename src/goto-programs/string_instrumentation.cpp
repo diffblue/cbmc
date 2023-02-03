@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
 #include <goto-programs/goto_model.h>
@@ -53,7 +52,7 @@ exprt buffer_size(const exprt &what)
 class string_instrumentationt
 {
 public:
-  explicit string_instrumentationt(symbol_tablet &_symbol_table)
+  explicit string_instrumentationt(symbol_table_baset &_symbol_table)
     : symbol_table(_symbol_table), ns(_symbol_table)
   {
   }
@@ -62,7 +61,7 @@ public:
   void operator()(goto_functionst &dest);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
 
   void make_type(exprt &dest, const typet &type)
@@ -160,7 +159,7 @@ protected:
 };
 
 void string_instrumentation(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt &dest)
 {
   string_instrumentationt string_instrumentation{symbol_table};
@@ -168,7 +167,7 @@ void string_instrumentation(
 }
 
 void string_instrumentation(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &dest)
 {
   string_instrumentationt string_instrumentation{symbol_table};
@@ -733,26 +732,20 @@ void string_instrumentationt::do_strerror(
 
   if(symbol_table.symbols.find(identifier_buf)==symbol_table.symbols.end())
   {
-    symbolt new_symbol_size;
-    new_symbol_size.base_name="__strerror_buffer_size";
+    symbolt new_symbol_size{identifier_size, size_type(), ID_C};
+    new_symbol_size.base_name = identifier_size;
     new_symbol_size.pretty_name=new_symbol_size.base_name;
-    new_symbol_size.name=identifier_size;
-    new_symbol_size.mode=ID_C;
-    new_symbol_size.type=size_type();
     new_symbol_size.is_state_var=true;
     new_symbol_size.is_lvalue=true;
     new_symbol_size.is_static_lifetime=true;
 
     array_typet type(char_type(), new_symbol_size.symbol_expr());
-    symbolt new_symbol_buf;
-    new_symbol_buf.mode=ID_C;
-    new_symbol_buf.type=type;
+    symbolt new_symbol_buf{identifier_buf, type, ID_C};
     new_symbol_buf.is_state_var=true;
     new_symbol_buf.is_lvalue=true;
     new_symbol_buf.is_static_lifetime=true;
-    new_symbol_buf.base_name="__strerror_buffer";
+    new_symbol_buf.base_name = identifier_buf;
     new_symbol_buf.pretty_name=new_symbol_buf.base_name;
-    new_symbol_buf.name=new_symbol_buf.base_name;
 
     symbol_table.insert(std::move(new_symbol_buf));
     symbol_table.insert(std::move(new_symbol_size));
@@ -813,12 +806,9 @@ void string_instrumentationt::invalidate_buffer(
 
   if(symbol_table.symbols.find(cntr_id)==symbol_table.symbols.end())
   {
-    symbolt new_symbol;
+    symbolt new_symbol{cntr_id, size_type(), ID_C};
     new_symbol.base_name="$counter";
     new_symbol.pretty_name=new_symbol.base_name;
-    new_symbol.name=cntr_id;
-    new_symbol.mode=ID_C;
-    new_symbol.type=size_type();
     new_symbol.is_state_var=true;
     new_symbol.is_lvalue=true;
     new_symbol.is_static_lifetime=true;

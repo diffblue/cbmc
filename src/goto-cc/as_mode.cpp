@@ -19,9 +19,6 @@ Author: Michael Tautschnig
 #include <sysexits.h>
 #endif
 
-#include <fstream>
-#include <iostream>
-
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
@@ -33,6 +30,9 @@ Author: Michael Tautschnig
 #include "compile.h"
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
 
 static std::string assembler_name(
   const cmdlinet &cmdline,
@@ -201,7 +201,7 @@ int as_modet::doit()
       {
         if(outputs>0)
         {
-          assert(!dest.empty());
+          PRECONDITION(!dest.empty());
           compiler.add_input_file(dest);
           os.close();
         }
@@ -230,7 +230,7 @@ int as_modet::doit()
 
     if(outputs>0)
     {
-      assert(!dest.empty());
+      PRECONDITION(!dest.empty());
       compiler.add_input_file(dest);
     }
     else
@@ -260,7 +260,7 @@ int as_modet::doit()
 /// run as or as86 with original command line
 int as_modet::run_as()
 {
-  assert(!cmdline.parsed_argv.empty());
+  PRECONDITION(!cmdline.parsed_argv.empty());
 
   // build new argv
   std::vector<std::string> new_argv;

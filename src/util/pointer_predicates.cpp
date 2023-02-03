@@ -37,7 +37,7 @@ exprt object_size(const exprt &pointer)
 
 exprt pointer_offset(const exprt &pointer)
 {
-  return pointer_offset_exprt(pointer, signed_size_type());
+  return pointer_offset_exprt(pointer, size_type());
 }
 
 exprt deallocated(const exprt &pointer, const namespacet &ns)
@@ -56,34 +56,6 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
-exprt good_pointer(const exprt &pointer)
-{
-  return unary_exprt(ID_good_pointer, pointer, bool_typet());
-}
-
-exprt good_pointer_def(
-  const exprt &pointer,
-  const namespacet &ns)
-{
-  const pointer_typet &pointer_type = to_pointer_type(pointer.type());
-  const typet &dereference_type = pointer_type.base_type();
-
-  const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
-  CHECK_RETURN(size_of_expr_opt.has_value());
-
-  const exprt good_dynamic = not_exprt{deallocated(pointer, ns)};
-
-  const not_exprt not_null(null_pointer(pointer));
-
-  const not_exprt not_invalid{is_invalid_pointer_exprt{pointer}};
-
-  const and_exprt good_bounds{
-    not_exprt{object_lower_bound(pointer, nil_exprt())},
-    not_exprt{object_upper_bound(pointer, size_of_expr_opt.value())}};
-
-  return and_exprt(not_null, not_invalid, good_dynamic, good_bounds);
-}
-
 exprt null_object(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
@@ -97,40 +69,49 @@ exprt integer_address(const exprt &pointer)
                    notequal_exprt(null_pointer, pointer));
 }
 
-exprt null_pointer(const exprt &pointer)
-{
-  null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
-  return same_object(pointer, null_pointer);
-}
-
 exprt object_upper_bound(
   const exprt &pointer,
   const exprt &access_size)
 {
-  // this is
-  // POINTER_OFFSET(p)+access_size>OBJECT_SIZE(pointer)
+  exprt object_offset = pointer_offset(pointer);
 
   exprt object_size_expr=object_size(pointer);
 
-  exprt object_offset=pointer_offset(pointer);
+  std::size_t max_width = std::max(
+    to_bitvector_type(object_offset.type()).get_width(),
+    to_bitvector_type(object_size_expr.type()).get_width());
 
-  // need to add size
-  irep_idt op=ID_ge;
-  exprt sum=object_offset;
-
+  // We add the size to the offset, if given.
   if(access_size.is_not_nil())
   {
-    op=ID_gt;
+    // This is
+    // POINTER_OFFSET(p)+access_size>OBJECT_SIZE(pointer)
+    // We enlarge all bit-vectors to avoid an overflow on the addition.
 
-    sum = plus_exprt(
-      typecast_exprt::conditional_cast(object_offset, access_size.type()),
-      access_size);
+    max_width =
+      std::max(max_width, to_bitvector_type(access_size.type()).get_width());
+
+    auto type = unsignedbv_typet(max_width + 1);
+
+    auto sum = plus_exprt(
+      typecast_exprt::conditional_cast(object_offset, type),
+      typecast_exprt::conditional_cast(access_size, type));
+
+    return binary_relation_exprt(
+      sum, ID_gt, typecast_exprt::conditional_cast(object_size_expr, type));
   }
+  else
+  {
+    // This is
+    // POINTER_OFFSET(p)>=OBJECT_SIZE(pointer)
 
-  return binary_relation_exprt(
-    typecast_exprt::conditional_cast(sum, object_size_expr.type()),
-    op,
-    object_size_expr);
+    auto type = unsignedbv_typet(max_width);
+
+    return binary_relation_exprt(
+      typecast_exprt::conditional_cast(object_offset, type),
+      ID_ge,
+      typecast_exprt::conditional_cast(object_size_expr, type));
+  }
 }
 
 exprt object_lower_bound(

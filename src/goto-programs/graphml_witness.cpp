@@ -15,18 +15,17 @@ Author: Daniel Kroening
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
-
-#include <langapi/language_util.h>
-#include <langapi/mode.h>
-
-#include <goto-symex/symex_target_equation.h>
+#include <util/symbol.h>
 
 #include <ansi-c/expr2c.h>
+#include <goto-symex/symex_target_equation.h>
+#include <langapi/language_util.h>
+#include <langapi/mode.h>
 
 #include "goto_program.h"
 #include "goto_trace.h"
@@ -106,13 +105,13 @@ std::string graphml_witnesst::convert_assign_rec(
     const array_typet &type = to_array_type(assign.rhs().type());
 
     unsigned i=0;
-    forall_operands(it, assign.rhs())
+    for(const auto &op : assign.rhs().operands())
     {
       index_exprt index(
         assign.lhs(), from_integer(i++, c_index_type()), type.element_type());
       if(!result.empty())
         result+=' ';
-      result+=convert_assign_rec(identifier, code_assignt(index, *it));
+      result += convert_assign_rec(identifier, code_assignt(index, op));
     }
   }
   else if(assign.rhs().id()==ID_struct ||
@@ -147,10 +146,12 @@ std::string graphml_witnesst::convert_assign_rec(
       assign.rhs().operands().begin();
     for(const auto &comp : components)
     {
-      if(comp.type().id()==ID_code ||
-         comp.get_is_padding() ||
-         // for some reason #is_padding gets lost in *some* cases
-         has_prefix(id2string(comp.get_name()), "$pad"))
+      DATA_INVARIANT(
+        comp.type().id() != ID_code, "struct member must not be of code type");
+      if(
+        comp.get_is_padding() ||
+        // for some reason #is_padding gets lost in *some* cases
+        has_prefix(id2string(comp.get_name()), "$pad"))
         continue;
 
       INVARIANT(
@@ -276,9 +277,9 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
     return true;
   }
 
-  forall_operands(it, expr)
+  for(const auto &op : expr.operands())
   {
-    if(contains_symbol_prefix(*it, prefix))
+    if(contains_symbol_prefix(op, prefix))
       return true;
   }
   return false;
@@ -458,9 +459,9 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         }
         else if(
           !contains_symbol_prefix(
-            it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "::dynamic_object") &&
           !contains_symbol_prefix(
-            it->full_lhs, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            it->full_lhs, SYMEX_DYNAMIC_PREFIX "::dynamic_object") &&
           lhs_id.find("thread") == std::string::npos &&
           lhs_id.find("mutex") == std::string::npos &&
           (!it->full_lhs_value.is_constant() ||
@@ -476,15 +477,18 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           code_assignt assign{it->full_lhs, it->full_lhs_value};
           val.data = convert_assign_rec(lhs_id, assign);
 
-          xmlt &val_s = edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          irep_idt function_id = it->function_id;
-          const symbolt *symbol_ptr = nullptr;
-          if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
+          if(!it->function_id.empty())
           {
-            function_id = lhs_id.substr(0, lhs_id.find("::"));
+            xmlt &val_s = edge.new_element("data");
+            val_s.set_attribute("key", "assumption.scope");
+            irep_idt function_id = it->function_id;
+            const symbolt *symbol_ptr = nullptr;
+            if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
+            {
+              function_id = lhs_id.substr(0, lhs_id.find("::"));
+            }
+            val_s.data = id2string(function_id);
           }
-          val_s.data = id2string(function_id);
 
           if(has_prefix(val.data, "\\result ="))
           {

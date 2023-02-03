@@ -13,13 +13,13 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/json.h>
 #include <util/std_code.h>
 #include <util/suffix.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_instruction_code.h>
 
 #include "assignments_from_json.h"
-#include "ci_lazy_methods_needed.h"
+#include "ci_lazy_methods_needed.h" // IWYU pragma: keep
 #include "java_object_factory.h"
 #include "java_object_factory_parameters.h"
 #include "java_types.h"
@@ -120,18 +120,15 @@ static symbolt add_new_variable_symbol(
   const bool is_thread_local,
   const bool is_static_lifetime)
 {
-  symbolt new_symbol;
-  new_symbol.name = name;
+  symbolt new_symbol{name, type, ID_java};
   new_symbol.pretty_name = name;
   new_symbol.base_name = name;
-  new_symbol.type = type;
   new_symbol.type.set(ID_C_no_nondet_initialization, true);
   new_symbol.value = value;
   new_symbol.is_lvalue = true;
   new_symbol.is_state_var = true;
   new_symbol.is_static_lifetime = is_static_lifetime;
   new_symbol.is_thread_local = is_thread_local;
-  new_symbol.mode = ID_java;
   symbol_table.add(new_symbol);
   return new_symbol;
 }
@@ -307,7 +304,8 @@ static void clinit_wrapper_do_recursive_calls(
 /// \param symbol_table: global symbol table
 /// \return true if a static initializer wrapper is needed
 static bool needs_clinit_wrapper(
-  const irep_idt &class_name, const symbol_tablet &symbol_table)
+  const irep_idt &class_name,
+  const symbol_table_baset &symbol_table)
 {
   if(symbol_table.has_symbol(clinit_function_name(class_name)))
     return true;
@@ -332,19 +330,17 @@ static void create_function_symbol(
   const irep_idt &function_name,
   const irep_idt &function_base_name,
   const synthetic_method_typet &synthetic_method_type,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
-  symbolt function_symbol;
-  const java_method_typet function_type({}, java_void_type());
+  symbolt function_symbol{
+    function_name, java_method_typet({}, java_void_type()), ID_java};
   function_symbol.name = function_name;
   function_symbol.pretty_name = function_symbol.name;
   function_symbol.base_name = function_base_name;
-  function_symbol.type = function_type;
   // This provides a back-link from a method to its associated class, as is done
   // for java_bytecode_convert_methodt::convert.
   set_declaring_class(function_symbol, class_name);
-  function_symbol.mode = ID_java;
   bool failed = symbol_table.add(function_symbol);
   INVARIANT(!failed, id2string(function_base_name) + " symbol should be fresh");
 
@@ -359,7 +355,7 @@ static void create_function_symbol(
 // Create symbol for the "clinit_wrapper"
 static void create_clinit_wrapper_function_symbol(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
   create_function_symbol(
@@ -374,7 +370,7 @@ static void create_clinit_wrapper_function_symbol(
 // Create symbol for the "user_specified_clinit"
 static void create_user_specified_clinit_function_symbol(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
   create_function_symbol(
@@ -398,7 +394,7 @@ static void create_user_specified_clinit_function_symbol(
 ///   clinit_wrapper thread safe will be created.
 static void create_clinit_wrapper_symbols(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   const bool thread_safe)
 {
@@ -780,7 +776,7 @@ code_ifthenelset get_clinit_wrapper_body(
 
 /// \return map associating classes to the symbols they declare
 std::unordered_multimap<irep_idt, symbolt>
-class_to_declared_symbols(const symbol_tablet &symbol_table)
+class_to_declared_symbols(const symbol_table_baset &symbol_table)
 {
   std::unordered_multimap<irep_idt, symbolt> result;
   for(const auto &symbol_pair : symbol_table)
@@ -876,7 +872,7 @@ code_blockt get_user_specified_clinit_body(
 ///   synthetic user_specified_clinit function should be created. This is true
 ///   if a file was given with the --static-values option and false otherwise.
 void create_static_initializer_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   const bool thread_safe,
   const bool is_user_clinit_needed)
@@ -927,7 +923,7 @@ static itertype advance_to_next_key(itertype in, itertype end)
 ///   static initialiser such that we get a callback to provide its body as and
 ///   when it is required.
 void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::unordered_set<irep_idt> &stub_globals_set,
   synthetic_methods_mapt &synthetic_methods)
 {
@@ -968,14 +964,10 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
       "a class cannot be both incomplete, and so have stub static fields, and "
       "also define a static initializer");
 
-    const java_method_typet thunk_type({}, java_void_type());
-
-    symbolt static_init_symbol;
-    static_init_symbol.name = static_init_name;
+    symbolt static_init_symbol{
+      static_init_name, java_method_typet({}, java_void_type()), ID_java};
     static_init_symbol.pretty_name = static_init_name;
     static_init_symbol.base_name = "clinit():V";
-    static_init_symbol.mode = ID_java;
-    static_init_symbol.type = thunk_type;
     // This provides a back-link from a method to its associated class, as is
     // done for java_bytecode_convert_methodt::convert.
     set_declaring_class(static_init_symbol, it->first);

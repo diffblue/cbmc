@@ -22,36 +22,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
-/// Return whether the expression is a constant.
-/// \return True if is a constant, false otherwise
-bool exprt::is_constant() const
-{
-  return id()==ID_constant;
-}
-
 /// Return whether the expression is a constant representing `true`.
 /// \return True if is a Boolean constant representing `true`, false otherwise.
 bool exprt::is_true() const
 {
-  return is_constant() &&
-         type().id()==ID_bool &&
-         get(ID_value)!=ID_false;
+  return is_constant() && is_boolean() && get(ID_value) != ID_false;
 }
 
 /// Return whether the expression is a constant representing `false`.
 /// \return True if is a Boolean constant representing `false`, false otherwise.
 bool exprt::is_false() const
 {
-  return is_constant() &&
-         type().id()==ID_bool &&
-         get(ID_value)==ID_false;
-}
-
-/// Return whether the expression represents a Boolean.
-/// \return True if is a Boolean, false otherwise.
-bool exprt::is_boolean() const
-{
-  return type().id()==ID_bool;
+  return is_constant() && is_boolean() && get(ID_value) == ID_false;
 }
 
 /// Return whether the expression is a constant representing 0.
@@ -169,9 +151,9 @@ const source_locationt &exprt::find_source_location() const
   if(l.is_not_nil())
     return l;
 
-  forall_operands(it, (*this))
+  for(const auto &op : operands())
   {
-    const source_locationt &op_l = it->find_source_location();
+    const source_locationt &op_l = op.find_source_location();
     if(op_l.is_not_nil())
       return op_l;
   }

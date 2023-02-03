@@ -45,10 +45,10 @@ int unlink(const char *s)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
-extern struct __CPROVER_pipet __CPROVER_pipes[];
+extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
-extern unsigned __CPROVER_pipe_count;
+unsigned __CPROVER_pipe_count = 0;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
@@ -63,6 +63,7 @@ int pipe(int fildes[2])
   }
 
   __CPROVER_atomic_begin();
+  __CPROVER_assume(__CPROVER_pipe_offset >= 0);
   __CPROVER_assume(__CPROVER_pipe_offset%2==0);
   __CPROVER_assume(__CPROVER_pipe_offset<=(int)(__CPROVER_pipe_offset+__CPROVER_pipe_count));
   fildes[0]=__CPROVER_pipe_offset+__CPROVER_pipe_count;
@@ -96,7 +97,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: close */
 
-extern struct __CPROVER_pipet __CPROVER_pipes[];
+extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
@@ -105,6 +106,8 @@ int close(int fildes)
   __CPROVER_HIDE:;
   if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
     return 0;
+
+  __CPROVER_assume(__CPROVER_pipe_offset >= 0);
 
   int retval=-1;
   fildes-=__CPROVER_pipe_offset;
@@ -148,7 +151,7 @@ int _close(int fildes)
 #define size_type size_t
 #endif
 
-extern struct __CPROVER_pipet __CPROVER_pipes[];
+extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
@@ -164,14 +167,18 @@ ret_type write(int fildes, const void *buf, size_type nbyte)
     return retval;
   }
 
+  __CPROVER_assume(__CPROVER_pipe_offset >= 0);
+
   int retval=-1;
   fildes-=__CPROVER_pipe_offset;
   if(fildes%2==1)
     --fildes;
   __CPROVER_atomic_begin();
-  if(!__CPROVER_pipes[fildes].widowed &&
-      sizeof(__CPROVER_pipes[fildes].data) >=
-      __CPROVER_pipes[fildes].next_avail+nbyte)
+  if(
+    !__CPROVER_pipes[fildes].widowed &&
+    __CPROVER_pipes[fildes].next_avail >= 0 &&
+    sizeof(__CPROVER_pipes[fildes].data) >=
+      __CPROVER_pipes[fildes].next_avail + nbyte)
   {
     for(size_type i=0; i<nbyte; ++i)
       __CPROVER_pipes[fildes].data[i+__CPROVER_pipes[fildes].next_avail]=
@@ -222,7 +229,7 @@ ret_type _write(int fildes, const void *buf, size_type nbyte)
 #define size_type size_t
 #endif
 
-extern struct __CPROVER_pipet __CPROVER_pipes[];
+extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
@@ -262,12 +269,16 @@ ret_type read(int fildes, void *buf, size_type nbyte)
     return error ? -1 : nread;
   }
 
+  __CPROVER_assume(__CPROVER_pipe_offset >= 0);
+
   int retval=0;
   fildes-=__CPROVER_pipe_offset;
   if(fildes%2==1)
     --fildes;
   __CPROVER_atomic_begin();
-  if(!__CPROVER_pipes[fildes].widowed)
+  if(
+    !__CPROVER_pipes[fildes].widowed &&
+    __CPROVER_pipes[fildes].next_unread >= 0)
   {
     for(size_type i=0; i<nbyte &&
       __CPROVER_pipes[fildes].next_unread <

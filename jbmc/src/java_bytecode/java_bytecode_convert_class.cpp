@@ -15,23 +15,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include "ci_lazy_methods.h"
-#include "java_bytecode_convert_method.h"
 #include "java_root_class.h"
-#include "java_types.h"
-#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
+#include <util/symbol_table_base.h>
+
+#include "ci_lazy_methods.h"
+#include "java_bytecode_convert_method.h"
+#include "java_string_library_preprocess.h"
+#include "java_types.h"
+#include "java_utils.h"
 
 class java_bytecode_convert_classt
 {
 public:
   java_bytecode_convert_classt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
     method_bytecodet &method_bytecode,
@@ -105,7 +108,7 @@ public:
 
 private:
   messaget log;
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const size_t max_array_length;
   method_bytecodet &method_bytecode;
   java_string_library_preprocesst &string_preprocess;
@@ -446,14 +449,10 @@ void java_bytecode_convert_classt::convert(
   }(id2string(c.name));
 
   // produce class symbol
-  symbolt new_symbol;
+  class_type.set_name(qualified_classname);
+  type_symbolt new_symbol{qualified_classname, class_type, ID_java};
   new_symbol.base_name = base_name;
   new_symbol.pretty_name=c.name;
-  new_symbol.name=qualified_classname;
-  class_type.set_name(new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
 
   symbolt *class_symbol;
 
@@ -711,14 +710,15 @@ void java_bytecode_convert_classt::convert(
     component.type() = field_type;
 
     // Create the symbol
-    symbolt new_symbol;
+    symbolt new_symbol{
+      id2string(class_symbol.name) + "." + id2string(f.name),
+      field_type,
+      ID_java};
 
     new_symbol.is_static_lifetime=true;
     new_symbol.is_lvalue=true;
     new_symbol.is_state_var=true;
-    new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
-    new_symbol.type=field_type;
     // Provide a static field -> class link, like
     // java_bytecode_convert_method::convert does for method -> class.
     set_declaring_class(new_symbol, class_symbol.name);
@@ -726,8 +726,6 @@ void java_bytecode_convert_classt::convert(
     new_symbol.type.set(ID_C_constant, f.is_final);
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+
       "."+id2string(f.name);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
 
     // These annotations use `ID_C_access` instead of `ID_access` like methods
     // to avoid type clashes in expressions like `some_static_field = 0`, where
@@ -765,8 +763,8 @@ void java_bytecode_convert_classt::convert(
     if(s_it!=symbol_table.symbols.end())
       symbol_table.erase(s_it); // erase, we stubbed it
 
-    if(symbol_table.add(new_symbol))
-      assert(false && "failed to add static field symbol");
+    const bool failed = symbol_table.add(new_symbol);
+    CHECK_RETURN_WITH_DIAGNOSTICS(!failed, "failed to add static field symbol");
   }
   else
   {
@@ -790,7 +788,7 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-void add_java_array_types(symbol_tablet &symbol_table)
+void add_java_array_types(symbol_table_baset &symbol_table)
 {
   const std::string letters="ijsbcfdza";
 
@@ -859,12 +857,8 @@ void add_java_array_types(symbol_tablet &symbol_table)
       "Constructed a new type representing a Java Array "
       "object that doesn't match expectations");
 
-    symbolt symbol;
-    symbol.name = struct_tag_type_identifier;
+    type_symbolt symbol{struct_tag_type_identifier, class_type, ID_java};
     symbol.base_name = struct_tag_type.get(ID_C_base_name);
-    symbol.is_type=true;
-    symbol.type = class_type;
-    symbol.mode = ID_java;
     symbol_table.add(symbol);
 
     // Also provide a clone method:
@@ -989,21 +983,18 @@ void add_java_array_types(symbol_tablet &symbol_table)
                                   copy_loop,
                                   return_inst});
 
-    symbolt clone_symbol;
-    clone_symbol.name=clone_name;
+    symbolt clone_symbol{clone_name, clone_type, ID_java};
     clone_symbol.pretty_name =
       id2string(struct_tag_type_identifier) + ".clone:()";
     clone_symbol.base_name="clone";
-    clone_symbol.type=clone_type;
     clone_symbol.value=clone_body;
-    clone_symbol.mode=ID_java;
     symbol_table.add(clone_symbol);
   }
 }
 
 bool java_bytecode_convert_class(
   const java_class_loadert::parse_tree_with_overlayst &parse_trees,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
   method_bytecodet &method_bytecode,
@@ -1188,7 +1179,7 @@ void convert_java_annotations(
 /// corresponding outer classes.
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   const std::string qualified_class_name = "java::" + id2string(class_name);
   PRECONDITION(symbol_table.has_symbol(qualified_class_name));

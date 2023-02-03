@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cprover_prefix.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/symbol.h>
 

@@ -15,7 +15,6 @@ Author: Diffblue Ltd.
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
-#include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/make_unique.h>
 #include <util/pointer_expr.h>
@@ -76,10 +75,11 @@ protected:
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
-    function.body.add(
-      goto_programt::make_assumption(false_exprt(), function_symbol.location));
-    function.body.add(
-      goto_programt::make_end_function(function_symbol.location));
+    source_locationt location = function_symbol.location;
+    location.set_function(function_name);
+
+    function.body.add(goto_programt::make_assumption(false_exprt(), location));
+    function.body.add(goto_programt::make_end_function(location));
   }
 };
 
@@ -249,6 +249,8 @@ protected:
     }
 
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
+    source_locationt location = function_symbol.location;
+    location.set_function(function_name);
 
     for(std::size_t i = 0; i < function.parameter_identifiers.size(); ++i)
     {
@@ -266,7 +268,7 @@ protected:
             equal_exprt(
               parameter_symbol.symbol_expr(),
               null_pointer_exprt(to_pointer_type(parameter_symbol.type))),
-            function_symbol.location));
+            location));
 
         dereference_exprt dereference_expr(
           parameter_symbol.symbol_expr(),
@@ -276,7 +278,7 @@ protected:
         havoc_expr_rec(
           dereference_expr,
           1, // depth 1 since we pass the dereferenced pointer
-          function_symbol.location,
+          location,
           function_name,
           symbol_table,
           dest);
@@ -284,7 +286,7 @@ protected:
         function.body.destructive_append(dest);
 
         auto label_instruction =
-          function.body.add(goto_programt::make_skip(function_symbol.location));
+          function.body.add(goto_programt::make_skip(location));
         goto_instruction->complete_goto(label_instruction);
       }
     }
@@ -298,7 +300,7 @@ protected:
       havoc_expr_rec(
         symbol_exprt(global_sym.name, global_sym.type),
         0,
-        function_symbol.location,
+        location,
         irep_idt(),
         symbol_table,
         dest);
@@ -316,21 +318,21 @@ protected:
         type,
         id2string(function_name),
         "return_value",
-        function_symbol.location,
+        location,
         ID_C,
         symbol_table);
 
       aux_symbol.is_static_lifetime = false;
 
-      function.body.add(goto_programt::make_decl(
-        aux_symbol.symbol_expr(), function_symbol.location));
+      function.body.add(
+        goto_programt::make_decl(aux_symbol.symbol_expr(), location));
 
       goto_programt dest;
 
       havoc_expr_rec(
         aux_symbol.symbol_expr(),
         0,
-        function_symbol.location,
+        location,
         function_name,
         symbol_table,
         dest);
@@ -340,15 +342,14 @@ protected:
       exprt return_expr =
         typecast_exprt::conditional_cast(aux_symbol.symbol_expr(), return_type);
 
-      function.body.add(goto_programt::make_set_return_value(
-        std::move(return_expr), function_symbol.location));
+      function.body.add(
+        goto_programt::make_set_return_value(std::move(return_expr), location));
 
-      function.body.add(goto_programt::make_dead(
-        aux_symbol.symbol_expr(), function_symbol.location));
+      function.body.add(
+        goto_programt::make_dead(aux_symbol.symbol_expr(), location));
     }
 
-    function.body.add(
-      goto_programt::make_end_function(function_symbol.location));
+    function.body.add(goto_programt::make_end_function(location));
 
     remove_skip(function.body);
   }

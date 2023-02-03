@@ -75,7 +75,7 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
   std::string line;
   external_satt::resultt result = resultt::P_ERROR;
   std::vector<bool> assigned_variables(no_variables(), false);
-  assignment.insert(assignment.begin(), no_variables(), tvt(false));
+  assignment.insert(assignment.begin(), no_variables(), tvt::unknown());
 
   while(getline(response_istream, line))
   {
@@ -146,16 +146,19 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
 
   if(result == resultt::P_SATISFIABLE)
   {
-    // We don't need to check zero
-    for(size_t index = 1; index < no_variables(); index++)
-    {
-      if(!assigned_variables[index])
-      {
-        log.error() << "No assignment was found for literal: " << index
+    log.conditional_output(
+      log.debug(), [this, &assigned_variables](messaget::mstreamt &mstream) {
+        // We don't need to check zero
+        for(size_t index = 1; index < no_variables(); index++)
+        {
+          // this may happen when a variable does not appear in any clause
+          if(!assigned_variables[index])
+          {
+            mstream << "No assignment was found for literal: " << index
                     << messaget::eom;
-        return resultt::P_ERROR;
-      }
-    }
+          }
+        }
+      });
     return resultt::P_SATISFIABLE;
   }
 

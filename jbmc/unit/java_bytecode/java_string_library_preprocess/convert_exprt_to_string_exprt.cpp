@@ -7,14 +7,16 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <util/c_types.h>
+#include <util/namespace.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
 #include <testing-utils/use_catch.h>
-#include <util/c_types.h>
-#include <util/namespace.h>
-#include <util/std_code.h>
 
 #include <regex>
 
@@ -23,7 +25,7 @@ refined_string_exprt convert_exprt_to_string_exprt_unit_test(
   const exprt &deref,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   return preprocess.convert_exprt_to_string_exprt(

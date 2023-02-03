@@ -16,8 +16,10 @@ Date: September 2021
 #include <util/mathematical_expr.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
+#include <util/symbol.h>
 
 #include <goto-programs/cfg.h>
 
@@ -84,9 +86,13 @@ exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)
 {
   exprt::operandst validity_checks;
 
-  if(expr.id() == ID_dereference)
-    validity_checks.push_back(
-      good_pointer_def(to_dereference_expr(expr).pointer(), ns));
+  if(auto deref = expr_try_dynamic_cast<dereference_exprt>(expr))
+  {
+    const auto size_of_expr_opt = size_of_expr(expr.type(), ns);
+    CHECK_RETURN(size_of_expr_opt.has_value());
+
+    validity_checks.push_back(r_ok_exprt{deref->pointer(), *size_of_expr_opt});
+  }
 
   for(const auto &op : expr.operands())
     validity_checks.push_back(all_dereferences_are_valid(op, ns));
@@ -146,6 +152,19 @@ void insert_before_swap_and_advance(
   const auto offset = payload.instructions.size();
   destination.insert_before_swap(target, payload);
   std::advance(target, offset);
+}
+
+void insert_before_and_update_jumps(
+  goto_programt &destination,
+  goto_programt::targett &target,
+  const goto_programt::instructiont &i)
+{
+  const auto new_target = destination.insert_before(target, i);
+  for(auto it : target->incoming_edges)
+  {
+    if(it->is_goto())
+      it->set_target(new_target);
+  }
 }
 
 const symbolt &new_tmp_symbol(
@@ -246,11 +265,11 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
          std::string::npos;
 }
 
-void widen_assigns(assignst &assigns)
+void widen_assigns(assignst &assigns, const namespacet &ns)
 {
   assignst result;
 
-  havoc_utils_is_constantt is_constant(assigns);
+  havoc_utils_is_constantt is_constant(assigns, ns);
 
   for(const auto &e : assigns)
   {
@@ -273,7 +292,7 @@ void widen_assigns(assignst &assigns)
 }
 
 void add_quantified_variable(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expression,
   const irep_idt &mode)
 {
@@ -345,7 +364,7 @@ void add_quantified_variable(
 }
 
 void replace_history_parameter(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
   source_locationt location,
@@ -422,7 +441,7 @@ void replace_history_parameter(
 }
 
 void generate_history_variables_initialization(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &clause,
   const irep_idt &mode,
   goto_programt &program)
@@ -440,4 +459,56 @@ void generate_history_variables_initialization(
     ID_old);
   // Add all the history variable initialization instructions
   program.destructive_append(history);
+}
+
+bool is_transformed_loop_head(const goto_programt::const_targett &target)
+{
+  // The head of a transformed loop is
+  // ASSIGN entered_loop = false
+  return is_assignment_to_instrumented_variable(target, ENTERED_LOOP) &&
+         target->assign_rhs() == false_exprt();
+}
+
+bool is_transformed_loop_end(const goto_programt::const_targett &target)
+{
+  // The end of a transformed loop is
+  // ASSIGN entered_loop = true
+  return is_assignment_to_instrumented_variable(target, ENTERED_LOOP) &&
+         target->assign_rhs() == true_exprt();
+}
+
+bool is_assignment_to_instrumented_variable(
+  const goto_programt::const_targett &target,
+  std::string var_name)
+{
+  INVARIANT(
+    var_name == IN_BASE_CASE || var_name == ENTERED_LOOP ||
+      var_name == IN_LOOP_HAVOC_BLOCK,
+    "var_name is not of instrumented variables.");
+
+  if(!target->is_assign())
+    return false;
+
+  if(can_cast_expr<symbol_exprt>(target->assign_lhs()))
+  {
+    const auto &lhs = to_symbol_expr(target->assign_lhs());
+    return id2string(lhs.get_identifier()).find("::" + var_name) !=
+           std::string::npos;
+  }
+
+  return false;
+}
+
+unsigned get_suffix_unsigned(const std::string &str, const std::string &prefix)
+{
+  // first_index is the end of the `prefix`.
+  auto first_index = str.find(prefix);
+  INVARIANT(
+    first_index != std::string::npos, "Prefix not found in the given string");
+  first_index += prefix.length();
+
+  // last_index is the index of not-digit.
+  auto last_index = str.find_first_not_of("0123456789", first_index);
+  std::string result = str.substr(first_index, last_index - first_index);
+  return std::stol(result);
 }

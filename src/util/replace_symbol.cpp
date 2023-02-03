@@ -177,9 +177,11 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
       return replaces_symbol(identifier);
   }
 
-  forall_operands(it, dest)
-    if(have_to_replace(*it))
+  for(const auto &op : dest.operands())
+  {
+    if(have_to_replace(op))
       return true;
+  }
 
   const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
 
@@ -247,30 +249,10 @@ bool replace_symbolt::replace(typet &dest) const
     if(spec_ensures.is_not_nil() && have_to_replace(spec_ensures))
       result &= replace(static_cast<exprt &>(dest.add(ID_C_spec_ensures)));
 
-    const exprt &spec_ensures_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_ensures_contract));
-    if(
-      spec_ensures_contract.is_not_nil() &&
-      have_to_replace(spec_ensures_contract))
-    {
-      result &=
-        replace(static_cast<exprt &>(dest.add(ID_C_spec_ensures_contract)));
-    }
-
     const exprt &spec_requires =
       static_cast<const exprt &>(dest.find(ID_C_spec_requires));
     if(spec_requires.is_not_nil() && have_to_replace(spec_requires))
       result &= replace(static_cast<exprt &>(dest.add(ID_C_spec_requires)));
-
-    const exprt &spec_requires_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_requires_contract));
-    if(
-      spec_requires_contract.is_not_nil() &&
-      have_to_replace(spec_requires_contract))
-    {
-      result &=
-        replace(static_cast<exprt &>(dest.add(ID_C_spec_requires_contract)));
-    }
   }
   else if(dest.id()==ID_array)
   {
@@ -327,28 +309,10 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     if(spec_ensures.is_not_nil() && have_to_replace(spec_ensures))
       return true;
 
-    const exprt &spec_ensures_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_ensures_contract));
-    if(
-      spec_ensures_contract.is_not_nil() &&
-      have_to_replace(spec_ensures_contract))
-    {
-      return true;
-    }
-
     const exprt &spec_requires =
       static_cast<const exprt &>(dest.find(ID_C_spec_requires));
     if(spec_requires.is_not_nil() && have_to_replace(spec_requires))
       return true;
-
-    const exprt &spec_requires_contract =
-      static_cast<const exprt &>(dest.find(ID_C_spec_requires_contract));
-    if(
-      spec_requires_contract.is_not_nil() &&
-      have_to_replace(spec_requires_contract))
-    {
-      return true;
-    }
   }
   else if(dest.id()==ID_array)
     return have_to_replace(to_array_type(dest).size());

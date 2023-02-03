@@ -29,7 +29,7 @@ bool cpp_parsert::parse()
   ansi_c_parser.in=in;
   ansi_c_parser.mode=mode;
   ansi_c_parser.set_file(get_file());
-  ansi_c_parser.set_message_handler(get_message_handler());
+  ansi_c_parser.log.set_message_handler(log.get_message_handler());
 
   return cpp_parse();
 }

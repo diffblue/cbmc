@@ -13,17 +13,13 @@ Date: January 2010
 
 #include "uninitialized.h"
 
-#include <util/std_code.h>
-#include <util/symbol_table.h>
-
 #include <analyses/uninitialized_domain.h>
 
 class uninitializedt
 {
 public:
-  explicit uninitializedt(symbol_tablet &_symbol_table):
-    symbol_table(_symbol_table),
-    ns(_symbol_table)
+  explicit uninitializedt(symbol_table_baset &_symbol_table)
+    : symbol_table(_symbol_table), ns(_symbol_table)
   {
   }
 
@@ -32,7 +28,7 @@ public:
     goto_programt &goto_program);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   uninitialized_analysist uninitialized_analysis;
 
@@ -84,15 +80,12 @@ void uninitializedt::add_assertions(
   {
     const symbolt &symbol=ns.lookup(*it);
 
-    symbolt new_symbol;
-    new_symbol.name=id2string(symbol.name)+"#initialized";
-    new_symbol.type=bool_typet();
+    symbolt new_symbol{
+      id2string(symbol.name) + "#initialized", bool_typet(), symbol.mode};
     new_symbol.base_name=id2string(symbol.base_name)+"#initialized";
     new_symbol.location=symbol.location;
-    new_symbol.mode=symbol.mode;
     new_symbol.module=symbol.module;
     new_symbol.is_thread_local=true;
-    new_symbol.is_static_lifetime=false;
     new_symbol.is_file_local=true;
     new_symbol.is_lvalue=true;
 
@@ -149,7 +142,8 @@ void uninitializedt::add_assertions(
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
-            assert(tracking.find(identifier)!=tracking.end());
+            INVARIANT(
+              tracking.find(identifier) != tracking.end(), "not tracked");
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
 
             // insert assertion

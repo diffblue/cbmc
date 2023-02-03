@@ -199,12 +199,24 @@ public:
     op.push_back(std::move(e3));
   }
 
-  bool is_constant() const;
+  /// Return whether the expression is a constant.
+  /// \return True if is a constant, false otherwise
+  bool is_constant() const
+  {
+    return id() == ID_constant;
+  }
+
   bool is_true() const;
   bool is_false() const;
   bool is_zero() const;
   bool is_one() const;
-  bool is_boolean() const;
+
+  /// Return whether the expression represents a Boolean.
+  /// \return True if is a Boolean, false otherwise.
+  bool is_boolean() const
+  {
+    return type().id() == ID_bool;
+  }
 
   const source_locationt &find_source_location() const;
 

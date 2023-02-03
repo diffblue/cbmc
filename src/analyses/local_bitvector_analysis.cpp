@@ -11,11 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "local_bitvector_analysis.h"
 
-#include <algorithm>
-
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol.h>
+
+#include <algorithm>
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {
@@ -103,8 +104,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get(
   const exprt &rhs)
 {
   local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
-
-  assert(loc_it!=cfg.loc_map.end());
+  CHECK_RETURN(loc_it != cfg.loc_map.end());
 
   return get_rec(rhs, loc_infos[loc_it->second]);
 }
@@ -113,7 +113,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   const exprt &rhs,
   points_tot &loc_info_src)
 {
-  if(rhs.id()==ID_constant)
+  if(rhs.is_constant())
   {
     if(rhs.is_zero())
       return flagst::mk_null();
@@ -333,7 +333,7 @@ void local_bitvector_analysist::build()
 
     for(const auto &succ : node.successors)
     {
-      assert(succ<loc_infos.size());
+      INVARIANT(succ < loc_infos.size(), "successor outside function");
       if(merge(loc_infos[succ], (loc_info_dest)))
         work_queue.insert(succ);
     }

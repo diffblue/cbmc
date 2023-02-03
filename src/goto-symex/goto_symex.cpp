@@ -29,8 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <climits>
 
-unsigned goto_symext::dynamic_counter=0;
-
 void goto_symext::do_simplify(exprt &expr)
 {
   if(symex_config.simplify_opt)
@@ -377,7 +375,7 @@ goto_symext::try_evaluate_constant(const statet &state, const exprt &expr)
   const auto constant_expr_opt =
     state.propagation.find(to_symbol_expr(expr).get_identifier());
 
-  if(!constant_expr_opt || constant_expr_opt->get().id() != ID_constant)
+  if(!constant_expr_opt || !constant_expr_opt->get().is_constant())
   {
     return {};
   }

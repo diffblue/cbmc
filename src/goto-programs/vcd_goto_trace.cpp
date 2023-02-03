@@ -27,7 +27,7 @@ std::string as_vcd_binary(
 {
   const typet &type = expr.type();
 
-  if(expr.id()==ID_constant)
+  if(expr.is_constant())
   {
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
@@ -41,8 +41,8 @@ std::string as_vcd_binary(
   {
     std::string result;
 
-    forall_operands(it, expr)
-      result+=as_vcd_binary(*it, ns);
+    for(const auto &op : expr.operands())
+      result += as_vcd_binary(op, ns);
 
     return result;
   }
@@ -50,8 +50,8 @@ std::string as_vcd_binary(
   {
     std::string result;
 
-    forall_operands(it, expr)
-      result+=as_vcd_binary(*it, ns);
+    for(const auto &op : expr.operands())
+      result += as_vcd_binary(op, ns);
 
     return result;
   }

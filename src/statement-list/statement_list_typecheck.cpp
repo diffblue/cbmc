@@ -10,9 +10,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 /// Statement List Language Type Checking
 
 #include "statement_list_typecheck.h"
-#include "converters/statement_list_types.h"
-
-#include <goto-programs/goto_instruction_code.h>
 
 #include <util/cprover_prefix.h>
 #include <util/message.h>
@@ -20,7 +17,11 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_instruction_code.h>
+
+#include "converters/statement_list_types.h"
 
 /// Size of pointers in Siemens TIA.
 #define STATEMENT_LIST_PTR_WIDTH 64
@@ -80,7 +81,7 @@ static code_typet::parametert create_data_block_parameter(
 
 bool statement_list_typecheck(
   const statement_list_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
@@ -116,7 +117,7 @@ statement_list_typecheckt::stl_jump_locationt::stl_jump_locationt(
 
 statement_list_typecheckt::statement_list_typecheckt(
   const statement_list_parse_treet &parse_tree,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
   : typecheckt(message_handler),
@@ -157,12 +158,10 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   const statement_list_parse_treet::function_blockt &function_block)
 {
   // Create FB symbol.
-  symbolt function_block_sym;
+  symbolt function_block_sym{function_block.name, typet{}, ID_statement_list};
   function_block_sym.module = module;
-  function_block_sym.name = function_block.name;
   function_block_sym.base_name = function_block_sym.name;
   function_block_sym.pretty_name = function_block_sym.name;
-  function_block_sym.mode = ID_statement_list;
 
   // When calling function blocks, the passed parameters are value-copied to a
   // corresponding instance data block. This block contains all input, inout,
@@ -174,11 +173,11 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
   // Create and add DB type symbol.
   const struct_typet data_block_type{
     create_instance_data_block_type(function_block)};
-  type_symbolt data_block{data_block_type};
-  data_block.name =
-    id2string(function_block_sym.name) + DATA_BLOCK_TYPE_POSTFIX;
+  type_symbolt data_block{
+    id2string(function_block_sym.name) + DATA_BLOCK_TYPE_POSTFIX,
+    data_block_type,
+    ID_statement_list};
   data_block.base_name = data_block.name;
-  data_block.mode = ID_statement_list;
   symbol_table.add(data_block);
 
   // Create and add parameter symbol.
@@ -205,12 +204,10 @@ void statement_list_typecheckt::typecheck_function_block_declaration(
 void statement_list_typecheckt::typecheck_function_declaration(
   const statement_list_parse_treet::functiont &function)
 {
-  symbolt function_sym;
+  symbolt function_sym{function.name, typet{}, ID_statement_list};
   function_sym.module = module;
-  function_sym.name = function.name;
   function_sym.base_name = function_sym.name;
   function_sym.pretty_name = function_sym.name;
-  function_sym.mode = ID_statement_list;
   code_typet::parameterst params;
   typecheck_function_var_decls(
     function.var_input, params, function.name, ID_statement_list_var_input);
@@ -229,28 +226,22 @@ void statement_list_typecheckt::typecheck_tag_list()
 {
   for(const symbol_exprt &tag : parse_tree.tags)
   {
-    symbolt tag_sym;
+    symbolt tag_sym{tag.get_identifier(), tag.type(), ID_statement_list};
     tag_sym.is_static_lifetime = true;
     tag_sym.module = module;
-    tag_sym.name = tag.get_identifier();
     tag_sym.base_name = tag_sym.name;
     tag_sym.pretty_name = tag_sym.name;
-    tag_sym.type = tag.type();
-    tag_sym.mode = ID_statement_list;
     symbol_table.add(tag_sym);
   }
 }
 
 void statement_list_typecheckt::add_temp_rlo()
 {
-  symbolt temp_rlo;
+  symbolt temp_rlo{CPROVER_TEMP_RLO, get_bool_type(), ID_statement_list};
   temp_rlo.is_static_lifetime = true;
   temp_rlo.module = module;
-  temp_rlo.name = CPROVER_TEMP_RLO;
   temp_rlo.base_name = temp_rlo.name;
   temp_rlo.pretty_name = temp_rlo.name;
-  temp_rlo.type = get_bool_type();
-  temp_rlo.mode = ID_statement_list;
   symbol_table.add(temp_rlo);
 }
 
@@ -320,13 +311,13 @@ void statement_list_typecheckt::typecheck_temp_var_decls(
   for(const statement_list_parse_treet::var_declarationt &declaration :
       tia_module.var_temp)
   {
-    symbolt temp_sym;
-    temp_sym.name = id2string(tia_symbol.name) +
-                    "::" + id2string(declaration.variable.get_identifier());
+    symbolt temp_sym{
+      id2string(tia_symbol.name) +
+        "::" + id2string(declaration.variable.get_identifier()),
+      declaration.variable.type(),
+      ID_statement_list};
     temp_sym.base_name = declaration.variable.get_identifier();
     temp_sym.pretty_name = temp_sym.base_name;
-    temp_sym.type = declaration.variable.type();
-    temp_sym.mode = ID_statement_list;
     temp_sym.module = module;
     symbol_table.add(temp_sym);
 

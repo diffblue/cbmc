@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --signed-overflow-check --bounds-check
 line 14 array 'y' upper bound in y\[\(signed long( long)? int\)1\]: FAILURE$

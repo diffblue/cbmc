@@ -11,21 +11,16 @@ Date: September 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 
-// clang-format off
-#include <vector>
-
-#include <analyses/dirty.h>
-#include <analyses/locals.h>
+#include <goto-programs/goto_convert_class.h>
 
 #include <goto-instrument/havoc_utils.h>
 
-#include <goto-programs/goto_convert_class.h>
-#include <goto-programs/goto_model.h>
+#include <vector>
 
-#include <util/expr_cast.h>
-#include <util/byte_operators.h>
-#include <util/message.h>
-// clang-format on
+#define IN_BASE_CASE "__in_base_case"
+#define ENTERED_LOOP "__entered_loop"
+#define IN_LOOP_HAVOC_BLOCK "__in_loop_havoc_block"
+#define INIT_INVARIANT "__init_invariant"
 
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
@@ -34,7 +29,7 @@ class havoc_if_validt : public havoc_utilst
 {
 public:
   havoc_if_validt(const assignst &mod, const namespacet &ns)
-    : havoc_utilst(mod), ns(ns)
+    : havoc_utilst(mod, ns), ns(ns)
   {
   }
 
@@ -72,8 +67,8 @@ public:
 ///
 /// This function generates a formula:
 ///
-///   good_pointer_def(pexpr_1, ns) &&
-///   good_pointer_def(pexpr_2, n2) &&
+///   r_ok_exprt(pexpr_1, sizeof(*pexpr_1)) &&
+///   r_ok_exprt(pexpr_2, sizeof(*pexpr_1)) &&
 ///   ...
 ///
 /// over all dereferenced pointer expressions *(pexpr_1), *(pexpr_2), ...
@@ -114,6 +109,30 @@ void insert_before_swap_and_advance(
   goto_programt &destination,
   goto_programt::targett &target,
   goto_programt &payload);
+
+/// \brief Insert a goto instruction before a target instruction iterator
+///        and update targets of all jumps that points to the iterator to
+///        jumping to the inserted instruction. This method is intended
+///        to keep external instruction::targett stable, i.e. they will
+///        still point to the same instruction after inserting the new one
+///
+/// This function inserts a instruction `i` into a destination program
+/// `destination` immediately before a specified instruction iterator `target`.
+/// After insertion, update all jumps that pointing to `target` to jumping to
+/// `i` instead.
+///
+/// Different from `insert_before_swap_and_advance`, this function doesn't
+/// invalidate the iterator `target` after insertion. That is, `target` and
+/// all other instruction iterators same as `target` will still point to the
+/// same instruction after insertion.
+///
+/// \param destination: The destination program for inserting the `i`.
+/// \param target: The instruction iterator at which to insert the `i`.
+/// \param i: The goto instruction to be inserted into the `destination`.
+void insert_before_and_update_jumps(
+  goto_programt &destination,
+  goto_programt::targett &target,
+  const goto_programt::instructiont &i);
 
 /// \brief Adds a fresh and uniquely named symbol to the symbol table.
 ///
@@ -185,21 +204,21 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
 /// with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant `i`,
 /// then replace it by the entire underlying object. Otherwise, e.g. for a[i] or
 /// *(b+i) when `i` is a known constant, keep the expression in the result.
-void widen_assigns(assignst &assigns);
+void widen_assigns(assignst &assigns, const namespacet &ns);
 
 /// This function recursively searches \p expression to find nested or
 /// non-nested quantified expressions. When a quantified expression is found,
 /// a fresh quantified variable is added to the symbol table and \p expression
 /// is updated to use this fresh variable.
 void add_quantified_variable(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expression,
   const irep_idt &mode);
 
 /// This function recursively identifies the "old" expressions within expr
-/// and replaces them with correspoding history variables.
+/// and replaces them with corresponding history variables.
 void replace_history_parameter(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
   source_locationt location,
@@ -210,9 +229,24 @@ void replace_history_parameter(
 /// This function generates all the instructions required to initialize
 /// history variables.
 void generate_history_variables_initialization(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   exprt &clause,
   const irep_idt &mode,
   goto_programt &program);
+
+/// Return true if `target` is the head of some transformed loop.
+bool is_transformed_loop_head(const goto_programt::const_targett &target);
+
+/// Return true if `target` is the end of some transformed loop.
+bool is_transformed_loop_end(const goto_programt::const_targett &target);
+
+/// Return true if `target` is an assignment to an instrumented variable with
+/// name `var_name`.
+bool is_assignment_to_instrumented_variable(
+  const goto_programt::const_targett &target,
+  std::string var_name);
+
+/// Convert the suffix digits right after `prefix` of `str` into unsigned.
+unsigned get_suffix_unsigned(const std::string &str, const std::string &prefix);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H

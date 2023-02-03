@@ -18,7 +18,7 @@
 typedef unsigned long thread_id_t;
 
 // Internal unbounded array indexed by local thread identifiers
-extern __CPROVER_bool __CPROVER_threads_exited[];
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
 
 // A thread_chain is like a chain of threads `f, g, ...` where `f`
 // must terminate before `g` can start to run, and so forth.
