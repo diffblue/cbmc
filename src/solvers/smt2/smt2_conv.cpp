@@ -83,6 +83,15 @@ smt2_convt::smt2_convt(
   case solvert::GENERIC:
     break;
 
+  case solvert::BITWUZLA:
+    use_FPA_theory = true;
+    use_array_of_bool = true;
+    use_as_const = true;
+    use_check_sat_assuming = true;
+    use_lambda_for_array = true;
+    emit_set_logic = false;
+    break;
+
   case solvert::BOOLECTOR:
     break;
 
@@ -101,6 +110,15 @@ smt2_convt::smt2_convt(
     logic = "ALL";
     use_array_of_bool = true;
     use_as_const = true;
+    break;
+
+  case solvert::CVC5:
+    logic = "ALL";
+    use_array_of_bool = true;
+    use_as_const = true;
+    use_check_sat_assuming = true;
+    use_lambda_for_array = true;
+    use_datatypes = true;
     break;
 
   case solvert::MATHSAT:
@@ -158,11 +176,13 @@ void smt2_convt::write_header()
   {
   // clang-format off
   case solvert::GENERIC: break;
+  case solvert::BITWUZLA: out << "; Generated for Bitwuzla\n"; break;
   case solvert::BOOLECTOR: out << "; Generated for Boolector\n"; break;
   case solvert::CPROVER_SMT2:
     out << "; Generated for the CPROVER SMT2 solver\n"; break;
   case solvert::CVC3: out << "; Generated for CVC 3\n"; break;
   case solvert::CVC4: out << "; Generated for CVC 4\n"; break;
+  case solvert::CVC5: out << "; Generated for CVC 5\n"; break;
   case solvert::MATHSAT: out << "; Generated for MathSAT\n"; break;
   case solvert::YICES: out << "; Generated for Yices\n"; break;
   case solvert::Z3: out << "; Generated for Z3\n"; break;

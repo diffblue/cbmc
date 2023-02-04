@@ -20,10 +20,12 @@ std::string smt2_dect::decision_procedure_text() const
   // clang-format off
   return "SMT2 " + logic + (use_FPA_theory ? " (with FPA)" : "") + " using " +
     (solver==solvert::GENERIC?"Generic":
+     solver==solvert::BITWUZLA?"Bitwuzla":
      solver==solvert::BOOLECTOR?"Boolector":
      solver==solvert::CPROVER_SMT2?"CPROVER SMT2":
      solver==solvert::CVC3?"CVC3":
      solver==solvert::CVC4?"CVC4":
+     solver==solvert::CVC5?"CVC5":
      solver==solvert::MATHSAT?"MathSAT":
      solver==solvert::YICES?"Yices":
      solver==solvert::Z3?"Z3":
@@ -54,6 +56,10 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   switch(solver)
   {
+  case solvert::BITWUZLA:
+    argv = {"bitwuzla", temp_file_problem()};
+    break;
+
   case solvert::BOOLECTOR:
     argv = {"boolector", "--smt2", temp_file_problem(), "-m"};
     break;
@@ -77,6 +83,10 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
     argv = {"cvc4", "-L", "smt2", temp_file_problem()};
+    break;
+
+  case solvert::CVC5:
+    argv = {"cvc5", "--lang", "smtlib", temp_file_problem()};
     break;
 
   case solvert::MATHSAT:
