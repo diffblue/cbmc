@@ -997,7 +997,7 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
   }
 
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
         __CPROVER_OBJECT_SIZE(arg))
   {
     void *a = va_arg(arg, void *);
@@ -1046,7 +1046,7 @@ __CPROVER_HIDE:;
   }
 
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
         __CPROVER_OBJECT_SIZE(arg))
   {
     void *a = va_arg(arg, void *);
@@ -1095,7 +1095,7 @@ int __stdio_common_vfscanf(
   }
 
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args) <
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&args) <
         __CPROVER_OBJECT_SIZE(args))
   {
     void *a = va_arg(args, void *);
@@ -1174,7 +1174,7 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
         __CPROVER_OBJECT_SIZE(arg))
   {
     void *a = va_arg(arg, void *);
@@ -1209,7 +1209,7 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
         __CPROVER_OBJECT_SIZE(arg))
   {
     void *a = va_arg(arg, void *);
@@ -1250,7 +1250,7 @@ int __stdio_common_vsscanf(
 
   (void)*s;
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args) <
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&args) <
         __CPROVER_OBJECT_SIZE(args))
   {
     void *a = va_arg(args, void *);
