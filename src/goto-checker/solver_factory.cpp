@@ -163,7 +163,9 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
 
   smt2_dect::solvert s = smt2_dect::solvert::GENERIC;
 
-  if(options.get_bool_option("boolector"))
+  if(options.get_bool_option("bitwuzla"))
+    s = smt2_dect::solvert::BITWUZLA;
+  else if(options.get_bool_option("boolector"))
     s = smt2_dect::solvert::BOOLECTOR;
   else if(options.get_bool_option("cprover-smt2"))
     s = smt2_dect::solvert::CPROVER_SMT2;
@@ -173,6 +175,8 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
     s = smt2_dect::solvert::CVC3;
   else if(options.get_bool_option("cvc4"))
     s = smt2_dect::solvert::CVC4;
+  else if(options.get_bool_option("cvc5"))
+    s = smt2_dect::solvert::CVC5;
   else if(options.get_bool_option("yices"))
     s = smt2_dect::solvert::YICES;
   else if(options.get_bool_option("z3"))
@@ -525,6 +529,12 @@ static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)
 
   bool solver_set = false;
 
+  if(cmdline.isset("bitwuzla"))
+  {
+    options.set_option("bitwuzla", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
   if(cmdline.isset("boolector"))
   {
     options.set_option("boolector", true), solver_set = true;
@@ -546,6 +556,12 @@ static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)
   if(cmdline.isset("cvc4"))
   {
     options.set_option("cvc4", true), solver_set = true;
+    options.set_option("smt2", true);
+  }
+
+  if(cmdline.isset("cvc5"))
+  {
+    options.set_option("cvc5", true), solver_set = true;
     options.set_option("smt2", true);
   }
 
