@@ -1,4 +1,4 @@
-THOROUGH
+CORE
 main.c
 --cover location
 ^EXIT=0$
@@ -8,6 +8,10 @@ main.c
 ^\[main.coverage.3\] file main.c line 13 function main block 3.*: FAILED$
 ^\[main.coverage.4\] file main.c line 16 function main block 4.*: SATISFIED$
 ^\[foo.coverage.1\] file main.c line 5 function foo block 1.*: FAILED$
-^\*\* 3 of 5 covered \(60.0%\)
+^\*\* 3 of \d+ covered
 --
 ^warning: ignoring
+--
+This test yields 5 blocks on Linux, 60 blocks on MacOS, and 65 blocks on
+Windows. In all cases, 3 blocks are covered successfully, everything else is
+unreachable.
