@@ -1,5 +1,8 @@
 var NAVTREEINDEX77 =
 {
+"expr2c_8h.html#a4425df69cdb7840797728634335c280d":[7,0,2,1,55,1],
+"expr2c_8h.html#a96bc0ff0dc9f39815bb58300372e32a3":[7,0,2,1,55,4],
+"expr2c_8h_source.html":[7,0,2,1,55],
 "expr2c__class_8h.html":[7,0,2,1,56],
 "expr2c__class_8h_source.html":[7,0,2,1,56],
 "expr2cpp_8cpp.html":[7,0,2,5,80],
@@ -246,8 +249,5 @@ var NAVTREEINDEX77 =
 "float__approximation_8cpp.html":[7,0,2,27,2,0],
 "float__approximation_8cpp_source.html":[7,0,2,27,2,0],
 "float__approximation_8h.html":[7,0,2,27,2,1],
-"float__approximation_8h_source.html":[7,0,2,27,2,1],
-"float__bv_8cpp.html":[7,0,2,27,2,2],
-"float__bv_8cpp_source.html":[7,0,2,27,2,2],
-"float__bv_8h.html":[7,0,2,27,2,3]
+"float__approximation_8h_source.html":[7,0,2,27,2,1]
 };

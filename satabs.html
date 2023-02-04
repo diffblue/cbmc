@@ -348,7 +348,7 @@ matches, `getenv` returns a pointer to the associated value.
 </pre><p> SATABS runs for quite a while and will eventually give up, telling us that its upper bound for abstraction refinement iterations has been exceeded. This is not exactly the result we were hoping for, and we could now increase the bound for iterations with help of the <code>--iterations</code> command line switch of SATABS.</p>
 <p>Before we do this, let us investigate why SATABS has failed to provide a useful result. The function <code>strcpy</code> contains a loop that counts from 1 to the length of the input string. Predicate abstraction, the mechanism SATABS is based on, is unable to detect such loops and will therefore unroll the loop body as often as necessary. The array <code>home</code> has <code>MAX_LEN</code> elements, and <code>MAX_LEN</code> is defined to be 512 in <code>aeon.h</code>. Therefore, SATABS would have to run through at least 512 iterations, only to verify (or reject) one of the more than 300 properties! Does this fact defeat the purpose of static verification?</p>
 <p>We can make the job easier: after reducing the value of <code>MAX_LEN</code> in <code>aeon.h</code> to a small value, say to 10, SATABS provides a counterexample trace that demonstrates how the buffer overflow be reproduced. If you use the Eclipse plugin (as described <a href="http://www.cprover.org/cprover-manual/installation-plugin.html">here</a>), you can step through this counterexample. The trace contains the string that is returned by <code>getenv</code>.</p>
-<p>Last modified: 2023-02-03 11:32:24 +0000 </p>
+<p>Last modified: 2023-02-04 12:13:05 -0800 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

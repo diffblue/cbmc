@@ -1,5 +1,8 @@
 var NAVTREEINDEX121 =
 {
+"string__refinement_8cpp.html#a0e03ce13d9c646a358ddb197f2d5fe9c":[7,0,2,27,10,30,21],
+"string__refinement_8cpp.html#a0e73fabc25ec14162a8a5302766081d1":[7,0,2,27,10,30,27],
+"string__refinement_8cpp.html#a129aff44f6131c8a0e2ac21ee44eb5cd":[7,0,2,27,10,30,36],
 "string__refinement_8cpp.html#a169dbd85bda1139fdb38b1a6fb4d6cb7":[7,0,2,27,10,30,12],
 "string__refinement_8cpp.html#a2d7f12fa04a320094eea1b3b51725214":[7,0,2,27,10,30,7],
 "string__refinement_8cpp.html#a328b5b84b55d64e104c2310951efc622":[7,0,2,27,10,30,34],
@@ -246,8 +249,5 @@ var NAVTREEINDEX121 =
 "structboolbv__widtht_1_1membert.html#a1f90e272ba125ec655d0b0c483b2213b":[6,0,121,1,0],
 "structboolbv__widtht_1_1membert.html#aa8ab1658b25006ea5909fd8342732cda":[6,0,121,1,1],
 "structboundst.html":[6,0,123],
-"structboundst.html#a803f784537536407a0f91cb8c38be5b8":[6,0,123,0],
-"structboundst.html#af7eba54b35c5e119cfeb8525f06b0260":[6,0,123,1],
-"structbv__pointers__widet_1_1postponedt.html":[6,0,130,0],
-"structbv__pointers__widet_1_1postponedt.html#a730f2f4adcf0a15af1a5d8335b7a5c32":[6,0,130,0,3]
+"structboundst.html#a803f784537536407a0f91cb8c38be5b8":[6,0,123,0]
 };
