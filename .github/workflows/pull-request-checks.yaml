@@ -521,10 +521,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-Glucose${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-Release-Glucose-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-Release-Glucose${{ github.ref }}
-            ${{ runner.os }}-Release
+            ${{ runner.os }}-Release-Glucose-${{ github.ref }}
+            ${{ runner.os }}-Release-Glucose
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
