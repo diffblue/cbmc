@@ -27,6 +27,7 @@ var group__module__hidden =
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_xmllang_README", null ],
     [ "background-concepts", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_background_concepts", null ],
     [ "cbmc-architecture", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_cbmc_architecture", null ],
+    [ "central-data-structures", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_central_data_structures", null ],
     [ "code-walkthrough", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_code_walkthrough", null ],
     [ "compilation-and-development", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_compilation_and_development", null ],
     [ "folder-walkthrough", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_folder_walkthrough", null ],
