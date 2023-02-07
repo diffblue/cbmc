@@ -85,7 +85,8 @@ osx_fat_readert::osx_fat_readert(
   if(!in)
     throw system_exceptiont("failed to read OSX fat header");
 
-  if(!is_osx_fat_header(reinterpret_cast<char *>(&(fh.magic))))
+  static_assert(sizeof(fh) >= 8, "fat_header is at least 8 bytes");
+  if(!is_osx_fat_header(reinterpret_cast<char *>(&fh)))
     throw deserialization_exceptiont("OSX fat header malformed");
 
   static_assert(
