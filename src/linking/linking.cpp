@@ -25,6 +25,95 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <deque>
 
+bool is_void_or_zero_size(const typet &type, const namespacet &ns) {
+  if (type.id() == ID_empty) {
+    return true;
+  }
+
+  auto bits = pointer_offset_bits(type, ns);
+  return bits.has_value() && *bits == 0;
+}
+
+struct_union_typet::componentst nonzero_sized_fields(const typet &type, const namespacet &ns) {
+  assert(type.id()==ID_struct || type.id()==ID_union);
+  auto components= to_struct_union_type(type).components();
+  struct_union_typet::componentst filtered;
+  for(auto &component : components) 
+    if (!is_void_or_zero_size(component.type(),ns))
+      filtered.emplace_back(component);
+  return filtered;
+}
+
+optionalt<typet> unwrap_transparent_type(const typet &type, const namespacet &ns){
+  if(type.id()==ID_struct || type.id()==ID_union) {
+    auto fields = nonzero_sized_fields(type, ns);
+    if (fields.size() == 1) {
+      return fields[0].type();
+    }
+  }
+  return {};
+}
+
+bool are_the_same_size(const typet &type1, const typet &type2, const namespacet &ns) {
+  auto bits1 = pointer_offset_bits(type1, ns);
+  auto bits2 = pointer_offset_bits(type2, ns);
+  //Question: Can I compare the two directly? 
+  return bits1.has_value() && bits2.has_value() && *bits1 == *bits2;
+}
+
+bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, const namespacet &ns) {
+  //Shortcut: identical types are similar
+  if (type1 == type2)
+    return true;
+
+  if (is_void_or_zero_size(type1, ns) && is_void_or_zero_size(type2, ns))
+    return true;
+
+  if (!are_the_same_size(type1, type2, ns)) 
+    return false;
+
+  // Treat two pointers as similar.
+  // TODO: this might be too relaxed. Consider checking that the pointed types are similar
+  if (type1.id()==ID_pointer && type2.id()==ID_pointer)
+    return true;
+
+  // If we just have a transparent struct (i.e. one with a single non-zero sized field).
+  // treat it as the wrapped type, and recurse.
+  auto unwrapped1 = unwrap_transparent_type(type1, ns);
+  if (unwrapped1.has_value())
+    return types_are_structurally_similar_rec(*unwrapped1, type2, ns);
+
+  auto unwrapped2 = unwrap_transparent_type(type2, ns);
+  if (unwrapped2.has_value())
+    return types_are_structurally_similar_rec(type1, *unwrapped2, ns);  
+
+  
+  // Two structs / unions are the same if they have the same non-zero fields in the same order.
+  // We don't care about field names.
+  // TODO: for unions, we don't need to worry about field order.
+  if((type1.id()==ID_struct && type2.id()==ID_struct) || (type1.id()==ID_union && type2.id()==ID_union)) {
+    auto non_zero_components1 = nonzero_sized_fields(type1, ns);
+    auto non_zero_components2 = nonzero_sized_fields(type2, ns);
+    if (non_zero_components1.size() != non_zero_components2.size())
+      return false;
+    for(auto i = 0; i < non_zero_components1.size(); ++i) {
+      if(!types_are_structurally_similar_rec(non_zero_components1[i].type(), non_zero_components2[i].type(), ns))
+        return false;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool return_types_are_compatable(const typet &old_type, const typet &new_type, const namespacet &ns) {
+  //return is_void_or_zero_size(old_type, ns) && is_void_or_zero_size(new_type, ns);
+  return types_are_structurally_similar_rec(old_type, new_type, ns);
+}
+
+
+
+
 bool casting_replace_symbolt::replace(exprt &dest) const
 {
   bool result = true; // unchanged
@@ -663,11 +752,18 @@ void linkingt::duplicate_code_symbol(
       typedef std::deque<std::pair<typet, typet> > conflictst;
       conflictst conflicts;
 
+//DSN fix for void vs () goes here
       if(old_t.return_type() != new_t.return_type())
       {
-        link_warning(old_symbol, new_symbol, "conflicting return types");
+        if (return_types_are_compatable(old_t.return_type(), new_t.return_type(), ns)) {
+          link_warning(old_symbol, new_symbol, "DSN1 conflicting return types");
+        } else {
 
-        conflicts.emplace_back(old_t.return_type(), new_t.return_type());
+          link_warning(old_symbol, new_symbol, "DSN2 conflicting return types");
+
+          conflicts.emplace_back(old_t.return_type(), new_t.return_type());
+
+        }
       }
 
       code_typet::parameterst::const_iterator
@@ -1553,3 +1649,4 @@ bool linking(
 
   return linking.typecheck_main();
 }
+
