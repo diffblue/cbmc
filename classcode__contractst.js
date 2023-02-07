@@ -24,5 +24,6 @@ var classcode__contractst =
     [ "ns", "classcode__contractst.html#a00713cdaad0d6c49ea879a300c9c3747", null ],
     [ "original_loop_number_map", "classcode__contractst.html#ada1e879a5811982049372c160025a6d5", null ],
     [ "summarized", "classcode__contractst.html#a89a113a0eb07ab4ea94e58f649e32673", null ],
-    [ "symbol_table", "classcode__contractst.html#a4e0f5509d76b1d2a3ae1a3daca1f454a", null ]
+    [ "symbol_table", "classcode__contractst.html#a4e0f5509d76b1d2a3ae1a3daca1f454a", null ],
+    [ "unwind_transformed_loops", "classcode__contractst.html#af7d834c82fe51ce382572b67ec52ff30", null ]
 ];
