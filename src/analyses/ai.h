@@ -67,9 +67,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Users of abstract interpreters should use the interface given by this class.
 /// It breaks into three categories:
 ///
-/// 1. Running an analysis, via
-///    \ref ai_baset#operator()(const irep_idt&,const goto_programt&, <!--
-///    --> const namespacet&),
+/// 1. Running an analysis, via \ref
+///    #operator()(const irep_idt&,const goto_programt&, const namespacet&),
 ///    \ref ai_baset#operator()(const goto_functionst&,const namespacet&)
 ///    and \ref ai_baset#operator()(const abstract_goto_modelt&)
 /// 2. Accessing the results of an analysis, by looking up the history objects
