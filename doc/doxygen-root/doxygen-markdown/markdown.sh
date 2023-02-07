@@ -46,7 +46,7 @@ for file in $FILES; do
     # lines is unescaped using sed in order to fix doxygen tags, which are
     # broken by pandoc.
     pandoc --read=gfm --write=gfm --wrap=none --filter=mermaid-filter $tmp |
-        $BINDIR/pandoc-codeblock-repair.sh | sed 's/^\\\\/\\/' > $file
+        $BINDIR/pandoc-codeblock-repair.sh | sed 's/\\\\ref\s/\\ref /;s/^\\\\/\\/' > $file
 done
 
 cprovers=$(find . -name cprover-manual)

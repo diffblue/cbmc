@@ -110,8 +110,7 @@ in the symbol-table for their definitions.
 A  goto program  is a sequence of GOTO instructions (`goto_instructiont`). For
 details of the `goto_programt` class itself see the documentation in
 [`goto_program.h`](../../src/goto-programs/goto_program.h). For further details
-of the life cycle of goto programs see
-[`src/goto-programs/README.md`](https://github.com/diffblue/cbmc/blob/develop/src/goto-programs/README.md).
+of the life cycle of goto programs see \ref goto-programs "goto programs"
 
 An instruction (`goto_instructiont`) is a triple (an element with three subcomponents),
 describing a GOTO level instruction with the following 3 component subtypes,
