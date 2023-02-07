@@ -610,6 +610,7 @@ optionalt<cext> cegis_verifiert::verify()
 
   // Apply loop contracts we annotated.
   code_contractst cont(goto_model, log);
+  cont.unwind_transformed_loops = false;
   cont.apply_loop_contracts();
   original_loop_number_map = cont.get_original_loop_number_map();
   loop_havoc_set = cont.get_loop_havoc_set();

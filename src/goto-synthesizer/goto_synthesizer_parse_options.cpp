@@ -110,6 +110,8 @@ int goto_synthesizer_parse_optionst::doit()
     cmdline.get_values("nondet-static-exclude").begin(),
     cmdline.get_values("nondet-static-exclude").end());
   code_contractst contracts(goto_model, log);
+  contracts.unwind_transformed_loops =
+    !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND);
   contracts.apply_loop_contracts(to_exclude_from_nondet_static);
 
   // recalculate numbers, etc.
@@ -183,6 +185,7 @@ void goto_synthesizer_parse_optionst::help()
     "\n"
     "Main options:\n"
     HELP_DUMP_LOOP_CONTRACTS
+    HELP_LOOP_CONTRACTS_NO_UNWIND
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

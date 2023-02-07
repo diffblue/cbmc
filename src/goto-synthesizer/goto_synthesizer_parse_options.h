@@ -13,11 +13,14 @@ Author: Qinheping Hu
 
 #include <goto-programs/goto_model.h>
 
+#include <goto-instrument/contracts/contracts.h>
+
 #include "dump_loop_contracts.h"
 
 // clang-format off
 #define GOTO_SYNTHESIZER_OPTIONS \
   OPT_DUMP_LOOP_CONTRACTS \
+  "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
   "(verbosity):(version)(xml-ui)(json-ui)" \
   // empty last line
 

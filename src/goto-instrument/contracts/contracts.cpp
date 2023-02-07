@@ -1445,10 +1445,13 @@ void code_contractst::apply_loop_contracts(
   nondet_static(goto_model, to_exclude_from_nondet_init);
 
   // unwind all transformed loops twice.
-  unwindsett unwindset{goto_model};
-  unwindset.parse_unwindset(loop_names, log.get_message_handler());
-  goto_unwindt goto_unwind;
-  goto_unwind(goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSUME);
+  if(unwind_transformed_loops)
+  {
+    unwindsett unwindset{goto_model};
+    unwindset.parse_unwindset(loop_names, log.get_message_handler());
+    goto_unwindt goto_unwind;
+    goto_unwind(goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSUME);
+  }
 
   remove_skip(goto_model);
 
