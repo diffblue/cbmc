@@ -55,7 +55,14 @@ tools process this format, either directly from the front-end or from
 it’s saved output. These include a wide range of analysis and
 transformation tools (see \ref other-tools).
 
-# Concepts #
+# Concepts
+
+## Central data structures
+
+For an explanation of the data structures involved in the modeling of a GOTO
+program (the GOTO Intermediate Representation used by CBMC and assorted tools)
+please see \subpage central-data-structures .
+
 ## {C, java bytecode} &rarr; Parse tree &rarr; Symbol table &rarr; GOTO programs &rarr; GOTO program transformations &rarr; BMC &rarr; counterexample (goto_tracet) &rarr; printing ##
 
 To be documented.

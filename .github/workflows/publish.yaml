@@ -10,10 +10,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install doxygen
-        run: sudo apt install doxygen graphviz pandoc
+        run: sudo apt install doxygen graphviz pandoc npm
 
       - name: Install python modules
         run: sudo python3 -m pip install gitpython pandocfilters
+
+      - name: Install mermaid diagram filter
+        run: sudo npm install --global mermaid-filter
 
       - name: Build documentation
         run: cd doc/doxygen-root && make && touch html/.nojekyll
