@@ -97,6 +97,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(horn)(skip-loops):(model-argc-argv):" \
   OPT_DFCC \
   "(" FLAG_LOOP_CONTRACTS ")" \
+  "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
   "(" FLAG_REPLACE_CALL "):" \
   "(" FLAG_ENFORCE_CONTRACT "):" \
   OPT_ENFORCE_CONTRACT_REC \

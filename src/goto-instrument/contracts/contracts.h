@@ -35,6 +35,11 @@ Date: February 2016
   " --apply-loop-contracts\n"                                                  \
   "                              check and use loop contracts when provided\n"
 
+#define FLAG_LOOP_CONTRACTS_NO_UNWIND "loop-contracts-no-unwind"
+#define HELP_LOOP_CONTRACTS_NO_UNWIND                                          \
+  " --loop-contracts-no-unwind\n"                                              \
+  "                              do not unwind transformed loops\n"
+
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
   " --replace-call-with-contract <function>[/contract]\n"                      \
@@ -138,6 +143,9 @@ public:
   }
 
   namespacet ns;
+
+  // Unwind transformed loops after applying loop contracts or not.
+  bool unwind_transformed_loops = true;
 
 protected:
   goto_modelt &goto_model;

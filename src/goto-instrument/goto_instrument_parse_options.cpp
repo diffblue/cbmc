@@ -1237,7 +1237,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     contracts.enforce_contracts(to_enforce, to_exclude_from_nondet_static);
 
     if(cmdline.isset(FLAG_LOOP_CONTRACTS))
+    {
+      if(cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND))
+      {
+        contracts.unwind_transformed_loops = false;
+        log.warning() << "**** WARNING: transformed loops will not be unwound "
+                      << "after applying loop contracts. Remember to unwind "
+                      << "them at least twice to pass unwinding-assertions."
+                      << messaget::eom;
+      }
       contracts.apply_loop_contracts(to_exclude_from_nondet_static);
+    }
   }
 
   if(cmdline.isset("value-set-fi-fp-removal"))
@@ -1966,6 +1976,7 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_DFCC
     HELP_LOOP_CONTRACTS
+    HELP_LOOP_CONTRACTS_NO_UNWIND
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     HELP_ENFORCE_CONTRACT_REC
