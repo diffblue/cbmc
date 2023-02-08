@@ -6,7 +6,9 @@ on:
 jobs:
   # This job takes approximately 2 minutes
   check-doxygen:
-    runs-on: ubuntu-20.04
+    # Note that the versions used for this `check-doxygen` job should be kept in
+    # sync with the `publish` job.
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - name: Fetch dependencies

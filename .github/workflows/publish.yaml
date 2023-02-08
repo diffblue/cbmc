@@ -4,7 +4,9 @@ on: [push, pull_request]
 jobs:
   # This job takes approximately 3 minutes
   publish:
-    runs-on: ubuntu-latest
+    # Note that the versions used for this `publish` job should be kept in sync
+    # with the `check-doxygen` job.
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
