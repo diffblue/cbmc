@@ -291,7 +291,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><p>This is the basic interface of the abstract interpreter with default implementations of the core functionality. </p>
 <p>Users of abstract interpreters should use the interface given by this class. It breaks into three categories:</p>
 <ol type="1">
-<li>Running an analysis, via ai_baset::operator()(const irep_idt&amp;,const <a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a>&amp;, const namespacet&amp;), <a class="el" href="classai__baset.html#a0df0c140871c9bf565922e449374efa3">ai_baset::operator()(const goto_functionst&amp;,const namespacet&amp;)</a> and <a class="el" href="classai__baset.html#a6df41c8d29df227b1ad9a654f2ba3437">ai_baset::operator()(const abstract_goto_modelt&amp;)</a></li>
+<li>Running an analysis, via <a class="el" href="classai__baset.html#a3f2d4e674dfb65a737f958fda9457d0a">operator()(const irep_idt&amp;,const goto_programt&amp;, const namespacet&amp;)</a>, <a class="el" href="classai__baset.html#a0df0c140871c9bf565922e449374efa3">ai_baset::operator()(const goto_functionst&amp;,const namespacet&amp;)</a> and <a class="el" href="classai__baset.html#a6df41c8d29df227b1ad9a654f2ba3437">ai_baset::operator()(const abstract_goto_modelt&amp;)</a></li>
 <li>Accessing the results of an analysis, by looking up the history objects for a given location <code>l</code> using <a class="el" href="classai__baset.html#a4562a5949e8d62397e91ae92c9fcb479">ai_baset::abstract_traces_before(locationt)const</a> or the domains using <a class="el" href="classai__baset.html#acc70aab89d6470bb6fc251c4e7da0cf4">ai_baset::abstract_state_before(locationt)const</a></li>
 <li>Outputting the results of the analysis; see <a class="el" href="classai__baset.html#a50b044f42c9528cb576fd3031e46f6de">ai_baset::output</a>(const namespacet&amp;, const irep_idt&amp;, const <a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a>&amp;, std::ostream&amp;)const et cetera.</li>
 </ol>
@@ -304,7 +304,7 @@ Protected Attributes</h2></td></tr>
 <p>E. For post-analysis cleanup <a class="el" href="classai__baset.html#af2c87f4066db93a82a3af6bb011eb053">ait::finalize()</a>,</p>
 <p>Historically, uses of abstract interpretation inherited from ait&lt;domainT&gt; and added the necessary functionality. This works (although care must be taken to respect the APIs of the various components &ndash; there are some hacks to support older analyses that didn't) but is discouraged in favour of having an object for the abstract interpreter and using its public API. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00118">118</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00117">117</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="af632d2e7db7cfac347d8e1bcdc592723"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af632d2e7db7cfac347d8e1bcdc592723">&#9670;&nbsp;</a></span>cstate_ptrt</h2>
@@ -318,7 +318,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00122">122</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00121">121</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -334,7 +334,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00125">125</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00124">124</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -350,7 +350,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00126">126</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00125">125</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -366,7 +366,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00121">121</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00120">120</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -382,7 +382,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00123">123</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00122">122</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -398,7 +398,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00124">124</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00123">123</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -424,7 +424,7 @@ Protected Attributes</h2></td></tr>
 
 <p>The work queue, sorted using the history's ordering operator. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00416">416</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00415">415</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -475,7 +475,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00128">128</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00127">127</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -502,7 +502,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00140">140</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00139">139</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -531,7 +531,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00250">250</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00249">249</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -569,7 +569,7 @@ Protected Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The abstract state after <code>l</code>. We return a pointer to a copy as the method should be const and there are some non-trivial cases including merging abstract states, etc. </dd></dl>
 <p><a class="el" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION(l is dereferenceable &amp;&amp; std::next(l) is dereferenceable)</a> Check relies on a DATA_INVARIANT of goto_programs</p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00236">236</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00235">235</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ Protected Attributes</h2></td></tr>
 
 <p>The same interfaces but with histories. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00245">245</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00244">244</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -636,7 +636,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The abstract state before <code>l</code>. We return a pointer to a copy as the method should be const and there are some non-trivial cases including merging abstract states, etc. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00223">223</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00222">222</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -674,7 +674,7 @@ Protected Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The set of histories before <code>l</code>. </dd></dl>
 <p><a class="el" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION(l is dereferenceable &amp;&amp; std::next(l) is dereferenceable)</a> Check relies on a DATA_INVARIANT of goto_programs</p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00206">206</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00205">205</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -711,7 +711,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The set of histories before <code>l</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00196">196</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00195">195</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -740,7 +740,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reset the abstract state. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00267">267</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00266">266</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -996,7 +996,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Get the state for the given history, creating it with the factory if it doesn't exist. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00517">517</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00516">516</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1142,7 +1142,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Make a copy of a state. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00507">507</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00506">506</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1188,7 +1188,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Merge the state <code>src</code>, flowing from tracet <code>from</code> to tracet <code>to</code>, into the state currently stored for tracet <code>to</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00500">500</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00499">499</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1218,7 +1218,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Run abstract interpretation on a whole program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00169">169</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00168">168</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1258,7 +1258,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Run abstract interpretation on a whole program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00158">158</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00157">157</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1304,7 +1304,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Run abstract interpretation on a single function. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00179">179</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00178">178</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1350,7 +1350,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Run abstract interpretation on a single function. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00145">145</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00144">144</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1390,7 +1390,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a whole program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00291">291</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00290">290</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1482,7 +1482,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a function. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00300">300</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00299">299</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1573,7 +1573,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a whole program as JSON. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00314">314</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00313">313</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1653,7 +1653,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a single function as JSON. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00330">330</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00329">329</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1693,7 +1693,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a single function as JSON. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00322">322</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00321">321</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1778,7 +1778,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for the whole program as XML. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00343">343</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00342">342</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1858,7 +1858,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a single function as XML. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00359">359</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00358">358</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1898,7 +1898,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output the abstract states for a single function as XML. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00351">351</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00350">350</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -1991,7 +1991,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00421">421</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00420">420</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -2351,7 +2351,7 @@ Protected Attributes</h2></td></tr>
 
 <p>For creating domain objects. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00496">496</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00495">495</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -2377,7 +2377,7 @@ Protected Attributes</h2></td></tr>
 
 <p>For creating history objects. </p>
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00493">493</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00492">492</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -2401,7 +2401,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00523">523</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00522">522</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
@@ -2425,7 +2425,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00513">513</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ai_8h_source.html#l00512">512</a> of file <a class="el" href="ai_8h_source.html">ai.h</a>.</p>
 
 </div>
 </div>
