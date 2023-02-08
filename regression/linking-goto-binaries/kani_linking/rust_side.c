@@ -1,5 +1,7 @@
 
 #include <stdint.h>
+#include <assert.h>
+#include <stdlib.h>
 
 struct Unit {};
 struct PhantomData {};
@@ -38,8 +40,8 @@ void test_ptr() {
     __CPROVER_assume(a < 1000);
     __CPROVER_assume(b < 1000);
     struct OptionU32PtrWithPhantomDataFirst p = returns_ptr(a,b);
-    assert(*p.ptr == a+b);
-    assert(*p.ptr == a);
+    assert(*p.ptr == a+b); // Should pass
+    assert(*p.ptr == a); // Should fail
 
 }
 

@@ -77,6 +77,7 @@ bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, 
   if (type1.id()==ID_pointer && type2.id()==ID_pointer)
     return true;
 
+  //if type1.id()==ID_struct_tag
   // If we just have a transparent struct (i.e. one with a single non-zero sized field).
   // treat it as the wrapped type, and recurse.
   auto unwrapped1 = unwrap_transparent_type(type1, ns);
