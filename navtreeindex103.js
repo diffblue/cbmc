@@ -1,6 +1,5 @@
 var NAVTREEINDEX103 =
 {
-"java__string__literals_8cpp.html#aec4130be5d61ab4fd8444c1e67e56876":[7,0,1,0,1,83,0],
 "java__string__literals_8cpp_source.html":[7,0,1,0,1,83],
 "java__string__literals_8h.html":[7,0,1,0,1,84],
 "java__string__literals_8h.html#a2660d8344f37f623515e2462d898e43c":[7,0,1,0,1,84,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX103 =
 "jdiff__parse__options_8h.html#a89b8d7cc5ca64efeea8bf8270b08bffd":[7,0,1,0,3,5,1],
 "jdiff__parse__options_8h_source.html":[7,0,1,0,3,5],
 "journalling__symbol__table_8h.html":[7,0,2,30,110],
-"journalling__symbol__table_8h_source.html":[7,0,2,30,110]
+"journalling__symbol__table_8h_source.html":[7,0,2,30,110],
+"jsa_8h.html":[7,0,2,1,1,2]
 };
