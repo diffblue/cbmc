@@ -610,7 +610,7 @@ jobs:
           nuget-version: '5.8.x'
       - name: Fetch dependencies
         run: |
-          choco install winflexbison3 strawberryperl
+          choco install -y winflexbison3 strawberryperl wget
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
@@ -619,7 +619,7 @@ jobs:
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
           New-Item -ItemType directory "C:\tools\cvc5"
-          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe -OutFile c:\tools\cvc5\cvc5.exe
+          wget.exe -O c:\tools\cvc5\cvc5.exe https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
