@@ -320,4 +320,54 @@ to_conditional_target_group_expr(exprt &expr)
   return ret;
 }
 
+/// \brief A Boolean expression returning true, iff the value of an enum-typed
+/// symbol equals one of the enum's declared values.
+class enum_is_in_range_exprt : public unary_predicate_exprt
+{
+public:
+  explicit enum_is_in_range_exprt(exprt _op)
+    : unary_predicate_exprt(ID_enum_is_in_range, std::move(_op))
+  {
+    op().add_source_location().add_pragma("disable:enum-range-check");
+  }
+
+  exprt lower(const namespacet &ns) const;
+};
+
+template <>
+inline bool can_cast_expr<enum_is_in_range_exprt>(const exprt &base)
+{
+  return base.id() == ID_enum_is_in_range;
+}
+
+inline void validate_expr(const enum_is_in_range_exprt &expr)
+{
+  validate_operands(
+    expr, 1, "enum_is_in_range expression must have one operand");
+}
+
+/// \brief Cast an exprt to an \ref enum_is_in_range_exprt
+///
+/// \a expr must be known to be \ref enum_is_in_range_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref enum_is_in_range_exprt
+inline const enum_is_in_range_exprt &to_enum_is_in_range_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_enum_is_in_range);
+  const enum_is_in_range_exprt &ret =
+    static_cast<const enum_is_in_range_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_side_effect_expr_overflow(const exprt &)
+inline enum_is_in_range_exprt &to_enum_is_in_range_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_enum_is_in_range);
+  enum_is_in_range_exprt &ret = static_cast<enum_is_in_range_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_ANSI_C_C_EXPR_H

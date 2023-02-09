@@ -40,6 +40,10 @@ struct __CPROVER_pipet {
   short next_unread;
 };
 
+// enumerations
+// expects one enum-typed argument
+__CPROVER_bool __CPROVER_enum_is_in_range(unsigned long long);
+
 #include "../cprover_builtin_headers.h"
 
 #endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H

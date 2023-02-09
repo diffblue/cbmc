@@ -137,9 +137,6 @@ __CPROVER_bool __CPROVER_overflow_plus();
 __CPROVER_bool __CPROVER_overflow_shl();
 __CPROVER_bool __CPROVER_overflow_unary_minus();
 
-// enumerations
-__CPROVER_bool __CPROVER_enum_is_in_range();
-
 // contracts
 void __CPROVER_assignable(void *ptr, __CPROVER_size_t size,
   __CPROVER_bool is_ptr_to_ptr);
