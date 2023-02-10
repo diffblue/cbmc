@@ -154,6 +154,17 @@ int goto_instrument_parse_optionst::doit()
       }
     }
 
+    // ignore default/user-specified initialization
+    // of matching variables with static lifetime
+    if(cmdline.isset("nondet-static-matching"))
+    {
+      log.status() << "Adding nondeterministic initialization "
+                      "of matching static/global variables"
+                   << messaget::eom;
+      nondet_static_matching(
+        goto_model, cmdline.get_value("nondet-static-matching"));
+    }
+
     instrument_goto_program();
 
     if(cmdline.isset("validate-goto-model"))
@@ -1898,6 +1909,8 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
     "                              (use multiple times if required)\n"
+    " --nondet-static-matching r   add nondeterministic initialization of variables\n" // NOLINT(*)
+    "                              with static lifetime matching regex r\n"
     " --function-enter <f>, --function-exit <f>, --branch <f>\n"
     "                              instruments a call to <f> at the beginning,\n" // NOLINT(*)
     "                              the exit, or a branch point, respectively\n"

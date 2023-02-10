@@ -1,0 +1,12 @@
+CORE
+main.c
+--nondet-static-matching '.*\.c:.*nondet.*'
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+assertion do_nondet_init1 == 0: FAILURE
+assertion init1 == 0: SUCCESS
+assertion do_nondet_init2 == 0: FAILURE
+assertion init2 == 0: SUCCESS
+--
+--
