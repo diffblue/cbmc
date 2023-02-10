@@ -102,12 +102,13 @@ $(document).ready(function(){initNavTree('nondet__static_8cpp.html',''); initRes
 <code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
+<code>#include &lt;regex&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for nondet_static.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="nondet__static_8cpp__incl.svg" width="1856" height="1216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="nondet__static_8cpp__incl.svg" width="1856" height="1231"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -130,6 +131,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a67b45e04cb643457a60313cf2da08605"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nondet__static_8cpp.html#a67b45e04cb643457a60313cf2da08605">nondet_static</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const std::set&lt; std::string &gt; &amp;except_values)</td></tr>
 <tr class="memdesc:a67b45e04cb643457a60313cf2da08605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Second main entry point of the module.  <a href="nondet__static_8cpp.html#a67b45e04cb643457a60313cf2da08605">More...</a><br /></td></tr>
 <tr class="separator:a67b45e04cb643457a60313cf2da08605"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15f41649a8405317b77113d47bafb36d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nondet__static_8cpp.html#a15f41649a8405317b77113d47bafb36d">nondet_static_matching</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const std::string &amp;regex)</td></tr>
+<tr class="memdesc:a15f41649a8405317b77113d47bafb36d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nondeterministically initializes global scope variables that match the given regex.  <a href="nondet__static_8cpp.html#a15f41649a8405317b77113d47bafb36d">More...</a><br /></td></tr>
+<tr class="separator:a15f41649a8405317b77113d47bafb36d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Nondeterministically initializes global scope variables, except for constants (such as string literals, final fields) and internal variables (such as CPROVER and symex variables, language specific internal variables). </p>
@@ -172,7 +176,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the symbol expression holds a static symbol which can be nondeterministically initialized, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00034">34</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00036">36</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
 
 </div>
 </div>
@@ -211,7 +215,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00128">128</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00130">130</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +269,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00080">80</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00082">82</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +297,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00138">138</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00140">140</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +336,46 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00150">150</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00152">152</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a15f41649a8405317b77113d47bafb36d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15f41649a8405317b77113d47bafb36d">&#9670;&nbsp;</a></span>nondet_static_matching()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void nondet_static_matching </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>regex</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Nondeterministically initializes global scope variables that match the given regex. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">goto_model</td><td>Existing goto-model to be updated. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">regex</td><td>regex for matching variables in the format "filename:variable" (same format as those of except_values in nondet_static(goto_model, except_values) variant above). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="nondet__static_8cpp_source.html#l00212">212</a> of file <a class="el" href="nondet__static_8cpp_source.html">nondet_static.cpp</a>.</p>
 
 </div>
 </div>
