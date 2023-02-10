@@ -1,5 +1,6 @@
 var NAVTREEINDEX34 =
 {
+"classgoto__difft.html#a88c43ebac5d8b29a08dce0566b17eb7c":[6,0,530,13],
 "classgoto__difft.html#ab798a591b3bbb2e29b17b93a4958f7e7":[6,0,530,6],
 "classgoto__difft.html#acca190b08410c5b0f007cfad6de67095":[6,0,530,0],
 "classgoto__difft.html#acf1b1724d2a5bd9834edd3f6fb0d32f5":[6,0,530,15],
@@ -248,6 +249,5 @@ var NAVTREEINDEX34 =
 "classgoto__program__dereferencet.html#a721f5890c60015907a550ebe8282e1ff":[6,0,545,12],
 "classgoto__program__dereferencet.html#a7c5387fa97996a25111a7195c0c3b3d0":[6,0,545,9],
 "classgoto__program__dereferencet.html#a7dc406ef1d5b10660338300336b33ac1":[6,0,545,4],
-"classgoto__program__dereferencet.html#a9900ce0c701278b5f2c7ee0a23e3f1db":[6,0,545,7],
-"classgoto__program__dereferencet.html#aa4b3dee6b4fc61b7545ca21281b9a682":[6,0,545,13]
+"classgoto__program__dereferencet.html#a9900ce0c701278b5f2c7ee0a23e3f1db":[6,0,545,7]
 };
