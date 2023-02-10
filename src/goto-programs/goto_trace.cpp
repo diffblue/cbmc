@@ -397,15 +397,8 @@ void show_compact_goto_trace(
   const goto_tracet &goto_trace,
   const trace_optionst &options)
 {
-  std::size_t function_depth = 0;
-
   for(const auto &step : goto_trace.steps)
   {
-    if(step.is_function_call())
-      function_depth++;
-    else if(step.is_function_return())
-      function_depth--;
-
     // hide the hidden ones
     if(step.hidden)
       continue;
