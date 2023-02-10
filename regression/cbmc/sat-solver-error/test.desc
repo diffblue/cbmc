@@ -1,0 +1,7 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend paths-lifo-expected-failure
+test.c
+--sat-solver non-existing-solver
+^EXIT=1$
+^SIGNAL=0$
+unknown solver 'non-existing-solver'
+--

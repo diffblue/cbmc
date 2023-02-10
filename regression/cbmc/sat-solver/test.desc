@@ -1,0 +1,10 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend 
+test.c
+--sat-solver cadical
+^EXIT=10$
+^SIGNAL=0$
+Solving with CaDiCaL|The specified solver, 'cadical', is not available. The default solver will be used instead.
+\[main\.assertion\.1] line \d+ assertion y != x: FAILURE
+\[main\.assertion\.2] line \d+ assertion y <= x: SUCCESS
+^VERIFICATION FAILED$
+--
