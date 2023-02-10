@@ -177,7 +177,11 @@ cadical-download:
 	@$(TAR) xfz $(cadical_release).tar.gz
 	@rm -Rf ../cadical
 	@mv cadical-$(cadical_release) ../cadical
-	@cd ../cadical && CXX=$(CXX) ./configure -O3 -s && make -j
+	@(cd ../cadical; patch -p1 < ../scripts/cadical-1.4.1-patch)
+	@(cd ../cadical && ./configure)
+  # Need to rename VERSION so that it isn't picked up by `#include<version>` on
+  # macOS which is case insensitive
+	@(cd ../cadical && mv VERSION VERSION.txt)
 	@$(RM) $(cadical_release).tar.gz
 
 doc :
