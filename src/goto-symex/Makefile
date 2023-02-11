@@ -15,6 +15,7 @@ SRC = auto_objects.cpp \
       precondition.cpp \
       renaming_level.cpp \
       shadow_memory.cpp \
+      shadow_memory_util.cpp \
       show_program.cpp \
       show_vcc.cpp \
       slice.cpp \
