@@ -1,0 +1,9 @@
+CORE
+bad2.c
+--function bad_declaration2 --verbosity 10
+^EXIT=6$
+^SIGNAL=0$
+^A shadow memory field must be of a bitvector type.
+--
+--
+Test that a shadow memory declaration of a non-bitvector type is rejected.

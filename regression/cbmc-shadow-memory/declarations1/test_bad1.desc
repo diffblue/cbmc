@@ -1,0 +1,9 @@
+CORE
+bad1.c
+--function bad_declaration1 --verbosity 10
+^EXIT=6$
+^SIGNAL=0$
+^A shadow memory field must not be larger than 8 bits.
+--
+--
+Test that a shadow memory declaration of a too large type is rejected.
