@@ -12,6 +12,8 @@ Author: Peter Schrammel
 #include "shadow_memory.h"
 
 #include <util/bitvector_types.h>
+#include <util/expr_initializer.h>
+#include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
 
@@ -22,23 +24,52 @@ Author: Peter Schrammel
 
 void shadow_memoryt::initialize_shadow_memory(
   goto_symex_statet &state,
-  const exprt &expr,
+  exprt expr,
   const shadow_memory_field_definitionst::field_definitiont &fields)
 {
-  // To be implemented
+  typet type = ns.follow(expr.type());
+  clean_pointer_expr(expr, type);
+  for(const auto &field_pair : fields)
+  {
+    const symbol_exprt &shadow = add_field(state, expr, field_pair.first, type);
+
+    if(
+      field_pair.second.id() == ID_typecast &&
+      to_typecast_expr(field_pair.second).op().is_zero())
+    {
+      const auto zero_value =
+        zero_initializer(type, expr.source_location(), ns);
+      CHECK_RETURN(zero_value.has_value());
+
+      symex_assign(state, shadow, *zero_value);
+    }
+    else
+    {
+      exprt init_expr = field_pair.second;
+      if(init_expr.id() == ID_typecast)
+        init_expr = to_typecast_expr(field_pair.second).op();
+      const auto init_value =
+        expr_initializer(type, expr.source_location(), ns, init_expr);
+      CHECK_RETURN(init_value.has_value());
+
+      symex_assign(state, shadow, *init_value);
+    }
+
+    log.debug() << "Shadow memory: initialize field "
+                << id2string(shadow.get_identifier()) << " for " << format(expr)
+                << " with initial value " << format(field_pair.second)
+                << messaget::eom;
+  }
 }
 
-symbol_exprt shadow_memoryt::add_field(
+const symbol_exprt &shadow_memoryt::add_field(
   goto_symex_statet &state,
   const exprt &expr,
   const irep_idt &field_name,
   const typet &field_type)
 {
-  // To be completed
-
   const auto &function_symbol = ns.lookup(state.source.function_id);
-
-  symbolt &new_symbol = get_fresh_aux_symbol(
+  const symbolt &new_symbol = get_fresh_aux_symbol(
     field_type,
     id2string(state.source.function_id),
     SHADOW_MEMORY_PREFIX + from_expr(expr) + "__" + id2string(field_name),
@@ -46,10 +77,11 @@ symbol_exprt shadow_memoryt::add_field(
     function_symbol.mode,
     state.symbol_table);
 
-  // Call some function on ns to silence the compiler in the meanwhile.
-  ns.get_symbol_table();
+  auto &addresses = state.shadow_memory.address_fields[field_name];
+  addresses.push_back(
+    shadow_memory_statet::shadowed_addresst{expr, new_symbol.symbol_expr()});
 
-  return new_symbol.symbol_expr();
+  return addresses.back().shadow;
 }
 
 void shadow_memoryt::symex_set_field(

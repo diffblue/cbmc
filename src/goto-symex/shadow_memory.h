@@ -115,7 +115,7 @@ private:
   /// \param fields The field definition to be used
   void initialize_shadow_memory(
     goto_symex_statet &state,
-    const exprt &expr,
+    exprt expr,
     const shadow_memory_field_definitionst::field_definitiont &fields);
 
   /// Registers a shadow memory field for the given original memory
@@ -124,7 +124,7 @@ private:
   /// \param field_name The field name
   /// \param field_type The field type
   /// \return The resulting shadow memory symbol expression
-  symbol_exprt add_field(
+  const symbol_exprt &add_field(
     goto_symex_statet &state,
     const exprt &expr,
     const irep_idt &field_name,
