@@ -104,7 +104,7 @@ void abort(void)
 
 #undef calloc
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef __GNUC__
 _Bool __builtin_mul_overflow();
 #endif
@@ -169,7 +169,7 @@ __CPROVER_HIDE:;
 
 #undef malloc
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
 __CPROVER_bool __CPROVER_malloc_is_new_array = 0;
 #endif
@@ -228,7 +228,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __builtin_alloca */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 const void *__CPROVER_alloca_object = 0;
 #ifndef LIBRARY_CHECK
 __CPROVER_bool __CPROVER_malloc_is_new_array = 0;
@@ -272,7 +272,7 @@ __CPROVER_HIDE:;
 #undef free
 
 void __CPROVER_deallocate(void *);
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
 const void *__CPROVER_alloca_object = 0;
 #endif
@@ -457,8 +457,8 @@ long atol(const char *nptr)
 #  define __CPROVER_STDDEF_H_INCLUDED
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-ptrdiff_t __VERIFIER_nondet_ptrdiff_t();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+ptrdiff_t __VERIFIER_nondet_ptrdiff_t(void);
 
 char *getenv(const char *name)
 {
@@ -592,7 +592,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: random */
 
-long __VERIFIER_nondet_long();
+long __VERIFIER_nondet_long(void);
 
 long random(void)
 {
@@ -605,7 +605,7 @@ long random(void)
 
 /* FUNCTION: rand */
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int rand(void)
 {
@@ -618,7 +618,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: rand_r */
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int rand_r(unsigned int *seed)
 {
@@ -632,7 +632,7 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __CPROVER_deallocate */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 void __CPROVER_deallocate(void *ptr)
 {

@@ -16,7 +16,7 @@
 #undef fileno
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 int putchar(int c)
 {
@@ -33,8 +33,8 @@ int putchar(int c)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-int __VERIFIER_nondet_int();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+int __VERIFIER_nondet_int(void);
 
 int puts(const char *s)
 {
@@ -71,7 +71,7 @@ __CPROVER_HIDE:;
 #endif
 
 void fclose_cleanup(void *stream);
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 FILE *fopen(const char *filename, const char *mode)
 {
@@ -121,7 +121,7 @@ FILE *fopen(const char *filename, const char *mode)
 #endif
 
 void fclose_cleanup(void *stream);
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 #ifdef __APPLE__
 FILE *_fopen(const char *filename, const char *mode)
@@ -185,7 +185,7 @@ FILE *freopen(const char *filename, const char *mode, FILE *f)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fclose(FILE *stream)
 {
@@ -275,8 +275,8 @@ FILE *_fdopen(int handle, const char *mode)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-int __VERIFIER_nondet_int();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+int __VERIFIER_nondet_int(void);
 
 char *fgets(char *str, int size, FILE *stream)
 {
@@ -330,8 +330,8 @@ char *fgets(char *str, int size, FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-char __VERIFIER_nondet_char();
-size_t __VERIFIER_nondet_size_t();
+char __VERIFIER_nondet_char(void);
+size_t __VERIFIER_nondet_size_t(void);
 
 size_t fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
@@ -369,7 +369,7 @@ size_t fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int feof(FILE *stream)
 {
@@ -401,7 +401,7 @@ int feof(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int ferror(FILE *stream)
 {
@@ -433,7 +433,7 @@ int ferror(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fileno(FILE *stream)
 {
@@ -469,7 +469,7 @@ __CPROVER_HIDE:;
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fputs(const char *s, FILE *stream)
 {
@@ -505,7 +505,7 @@ int fputs(const char *s, FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fflush(FILE *stream)
 {
@@ -530,7 +530,7 @@ int fflush(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fpurge(FILE *stream)
 {
@@ -562,7 +562,7 @@ int fpurge(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fgetc(FILE *stream)
 {
@@ -598,7 +598,7 @@ int fgetc(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int getc(FILE *stream)
 {
@@ -634,9 +634,9 @@ int getc(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
-int getchar()
+int getchar(void)
 {
   __CPROVER_HIDE:;
   int return_value=__VERIFIER_nondet_int();
@@ -653,7 +653,7 @@ int getchar()
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int getw(FILE *stream)
 {
@@ -687,7 +687,7 @@ int getw(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fseek(FILE *stream, long offset, int whence)
 {
@@ -717,7 +717,7 @@ int fseek(FILE *stream, long offset, int whence)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-long __VERIFIER_nondet_long();
+long __VERIFIER_nondet_long(void);
 
 long ftell(FILE *stream)
 {
@@ -768,7 +768,7 @@ __CPROVER_HIDE:
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-size_t __VERIFIER_nondet_size_t();
+size_t __VERIFIER_nondet_size_t(void);
 
 size_t fwrite(
   const void *ptr,
@@ -980,7 +980,7 @@ __CPROVER_HIDE:;
 #    define __CPROVER_STDARG_H_INCLUDED
 #  endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 {
@@ -1026,7 +1026,7 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 #  define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int __isoc99_vfscanf(
   FILE *restrict stream,
@@ -1075,7 +1075,7 @@ __CPROVER_HIDE:;
 #    define __CPROVER_STDARG_H_INCLUDED
 #  endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int __stdio_common_vfscanf(
   unsigned __int64 options,
@@ -1166,7 +1166,7 @@ __CPROVER_HIDE:;
 #    define __CPROVER_STDARG_H_INCLUDED
 #  endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
 {
@@ -1198,7 +1198,7 @@ __CPROVER_HIDE:;
 #  define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int __isoc99_vsscanf(
   const char *restrict s,
@@ -1233,7 +1233,7 @@ __CPROVER_HIDE:;
 #    define __CPROVER_STDARG_H_INCLUDED
 #  endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int __stdio_common_vsscanf(
   unsigned __int64 options,
@@ -1274,7 +1274,7 @@ int __stdio_common_vsscanf(
 #  define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int printf(const char *format, ...)
 {
@@ -1321,7 +1321,7 @@ int fprintf(FILE *stream, const char *restrict format, ...)
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 {
@@ -1366,8 +1366,8 @@ int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-char __VERIFIER_nondet_char();
-int __VERIFIER_nondet_int();
+char __VERIFIER_nondet_char(void);
+int __VERIFIER_nondet_int(void);
 
 int vasprintf(char **ptr, const char *fmt, va_list ap)
 {

@@ -7,7 +7,7 @@
 #define __CPROVER_INET_H_INCLUDED
 #endif
 
-in_addr_t __VERIFIER_nondet_in_addr_t();
+in_addr_t __VERIFIER_nondet_in_addr_t(void);
 
 in_addr_t inet_addr(const char *cp)
 {
@@ -33,7 +33,7 @@ in_addr_t inet_addr(const char *cp)
 #define __CPROVER_INET_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int inet_aton(const char *cp, struct in_addr *pin)
 {
@@ -60,7 +60,7 @@ int inet_aton(const char *cp, struct in_addr *pin)
 #define __CPROVER_INET_H_INCLUDED
 #endif
 
-in_addr_t __VERIFIER_nondet_in_addr_t();
+in_addr_t __VERIFIER_nondet_in_addr_t(void);
 
 in_addr_t inet_network(const char *cp)
 {

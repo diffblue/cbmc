@@ -212,7 +212,7 @@ float __builtin_ia32_vec_ext_v4sf(__gcc_v4sf vec, int offset)
 #ifndef LIBRARY_CHECK
 typedef short __gcc_v8hi __attribute__((__vector_size__(16)));
 #else
-__gcc_v8hi __CPROVER_saturating_minus();
+__gcc_v8hi __CPROVER_saturating_minus(__gcc_v8hi, __gcc_v8hi);
 #endif
 
 __gcc_v8hi __builtin_ia32_psubsw128(__gcc_v8hi a, __gcc_v8hi b)
@@ -224,6 +224,10 @@ __gcc_v8hi __builtin_ia32_psubsw128(__gcc_v8hi a, __gcc_v8hi b)
 
 #ifndef LIBRARY_CHECK
 typedef short __gcc_v8hi __attribute__((__vector_size__(16)));
+#else
+typedef unsigned short v8hi_u __attribute__((__vector_size__(16)));
+__gcc_v8hi __CPROVER_saturating_minus_v8hi_u(v8hi_u, v8hi_u);
+#  define __CPROVER_saturating_minus __CPROVER_saturating_minus_v8hi_u
 #endif
 
 __gcc_v8hi __builtin_ia32_psubusw128(__gcc_v8hi a, __gcc_v8hi b)
@@ -237,7 +241,7 @@ __gcc_v8hi __builtin_ia32_psubusw128(__gcc_v8hi a, __gcc_v8hi b)
 #ifndef LIBRARY_CHECK
 typedef short __gcc_v4hi __attribute__((__vector_size__(8)));
 #else
-__gcc_v4hi __CPROVER_saturating_plus();
+__gcc_v4hi __CPROVER_saturating_plus(__gcc_v4hi, __gcc_v4hi);
 #endif
 
 __gcc_v4hi __builtin_ia32_paddsw(__gcc_v4hi a, __gcc_v4hi b)
@@ -251,6 +255,7 @@ __gcc_v4hi __builtin_ia32_paddsw(__gcc_v4hi a, __gcc_v4hi b)
 typedef short __gcc_v4hi __attribute__((__vector_size__(8)));
 #else
 __gcc_v4hi __CPROVER_saturating_minus_v4hi(__gcc_v4hi, __gcc_v4hi);
+#  undef __CPROVER_saturating_minus
 #  define __CPROVER_saturating_minus __CPROVER_saturating_minus_v4hi
 #endif
 

@@ -14,8 +14,8 @@ const void *__CPROVER_new_object = 0;
 extern const void *__CPROVER_memory_leak;
 __CPROVER_bool __CPROVER_malloc_is_new_array = 0;
 int __builtin_clzll(unsigned long long);
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-__CPROVER_size_t __VERIFIER_nondet_size();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+__CPROVER_size_t __VERIFIER_nondet_size(void);
 
 /// \brief A conditionally writable range of bytes.
 typedef struct

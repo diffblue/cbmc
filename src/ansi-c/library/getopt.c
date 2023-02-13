@@ -8,8 +8,8 @@ extern int optind;
 #define __CPROVER_STRING_H_INCLUDED
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-size_t __VERIFIER_nondet_size_t();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+size_t __VERIFIER_nondet_size_t(void);
 
 int getopt(int argc, char *const argv[], const char *optstring)
 {

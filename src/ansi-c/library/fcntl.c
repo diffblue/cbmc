@@ -5,7 +5,7 @@
 #define __CPROVER_FCNTL_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int fcntl(int fd, int cmd, ...)
 {
