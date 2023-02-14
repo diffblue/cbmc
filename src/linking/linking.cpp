@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include <deque>
+#include <iostream>
 
 static bool is_void_or_zero_size(const typet &type, const namespacet &ns) {
   // pointer_offset_bits doesn't give a meaningful result for void
@@ -67,6 +68,14 @@ static bool are_the_same_size(const typet &type1, const typet &type2, const name
 static bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, const namespacet &ns) {
   // Shortcut: identical types are similar
   // TODO: is == the right CBMC operation here
+  std::cout << "[comparison] type1: [" << type1.id_string() <<  "]   ---   type2:[" << type2.id_string() << "];\n\n";
+
+  //if(type1.id() == ID_unsignedbv)
+  //std::cout << "type1.name:\n" << type1.pretty() << "\n\n";
+
+  //if(type2.id() == ID_unsignedbv)
+  //std::cout << "type2.name:\n" << type2.pretty() << "\n\n";
+
   if (type1 == type2)
     return true;
 
@@ -84,8 +93,9 @@ static bool types_are_structurally_similar_rec(const typet &type1, const typet &
     return true;
 
   // Unwrap tags if needed
-  if (type1.id()==ID_struct_tag)
+  if (type1.id()==ID_struct_tag){
     return types_are_structurally_similar_rec(ns.follow_tag(to_struct_tag_type(type1)), type2, ns);
+  }
 
   if (type1.id()==ID_union_tag)
     return types_are_structurally_similar_rec(ns.follow_tag(to_union_tag_type(type1)), type2, ns);
@@ -113,13 +123,22 @@ static bool types_are_structurally_similar_rec(const typet &type1, const typet &
   if((type1.id()==ID_struct && type2.id()==ID_struct) || (type1.id()==ID_union && type2.id()==ID_union)) {
     auto non_zero_components1 = nonzero_sized_fields(type1, ns);
     auto non_zero_components2 = nonzero_sized_fields(type2, ns);
+    for(auto it = non_zero_components1.begin(); it != non_zero_components1.end(); it++)
+      std::cout << "\nnon_zero_components1: " << (*it).type().id() << "\n";
+    std::cout << "\n----------------------------------\n";
+    for(auto it = non_zero_components2.begin(); it != non_zero_components2.end(); it++)
+      std::cout << "\nnon_zero_components2: " << (*it).type().id() << "\n";
+    
     if (non_zero_components1.size() != non_zero_components2.size())
       return false;
-    for(auto i = 0; i < non_zero_components1.size(); ++i) {
+    for(size_t i = 0; i < non_zero_components1.size(); ++i) {
       if(!types_are_structurally_similar_rec(non_zero_components1[i].type(), non_zero_components2[i].type(), ns))
+      {
+        std::cout << "[BAIL] type1: [" << non_zero_components1[i].type().id() << "]  ---  type2: [" << non_zero_components2[i].type().id() << "]\n\n";
         return false;
-      return true;
+      }
     }
+    return true;
   }
 
   return false;
@@ -772,13 +791,24 @@ void linkingt::duplicate_code_symbol(
       {
         if (return_types_are_compatable(old_t.return_type(), new_t.return_type(), ns)) {
           // TODO for debug purposes. Better warning should go here
-         // warning() << "type 1" << old_t.return_type().pretty() << "\n";
-         // warning() << "type 2" << new_t.return_type().pretty() << "\n";
-         
-          //link_warning(old_symbol, new_symbol, "DSN1 conflicting return types");
-        } else {
+          /*warning() << "type 1" << old_t.return_type().pretty() << "\n\n";
+          warning() << "type 2" << new_t.return_type().pretty() << "\n\n";
 
-          link_warning(old_symbol, new_symbol, "DSN2 conflicting return types");
+          if (old_t.return_type().id() ==ID_struct_tag){
+            warning() << "type 1 -- " << ns.follow_tag(to_struct_tag_type(old_t.return_type())).pretty() << "\n\n";
+          }
+
+          if (new_t.return_type().id() ==ID_struct_tag){
+            warning() << "type 2 -- " << ns.follow_tag(to_struct_tag_type(new_t.return_type())).pretty() << "\n\n";
+          }*/
+         
+          link_warning(old_symbol, new_symbol, "DSN1 conflicting return types");
+        } else {
+          //link_warning(old_symbol, new_symbol, "DSN2 conflicting return types");
+          link_error(
+            old_symbol,
+            new_symbol,
+            "return types are not compatable");
 
           conflicts.emplace_back(old_t.return_type(), new_t.return_type());
 
