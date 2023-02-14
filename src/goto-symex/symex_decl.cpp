@@ -58,4 +58,6 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
       ssa,
       state.atomic_section_id,
       state.source);
+
+  shadow_memory.symex_field_local_init(state, ssa);
 }

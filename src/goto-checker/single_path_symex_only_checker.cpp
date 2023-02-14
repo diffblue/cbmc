@@ -14,6 +14,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/ui_message.h>
 
 #include <goto-symex/path_storage.h>
+#include <goto-symex/shadow_memory.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
@@ -73,8 +74,12 @@ void single_path_symex_only_checkert::initialize_worklist()
     unwindset);
   setup_symex(symex);
 
+  // Gather fields for shadow memory instrumentation
+  const auto fields =
+    shadow_memoryt::gather_field_declarations(goto_model, ui_message_handler);
+
   symex.initialize_path_storage_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+    goto_symext::get_goto_function(goto_model), symex_symbol_table, fields);
 }
 
 bool single_path_symex_only_checkert::has_finished_exploration(

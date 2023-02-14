@@ -82,11 +82,13 @@ SCENARIO(
     WHEN("Symbol `foo` is assigned constant integer `475`")
     {
       const exprt rhs1 = from_integer(475, int_type);
-      symex_assignt{state,
-                    symex_targett::assignment_typet::STATE,
-                    ns,
-                    symex_config,
-                    target_equation}
+      symex_assignt{
+        {},
+        state,
+        symex_targett::assignment_typet::STATE,
+        ns,
+        symex_config,
+        target_equation}
         .assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
       THEN("An equation is added to the target")
       {
@@ -136,11 +138,13 @@ SCENARIO(
     {
       const exprt rhs1 = from_integer(5721, int_type);
       symex_target_equationt target_equation{null_message_handler};
-      symex_assignt symex_assign{state,
-                                 symex_targett::assignment_typet::STATE,
-                                 ns,
-                                 symex_config,
-                                 target_equation};
+      symex_assignt symex_assign{
+        {},
+        state,
+        symex_targett::assignment_typet::STATE,
+        ns,
+        symex_config,
+        target_equation};
       symex_assign.assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
       THEN("An equation with an empty guard is added to the target")
       {
@@ -217,11 +221,13 @@ SCENARIO(
 
     WHEN("Symbol `struct1` is assigned `struct1 with [field1 <- 234]`")
     {
-      symex_assignt{state,
-                    symex_targett::assignment_typet::STATE,
-                    ns,
-                    symex_config,
-                    target_equation}
+      symex_assignt{
+        {},
+        state,
+        symex_targett::assignment_typet::STATE,
+        ns,
+        symex_config,
+        target_equation}
         .assign_symbol(struct1_ssa, skeleton, rhs, guard);
       THEN("Two equations are added to the target")
       {

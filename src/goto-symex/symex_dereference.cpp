@@ -230,7 +230,12 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
   lift_lets(state, cache_value);
 
   auto assign = symex_assignt{
-    state, symex_targett::assignment_typet::STATE, ns, symex_config, target};
+    shadow_memory,
+    state,
+    symex_targett::assignment_typet::STATE,
+    ns,
+    symex_config,
+    target};
 
   auto cache_symbol_expr = cache_symbol.symbol_expr();
   assign.assign_symbol(

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 #include "complexity_limiter.h"
+#include "shadow_memory.h"
 #include "symex_config.h"
 #include "symex_target_equation.h"
 
@@ -22,6 +23,7 @@ class address_of_exprt;
 class function_application_exprt;
 class goto_symex_statet;
 class path_storaget;
+class shadow_memory_field_definitionst;
 class side_effect_exprt;
 class symex_assignt;
 class typet;
@@ -65,7 +67,16 @@ public:
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
-      complexity_module(mh, options)
+      complexity_module(mh, options),
+      shadow_memory(
+        std::bind(
+          &goto_symext::symex_assign,
+          this,
+          std::placeholders::_1,
+          std::placeholders::_2,
+          std::placeholders::_3),
+        ns,
+        mh)
   {
   }
 
@@ -98,16 +109,24 @@ public:
   /// having the state around afterwards.
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
+  /// \param fields The shadow memory field declarations
   /// \return A symbol table holding the symbols added during symbolic
   ///   execution.
   NODISCARD
-  virtual symbol_tablet
-  symex_from_entry_point_of(const get_goto_functiont &get_goto_function);
+  virtual symbol_tablet symex_from_entry_point_of(
+    const get_goto_functiont &get_goto_function,
+    const shadow_memory_field_definitionst &fields);
 
   /// Puts the initial state of the entry point function into the path storage
+  /// \param get_goto_function: The delegate to retrieve function bodies (see
+  ///   \ref get_goto_functiont)
+  /// \param new_symbol_table: A symbol table to store the symbols added during
+  /// symbolic execution
+  /// \param fields The shadow memory field declarations
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_table_baset &new_symbol_table);
+    symbol_table_baset &new_symbol_table,
+    const shadow_memory_field_definitionst &fields);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -445,6 +464,16 @@ protected:
     const get_goto_functiont &get_goto_function,
     statet &state,
     const goto_programt::instructiont &instruction);
+
+  /// Preserves locality of parameters of a given function by applying L1
+  /// renaming to them.
+  /// \param function_identifier The parameter identifier
+  /// \param state The current state
+  /// \param goto_function The goto function
+  virtual void locality(
+    const irep_idt &function_identifier,
+    goto_symext::statet &state,
+    const goto_functionst::goto_functiont &goto_function);
 
   /// Symbolically execute a END_FUNCTION instruction.
   /// \param state: Symbolic execution state for current instruction
@@ -814,6 +843,9 @@ protected:
   ///@}
 
   complexity_limitert complexity_module;
+
+  /// Shadow memory instrumentation API
+  shadow_memoryt shadow_memory;
 
 public:
   unsigned get_total_vccs() const

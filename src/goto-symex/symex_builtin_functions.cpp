@@ -201,6 +201,8 @@ void goto_symext::symex_allocate(
     rhs=address_of_exprt(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
   }
+  shadow_memory.symex_field_dynamic_init(
+    state, value_symbol.symbol_expr(), code);
 
   symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 }

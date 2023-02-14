@@ -426,7 +426,9 @@ void _check_with_strategy(
     setup_symex(symex, ns, options, ui_message_handler);
 
     symex.initialize_path_storage_from_entry_point_of(
-      goto_symext::get_goto_function(goto_model), symex_symbol_table);
+      goto_symext::get_goto_function(goto_model),
+      symex_symbol_table,
+      shadow_memory_field_definitionst{});
   }
 
   std::size_t expected_results_cnt = 0;

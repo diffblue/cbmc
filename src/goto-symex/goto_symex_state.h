@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "field_sensitivity.h"
 #include "goto_state.h"
 #include "renaming_level.h"
+#include "shadow_memory_state.h"
 
 #include <functional>
 #include <memory>
@@ -120,6 +121,8 @@ public:
     bool allow_pointer_unsoundness = false);
 
   field_sensitivityt field_sensitivity;
+
+  shadow_memory_statet shadow_memory;
 
 protected:
   template <levelt>

@@ -12,8 +12,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_ASSIGN_H
 #define CPROVER_GOTO_SYMEX_SYMEX_ASSIGN_H
 
-#include "symex_target.h"
 #include <util/expr.h>
+
+#include "shadow_memory.h"
+#include "symex_target.h"
 
 class byte_extract_exprt;
 class expr_skeletont;
@@ -26,12 +28,14 @@ class symex_assignt
 {
 public:
   symex_assignt(
+    optionalt<shadow_memoryt> shadow_memory,
     goto_symex_statet &state,
     symex_targett::assignment_typet assignment_type,
     const namespacet &ns,
     const symex_configt &symex_config,
     symex_targett &target)
-    : state(state),
+    : shadow_memory(shadow_memory),
+      state(state),
       assignment_type(assignment_type),
       ns(ns),
       symex_config(symex_config),
@@ -56,6 +60,7 @@ public:
     exprt::operandst &guard);
 
 private:
+  optionalt<shadow_memoryt> shadow_memory;
   goto_symex_statet &state;
   symex_targett::assignment_typet assignment_type;
   const namespacet &ns;
