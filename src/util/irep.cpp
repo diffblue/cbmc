@@ -94,12 +94,8 @@ void irept::set_size_t(const irep_idt &name, const std::size_t value)
 
 void irept::remove(const irep_idt &name)
 {
-#if NAMED_SUB_IS_FORWARD_LIST
-  return get_named_sub().remove(name);
-#else
   named_subt &s = get_named_sub();
   s.erase(name);
-#endif
 }
 
 const irept &irept::find(const irep_idt &name) const

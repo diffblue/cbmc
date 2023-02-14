@@ -34,7 +34,7 @@ public:
   {
   }
 
-  void remove(const keyt &name)
+  void erase(const keyt &name)
   {
     const_iterator it = this->lower_bound(name);
 
