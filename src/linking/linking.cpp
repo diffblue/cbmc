@@ -28,7 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <deque>
 
-bool is_void_or_zero_size(const typet &type, const namespacet &ns) {
+static bool is_void_or_zero_size(const typet &type, const namespacet &ns) {
+  // pointer_offset_bits doesn't give a meaningful result for void
   if (type.id() == ID_empty) 
     return true;
 
@@ -36,7 +37,7 @@ bool is_void_or_zero_size(const typet &type, const namespacet &ns) {
   return pointer_offset_bits(type,ns).value_or(1) == 0;
 }
 
-struct_union_typet::componentst nonzero_sized_fields(const typet &type, const namespacet &ns) {
+static struct_union_typet::componentst nonzero_sized_fields(const typet &type, const namespacet &ns) {
   assert(type.id()==ID_struct || type.id()==ID_union);
   auto components= to_struct_union_type(type).components();
   struct_union_typet::componentst filtered;
@@ -47,7 +48,7 @@ struct_union_typet::componentst nonzero_sized_fields(const typet &type, const na
   return filtered;
 }
 
-optionalt<typet> unwrap_transparent_type(const typet &type, const namespacet &ns){
+static optionalt<typet> unwrap_transparent_type(const typet &type, const namespacet &ns){
   if(type.id()==ID_struct || type.id()==ID_union) {
     auto fields = nonzero_sized_fields(type, ns);
     if (fields.size() == 1) {
@@ -57,34 +58,32 @@ optionalt<typet> unwrap_transparent_type(const typet &type, const namespacet &ns
   return {};
 }
 
-bool are_the_same_size(const typet &type1, const typet &type2, const namespacet &ns) {
+static bool are_the_same_size(const typet &type1, const typet &type2, const namespacet &ns) {
   auto bits1 = pointer_offset_bits(type1, ns);
   auto bits2 = pointer_offset_bits(type2, ns);
-  //Question: Can I compare the two directly? 
   return bits1.has_value() && bits2.has_value() && *bits1 == *bits2;
 }
 
-bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, const namespacet &ns) {
-  warning() << type1 << "\n";
-
-  assert(type1.id() != ID_float);
-  assert(type2.id() != ID_float);
-
-  //Shortcut: identical types are similar
+static bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, const namespacet &ns) {
+  // Shortcut: identical types are similar
+  // TODO: is == the right CBMC operation here
   if (type1 == type2)
     return true;
 
   if (is_void_or_zero_size(type1, ns) && is_void_or_zero_size(type2, ns))
     return true;
 
+  // Short circuit, if sizes differ they can never be the compatable types. No need to recurse.
   if (!are_the_same_size(type1, type2, ns)) 
     return false;
 
   // Treat two pointers as similar.
   // TODO: this might be too relaxed. Consider checking that the pointed types are similar
+  // For e.g. *void and *char would be treated as equivilent right now.
   if (type1.id()==ID_pointer && type2.id()==ID_pointer)
     return true;
 
+  // Unwrap tags if needed
   if (type1.id()==ID_struct_tag)
     return types_are_structurally_similar_rec(ns.follow_tag(to_struct_tag_type(type1)), type2, ns);
 
@@ -103,6 +102,7 @@ bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, 
   if (unwrapped1.has_value())
     return types_are_structurally_similar_rec(*unwrapped1, type2, ns);
 
+  // Do the symmetric case
   auto unwrapped2 = unwrap_transparent_type(type2, ns);
   if (unwrapped2.has_value())
     return types_are_structurally_similar_rec(type1, *unwrapped2, ns);  
@@ -125,13 +125,9 @@ bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, 
   return false;
 }
 
-bool return_types_are_compatable(const typet &old_type, const typet &new_type, const namespacet &ns) {
-  //return is_void_or_zero_size(old_type, ns) && is_void_or_zero_size(new_type, ns);
+static bool return_types_are_compatable(const typet &old_type, const typet &new_type, const namespacet &ns) {
   return types_are_structurally_similar_rec(old_type, new_type, ns);
 }
-
-
-
 
 bool casting_replace_symbolt::replace(exprt &dest) const
 {
@@ -771,11 +767,15 @@ void linkingt::duplicate_code_symbol(
       typedef std::deque<std::pair<typet, typet> > conflictst;
       conflictst conflicts;
 
-//DSN fix for void vs () goes here
+      //DSN fix for void vs () goes here
       if(old_t.return_type() != new_t.return_type())
       {
         if (return_types_are_compatable(old_t.return_type(), new_t.return_type(), ns)) {
-          link_warning(old_symbol, new_symbol, "DSN1 conflicting return types");
+          // TODO for debug purposes. Better warning should go here
+         // warning() << "type 1" << old_t.return_type().pretty() << "\n";
+         // warning() << "type 2" << new_t.return_type().pretty() << "\n";
+         
+          //link_warning(old_symbol, new_symbol, "DSN1 conflicting return types");
         } else {
 
           link_warning(old_symbol, new_symbol, "DSN2 conflicting return types");
