@@ -94,6 +94,23 @@ public:
     return it->second;
   }
 
+  mappedt &emplace(const keyt &name, const mappedt &irep)
+  {
+    iterator it = mutable_lower_bound(name);
+
+    if(it == this->end() || it->first != name)
+    {
+      iterator before = this->before_begin();
+      while(std::next(before) != it)
+        ++before;
+      it = this->emplace_after(before, name, irep);
+    }
+    else
+      it->second = irep;
+
+    return it->second;
+  }
+
   std::size_t size() const
   {
     return narrow<std::size_t>(std::distance(this->begin(), this->end()));
