@@ -23,6 +23,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "propagate.h"
 #include "solver.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 

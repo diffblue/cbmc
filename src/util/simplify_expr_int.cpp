@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_utils.h"
 #include "std_expr.h"
 
+#include <algorithm>
+
 simplify_exprt::resultt<>
 simplify_exprt::simplify_bswap(const bswap_exprt &expr)
 {

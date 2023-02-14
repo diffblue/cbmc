@@ -26,6 +26,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "state_encoding_targets.h"
 #include "variable_encoding.h"
 
+#include <algorithm>
 #include <iostream>
 
 class state_encodingt

@@ -21,6 +21,7 @@ Date: January 2022
 
 #include <goto-programs/goto_program.h>
 
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 

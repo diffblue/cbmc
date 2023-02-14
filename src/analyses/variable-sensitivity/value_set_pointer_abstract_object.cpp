@@ -18,6 +18,7 @@
 #include "abstract_environment.h"
 #include "context_abstract_object.h" // IWYU pragma: keep
 
+#include <algorithm>
 #include <numeric>
 
 static abstract_object_sett
