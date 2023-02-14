@@ -338,6 +338,294 @@ void dfcc_instrumentt::instrument_function(
     function_pointer_contracts);
 }
 
+static bool is_loop_id_pragma(const irep_idt &pragma)
+{
+  return id2string(pragma).rfind(CONTRACT_PRAGMA_loop_id, 0) == 0;
+}
+
+static size_t get_loop_id_from_pragma(const irep_idt &pragma)
+{
+  INVARIANT(
+    is_loop_id_pragma(pragma), "Wrong usage of get_loop_id_from_pragma");
+  const auto pragma_s = id2string(pragma);
+  size_t last_index = pragma_s.find_last_not_of("0123456789");
+  return atoi(pragma_s.substr(last_index + 1).c_str());
+}
+
+void dfcc_instrumentt::tag_loop_instruction(
+  goto_programt::instructiont::targett &target,
+  const irep_idt &pragma,
+  const size_t loop_id)
+{
+  target->source_location_nonconst().add_pragma(
+    id2string(pragma) + ":" + std::to_string(loop_id));
+}
+
+irep_idt
+dfcc_instrumentt::get_loop_id_pragma(const goto_programt::targett &target)
+{
+  for(const auto &pragma : target->source_location().get_pragmas())
+  {
+    if(is_loop_id_pragma(pragma.first))
+      return pragma.first;
+  }
+  const irep_idt empty;
+  return empty;
+}
+
+void dfcc_instrumentt::remove_loop_id_pragma(goto_programt::targett &target)
+{
+  for(const auto &pragma : target->source_location().get_pragmas())
+  {
+    if(is_loop_id_pragma(pragma.first))
+    {
+      target->source_location_nonconst()
+        .get_named_sub()
+        .add(ID_pragma)
+        ->second.remove(pragma.first);
+      return;
+    }
+  }
+}
+
+void dfcc_instrumentt::compute_loop_nesting_graph(
+  const irep_idt &function_id,
+  grapht<loop_graph_nodet> &loop_nesting_graph,
+  goto_programt &function_body)
+{
+  std::list<size_t> to_check_contracts_on_children;
+
+  natural_loops_mutablet natural_loops(function_body);
+
+  for(auto &loop_head_and_content : natural_loops.loop_map)
+  {
+    auto &loop_content = loop_head_and_content.second;
+    if(loop_content.empty())
+      continue;
+
+    auto loop_head = loop_head_and_content.first;
+    auto loop_end = loop_head;
+
+    // Find the last back edge to `loop_head`
+    for(const auto &t : loop_content)
+    {
+      if(
+        t->is_goto() && t->get_target() == loop_head &&
+        t->location_number > loop_end->location_number)
+        loop_end = t;
+    }
+
+    if(loop_end == loop_head)
+    {
+      log.error() << "Could not find end of the loop starting at: "
+                  << loop_head->source_location() << messaget::eom;
+      throw 0;
+    }
+
+    // After loop-contract instrumentation, jumps to the `loop_head` will skip
+    // some instrumented instructions. So we want to make sure that there is
+    // only one jump targeting `loop_head` from `loop_end` before loop-contract
+    // instrumentation.
+    // Add a skip before `loop_head` and let all jumps (except for the
+    // `loop_end`) that target to the `loop_head` target to the skip
+    // instead.
+    insert_before_and_update_jumps(
+      function_body, loop_head, goto_programt::make_skip());
+    loop_end->set_target(loop_head);
+
+    // Collect loop contracts clauses.
+    exprt assigns_clause =
+      static_cast<const exprt &>(loop_end->condition().find(ID_C_spec_assigns));
+    exprt invariant = static_cast<const exprt &>(
+      loop_end->condition().find(ID_C_spec_loop_invariant));
+    exprt decreases_clause = static_cast<const exprt &>(
+      loop_end->condition().find(ID_C_spec_decreases));
+
+    if(invariant.is_nil())
+    {
+      if(decreases_clause.is_not_nil() || assigns_clause.is_not_nil())
+      {
+        invariant = true_exprt{};
+        // assigns clause is missing; we will try to automatic inference
+        log.warning()
+          << "The loop at " << loop_head->source_location().as_string()
+          << " does not have an invariant in its contract.\n"
+          << "Hence, a default invariant ('true') is being used.\n"
+          << "This choice is sound, but verification may fail"
+          << " if it is be too weak to prove the desired properties."
+          << messaget::eom;
+      }
+    }
+    else
+    {
+      invariant = conjunction(invariant.operands());
+      if(decreases_clause.is_nil())
+      {
+        log.warning() << "The loop at "
+                      << loop_head->source_location().as_string()
+                      << " does not have a decreases clause in its contract.\n"
+                      << "Termination of this loop will not be verified."
+                      << messaget::eom;
+      }
+    }
+
+    const auto idx = loop_nesting_graph.add_node(
+      loop_content,
+      loop_head,
+      loop_end,
+      assigns_clause,
+      invariant,
+      decreases_clause);
+
+    // Create a write set symbol for the loop.
+    const auto &loop_write_set = get_fresh_aux_symbol(
+      library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+      id2string(function_id),
+      "__loop_" + std::to_string(idx) + "_write_set_to_check",
+      loop_head->source_location(),
+      goto_model.symbol_table.get_writeable(function_id)->mode,
+      goto_model.symbol_table);
+    ;
+    loop_nesting_graph[idx].write_set_symbol = loop_write_set;
+
+    if(
+      assigns_clause.is_nil() && invariant.is_nil() &&
+      decreases_clause.is_nil())
+      continue;
+
+    to_check_contracts_on_children.push_back(idx);
+
+    // By definition the `loop_content` is a set of instructions computed
+    // by `natural_loops` based on the CFG.
+    // Since we perform assigns clause instrumentation by sequentially
+    // traversing instructions from `loop_head` to `loop_end`,
+    // here we ensure that all instructions in `loop_content` belong within
+    // the [loop_head, loop_end] target range
+
+    // Check 1. (i \in loop_content) ==> loop_head <= i <= loop_end
+
+    // Check 2. no jumps into instructions in loops from outside.
+    for(const auto &i : loop_content)
+    {
+      if(std::distance(loop_head, i) < 0 || std::distance(i, loop_end) < 0)
+      {
+        log.conditional_output(
+          log.error(),
+          [&i, &loop_head](messaget::mstreamt &mstream)
+          {
+            mstream << "Computed loop at " << loop_head->source_location()
+                    << "contains an instruction beyond [loop_head, loop_end]:"
+                    << messaget::eom;
+            i->output(mstream);
+            mstream << messaget::eom;
+          });
+        throw 0;
+      }
+
+      for(const auto &from : i->incoming_edges)
+      {
+        if(i != loop_head && !loop_content.contains(from))
+        {
+          log.conditional_output(
+            log.error(),
+            [&i, &loop_head](messaget::mstreamt &mstream)
+            {
+              mstream << "Computed loop at " << loop_head->source_location()
+                      << "contains an instruction being target of a jump from "
+                         "outside of the loop:"
+                      << messaget::eom;
+              i->output(mstream);
+              mstream << messaget::eom;
+            });
+          throw 0;
+        }
+      }
+    }
+  }
+
+  // Compute the dependency of loops.
+  for(size_t outer = 0; outer < loop_nesting_graph.size(); ++outer)
+  {
+    for(size_t inner = 0; inner < loop_nesting_graph.size(); ++inner)
+    {
+      if(inner == outer)
+        continue;
+
+      if(loop_nesting_graph[outer].content.contains(
+           loop_nesting_graph[inner].head_target))
+      {
+        if(!loop_nesting_graph[outer].content.contains(
+             loop_nesting_graph[inner].latch_target))
+        {
+          log.error()
+            << "Overlapping loops at:\n"
+            << loop_nesting_graph[outer].head_target->source_location()
+            << "\nand\n"
+            << loop_nesting_graph[inner].head_target->source_location()
+            << "\nLoops must be nested or sequential for contracts to be "
+               "enforced."
+            << messaget::eom;
+        }
+        loop_nesting_graph.add_edge(inner, outer);
+      }
+    }
+  }
+
+  // Make sure all children of a contractified loop also have contracts
+  while(!to_check_contracts_on_children.empty())
+  {
+    const auto loop_idx = to_check_contracts_on_children.front();
+    to_check_contracts_on_children.pop_front();
+
+    const auto &loop_node = loop_nesting_graph[loop_idx];
+    if(
+      loop_node.assigns_clause.is_nil() && loop_node.invariant.is_nil() &&
+      loop_node.decreases_clause.is_nil())
+    {
+      log.error()
+        << "Inner loop at: " << loop_node.head_target->source_location()
+        << " does not have contracts, but an enclosing loop does.\n"
+        << "Please provide contracts for this loop, or unwind it first."
+        << messaget::eom;
+      throw 0;
+    }
+
+    for(const auto child_idx : loop_nesting_graph.get_predecessors(loop_idx))
+      to_check_contracts_on_children.push_back(child_idx);
+  }
+
+  // Tag loop id pragma to loop instructions.
+  // From inner loops to outer loops.
+  for(const auto &idx : loop_nesting_graph.topsort())
+  {
+    auto &loop_head = loop_nesting_graph[idx].head_target;
+    auto &loop_latch = loop_nesting_graph[idx].latch_target;
+    tag_loop_instruction(loop_head, CONTRACT_PRAGMA_loop_head, idx);
+    tag_loop_instruction(loop_latch, CONTRACT_PRAGMA_loop_latch, idx);
+
+    for(goto_programt::instructiont::targett i :
+        loop_nesting_graph[idx].content)
+    {
+      if(i == loop_head || i == loop_latch)
+        continue;
+
+      // Skip instructions belong to some inner loops.
+      if(is_loop_id_pragma(get_loop_id_pragma(i)))
+        continue;
+
+      if(
+        i->is_goto() &&
+        !loop_nesting_graph[idx].content.contains(i->get_target()))
+      {
+        tag_loop_instruction(i, CONTRACT_PRAGMA_loop_exiting, idx);
+        continue;
+      }
+
+      tag_loop_instruction(i, CONTRACT_PRAGMA_loop_body, idx);
+    }
+  }
+}
+
 void dfcc_instrumentt::instrument_function_body(
   const irep_idt &function_id,
   const exprt &write_set,
@@ -360,6 +648,39 @@ void dfcc_instrumentt::instrument_function_body(
   }
 
   auto &body = goto_function.body;
+
+  // Builds a dependency graph representing the loop nesting structure
+  // identifies loop head and creates fresh symbols for write sets
+  grapht<loop_graph_nodet> loop_nesting_graph;
+  compute_loop_nesting_graph(function_id, loop_nesting_graph, body);
+
+  // Iterate over the (natural) loops in the function, in topo-sorted order,
+  // and apply any loop contracts that we find.
+  for(const auto &idx : loop_nesting_graph.topsort())
+  {
+    const auto &loop_node = loop_nesting_graph[idx];
+    if(
+      loop_node.assigns_clause.is_nil() && loop_node.invariant.is_nil() &&
+      loop_node.decreases_clause.is_nil())
+      continue;
+
+    const auto &loop_filter =
+      [&](const goto_programt::instructiont::targett &target)
+    { return get_loop_id_from_pragma(get_loop_id_pragma(target)) == idx; };
+
+    // TODO: check that no malloc and dealloc in loop body.
+    // instrument the loop body
+    instrument_instructions(
+      function_id,
+      loop_node.write_set_symbol.symbol_expr(),
+      body,
+      loop_node.head_target,
+      loop_node.latch_target,
+      cfg_info,
+      // don't skip any instructions
+      loop_filter,
+      function_pointer_contracts);
+  }
 
   // instrument the whole body
   instrument_instructions(

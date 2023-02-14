@@ -14,12 +14,15 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/graph.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
 #include <goto-programs/goto_program.h>
+
+#include <analyses/natural_loops.h>
 
 #include "dfcc_contract_mode.h"
 
@@ -33,6 +36,48 @@ class conditional_target_group_exprt;
 class cfg_infot;
 class dfcc_libraryt;
 class dfcc_utilst;
+
+/// A local pragma used to keep track instructions in loops.
+const std::string CONTRACT_PRAGMA_loop_id = "contracts:loop-id";
+const std::string CONTRACT_PRAGMA_loop_body = CONTRACT_PRAGMA_loop_id + "-body";
+const std::string CONTRACT_PRAGMA_loop_head = CONTRACT_PRAGMA_loop_id + "-head";
+const std::string CONTRACT_PRAGMA_loop_latch =
+  CONTRACT_PRAGMA_loop_id + "-latch";
+const std::string CONTRACT_PRAGMA_loop_exiting =
+  CONTRACT_PRAGMA_loop_id + "-exiting";
+
+// A graph node type that stores information about a loop.
+// We create a DAG representing nesting of various loops in goto_function,
+// sort them topologically, and instrument them in the top-sorted order.
+//
+// The goal here is not avoid explicit "subset checks" on nested write sets.
+// When instrumenting in a top-sorted order,
+// the outer loop would no longer observe the inner loop's write set,
+// but only corresponding `havoc` statements,
+// which can be instrumented in the usual way to achieve a "subset check".
+struct loop_graph_nodet : public graph_nodet<empty_edget>
+{
+  natural_loops_mutablet::loopt &content;
+  goto_programt::targett head_target, latch_target;
+  exprt assigns_clause, invariant, decreases_clause;
+  symbolt write_set_symbol;
+
+  loop_graph_nodet(
+    natural_loops_mutablet::loopt &loop,
+    const goto_programt::targett head,
+    const goto_programt::targett latch,
+    const exprt &assigns,
+    const exprt &inv,
+    const exprt &decreases)
+    : content(loop),
+      head_target(head),
+      latch_target(latch),
+      assigns_clause(assigns),
+      invariant(inv),
+      decreases_clause(decreases)
+  {
+  }
+};
 
 /// This class instruments GOTO functions or instruction sequences
 /// for frame condition checking.
@@ -372,6 +417,24 @@ protected:
     goto_programt::targett &target,
     goto_programt &goto_program,
     cfg_infot &cfg_info);
+
+  /// Builds a dependency graph representing the loop nesting structure.
+  void compute_loop_nesting_graph(
+    const irep_idt &function_id,
+    grapht<loop_graph_nodet> &loop_nesting_graph,
+    goto_programt &function_body);
+
+  /// Tags program instructions with pragmas
+  void tag_loop_instruction(
+    goto_programt::targett &target,
+    const irep_idt &pragma,
+    const size_t loop_id);
+
+  /// Return loop id pragma of a target.
+  irep_idt get_loop_id_pragma(const goto_programt::targett &target);
+
+  /// Remove loop id pragma from a target.
+  void remove_loop_id_pragma(goto_programt::targett &target);
 };
 
 #endif
