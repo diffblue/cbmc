@@ -12,9 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "linking.h"
 #include "linking_class.h"
 
+#include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/find_symbols.h>
 #include <util/mathematical_types.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
@@ -26,21 +29,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <deque>
 
 bool is_void_or_zero_size(const typet &type, const namespacet &ns) {
-  if (type.id() == ID_empty) {
+  if (type.id() == ID_empty) 
     return true;
-  }
 
-  auto bits = pointer_offset_bits(type, ns);
-  return bits.has_value() && *bits == 0;
+  // 1 is an arbitrary non-zero value
+  return pointer_offset_bits(type,ns).value_or(1) == 0;
 }
 
 struct_union_typet::componentst nonzero_sized_fields(const typet &type, const namespacet &ns) {
   assert(type.id()==ID_struct || type.id()==ID_union);
   auto components= to_struct_union_type(type).components();
   struct_union_typet::componentst filtered;
-  for(auto &component : components) 
+  for(auto &component : components) {
     if (!is_void_or_zero_size(component.type(),ns))
       filtered.emplace_back(component);
+  }
   return filtered;
 }
 
@@ -62,6 +65,11 @@ bool are_the_same_size(const typet &type1, const typet &type2, const namespacet 
 }
 
 bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, const namespacet &ns) {
+  warning() << type1 << "\n";
+
+  assert(type1.id() != ID_float);
+  assert(type2.id() != ID_float);
+
   //Shortcut: identical types are similar
   if (type1 == type2)
     return true;
@@ -77,7 +85,18 @@ bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, 
   if (type1.id()==ID_pointer && type2.id()==ID_pointer)
     return true;
 
-  //if type1.id()==ID_struct_tag
+  if (type1.id()==ID_struct_tag)
+    return types_are_structurally_similar_rec(ns.follow_tag(to_struct_tag_type(type1)), type2, ns);
+
+  if (type1.id()==ID_union_tag)
+    return types_are_structurally_similar_rec(ns.follow_tag(to_union_tag_type(type1)), type2, ns);
+
+  if (type2.id()==ID_struct_tag)
+    return types_are_structurally_similar_rec(type1, ns.follow_tag(to_struct_tag_type(type2)), ns);
+
+  if (type2.id()==ID_union_tag)
+    return types_are_structurally_similar_rec(type1, ns.follow_tag(to_union_tag_type(type2)), ns);
+
   // If we just have a transparent struct (i.e. one with a single non-zero sized field).
   // treat it as the wrapped type, and recurse.
   auto unwrapped1 = unwrap_transparent_type(type1, ns);
@@ -88,7 +107,6 @@ bool types_are_structurally_similar_rec(const typet &type1, const typet &type2, 
   if (unwrapped2.has_value())
     return types_are_structurally_similar_rec(type1, *unwrapped2, ns);  
 
-  
   // Two structs / unions are the same if they have the same non-zero fields in the same order.
   // We don't care about field names.
   // TODO: for unions, we don't need to worry about field order.
@@ -152,7 +170,7 @@ bool casting_replace_symbolt::replace(exprt &dest) const
         to_code_type(call->function().type()).return_type())
       {
         call->type() = to_code_type(call->function().type()).return_type();
-        dest = typecast_exprt(*call, type.return_type());
+        dest = make_byte_extract(*call, from_integer(0, index_type()), type.return_type());
         result = true;
       }
 

@@ -207,6 +207,7 @@ void finalize_linking(
               instruction.call_lhs().type() !=
               to_code_type(instruction.call_function().type()).return_type())
             {
+              assert(0);
               instruction.call_lhs() = typecast_exprt{
                 instruction.call_lhs(),
                 to_code_type(instruction.call_function().type()).return_type()};
