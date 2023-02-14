@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/goto_symex_state.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/goto_symex_state.cpp">
-<area shape="rect" id="node1" title="Symbolic Execution." alt="" coords="1287,5,1486,61"/>
-<area shape="rect" id="node2" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="860,109,1014,136"/>
-<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1762,1259,1880,1285"/>
-<area shape="rect" id="node10" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1530,572,1619,599"/>
-<area shape="rect" id="node15" href="$as__const_8h.html" title=" " alt="" coords="268,885,358,912"/>
-<area shape="rect" id="node23" href="$exception__utils_8h.html" title=" " alt="" coords="1057,1035,1190,1061"/>
-<area shape="rect" id="node44" href="$base__exceptions_8h.html" title="Generic exception types primarily designed for use with invariants." alt="" coords="2306,960,2474,987"/>
-<area shape="rect" id="node45" href="$byte__operators_8h.html" title="Expression classes for byte&#45;level operators." alt="" coords="2148,490,2305,517"/>
-<area shape="rect" id="node46" href="$c__types_8h.html" title=" " alt="" coords="2005,408,2114,435"/>
-<area shape="rect" id="node49" href="$expr__util_8h.html" title="Deprecated expression utility functions." alt="" coords="531,811,647,837"/>
-<area shape="rect" id="node50" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="1247,490,1371,517"/>
-<area shape="rect" id="node52" href="$add__failed__symbols_8h.html" title="Pointer Dereferencing." alt="" coords="44,721,198,763"/>
-<area shape="rect" id="node53" href="$goto__symex__is__constant_8h.html" title="GOTO Symex constant propagation." alt="" coords="526,729,721,755"/>
-<area shape="rect" id="node54" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1547,259,1735,285"/>
-<area shape="rect" id="node8" href="$nodiscard_8h.html" title=" " alt="" coords="960,259,1082,285"/>
-<area shape="rect" id="node9" href="$ssa__expr_8h.html" title=" " alt="" coords="1230,408,1346,435"/>
-<area shape="rect" id="node13" title=" " alt="" coords="647,885,734,912"/>
-<area shape="rect" id="node28" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="717,184,864,211"/>
-<area shape="rect" id="node31" href="$guard_8h.html" title="Guard Data Structure." alt="" coords="425,408,558,435"/>
-<area shape="rect" id="node33" href="$call__stack_8h.html" title=" " alt="" coords="888,184,986,211"/>
-<area shape="rect" id="node35" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="544,333,647,360"/>
-<area shape="rect" id="node37" title=" " alt="" coords="166,885,244,912"/>
-<area shape="rect" id="node40" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="634,408,768,435"/>
-<area shape="rect" id="node43" href="$field__sensitivity_8h.html" title=" " alt="" coords="1062,184,1196,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1788,1333,1854,1360"/>
-<area shape="rect" id="node5" title=" " alt="" coords="2145,1333,2220,1360"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1096,1333,1154,1360"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1334,1333,1426,1360"/>
-<area shape="rect" id="node11" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1263,729,1360,755"/>
-<area shape="rect" id="node24" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1350,647,1447,673"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1250,811,1326,837"/>
-<area shape="rect" id="node14" href="$expr_8h.html" title=" " alt="" coords="671,811,734,837"/>
-<area shape="rect" id="node16" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="890,885,952,912"/>
-<area shape="rect" id="node17" href="$source__location_8h.html" title=" " alt="" coords="952,1109,1088,1136"/>
-<area shape="rect" id="node22" href="$validate_8h.html" title=" " alt="" coords="1154,960,1240,987"/>
-<area shape="rect" id="node18" href="$deprecate_8h.html" title=" " alt="" coords="1772,1184,1870,1211"/>
-<area shape="rect" id="node19" href="$irep_8h.html" title=" " alt="" coords="782,1184,841,1211"/>
-<area shape="rect" id="node21" href="$optional_8h.html" title=" " alt="" coords="383,1184,470,1211"/>
-<area shape="rect" id="node20" title=" " alt="" coords="608,1259,671,1285"/>
-<area shape="rect" id="node25" href="$mp__arith_8h.html" title=" " alt="" coords="1487,729,1579,755"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1012,729,1136,755"/>
-<area shape="rect" id="node26" title=" " alt="" coords="1654,885,1718,912"/>
-<area shape="rect" id="node29" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="854,647,1014,673"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1028,885,1078,912"/>
-<area shape="rect" id="node32" href="$guard__expr_8h.html" title="Guard Data Structure." alt="" coords="597,647,704,673"/>
-<area shape="rect" id="node34" href="$frame_8h.html" title="Class for stack frames." alt="" coords="862,259,935,285"/>
-<area shape="rect" id="node42" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1370,408,1494,435"/>
-<area shape="rect" id="node36" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="312,811,455,837"/>
-<area shape="rect" id="node38" href="$value__set_8h.html" title="Value Set." alt="" coords="847,483,1014,524"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1140,572,1254,599"/>
-<area shape="rect" id="node41" href="$renamed_8h.html" title="Class for expressions or types renamed up to a given level." alt="" coords="1395,490,1487,517"/>
-<area shape="rect" id="node47" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1664,490,1778,517"/>
-<area shape="rect" id="node48" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="1643,572,1778,599"/>
-<area shape="rect" id="node51" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1144,647,1274,673"/>
-<area shape="rect" id="node55" title=" " alt="" coords="1642,333,1728,360"/>
-<area shape="rect" id="node56" title=" " alt="" coords="1576,333,1618,360"/>
-<area shape="rect" id="node57" href="$merge__irep_8h.html" title=" " alt="" coords="1089,490,1222,517"/>
-<area shape="rect" id="node58" href="$src_2util_2message_8h.html" title=" " alt="" coords="1802,811,1920,837"/>
-<area shape="rect" id="node59" href="$narrow_8h.html" title=" " alt="" coords="1418,1184,1496,1211"/>
-<area shape="rect" id="node60" href="$ssa__step_8h.html" title=" " alt="" coords="1309,333,1400,360"/>
+<area shape="rect" id="node1" title="Symbolic Execution." alt="" coords="1266,5,1465,61"/>
+<area shape="rect" id="node2" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="695,109,849,136"/>
+<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1547,1049,1664,1076"/>
+<area shape="rect" id="node10" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1409,579,1498,606"/>
+<area shape="rect" id="node15" href="$as__const_8h.html" title=" " alt="" coords="584,900,675,927"/>
+<area shape="rect" id="node20" href="$exception__utils_8h.html" title=" " alt="" coords="2381,825,2515,852"/>
+<area shape="rect" id="node44" href="$base__exceptions_8h.html" title="Generic exception types primarily designed for use with invariants." alt="" coords="1109,109,1277,136"/>
+<area shape="rect" id="node45" href="$byte__operators_8h.html" title="Expression classes for byte&#45;level operators." alt="" coords="1592,490,1749,517"/>
+<area shape="rect" id="node46" href="$c__types_8h.html" title=" " alt="" coords="2280,408,2389,435"/>
+<area shape="rect" id="node49" href="$expr__util_8h.html" title="Deprecated expression utility functions." alt="" coords="435,825,551,852"/>
+<area shape="rect" id="node50" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="1123,490,1247,517"/>
+<area shape="rect" id="node52" href="$add__failed__symbols_8h.html" title="Pointer Dereferencing." alt="" coords="1261,736,1416,777"/>
+<area shape="rect" id="node53" href="$goto__symex__is__constant_8h.html" title="GOTO Symex constant propagation." alt="" coords="375,743,569,770"/>
+<area shape="rect" id="node54" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1903,259,2091,285"/>
+<area shape="rect" id="node8" href="$nodiscard_8h.html" title=" " alt="" coords="999,259,1121,285"/>
+<area shape="rect" id="node9" href="$ssa__expr_8h.html" title=" " alt="" coords="1331,408,1447,435"/>
+<area shape="rect" id="node13" title=" " alt="" coords="725,900,811,927"/>
+<area shape="rect" id="node26" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="169,184,316,211"/>
+<area shape="rect" id="node29" href="$guard_8h.html" title="Guard Data Structure." alt="" coords="520,408,653,435"/>
+<area shape="rect" id="node31" href="$call__stack_8h.html" title=" " alt="" coords="765,184,864,211"/>
+<area shape="rect" id="node33" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="626,333,729,360"/>
+<area shape="rect" id="node35" title=" " alt="" coords="421,661,499,688"/>
+<area shape="rect" id="node38" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="729,408,863,435"/>
+<area shape="rect" id="node41" href="$field__sensitivity_8h.html" title=" " alt="" coords="1041,184,1175,211"/>
+<area shape="rect" id="node42" href="$shadow__memory__state_8h.html" title="Symex Shadow Memory Instrumentation State." alt="" coords="208,490,395,517"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1615,1124,1681,1151"/>
+<area shape="rect" id="node5" title=" " alt="" coords="2051,1124,2125,1151"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1532,1124,1591,1151"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1749,1124,1841,1151"/>
+<area shape="rect" id="node11" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1709,743,1806,770"/>
+<area shape="rect" id="node16" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1709,661,1806,688"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1694,825,1770,852"/>
+<area shape="rect" id="node14" href="$expr_8h.html" title=" " alt="" coords="718,825,781,852"/>
+<area shape="rect" id="node17" href="$mp__arith_8h.html" title=" " alt="" coords="1593,743,1685,770"/>
+<area shape="rect" id="node19" href="$validate_8h.html" title=" " alt="" coords="1998,743,2085,770"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1933,900,1997,927"/>
+<area shape="rect" id="node21" href="$source__location_8h.html" title=" " alt="" coords="2123,900,2259,927"/>
+<area shape="rect" id="node22" href="$deprecate_8h.html" title=" " alt="" coords="2312,975,2411,1001"/>
+<area shape="rect" id="node23" href="$irep_8h.html" title=" " alt="" coords="959,975,1017,1001"/>
+<area shape="rect" id="node25" href="$optional_8h.html" title=" " alt="" coords="1270,975,1357,1001"/>
+<area shape="rect" id="node24" title=" " alt="" coords="517,1049,579,1076"/>
+<area shape="rect" id="node27" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="155,259,315,285"/>
+<area shape="rect" id="node28" title=" " alt="" coords="296,661,347,688"/>
+<area shape="rect" id="node30" href="$guard__expr_8h.html" title="Guard Data Structure." alt="" coords="573,661,680,688"/>
+<area shape="rect" id="node32" href="$frame_8h.html" title="Class for stack frames." alt="" coords="778,259,851,285"/>
+<area shape="rect" id="node40" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1471,408,1595,435"/>
+<area shape="rect" id="node34" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="747,579,890,606"/>
+<area shape="rect" id="node36" href="$value__set_8h.html" title="Value Set." alt="" coords="881,483,1047,524"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1128,579,1243,606"/>
+<area shape="rect" id="node39" href="$renamed_8h.html" title="Class for expressions or types renamed up to a given level." alt="" coords="1323,490,1415,517"/>
+<area shape="rect" id="node43" href="$shadow__memory__field__definitions_8h.html" title="Symex Shadow Memory Field Definitions." alt="" coords="195,572,365,613"/>
+<area shape="rect" id="node47" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1981,490,2096,517"/>
+<area shape="rect" id="node48" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="1941,579,2075,606"/>
+<area shape="rect" id="node51" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="541,579,672,606"/>
+<area shape="rect" id="node55" title=" " alt="" coords="1995,333,2080,360"/>
+<area shape="rect" id="node56" title=" " alt="" coords="2104,333,2147,360"/>
+<area shape="rect" id="node57" href="$merge__irep_8h.html" title=" " alt="" coords="1824,490,1957,517"/>
+<area shape="rect" id="node58" href="$src_2util_2message_8h.html" title=" " alt="" coords="2175,825,2294,852"/>
+<area shape="rect" id="node59" href="$narrow_8h.html" title=" " alt="" coords="2537,975,2615,1001"/>
+<area shape="rect" id="node60" href="$ssa__step_8h.html" title=" " alt="" coords="1488,333,1579,360"/>
 </map>

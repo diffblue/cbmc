@@ -49,6 +49,7 @@ var classgoto__symex__statet =
     [ "remaining_vccs", "classgoto__symex__statet.html#ab1e8095291d505cf19488bc733d1c268", null ],
     [ "run_validation_checks", "classgoto__symex__statet.html#aec372a9331cd249766902c52ec94a923", null ],
     [ "saved_target", "classgoto__symex__statet.html#a0bfd722b954582aa689853f9898b3e37", null ],
+    [ "shadow_memory", "classgoto__symex__statet.html#a36ca357274a3bdbc1ee61a746bc801e7", null ],
     [ "source", "classgoto__symex__statet.html#ac7f08eb7139175f1c638d43ab2d32594", null ],
     [ "symbol_table", "classgoto__symex__statet.html#a9c501442b9ac7b9f61870e32c02ba650", null ],
     [ "symex_target", "classgoto__symex__statet.html#a957daf60fe0394319613d0394367be8b", null ],

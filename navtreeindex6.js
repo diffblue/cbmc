@@ -1,6 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"cbmc-architecture.html#autotoc_md168":[0,4,9,0,6],
 "cbmc-architecture.html#autotoc_md169":[0,4,9,0,6,0],
 "cbmc-architecture.html#autotoc_md170":[0,4,9,0,6,1],
 "cbmc-architecture.html#autotoc_md171":[0,4,9,0,6,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX6 =
 "class_parser.html#a6d6c233a424faaa60006fee8794b2e6f":[6,0,878,16],
 "class_parser.html#a6db58627e6debeab3a19cc84aff8096e":[6,0,878,4],
 "class_parser.html#a7004d56e1bfe11a61e695e2ca4f51bf3":[6,0,878,124],
-"class_parser.html#a72e649771d16968f237c0b8bc9a844d4":[6,0,878,52]
+"class_parser.html#a72e649771d16968f237c0b8bc9a844d4":[6,0,878,52],
+"class_parser.html#a749061c5dd751ae615e8b869dfb30cf6":[6,0,878,73]
 };

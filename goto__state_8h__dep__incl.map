@@ -1,17 +1,18 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/goto_state.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/goto_state.h">
-<area shape="rect" id="node1" title="goto_statet class definition" alt="" coords="1409,5,1608,61"/>
-<area shape="rect" id="node2" href="$frame_8h.html" title="Class for stack frames." alt="" coords="1398,109,1619,151"/>
-<area shape="rect" id="node4" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="1197,310,1396,366"/>
-<area shape="rect" id="node7" href="$goto__state_8cpp.html" title=" " alt="" coords="1779,429,1977,485"/>
-<area shape="rect" id="node3" href="$call__stack_8h.html" title=" " alt="" coords="1412,199,1605,255"/>
-<area shape="rect" id="node43" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="1420,303,1643,373"/>
+<area shape="rect" id="node1" title="goto_statet class definition" alt="" coords="1327,5,1525,61"/>
+<area shape="rect" id="node2" href="$frame_8h.html" title="Class for stack frames." alt="" coords="1315,109,1537,151"/>
+<area shape="rect" id="node4" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="1115,310,1313,366"/>
+<area shape="rect" id="node7" href="$goto__state_8cpp.html" title=" " alt="" coords="1769,429,1968,485"/>
+<area shape="rect" id="node3" href="$call__stack_8h.html" title=" " alt="" coords="1329,199,1523,255"/>
+<area shape="rect" id="node44" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="1337,303,1560,373"/>
 <area shape="rect" id="node5" href="$complexity__limiter_8cpp.html" title=" " alt="" coords="819,644,1062,700"/>
-<area shape="rect" id="node6" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="1333,429,1532,485"/>
-<area shape="rect" id="node8" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="1556,429,1755,485"/>
+<area shape="rect" id="node6" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="1324,429,1523,485"/>
+<area shape="rect" id="node8" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="1547,429,1745,485"/>
 <area shape="rect" id="node9" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="1687,644,1885,700"/>
-<area shape="rect" id="node38" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="474,429,706,485"/>
-<area shape="rect" id="node39" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="731,429,945,485"/>
-<area shape="rect" id="node40" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="1037,421,1252,492"/>
+<area shape="rect" id="node38" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="237,429,469,485"/>
+<area shape="rect" id="node39" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="493,429,713,485"/>
+<area shape="rect" id="node40" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="737,429,952,485"/>
+<area shape="rect" id="node41" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="1035,421,1249,492"/>
 <area shape="rect" id="node10" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="2615,985,2821,1041"/>
 <area shape="rect" id="node11" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="3137,748,3321,819"/>
 <area shape="rect" id="node15" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3682,985,3874,1041"/>
@@ -40,6 +41,6 @@
 <area shape="rect" id="node26" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="1259,874,1537,930"/>
 <area shape="rect" id="node27" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1561,874,1824,930"/>
 <area shape="rect" id="node28" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="1849,874,2083,930"/>
-<area shape="rect" id="node41" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="1021,540,1263,596"/>
-<area shape="rect" id="node42" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="1087,644,1285,700"/>
+<area shape="rect" id="node42" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="1021,540,1263,596"/>
+<area shape="rect" id="node43" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="1087,644,1285,700"/>
 </map>

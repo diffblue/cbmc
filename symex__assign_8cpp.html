@@ -99,18 +99,19 @@ $(document).ready(function(){initNavTree('symex__assign_8cpp.html',''); initResi
 <p>Symbolic Execution.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="expr__skeleton_8h_source.html">expr_skeleton.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="byte__operators_8h_source.html">util/byte_operators.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__util_8h_source.html">util/expr_util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="range_8h_source.html">util/range.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="expr__skeleton_8h_source.html">expr_skeleton.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="symex__config_8h_source.html">symex_config.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for symex_assign.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="symex__assign_8cpp__incl.svg" width="2987" height="918"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="symex__assign_8cpp__incl.svg" width="2644" height="1216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -126,12 +127,52 @@ Classes</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a2833189339825778dd556010eec54338"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symex__assign_8cpp.html#a2833189339825778dd556010eec54338">use_update</a> ()</td></tr>
 <tr class="separator:a2833189339825778dd556010eec54338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8209a853e2a1f848a84cbcf4985c6c38"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symex__assign_8cpp.html#a8209a853e2a1f848a84cbcf4985c6c38">is_string_constant_initialization</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;rhs)</td></tr>
+<tr class="memdesc:a8209a853e2a1f848a84cbcf4985c6c38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the RHS expression is a string constant initialization.  <a href="symex__assign_8cpp.html#a8209a853e2a1f848a84cbcf4985c6c38">More...</a><br /></td></tr>
+<tr class="separator:a8209a853e2a1f848a84cbcf4985c6c38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Symbolic Execution. </p>
 
 <p class="definition">Definition in file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a8209a853e2a1f848a84cbcf4985c6c38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8209a853e2a1f848a84cbcf4985c6c38">&#9670;&nbsp;</a></span>is_string_constant_initialization()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool is_string_constant_initialization </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Determine whether the RHS expression is a string constant initialization. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rhs</td><td>The RHS expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the expression points to the first character of a string constant </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00041">41</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a2833189339825778dd556010eec54338"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2833189339825778dd556010eec54338">&#9670;&nbsp;</a></span>use_update()</h2>
 
@@ -155,7 +196,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00027">27</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00028">28</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h" name="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4353,5,4553,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4473,5,4673,61"/>
 <area shape="rect" id="node2" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="5,117,212,173"/>
 <area shape="rect" id="node3" href="$custom__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="236,117,435,173"/>
 <area shape="rect" id="node4" href="$goto__rw_8cpp.html" title=" " alt="" coords="459,117,643,173"/>
@@ -34,10 +34,11 @@
 <area shape="rect" id="node33" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="6909,117,7093,173"/>
 <area shape="rect" id="node34" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="7117,117,7301,173"/>
 <area shape="rect" id="node35" href="$xml__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="7325,117,7509,173"/>
-<area shape="rect" id="node36" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="7533,117,7737,173"/>
-<area shape="rect" id="node37" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="7761,117,7976,173"/>
-<area shape="rect" id="node38" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="8001,117,8198,173"/>
-<area shape="rect" id="node39" href="$language__util_8cpp.html" title=" " alt="" coords="8222,117,8422,173"/>
-<area shape="rect" id="node40" href="$linking_8cpp.html" title="ANSI&#45;C Linking." alt="" coords="8447,124,8653,165"/>
-<area shape="rect" id="node41" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="8677,117,8871,173"/>
+<area shape="rect" id="node36" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="7533,117,7753,173"/>
+<area shape="rect" id="node37" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="7777,117,7981,173"/>
+<area shape="rect" id="node38" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="8005,117,8220,173"/>
+<area shape="rect" id="node39" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="8245,117,8442,173"/>
+<area shape="rect" id="node40" href="$language__util_8cpp.html" title=" " alt="" coords="8466,117,8666,173"/>
+<area shape="rect" id="node41" href="$linking_8cpp.html" title="ANSI&#45;C Linking." alt="" coords="8691,124,8897,165"/>
+<area shape="rect" id="node42" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="8921,117,9115,173"/>
 </map>

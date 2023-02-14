@@ -1,19 +1,19 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/sharing_map.h" name="/home/runner/work/cbmc/cbmc/src/util/sharing_map.h">
-<area shape="rect" id="node1" title="Sharing map." alt="" coords="4653,5,4862,47"/>
+<area shape="rect" id="node1" title="Sharing map." alt="" coords="4395,5,4605,47"/>
 <area shape="rect" id="node2" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="3000,95,3211,151"/>
 <area shape="rect" id="node7" href="$full__struct__abstract__object_8h.html" title="An abstraction of a structure that stores one abstract object per field." alt="" coords="333,436,557,507"/>
-<area shape="rect" id="node42" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="5230,206,5429,262"/>
-<area shape="rect" id="node54" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="4641,95,4873,151"/>
-<area shape="rect" id="node57" href="$value__set_8h.html" title="Value Set." alt="" coords="5233,95,5426,151"/>
+<area shape="rect" id="node41" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="4973,206,5171,262"/>
+<area shape="rect" id="node54" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="4384,95,4616,151"/>
+<area shape="rect" id="node57" href="$value__set_8h.html" title="Value Set." alt="" coords="4975,95,5169,151"/>
 <area shape="rect" id="node3" href="$abstract__aggregate__object_8h.html" title="Common behaviour for abstract objects modelling aggregate values &#45; arrays, structs,..." alt="" coords="1102,317,1327,388"/>
 <area shape="rect" id="node12" href="$abstract__environment_8h.html" title="An abstract version of a program environment." alt="" coords="3110,206,3365,262"/>
-<area shape="rect" id="node14" href="$abstract__object_8cpp.html" title=" " alt="" coords="3619,325,3845,381"/>
-<area shape="rect" id="node27" href="$abstract__pointer__object_8h.html" title="The base of all pointer abstractions." alt="" coords="2223,199,2428,269"/>
-<area shape="rect" id="node31" href="$abstract__value__object_8h.html" title="Common behaviour for abstract objects modelling values &#45; constants, intervals, etc." alt="" coords="1475,199,1677,269"/>
-<area shape="rect" id="node36" href="$context__abstract__object_8h.html" title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co..." alt="" coords="3528,436,3736,507"/>
-<area shape="rect" id="node39" href="$location__update__visitor_8h.html" title=" " alt="" coords="5,436,208,507"/>
-<area shape="rect" id="node40" href="$variable__sensitivity__object__factory_8h.html" title="Tracks the user&#45;supplied configuration for VSD and build the correct type of abstract object when nee..." alt="" coords="3811,436,4037,507"/>
-<area shape="rect" id="node41" href="$write__stack__entry_8h.html" title="Represents an entry in the write_stackt." alt="" coords="2861,206,3086,262"/>
+<area shape="rect" id="node14" href="$abstract__object_8cpp.html" title=" " alt="" coords="3804,325,4031,381"/>
+<area shape="rect" id="node26" href="$abstract__pointer__object_8h.html" title="The base of all pointer abstractions." alt="" coords="2223,199,2428,269"/>
+<area shape="rect" id="node30" href="$abstract__value__object_8h.html" title="Common behaviour for abstract objects modelling values &#45; constants, intervals, etc." alt="" coords="1475,199,1677,269"/>
+<area shape="rect" id="node35" href="$context__abstract__object_8h.html" title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co..." alt="" coords="3528,436,3736,507"/>
+<area shape="rect" id="node38" href="$location__update__visitor_8h.html" title=" " alt="" coords="5,436,208,507"/>
+<area shape="rect" id="node39" href="$variable__sensitivity__object__factory_8h.html" title="Tracks the user&#45;supplied configuration for VSD and build the correct type of abstract object when nee..." alt="" coords="3844,436,4071,507"/>
+<area shape="rect" id="node40" href="$write__stack__entry_8h.html" title="Represents an entry in the write_stackt." alt="" coords="2861,206,3086,262"/>
 <area shape="rect" id="node4" href="$full__array__abstract__object_8h.html" title="An abstraction of an array value." alt="" coords="632,436,853,507"/>
 <area shape="rect" id="node9" href="$two__value__array__abstract__object_8h.html" title="The base type of all abstract array representations." alt="" coords="878,436,1085,507"/>
 <area shape="rect" id="node10" href="$two__value__struct__abstract__object_8h.html" title="The base of all structure abstractions." alt="" coords="1109,436,1320,507"/>
@@ -21,42 +21,42 @@
 <area shape="rect" id="node5" href="$full__array__abstract__object_8cpp.html" title=" " alt="" coords="459,555,680,625"/>
 <area shape="rect" id="node6" href="$variable__sensitivity__object__factory_8cpp.html" title=" " alt="" coords="1504,555,1731,625"/>
 <area shape="rect" id="node8" href="$full__struct__abstract__object_8cpp.html" title=" " alt="" coords="184,555,408,625"/>
-<area shape="rect" id="node13" href="$abstract__environment_8cpp.html" title=" " alt="" coords="3775,562,4044,618"/>
+<area shape="rect" id="node13" href="$abstract__environment_8cpp.html" title=" " alt="" coords="3757,562,4027,618"/>
 <area shape="rect" id="node15" href="$abstract__pointer__object_8cpp.html" title=" " alt="" coords="2453,317,2659,388"/>
-<area shape="rect" id="node16" href="$abstract__value__object_8cpp.html" title=" " alt="" coords="2211,555,2413,625"/>
+<area shape="rect" id="node16" href="$abstract__value__object_8cpp.html" title=" " alt="" coords="2195,555,2397,625"/>
 <area shape="rect" id="node17" href="$constant__pointer__abstract__object_8cpp.html" title=" " alt="" coords="2755,436,2963,507"/>
-<area shape="rect" id="node18" href="$interval__abstract__value_8cpp.html" title=" " alt="" coords="2843,555,3053,625"/>
+<area shape="rect" id="node18" href="$interval__abstract__value_8cpp.html" title=" " alt="" coords="2826,555,3035,625"/>
 <area shape="rect" id="node19" href="$two__value__pointer__abstract__object_8cpp.html" title=" " alt="" coords="2512,436,2731,507"/>
-<area shape="rect" id="node20" href="$value__set__abstract__object_8cpp.html" title="Value Set Abstract Object." alt="" coords="2597,555,2819,625"/>
-<area shape="rect" id="node21" href="$value__set__pointer__abstract__object_8cpp.html" title="Value Set of Pointer Abstract Object." alt="" coords="3077,555,3291,625"/>
-<area shape="rect" id="node22" href="$variable__sensitivity__domain_8h.html" title="There are different ways of handling arrays, structures, unions and pointers." alt="" coords="4061,436,4288,507"/>
-<area shape="rect" id="node25" href="$write__stack_8cpp.html" title="Represents a stack of write operations to an addressable memory location." alt="" coords="2683,325,2885,381"/>
-<area shape="rect" id="node26" href="$write__stack__entry_8cpp.html" title="Represents an entry in the write_stackt." alt="" coords="2909,325,3149,381"/>
-<area shape="rect" id="node23" href="$three__way__merge__abstract__interpreter_8cpp.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="4276,555,4492,625"/>
-<area shape="rect" id="node24" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4068,562,4252,618"/>
-<area shape="rect" id="node28" href="$constant__pointer__abstract__object_8h.html" title="An abstraction of a pointer that tracks a single pointer." alt="" coords="2221,317,2429,388"/>
-<area shape="rect" id="node29" href="$two__value__pointer__abstract__object_8h.html" title=" " alt="" coords="1877,317,2096,388"/>
-<area shape="rect" id="node30" href="$value__set__pointer__abstract__object_8h.html" title="Value Set of Pointer Abstract Object." alt="" coords="2273,436,2487,507"/>
-<area shape="rect" id="node32" href="$abstract__object__set_8h.html" title="an unordered set of value objects" alt="" coords="1614,325,1853,381"/>
-<area shape="rect" id="node33" href="$value__set__abstract__object_8h.html" title="Value Set Abstract Object." alt="" coords="2026,436,2249,507"/>
-<area shape="rect" id="node34" href="$constant__abstract__value_8h.html" title="An abstraction of a single value that just stores a constant." alt="" coords="1681,443,1951,499"/>
-<area shape="rect" id="node35" href="$interval__abstract__value_8h.html" title="An interval to represent a set of possible values." alt="" coords="3037,443,3301,499"/>
-<area shape="rect" id="node37" href="$context__abstract__object_8cpp.html" title=" " alt="" coords="3543,555,3751,625"/>
-<area shape="rect" id="node38" href="$write__location__context_8h.html" title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac..." alt="" coords="3316,555,3519,625"/>
-<area shape="rect" id="node43" href="$frame_8h.html" title="Class for stack frames." alt="" coords="5187,332,5408,373"/>
-<area shape="rect" id="node45" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="5050,562,5249,618"/>
-<area shape="rect" id="node48" href="$goto__state_8cpp.html" title=" " alt="" coords="5890,681,6089,737"/>
-<area shape="rect" id="node44" href="$call__stack_8h.html" title=" " alt="" coords="5194,443,5387,499"/>
-<area shape="rect" id="node46" href="$complexity__limiter_8cpp.html" title=" " alt="" coords="5400,681,5643,737"/>
-<area shape="rect" id="node47" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="5667,681,5866,737"/>
-<area shape="rect" id="node49" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="4477,681,4675,737"/>
-<area shape="rect" id="node50" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="4699,681,4898,737"/>
-<area shape="rect" id="node51" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="4220,681,4452,737"/>
-<area shape="rect" id="node52" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="4922,681,5137,737"/>
-<area shape="rect" id="node53" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="5161,673,5375,744"/>
-<area shape="rect" id="node55" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="4921,213,5207,255"/>
-<area shape="rect" id="node56" href="$precondition_8cpp.html" title="Symbolic Execution." alt="" coords="4618,213,4897,255"/>
-<area shape="rect" id="node58" href="$value__set_8cpp.html" title="Value Set." alt="" coords="5670,206,5863,262"/>
-<area shape="rect" id="node59" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="5453,206,5646,262"/>
-<area shape="rect" id="node60" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="5483,325,5677,381"/>
+<area shape="rect" id="node20" href="$value__set__abstract__object_8cpp.html" title="Value Set Abstract Object." alt="" coords="2579,555,2802,625"/>
+<area shape="rect" id="node21" href="$value__set__pointer__abstract__object_8cpp.html" title="Value Set of Pointer Abstract Object." alt="" coords="3059,555,3274,625"/>
+<area shape="rect" id="node22" href="$variable__sensitivity__domain_8h.html" title="There are different ways of handling arrays, structures, unions and pointers." alt="" coords="3553,317,3780,388"/>
+<area shape="rect" id="node24" href="$write__stack_8cpp.html" title="Represents a stack of write operations to an addressable memory location." alt="" coords="2683,325,2885,381"/>
+<area shape="rect" id="node25" href="$write__stack__entry_8cpp.html" title="Represents an entry in the write_stackt." alt="" coords="2909,325,3149,381"/>
+<area shape="rect" id="node23" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4051,562,4235,618"/>
+<area shape="rect" id="node27" href="$constant__pointer__abstract__object_8h.html" title="An abstraction of a pointer that tracks a single pointer." alt="" coords="2221,317,2429,388"/>
+<area shape="rect" id="node28" href="$two__value__pointer__abstract__object_8h.html" title=" " alt="" coords="1877,317,2096,388"/>
+<area shape="rect" id="node29" href="$value__set__pointer__abstract__object_8h.html" title="Value Set of Pointer Abstract Object." alt="" coords="2273,436,2487,507"/>
+<area shape="rect" id="node31" href="$abstract__object__set_8h.html" title="an unordered set of value objects" alt="" coords="1614,325,1853,381"/>
+<area shape="rect" id="node32" href="$value__set__abstract__object_8h.html" title="Value Set Abstract Object." alt="" coords="2026,436,2249,507"/>
+<area shape="rect" id="node33" href="$constant__abstract__value_8h.html" title="An abstraction of a single value that just stores a constant." alt="" coords="1681,443,1951,499"/>
+<area shape="rect" id="node34" href="$interval__abstract__value_8h.html" title="An interval to represent a set of possible values." alt="" coords="3037,443,3301,499"/>
+<area shape="rect" id="node36" href="$context__abstract__object_8cpp.html" title=" " alt="" coords="3299,555,3507,625"/>
+<area shape="rect" id="node37" href="$write__location__context_8h.html" title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac..." alt="" coords="3531,555,3733,625"/>
+<area shape="rect" id="node42" href="$frame_8h.html" title="Class for stack frames." alt="" coords="4929,332,5151,373"/>
+<area shape="rect" id="node44" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="4793,562,4991,618"/>
+<area shape="rect" id="node47" href="$goto__state_8cpp.html" title=" " alt="" coords="5771,681,5970,737"/>
+<area shape="rect" id="node43" href="$call__stack_8h.html" title=" " alt="" coords="4937,443,5130,499"/>
+<area shape="rect" id="node45" href="$complexity__limiter_8cpp.html" title=" " alt="" coords="5504,681,5747,737"/>
+<area shape="rect" id="node46" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="4114,681,4313,737"/>
+<area shape="rect" id="node48" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="4337,681,4535,737"/>
+<area shape="rect" id="node49" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="4559,681,4758,737"/>
+<area shape="rect" id="node50" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="3857,681,4089,737"/>
+<area shape="rect" id="node51" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="4782,681,5002,737"/>
+<area shape="rect" id="node52" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="5026,681,5241,737"/>
+<area shape="rect" id="node53" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="5265,673,5479,744"/>
+<area shape="rect" id="node55" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="4664,213,4949,255"/>
+<area shape="rect" id="node56" href="$precondition_8cpp.html" title="Symbolic Execution." alt="" coords="4361,213,4639,255"/>
+<area shape="rect" id="node58" href="$value__set_8cpp.html" title="Value Set." alt="" coords="5413,206,5606,262"/>
+<area shape="rect" id="node59" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="5195,206,5389,262"/>
+<area shape="rect" id="node60" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="5226,325,5419,381"/>
 </map>

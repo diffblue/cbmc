@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('classgoto__symex__statet.html',''); in
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classgoto__symex__statet__coll__graph.svg" width="2386" height="1907"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classgoto__symex__statet__coll__graph.svg" width="2055" height="1950"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -242,6 +242,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a71a5283a1ac8974d6941773d31ff7eba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8a20fcfb8165beb4f7f9c5966b31917"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfield__sensitivityt.html">field_sensitivityt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__statet.html#ab8a20fcfb8165beb4f7f9c5966b31917">field_sensitivity</a></td></tr>
 <tr class="separator:ab8a20fcfb8165beb4f7f9c5966b31917"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36ca357274a3bdbc1ee61a746bc801e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classshadow__memory__statet.html">shadow_memory_statet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__statet.html#a36ca357274a3bdbc1ee61a746bc801e7">shadow_memory</a></td></tr>
+<tr class="separator:a36ca357274a3bdbc1ee61a746bc801e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d7fe070f6420a7fa21c5e7badab8087"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classssa__exprt.html">ssa_exprt</a>, <a class="el" href="classgoto__symex__statet.html#a1a780f5aea5595068230778c0bc27308">a_s_r_entryt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__statet.html#a5d7fe070f6420a7fa21c5e7badab8087">read_in_atomic_section</a></td></tr>
 <tr class="separator:a5d7fe070f6420a7fa21c5e7badab8087"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6986ade53920a91ed3d3278d494b39d1"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classssa__exprt.html">ssa_exprt</a>, <a class="el" href="classgoto__symex__statet.html#a9ec96d636f49558a65c7ebf45cbcf75a">a_s_w_entryt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__statet.html#a6986ade53920a91ed3d3278d494b39d1">written_in_atomic_section</a></td></tr>
@@ -335,7 +337,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Central data structure: state. </p>
 <p>The state is a persistent data structure that symex maintains as it executes. As we walk over each instruction, state will be updated reflecting their effects until a branch occurs (such as an if), where parts of the state will be copied into a <a class="el" href="classgoto__statet.html">goto_statet</a>, stored in a map for later reference and then merged again (via merge_goto) once it reaches a control-flow graph convergence. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00042">42</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00043">43</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a1a780f5aea5595068230778c0bc27308"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1a780f5aea5595068230778c0bc27308">&#9670;&nbsp;</a></span>a_s_r_entryt</h2>
@@ -349,7 +351,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00177">177</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00180">180</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -365,7 +367,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00178">178</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00181">181</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -389,7 +391,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00134">134</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00137">137</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -419,7 +421,7 @@ Private Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a6460011152fae567f384429606e14b39a049518eb4dc1859c7cebbe15876cfd63"></a>SHARED&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00199">199</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00202">202</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -533,7 +535,7 @@ Private Attributes</h2></td></tr>
 
 <p>Fake "copy constructor" that initializes the <code>symex_target</code> member. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00054">54</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00055">55</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -692,7 +694,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00145">145</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00148">148</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -719,7 +721,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00151">151</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00154">154</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -782,7 +784,7 @@ Private Attributes</h2></td></tr>
 
 <p>Drops an L1 name from the local L2 map. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00231">231</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00234">234</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -812,7 +814,7 @@ Private Attributes</h2></td></tr>
 
 <p>Drops an L1 name from the local L2 map. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00237">237</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00240">240</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -839,7 +841,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00242">242</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00245">245</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -866,7 +868,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00139">139</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00142">142</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -896,7 +898,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns true if <code>lvalue</code> is a read-only object, such as the null object. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00248">248</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00251">251</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1379,7 +1381,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00213">213</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00216">216</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1395,7 +1397,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00122">122</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00123">123</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1419,7 +1421,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00260">260</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00263">263</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1435,7 +1437,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00070">70</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00071">71</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1453,7 +1455,7 @@ template&lt;&gt; </div>
 
 <p>This state is saved, with the PC pointing to the target of a GOTO. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00218">218</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00221">221</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1471,7 +1473,7 @@ template&lt;&gt; </div>
 
 <p>This state is saved, with the PC pointing to the next instruction of a GOTO. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00222">222</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00225">225</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1495,7 +1497,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00135">135</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00138">138</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1511,7 +1513,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00073">73</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00074">74</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1527,7 +1529,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00179">179</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00182">182</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1543,7 +1545,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00211">211</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00214">214</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1559,7 +1561,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00228">228</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00231">231</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1577,7 +1579,7 @@ template&lt;&gt; </div>
 
 <p>Should the additional validation checks be run? </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00225">225</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00228">228</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1593,7 +1595,23 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00215">215</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00218">218</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+
+</div>
+</div>
+<a id="a36ca357274a3bdbc1ee61a746bc801e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36ca357274a3bdbc1ee61a746bc801e7">&#9670;&nbsp;</a></span>shadow_memory</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classshadow__memory__statet.html">shadow_memory_statet</a> goto_symex_statet::shadow_memory</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00125">125</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1609,7 +1627,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00062">62</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00063">63</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1628,7 +1646,7 @@ template&lt;&gt; </div>
 <p>contains symbols that are minted during symbolic execution, such as dynamically created objects etc. </p>
 <p>The names in this table are needed for error traces even after symbolic execution has finished. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00067">67</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00068">68</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1644,7 +1662,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00071">71</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00072">72</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1660,7 +1678,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00197">197</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00200">200</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1676,7 +1694,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00227">227</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00230">230</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>
@@ -1692,7 +1710,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00181">181</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__state_8h_source.html#l00184">184</a> of file <a class="el" href="goto__symex__state_8h_source.html">goto_symex_state.h</a>.</p>
 
 </div>
 </div>

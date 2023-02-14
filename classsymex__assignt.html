@@ -107,14 +107,14 @@ $(document).ready(function(){initNavTree('classsymex__assignt.html',''); initRes
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classsymex__assignt__coll__graph.svg" width="2280" height="1774"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classsymex__assignt__coll__graph.svg" width="2300" height="1956"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9e38385748940d8661022150f7cf6d79"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__assignt.html#a9e38385748940d8661022150f7cf6d79">symex_assignt</a> (<a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;<a class="el" href="classsymex__assignt.html#a2c49025e981654ad8957a1efbea91d3c">state</a>, <a class="el" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8b">symex_targett::assignment_typet</a> <a class="el" href="classsymex__assignt.html#a9dbc7898512b337e7dc19545c7f38e89">assignment_type</a>, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;<a class="el" href="classsymex__assignt.html#ad3000d54480e086e2f0606c8f7674a5f">ns</a>, const <a class="el" href="structsymex__configt.html">symex_configt</a> &amp;<a class="el" href="classsymex__assignt.html#a2813c7a13c12770c788474ebd1d071d6">symex_config</a>, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;<a class="el" href="classsymex__assignt.html#a7075ff648bcee8b75d3c6de3dce6b5e1">target</a>)</td></tr>
-<tr class="separator:a9e38385748940d8661022150f7cf6d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a492391b6112419f87577f7c4d105a221"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__assignt.html#a492391b6112419f87577f7c4d105a221">symex_assignt</a> (<a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classshadow__memoryt.html">shadow_memoryt</a> &gt; <a class="el" href="classsymex__assignt.html#a791b1a2499f96eb96a2663183fdcdc9a">shadow_memory</a>, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;<a class="el" href="classsymex__assignt.html#a2c49025e981654ad8957a1efbea91d3c">state</a>, <a class="el" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8b">symex_targett::assignment_typet</a> <a class="el" href="classsymex__assignt.html#a9dbc7898512b337e7dc19545c7f38e89">assignment_type</a>, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;<a class="el" href="classsymex__assignt.html#ad3000d54480e086e2f0606c8f7674a5f">ns</a>, const <a class="el" href="structsymex__configt.html">symex_configt</a> &amp;<a class="el" href="classsymex__assignt.html#a2813c7a13c12770c788474ebd1d071d6">symex_config</a>, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;<a class="el" href="classsymex__assignt.html#a7075ff648bcee8b75d3c6de3dce6b5e1">target</a>)</td></tr>
+<tr class="separator:a492391b6112419f87577f7c4d105a221"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95c9d81fa91c20d841614f64636975f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__assignt.html#a95c9d81fa91c20d841614f64636975f8">assign_symbol</a> (const <a class="el" href="classssa__exprt.html">ssa_exprt</a> &amp;lhs, const <a class="el" href="classexpr__skeletont.html">expr_skeletont</a> &amp;full_lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="memdesc:a95c9d81fa91c20d841614f64636975f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Record the assignment of value <code>rhs</code> to variable <code>lhs</code> in <code>state</code> and add the equation to target: <code>lhs#{n+1} == guard ? rhs#{m} : lhs#{n}</code> where {n} and {m} denote the current L2 indexes of lhs and rhs respectively.  <a href="classsymex__assignt.html#a95c9d81fa91c20d841614f64636975f8">More...</a><br /></td></tr>
 <tr class="separator:a95c9d81fa91c20d841614f64636975f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,6 +143,8 @@ Private Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
+<tr class="memitem:a791b1a2499f96eb96a2663183fdcdc9a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classshadow__memoryt.html">shadow_memoryt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__assignt.html#a791b1a2499f96eb96a2663183fdcdc9a">shadow_memory</a></td></tr>
+<tr class="separator:a791b1a2499f96eb96a2663183fdcdc9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c49025e981654ad8957a1efbea91d3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__assignt.html#a2c49025e981654ad8957a1efbea91d3c">state</a></td></tr>
 <tr class="separator:a2c49025e981654ad8957a1efbea91d3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dbc7898512b337e7dc19545c7f38e89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymex__targett.html#a8e793a7e75fcf4232f9038a3167cac8b">symex_targett::assignment_typet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__assignt.html#a9dbc7898512b337e7dc19545c7f38e89">assignment_type</a></td></tr>
@@ -157,10 +159,10 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Functor for symex assignment. </p>
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00025">25</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00027">27</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a9e38385748940d8661022150f7cf6d79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e38385748940d8661022150f7cf6d79">&#9670;&nbsp;</a></span>symex_assignt()</h2>
+<a id="a492391b6112419f87577f7c4d105a221"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a492391b6112419f87577f7c4d105a221">&#9670;&nbsp;</a></span>symex_assignt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -171,6 +173,12 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">symex_assignt::symex_assignt </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classshadow__memoryt.html">shadow_memoryt</a> &gt;&#160;</td>
+          <td class="paramname"><em>shadow_memory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;&#160;</td>
           <td class="paramname"><em>state</em>, </td>
         </tr>
@@ -211,7 +219,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00028">28</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00030">30</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 
 </div>
 </div>
@@ -270,7 +278,7 @@ template&lt;bool use_update&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00248">248</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00285">285</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -320,7 +328,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00364">364</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00401">401</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -381,7 +389,7 @@ template&lt;bool use_update&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00128">128</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00165">165</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -431,7 +439,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00347">347</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00384">384</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -481,7 +489,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00150">150</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00187">187</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -523,7 +531,7 @@ template&lt;bool use_update&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00036">36</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00058">58</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -581,7 +589,7 @@ template&lt;bool use_update&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00285">285</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00322">322</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +633,7 @@ template&lt;bool use_update&gt; </div>
 
 <p>Record the assignment of value <code>rhs</code> to variable <code>lhs</code> in <code>state</code> and add the equation to target: <code>lhs#{n+1} == guard ? rhs#{m} : lhs#{n}</code> where {n} and {m} denote the current L2 indexes of lhs and rhs respectively. </p>
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00221">221</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00258">258</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -675,7 +683,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00234">234</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8cpp_source.html#l00271">271</a> of file <a class="el" href="symex__assign_8cpp_source.html">symex_assign.cpp</a>.</p>
 
 </div>
 </div>
@@ -700,7 +708,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00060">60</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00065">65</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 
 </div>
 </div>
@@ -724,7 +732,31 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00061">61</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00066">66</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+
+</div>
+</div>
+<a id="a791b1a2499f96eb96a2663183fdcdc9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a791b1a2499f96eb96a2663183fdcdc9a">&#9670;&nbsp;</a></span>shadow_memory</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classshadow__memoryt.html">shadow_memoryt</a>&gt; symex_assignt::shadow_memory</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00063">63</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 
 </div>
 </div>
@@ -748,7 +780,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00059">59</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00064">64</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 
 </div>
 </div>
@@ -772,7 +804,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00062">62</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00067">67</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 
 </div>
 </div>
@@ -796,7 +828,7 @@ template&lt;bool use_update&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00063">63</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__assign_8h_source.html#l00068">68</a> of file <a class="el" href="symex__assign_8h_source.html">symex_assign.h</a>.</p>
 
 </div>
 </div>
