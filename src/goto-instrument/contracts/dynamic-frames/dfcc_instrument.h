@@ -12,6 +12,8 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_INSTRUMENT_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_INSTRUMENT_H
 
+#include <goto-programs/goto_convert_class.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/graph.h>
@@ -22,7 +24,9 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <goto-programs/goto_program.h>
 
+#include <analyses/local_may_alias.h>
 #include <analyses/natural_loops.h>
+#include <goto-instrument/loop_utils.h>
 
 #include "dfcc_contract_mode.h"
 
@@ -45,6 +49,8 @@ const std::string CONTRACT_PRAGMA_loop_latch =
   CONTRACT_PRAGMA_loop_id + "-latch";
 const std::string CONTRACT_PRAGMA_loop_exiting =
   CONTRACT_PRAGMA_loop_id + "-exiting";
+
+const irep_idt empty_pragma = 0;
 
 // A graph node type that stores information about a loop.
 // We create a DAG representing nesting of various loops in goto_function,
@@ -199,6 +205,7 @@ protected:
   dfcc_utilst &utils;
   dfcc_libraryt &library;
   namespacet ns;
+  goto_convertt converter;
 
   /// \brief Keeps track of instrumented functions, so that no function gets
   /// instrumented more than once.
@@ -433,8 +440,35 @@ protected:
   /// Return loop id pragma of a target.
   irep_idt get_loop_id_pragma(const goto_programt::targett &target);
 
+  size_t
+  get_loop_id_from_target(const goto_programt::instructiont::targett target);
+
+  bool is_loop_instruction(const goto_programt::instructiont::targett target);
+
   /// Remove loop id pragma from a target.
   void remove_loop_id_pragma(goto_programt::targett &target);
+
+  // Infer assigns clauses for function with nested-graph-id `idx`.
+  void get_assigns_dfcc(
+    const local_may_aliast &local_may_alias,
+    goto_functionst::goto_functiont &goto_function,
+    const size_t idx,
+    assignst &assigns);
+
+  /// Add instructions for loop contracts.
+  void add_loop_contracts_instructions(
+    const irep_idt &function_id,
+    goto_functionst::goto_functiont &goto_function,
+    symbol_tablet &symbol_table,
+    const local_may_aliast &local_may_alias,
+    goto_programt::targett loop_head,
+    goto_programt::targett loop_latch,
+    exprt assigns_clause,
+    exprt invariant,
+    exprt decreases_clause,
+    exprt write_set,
+    exprt outer_write_set,
+    const irep_idt &mode);
 };
 
 #endif

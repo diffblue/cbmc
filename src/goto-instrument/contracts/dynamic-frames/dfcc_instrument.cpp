@@ -25,6 +25,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/c_object_factory_parameters.h>
 #include <goto-instrument/contracts/cfg_info.h>
 #include <goto-instrument/contracts/contracts.h>
+#include <goto-instrument/contracts/instrument_spec_assigns.h>
 #include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <langapi/language_util.h>
@@ -50,7 +51,8 @@ dfcc_instrumentt::dfcc_instrumentt(
     log(message_handler),
     utils(utils),
     library(library),
-    ns(goto_model.symbol_table)
+    ns(goto_model.symbol_table),
+    converter(goto_model.symbol_table, log.get_message_handler())
 {
   // these come from different assert.h implementation on different systems
   // and eventually become ASSERT instructions and must not be instrumented
@@ -352,6 +354,23 @@ static size_t get_loop_id_from_pragma(const irep_idt &pragma)
   return atoi(pragma_s.substr(last_index + 1).c_str());
 }
 
+size_t dfcc_instrumentt::get_loop_id_from_target(
+  const goto_programt::instructiont::targett target)
+{
+  INVARIANT(
+    is_loop_instruction(target), "Wrong usage of get_loop_id_from_target");
+  const auto &pragma = get_loop_id_pragma(target);
+
+  return get_loop_id_from_pragma(pragma);
+}
+
+bool dfcc_instrumentt::is_loop_instruction(
+  const goto_programt::instructiont::targett target)
+{
+  const auto &pragma = get_loop_id_pragma(target);
+  return pragma != empty_pragma;
+}
+
 void dfcc_instrumentt::tag_loop_instruction(
   goto_programt::instructiont::targett &target,
   const irep_idt &pragma,
@@ -369,8 +388,7 @@ dfcc_instrumentt::get_loop_id_pragma(const goto_programt::targett &target)
     if(is_loop_id_pragma(pragma.first))
       return pragma.first;
   }
-  const irep_idt empty;
-  return empty;
+  return empty_pragma;
 }
 
 void dfcc_instrumentt::remove_loop_id_pragma(goto_programt::targett &target)
@@ -610,7 +628,7 @@ void dfcc_instrumentt::compute_loop_nesting_graph(
         continue;
 
       // Skip instructions belong to some inner loops.
-      if(is_loop_id_pragma(get_loop_id_pragma(i)))
+      if(is_loop_instruction(i))
         continue;
 
       if(
@@ -623,6 +641,460 @@ void dfcc_instrumentt::compute_loop_nesting_graph(
 
       tag_loop_instruction(i, CONTRACT_PRAGMA_loop_body, idx);
     }
+  }
+}
+
+void dfcc_instrumentt::get_assigns_dfcc(
+  const local_may_aliast &local_may_alias,
+  goto_functionst::goto_functiont &goto_function,
+  const size_t idx,
+  assignst &assigns)
+{
+  for(auto i_it = goto_function.body.instructions.begin();
+      i_it != goto_function.body.instructions.end();
+      i_it++)
+  {
+    if(get_loop_id_from_target(i_it) != idx)
+      continue;
+
+    const goto_programt::instructiont &instruction = *i_it;
+
+    if(instruction.is_assign())
+    {
+      const exprt &lhs = instruction.assign_lhs();
+      get_assigns_lhs(local_may_alias, i_it, lhs, assigns);
+    }
+    else if(instruction.is_function_call())
+    {
+      const exprt &lhs = instruction.call_lhs();
+      get_assigns_lhs(local_may_alias, i_it, lhs, assigns);
+    }
+  }
+}
+
+void dfcc_instrumentt ::add_loop_contracts_instructions(
+  const irep_idt &function_id,
+  goto_functionst::goto_functiont &goto_function,
+  symbol_tablet &symbol_table,
+  const local_may_aliast &local_may_alias,
+  goto_programt::targett loop_head,
+  goto_programt::targett loop_latch,
+  exprt assigns_clause,
+  exprt invariant,
+  exprt decreases_clause,
+  exprt write_set,
+  exprt outer_write_set,
+  const irep_idt &mode)
+{
+  const auto loop_head_location = loop_head->source_location();
+  // idx is the index of loops in the nesting graph, while loop number is
+  // the index computed by goto_functions.update();
+  const auto loop_number = loop_latch->loop_number;
+  const auto idx = get_loop_id_from_target(loop_head);
+
+  //                               ... preamble ...
+  //                        ,-     initialize loop_entry history vars;
+  //                        |      entered_loop = false
+  // loop assigns check     |      initial_invariant_val = invariant_expr;
+  //  - unchecked, temps    |      in_base_case = true;
+  // func assigns check     |      __populate(w_loop_i, <loop_assigns>);
+  //  - disabled via pragma |      goto HEAD;
+
+  goto_programt pre_loop_head_instrs;
+
+  // Process "loop_entry" history variables.
+  // We find and replace all "__CPROVER_loop_entry" subexpressions in invariant.
+  std::map<exprt, exprt> history_var_map;
+  replace_history_parameter(
+    symbol_table,
+    invariant,
+    history_var_map,
+    loop_head_location,
+    mode,
+    pre_loop_head_instrs,
+    ID_loop_entry);
+
+  // Create a temporary to track if we entered the loop,
+  // i.e., the loop guard was satisfied.
+  const auto entered_loop =
+    new_tmp_symbol(
+      bool_typet(),
+      loop_head_location,
+      mode,
+      symbol_table,
+      std::string(ENTERED_LOOP) + "__" + std::to_string(loop_number))
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(entered_loop, loop_head_location));
+  pre_loop_head_instrs.add(
+    goto_programt::make_assignment(entered_loop, false_exprt{}));
+
+  // Create a snapshot of the invariant so that we can check the base case,
+  // if the loop is not vacuous and must be abstracted with contracts.
+  const auto initial_invariant_val =
+    new_tmp_symbol(
+      bool_typet(), loop_head_location, mode, symbol_table, INIT_INVARIANT)
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(initial_invariant_val, loop_head_location));
+  {
+    // Although the invariant at this point will not have side effects,
+    // it is still a C expression, and needs to be "goto_convert"ed.
+    // Note that this conversion may emit many GOTO instructions.
+    code_assignt initial_invariant_value_assignment{
+      initial_invariant_val, invariant};
+    initial_invariant_value_assignment.add_source_location() =
+      loop_head_location;
+    converter.goto_convert(
+      initial_invariant_value_assignment, pre_loop_head_instrs, mode);
+  }
+
+  // Create a temporary variable to track base case vs inductive case
+  // instrumentation of the loop.
+  const auto in_base_case =
+    new_tmp_symbol(
+      bool_typet(), loop_head_location, mode, symbol_table, "__in_base_case")
+      .symbol_expr();
+  pre_loop_head_instrs.add(
+    goto_programt::make_decl(in_base_case, loop_head_location));
+  pre_loop_head_instrs.add(
+    goto_programt::make_assignment(in_base_case, true_exprt{}));
+
+  // TODO: __populate(w_loop_i, <loop_assigns>);
+
+  goto_function.body.destructive_insert(
+    loop_head, add_pragma_disable_assigns_check(pre_loop_head_instrs));
+
+  //                        |    STEP:
+  //                  --.   |      assert (initial_invariant_val);
+  //                    |   |      check_assigns_inclusion(w_loop, w_parent);
+  // loop assigns check |   |      in_base_case = false;
+  //  - not applicable   >=======  in_loop_havoc_block = true;
+  // func assigns check |   |      havoc (assigns_set);
+  //  + deferred        |   |      in_loop_havoc_block = false;
+  //                  --'   |      assume (invariant_expr);
+  //                        `-     old_variant_val = decreases_clause_expr;
+
+  goto_programt step_instrs;
+
+  // set of targets to havoc
+  assignst to_havoc;
+
+  if(assigns_clause.is_nil())
+  {
+    // No assigns clause was specified for this loop.
+    // Infer memory locations assigned by the loop from the loop instructions
+    // and the inferred aliasing relation.
+    try
+    {
+      get_assigns_dfcc(local_may_alias, goto_function, idx, to_havoc);
+
+      // If the set contains pairs (i, a[i]),
+      // we widen them to (i, __CPROVER_POINTER_OBJECT(a))
+      widen_assigns(to_havoc, ns);
+
+      log.debug() << "No loop assigns clause provided. Inferred targets: {";
+      // Add inferred targets to the loop assigns clause.
+      bool ran_once = false;
+      for(const auto &target : to_havoc)
+      {
+        if(ran_once)
+          log.debug() << ", ";
+        ran_once = true;
+        log.debug() << format(target);
+      }
+      log.debug() << "}" << messaget::eom;
+    }
+    catch(const analysis_exceptiont &exc)
+    {
+      log.error() << "Failed to infer variables being modified by the loop at "
+                  << loop_head_location
+                  << ".\nPlease specify an assigns clause.\nReason:"
+                  << messaget::eom;
+      throw exc;
+    }
+  }
+  else
+  {
+    // An assigns clause was specified for this loop.
+    // Add the targets to the set of expressions to havoc.
+    for(const auto &target : assigns_clause.operands())
+    {
+      to_havoc.insert(target);
+    }
+  }
+
+  // Insert a jump to the loop head
+  // (skipping over the step case initialization code below)
+  step_instrs.add(
+    goto_programt::make_goto(loop_head, true_exprt{}, loop_head_location));
+
+  // The STEP case instructions follow.
+  // We skip past it initially, because of the unconditional jump above,
+  // but jump back here if we get past the loop guard while in_base_case.
+  const auto step_case_target = step_instrs.add(goto_programt::make_assignment(
+    in_base_case, false_exprt{}, loop_head_location));
+
+  // If we jump here, then the loop runs at least once,
+  // so add the base case assertion:
+  //   assert(initial_invariant_val)
+  // We use a block scope for assertion, since it's immediately goto converted,
+  // and doesn't need to be kept around.
+  {
+    const auto initial_invariant_val =
+      new_tmp_symbol(
+        bool_typet(), loop_head_location, mode, symbol_table, INIT_INVARIANT)
+        .symbol_expr();
+    code_assertt assertion{initial_invariant_val};
+    assertion.add_source_location() = loop_head_location;
+    assertion.add_source_location().set_comment(
+      "Check loop invariant before entry");
+    converter.goto_convert(assertion, step_instrs, mode);
+  }
+
+  {
+    auto check_var =
+      get_fresh_aux_symbol(
+        bool_typet(),
+        id2string(function_id),
+        "__check_assigns_clause_incl_loop_" + std::to_string(idx),
+        loop_head_location,
+        mode,
+        symbol_table)
+        .symbol_expr();
+
+    code_function_callt check_incl_call(
+      check_var,
+      library
+        .dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ASSIGNS_CLAUSE_INCLUSION]
+        .symbol_expr(),
+      {outer_write_set, write_set});
+
+    code_assertt assertion{check_incl_call};
+    assertion.add_source_location() = loop_head_location;
+    assertion.add_source_location().set_comment(
+      "Check loop invariant before entry");
+    converter.goto_convert(assertion, step_instrs, mode);
+  }
+
+  goto_function.body.destructive_insert(
+    loop_head, add_pragma_disable_assigns_check(step_instrs));
+
+  // Generate havocing code for assignment targets.
+  // ASSIGN in_loop_havoc_block = true;
+  // havoc (assigns_set);
+  // ASSIGN in_loop_havoc_block = false;
+  const auto in_loop_havoc_block =
+    new_tmp_symbol(
+      bool_typet(),
+      loop_head_location,
+      mode,
+      symbol_table,
+      std::string(IN_LOOP_HAVOC_BLOCK) + +"__" + std::to_string(loop_number))
+      .symbol_expr();
+  step_instrs.add(
+    goto_programt::make_decl(in_loop_havoc_block, loop_head_location));
+  step_instrs.add(
+    goto_programt::make_assignment(in_loop_havoc_block, true_exprt{}));
+  havoc_assigns_targetst havoc_gen(to_havoc, ns);
+  havoc_gen.append_full_havoc_code(loop_head_location, step_instrs);
+  step_instrs.add(
+    goto_programt::make_assignment(in_loop_havoc_block, false_exprt{}));
+
+  // Insert the second block of step_instrs: the havocing code.
+  // We do not `add_pragma_disable_assigns_check`,
+  // so that the enclosing scope's assigns clause instrumentation
+  // would pick these havocs up for inclusion (subset) checks.
+  goto_function.body.destructive_insert(loop_head, step_instrs);
+
+  // Generate: assume(invariant) just after havocing
+  // We use a block scope for assumption, since it's immediately goto converted,
+  // and doesn't need to be kept around.
+  {
+    code_assumet assumption{invariant};
+    assumption.add_source_location() = loop_head_location;
+    converter.goto_convert(assumption, step_instrs, mode);
+  }
+
+  // Create fresh temporary variables that store the multidimensional
+  // decreases clause's value before and after the loop
+
+  // Temporary variables for storing the multidimensional decreases clause
+  // at the start of and end of a loop body
+  std::vector<symbol_exprt> old_decreases_vars, new_decreases_vars;
+  const auto &decreases_clause_exprs = decreases_clause.operands();
+
+  for(const auto &clause : decreases_clause.operands())
+  {
+    const auto old_decreases_var =
+      new_tmp_symbol(clause.type(), loop_head_location, mode, symbol_table)
+        .symbol_expr();
+    step_instrs.add(
+      goto_programt::make_decl(old_decreases_var, loop_head_location));
+    old_decreases_vars.push_back(old_decreases_var);
+
+    const auto new_decreases_var =
+      new_tmp_symbol(clause.type(), loop_head_location, mode, symbol_table)
+        .symbol_expr();
+    step_instrs.add(
+      goto_programt::make_decl(new_decreases_var, loop_head_location));
+    new_decreases_vars.push_back(new_decreases_var);
+  }
+
+  // Generate: assignments to store the multidimensional decreases clause's
+  // value just before the loop_head
+  if(!decreases_clause.is_nil())
+  {
+    for(size_t i = 0; i < old_decreases_vars.size(); i++)
+    {
+      code_assignt old_decreases_assignment{
+        old_decreases_vars[i], decreases_clause_exprs[i]};
+      old_decreases_assignment.add_source_location() = loop_head_location;
+      converter.goto_convert(old_decreases_assignment, step_instrs, mode);
+    }
+  }
+
+  goto_function.body.destructive_insert(
+    loop_head, add_pragma_disable_assigns_check(step_instrs));
+
+  //                           * HEAD:
+  // loop assigns check     ,-     ... eval guard ...
+  //  + assertions added    |      if (!guard)
+  // func assigns check     |        goto EXIT;
+  //  - disabled via pragma `-     ... loop body ...
+  //                        ,-     entered_loop = true
+  //                        |      if (in_base_case)
+  //                        |        goto STEP;
+  // loop assigns check     |      assert (invariant_expr);
+  //  - unchecked, temps    |      new_variant_val = decreases_clause_expr;
+  // func assigns check     |      assert (new_variant_val < old_variant_val);
+  //                        |  *   assume (false);
+  // `pre_loop_end_instrs` are to be inserted before `loop_end`.
+
+  goto_programt pre_loop_latch_instrs;
+
+  // Jump back to the step case to havoc the write set, assume the invariant,
+  // and execute an arbitrary iteration.
+  pre_loop_latch_instrs.add(goto_programt::make_goto(
+    step_case_target, in_base_case, loop_head_location));
+
+  // The following code is only reachable in the step case,
+  // i.e., when in_base_case == false,
+  // because of the unconditional jump above.
+
+  // Generate the inductiveness check:
+  //   assert(invariant)
+  // We use a block scope for assertion, since it's immediately goto converted,
+  // and doesn't need to be kept around.
+  {
+    code_assertt assertion{invariant};
+    assertion.add_source_location() = loop_head_location;
+    assertion.add_source_location().set_comment(
+      "Check that loop invariant is preserved");
+    converter.goto_convert(assertion, pre_loop_latch_instrs, mode);
+  }
+
+  // Generate: assignments to store the multidimensional decreases clause's
+  // value after one iteration of the loop
+  if(!decreases_clause.is_nil())
+  {
+    for(size_t i = 0; i < new_decreases_vars.size(); i++)
+    {
+      code_assignt new_decreases_assignment{
+        new_decreases_vars[i], decreases_clause_exprs[i]};
+      new_decreases_assignment.add_source_location() = loop_head_location;
+      converter.goto_convert(
+        new_decreases_assignment, pre_loop_latch_instrs, mode);
+    }
+
+    // Generate: assertion that the multidimensional decreases clause's value
+    // after the loop is lexicographically smaller than its initial value.
+    code_assertt monotonic_decreasing_assertion{
+      generate_lexicographic_less_than_check(
+        new_decreases_vars, old_decreases_vars)};
+    monotonic_decreasing_assertion.add_source_location() = loop_head_location;
+    monotonic_decreasing_assertion.add_source_location().set_comment(
+      "Check decreases clause on loop iteration");
+    converter.goto_convert(
+      monotonic_decreasing_assertion, pre_loop_latch_instrs, mode);
+
+    // Discard the temporary variables that store decreases clause's value
+    for(size_t i = 0; i < old_decreases_vars.size(); i++)
+    {
+      pre_loop_latch_instrs.add(
+        goto_programt::make_dead(old_decreases_vars[i], loop_head_location));
+      pre_loop_latch_instrs.add(
+        goto_programt::make_dead(new_decreases_vars[i], loop_head_location));
+    }
+  }
+
+  insert_before_swap_and_advance(
+    goto_function.body,
+    loop_latch,
+    add_pragma_disable_assigns_check(pre_loop_latch_instrs));
+
+  // change the back edge into assume(false) or assume(guard)
+  loop_latch->turn_into_assume();
+  loop_latch->condition_nonconst() = boolean_negate(loop_latch->condition());
+
+  std::set<goto_programt::targett> seen_targets;
+  // Find all exit points of the loop, make temporary variables `DEAD`,
+  // and check that step case was checked for non-vacuous loops.
+  for(goto_programt::instructiont::targett t =
+        goto_function.body.instructions.begin();
+      t != goto_function.body.instructions.end();
+      t++)
+  {
+    if(!t->is_goto() || get_loop_id_from_target(t) != idx)
+      continue;
+
+    auto exit_target = t->get_target();
+    if(
+      get_loop_id_from_target(exit_target) == idx ||
+      seen_targets.find(exit_target) != seen_targets.end())
+      continue;
+
+    seen_targets.insert(exit_target);
+
+    goto_programt pre_loop_exit_instrs;
+    // Assertion to check that step case was checked if we entered the loop.
+    source_locationt annotated_location = loop_head_location;
+    annotated_location.set_comment(
+      "Check that loop instrumentation was not truncated");
+    pre_loop_exit_instrs.add(goto_programt::make_assertion(
+      or_exprt{not_exprt{entered_loop}, not_exprt{in_base_case}},
+      annotated_location));
+
+    // Instructions to make all the temporaries go dead.
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(in_base_case, loop_head_location));
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(entered_loop, loop_head_location));
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(in_loop_havoc_block, loop_head_location));
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(initial_invariant_val, loop_head_location));
+    for(const auto &v : history_var_map)
+    {
+      pre_loop_exit_instrs.add(
+        goto_programt::make_dead(to_symbol_expr(v.second), loop_head_location));
+    }
+    pre_loop_exit_instrs.add(
+      goto_programt::make_dead(to_symbol_expr(write_set), loop_head_location));
+    if(!decreases_clause.is_nil())
+    { // Discard the temporary variables that store decreases clause's value
+      for(size_t i = 0; i < old_decreases_vars.size(); i++)
+      {
+        pre_loop_exit_instrs.add(
+          goto_programt::make_dead(old_decreases_vars[i], loop_head_location));
+        pre_loop_exit_instrs.add(
+          goto_programt::make_dead(new_decreases_vars[i], loop_head_location));
+      }
+    }
+
+    // Insert these instructions, preserving the loop end target.
+    insert_before_swap_and_advance(
+      goto_function.body, exit_target, pre_loop_exit_instrs);
   }
 }
 
@@ -664,9 +1136,19 @@ void dfcc_instrumentt::instrument_function_body(
       loop_node.decreases_clause.is_nil())
       continue;
 
+    // TODO: Fix loop contract handling for do/while loops.
+    if(
+      loop_node.latch_target->is_goto() &&
+      !loop_node.latch_target->condition().is_true())
+    {
+      log.error() << "Loop contracts are unsupported on do/while loops: "
+                  << loop_node.head_target->source_location() << messaget::eom;
+      throw 0;
+    }
+
     const auto &loop_filter =
       [&](const goto_programt::instructiont::targett &target)
-    { return get_loop_id_from_pragma(get_loop_id_pragma(target)) == idx; };
+    { return get_loop_id_from_target(target) == idx; };
 
     // TODO: check that no malloc and dealloc in loop body.
     // instrument the loop body
@@ -682,6 +1164,10 @@ void dfcc_instrumentt::instrument_function_body(
       function_pointer_contracts);
   }
 
+  const auto &not_in_loop_filter =
+    [&](const goto_programt::instructiont::targett &target)
+  { return !is_loop_instruction(target); };
+
   // instrument the whole body
   instrument_instructions(
     function_id,
@@ -691,7 +1177,7 @@ void dfcc_instrumentt::instrument_function_body(
     body.instructions.end(),
     cfg_info,
     // don't skip any instructions
-    {},
+    not_in_loop_filter,
     function_pointer_contracts);
 
   // insert add/remove instructions for local statics
