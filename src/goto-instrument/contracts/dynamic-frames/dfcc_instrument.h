@@ -105,7 +105,7 @@ public:
   /// variables in the write set.
   ///
   /// \pre The function must be a function wrapped for contract checking or
-  /// replacemend. For other functions \ref instrument_function must be used
+  /// replacement. For other functions \ref instrument_function must be used
   /// instead.
   ///
   /// \param wrapped_function_id The name of the function, used to retrieve the
@@ -309,7 +309,7 @@ protected:
 
   /// Instrument the \p lhs of an `ASSIGN lhs := rhs` instruction by
   /// adding an inclusion check of \p lhs in \p write_set.
-  /// If \ref is_dead_object_update returns a successfull match, the matched
+  /// If \ref is_dead_object_update returns a successful match, the matched
   /// pointer expression is removed from \p write_set.
   /// If \p rhs is a `side_effect_expr(ID_allocate)`, the allocated pointer gets
   /// added to the \p write_set.
@@ -332,7 +332,7 @@ protected:
   /// Before calling a function pointer, performs a dynamic lookup into
   /// the map of instrumented function provided by
   /// \ref dfcc_libraryt.get_instrumented_functions_map_symbol,
-  /// and passes the write_set parameter to the funciton pointer only if
+  /// and passes the write_set parameter to the function pointer only if
   /// it points to a function known to be instrumented and hence able to accept
   /// this parameter.
   /// \pre \p target points to a `CALL` instruction where the function

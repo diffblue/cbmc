@@ -133,7 +133,7 @@ void dfcc_instrumentt::get_instrumented_functions(
   are allowed for deallocation by the write set.
 
   There is also a number of CPROVER global static symbols that are used to
-  suport memory safety property instrumentation, and assignments to these
+  support memory safety property instrumentation, and assignments to these
   statics should always be allowed (i.e not instrumented):
   - __CPROVER_alloca_object,
   - __CPROVER_dead_object,
@@ -831,7 +831,7 @@ void dfcc_instrumentt::instrument_assign(
   if(rhs.id() == ID_side_effect && rhs.get(ID_statement) == ID_allocate)
   {
     // ```
-    // CALL lhs := side_effect(statemet = ID_allocate, args = {size, clear});
+    // CALL lhs := side_effect(statement = ID_allocate, args = {size, clear});
     // ----
     // IF !write_set GOTO skip_target;
     // CALL add_allocated(write_set, lhs);
@@ -1078,7 +1078,7 @@ void dfcc_instrumentt::instrument_other(
     // DEAD check_array_set;
     // skip_target: SKIP;
     // ----
-    // OTHER {statemet = array_set, args = {dest, value}};
+    // OTHER {statement = array_set, args = {dest, value}};
     // ```
     const auto &mode = utils.get_function_symbol(function_id).mode;
     goto_programt payload;
@@ -1139,7 +1139,7 @@ void dfcc_instrumentt::instrument_other(
     // DEAD check_array_replace;
     // skip_target: SKIP;
     // ----
-    // OTHER {statemet = array_replace, args = {dest, src}};
+    // OTHER {statement = array_replace, args = {dest, src}};
     // ```
     const auto &mode = utils.get_function_symbol(function_id).mode;
     goto_programt payload;
