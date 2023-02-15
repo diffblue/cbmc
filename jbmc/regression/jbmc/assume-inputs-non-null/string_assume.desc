@@ -1,6 +1,6 @@
-THOROUGH
+CORE
 My
---function My.stringArg --java-assume-inputs-non-null
+--function My.stringArg --java-assume-inputs-non-null --max-nondet-string-length 10
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -10,6 +10,3 @@ My
 ^warning: ignoring
 --
 Check that --java-assume-inputs-non-null restricts inputs to non-null strings
-
-The test is marked "THOROUGH" as it requires more memory than may be available
-on some GitHub runners.
