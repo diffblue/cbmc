@@ -89,6 +89,9 @@ protected:
   // consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();
+
+  // emit a warning for non-existent solver
+  void emit_solver_warning(const std::string &solver);
 };
 
 /// Parse solver-related command-line parameters in \p cmdline and set
@@ -104,6 +107,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(mathsat)"                                                                  \
   "(cprover-smt2)"                                                             \
   "(incremental-smt2-solver):"                                                 \
+  "(sat-solver):"                                                              \
   "(external-sat-solver):"                                                     \
   "(no-sat-preprocessor)"                                                      \
   "(beautify)"                                                                 \
@@ -126,6 +130,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " --smt2                       use default SMT2 solver (Z3)\n"               \
   " --bitwuzla                   use Bitwuzla\n"                               \
   " --boolector                  use Boolector\n"                              \
+  " --sat-solver solver          use specified SAT solver\n"                   \
   " --cprover-smt2               use CPROVER SMT2 solver\n"                    \
   " --cvc3                       use CVC3\n"                                   \
   " --cvc4                       use CVC4\n"                                   \

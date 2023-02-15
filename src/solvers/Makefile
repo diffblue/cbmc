@@ -66,6 +66,7 @@ ifneq ($(CADICAL),)
   CADICAL_INCLUDE=-I $(CADICAL)/src
   CADICAL_LIB=$(CADICAL)/build/libcadical$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_CADICAL
+  CLEANFILES += $(CADICAL_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(CADICAL_LIB))
 endif
 
 SRC = $(BOOLEFORCE_SRC) \
@@ -274,6 +275,9 @@ endif
 
 solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
 	$(LINKLIB)
+
+../../cadical/build/libcadical$(LIBEXT):
+	$(MAKE) $(MAKEARGS) -C $(CADICAL)/build libcadical.a CXX="$(CXX)" CXXFLAGS="$(CP_CXXFLAGS)"
 
 -include smt2/smt2_solver$(DEPEXT)
 

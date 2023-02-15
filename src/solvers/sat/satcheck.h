@@ -60,64 +60,82 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #if defined SATCHECK_ZCHAFF
+#  include "satcheck_zchaff.h"
+#endif
 
-#include "satcheck_zchaff.h"
+#if defined SATCHECK_BOOLEFORCE
+#  include "satcheck_booleforce.h"
+#endif
+
+#if defined SATCHECK_MINISAT1
+#  include "satcheck_minisat.h"
+#endif
+
+#if defined SATCHECK_MINISAT2
+#  include "satcheck_minisat2.h"
+#endif
+
+#if defined SATCHECK_IPASIR
+#  include "satcheck_ipasir.h"
+#endif
+
+#if defined SATCHECK_PICOSAT
+#  include "satcheck_picosat.h"
+#endif
+
+#if defined SATCHECK_LINGELING
+#  include "satcheck_lingeling.h"
+#endif
+
+#if defined SATCHECK_GLUCOSE
+#  include "satcheck_glucose.h"
+#endif
+
+#if defined SATCHECK_CADICAL
+#  include "satcheck_cadical.h"
+#endif
+
+#if defined SATCHECK_ZCHAFF
 
 typedef satcheck_zchafft satcheckt;
 typedef satcheck_zchafft satcheck_no_simplifiert;
 
 #elif defined SATCHECK_BOOLEFORCE
 
-#include "satcheck_booleforce.h"
-
 typedef satcheck_booleforcet satcheckt;
 typedef satcheck_booleforcet satcheck_no_simplifiert;
 
 #elif defined SATCHECK_MINISAT1
-
-#include "satcheck_minisat.h"
 
 typedef satcheck_minisat1t satcheckt;
 typedef satcheck_minisat1t satcheck_no_simplifiert;
 
 #elif defined SATCHECK_MINISAT2
 
-#include "satcheck_minisat2.h"
-
 typedef satcheck_minisat_simplifiert satcheckt;
 typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;
 
 #elif defined SATCHECK_IPASIR
-
-#include "satcheck_ipasir.h"
 
 typedef satcheck_ipasirt satcheckt;
 typedef satcheck_ipasirt satcheck_no_simplifiert;
 
 #elif defined SATCHECK_PICOSAT
 
-#include "satcheck_picosat.h"
-
 typedef satcheck_picosatt satcheckt;
 typedef satcheck_picosatt satcheck_no_simplifiert;
 
 #elif defined SATCHECK_LINGELING
-
-#include "satcheck_lingeling.h"
 
 typedef satcheck_lingelingt satcheckt;
 typedef satcheck_lingelingt satcheck_no_simplifiert;
 
 #elif defined SATCHECK_GLUCOSE
 
-#include "satcheck_glucose.h"
-
 typedef satcheck_glucose_simplifiert satcheckt;
 typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
 
 #elif defined SATCHECK_CADICAL
-
-#include "satcheck_cadical.h"
 
 typedef satcheck_cadicalt satcheckt;
 typedef satcheck_cadicalt satcheck_no_simplifiert;

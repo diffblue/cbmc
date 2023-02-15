@@ -1,0 +1,9 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend 
+test.c
+--sat-solver lingeling
+^EXIT=0$
+^SIGNAL=0$
+The specified solver, 'lingeling', is not available\. The default solver will be used instead\.
+\[main\.assertion\.1] line \d+ assertion x == y: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--

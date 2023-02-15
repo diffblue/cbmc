@@ -92,7 +92,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
-          make -C src minisat2-download
+          make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
@@ -118,7 +118,7 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: |
-          make -C src       -j2
+          make -C src       -j2 MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
           make -C unit      -j2
           make -C jbmc/src  -j2
           make -C jbmc/unit -j2
@@ -223,7 +223,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Check that doc task works
         run: ninja -C build doc
       - name: Zero ccache stats and limit in size
@@ -260,7 +260,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
-          make -C src minisat2-download
+          make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
@@ -290,7 +290,7 @@ jobs:
           make -C src/cpp library_check
       - name: Build with make
         run: |
-          make -C src       -j2
+          make -C src       -j2 MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
           make -C unit      -j2
           make -C jbmc/src  -j2
           make -C jbmc/unit -j2
@@ -348,7 +348,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Check that doc task works
         run: ninja -C build doc
       - name: Zero ccache stats and limit in size
@@ -439,7 +439,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
@@ -482,8 +482,8 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build using Make
         run: |
-          make -C src minisat2-download
-          make -C src -j3 CXX="ccache clang++"
+          make -C src minisat2-download cadical-download
+          make -C src -j3 CXX="ccache clang++" MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
           make -C jbmc/src -j3 CXX="ccache clang++"
           make -C unit "CXX=ccache clang++"
           make -C jbmc/unit "CXX=ccache clang++"

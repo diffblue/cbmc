@@ -39,7 +39,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build using Ninja
@@ -112,7 +112,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build using Ninja
@@ -198,7 +198,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build using Ninja
