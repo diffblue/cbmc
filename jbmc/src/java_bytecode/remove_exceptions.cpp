@@ -95,7 +95,7 @@ public:
     message_handlert &_message_handler)
     : symbol_table(_symbol_table),
       class_hierarchy(_class_hierarchy),
-      function_may_throw(_function_may_throw),
+      function_may_throw(std::move(_function_may_throw)),
       remove_added_instanceof(_remove_added_instanceof),
       message_handler(_message_handler)
   {
