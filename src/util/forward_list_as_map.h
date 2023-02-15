@@ -34,7 +34,7 @@ public:
   {
   }
 
-  void remove(const keyt &name)
+  void erase(const keyt &name)
   {
     const_iterator it = this->lower_bound(name);
 
@@ -90,6 +90,23 @@ public:
     }
     else
       it->second = std::move(irep);
+
+    return it->second;
+  }
+
+  mappedt &emplace(const keyt &name, const mappedt &irep)
+  {
+    iterator it = mutable_lower_bound(name);
+
+    if(it == this->end() || it->first != name)
+    {
+      iterator before = this->before_begin();
+      while(std::next(before) != it)
+        ++before;
+      it = this->emplace_after(before, name, irep);
+    }
+    else
+      it->second = irep;
 
     return it->second;
   }

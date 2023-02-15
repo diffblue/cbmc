@@ -1,5 +1,4 @@
 // Author: Diffblue Ltd.
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
@@ -22,6 +21,7 @@
 #include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 
+#include <algorithm>
 #include <functional>
 #include <numeric>
 

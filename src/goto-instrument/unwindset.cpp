@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/abstract_goto_model.h>
 
+#include <algorithm>
 #include <fstream>
 
 void unwindsett::parse_unwind(const std::string &unwind)

@@ -4,6 +4,8 @@
 
 #include <util/range.h>
 
+#include <algorithm>
+
 // Define the irep_idts for commands.
 #define COMMAND_ID(the_id)                                                     \
   const irep_idt ID_smt_##the_id##_command{"smt_" #the_id "_command"};

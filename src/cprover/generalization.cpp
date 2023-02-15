@@ -16,6 +16,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "solver.h"
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 

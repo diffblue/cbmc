@@ -75,31 +75,18 @@ irept irep_serializationt::read_irep(std::istream &in)
     sub.push_back(reference_convert(in));
   }
 
-#if NAMED_SUB_IS_FORWARD_LIST
-  irept::named_subt::iterator before = named_sub.before_begin();
-#endif
   while(in.peek()=='N')
   {
     in.get();
     irep_idt id = read_string_ref(in);
-#if NAMED_SUB_IS_FORWARD_LIST
-    named_sub.emplace_after(before, id, reference_convert(in));
-    ++before;
-#else
     named_sub.emplace(id, reference_convert(in));
-#endif
   }
 
   while(in.peek()=='C')
   {
     in.get();
     irep_idt id = read_string_ref(in);
-#if NAMED_SUB_IS_FORWARD_LIST
-    named_sub.emplace_after(before, id, reference_convert(in));
-    ++before;
-#else
     named_sub.emplace(id, reference_convert(in));
-#endif
   }
 
   if(in.get()!=0)

@@ -6,9 +6,11 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
+#include <util/bitvector_expr.h>
+
 #include "boolbv.h"
 
-#include <util/bitvector_expr.h>
+#include <algorithm>
 
 bvt boolbvt::convert_bitreverse(const bitreverse_exprt &expr)
 {
