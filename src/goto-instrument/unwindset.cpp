@@ -36,7 +36,9 @@ void unwindsett::parse_unwindset_one_loop(
   if(val.empty())
     return;
 
-  optionalt<unsigned> thread_nr;
+  // we should use optionalt<unsigned> here, but then GCC 12 wrongly complains that we may be using an uninitialized variable
+  unsigned thread_nr = 0;
+  bool thread_nr_is_set = false;
   if(isdigit(val[0]))
   {
     auto c_pos = val.find(':');
@@ -44,6 +46,7 @@ void unwindsett::parse_unwindset_one_loop(
     {
       std::string nr = val.substr(0, c_pos);
       thread_nr = unsafe_string2unsigned(nr);
+      thread_nr_is_set = true;
       val.erase(0, nr.size() + 1);
     }
   }
@@ -171,8 +174,10 @@ void unwindsett::parse_unwindset_one_loop(
     else
       uw = unsafe_string2unsigned(uw_string);
 
-    if(thread_nr.has_value())
-      thread_loop_map[std::pair<irep_idt, unsigned>(id, *thread_nr)] = uw;
+    if(thread_nr_is_set)
+    {
+      thread_loop_map[std::make_pair(id, thread_nr)] = uw;
+    }
     else
       loop_map[id] = uw;
   }
