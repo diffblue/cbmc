@@ -172,9 +172,19 @@ void unwindsett::parse_unwindset_one_loop(
       uw = unsafe_string2unsigned(uw_string);
 
     if(thread_nr.has_value())
+    {
+// Work around spurious GCC 12 warning about thread_nr being uninitialised.
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
       thread_loop_map[std::pair<irep_idt, unsigned>(id, *thread_nr)] = uw;
+#pragma GCC diagnostic pop
+    }
     else
+    {
       loop_map[id] = uw;
+    }
   }
 }
 
