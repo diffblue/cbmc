@@ -1,6 +1,6 @@
 THOROUGH
 main.c
-
+--sat-solver cadical
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -8,3 +8,6 @@ main.c
 ^\*\* 1 of 3 failed
 --
 ^warning: ignoring
+--
+MiniSat takes approximately 1 hour on this test while CaDiCaL completes in under
+3 minutes.

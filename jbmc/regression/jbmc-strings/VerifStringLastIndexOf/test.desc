@@ -1,6 +1,10 @@
 THOROUGH
 Test
---function Test.check --max-nondet-string-length 50 --unwind 50 --java-assume-inputs-non-null  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+--function Test.check --max-nondet-string-length 50 --unwind 50 --java-assume-inputs-non-null  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --sat-solver cadical
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$
+--
+--
+This test takes approximately 3 minutes when using MiniSat, and less than 1
+minute when using CaDiCaL.

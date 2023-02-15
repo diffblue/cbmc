@@ -1,7 +1,10 @@
 THOROUGH
 easychair
---max-nondet-string-length 1000
+--max-nondet-string-length 1000 --sat-solver cadical
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion\.1\].* line 30.* FAILURE$
 --
+--
+This test takes approximately 2 minutes when using MiniSat, and just 20 seconds
+when using CaDiCaL.
