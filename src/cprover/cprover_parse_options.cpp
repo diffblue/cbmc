@@ -218,17 +218,15 @@ int cprover_parse_optionst::main()
       return CPROVER_EXIT_SUCCESS;
     }
 
-// gcc produces a spurious warning on optionalt<irep_idt>.
-// This will likely go away once we use std::optional<irep_idt>.
-// To make clang ignore the pragma, we need to guard it with an ifdef.
-#pragma GCC diagnostic push
-#ifndef __clang__
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-    optionalt<irep_idt> contract = cmdline.isset("contract")
-                                     ? irep_idt(cmdline.get_value("contract"))
-                                     : optionalt<irep_idt>{};
-#pragma GCC diagnostic pop
+    // gcc produces a spurious warning for optionalt<irep_idt> if initialised
+    // with ternary operator. Initialising with an immediately invoked lamda
+    // avoids this.
+    const auto contract = [&]() -> optionalt<irep_idt> {
+      if(cmdline.isset("contract"))
+        return {cmdline.get_value("contract")};
+      else
+        return {};
+    }();
 
     if(cmdline.isset("smt2") || cmdline.isset("text") || variable_encoding)
     {
