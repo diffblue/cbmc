@@ -157,38 +157,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --external-sat-solver cmd    command to invoke SAT solver process\n&quot;</span>       \</div>
-<div class="line">  <span class="stringliteral">&quot; --no-sat-preprocessor        disable the SAT solver&#39;s simplifier\n&quot;</span>        \</div>
-<div class="line">  <span class="stringliteral">&quot; --dimacs                     generate CNF in DIMACS format\n&quot;</span>              \</div>
-<div class="line">  <span class="stringliteral">&quot; --beautify                   beautify the counterexample\n&quot;</span>                \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (greedy heuristic)\n&quot;</span>                         \</div>
-<div class="line">  <span class="stringliteral">&quot; --smt1                       use default SMT1 solver (obsolete)\n&quot;</span>         \</div>
-<div class="line">  <span class="stringliteral">&quot; --smt2                       use default SMT2 solver (Z3)\n&quot;</span>               \</div>
-<div class="line">  <span class="stringliteral">&quot; --bitwuzla                   use Bitwuzla\n&quot;</span>                               \</div>
-<div class="line">  <span class="stringliteral">&quot; --boolector                  use Boolector\n&quot;</span>                              \</div>
-<div class="line">  <span class="stringliteral">&quot; --cprover-smt2               use CPROVER SMT2 solver\n&quot;</span>                    \</div>
-<div class="line">  <span class="stringliteral">&quot; --cvc3                       use CVC3\n&quot;</span>                                   \</div>
-<div class="line">  <span class="stringliteral">&quot; --cvc4                       use CVC4\n&quot;</span>                                   \</div>
-<div class="line">  <span class="stringliteral">&quot; --cvc5                       use CVC5\n&quot;</span>                                   \</div>
-<div class="line">  <span class="stringliteral">&quot; --mathsat                    use MathSAT\n&quot;</span>                                \</div>
-<div class="line">  <span class="stringliteral">&quot; --yices                      use Yices\n&quot;</span>                                  \</div>
-<div class="line">  <span class="stringliteral">&quot; --z3                         use Z3\n&quot;</span>                                     \</div>
-<div class="line">  <span class="stringliteral">&quot; --fpa                        use theory of floating-point arithmetic\n&quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot; --refine                     use refinement procedure (experimental)\n&quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot; --refine-arrays              use refinement for arrays only\n&quot;</span>             \</div>
-<div class="line">  <span class="stringliteral">&quot; --refine-arithmetic          refinement of arithmetic expressions only\n&quot;</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot; --max-node-refinement        maximum refinement iterations for\n&quot;</span>          \</div>
-<div class="line">  <span class="stringliteral">&quot;                              arithmetic expressions\n&quot;</span>                     \</div>
-<div class="line">  <span class="stringliteral">&quot; --incremental-smt2-solver cmd\n&quot;</span>                                           \</div>
-<div class="line">  <span class="stringliteral">&quot;                              command to invoke external SMT solver for\n&quot;</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot;                              incremental solving (experimental)\n&quot;</span>         \</div>
-<div class="line">  <span class="stringliteral">&quot; --outfile filename           output formula to given file\n&quot;</span>               \</div>
-<div class="line">  <span class="stringliteral">&quot; --dump-smt-formula filename  output smt incremental formula to the\n&quot;</span>      \</div>
-<div class="line">  <span class="stringliteral">&quot;                              given file\n&quot;</span>                                 \</div>
-<div class="line">  <span class="stringliteral">&quot; --write-solver-stats-to json-file\n&quot;</span>                                       \</div>
-<div class="line">  <span class="stringliteral">&quot;                              collect the solver query complexity\n&quot;</span></div>
-</div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="solver__factory_8h_source.html#l00119">119</a> of file <a class="el" href="solver__factory_8h_source.html">solver_factory.h</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="solver__factory_8h_source.html#l00123">123</a> of file <a class="el" href="solver__factory_8h_source.html">solver_factory.h</a>.</p>
 
 </div>
 </div>
@@ -211,6 +181,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(mathsat)&quot;</span>                                                                  \</div>
 <div class="line">  <span class="stringliteral">&quot;(cprover-smt2)&quot;</span>                                                             \</div>
 <div class="line">  <span class="stringliteral">&quot;(incremental-smt2-solver):&quot;</span>                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;(sat-solver):&quot;</span>                                                              \</div>
 <div class="line">  <span class="stringliteral">&quot;(external-sat-solver):&quot;</span>                                                     \</div>
 <div class="line">  <span class="stringliteral">&quot;(no-sat-preprocessor)&quot;</span>                                                      \</div>
 <div class="line">  <span class="stringliteral">&quot;(beautify)&quot;</span>                                                                 \</div>
@@ -223,7 +194,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(dump-smt-formula):&quot;</span>                                                        \</div>
 <div class="line">  <span class="stringliteral">&quot;(write-solver-stats-to):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="solver__factory_8h_source.html#l00098">98</a> of file <a class="el" href="solver__factory_8h_source.html">solver_factory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8h_source.html#l00101">101</a> of file <a class="el" href="solver__factory_8h_source.html">solver_factory.h</a>.</p>
 
 </div>
 </div>
@@ -256,7 +227,7 @@ Functions</h2></td></tr>
 
 <p>Parse solver-related command-line parameters in <code>cmdline</code> and set corresponding values in <code>options</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00602">602</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00742">742</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 
 </div>
 </div>

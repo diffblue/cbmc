@@ -135,8 +135,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9d92af9f13ea3818496c9c550803a5ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f1f19932a882fd970a2f8b73474f05b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a2f1f19932a882fd970a2f8b73474f05b">forward_list_as_mapt</a> (std::initializer_list&lt; std::pair&lt; keyt, mappedt &gt;&gt; list)</td></tr>
 <tr class="separator:a2f1f19932a882fd970a2f8b73474f05b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0de44d091bb362c36dae866e38d8e352"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a0de44d091bb362c36dae866e38d8e352">remove</a> (const keyt &amp;name)</td></tr>
-<tr class="separator:a0de44d091bb362c36dae866e38d8e352"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a994fa543b823f9e39db0a1ba00220a8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a994fa543b823f9e39db0a1ba00220a8a">erase</a> (const keyt &amp;name)</td></tr>
+<tr class="separator:a994fa543b823f9e39db0a1ba00220a8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e1bbcd6a2906844f5e38c9f019b27b1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classforward__list__as__mapt.html#aecd5b6b9b82610bffe4325aea534b6be">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a0e1bbcd6a2906844f5e38c9f019b27b1">find</a> (const keyt &amp;name) const</td></tr>
 <tr class="separator:a0e1bbcd6a2906844f5e38c9f019b27b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a981b52629b04c477b7a0359fb492eac1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classforward__list__as__mapt.html#a506d80019396d31a834c0b4f9ee1736d">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a981b52629b04c477b7a0359fb492eac1">add</a> (const keyt &amp;name)</td></tr>
@@ -145,6 +145,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aed79be12cded310caae6ed3563bee0f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c7a64a942ece224ee410f2f340c19f8"><td class="memItemLeft" align="right" valign="top">mappedt &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a5c7a64a942ece224ee410f2f340c19f8">add</a> (const keyt &amp;name, mappedt irep)</td></tr>
 <tr class="separator:a5c7a64a942ece224ee410f2f340c19f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9db2ccd81f5f2c1f6048f464e9b20026"><td class="memItemLeft" align="right" valign="top">mappedt &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a9db2ccd81f5f2c1f6048f464e9b20026">emplace</a> (const keyt &amp;name, const mappedt &amp;irep)</td></tr>
+<tr class="separator:a9db2ccd81f5f2c1f6048f464e9b20026"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a266b2ccb3d80cc47c77d413b989abc9c"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforward__list__as__mapt.html#a266b2ccb3d80cc47c77d413b989abc9c">size</a> () const</td></tr>
 <tr class="separator:a266b2ccb3d80cc47c77d413b989abc9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -353,6 +355,76 @@ template&lt;typename keyt , typename mappedt &gt; </div>
 
 </div>
 </div>
+<a id="a9db2ccd81f5f2c1f6048f464e9b20026"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9db2ccd81f5f2c1f6048f464e9b20026">&#9670;&nbsp;</a></span>emplace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename keyt , typename mappedt &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">mappedt&amp; <a class="el" href="classforward__list__as__mapt.html">forward_list_as_mapt</a>&lt; keyt, mappedt &gt;::emplace </td>
+          <td>(</td>
+          <td class="paramtype">const keyt &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const mappedt &amp;&#160;</td>
+          <td class="paramname"><em>irep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00097">97</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
+
+</div>
+</div>
+<a id="a994fa543b823f9e39db0a1ba00220a8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a994fa543b823f9e39db0a1ba00220a8a">&#9670;&nbsp;</a></span>erase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename keyt , typename mappedt &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classforward__list__as__mapt.html">forward_list_as_mapt</a>&lt; keyt, mappedt &gt;::erase </td>
+          <td>(</td>
+          <td class="paramtype">const keyt &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00037">37</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
+
+</div>
+</div>
 <a id="a0e1bbcd6a2906844f5e38c9f019b27b1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0e1bbcd6a2906844f5e38c9f019b27b1">&#9670;&nbsp;</a></span>find()</h2>
 
@@ -409,7 +481,7 @@ template&lt;typename keyt , typename mappedt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00108">108</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00125">125</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
 
 </div>
 </div>
@@ -439,7 +511,7 @@ template&lt;typename keyt , typename mappedt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00113">113</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00130">130</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
 
 </div>
 </div>
@@ -509,37 +581,7 @@ template&lt;typename keyt , typename mappedt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00103">103</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
-
-</div>
-</div>
-<a id="a0de44d091bb362c36dae866e38d8e352"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0de44d091bb362c36dae866e38d8e352">&#9670;&nbsp;</a></span>remove()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename keyt , typename mappedt &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classforward__list__as__mapt.html">forward_list_as_mapt</a>&lt; keyt, mappedt &gt;::remove </td>
-          <td>(</td>
-          <td class="paramtype">const keyt &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00037">37</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00120">120</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
 
 </div>
 </div>
@@ -568,7 +610,7 @@ template&lt;typename keyt , typename mappedt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00097">97</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="forward__list__as__map_8h_source.html#l00114">114</a> of file <a class="el" href="forward__list__as__map_8h_source.html">forward_list_as_map.h</a>.</p>
 
 </div>
 </div>

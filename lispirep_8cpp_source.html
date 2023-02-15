@@ -140,53 +140,48 @@ $(document).ready(function(){initNavTree('lispirep_8cpp_source.html',''); initRe
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  dest.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>.clear();</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  dest.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192da19bed25bbdc77c31f5e2200525aa27d3">lispexprt::List</a>;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#if NAMED_SUB_IS_FORWARD_LIST</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">const</span> std::size_t named_sub_size =</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    std::distance(src.<a class="code" href="classirept.html#a42ee9bb9f5ef8ce2c3069496620462f6">get_named_sub</a>().begin(), src.<a class="code" href="classirept.html#a42ee9bb9f5ef8ce2c3069496620462f6">get_named_sub</a>().end());</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">const</span> std::size_t named_sub_size = src.<a class="code" href="classirept.html#a42ee9bb9f5ef8ce2c3069496620462f6">get_named_sub</a>().size();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  dest.reserve(2 + 2 * src.<a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>().size() + 2 * named_sub_size);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">const</span> std::size_t named_sub_size = src.<a class="code" href="classirept.html#a42ee9bb9f5ef8ce2c3069496620462f6">get_named_sub</a>().size();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  dest.reserve(2 + 2 * src.<a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>().size() + 2 * named_sub_size);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <a class="code" href="classlispexprt.html">lispexprt</a> id;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordtype">id</span>.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192daa4990da5b087fb106d1c3d73a14e8279">lispexprt::String</a>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordtype">id</span>.value=src.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  dest.push_back(<span class="keywordtype">id</span>);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classlispexprt.html">lispexprt</a> id;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordtype">id</span>.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192daa4990da5b087fb106d1c3d73a14e8279">lispexprt::String</a>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordtype">id</span>.value=src.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>();</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  dest.push_back(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="comment">// reserve objects for extra performance</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : src.<a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>())</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> name;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    name.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192daa4990da5b087fb106d1c3d73a14e8279">lispexprt::String</a>;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    name.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>.clear();</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    dest.push_back(name);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> sub;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="lispirep_8cpp.html#a5acfb63b9e64031bbfbb7a4ded91731f">irep2lisp</a>(irep, sub);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    dest.push_back(sub);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep_entry : src.<a class="code" href="classirept.html#a42ee9bb9f5ef8ce2c3069496620462f6">get_named_sub</a>())</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> name;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    name.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192daa4990da5b087fb106d1c3d73a14e8279">lispexprt::String</a>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    name.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a> = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(irep_entry.first);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    dest.push_back(name);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> sub;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <a class="code" href="lispirep_8cpp.html#a5acfb63b9e64031bbfbb7a4ded91731f">irep2lisp</a>(irep_entry.second, sub);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    dest.push_back(sub);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <a class="code" href="classlispexprt.html">lispexprt</a> nil;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  nil.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192dac6dca178d92a6dbf996e2541d39ac654">lispexprt::Symbol</a>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  nil.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>=<span class="stringliteral">&quot;nil&quot;</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  dest.push_back(nil);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="comment">// reserve objects for extra performance</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : src.<a class="code" href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">get_sub</a>())</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> name;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    name.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192daa4990da5b087fb106d1c3d73a14e8279">lispexprt::String</a>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    name.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>.clear();</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    dest.push_back(name);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> sub;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="lispirep_8cpp.html#a5acfb63b9e64031bbfbb7a4ded91731f">irep2lisp</a>(irep, sub);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    dest.push_back(sub);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep_entry : src.<a class="code" href="classirept.html#a42ee9bb9f5ef8ce2c3069496620462f6">get_named_sub</a>())</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> name;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    name.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192daa4990da5b087fb106d1c3d73a14e8279">lispexprt::String</a>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    name.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a> = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(irep_entry.first);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    dest.push_back(name);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="classlispexprt.html">lispexprt</a> sub;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="lispirep_8cpp.html#a5acfb63b9e64031bbfbb7a4ded91731f">irep2lisp</a>(irep_entry.second, sub);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    dest.push_back(sub);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  }</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <a class="code" href="classlispexprt.html">lispexprt</a> nil;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  nil.<a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192dac6dca178d92a6dbf996e2541d39ac654">lispexprt::Symbol</a>;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  nil.<a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>=<span class="stringliteral">&quot;nil&quot;</span>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  dest.push_back(nil);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;}</div>
 <div class="ttc" id="aclassirept_html"><div class="ttname"><a href="classirept.html">irept</a></div><div class="ttdoc">There are a large number of kinds of tree structured or tree-like data in CPROVER.</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00359">irep.h:372</a></div></div>
 <div class="ttc" id="aclassirept_html_a0ca41d4d612e6245e1225cb2ebeef6eb"><div class="ttname"><a href="classirept.html#a0ca41d4d612e6245e1225cb2ebeef6eb">irept::get_sub</a></div><div class="ttdeci">subt &amp; get_sub()</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00456">irep.h:456</a></div></div>
 <div class="ttc" id="aclassirept_html_a18969b6b063683cb74c5c245db809631"><div class="ttname"><a href="classirept.html#a18969b6b063683cb74c5c245db809631">irept::move_to_named_sub</a></div><div class="ttdeci">void move_to_named_sub(const irep_idt &amp;name, irept &amp;irep)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00026">irep.cpp:26</a></div></div>
