@@ -1,6 +1,6 @@
-THOROUGH
+CORE
 test
---unwind 10
+--unwind 10 --max-nondet-string-length 10
 ^\[java::test.main:\(\[Ljava/lang/String;\)V\.assertion.1\] line 14 assertion at file test\.java line 14 function java::test.main:\(\[Ljava/lang/String;\)V bytecode-index 21: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
@@ -15,6 +15,3 @@ test.main gives the following exception table:
     8    22    25   Class java/lang/Exception
     0     7    45   Class MyException
     8    42    45   Class MyException
-
-The test is marked "THOROUGH" as it requires more memory than may be available
-on some GitHub runners.

@@ -1,6 +1,6 @@
-THOROUGH
+CORE
 Main
---context-include Main.
+--context-include Main. --max-nondet-string-length 10
 ^EXIT=10$
 ^SIGNAL=0$
 .* line 12 assertion at file Main.java line 12 .*: SUCCESS
@@ -11,6 +11,3 @@ Main
 WARNING: no body for function .*
 --
 Tests that only methods from the specified class are included.
-
-The test is marked "THOROUGH" as it requires more memory than may be available
-on some GitHub runners.
