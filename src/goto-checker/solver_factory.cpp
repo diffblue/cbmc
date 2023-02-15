@@ -152,7 +152,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
     return get_incremental_smt2(incremental_smt2_solver);
   if(options.get_bool_option("smt2"))
     return get_smt2(get_smt2_solver_type());
-  return get_sat_solver();
+  return get_default();
 }
 
 /// Uses the options to pick an SMT 2.0 solver
@@ -214,7 +214,7 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
   return satcheck;
 }
 
-std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_sat_solver()
+std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
   auto solver = util_make_unique<solvert>();
   bool solver_set = false;
