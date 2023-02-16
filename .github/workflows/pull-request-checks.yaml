@@ -464,7 +464,7 @@ jobs:
           git checkout -- memory_allocation1 printf1 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
-  # This job takes approximately 73 to 95 minutes
+  # This job takes approximately 8 to 30 minutes
   check-ubuntu-20_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-20.04
     steps:
