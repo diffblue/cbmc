@@ -87,12 +87,6 @@ solver_factoryt::solvert::stack_decision_procedure() const
   return *solver;
 }
 
-propt &solver_factoryt::solvert::prop() const
-{
-  PRECONDITION(prop_ptr != nullptr);
-  return *prop_ptr;
-}
-
 void solver_factoryt::set_decision_procedure_time_limit(
   decision_proceduret &decision_procedure)
 {
