@@ -157,7 +157,7 @@ irept</h2>
 <p><code>irep</code>s are the underlying data structure used to implement many of the data structures in CBMC and the assorted tools. These include the <code>exprt</code>, <code>typet</code>, <code>codet</code> and <code><a class="el" href="classsource__locationt.html">source_locationt</a></code> classes. This is a tree data structure where each node is expected to contain a string/ID and may have child nodes stored in both a sequence of child nodes and a map of strings/IDs to child nodes. This enables the singular <code>irept</code> data structure to be used to model graphs such as ASTs, CFGs, etc.</p>
 <p>The classes extending <code>irept</code> define how the higher level concepts are mapped onto the underlying tree data structure. For this reason it is usually advised that the member functions of the sub-classes should be used to access the data held, rather than the member functions of the base <code>irept</code> class. This aids potential future restructuring and associates accesses of the data with the member functions which have the doxygen explaining what the data is.</p>
 <p>The strings/IDs held within <code>irept</code> are of type <code>irep_idt</code>. These can be converted to <code>std::string</code> using the <code>id2string</code> function. There is a mechanism provided for casting expressions and types in <a href="../../src/util/expr_cast.h"><code>src/util/expr_cast.h</code></a>. In depth documentation of the <code>irept</code> class itself can be found in <a href="../../src/util/irep.h"><code>src/util/irep.h</code></a>.</p>
-<p>Last modified: 2023-02-16 20:13:11 +0000 </p>
+<p>Last modified: 2023-02-16 22:43:21 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
