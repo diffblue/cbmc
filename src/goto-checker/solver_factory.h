@@ -38,7 +38,6 @@ public:
   class solvert final
   {
   public:
-    solvert() = default;
     explicit solvert(std::unique_ptr<decision_proceduret> p);
     solvert(std::unique_ptr<decision_proceduret> p1, std::unique_ptr<propt> p2);
     solvert(
@@ -47,7 +46,6 @@ public:
 
     decision_proceduret &decision_procedure() const;
     stack_decision_proceduret &stack_decision_procedure() const;
-    propt &prop() const;
 
     void set_decision_procedure(std::unique_ptr<decision_proceduret> p);
     void set_prop(std::unique_ptr<propt> p);
@@ -89,9 +87,6 @@ protected:
   // consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();
-
-  // emit a warning for non-existent solver
-  void emit_solver_warning(const std::string &solver);
 };
 
 /// Parse solver-related command-line parameters in \p cmdline and set

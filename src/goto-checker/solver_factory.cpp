@@ -87,12 +87,6 @@ solver_factoryt::solvert::stack_decision_procedure() const
   return *solver;
 }
 
-propt &solver_factoryt::solvert::prop() const
-{
-  PRECONDITION(prop_ptr != nullptr);
-  return *prop_ptr;
-}
-
 void solver_factoryt::set_decision_procedure_time_limit(
   decision_proceduret &decision_procedure)
 {
@@ -188,6 +182,17 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
   return s;
 }
 
+/// Emit a warning for non-existent solver \p solver via \p message_handler.
+static void emit_solver_warning(
+  message_handlert &message_handler,
+  const std::string &solver)
+{
+  messaget log(message_handler);
+  log.warning() << "The specified solver, '" << solver
+                << "', is not available. "
+                << "The default solver will be used instead." << messaget::eom;
+}
+
 template <typename SatcheckT>
 static std::unique_ptr<SatcheckT>
 make_satcheck_prop(message_handlert &message_handler, const optionst &options)
@@ -214,123 +219,107 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
   return satcheck;
 }
 
-std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
+static std::unique_ptr<propt>
+get_sat_solver(message_handlert &message_handler, const optionst &options)
 {
-  auto solver = util_make_unique<solvert>();
-  bool solver_set = false;
+  const bool no_simplifier = options.get_bool_option("beautify") ||
+                             !options.get_bool_option("sat-preprocessor") ||
+                             options.get_bool_option("refine") ||
+                             options.get_bool_option("refine-strings");
+
   if(options.is_set("sat-solver"))
   {
     const std::string &solver_option = options.get_option("sat-solver");
     if(solver_option == "zchaff")
     {
 #if defined SATCHECK_ZCHAFF
-      solver->set_prop(
-        make_satcheck_prop<satcheck_zchafft>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_zchafft>(message_handler, options);
 #else
-      emit_solver_warning("zchaff");
+      emit_solver_warning(message_handler, "zchaff");
 #endif
     }
     else if(solver_option == "booleforce")
     {
 #if defined SATCHECK_BOOLERFORCE
-      solver->set_prop(
-        make_satcheck_prop<satcheck_booleforcet>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_booleforcet>(message_handler, options);
 #else
-      emit_solver_warning("booleforce");
+      emit_solver_warning(message_handler, "booleforce");
 #endif
     }
     else if(solver_option == "minisat1")
     {
 #if defined SATCHECK_MINISAT1
-      solver->set_prop(
-        make_satcheck_prop<satcheck_minisat1t>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_minisat1t>(message_handler, options);
 #else
-      emit_solver_warning("minisat1");
+      emit_solver_warning(message_handler, "minisat1");
 #endif
     }
     else if(solver_option == "minisat2")
     {
 #if defined SATCHECK_MINISAT2
-      if(
-        options.get_bool_option("beautify") ||
-        !options.get_bool_option("sat-preprocessor")) // no simplifier
+      if(no_simplifier)
       {
         // simplifier won't work with beautification
-        solver->set_prop(make_satcheck_prop<satcheck_minisat_no_simplifiert>(
-          message_handler, options));
+        return make_satcheck_prop<satcheck_minisat_no_simplifiert>(
+          message_handler, options);
       }
       else // with simplifier
       {
-        solver->set_prop(make_satcheck_prop<satcheck_minisat_simplifiert>(
-          message_handler, options));
+        return make_satcheck_prop<satcheck_minisat_simplifiert>(
+          message_handler, options);
       }
-      solver_set = true;
 #else
-      emit_solver_warning("minisat2");
+      emit_solver_warning(message_handler, "minisat2");
 #endif
     }
     else if(solver_option == "ipasir")
     {
 #if defined SATCHECK_IPASIR
-      solver->set_prop(
-        make_satcheck_prop<satcheck_ipasirt>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_ipasirt>(message_handler, options);
 #else
-      emit_solver_warning("ipasir");
+      emit_solver_warning(message_handler, "ipasir");
 #endif
     }
     else if(solver_option == "picosat")
     {
 #if defined SATCHECK_PICOSAT
-      solver->set_prop(
-        make_satcheck_prop<satcheck_picosatt>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_picosatt>(message_handler, options);
 #else
-      emit_solver_warning("picosat");
+      emit_solver_warning(message_handler, "picosat");
 #endif
     }
     else if(solver_option == "lingeling")
     {
 #if defined SATCHECK_LINGELING
-      solver->set_prop(
-        make_satcheck_prop<satcheck_lingelingt>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_lingelingt>(message_handler, options);
 #else
-      emit_solver_warning("lingeling");
+      emit_solver_warning(message_handler, "lingeling");
 #endif
     }
     else if(solver_option == "glucose")
     {
 #if defined SATCHECK_GLUCOSE
-      if(
-        options.get_bool_option("beautify") ||
-        !options.get_bool_option("sat-preprocessor")) // no simplifier
+      if(no_simplifier)
       {
         // simplifier won't work with beautification
-        solver->set_prop(make_satcheck_prop<satcheck_glucose_no_simplifiert>(
-          message_handler, options));
+        return make_satcheck_prop<satcheck_glucose_no_simplifiert>(
+          message_handler, options);
       }
       else // with simplifier
       {
-        solver->set_prop(make_satcheck_prop<satcheck_glucose_simplifiert>(
-          message_handler, options));
+        return make_satcheck_prop<satcheck_glucose_simplifiert>(
+          message_handler, options);
       }
-      solver_set = true;
 #else
-      emit_solver_warning("glucose");
+      emit_solver_warning(message_handler, "glucose");
 #endif
     }
     else if(solver_option == "cadical")
     {
 #if defined SATCHECK_CADICAL
-      solver->set_prop(
-        make_satcheck_prop<satcheck_cadicalt>(message_handler, options));
-      solver_set = true;
+      return make_satcheck_prop<satcheck_cadicalt>(message_handler, options);
 #else
-      emit_solver_warning("cadical");
+      emit_solver_warning(message_handler, "cadical");
 #endif
     }
     else
@@ -341,27 +330,28 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       exit(CPROVER_EXIT_USAGE_ERROR);
     }
   }
-  if(!solver_set)
+
+  // default solver
+  if(no_simplifier)
   {
-    // default solver
-    if(
-      options.get_bool_option("beautify") ||
-      !options.get_bool_option("sat-preprocessor")) // no simplifier
-    {
-      // simplifier won't work with beautification
-      solver->set_prop(
-        make_satcheck_prop<satcheck_no_simplifiert>(message_handler, options));
-    }
-    else // with simplifier
-    {
-      solver->set_prop(make_satcheck_prop<satcheckt>(message_handler, options));
-    }
+    // simplifier won't work with beautification
+    return make_satcheck_prop<satcheck_no_simplifiert>(
+      message_handler, options);
   }
+  else // with simplifier
+  {
+    return make_satcheck_prop<satcheckt>(message_handler, options);
+  }
+}
+
+std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
+{
+  auto sat_solver = get_sat_solver(message_handler, options);
 
   bool get_array_constraints =
     options.get_bool_option("show-array-constraints");
   auto bv_pointers = util_make_unique<bv_pointerst>(
-    ns, solver->prop(), message_handler, get_array_constraints);
+    ns, *sat_solver, message_handler, get_array_constraints);
 
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
@@ -369,17 +359,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
   set_decision_procedure_time_limit(*bv_pointers);
-  solver->set_decision_procedure(std::move(bv_pointers));
 
-  return solver;
-}
-
-void solver_factoryt::emit_solver_warning(const std::string &solver)
-{
-  messaget log(message_handler);
-  log.warning() << "The specified solver, '" << solver
-                << "', is not available. "
-                << "The default solver will be used instead." << messaget::eom;
+  return util_make_unique<solvert>(
+    std::move(bv_pointers), std::move(sat_solver));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
@@ -413,16 +395,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 {
-  std::unique_ptr<propt> prop = [this]() -> std::unique_ptr<propt> {
-    // We offer the option to disable the SAT preprocessor
-    if(options.get_bool_option("sat-preprocessor"))
-    {
-      no_beautification();
-      return make_satcheck_prop<satcheckt>(message_handler, options);
-    }
-    return make_satcheck_prop<satcheck_no_simplifiert>(
-      message_handler, options);
-  }();
+  std::unique_ptr<propt> prop = get_sat_solver(message_handler, options);
 
   bv_refinementt::infot info;
   info.ns = &ns;
@@ -452,8 +425,7 @@ solver_factoryt::get_string_refinement()
 {
   string_refinementt::infot info;
   info.ns = &ns;
-  auto prop =
-    make_satcheck_prop<satcheck_no_simplifiert>(message_handler, options);
+  auto prop = get_sat_solver(message_handler, options);
   info.prop = prop.get();
   info.refinement_bound = DEFAULT_MAX_NB_REFINEMENT;
   info.output_xml = output_xml_in_refinement;
