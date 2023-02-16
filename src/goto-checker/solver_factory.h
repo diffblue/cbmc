@@ -89,9 +89,6 @@ protected:
   // consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();
-
-  // emit a warning for non-existent solver
-  void emit_solver_warning(const std::string &solver);
 };
 
 /// Parse solver-related command-line parameters in \p cmdline and set
