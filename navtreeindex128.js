@@ -1,5 +1,6 @@
 var NAVTREEINDEX128 =
 {
+"structscratch__program__symext.html#aea8770581521fe5df6bd6030a9cb4d09":[6,0,1015,0],
 "structshadow__memory__statet_1_1shadowed__addresst.html":[6,0,1021,0],
 "structshadow__memory__statet_1_1shadowed__addresst.html#a5ef62f533aee54998d221bdcbcfe3b2d":[6,0,1021,0,0],
 "structshadow__memory__statet_1_1shadowed__addresst.html#a6d1af533589030ffdc295432e8c913cb":[6,0,1021,0,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX128 =
 "structsmt__core__theoryt_1_1xort.html#ac27509a07a742a42b796aff0209c435b":[6,0,1085,7,1],
 "structsmt__function__application__termt_1_1has__indicest.html":[6,0,1092,1],
 "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01void__t_3_01decltypee12aeb38d6b102d3d76884f449b76745.html":[6,0,1092,2],
-"structsmt__is__dynamic__objectt.html":[6,0,1100],
-"structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03":[6,0,1100,0]
+"structsmt__is__dynamic__objectt.html":[6,0,1100]
 };
