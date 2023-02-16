@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Allows to clean expressions of side effects.">
+<g id="a_node1"><a xlink:title="Class that allows to clean expressions of side effects and to generate havoc_slice expressions.">
 <polygon fill="#bfbfbf" stroke="black" points="1836,-129.14 1836,-148.14 1892,-148.14 1892,-129.14 1836,-129.14"/>
 <text text-anchor="middle" x="1864" y="-136.14" font-family="Helvetica,sans-Serif" font-size="10.00">cleanert</text>
 </a>

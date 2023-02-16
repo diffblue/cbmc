@@ -1,5 +1,11 @@
 var NAVTREEINDEX71 =
 {
+"cnf_8h.html":[7,0,2,27,7,1],
+"cnf_8h_source.html":[7,0,2,27,7,1],
+"cnf__clause__list_8cpp.html":[7,0,2,27,7,2],
+"cnf__clause__list_8cpp_source.html":[7,0,2,27,7,2],
+"cnf__clause__list_8h.html":[7,0,2,27,7,3],
+"cnf__clause__list_8h_source.html":[7,0,2,27,7,3],
 "code-walkthrough.html":[0,4,11],
 "code-walkthrough.html#bmct-class-section":[0,4,11,3],
 "code-walkthrough.html#data-structures-core-structures-and-ast-section":[0,4,11,0],
@@ -243,11 +249,5 @@ var NAVTREEINDEX71 =
 "contracts-history-variables.html#autotoc_md94":[1,0,9,0,1],
 "contracts-history-variables.html#autotoc_md95":[1,0,9,0,2],
 "contracts-history-variables.html#autotoc_md96":[1,0,9,1],
-"contracts-history-variables.html#autotoc_md97":[1,0,9,2],
-"contracts-loop-invariants.html":[1,0,5],
-"contracts-loop-invariants.html#autotoc_md100":[1,0,5,2],
-"contracts-loop-invariants.html#autotoc_md98":[1,0,5,0],
-"contracts-loop-invariants.html#autotoc_md99":[1,0,5,1],
-"contracts-loops.html":[1,0,1],
-"contracts-loops.html#autotoc_md101":[1,0,1,0]
+"contracts-history-variables.html#autotoc_md97":[1,0,9,2]
 };
