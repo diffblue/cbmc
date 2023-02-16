@@ -222,6 +222,11 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 static std::unique_ptr<propt>
 get_sat_solver(message_handlert &message_handler, const optionst &options)
 {
+  const bool no_simplifier = options.get_bool_option("beautify") ||
+                             !options.get_bool_option("sat-preprocessor") ||
+                             options.get_bool_option("refine") ||
+                             options.get_bool_option("refine-strings");
+
   if(options.is_set("sat-solver"))
   {
     const std::string &solver_option = options.get_option("sat-solver");
@@ -252,9 +257,7 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
     else if(solver_option == "minisat2")
     {
 #if defined SATCHECK_MINISAT2
-      if(
-        options.get_bool_option("beautify") ||
-        !options.get_bool_option("sat-preprocessor")) // no simplifier
+      if(no_simplifier)
       {
         // simplifier won't work with beautification
         return make_satcheck_prop<satcheck_minisat_no_simplifiert>(
@@ -296,9 +299,7 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
     else if(solver_option == "glucose")
     {
 #if defined SATCHECK_GLUCOSE
-      if(
-        options.get_bool_option("beautify") ||
-        !options.get_bool_option("sat-preprocessor")) // no simplifier
+      if(no_simplifier)
       {
         // simplifier won't work with beautification
         return make_satcheck_prop<satcheck_glucose_no_simplifiert>(
@@ -331,9 +332,7 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
   }
 
   // default solver
-  if(
-    options.get_bool_option("beautify") ||
-    !options.get_bool_option("sat-preprocessor")) // no simplifier
+  if(no_simplifier)
   {
     // simplifier won't work with beautification
     return make_satcheck_prop<satcheck_no_simplifiert>(
@@ -396,16 +395,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 {
-  std::unique_ptr<propt> prop = [this]() -> std::unique_ptr<propt> {
-    // We offer the option to disable the SAT preprocessor
-    if(options.get_bool_option("sat-preprocessor"))
-    {
-      no_beautification();
-      return make_satcheck_prop<satcheckt>(message_handler, options);
-    }
-    return make_satcheck_prop<satcheck_no_simplifiert>(
-      message_handler, options);
-  }();
+  std::unique_ptr<propt> prop = get_sat_solver(message_handler, options);
 
   bv_refinementt::infot info;
   info.ns = &ns;
@@ -435,8 +425,7 @@ solver_factoryt::get_string_refinement()
 {
   string_refinementt::infot info;
   info.ns = &ns;
-  auto prop =
-    make_satcheck_prop<satcheck_no_simplifiert>(message_handler, options);
+  auto prop = get_sat_solver(message_handler, options);
   info.prop = prop.get();
   info.refinement_bound = DEFAULT_MAX_NB_REFINEMENT;
   info.output_xml = output_xml_in_refinement;
