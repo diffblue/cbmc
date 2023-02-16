@@ -31,6 +31,7 @@ class dfcc_utilst;
 class dfcc_instrumentt;
 class dfcc_lift_memory_predicatest;
 class dfcc_spec_functionst;
+class dfcc_contract_clauses_codegent;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
 
@@ -72,7 +73,8 @@ public:
     dfcc_libraryt &library,
     dfcc_instrumentt &instrument,
     dfcc_lift_memory_predicatest &memory_predicates,
-    dfcc_spec_functionst &spec_functions);
+    dfcc_spec_functionst &spec_functions,
+    dfcc_contract_clauses_codegent &contract_clauses_codegen);
 
   /// Adds instructions in `dest` modeling contract checking, assuming
   /// that `ret_t wrapper_id(params)` is the function receiving
@@ -122,6 +124,7 @@ protected:
   dfcc_instrumentt &instrument;
   dfcc_lift_memory_predicatest &memory_predicates;
   dfcc_spec_functionst &spec_functions;
+  dfcc_contract_clauses_codegent &contract_clauses_codegen;
   namespacet ns;
 
   // Caches the functions generated from contracts

@@ -30,6 +30,7 @@ class message_handlert;
 class dfcc_libraryt;
 class dfcc_utilst;
 class dfcc_spec_functionst;
+class dfcc_contract_clauses_codegent;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
 
@@ -67,14 +68,16 @@ public:
   /// \param utils utility class for dynamic frames
   /// \param library the contracts instrumentation library
   /// \param spec_functions provides translation methods for assignable set
-  /// or freeable set specification functions.
+  /// \param contract_clauses_codegen provides GOTO code generation methods
+  /// for assigns and free clauses.
   dfcc_contract_functionst(
     const symbolt &pure_contract_symbol,
     goto_modelt &goto_model,
     message_handlert &message_handler,
     dfcc_utilst &utils,
     dfcc_libraryt &library,
-    dfcc_spec_functionst &spec_functions);
+    dfcc_spec_functionst &spec_functions,
+    dfcc_contract_clauses_codegent &contract_clauses_codegen);
 
   /// Returns the contract::assigns function symbol
   const symbolt &get_spec_assigns_function_symbol() const;
@@ -116,6 +119,7 @@ protected:
   dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_spec_functionst &spec_functions;
+  dfcc_contract_clauses_codegent &contract_clauses_codegen;
   namespacet ns;
   std::size_t nof_assigns_targets;
   std::size_t nof_frees_targets;
@@ -128,32 +132,6 @@ protected:
   /// Translates the contract's frees clause to a GOTO function that uses the
   /// `freeable` built-in to express targets.
   void gen_spec_frees_function();
-
-  /// Generates GOTO instructions to build the representation of the given
-  /// conditional target group.
-  void encode_assignable_target_group(
-    const conditional_target_group_exprt &group,
-    goto_programt &dest);
-
-  /// Generates GOTO instructions to build the representation of the given
-  /// assignable target.
-  void encode_assignable_target(const exprt &target, goto_programt &dest);
-
-  /// Generates GOTO instructions to build the representation of the given
-  /// conditional target group.
-  void encode_freeable_target_group(
-    const conditional_target_group_exprt &group,
-    goto_programt &dest);
-
-  /// Generates GOTO instructions to build the representation of the given
-  /// freeable target.
-  void encode_freeable_target(const exprt &target, goto_programt &dest);
-
-  /// Inlines the given function and checks that the only missign functions
-  /// or no body functions are front-end
-  // void or __CPROVER_freeable_t functions,
-  /// and that no other warnings happened.
-  void inline_and_check_warnings(const irep_idt &function_id);
 };
 
 #endif

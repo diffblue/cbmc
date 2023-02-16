@@ -78,6 +78,38 @@ public:
     const irep_idt &havoc_function_id,
     std::size_t &nof_targets);
 
+  /// Translates \p original_program that specifies assignable targets
+  /// into a program that havocs the targets.
+  ///
+  /// \pre The \p original_program must be already fully inlined, and the only
+  /// function calls allowed are to the built-ins that specify
+  /// assignable targets: `__CPROVER_assignable`, `__CPROVER_object_whole`,
+  /// `__CPROVER_object_from`, `__CPROVER_object_upto`.
+  ///
+  /// \details The \p original_program is assumed to encode an assigns clause
+  /// using the built-ins `__CPROVER_assignable`, `__CPROVER_object_whole`,
+  /// `__CPROVER_object_from`, `__CPROVER_object_upto`.
+  /// The method traverses \p original_program and emits a sequence of GOTO
+  /// instructions in \p havoc_program that encode the havocing of the target
+  /// write set \p write_set_to_havoc.
+  ///
+  /// \param[in] function_id function id to use for prefixing fresh variables
+  /// \param[in] mode function id to use for prefixing fresh variables
+  /// \param[in] module function id to use for prefixing fresh variables
+  /// \param[in] original_program program from which to derive the havoc program
+  /// \param[in] write_set_to_havoc write set symbol to havoc
+  /// \param[out] havoc_program destination program for havoc instructions
+  /// \param[out] nof_targets max number of havoc targets discovered
+  ///
+  void generate_havoc_instructions(
+    const irep_idt &function_id,
+    const irep_idt &mode,
+    const irep_idt &module,
+    const goto_programt &original_program,
+    const exprt &write_set_to_havoc,
+    goto_programt &havoc_program,
+    std::size_t &nof_targets);
+
   /// Transforms (in place) a function
   ///
   /// ```
@@ -103,6 +135,29 @@ public:
   ///
   void to_spec_assigns_function(
     const irep_idt &function_id,
+    std::size_t &nof_targets);
+
+  /// Rewrites in place \p program expressed in terms of built-ins specifying
+  /// assignable targets declaratively using `__CPROVER_assignable`,
+  /// `__CPROVER_object_whole`, `__CPROVER_object_from`,
+  /// `__CPROVER_object_upto` into a program populating \p write_set_to_fill.
+  ///
+  /// It is the responsibility of the caller of this method to instrument the
+  /// resulting program against another write set instance to check them for
+  /// unwanted side effects.
+  ///
+  /// \pre The \p program must be already fully inlined, and the only
+  /// function calls allowed are to the built-ins that specify
+  /// assignable targets: `__CPROVER_assignable`, `__CPROVER_object_whole`,
+  /// `__CPROVER_object_from`, `__CPROVER_object_upto`.
+  ///
+  /// \param[in] write_set_to_fill write set to populate.
+  /// \param[inout] program function to transform in place
+  /// \param[out] nof_targets receives the estimated size of the write set
+  ///
+  void to_spec_assigns_instructions(
+    const exprt &write_set_to_fill,
+    goto_programt &program,
     std::size_t &nof_targets);
 
   /// Transforms (in place) a function
@@ -132,6 +187,27 @@ public:
   ///
   void
   to_spec_frees_function(const irep_idt &function_id, std::size_t &nof_targets);
+
+  /// Rewrites in place \p program expressed in terms of built-ins specifying
+  /// freeable targets declaratively using `__CPROVER_freeable` into a program
+  /// populating \p write_set_to_fill.
+  ///
+  /// It is the responsibility of the caller of this method to instrument the
+  /// resulting program against another write set instance to check them for
+  /// unwanted side effects.
+  ///
+  /// \pre The \p program must be already fully inlined, and the only
+  /// function calls allowed are to the built-ins that specify
+  /// freeable targets: `__CPROVER_freeable`.
+  ///
+  /// \param[in] write_set_to_fill write set to populate.
+  /// \param[inout] program function to transform in place
+  /// \param[out] nof_targets receives the estimated size of the write set
+  ///
+  void to_spec_frees_instructions(
+    const exprt &write_set_to_fill,
+    goto_programt &program,
+    std::size_t &nof_targets);
 
 protected:
   goto_modelt &goto_model;

@@ -26,6 +26,7 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_lift_memory_predicates.cpp \
       contracts/dynamic-frames/dfcc_instrument.cpp \
       contracts/dynamic-frames/dfcc_spec_functions.cpp \
+      contracts/dynamic-frames/dfcc_contract_clauses_codegen.cpp \
       contracts/dynamic-frames/dfcc_contract_functions.cpp \
       contracts/dynamic-frames/dfcc_wrapper_program.cpp \
       contracts/dynamic-frames/dfcc_contract_handler.cpp \

@@ -191,6 +191,12 @@ dfcct::dfcct(
     instrument(goto_model, message_handler, utils, library),
     memory_predicates(goto_model, utils, library, instrument, message_handler),
     spec_functions(goto_model, message_handler, utils, library, instrument),
+    contract_clauses_codegen(
+      goto_model,
+      message_handler,
+      utils,
+      library,
+      spec_functions),
     contract_handler(
       goto_model,
       message_handler,
@@ -198,7 +204,8 @@ dfcct::dfcct(
       library,
       instrument,
       memory_predicates,
-      spec_functions),
+      spec_functions,
+      contract_clauses_codegen),
     swap_and_wrap(
       goto_model,
       message_handler,
@@ -483,6 +490,8 @@ void dfcct::instrument_other_functions()
 
   goto_model.goto_functions.update();
 
+  // TODO specialise the library functions for the max size of
+  // loop and function contracts
   if(to_check.has_value())
   {
     log.status() << "Specializing cprover_contracts functions for assigns "

@@ -44,7 +44,8 @@ dfcc_contract_handlert::dfcc_contract_handlert(
   dfcc_libraryt &library,
   dfcc_instrumentt &instrument,
   dfcc_lift_memory_predicatest &memory_predicates,
-  dfcc_spec_functionst &spec_functions)
+  dfcc_spec_functionst &spec_functions,
+  dfcc_contract_clauses_codegent &contract_clauses_codegen)
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
@@ -53,6 +54,7 @@ dfcc_contract_handlert::dfcc_contract_handlert(
     instrument(instrument),
     memory_predicates(memory_predicates),
     spec_functions(spec_functions),
+    contract_clauses_codegen(contract_clauses_codegen),
     ns(goto_model.symbol_table)
 {
 }
@@ -76,7 +78,8 @@ dfcc_contract_handlert::get_contract_functions(const irep_idt &contract_id)
          message_handler,
          utils,
          library,
-         spec_functions)})
+         spec_functions,
+         contract_clauses_codegen)})
     .first->second;
 }
 
