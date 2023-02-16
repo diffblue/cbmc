@@ -13,6 +13,8 @@ Date: September 2021
 
 #include <goto-programs/goto_convert_class.h>
 
+#include <goto-programs/goto_model.h>
+
 #include <goto-instrument/havoc_utils.h>
 
 #include <vector>
@@ -21,6 +23,33 @@ Date: September 2021
 #define ENTERED_LOOP "__entered_loop"
 #define IN_LOOP_HAVOC_BLOCK "__in_loop_havoc_block"
 #define INIT_INVARIANT "__init_invariant"
+
+/// Class that allows to clean expressions of side effects and to generate
+/// havoc_slice expressions.
+class cleanert : public goto_convertt
+{
+public:
+  cleanert(
+    symbol_table_baset &_symbol_table,
+    message_handlert &_message_handler)
+    : goto_convertt(_symbol_table, _message_handler)
+  {
+  }
+
+  void clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
+  {
+    goto_convertt::clean_expr(guard, dest, mode, true);
+  }
+
+  void do_havoc_slice(
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest,
+    const irep_idt &mode)
+  {
+    goto_convertt::do_havoc_slice(nil_exprt{}, function, arguments, dest, mode);
+  }
+};
 
 /// \brief A class that overrides the low-level havocing functions in the base
 ///        utility class, to havoc only when expressions point to valid memory,
@@ -52,15 +81,39 @@ protected:
 class havoc_assigns_targetst : public havoc_if_validt
 {
 public:
-  havoc_assigns_targetst(const assignst &mod, const namespacet &ns)
-    : havoc_if_validt(mod, ns)
+  havoc_assigns_targetst(
+    const assignst &mod,
+    symbol_tablet &st,
+    message_handlert &message_handler,
+    const irep_idt &mode)
+    : havoc_if_validt(mod, ns),
+      ns(st),
+      cleaner(st, message_handler),
+      log(message_handler),
+      mode(mode)
   {
   }
+
+  void append_havoc_pointer_code(
+    const source_locationt location,
+    const exprt &ptr_to_ptr,
+    goto_programt &dest);
+
+  void append_havoc_slice_code(
+    const source_locationt location,
+    const exprt &ptr,
+    const exprt &size,
+    goto_programt &dest);
 
   void append_havoc_code_for_expr(
     const source_locationt location,
     const exprt &expr,
-    goto_programt &dest) const override;
+    goto_programt &dest);
+
+  namespacet ns;
+  cleanert cleaner;
+  messaget log;
+  const irep_idt &mode;
 };
 
 /// \brief Generate a validity check over all dereferences in an expression
@@ -161,32 +214,6 @@ bool is_loop_free(
   const goto_programt &goto_program,
   namespacet &ns,
   messaget &log);
-
-/// Allows to clean expressions of side effects.
-class cleanert : public goto_convertt
-{
-public:
-  cleanert(
-    symbol_table_baset &_symbol_table,
-    message_handlert &_message_handler)
-    : goto_convertt(_symbol_table, _message_handler)
-  {
-  }
-
-  void clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
-  {
-    goto_convertt::clean_expr(guard, dest, mode, true);
-  }
-
-  void do_havoc_slice(
-    const symbol_exprt &function,
-    const exprt::operandst &arguments,
-    goto_programt &dest,
-    const irep_idt &mode)
-  {
-    goto_convertt::do_havoc_slice(nil_exprt{}, function, arguments, dest, mode);
-  }
-};
 
 /// Returns an \ref irep_idt that essentially says that
 /// `target` was assigned by the contract of `function_id`.

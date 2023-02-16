@@ -1013,11 +1013,6 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
     throw_on_side_effects(target);
     return;
   }
-  else if(target.id() == ID_pointer_object)
-  {
-    throw_on_side_effects(target);
-    return;
-  }
   else if(can_cast_expr<side_effect_expr_function_callt>(target))
   {
     const auto &funcall = to_side_effect_expr_function_call(target);
@@ -1044,9 +1039,8 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
   {
     // if we reach this point the target did not pass the checks
     throw invalid_source_file_exceptiont(
-      "assigns clause target must be a non-void lvalue, a call "
-      "to " CPROVER_PREFIX
-      "POINTER_OBJECT or a call to a function returning void",
+      "assigns clause target must be a non-void lvalue or a call to a function "
+      "returning void",
       target.source_location());
   }
 }

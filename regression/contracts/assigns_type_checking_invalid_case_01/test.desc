@@ -4,6 +4,6 @@ main.c
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
-^.*error: assigns clause target must be a non-void lvalue, a call to __CPROVER_POINTER_OBJECT or a call to a function returning void$
+^.*error: assigns clause target must be a non-void lvalue or a call to a function returning void$
 --
 Checks whether type checking rejects literal constants in assigns clause.

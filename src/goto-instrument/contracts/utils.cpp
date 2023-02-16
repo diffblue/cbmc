@@ -10,6 +10,7 @@ Date: September 2021
 
 #include "utils.h"
 
+#include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
@@ -47,6 +48,40 @@ static void append_safe_havoc_code_for_expr(
   dest.destructive_append(skip_program);
 }
 
+void havoc_assigns_targetst::append_havoc_slice_code(
+  const source_locationt location,
+  const exprt &ptr,
+  const exprt &size,
+  goto_programt &dest)
+{
+  append_safe_havoc_code_for_expr(
+    location,
+    ns,
+    ptr,
+    dest,
+    // clang-format off
+    [&]() {
+      symbol_exprt function{CPROVER_PREFIX "havoc_slice", empty_typet()};
+      function.add_source_location() = location;
+      // havoc slice is lowered to array operations during goto conversion
+      // so we use goto_convertt directly as provided by clearnert
+      cleaner.do_havoc_slice(function, {ptr, size}, dest, mode);
+    });
+  // clang-format on
+}
+
+void havoc_assigns_targetst::append_havoc_pointer_code(
+  const source_locationt location,
+  const exprt &ptr_to_ptr,
+  goto_programt &dest)
+{
+  append_safe_havoc_code_for_expr(location, ns, ptr_to_ptr, dest, [&]() {
+    auto ptr = dereference_exprt(ptr_to_ptr);
+    dest.add(goto_programt::make_assignment(
+      ptr, side_effect_expr_nondett(ptr.type(), location), location));
+  });
+}
+
 void havoc_if_validt::append_object_havoc_code_for_expr(
   const source_locationt location,
   const exprt &expr,
@@ -70,16 +105,68 @@ void havoc_if_validt::append_scalar_havoc_code_for_expr(
 void havoc_assigns_targetst::append_havoc_code_for_expr(
   const source_locationt location,
   const exprt &expr,
-  goto_programt &dest) const
+  goto_programt &dest)
 {
   if(expr.id() == ID_pointer_object)
   {
+    // pointer_object is still used internally to support malloc/free
     append_object_havoc_code_for_expr(
       location, to_pointer_object_expr(expr).pointer(), dest);
     return;
   }
+  else if(can_cast_expr<side_effect_expr_function_callt>(expr))
+  {
+    const auto &funcall = to_side_effect_expr_function_call(expr);
+    // type-checking ensures the function expression is necessarily a symbol
+    const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
+    if(ident == CPROVER_PREFIX "object_whole")
+    {
+      append_object_havoc_code_for_expr(
+        location, funcall.arguments().at(0), dest);
+    }
+    else if(ident == CPROVER_PREFIX "object_from")
+    {
+      const auto ptr = typecast_exprt::conditional_cast(
+        funcall.arguments().at(0), pointer_type(char_type()));
 
-  havoc_utilst::append_havoc_code_for_expr(location, expr, dest);
+      exprt obj_size = object_size(ptr);
+      minus_exprt size{
+        obj_size,
+        typecast_exprt::conditional_cast(pointer_offset(ptr), obj_size.type())};
+
+      append_havoc_slice_code(expr.source_location(), ptr, size, dest);
+    }
+    else if(ident == CPROVER_PREFIX "object_upto")
+    {
+      const auto ptr = typecast_exprt::conditional_cast(
+        funcall.arguments().at(0), pointer_type(char_type()));
+      const auto size = typecast_exprt::conditional_cast(
+        funcall.arguments().at(1), size_type());
+      append_havoc_slice_code(expr.source_location(), ptr, size, dest);
+    }
+    else if(ident == CPROVER_PREFIX "assignable")
+    {
+      const auto &ptr = funcall.arguments().at(0);
+      const auto &size = funcall.arguments().at(1);
+      if(funcall.arguments().at(2).is_true())
+      {
+        append_havoc_pointer_code(expr.source_location(), ptr, dest);
+      }
+      else
+      {
+        append_havoc_slice_code(expr.source_location(), ptr, size, dest);
+      }
+    }
+    else
+    {
+      UNREACHABLE;
+    }
+  }
+  else
+  {
+    // we have an lvalue expression, make nondet assignment
+    havoc_utilst::append_havoc_code_for_expr(location, expr, dest);
+  }
 }
 
 exprt all_dereferences_are_valid(const exprt &expr, const namespacet &ns)

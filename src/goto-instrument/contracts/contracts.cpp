@@ -314,7 +314,8 @@ void code_contractst::check_apply_loop_contracts(
     goto_programt::make_decl(in_loop_havoc_block, loop_head_location));
   pre_loop_head_instrs.add(
     goto_programt::make_assignment(in_loop_havoc_block, true_exprt{}));
-  havoc_assigns_targetst havoc_gen(to_havoc, ns);
+  havoc_assigns_targetst havoc_gen(
+    to_havoc, symbol_table, log.get_message_handler(), mode);
   havoc_gen.append_full_havoc_code(loop_head_location, pre_loop_head_instrs);
   pre_loop_head_instrs.add(
     goto_programt::make_assignment(in_loop_havoc_block, false_exprt{}));
