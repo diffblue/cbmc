@@ -69,6 +69,10 @@ To be documented.
 
 ## Instrumentation: goto functions &rarr; goto functions
 
+For an overview of the transformations applied to goto programs after the
+generation of the initial goto program and before BMC, see
+\subpage goto-program-transformations .
+
 To be documented.
 
 ## Goto functions &rarr; BMC &rarr; Counterexample (trace)
