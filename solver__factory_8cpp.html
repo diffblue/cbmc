@@ -131,9 +131,14 @@ $(document).ready(function(){initNavTree('solver__factory_8cpp.html',''); initRe
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ac3c20f319869597c88d6a156c193a6fc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__factory_8cpp.html#ac3c20f319869597c88d6a156c193a6fc">emit_solver_warning</a> (<a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::string &amp;<a class="el" href="smt2__solver_8cpp.html#a6ae5034eec99c41b9bf9daa35c0f7dcf">solver</a>)</td></tr>
+<tr class="memdesc:ac3c20f319869597c88d6a156c193a6fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emit a warning for non-existent solver <code>solver</code> via <code>message_handler</code>.  <a href="solver__factory_8cpp.html#ac3c20f319869597c88d6a156c193a6fc">More...</a><br /></td></tr>
+<tr class="separator:ac3c20f319869597c88d6a156c193a6fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9c9394098d692c2cc4d2cc8fae57087"><td class="memTemplParams" colspan="2">template&lt;typename SatcheckT &gt; </td></tr>
 <tr class="memitem:ac9c9394098d692c2cc4d2cc8fae57087"><td class="memTemplItemLeft" align="right" valign="top">static std::unique_ptr&lt; SatcheckT &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="solver__factory_8cpp.html#ac9c9394098d692c2cc4d2cc8fae57087">make_satcheck_prop</a> (<a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classoptionst.html">optionst</a> &amp;options)</td></tr>
 <tr class="separator:ac9c9394098d692c2cc4d2cc8fae57087"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cf802c65fd4254d9e6988e8b2e8ef24"><td class="memItemLeft" align="right" valign="top">static std::unique_ptr&lt; <a class="el" href="classpropt.html">propt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__factory_8cpp.html#a5cf802c65fd4254d9e6988e8b2e8ef24">get_sat_solver</a> (<a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classoptionst.html">optionst</a> &amp;options)</td></tr>
+<tr class="separator:a5cf802c65fd4254d9e6988e8b2e8ef24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78ec153f3a4f569b3efdd91f19c486fa"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; std::ofstream &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__factory_8cpp.html#a78ec153f3a4f569b3efdd91f19c486fa">open_outfile_and_check</a> (const std::string &amp;filename, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const std::string &amp;arg_name)</td></tr>
 <tr class="separator:a78ec153f3a4f569b3efdd91f19c486fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52b4fb3cf88b8c148bd4b9002e924245"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__factory_8cpp.html#a52b4fb3cf88b8c148bd4b9002e924245">parse_sat_options</a> (const <a class="el" href="classcmdlinet.html">cmdlinet</a> &amp;cmdline, <a class="el" href="classoptionst.html">optionst</a> &amp;options)</td></tr>
@@ -149,6 +154,84 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ac3c20f319869597c88d6a156c193a6fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3c20f319869597c88d6a156c193a6fc">&#9670;&nbsp;</a></span>emit_solver_warning()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void emit_solver_warning </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>solver</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emit a warning for non-existent solver <code>solver</code> via <code>message_handler</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00186">186</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5cf802c65fd4254d9e6988e8b2e8ef24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cf802c65fd4254d9e6988e8b2e8ef24">&#9670;&nbsp;</a></span>get_sat_solver()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::unique_ptr&lt;<a class="el" href="classpropt.html">propt</a>&gt; get_sat_solver </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classoptionst.html">optionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00223">223</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+
+</div>
+</div>
 <a id="ac9c9394098d692c2cc4d2cc8fae57087"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac9c9394098d692c2cc4d2cc8fae57087">&#9670;&nbsp;</a></span>make_satcheck_prop()</h2>
 
@@ -185,7 +268,7 @@ template&lt;typename SatcheckT &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00193">193</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00198">198</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +304,7 @@ template&lt;typename SatcheckT &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00473">473</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00445">445</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +342,7 @@ template&lt;typename SatcheckT &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00645">645</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00617">617</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +380,7 @@ template&lt;typename SatcheckT &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00662">662</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00634">634</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +412,7 @@ template&lt;typename SatcheckT &gt; </div>
 
 <p>Parse solver-related command-line parameters in <code>cmdline</code> and set corresponding values in <code>options</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00742">742</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="solver__factory_8cpp_source.html#l00714">714</a> of file <a class="el" href="solver__factory_8cpp_source.html">solver_factory.cpp</a>.</p>
 
 </div>
 </div>

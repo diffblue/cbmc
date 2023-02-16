@@ -3,7 +3,6 @@ var classsolver__factoryt =
     [ "solvert", "classsolver__factoryt_1_1solvert.html", "classsolver__factoryt_1_1solvert" ],
     [ "solver_factoryt", "classsolver__factoryt.html#a46e71b3faf0bf24a01547adbd623fa29", null ],
     [ "~solver_factoryt", "classsolver__factoryt.html#ad87c2526a45b1b9d07001ae990b1dfbb", null ],
-    [ "emit_solver_warning", "classsolver__factoryt.html#a86039aa1bb2157392f7144d9ce031cb2", null ],
     [ "get_bv_refinement", "classsolver__factoryt.html#ae1b38582be420e3926eb3095c9f23fd8", null ],
     [ "get_default", "classsolver__factoryt.html#a425cf88f6cb97ec9b4d5cd1518f64669", null ],
     [ "get_dimacs", "classsolver__factoryt.html#a51c649ddc04da302a7f77b63c2cbf446", null ],
