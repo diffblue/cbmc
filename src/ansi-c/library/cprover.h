@@ -40,6 +40,35 @@ struct __CPROVER_pipet {
   short next_unread;
 };
 
+// __CPROVER_equal expects two arguments of the same type -- any type is
+// permitted, unsigned long long is just used for the benefit of running syntax
+// checks using system compilers
+__CPROVER_bool __CPROVER_equal(unsigned long long, unsigned long long);
+
+// The following built-ins are type checked by our C front-end and do not
+// require declarations. They work with any types as described below. unsigned
+// long long is just used to enable checks using system compilers.
+
+// detect overflow
+// the following expect two numeric arguments
+__CPROVER_bool __CPROVER_overflow_minus(unsigned long long, unsigned long long);
+__CPROVER_bool __CPROVER_overflow_mult(unsigned long long, unsigned long long);
+__CPROVER_bool __CPROVER_overflow_plus(unsigned long long, unsigned long long);
+__CPROVER_bool __CPROVER_overflow_shl(unsigned long long, unsigned long long);
+// expects one numeric argument
+__CPROVER_bool __CPROVER_overflow_unary_minus(unsigned long long);
+
+// enumerations
+// expects one enum-typed argument
+__CPROVER_bool __CPROVER_enum_is_in_range(unsigned long long);
+
+// The following have an optional second parameter (the width), and are
+// polymorphic in the first parameter: if the second argument is omitted, then
+// the width of the subtype of the pointer-typed first argument is used.
+__CPROVER_bool __CPROVER_r_ok(const void *, ...);
+__CPROVER_bool __CPROVER_w_ok(const void *, ...);
+__CPROVER_bool __CPROVER_rw_ok(const void *, ...);
+
 #include "../cprover_builtin_headers.h"
 
 #endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H

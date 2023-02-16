@@ -1,6 +1,6 @@
 /* FUNCTION: _beginthread */
 
-__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t();
+__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t(void);
 
 __CPROVER_size_t _beginthread(
   void (*start_address)(void *),
@@ -16,7 +16,7 @@ __CPROVER_size_t _beginthread(
 
 /* FUNCTION: _beginthreadex */
 
-__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t();
+__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t(void);
 
 __CPROVER_size_t _beginthreadex(
    void *security,

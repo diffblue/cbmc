@@ -24,8 +24,8 @@ void __CPROVER_input(const char *description, ...);
 void __CPROVER_output(const char *description, ...);
 
 // concurrency-related
-void __CPROVER_atomic_begin();
-void __CPROVER_atomic_end();
+void __CPROVER_atomic_begin(void);
+void __CPROVER_atomic_end(void);
 void __CPROVER_fence(const char *kind, ...);
 
 // pointers

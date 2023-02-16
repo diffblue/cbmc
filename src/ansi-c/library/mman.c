@@ -19,7 +19,7 @@
 #    define MAP_UNINITIALIZED 0
 #  endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 void *mmap(
   void *addr,
@@ -72,7 +72,7 @@ void *mmap(
 #    define MAP_UNINITIALIZED 0
 #  endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 void *_mmap(
   void *addr,
@@ -106,7 +106,7 @@ void *_mmap(
 
 /* FUNCTION: munmap */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 int munmap(void *addr, __CPROVER_size_t length)
 {
@@ -119,7 +119,7 @@ int munmap(void *addr, __CPROVER_size_t length)
 
 /* FUNCTION: _munmap */
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 int _munmap(void *addr, __CPROVER_size_t length)
 {

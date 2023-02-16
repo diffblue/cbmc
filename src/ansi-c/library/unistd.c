@@ -1,6 +1,6 @@
 /* FUNCTION: sleep */
 
-unsigned __VERIFIER_nondet_unsigned();
+unsigned __VERIFIER_nondet_unsigned(void);
 
 unsigned int sleep(unsigned int seconds)
 {
@@ -24,7 +24,7 @@ unsigned int _sleep(unsigned int seconds)
 
 /* FUNCTION: unlink */
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int unlink(const char *s)
 {
@@ -50,7 +50,7 @@ extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 extern const int __CPROVER_pipe_offset;
 unsigned __CPROVER_pipe_count = 0;
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 int pipe(int fildes[2])
 {
@@ -155,7 +155,7 @@ extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
-ret_type __VERIFIER_nondet_ret_type();
+ret_type __VERIFIER_nondet_ret_type(void);
 
 ret_type write(int fildes, const void *buf, size_type nbyte)
 {
@@ -233,9 +233,9 @@ extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-ret_type __VERIFIER_nondet_ret_type();
-size_type __VERIFIER_nondet_size_type();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+ret_type __VERIFIER_nondet_ret_type(void);
+size_type __VERIFIER_nondet_size_type(void);
 
 ret_type read(int fildes, void *buf, size_type nbyte)
 {

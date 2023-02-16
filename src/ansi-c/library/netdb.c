@@ -6,7 +6,7 @@
 #include <netdb.h>
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 struct hostent *gethostbyname(const char *name)
 {
@@ -35,7 +35,7 @@ struct hostent *gethostbyname(const char *name)
 #include <netdb.h>
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
 {
@@ -59,7 +59,7 @@ struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
 // There does not appear to be a Windows variant of gethostent
 #include <netdb.h>
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 struct hostent *gethostent(void)
 {

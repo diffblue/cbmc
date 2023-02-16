@@ -465,7 +465,7 @@ __CPROVER_HIDE:
 
 /* FUNCTION: sin */
 
-double __VERIFIER_nondet_double();
+double __VERIFIER_nondet_double(void);
 
 double sin(double x)
 {
@@ -486,7 +486,7 @@ double sin(double x)
 
 /* FUNCTION: sinl */
 
-long double __VERIFIER_nondet_long_double();
+long double __VERIFIER_nondet_long_double(void);
 
 long double sinl(long double x)
 {
@@ -507,7 +507,7 @@ long double sinl(long double x)
 
 /* FUNCTION: sinf */
 
-float __VERIFIER_nondet_float();
+float __VERIFIER_nondet_float(void);
 
 float sinf(float x)
 {
@@ -528,7 +528,7 @@ float sinf(float x)
 
 /* FUNCTION: cos */
 
-double __VERIFIER_nondet_double();
+double __VERIFIER_nondet_double(void);
 
 double cos(double x)
 {
@@ -549,7 +549,7 @@ double cos(double x)
 
 /* FUNCTION: cosl */
 
-long double __VERIFIER_nondet_long_double();
+long double __VERIFIER_nondet_long_double(void);
 
 long double cosl(long double x)
 {
@@ -570,7 +570,7 @@ long double cosl(long double x)
 
 /* FUNCTION: cosf */
 
-float __VERIFIER_nondet_float();
+float __VERIFIER_nondet_float(void);
 
 float cosf(float x)
 {
@@ -833,7 +833,7 @@ __CPROVER_hide:;
 
 float nextUpf(float f);
 
-float __VERIFIER_nondet_float();
+float __VERIFIER_nondet_float(void);
 
 float sqrtf(float f)
 {
@@ -920,7 +920,7 @@ float sqrtf(float f)
 
 double nextUp(double d);
 
-double __VERIFIER_nondet_double();
+double __VERIFIER_nondet_double(void);
 
 double sqrt(double d)
 {
@@ -991,7 +991,7 @@ double sqrt(double d)
 
 long double nextUpl(long double d);
 
-long double __VERIFIER_nondet_long_double();
+long double __VERIFIER_nondet_long_double(void);
 
 long double sqrtl(long double d)
 {

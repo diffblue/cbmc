@@ -41,6 +41,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 #include <langapi/mode.h>
 
+#include "c_expr.h"
+
 #include <algorithm>
 
 class goto_check_ct
@@ -523,19 +525,15 @@ void goto_check_ct::enum_range_check(const exprt &expr, const guardt &guard)
   if(!enable_enum_range_check)
     return;
 
-  const c_enum_tag_typet &c_enum_tag_type = to_c_enum_tag_type(expr.type());
-  const c_enum_typet &c_enum_type = ns.follow_tag(c_enum_tag_type);
-
-  const c_enum_typet::memberst enum_values = c_enum_type.members();
-
-  std::vector<exprt> disjuncts;
-  for(const auto &enum_value : enum_values)
+  // we might be looking at a lowered enum_is_in_range_exprt, skip over these
+  const auto &pragmas = expr.source_location().get_pragmas();
+  for(const auto &d : pragmas)
   {
-    const constant_exprt val{enum_value.get_value(), c_enum_tag_type};
-    disjuncts.push_back(equal_exprt(expr, val));
+    if(d.first == "disable:enum-range-check")
+      return;
   }
 
-  const exprt check = disjunction(disjuncts);
+  const exprt check = enum_is_in_range_exprt{expr}.lower(ns);
 
   add_guarded_property(
     check,

@@ -5,7 +5,7 @@
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 {
@@ -30,7 +30,7 @@ int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 int pthread_cancel(pthread_t thread)
 {
@@ -839,7 +839,7 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 // no pthread_barrier_t on the Mac
 // slightly different declaration on OpenBSD
@@ -893,7 +893,7 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__
@@ -923,7 +923,7 @@ int pthread_barrier_destroy(pthread_barrier_t *barrier)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int __VERIFIER_nondet_int();
+int __VERIFIER_nondet_int(void);
 
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__

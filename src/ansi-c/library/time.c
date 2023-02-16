@@ -7,7 +7,7 @@
 
 #undef time
 
-time_t __VERIFIER_nondet_time_t();
+time_t __VERIFIER_nondet_time_t(void);
 
 time_t time(time_t *tloc)
 {
@@ -26,7 +26,7 @@ time_t time(time_t *tloc)
 #    define __CPROVER_TIME_H_INCLUDED
 #  endif
 
-time_t __VERIFIER_nondet_time_t();
+time_t __VERIFIER_nondet_time_t(void);
 
 time_t _time64(time_t *tloc)
 {
@@ -47,7 +47,7 @@ time_t _time64(time_t *tloc)
 #    define __CPROVER_TIME_H_INCLUDED
 #  endif
 
-__time32_t __VERIFIER_nondet_time32_t();
+__time32_t __VERIFIER_nondet_time32_t(void);
 
 __time32_t _time32(__time32_t *tloc)
 {
@@ -150,7 +150,7 @@ struct tm *localtime_r(const time_t *clock, struct tm *result)
 
 #undef mktime
 
-time_t __VERIFIER_nondet_time_t();
+time_t __VERIFIER_nondet_time_t(void);
 
 time_t mktime(struct tm *timeptr)
 {
@@ -168,7 +168,7 @@ time_t mktime(struct tm *timeptr)
 
 #undef timegm
 
-time_t __VERIFIER_nondet_time_t();
+time_t __VERIFIER_nondet_time_t(void);
 
 time_t timegm(struct tm *timeptr)
 {

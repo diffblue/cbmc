@@ -10,7 +10,7 @@
 #define __CPROVER_SIGNAL_H_INCLUDED
 #endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 int kill(pid_t pid, int sig)
 {

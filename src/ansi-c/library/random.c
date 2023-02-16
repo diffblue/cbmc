@@ -17,8 +17,8 @@
 #    define GRND_NONBLOCK 0
 #  endif
 
-__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-size_t __VERIFIER_nondet_size_t();
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+size_t __VERIFIER_nondet_size_t(void);
 
 ssize_t getrandom(void *buf, size_t buflen, unsigned int flags)
 {

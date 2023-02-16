@@ -2118,6 +2118,106 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
         return;
       }
+      else if(identifier == CPROVER_PREFIX "equal")
+      {
+        if(expr.arguments().size() != 2)
+        {
+          error().source_location = f_op.source_location();
+          error() << "equal expects two operands" << eom;
+          throw 0;
+        }
+
+        equal_exprt equality_expr(
+          expr.arguments().front(), expr.arguments().back());
+        equality_expr.add_source_location() = expr.source_location();
+
+        if(equality_expr.lhs().type() != equality_expr.rhs().type())
+        {
+          error().source_location = f_op.source_location();
+          error() << "equal expects two operands of same type" << eom;
+          throw 0;
+        }
+
+        expr.swap(equality_expr);
+        return;
+      }
+      else if(
+        identifier == CPROVER_PREFIX "overflow_minus" ||
+        identifier == CPROVER_PREFIX "overflow_mult" ||
+        identifier == CPROVER_PREFIX "overflow_plus" ||
+        identifier == CPROVER_PREFIX "overflow_shl")
+      {
+        exprt overflow{identifier, typet{}, exprt::operandst{expr.arguments()}};
+        overflow.add_source_location() = f_op.source_location();
+
+        if(identifier == CPROVER_PREFIX "overflow_minus")
+        {
+          overflow.id(ID_minus);
+          typecheck_expr_binary_arithmetic(overflow);
+        }
+        else if(identifier == CPROVER_PREFIX "overflow_mult")
+        {
+          overflow.id(ID_mult);
+          typecheck_expr_binary_arithmetic(overflow);
+        }
+        else if(identifier == CPROVER_PREFIX "overflow_plus")
+        {
+          overflow.id(ID_plus);
+          typecheck_expr_binary_arithmetic(overflow);
+        }
+        else if(identifier == CPROVER_PREFIX "overflow_shl")
+        {
+          overflow.id(ID_shl);
+          typecheck_expr_shifts(to_shift_expr(overflow));
+        }
+
+        binary_overflow_exprt of{
+          overflow.operands()[0], overflow.id(), overflow.operands()[1]};
+        of.add_source_location() = overflow.source_location();
+        expr.swap(of);
+        return;
+      }
+      else if(identifier == CPROVER_PREFIX "overflow_unary_minus")
+      {
+        exprt tmp{ID_unary_minus, typet{}, exprt::operandst{expr.arguments()}};
+        tmp.add_source_location() = f_op.source_location();
+
+        typecheck_expr_unary_arithmetic(tmp);
+
+        unary_minus_overflow_exprt overflow{tmp.operands().front()};
+        overflow.add_source_location() = tmp.source_location();
+        expr.swap(overflow);
+        return;
+      }
+      else if(identifier == CPROVER_PREFIX "enum_is_in_range")
+      {
+        // Check correct number of arguments
+        if(expr.arguments().size() != 1)
+        {
+          std::ostringstream error_message;
+          error_message << identifier << " takes exactly 1 argument, but "
+                        << expr.arguments().size() << " were provided";
+          throw invalid_source_file_exceptiont{
+            error_message.str(), expr.source_location()};
+        }
+        const auto &arg1 = expr.arguments()[0];
+        if(!can_cast_type<c_enum_tag_typet>(arg1.type()))
+        {
+          // Can't enum range check a non-enum
+          std::ostringstream error_message;
+          error_message << identifier << " expects enum, but ("
+                        << expr2c(arg1, *this) << ") has type `"
+                        << type2c(arg1.type(), *this) << '`';
+          throw invalid_source_file_exceptiont{
+            error_message.str(), expr.source_location()};
+        }
+
+        enum_is_in_range_exprt in_range{arg1};
+        in_range.add_source_location() = expr.source_location();
+        exprt lowered = in_range.lower(*this);
+        expr.swap(lowered);
+        return;
+      }
       else if(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
@@ -2534,11 +2634,15 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
+    exprt::operandst args_no_cast;
+    args_no_cast.reserve(expr.arguments().size());
     for(const auto &argument : expr.arguments())
     {
+      args_no_cast.push_back(skip_typecast(argument));
       if(
-        argument.type().id() != ID_pointer ||
-        to_pointer_type(argument.type()).base_type().id() != ID_struct_tag)
+        args_no_cast.back().type().id() != ID_pointer ||
+        to_pointer_type(args_no_cast.back().type()).base_type().id() !=
+          ID_struct_tag)
       {
         error().source_location = expr.arguments()[0].source_location();
         error() << "is_sentinel_dll_node expects struct-pointer operands"
@@ -2548,7 +2652,7 @@ exprt c_typecheck_baset::do_special_functions(
     }
 
     predicate_exprt is_sentinel_dll_expr("is_sentinel_dll");
-    is_sentinel_dll_expr.operands() = expr.arguments();
+    is_sentinel_dll_expr.operands() = args_no_cast;
     is_sentinel_dll_expr.add_source_location() = source_location;
 
     return std::move(is_sentinel_dll_expr);
@@ -3324,30 +3428,6 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ffs);
   }
-  else if(identifier==CPROVER_PREFIX "equal")
-  {
-    if(expr.arguments().size()!=2)
-    {
-      error().source_location = f_op.source_location();
-      error() << "equal expects two operands" << eom;
-      throw 0;
-    }
-
-    typecheck_function_call_arguments(expr);
-
-    equal_exprt equality_expr(
-      expr.arguments().front(), expr.arguments().back());
-    equality_expr.add_source_location()=source_location;
-
-    if(equality_expr.lhs().type() != equality_expr.rhs().type())
-    {
-      error().source_location = f_op.source_location();
-      error() << "equal expects two operands of same type" << eom;
-      throw 0;
-    }
-
-    return std::move(equality_expr);
-  }
   else if(identifier=="__builtin_expect")
   {
     // This is a gcc extension to provide branch prediction.
@@ -3532,80 +3612,6 @@ exprt c_typecheck_baset::do_special_functions(
     tmp.add_source_location()=source_location;
 
     return tmp;
-  }
-  else if(
-    identifier == CPROVER_PREFIX "overflow_minus" ||
-    identifier == CPROVER_PREFIX "overflow_mult" ||
-    identifier == CPROVER_PREFIX "overflow_plus" ||
-    identifier == CPROVER_PREFIX "overflow_shl")
-  {
-    exprt overflow{identifier, typet{}, exprt::operandst{expr.arguments()}};
-    overflow.add_source_location() = f_op.source_location();
-
-    if(identifier == CPROVER_PREFIX "overflow_minus")
-    {
-      overflow.id(ID_minus);
-      typecheck_expr_binary_arithmetic(overflow);
-    }
-    else if(identifier == CPROVER_PREFIX "overflow_mult")
-    {
-      overflow.id(ID_mult);
-      typecheck_expr_binary_arithmetic(overflow);
-    }
-    else if(identifier == CPROVER_PREFIX "overflow_plus")
-    {
-      overflow.id(ID_plus);
-      typecheck_expr_binary_arithmetic(overflow);
-    }
-    else if(identifier == CPROVER_PREFIX "overflow_shl")
-    {
-      overflow.id(ID_shl);
-      typecheck_expr_shifts(to_shift_expr(overflow));
-    }
-
-    binary_overflow_exprt of{
-      overflow.operands()[0], overflow.id(), overflow.operands()[1]};
-    of.add_source_location() = overflow.source_location();
-    return std::move(of);
-  }
-  else if(identifier == CPROVER_PREFIX "overflow_unary_minus")
-  {
-    exprt tmp{ID_unary_minus, typet{}, exprt::operandst{expr.arguments()}};
-    tmp.add_source_location() = f_op.source_location();
-
-    typecheck_expr_unary_arithmetic(tmp);
-
-    unary_minus_overflow_exprt overflow{tmp.operands().front()};
-    overflow.add_source_location() = tmp.source_location();
-    return std::move(overflow);
-  }
-  else if(identifier == CPROVER_PREFIX "enum_is_in_range")
-  {
-    // Check correct number of arguments
-    if(expr.arguments().size() != 1)
-    {
-      std::ostringstream error_message;
-      error_message << identifier << " takes exactly 1 argument, but "
-                    << expr.arguments().size() << " were provided";
-      throw invalid_source_file_exceptiont{
-        error_message.str(), expr.source_location()};
-    }
-    auto arg1 = expr.arguments()[0];
-    typecheck_expr(arg1);
-    if(!can_cast_type<c_enum_tag_typet>(arg1.type()))
-    {
-      // Can't enum range check a non-enum
-      std::ostringstream error_message;
-      error_message << identifier << " expects enum, but ("
-                    << expr2c(arg1, *this) << ") has type `"
-                    << type2c(arg1.type(), *this) << '`';
-      throw invalid_source_file_exceptiont{
-        error_message.str(), expr.source_location()};
-    }
-    else
-    {
-      return expr;
-    }
   }
   else if(
     identifier == "__builtin_add_overflow" ||
