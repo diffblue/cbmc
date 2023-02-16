@@ -63,11 +63,11 @@ For an explanation of the data structures involved in the modeling of a GOTO
 program (the GOTO Intermediate Representation used by CBMC and assorted tools)
 please see \subpage central-data-structures .
 
-## {C, java bytecode} &rarr; Parse tree &rarr; Symbol table &rarr; GOTO programs &rarr; GOTO program transformations &rarr; BMC &rarr; counterexample (goto_tracet) &rarr; printing ##
+## {C, java bytecode} &rarr; Parse tree &rarr; Symbol table &rarr; GOTO programs &rarr; GOTO program transformations &rarr; BMC &rarr; counterexample (goto_tracet) &rarr; printing
 
 To be documented.
 
-## Instrumentation: goto functions &rarr; goto functions ##
+## Instrumentation: goto functions &rarr; goto functions
 
 To be documented.
 
@@ -76,28 +76,28 @@ To be documented.
 For an explanation of part of how the BMC (Symex) process works, please refer
 to [Symex and GOTO program instructions](symex-instructions.md)
 
-## Trace &rarr; interpreter &rarr; memory map ##
+## Trace &rarr; interpreter &rarr; memory map
 
 To be documented.
 
-## Goto functions &rarr; abstract interpretation ##
+## Goto functions &rarr; abstract interpretation
 
 To be documented.
 
-## Executables (flow of transformations): ##
+## Executables (flow of transformations):
 
-### goto-cc ###
-
-To be documented.
-
-### goto-instrument ###
+### goto-cc
 
 To be documented.
 
-### cbmc ###
+### goto-instrument
 
 To be documented.
 
-### goto-analyzer ###
+### cbmc
+
+To be documented.
+
+### goto-analyzer
 
 To be documented.
