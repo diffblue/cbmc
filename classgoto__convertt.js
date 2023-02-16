@@ -65,7 +65,6 @@ var classgoto__convertt =
     [ "do_atomic_end", "classgoto__convertt.html#a4d7f809b9508c0c97d390d38fcdfc859", null ],
     [ "do_cpp_new", "classgoto__convertt.html#aea82212a0bab6b4f1db79d05942eee1f", null ],
     [ "do_create_thread", "classgoto__convertt.html#ac7c4328f12b1359a0d012fc6c904fce3", null ],
-    [ "do_enum_is_in_range", "classgoto__convertt.html#a4dae7695c1ac4dda98213c815963973d", null ],
     [ "do_function_call", "classgoto__convertt.html#a1eeb4d806573c2eeae6306260889ae9d", null ],
     [ "do_function_call_if", "classgoto__convertt.html#a16b1c025c576872c4f4f341e1cf22a1b", null ],
     [ "do_function_call_other", "classgoto__convertt.html#abcdddd63b6f3e64a80c69922e84aac45", null ],

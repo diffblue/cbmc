@@ -361,9 +361,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a7c6fd63b1487ab9eb4a8baebc40db6ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a233e527fdbe44177319cebec3c4b9e2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c">get_constant</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="separator:a233e527fdbe44177319cebec3c4b9e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4dae7695c1ac4dda98213c815963973d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__convertt.html#a4dae7695c1ac4dda98213c815963973d">do_enum_is_in_range</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;function, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;dest)</td></tr>
-<tr class="memdesc:a4dae7695c1ac4dda98213c815963973d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts calls to the built in <code>enum_is_in_range</code> function to a test that the given enum value is in the valid range of values for that enum type.  <a href="classgoto__convertt.html#a4dae7695c1ac4dda98213c815963973d">More...</a><br /></td></tr>
-<tr class="separator:a4dae7695c1ac4dda98213c815963973d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad45545f672b3863525644b415f52ec37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__convertt.html#ad45545f672b3863525644b415f52ec37">do_atomic_begin</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;function, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;dest)</td></tr>
 <tr class="separator:ad45545f672b3863525644b415f52ec37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d7f809b9508c0c97d390d38fcdfc859"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__convertt.html#a4d7f809b9508c0c97d390d38fcdfc859">do_atomic_end</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;function, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;dest)</td></tr>
@@ -2674,7 +2671,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>alloca allocates memory that is freed when leaving the function (and not the block, as regular destructors would do). </p>
 
-<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00726">726</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00699">699</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -2974,67 +2971,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a4dae7695c1ac4dda98213c815963973d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4dae7695c1ac4dda98213c815963973d">&#9670;&nbsp;</a></span>do_enum_is_in_range()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void goto_convertt::do_enum_is_in_range </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>lhs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>function</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;&#160;</td>
-          <td class="paramname"><em>arguments</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Converts calls to the built in <code>enum_is_in_range</code> function to a test that the given enum value is in the valid range of values for that enum type. </p>
-<p>Note that the check for the range of values is done by creating a disjunction comparing the expression with each possible valid value. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">lhs</td><td>The destination for the generated assignment. </td></tr>
-    <tr><td class="paramname">function</td><td>The <code>enum_is_in_range</code> symbol of the source function call. </td></tr>
-    <tr><td class="paramname">arguments</td><td>A collection of arguments, which is expected to contain a single argument which is an expression that resolves to a value of enum type. The arguments are expected to have been prevalidated by the typechecking process. </td></tr>
-    <tr><td class="paramname">dest</td><td>The goto program into which the generated assignment is copied. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00618">618</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a1eeb4d806573c2eeae6306260889ae9d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1eeb4d806573c2eeae6306260889ae9d">&#9670;&nbsp;</a></span>do_function_call()</h2>
 
@@ -3251,7 +3187,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>add function calls to function queue for later processing </p>
 
-<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00816">816</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00789">789</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -3335,7 +3271,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00645">645</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="builtin__functions_8cpp_source.html#l00618">618</a> of file <a class="el" href="builtin__functions_8cpp_source.html">builtin_functions.cpp</a>.</p>
 
 </div>
 </div>

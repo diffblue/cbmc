@@ -434,6 +434,7 @@ var annotated_dup =
     [ "endianness_map_widet", "classendianness__map__widet.html", "classendianness__map__widet" ],
     [ "endianness_mapt", "classendianness__mapt.html", "classendianness__mapt" ],
     [ "enter_scope_state_exprt", "classenter__scope__state__exprt.html", "classenter__scope__state__exprt" ],
+    [ "enum_is_in_range_exprt", "classenum__is__in__range__exprt.html", "classenum__is__in__range__exprt" ],
     [ "enumerating_loop_accelerationt", "classenumerating__loop__accelerationt.html", "classenumerating__loop__accelerationt" ],
     [ "enumeration_typet", "classenumeration__typet.html", "classenumeration__typet" ],
     [ "enumerative_loop_contracts_synthesizert", "classenumerative__loop__contracts__synthesizert.html", "classenumerative__loop__contracts__synthesizert" ],
