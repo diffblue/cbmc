@@ -292,10 +292,6 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
   // starting from 0
   size_t size_bound = 0;
 
-  // numbers of candidates we have seen,
-  // used for quantitative analysis
-  size_t seen_terms = 0;
-
   // Start to enumerate and check.
   while(true)
   {
@@ -306,7 +302,6 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
     {
       log.progress() << "Verifying candidate: "
                      << format(strengthening_candidate) << messaget::eom;
-      seen_terms++;
       invariant_mapt new_in_clauses = invariant_mapt(in_invariant_clause_map);
       new_in_clauses[cause_loop_id] =
         and_exprt(new_in_clauses[cause_loop_id], strengthening_candidate);
