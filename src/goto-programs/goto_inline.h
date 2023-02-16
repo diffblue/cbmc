@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class goto_functionst;
 class goto_modelt;
+class goto_programt;
 class message_handlert;
 class namespacet;
 
@@ -73,5 +74,13 @@ jsont goto_function_inline_and_log(
   message_handlert &message_handler,
   bool adjust_function=false,
   bool caching=true);
+
+void goto_program_inline(
+  goto_functionst &goto_functions,
+  goto_programt &goto_program,
+  const namespacet &ns,
+  message_handlert &message_handler,
+  bool adjust_function = false,
+  bool caching = true);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H

@@ -488,6 +488,21 @@ void goto_inlinet::goto_inline(
     force_full);
 }
 
+void goto_inlinet::goto_inline(
+  const goto_inlinet::call_listt &call_list,
+  goto_programt &goto_program,
+  const bool force_full)
+{
+  recursion_set.clear();
+  for(const auto &call : call_list)
+  {
+    // each top level call in the program gets its own fresh inline map
+    const inline_mapt inline_map;
+    expand_function_call(
+      goto_program, inline_map, call.second, force_full, call.first);
+  }
+}
+
 void goto_inlinet::goto_inline_nontransitive(
   const irep_idt identifier,
   goto_functiont &goto_function,

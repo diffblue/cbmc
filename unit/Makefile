@@ -66,6 +66,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_declaration.cpp \
        goto-programs/goto_program_function_call.cpp \
        goto-programs/goto_program_goto_target.cpp \
+       goto-programs/goto_program_goto_program_inline.cpp \
        goto-programs/goto_program_symbol_type_table_consistency.cpp \
        goto-programs/goto_program_table_consistency.cpp \
        goto-programs/goto_program_validate.cpp \
