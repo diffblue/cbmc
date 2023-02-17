@@ -19,12 +19,14 @@ central CBMC module, the *symbolic execution engine* (from now on, just *symex*)
 
 ## A (very) short introduction to Symex
 
-Symex is, at its core, a GOTO-program interpreter. While Symex is interpreting
-the program, it's also building a list of SSA steps that form part of the equation
-that is to be sent to the solver.
+Symex is, at its core, a GOTO-program interpreter that uses symbolic values instead of actual ones.
+This produces a formula which describes all possible outputs rather than a single output value.
+While Symex is interpreting the program, it also builds a list of Static Single Assignment (SSA)
+steps that form part of the equation that is to be sent to the solver. For more information see
+[src/goto-symex](../../src/goto-symex/README.md).
 
 You can see the main instruction dispatcher (what corresponds to the main interpreter
-loop) at goto_symext::execute_next_instruction.
+loop) at `goto_symext::execute_next_instruction`.
 
 Symex's source code is available under [src/goto-symex](../../src/goto-symex/).
 
@@ -37,8 +39,9 @@ purposes:
 ```c
 enum goto_program_instruction_typet
 {
+  [...]
   GOTO = 1,              // branch, possibly guarded
-  ASSUME = 2,            // non-failing guarded self loop
+  ASSUME = 2,            // assumption
   ASSERT = 3,            // assertions
   SKIP = 5,              // just advance the PC
   SET_RETURN_VALUE = 12, // set function return value (no control-flow change)
@@ -46,6 +49,7 @@ enum goto_program_instruction_typet
   DECL = 14,             // declare a local variable
   DEAD = 15,             // marks the end-of-live of a local variable
   FUNCTION_CALL = 16,    // call a function
+  [...]
 };
 ```
 
@@ -60,8 +64,8 @@ consider the following C file:
 ```c
 int main(int argc, char **argv)
 {
-    int arry[] = {0, 1, 2, 3};
-    __CPROVER_assert(arry[3] != 3, "expected failure: last arry element is equal to 3");
+    int a[] = {0, 1, 2, 3};
+    __CPROVER_assert(a[3] != 3, "expected failure: last element of array 'a' is equal to 3");
 }
 ```
 
@@ -92,10 +96,10 @@ correspondent instruction types (`DECL`, `ASSIGN`, etc).
 ---
 
 Symex (as mentioned above) is going to pick a designated entry point and then start going through
-each instruction. This happens at goto_symext::execute_next_instruction. While doing so, it will
-inspect the instruction's type, and then dispatch to a designated handling function (which usually go
-by the name `symex_<instruction-type>`) to handle that particular instruction type and its symbolic
-execution. In pseudocode, it looks like this:
+each instruction. This happens at `goto_symext::execute_next_instruction`. While doing so, it will
+inspect the instruction's type, and then dispatch to a designated handling function (which usually
+go by the name `symex_<instruction-type>`) to handle that particular instruction type and its
+symbolic execution. In pseudocode, it looks like this:
 
 ```c
 switch(instruction.type())
