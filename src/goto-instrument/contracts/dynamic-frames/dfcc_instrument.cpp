@@ -521,9 +521,8 @@ void dfcc_instrumentt::insert_add_decl_call(
     utils.make_null_check_expr(write_set), target->source_location()));
 
   payload.add(goto_programt::make_function_call(
-    code_function_callt{
-      library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_ADD_DECL].symbol_expr(),
-      {write_set, address_of_exprt(symbol_expr)}},
+    library.write_set_add_decl_call(
+      write_set, address_of_exprt(symbol_expr), target->source_location()),
     target->source_location()));
 
   auto label_instruction =
@@ -569,9 +568,8 @@ void dfcc_instrumentt::insert_record_dead_call(
     utils.make_null_check_expr(write_set), target->source_location()));
 
   payload.add(goto_programt::make_function_call(
-    code_function_callt{
-      library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_RECORD_DEAD].symbol_expr(),
-      {write_set, address_of_exprt(symbol_expr)}},
+    library.write_set_record_dead_call(
+      write_set, address_of_exprt(symbol_expr), target->source_location()),
     target->source_location()));
 
   auto label_instruction =
@@ -716,14 +714,13 @@ void dfcc_instrumentt::instrument_lhs(
     payload.add(goto_programt::make_decl(check_var, lhs_source_location));
 
     payload.add(goto_programt::make_function_call(
-      code_function_callt{
+      library.write_set_check_assignment_call(
         check_var,
-        library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ASSIGNMENT]
-          .symbol_expr(),
-        {write_set,
-         typecast_exprt::conditional_cast(
-           address_of_exprt(lhs), pointer_type(empty_typet{})),
-         utils.make_sizeof_expr(lhs)}},
+        write_set,
+        typecast_exprt::conditional_cast(
+          address_of_exprt(lhs), pointer_type(empty_typet{})),
+        utils.make_sizeof_expr(lhs),
+        lhs_source_location),
       lhs_source_location));
 
     payload.add(
@@ -810,10 +807,8 @@ void dfcc_instrumentt::instrument_assign(
       utils.make_null_check_expr(write_set), target_location));
 
     payload.add(goto_programt::make_function_call(
-      code_function_callt{
-        library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_RECORD_DEALLOCATED]
-          .symbol_expr(),
-        {write_set, dead_ptr.value()}},
+      library.write_set_record_dead_call(
+        write_set, dead_ptr.value(), target_location),
       target_location));
 
     auto label_instruction =
@@ -846,10 +841,7 @@ void dfcc_instrumentt::instrument_assign(
       utils.make_null_check_expr(write_set), target_location));
 
     payload.add(goto_programt::make_function_call(
-      code_function_callt{
-        library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_ADD_ALLOCATED]
-          .symbol_expr(),
-        {write_set, lhs}},
+      library.write_set_add_allocated_call(write_set, lhs, target_location),
       target_location));
 
     auto label_instruction =
@@ -987,11 +979,8 @@ void dfcc_instrumentt::instrument_deallocate_call(
   const auto &ptr = target->call_arguments().at(0);
 
   payload.add(goto_programt::make_function_call(
-    code_function_callt{
-      check_var,
-      library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_DEALLOCATE]
-        .symbol_expr(),
-      {write_set, ptr}},
+    library.write_set_check_deallocate_call(
+      check_var, write_set, ptr, target_location),
     target_location));
 
   // add property class on assertion source_location
@@ -1005,10 +994,7 @@ void dfcc_instrumentt::instrument_deallocate_call(
   payload.add(goto_programt::make_dead(check_var, target_location));
 
   payload.add(goto_programt::make_function_call(
-    code_function_callt{
-      library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_RECORD_DEALLOCATED]
-        .symbol_expr(),
-      {write_set, ptr}},
+    library.write_set_record_deallocated_call(write_set, ptr, target_location),
     target_location));
 
   auto label_instruction =
@@ -1099,13 +1085,11 @@ void dfcc_instrumentt::instrument_other(
 
     const auto &dest = target->get_other().operands().at(0);
 
-    symbolt &check_fun =
-      library.dfcc_fun_symbol
-        [is_array_set ? dfcc_funt::WRITE_SET_CHECK_ARRAY_SET
-                      : dfcc_funt::WRITE_SET_CHECK_ARRAY_COPY];
     payload.add(goto_programt::make_function_call(
-      code_function_callt{
-        check_var, check_fun.symbol_expr(), {write_set, dest}},
+      is_array_set ? library.write_set_check_array_set_call(
+                       check_var, write_set, dest, target_location)
+                   : library.write_set_check_array_copy_call(
+                       check_var, write_set, dest, target_location),
       target_location));
 
     // add property class on assertion source_location
@@ -1162,11 +1146,8 @@ void dfcc_instrumentt::instrument_other(
     const auto &src = target->get_other().operands().at(1);
 
     payload.add(goto_programt::make_function_call(
-      code_function_callt{
-        check_var,
-        library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ARRAY_REPLACE]
-          .symbol_expr(),
-        {write_set, dest, src}},
+      library.write_set_check_array_replace_call(
+        check_var, write_set, dest, src, target_location),
       target_location));
 
     // add property class on assertion source_location
@@ -1217,11 +1198,8 @@ void dfcc_instrumentt::instrument_other(
     const auto &ptr = target->get_other().operands().at(0);
 
     payload.add(goto_programt::make_function_call(
-      code_function_callt{
-        check_var,
-        library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_HAVOC_OBJECT]
-          .symbol_expr(),
-        {write_set, ptr}},
+      library.write_set_check_havoc_object_call(
+        check_var, write_set, ptr, target_location),
       target_location));
 
     // add property class on assertion source_location

@@ -559,3 +559,312 @@ void dfcc_libraryt::add_instrumented_functions_map_init_instructions(
   }
   goto_model.goto_functions.update();
 }
+
+const code_function_callt dfcc_libraryt::write_set_create_call(
+  const exprt &address_of_write_set,
+  const exprt &max_assigns_clause_size,
+  const exprt &max_frees_clause_size,
+  const exprt &assume_requires_ctx,
+  const exprt &assert_requires_ctx,
+  const exprt &assume_ensures_ctx,
+  const exprt &assert_ensures_ctx,
+  const exprt &allow_allocate,
+  const exprt &allow_deallocate,
+  const source_locationt &source_location)
+{
+  auto function_symbol =
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CREATE].symbol_expr();
+  code_function_callt call(function_symbol);
+  auto &arguments = call.arguments();
+  // check that address_of_write_set.type() is dfcc_typet::WRITE_SET_PTR
+  arguments.emplace_back(address_of_write_set);
+  PRECONDITION(max_assigns_clause_size.type() == size_type());
+  arguments.emplace_back(max_assigns_clause_size);
+  PRECONDITION(max_frees_clause_size.type() == size_type());
+  arguments.emplace_back(max_frees_clause_size);
+  arguments.push_back(assume_requires_ctx);
+  arguments.push_back(assert_requires_ctx);
+  arguments.push_back(assume_ensures_ctx);
+  arguments.push_back(assert_ensures_ctx);
+  arguments.push_back(allow_allocate);
+  arguments.push_back(allow_deallocate);
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_release_call(
+  const exprt &write_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_RELEASE].symbol_expr(),
+    {write_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_add_allocated_call(
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_ADD_ALLOCATED].symbol_expr(),
+    {write_set_ptr, ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_add_decl_call(
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_ADD_DECL].symbol_expr(),
+    {write_set_ptr, ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_record_dead_call(
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_RECORD_DEAD].symbol_expr(),
+    {write_set_ptr, ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_record_deallocated_call(
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_RECORD_DEALLOCATED].symbol_expr(),
+    {write_set_ptr, ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt
+dfcc_libraryt::write_set_check_allocated_deallocated_is_empty_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ALLOCATED_DEALLOCATED_IS_EMPTY]
+      .symbol_expr(),
+    {write_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_check_assignment_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const exprt &size,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ASSIGNMENT].symbol_expr(),
+    {write_set_ptr, ptr, size});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_check_array_set_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const exprt &dest,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ARRAY_SET].symbol_expr(),
+    {write_set_ptr, dest});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_check_array_copy_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const exprt &dest,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ARRAY_COPY].symbol_expr(),
+    {write_set_ptr, dest});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_check_array_replace_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const exprt &dest,
+  const exprt &src,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ARRAY_REPLACE].symbol_expr(),
+    {write_set_ptr, dest, src});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_check_havoc_object_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_HAVOC_OBJECT].symbol_expr(),
+    {write_set_ptr, ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_check_deallocate_call(
+  const exprt &check_var,
+  const exprt &write_set_ptr,
+  const exprt &ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_DEALLOCATE].symbol_expr(),
+    {write_set_ptr, ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt
+dfcc_libraryt::write_set_check_assigns_clause_inclusion_call(
+  const exprt &check_var,
+  const exprt &reference_write_set_ptr,
+  const exprt &candidate_write_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_ASSIGNS_CLAUSE_INCLUSION]
+      .symbol_expr(),
+    {reference_write_set_ptr, candidate_write_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt
+dfcc_libraryt::write_set_check_frees_clause_inclusion_call(
+  const exprt &check_var,
+  const exprt &reference_write_set_ptr,
+  const exprt &candidate_write_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    check_var,
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_CHECK_FREES_CLAUSE_INCLUSION]
+      .symbol_expr(),
+    {reference_write_set_ptr, candidate_write_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::write_set_deallocate_freeable_call(
+  const exprt &write_set_ptr,
+  const exprt &target_write_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::WRITE_SET_DEALLOCATE_FREEABLE].symbol_expr(),
+    {write_set_ptr, target_write_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::link_is_fresh_call(
+  const exprt &write_set_ptr,
+  const exprt &is_fresh_obj_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::LINK_IS_FRESH].symbol_expr(),
+    {write_set_ptr, is_fresh_obj_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::link_allocated_call(
+  const exprt &write_set_postconditions_ptr,
+  const exprt &write_set_to_link_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::LINK_ALLOCATED].symbol_expr(),
+    {write_set_postconditions_ptr, write_set_to_link_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::link_deallocated_call(
+  const exprt &write_set_postconditions_ptr,
+  const exprt &write_set_to_link_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::LINK_DEALLOCATED].symbol_expr(),
+    {write_set_postconditions_ptr, write_set_to_link_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt
+dfcc_libraryt::check_replace_ensures_was_freed_preconditions_call(
+  const exprt &ptr,
+  const exprt &write_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::REPLACE_ENSURES_WAS_FREED_PRECONDITIONS]
+      .symbol_expr(),
+    {ptr, write_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt
+dfcc_libraryt::obj_set_create_indexed_by_object_id_call(
+  const exprt &obj_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::OBJ_SET_CREATE_INDEXED_BY_OBJECT_ID]
+      .symbol_expr(),
+    {obj_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}
+
+const code_function_callt dfcc_libraryt::obj_set_release_call(
+  const exprt &obj_set_ptr,
+  const source_locationt &source_location)
+{
+  code_function_callt call(
+    dfcc_fun_symbol[dfcc_funt::OBJ_SET_RELEASE].symbol_expr(), {obj_set_ptr});
+  call.add_source_location() = source_location;
+  return call;
+}

@@ -60,12 +60,10 @@ void dfcc_is_freeablet::rewrite_calls(
         {
           // insert call to precondition for vacuity checking
           auto inst = goto_programt::make_function_call(
-            code_function_callt{
-              library
-                .dfcc_fun_symbol
-                  [dfcc_funt::REPLACE_ENSURES_WAS_FREED_PRECONDITIONS]
-                .symbol_expr(),
-              {target->call_arguments().at(0), write_set}},
+            library.check_replace_ensures_was_freed_preconditions_call(
+              target->call_arguments().at(0),
+              write_set,
+              target->source_location()),
             target->source_location());
           program.insert_before_swap(target, inst);
           target++;
