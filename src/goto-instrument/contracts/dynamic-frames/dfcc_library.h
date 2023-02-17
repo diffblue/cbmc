@@ -87,6 +87,8 @@ enum class dfcc_funt
   WRITE_SET_ADD_FREEABLE,
   /// \see __CPROVER_contracts_write_set_add_allocated
   WRITE_SET_ADD_ALLOCATED,
+  /// \see __CPROVER_contracts_write_set_add_decl
+  WRITE_SET_ADD_DECL,
   /// \see __CPROVER_contracts_write_set_record_dead
   WRITE_SET_RECORD_DEAD,
   /// \see __CPROVER_contracts_write_set_record_deallocated

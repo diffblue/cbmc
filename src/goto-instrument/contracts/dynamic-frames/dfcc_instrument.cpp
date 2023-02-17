@@ -380,8 +380,7 @@ void dfcc_instrumentt::instrument_function_body(
   for(const auto &local_static : local_statics)
   {
     // automatically add local statics to the write set
-    insert_add_allocated_call(
-      function_id, write_set, local_static, begin, body);
+    insert_add_decl_call(function_id, write_set, local_static, begin, body);
 
     // automatically remove local statics to the write set
     insert_record_dead_call(function_id, write_set, local_static, end, body);
@@ -510,7 +509,7 @@ bool dfcc_instrumentt::must_track_decl_or_dead(
   return retval;
 }
 
-void dfcc_instrumentt::insert_add_allocated_call(
+void dfcc_instrumentt::insert_add_decl_call(
   const irep_idt &function_id,
   const exprt &write_set,
   const symbol_exprt &symbol_expr,
@@ -523,7 +522,7 @@ void dfcc_instrumentt::insert_add_allocated_call(
 
   payload.add(goto_programt::make_function_call(
     code_function_callt{
-      library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_ADD_ALLOCATED].symbol_expr(),
+      library.dfcc_fun_symbol[dfcc_funt::WRITE_SET_ADD_DECL].symbol_expr(),
       {write_set, address_of_exprt(symbol_expr)}},
     target->source_location()));
 
@@ -538,7 +537,7 @@ void dfcc_instrumentt::insert_add_allocated_call(
 /// ```c
 /// DECL x;
 /// ----
-/// insert_add_allocated_call(...);
+/// insert_add_decl_call(...);
 /// ```
 void dfcc_instrumentt::instrument_decl(
   const irep_idt &function_id,
@@ -552,7 +551,7 @@ void dfcc_instrumentt::instrument_decl(
 
   const auto &decl_symbol = target->decl_symbol();
   target++;
-  insert_add_allocated_call(
+  insert_add_decl_call(
     function_id, write_set, decl_symbol, target, goto_program);
   target--;
 }

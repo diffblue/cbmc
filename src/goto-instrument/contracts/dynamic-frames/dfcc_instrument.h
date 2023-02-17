@@ -175,7 +175,7 @@ protected:
   /// forward.
   /// ```
   /// IF !write_set GOTO skip_target;
-  /// CALL __CPROVER_contracts_write_set_add_allocated(write_set, &x);
+  /// CALL __CPROVER_contracts_write_set_add_decl(write_set, &x);
   /// skip_target: SKIP;
   /// ```
   /// \param function_id Name of the function in which the instructions is added
@@ -183,7 +183,7 @@ protected:
   /// \param symbol_expr The symbol to add to the write set
   /// \param target The instruction pointer to insert at
   /// \param goto_program the goto_program being instrumented
-  void insert_add_allocated_call(
+  void insert_add_decl_call(
     const irep_idt &function_id,
     const exprt &write_set,
     const symbol_exprt &symbol_expr,

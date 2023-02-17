@@ -91,6 +91,7 @@ const std::map<dfcc_funt, irep_idt> create_dfcc_fun_to_name()
      CONTRACTS_PREFIX "write_set_add_freeable"},
     {dfcc_funt::WRITE_SET_ADD_ALLOCATED,
      CONTRACTS_PREFIX "write_set_add_allocated"},
+    {dfcc_funt::WRITE_SET_ADD_DECL, CONTRACTS_PREFIX "write_set_add_decl"},
     {dfcc_funt::WRITE_SET_RECORD_DEAD,
      CONTRACTS_PREFIX "write_set_record_dead"},
     {dfcc_funt::WRITE_SET_RECORD_DEALLOCATED,
