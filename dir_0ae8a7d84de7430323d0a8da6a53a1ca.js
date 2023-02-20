@@ -8,8 +8,6 @@ var dir_0ae8a7d84de7430323d0a8da6a53a1ca =
     [ "goto_program_dereference.cpp", "goto__program__dereference_8cpp.html", "goto__program__dereference_8cpp" ],
     [ "goto_program_dereference.h", "goto__program__dereference_8h.html", "goto__program__dereference_8h" ],
     [ "object_numbering.h", "object__numbering_8h.html", "object__numbering_8h" ],
-    [ "rewrite_index.cpp", "rewrite__index_8cpp.html", "rewrite__index_8cpp" ],
-    [ "rewrite_index.h", "rewrite__index_8h.html", "rewrite__index_8h" ],
     [ "show_value_sets.cpp", "show__value__sets_8cpp.html", "show__value__sets_8cpp" ],
     [ "show_value_sets.h", "show__value__sets_8h.html", "show__value__sets_8h" ],
     [ "value_set.cpp", "value__set_8cpp.html", "value__set_8cpp" ],

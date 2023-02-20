@@ -302,7 +302,7 @@ VERIFICATION FAILED
 <div class="line">}</div>
 </div><!-- fragment --><p>Note that no attempt to follow the <code>next</code> pointer is made. If an array of unknown (or 0) size is encountered, a diagnostic is emitted and the array is not further examined.</p>
 <p>Some care must be taken when choosing the regular expressions for globals and functions. Names starting with <code>__</code> are reserved for internal purposes; For example, replacing functions or setting global variables with the <code>__CPROVER</code> prefix might make analysis impossible. To avoid doing this by accident, negative lookahead can be used. For example, <code>(?!__).*</code> matches all names not starting with <code>__</code>.</p>
-<p>Last modified: 2023-02-17 11:09:06 +0000 </p>
+<p>Last modified: 2023-02-20 13:23:47 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

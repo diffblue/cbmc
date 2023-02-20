@@ -1,10 +1,5 @@
 var NAVTREEINDEX115 =
 {
-"satcheck__cadical_8h.html":[7,0,2,27,7,16],
-"satcheck__cadical_8h_source.html":[7,0,2,27,7,16],
-"satcheck__core_8h.html":[7,0,2,27,7,17],
-"satcheck__core_8h_source.html":[7,0,2,27,7,17],
-"satcheck__glucose_8cpp.html":[7,0,2,27,7,18],
 "satcheck__glucose_8cpp.html#a40b69ebeceecc72659aee95f58495208":[7,0,2,27,7,18,0],
 "satcheck__glucose_8cpp_source.html":[7,0,2,27,7,18],
 "satcheck__glucose_8h.html":[7,0,2,27,7,19],
@@ -216,13 +211,13 @@ var NAVTREEINDEX115 =
 "show__symbol__table_8h.html#a79edb897251da17e37451694ef3b5ba6":[7,0,2,14,131,3],
 "show__symbol__table_8h.html#ae3c5881762d155b31489db9912d6d973":[7,0,2,14,131,1],
 "show__symbol__table_8h_source.html":[7,0,2,14,131],
-"show__value__sets_8cpp.html":[7,0,2,26,8],
-"show__value__sets_8cpp.html#a4aaaa1ed19e360738279903665e52c46":[7,0,2,26,8,0],
-"show__value__sets_8cpp.html#a62a3031b1e1b09d1fb0a4f99b9f57745":[7,0,2,26,8,1],
-"show__value__sets_8cpp_source.html":[7,0,2,26,8],
-"show__value__sets_8h.html":[7,0,2,26,9],
-"show__value__sets_8h.html#ac356fc75d4aa678e165ef880eefb92c2":[7,0,2,26,9,0],
-"show__value__sets_8h_source.html":[7,0,2,26,9],
+"show__value__sets_8cpp.html":[7,0,2,26,6],
+"show__value__sets_8cpp.html#a4aaaa1ed19e360738279903665e52c46":[7,0,2,26,6,0],
+"show__value__sets_8cpp.html#a62a3031b1e1b09d1fb0a4f99b9f57745":[7,0,2,26,6,1],
+"show__value__sets_8cpp_source.html":[7,0,2,26,6],
+"show__value__sets_8h.html":[7,0,2,26,7],
+"show__value__sets_8h.html#ac356fc75d4aa678e165ef880eefb92c2":[7,0,2,26,7,0],
+"show__value__sets_8h_source.html":[7,0,2,26,7],
 "show__vcc_8cpp.html":[7,0,2,15,44],
 "show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0":[7,0,2,15,44,2],
 "show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b":[7,0,2,15,44,1],
@@ -249,5 +244,10 @@ var NAVTREEINDEX115 =
 "simple__method__stubbing_8cpp.html":[7,0,1,0,1,115],
 "simple__method__stubbing_8cpp.html#a4f141080035d6f08eff36859ba62e876":[7,0,1,0,1,115,1],
 "simple__method__stubbing_8cpp.html#a86bc79fd006692a22f4074993d348d19":[7,0,1,0,1,115,2],
-"simple__method__stubbing_8cpp_source.html":[7,0,1,0,1,115]
+"simple__method__stubbing_8cpp_source.html":[7,0,1,0,1,115],
+"simple__method__stubbing_8h.html":[7,0,1,0,1,116],
+"simple__method__stubbing_8h.html#a4f141080035d6f08eff36859ba62e876":[7,0,1,0,1,116,0],
+"simple__method__stubbing_8h.html#a86bc79fd006692a22f4074993d348d19":[7,0,1,0,1,116,1],
+"simple__method__stubbing_8h_source.html":[7,0,1,0,1,116],
+"simplify__expr_8cpp.html":[7,0,2,30,194]
 };

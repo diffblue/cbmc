@@ -1,5 +1,6 @@
 var NAVTREEINDEX71 =
 {
+"cnf_8cpp_source.html":[7,0,2,27,7,0],
 "cnf_8h.html":[7,0,2,27,7,1],
 "cnf_8h_source.html":[7,0,2,27,7,1],
 "cnf__clause__list_8cpp.html":[7,0,2,27,7,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX71 =
 "contracts-history-variables.html#autotoc_md93":[1,0,9,0,0],
 "contracts-history-variables.html#autotoc_md94":[1,0,9,0,1],
 "contracts-history-variables.html#autotoc_md95":[1,0,9,0,2],
-"contracts-history-variables.html#autotoc_md96":[1,0,9,1],
-"contracts-history-variables.html#autotoc_md97":[1,0,9,2]
+"contracts-history-variables.html#autotoc_md96":[1,0,9,1]
 };
