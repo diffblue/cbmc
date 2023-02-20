@@ -20,7 +20,6 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../pointer-analysis/value_set_fi$(OBJEXT) \
       ../pointer-analysis/value_set_dereference$(OBJEXT) \
       ../pointer-analysis/add_failed_symbols$(OBJEXT) \
-      ../pointer-analysis/rewrite_index$(OBJEXT) \
       ../pointer-analysis/goto_program_dereference$(OBJEXT) \
       ../goto-instrument/source_lines$(OBJEXT) \
       ../goto-instrument/cover$(OBJEXT) \
