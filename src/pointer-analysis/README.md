@@ -34,10 +34,6 @@ storage.
 
 To be documented.
 
-\subsection pointer-analysis-rewrite-index Rewrite index (x[i] -> *(x+i)) (rewrite_index)
-
-To be documented.
-
 \section pointer-analysis-analysis Value-set Analysis:
 
 Value-set analysis is a framework for data-flow analyses which involve keeping
