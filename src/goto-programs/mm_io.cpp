@@ -111,8 +111,9 @@ void mm_io(
 void mm_io(symbol_tablet &symbol_table, goto_functionst &goto_functions)
 {
   const namespacet ns(symbol_table);
-  exprt mm_io_r = nil_exprt(), mm_io_r_value = nil_exprt(),
-        mm_io_w = nil_exprt();
+  exprt mm_io_r = nil_exprt();
+  exprt mm_io_r_value = nil_exprt();
+  exprt mm_io_w = nil_exprt();
 
   irep_idt id_r=CPROVER_PREFIX "mm_io_r";
   irep_idt id_w=CPROVER_PREFIX "mm_io_w";
