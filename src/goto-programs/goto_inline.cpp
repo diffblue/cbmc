@@ -354,3 +354,36 @@ jsont goto_function_inline_and_log(
 
   return goto_inline.output_inline_log_json();
 }
+
+/// Transitively inline all function calls found in a particular program.
+/// Caller is responsible for calling update(), compute_loop_numbers(), etc.
+/// \param goto_functions: The function map to use to find function bodies.
+/// \param goto_program: The program whose calls to inline.
+/// \param ns: Namespace used by goto_inlinet.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param adjust_function: Replace location in inlined function with call site.
+/// \param caching: Tell goto_inlinet to cache.
+void goto_program_inline(
+  goto_functionst &goto_functions,
+  goto_programt &goto_program,
+  const namespacet &ns,
+  message_handlert &message_handler,
+  bool adjust_function,
+  bool caching)
+{
+  goto_inlinet goto_inline(
+    goto_functions, ns, message_handler, adjust_function, caching);
+
+  // gather all calls found in the program
+  goto_inlinet::call_listt call_list;
+
+  Forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(!i_it->is_function_call())
+      continue;
+
+    call_list.push_back(goto_inlinet::callt(i_it, true));
+  }
+
+  goto_inline.goto_inline(call_list, goto_program, true);
+}

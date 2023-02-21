@@ -69,6 +69,16 @@ public:
     const inline_mapt &inline_map,
     const bool force_full=false);
 
+  /// \brief Inline specified calls in a given program.
+  /// \param call_list : calls to inline in the `goto_program`.
+  /// \param goto_program : goto program to inline `calls_list` in.
+  /// \param force_full : true to break recursion with a SKIP,
+  ///   false means detecting recursion is an error.
+  void goto_inline(
+    const goto_inlinet::call_listt &call_list,
+    goto_programt &goto_program,
+    const bool force_full = false);
+
   // handle all functions
   void goto_inline(
     const inline_mapt &inline_map,
