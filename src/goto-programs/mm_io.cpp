@@ -23,14 +23,14 @@ Date:   April 2017
 
 #include <set>
 
-void collect_deref_expr(
-  const exprt &src,
-  std::set<dereference_exprt> &dest)
+std::set<dereference_exprt> collect_deref_expr(const exprt &src)
 {
-  src.visit_pre([&dest](const exprt &e) {
+  std::set<dereference_exprt> collected;
+  src.visit_pre([&collected](const exprt &e) {
     if(e.id() == ID_dereference)
-      dest.insert(to_dereference_expr(e));
+      collected.insert(to_dereference_expr(e));
   });
+  return collected;
 }
 
 void mm_io(
@@ -47,11 +47,9 @@ void mm_io(
     if(!it->is_assign())
       continue;
 
-    std::set<dereference_exprt> deref_expr_r;
-
     auto &a_lhs = it->assign_lhs();
     auto &a_rhs = it->assign_rhs_nonconst();
-    collect_deref_expr(a_rhs, deref_expr_r);
+    const auto deref_expr_r = collect_deref_expr(a_rhs);
 
     if(mm_io_r.is_not_nil())
     {
