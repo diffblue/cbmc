@@ -115,8 +115,8 @@ void mm_io(symbol_tablet &symbol_table, goto_functionst &goto_functions)
   exprt mm_io_r_value = nil_exprt();
   exprt mm_io_w = nil_exprt();
 
-  irep_idt id_r=CPROVER_PREFIX "mm_io_r";
-  irep_idt id_w=CPROVER_PREFIX "mm_io_w";
+  const irep_idt id_r = CPROVER_PREFIX "mm_io_r";
+  const irep_idt id_w = CPROVER_PREFIX "mm_io_w";
 
   auto maybe_symbol=symbol_table.lookup(id_r);
   if(maybe_symbol)
