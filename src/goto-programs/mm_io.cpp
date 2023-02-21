@@ -47,7 +47,7 @@ void mm_io(
     if(!it->is_assign())
       continue;
 
-    std::set<dereference_exprt> deref_expr_w, deref_expr_r;
+    std::set<dereference_exprt> deref_expr_r;
 
     auto &a_lhs = it->assign_lhs();
     auto &a_rhs = it->assign_rhs_nonconst();
