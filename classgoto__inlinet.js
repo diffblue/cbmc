@@ -15,6 +15,7 @@ var classgoto__inlinet =
     [ "clear", "classgoto__inlinet.html#adc918c81799677656d1b0090566be501", null ],
     [ "expand_function_call", "classgoto__inlinet.html#af1afbb557e695231fc59b20880ef87a6", null ],
     [ "get_call", "classgoto__inlinet.html#a3bdadf74928f4af5f69ca66aeea27266", null ],
+    [ "goto_inline", "classgoto__inlinet.html#aaf4056feed32c907528253c7f6a2d8ef", null ],
     [ "goto_inline", "classgoto__inlinet.html#a79847de72fcdee6bc20b70c51b8f9977", null ],
     [ "goto_inline", "classgoto__inlinet.html#a5b749b07ec70df240991f7f425678cf0", null ],
     [ "goto_inline_nontransitive", "classgoto__inlinet.html#a1e6f5bf8a5fe8dc525fd0634127e1076", null ],

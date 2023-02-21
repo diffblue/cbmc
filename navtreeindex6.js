@@ -1,6 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"call__stack_8h.html":[7,0,2,15,3],
 "call__stack_8h_source.html":[7,0,2,15,3],
 "call__stack__history_8cpp.html":[7,0,2,0,12],
 "call__stack__history_8cpp_source.html":[7,0,2,0,12],
@@ -249,5 +248,6 @@ var NAVTREEINDEX6 =
 "class_parser.html#a4f936d43ea1c5164b1357bcfb1346225":[6,0,879,11],
 "class_parser.html#a503a402a39e4477302dde1da7f5590ae":[6,0,879,71],
 "class_parser.html#a560504861d6edf196c3d22034ed7f813":[6,0,879,112],
-"class_parser.html#a56e5433cebfa83870445186702ecff3c":[6,0,879,25]
+"class_parser.html#a56e5433cebfa83870445186702ecff3c":[6,0,879,25],
+"class_parser.html#a5770fbd6c4a103f32556f9654c2899e6":[6,0,879,49]
 };

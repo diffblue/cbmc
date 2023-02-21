@@ -139,6 +139,9 @@ Functions</h2></td></tr>
 <tr class="separator:a15fe6e63eca5b8c0595c9212b9fb0506"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdd2e70c1f7f793a16d47b5db27bc4ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classjsont.html">jsont</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__inline_8h.html#afdd2e70c1f7f793a16d47b5db27bc4ba">goto_function_inline_and_log</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> function, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, bool adjust_function=false, bool caching=true)</td></tr>
 <tr class="separator:afdd2e70c1f7f793a16d47b5db27bc4ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ac9edc05b4bfdf0f85eaf395494d5da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__inline_8h.html#a9ac9edc05b4bfdf0f85eaf395494d5da">goto_program_inline</a> (<a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, bool adjust_function=false, bool caching=true)</td></tr>
+<tr class="memdesc:a9ac9edc05b4bfdf0f85eaf395494d5da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transitively inline all function calls found in a particular program.  <a href="goto__inline_8h.html#a9ac9edc05b4bfdf0f85eaf395494d5da">More...</a><br /></td></tr>
+<tr class="separator:a9ac9edc05b4bfdf0f85eaf395494d5da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Function Inlining This gives a number of different interfaces to the function inlining functionality of <a class="el" href="classgoto__inlinet.html">goto_inlinet</a>. </p>
@@ -529,6 +532,73 @@ Functions</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="goto__inline_8cpp_source.html#l00122">122</a> of file <a class="el" href="goto__inline_8cpp_source.html">goto_inline.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a9ac9edc05b4bfdf0f85eaf395494d5da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ac9edc05b4bfdf0f85eaf395494d5da">&#9670;&nbsp;</a></span>goto_program_inline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void goto_program_inline </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>adjust_function</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>caching</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Transitively inline all function calls found in a particular program. </p>
+<p>Caller is responsible for calling update(), compute_loop_numbers(), etc. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">goto_functions</td><td>The function map to use to find function bodies. </td></tr>
+    <tr><td class="paramname">goto_program</td><td>The program whose calls to inline. </td></tr>
+    <tr><td class="paramname">ns</td><td>Namespace used by <a class="el" href="classgoto__inlinet.html">goto_inlinet</a>. </td></tr>
+    <tr><td class="paramname">message_handler</td><td>Message handler used by <a class="el" href="classgoto__inlinet.html">goto_inlinet</a>. </td></tr>
+    <tr><td class="paramname">adjust_function</td><td>Replace location in inlined function with call site. </td></tr>
+    <tr><td class="paramname">caching</td><td>Tell <a class="el" href="classgoto__inlinet.html">goto_inlinet</a> to cache. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="goto__inline_8cpp_source.html#l00366">366</a> of file <a class="el" href="goto__inline_8cpp_source.html">goto_inline.cpp</a>.</p>
 
 </div>
 </div>

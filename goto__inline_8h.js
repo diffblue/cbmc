@@ -6,5 +6,6 @@ var goto__inline_8h =
     [ "goto_inline", "goto__inline_8h.html#a7d6904a047ecaa8998a759c0bc2cb73c", null ],
     [ "goto_inline", "goto__inline_8h.html#a51f1567f914838ff660812d988fe20ea", null ],
     [ "goto_partial_inline", "goto__inline_8h.html#ac1fd082b4cde2afde0b20910773e8d3f", null ],
-    [ "goto_partial_inline", "goto__inline_8h.html#ade5846664c18cd5ae7f0cde01915128a", null ]
+    [ "goto_partial_inline", "goto__inline_8h.html#ade5846664c18cd5ae7f0cde01915128a", null ],
+    [ "goto_program_inline", "goto__inline_8h.html#a9ac9edc05b4bfdf0f85eaf395494d5da", null ]
 ];
