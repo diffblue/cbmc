@@ -40,9 +40,8 @@ void mm_io(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {
-  for(goto_programt::instructionst::iterator it=
-      goto_function.body.instructions.begin();
-      it!=goto_function.body.instructions.end();
+  for(auto it = goto_function.body.instructions.begin();
+      it != goto_function.body.instructions.end();
       it++)
   {
     if(!it->is_assign())
