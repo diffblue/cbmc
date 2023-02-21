@@ -23,7 +23,7 @@ Date:   April 2017
 
 #include <set>
 
-std::set<dereference_exprt> collect_deref_expr(const exprt &src)
+static std::set<dereference_exprt> collect_deref_expr(const exprt &src)
 {
   std::set<dereference_exprt> collected;
   src.visit_pre([&collected](const exprt &e) {
