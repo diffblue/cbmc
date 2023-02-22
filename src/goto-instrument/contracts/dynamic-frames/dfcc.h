@@ -33,6 +33,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/irep.h>
 #include <util/message.h>
 
+#include "dfcc_contract_clauses_codegen.h"
 #include "dfcc_contract_handler.h"
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
@@ -208,13 +209,15 @@ protected:
   message_handlert &message_handler;
   messaget log;
 
-  // hold the global state of the transformation (caches etc.)
+  // Singletons that hold the global state of the program transformation
+  // (caches etc.)
   dfcc_utilst utils;
   dfcc_libraryt library;
   namespacet ns;
   dfcc_instrumentt instrument;
   dfcc_lift_memory_predicatest memory_predicates;
   dfcc_spec_functionst spec_functions;
+  dfcc_contract_clauses_codegent contract_clauses_codegen;
   dfcc_contract_handlert contract_handler;
   dfcc_swap_and_wrapt swap_and_wrap;
 

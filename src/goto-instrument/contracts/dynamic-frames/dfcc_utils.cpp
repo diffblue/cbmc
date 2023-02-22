@@ -476,8 +476,7 @@ void dfcc_utilst::inline_function(const irep_idt &function_id)
 
   inlining_decoratort decorated(log.get_message_handler());
   namespacet ns{goto_model.symbol_table};
-  goto_function_inline(
-    goto_model.goto_functions, function_id, ns, log.get_message_handler());
+  goto_function_inline(goto_model.goto_functions, function_id, ns, decorated);
 
   decorated.throw_on_recursive_calls(log, 0);
   decorated.throw_on_no_body(log, 0);
@@ -503,8 +502,7 @@ void dfcc_utilst::inline_function(
 
   inlining_decoratort decorated(log.get_message_handler());
   namespacet ns{goto_model.symbol_table};
-  goto_function_inline(
-    goto_model.goto_functions, function_id, ns, log.get_message_handler());
+  goto_function_inline(goto_model.goto_functions, function_id, ns, decorated);
   no_body.insert(
     decorated.get_no_body_set().begin(), decorated.get_no_body_set().end());
   recursive_call.insert(
@@ -519,10 +517,51 @@ void dfcc_utilst::inline_function(
   goto_model.goto_functions.update();
 }
 
+void dfcc_utilst::inline_program(goto_programt &program)
+{
+  inlining_decoratort decorated(log.get_message_handler());
+  namespacet ns{goto_model.symbol_table};
+  goto_program_inline(goto_model.goto_functions, program, ns, decorated);
+
+  decorated.throw_on_recursive_calls(log, 0);
+  decorated.throw_on_no_body(log, 0);
+  decorated.throw_on_missing_function(log, 0);
+  decorated.throw_on_not_enough_arguments(log, 0);
+}
+
+void dfcc_utilst::inline_program(
+  goto_programt &goto_program,
+  std::set<irep_idt> &no_body,
+  std::set<irep_idt> &recursive_call,
+  std::set<irep_idt> &missing_function,
+  std::set<irep_idt> &not_enough_arguments)
+{
+  inlining_decoratort decorated(log.get_message_handler());
+  namespacet ns{goto_model.symbol_table};
+  goto_program_inline(goto_model.goto_functions, goto_program, ns, decorated);
+  no_body.insert(
+    decorated.get_no_body_set().begin(), decorated.get_no_body_set().end());
+  recursive_call.insert(
+    decorated.get_recursive_call_set().begin(),
+    decorated.get_recursive_call_set().end());
+  missing_function.insert(
+    decorated.get_missing_function_set().begin(),
+    decorated.get_missing_function_set().end());
+  not_enough_arguments.insert(
+    decorated.get_not_enough_arguments_set().begin(),
+    decorated.get_not_enough_arguments_set().end());
+  goto_model.goto_functions.update();
+}
+
+bool dfcc_utilst::has_no_loops(const goto_programt &goto_program)
+{
+  return is_loop_free(goto_program, ns, log);
+}
+
 bool dfcc_utilst::has_no_loops(const irep_idt &function_id)
 {
-  auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
-  return is_loop_free(goto_function.body, ns, log);
+  return has_no_loops(
+    goto_model.goto_functions.function_map.at(function_id).body);
 }
 
 void dfcc_utilst::set_hide(const irep_idt &function_id, bool hide)

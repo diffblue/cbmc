@@ -20,6 +20,7 @@ Date: August 2022
 #include <set>
 
 class goto_modelt;
+class goto_programt;
 class message_handlert;
 class symbolt;
 
@@ -212,6 +213,22 @@ public:
 
   /// \returns True iff \p function_id is loop free.
   bool has_no_loops(const irep_idt &function_id);
+
+  /// \brief Inlines the given program, aborts on recursive calls during
+  /// inlining.
+  void inline_program(goto_programt &program);
+
+  /// \brief Inlines the given program, and returns function symbols that
+  /// caused warnings.
+  void inline_program(
+    goto_programt &goto_program,
+    std::set<irep_idt> &no_body,
+    std::set<irep_idt> &recursive_call,
+    std::set<irep_idt> &missing_function,
+    std::set<irep_idt> &not_enough_arguments);
+
+  /// \returns True iff \p goto_program is loop free.
+  bool has_no_loops(const goto_programt &goto_program);
 
   /// \brief Sets the given hide flag on all instructions of the function if it
   /// exists.
