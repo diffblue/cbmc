@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"contracts-history-variables.html#autotoc_md96":[1,0,9,1],
 "contracts-history-variables.html#autotoc_md97":[1,0,9,2],
 "contracts-loop-invariants.html":[1,0,5],
 "contracts-loop-invariants.html#autotoc_md100":[1,0,5,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "convert__string__literal_8h.html#a5dd4023fe3e52ecd8c49e53d4004014d":[7,0,2,1,2,7,0],
 "convert__string__literal_8h_source.html":[7,0,2,1,2,7],
 "convert__string__value_8cpp.html":[7,0,2,28,0,8],
-"convert__string__value_8cpp.html#a049d27592fe8f6186776e94310090bb1":[7,0,2,28,0,8,2],
-"convert__string__value_8cpp.html#a9b360d98300958e58b9cbaf3a815cc5f":[7,0,2,28,0,8,0]
+"convert__string__value_8cpp.html#a049d27592fe8f6186776e94310090bb1":[7,0,2,28,0,8,2]
 };

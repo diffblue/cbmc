@@ -117,6 +117,9 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Perform Memory-mapped I/O instrumentation. </p>
+<p>In the case where a modelling function named <code>__CPROVER_mm_io_r</code> exists in the symbol table, this pass will insert calls to this function before pointer dereference reads. Only the case where there is a single dereference on the right hand side of an assignment is included in the set of dereference reads.</p>
+<p>In the case where a modelling function named <code>__CPROVER_mm_io_w</code> exists in the symbol table, this pass will insert calls to this function before all pointer dereference writes. All pointer dereference writes are assumed to be on the left hand side of assignments.</p>
+<p>For details as to how and why this is used see the "Device behavior" section of modeling-mmio.md </p>
 
 <p class="definition">Definition in file <a class="el" href="mm__io_8h_source.html">mm_io.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
@@ -164,7 +167,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mm__io_8cpp_source.html#l00144">144</a> of file <a class="el" href="mm__io_8cpp_source.html">mm_io.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mm__io_8cpp_source.html#l00140">140</a> of file <a class="el" href="mm__io_8cpp_source.html">mm_io.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,6 @@
 var NAVTREEINDEX56 =
 {
+"classsatcheck__glucose__baset.html#aace536f73b3ed68143515a059a8468e0":[6,0,997,12],
 "classsatcheck__glucose__baset.html#ac68a3cf923610d8b36c426a919683df8":[6,0,997,7],
 "classsatcheck__glucose__baset.html#ad4fc2eb01498411a3cd93acb34fa833b":[6,0,997,4],
 "classsatcheck__glucose__baset.html#ae66fd39f562b9ecc7c63386a147796fb":[6,0,997,9],
@@ -248,6 +249,5 @@ var NAVTREEINDEX56 =
 "classshared__bufferst.html#afdbd0b3f3fca92907791fe527f64fdde":[6,0,1024,11],
 "classshared__bufferst_1_1cfg__visitort.html":[6,0,1024,0],
 "classshared__bufferst_1_1cfg__visitort.html#a3871fd76f6d5ab0d7e37152c50c0f347":[6,0,1024,0,7],
-"classshared__bufferst_1_1cfg__visitort.html#a3bc31b4ad9b5b975ebd315a1565aa5ce":[6,0,1024,0,8],
-"classshared__bufferst_1_1cfg__visitort.html#a51e046c912ccc6fe70b8be41326fe02e":[6,0,1024,0,1]
+"classshared__bufferst_1_1cfg__visitort.html#a3bc31b4ad9b5b975ebd315a1565aa5ce":[6,0,1024,0,8]
 };
