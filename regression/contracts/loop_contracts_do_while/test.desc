@@ -7,3 +7,4 @@ main.c
 --
 --
 This test checks that loop contracts work correctly on do/while loops.
+Fails because contracts are not yet supported on do while loops.

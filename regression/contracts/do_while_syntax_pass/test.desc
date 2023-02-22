@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Checks that loop contracts for do-while loops can be attached after the `do`
+keyword.
