@@ -118,12 +118,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">generate_havoc_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;havoc_function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a4aa878468b43f3e46395eeccfd1a24ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">From a function:  <a href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">More...</a><br /></td></tr>
 <tr class="separator:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3791050c87eb30ea71eae38706bb16b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#ac3791050c87eb30ea71eae38706bb16b">generate_havoc_instructions</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;module, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;original_program, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_havoc, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;havoc_program, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memdesc:ac3791050c87eb30ea71eae38706bb16b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translates <code>original_program</code> that specifies assignable targets into a program that havocs the targets.  <a href="classdfcc__spec__functionst.html#ac3791050c87eb30ea71eae38706bb16b">More...</a><br /></td></tr>
+<tr class="separator:ac3791050c87eb30ea71eae38706bb16b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a150d81017334f45e3152527c64a6213d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">to_spec_assigns_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a150d81017334f45e3152527c64a6213d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms (in place) a function.  <a href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">More...</a><br /></td></tr>
 <tr class="separator:a150d81017334f45e3152527c64a6213d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82522c6484e8f0e3fd58625ddaf72228"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">to_spec_assigns_instructions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_fill, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;language_mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memdesc:a82522c6484e8f0e3fd58625ddaf72228"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites in place <code>program</code> expressed in terms of built-ins specifying assignable targets declaratively using <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code> into a program populating <code>write_set_to_fill</code>.  <a href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">More...</a><br /></td></tr>
+<tr class="separator:a82522c6484e8f0e3fd58625ddaf72228"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee89c7ad74728f279407a672d8393ec7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">to_spec_frees_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:aee89c7ad74728f279407a672d8393ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms (in place) a function.  <a href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">More...</a><br /></td></tr>
 <tr class="separator:aee89c7ad74728f279407a672d8393ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30c9a683159e9ac5863c075641f73fcc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">to_spec_frees_instructions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_fill, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;language_mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memdesc:a30c9a683159e9ac5863c075641f73fcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites in place <code>program</code> expressed in terms of built-ins specifying freeable targets declaratively using <code>__CPROVER_freeable</code> into a program populating <code>write_set_to_fill</code>.  <a href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">More...</a><br /></td></tr>
+<tr class="separator:a30c9a683159e9ac5863c075641f73fcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -259,6 +268,82 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac3791050c87eb30ea71eae38706bb16b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3791050c87eb30ea71eae38706bb16b">&#9670;&nbsp;</a></span>generate_havoc_instructions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfcc_spec_functionst::generate_havoc_instructions </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>original_program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_to_havoc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>havoc_program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>nof_targets</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Translates <code>original_program</code> that specifies assignable targets into a program that havocs the targets. </p>
+<dl class="section pre"><dt>Precondition</dt><dd>The <code>original_program</code> must be already fully inlined, and the only function calls allowed are to the built-ins that specify assignable targets: <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code>.</dd></dl>
+<p>The <code>original_program</code> is assumed to encode an assigns clause using the built-ins <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code>. The method traverses <code>original_program</code> and emits a sequence of GOTO instructions in <code>havoc_program</code> that encode the havocing of the target write set <code>write_set_to_havoc</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">function_id</td><td>function id to use for prefixing fresh variables </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>function id to use for prefixing fresh variables </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">module</td><td>function id to use for prefixing fresh variables </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">original_program</td><td>program from which to derive the havoc program </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">write_set_to_havoc</td><td>write set symbol to havoc </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">havoc_program</td><td>destination program for havoc instructions </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">nof_targets</td><td>max number of havoc targets discovered </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00144">144</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aa5feac9ec8c880aa8c4d0d548bd84245"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa5feac9ec8c880aa8c4d0d548bd84245">&#9670;&nbsp;</a></span>get_target_type()</h2>
 
@@ -335,7 +420,62 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00230">230</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00252">252</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a82522c6484e8f0e3fd58625ddaf72228"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82522c6484e8f0e3fd58625ddaf72228">&#9670;&nbsp;</a></span>to_spec_assigns_instructions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfcc_spec_functionst::to_spec_assigns_instructions </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_to_fill</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>language_mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>nof_targets</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rewrites in place <code>program</code> expressed in terms of built-ins specifying assignable targets declaratively using <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code> into a program populating <code>write_set_to_fill</code>. </p>
+<p>It is the responsibility of the caller of this method to instrument the resulting program against another write set instance to check them for unwanted side effects.</p>
+<dl class="section pre"><dt>Precondition</dt><dd>The <code>program</code> must be already fully inlined, and the only function calls allowed are to the built-ins that specify assignable targets: <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code>.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">write_set_to_fill</td><td>write set to populate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">language_mode</td><td>used to format expressions. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">program</td><td>function to transform in place </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">nof_targets</td><td>receives the estimated size of the write set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00284">284</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +526,62 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00302">302</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00341">341</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a30c9a683159e9ac5863c075641f73fcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30c9a683159e9ac5863c075641f73fcc">&#9670;&nbsp;</a></span>to_spec_frees_instructions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfcc_spec_functionst::to_spec_frees_instructions </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_to_fill</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>language_mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t &amp;&#160;</td>
+          <td class="paramname"><em>nof_targets</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rewrites in place <code>program</code> expressed in terms of built-ins specifying freeable targets declaratively using <code>__CPROVER_freeable</code> into a program populating <code>write_set_to_fill</code>. </p>
+<p>It is the responsibility of the caller of this method to instrument the resulting program against another write set instance to check them for unwanted side effects.</p>
+<dl class="section pre"><dt>Precondition</dt><dd>The <code>program</code> must be already fully inlined, and the only function calls allowed are to the built-ins that specify freeable targets: <code>__CPROVER_freeable</code>.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">write_set_to_fill</td><td>write set to populate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">language_mode</td><td>used to format expressions. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">program</td><td>function to transform in place </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">nof_targets</td><td>receives the estimated size of the write set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00374">374</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -411,7 +606,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00137">137</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00217">217</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -435,7 +630,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00142">142</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00222">222</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -459,7 +654,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00141">141</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00221">221</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -483,7 +678,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00139">139</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00219">219</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -507,7 +702,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00138">138</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00218">218</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -531,7 +726,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00143">143</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00223">223</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -555,7 +750,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00140">140</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00220">220</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>

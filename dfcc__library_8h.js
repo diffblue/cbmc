@@ -23,6 +23,7 @@ var dfcc__library_8h =
       [ "WRITE_SET_INSERT_OBJECT_UPTO", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca01410b6a220ee7197045ed52c3e1eb84", null ],
       [ "WRITE_SET_ADD_FREEABLE", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac2f123da3706a017744c12aa71959518", null ],
       [ "WRITE_SET_ADD_ALLOCATED", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57caf21cb0c6e198fd825fb3387c1cabebab", null ],
+      [ "WRITE_SET_ADD_DECL", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac65197bde8cdde615ee8ffd35f7e2a99", null ],
       [ "WRITE_SET_RECORD_DEAD", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca7e32cadcda141707c435857783ed667b", null ],
       [ "WRITE_SET_RECORD_DEALLOCATED", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cad0260d6e47eee44521ac968dc93f4d55", null ],
       [ "WRITE_SET_CHECK_ALLOCATED_DEALLOCATED_IS_EMPTY", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca7633fc0610e0d10ad1f706213077236c", null ],

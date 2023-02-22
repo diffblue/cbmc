@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/optional.h" name="/home/runner/work/cbmc/cbmc/src/util/optional.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4836,5,5020,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4993,5,5177,47"/>
 <area shape="rect" id="node2" href="$sese__regions_8h.html" title="Single&#45;entry, single&#45;exit region analysis." alt="" coords="5,102,189,158"/>
-<area shape="rect" id="node5" href="$c__typecast_8h.html" title=" " alt="" coords="2253,109,2467,151"/>
-<area shape="rect" id="node10" href="$instrument__contracts_8h.html" title="Instrument Given Invariants." alt="" coords="2491,102,2703,158"/>
-<area shape="rect" id="node11" href="$state__encoding_8h.html" title="State Encoding." alt="" coords="2728,102,2912,158"/>
-<area shape="rect" id="node12" href="$c__defines_8h.html" title="c_defines" alt="" coords="2936,109,3155,151"/>
-<area shape="rect" id="node13" href="$mini__c__parser_8h.html" title="Mini C Parser." alt="" coords="3179,102,3363,158"/>
-<area shape="rect" id="node14" href="$taint__analysis_8h.html" title="Taint Analysis." alt="" coords="3387,102,3571,158"/>
-<area shape="rect" id="node15" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3523,213,3728,284"/>
-<area shape="rect" id="node16" href="$recursive__initialization_8h.html" title=" " alt="" coords="3645,102,3832,158"/>
-<area shape="rect" id="node17" href="$dfcc_8cpp.html" title=" " alt="" coords="1391,213,1588,284"/>
-<area shape="rect" id="node18" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="3907,95,4104,165"/>
-<area shape="rect" id="node19" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="3783,213,3980,284"/>
-<area shape="rect" id="node20" href="$dfcc__wrapper__program_8h.html" title="Generates the body of a wrapper function from a contract for contract checking or contract replacemen..." alt="" coords="4017,213,4215,284"/>
-<area shape="rect" id="node21" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="4179,95,4376,165"/>
-<area shape="rect" id="node22" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1612,213,1809,284"/>
-<area shape="rect" id="node23" href="$cover__basic__blocks_8h.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="4401,102,4594,158"/>
-<area shape="rect" id="node24" href="$unwindset_8h.html" title="Loop unwinding." alt="" coords="4618,102,4811,158"/>
-<area shape="rect" id="node25" href="$format__strings_8h.html" title="Format String Parser." alt="" coords="4836,102,5020,158"/>
-<area shape="rect" id="node26" href="$read__goto__binary_8h.html" title="Read Goto Programs." alt="" coords="1080,102,1264,158"/>
-<area shape="rect" id="node27" href="$remove__virtual__functions_8h.html" title="Functions for replacing virtual function call with a static function calls in functions,..." alt="" coords="1289,102,1493,158"/>
-<area shape="rect" id="node28" href="$resolve__inherited__component_8h.html" title="Given a class and a component (either field or method), find the closest parent that defines that com..." alt="" coords="5045,102,5275,158"/>
-<area shape="rect" id="node29" href="$restrict__function__pointers_8h.html" title="Given goto functions and a list of function parameters or globals that are function pointers with lis..." alt="" coords="214,102,418,158"/>
-<area shape="rect" id="node30" href="$show__properties_8h.html" title="Show the properties." alt="" coords="443,102,627,158"/>
-<area shape="rect" id="node31" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="5300,102,5497,158"/>
-<area shape="rect" id="node32" href="$add__failed__symbols_8h.html" title="Pointer Dereferencing." alt="" coords="651,102,845,158"/>
-<area shape="rect" id="node33" href="$src_2solvers_2smt2_2smt2irep_8h.html" title=" " alt="" coords="5521,102,5705,158"/>
-<area shape="rect" id="node34" href="$smt__sorts_8h.html" title="Data structure for smt sorts." alt="" coords="5729,102,5940,158"/>
-<area shape="rect" id="node35" href="$response__or__error_8h.html" title=" " alt="" coords="5965,95,6155,165"/>
-<area shape="rect" id="node36" href="$arith__tools_8h.html" title=" " alt="" coords="2035,109,2229,151"/>
-<area shape="rect" id="node37" href="$cmdline_8h.html" title=" " alt="" coords="6180,109,6364,151"/>
-<area shape="rect" id="node38" href="$config_8h.html" title=" " alt="" coords="1827,109,2011,151"/>
-<area shape="rect" id="node39" href="$dense__integer__map_8h.html" title="Dense integer map." alt="" coords="6388,109,6641,151"/>
-<area shape="rect" id="node40" href="$edit__distance_8h.html" title=" " alt="" coords="6666,109,6878,151"/>
-<area shape="rect" id="node41" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="6903,109,7124,151"/>
-<area shape="rect" id="node42" href="$interval__union_8h.html" title="Union of intervals." alt="" coords="7148,102,7332,158"/>
-<area shape="rect" id="node43" href="$lazy_8h.html" title=" " alt="" coords="7356,109,7540,151"/>
-<area shape="rect" id="node44" href="$numbering_8h.html" title=" " alt="" coords="7564,109,7759,151"/>
-<area shape="rect" id="node45" href="$optional__utils_8h.html" title=" " alt="" coords="7783,102,7967,158"/>
-<area shape="rect" id="node46" href="$piped__process_8cpp.html" title="Subprocess communication with pipes." alt="" coords="7961,228,8194,269"/>
-<area shape="rect" id="node47" href="$piped__process_8h.html" title="Subprocess communication with pipes." alt="" coords="8041,109,8260,151"/>
-<area shape="rect" id="node48" href="$pointer__offset__size_8h.html" title="Pointer Logic." alt="" coords="1619,102,1803,158"/>
-<area shape="rect" id="node49" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="8285,109,8494,151"/>
-<area shape="rect" id="node50" href="$simplify__utils_8h.html" title=" " alt="" coords="8519,102,8703,158"/>
-<area shape="rect" id="node51" href="$source__location_8h.html" title=" " alt="" coords="8727,102,8911,158"/>
-<area shape="rect" id="node52" href="$string2int_8h.html" title=" " alt="" coords="869,109,1056,151"/>
-<area shape="rect" id="node53" href="$substitute__symbols_8h.html" title="Symbol Substitution." alt="" coords="8935,102,9119,158"/>
-<area shape="rect" id="node54" href="$jar__file_8h.html" title=" " alt="" coords="9143,102,9361,158"/>
-<area shape="rect" id="node55" href="$java__bytecode__parse__tree_8h.html" title=" " alt="" coords="9363,221,9581,277"/>
-<area shape="rect" id="node56" href="$java__bytecode__parser_8h.html" title=" " alt="" coords="9679,102,9897,158"/>
-<area shape="rect" id="node57" href="$java__class__loader__base_8h.html" title=" " alt="" coords="9921,102,10140,158"/>
-<area shape="rect" id="node58" href="$java__trace__validation_8h.html" title=" " alt="" coords="10164,102,10383,158"/>
-<area shape="rect" id="node59" href="$java__types_8h.html" title=" " alt="" coords="9436,102,9655,158"/>
-<area shape="rect" id="node60" href="$unit_2testing-utils_2smt2irep_8h.html" title=" " alt="" coords="10407,102,10591,158"/>
+<area shape="rect" id="node5" href="$c__typecast_8h.html" title=" " alt="" coords="1516,109,1729,151"/>
+<area shape="rect" id="node9" href="$instrument__contracts_8h.html" title="Instrument Given Invariants." alt="" coords="2489,102,2701,158"/>
+<area shape="rect" id="node10" href="$state__encoding_8h.html" title="State Encoding." alt="" coords="2725,102,2909,158"/>
+<area shape="rect" id="node11" href="$c__defines_8h.html" title="c_defines" alt="" coords="2933,109,3152,151"/>
+<area shape="rect" id="node12" href="$mini__c__parser_8h.html" title="Mini C Parser." alt="" coords="3176,102,3360,158"/>
+<area shape="rect" id="node13" href="$taint__analysis_8h.html" title="Taint Analysis." alt="" coords="3384,102,3568,158"/>
+<area shape="rect" id="node14" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3568,213,3773,284"/>
+<area shape="rect" id="node15" href="$recursive__initialization_8h.html" title=" " alt="" coords="3643,102,3829,158"/>
+<area shape="rect" id="node16" href="$dfcc_8cpp.html" title=" " alt="" coords="2113,213,2311,284"/>
+<area shape="rect" id="node17" href="$dfcc__contract__clauses__codegen_8h.html" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="3853,95,4096,165"/>
+<area shape="rect" id="node18" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="4171,95,4368,165"/>
+<area shape="rect" id="node19" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="4047,213,4244,284"/>
+<area shape="rect" id="node20" href="$dfcc__wrapper__program_8h.html" title="Generates the body of a wrapper function from a contract for contract checking or contract replacemen..." alt="" coords="4281,213,4479,284"/>
+<area shape="rect" id="node21" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="4443,95,4640,165"/>
+<area shape="rect" id="node22" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2335,213,2532,284"/>
+<area shape="rect" id="node23" href="$cover__basic__blocks_8h.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="4665,102,4858,158"/>
+<area shape="rect" id="node24" href="$unwindset_8h.html" title="Loop unwinding." alt="" coords="4882,102,5075,158"/>
+<area shape="rect" id="node25" href="$format__strings_8h.html" title="Format String Parser." alt="" coords="5100,102,5284,158"/>
+<area shape="rect" id="node26" href="$read__goto__binary_8h.html" title="Read Goto Programs." alt="" coords="213,102,397,158"/>
+<area shape="rect" id="node27" href="$remove__virtual__functions_8h.html" title="Functions for replacing virtual function call with a static function calls in functions,..." alt="" coords="422,102,626,158"/>
+<area shape="rect" id="node28" href="$resolve__inherited__component_8h.html" title="Given a class and a component (either field or method), find the closest parent that defines that com..." alt="" coords="5309,102,5539,158"/>
+<area shape="rect" id="node29" href="$restrict__function__pointers_8h.html" title="Given goto functions and a list of function parameters or globals that are function pointers with lis..." alt="" coords="650,102,854,158"/>
+<area shape="rect" id="node30" href="$show__properties_8h.html" title="Show the properties." alt="" coords="879,102,1063,158"/>
+<area shape="rect" id="node31" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="5564,102,5761,158"/>
+<area shape="rect" id="node32" href="$add__failed__symbols_8h.html" title="Pointer Dereferencing." alt="" coords="1087,102,1281,158"/>
+<area shape="rect" id="node33" href="$src_2solvers_2smt2_2smt2irep_8h.html" title=" " alt="" coords="5785,102,5969,158"/>
+<area shape="rect" id="node34" href="$smt__sorts_8h.html" title="Data structure for smt sorts." alt="" coords="5993,102,6204,158"/>
+<area shape="rect" id="node35" href="$response__or__error_8h.html" title=" " alt="" coords="6229,95,6419,165"/>
+<area shape="rect" id="node36" href="$arith__tools_8h.html" title=" " alt="" coords="1753,109,1948,151"/>
+<area shape="rect" id="node37" href="$cmdline_8h.html" title=" " alt="" coords="6444,109,6628,151"/>
+<area shape="rect" id="node38" href="$config_8h.html" title=" " alt="" coords="1972,109,2156,151"/>
+<area shape="rect" id="node39" href="$dense__integer__map_8h.html" title="Dense integer map." alt="" coords="6652,109,6905,151"/>
+<area shape="rect" id="node40" href="$edit__distance_8h.html" title=" " alt="" coords="6930,109,7142,151"/>
+<area shape="rect" id="node41" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="7167,109,7388,151"/>
+<area shape="rect" id="node42" href="$interval__union_8h.html" title="Union of intervals." alt="" coords="7412,102,7596,158"/>
+<area shape="rect" id="node43" href="$lazy_8h.html" title=" " alt="" coords="7620,109,7804,151"/>
+<area shape="rect" id="node44" href="$numbering_8h.html" title=" " alt="" coords="7828,109,8023,151"/>
+<area shape="rect" id="node45" href="$optional__utils_8h.html" title=" " alt="" coords="8047,102,8231,158"/>
+<area shape="rect" id="node46" href="$piped__process_8cpp.html" title="Subprocess communication with pipes." alt="" coords="8225,228,8458,269"/>
+<area shape="rect" id="node47" href="$piped__process_8h.html" title="Subprocess communication with pipes." alt="" coords="8305,109,8524,151"/>
+<area shape="rect" id="node48" href="$pointer__offset__size_8h.html" title="Pointer Logic." alt="" coords="2231,102,2415,158"/>
+<area shape="rect" id="node49" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="8549,109,8758,151"/>
+<area shape="rect" id="node50" href="$simplify__utils_8h.html" title=" " alt="" coords="8783,102,8967,158"/>
+<area shape="rect" id="node51" href="$source__location_8h.html" title=" " alt="" coords="8991,102,9175,158"/>
+<area shape="rect" id="node52" href="$string2int_8h.html" title=" " alt="" coords="1305,109,1492,151"/>
+<area shape="rect" id="node53" href="$substitute__symbols_8h.html" title="Symbol Substitution." alt="" coords="9199,102,9383,158"/>
+<area shape="rect" id="node54" href="$jar__file_8h.html" title=" " alt="" coords="9407,102,9625,158"/>
+<area shape="rect" id="node55" href="$java__bytecode__parse__tree_8h.html" title=" " alt="" coords="9627,221,9845,277"/>
+<area shape="rect" id="node56" href="$java__bytecode__parser_8h.html" title=" " alt="" coords="9943,102,10161,158"/>
+<area shape="rect" id="node57" href="$java__class__loader__base_8h.html" title=" " alt="" coords="10185,102,10404,158"/>
+<area shape="rect" id="node58" href="$java__trace__validation_8h.html" title=" " alt="" coords="10428,102,10647,158"/>
+<area shape="rect" id="node59" href="$java__types_8h.html" title=" " alt="" coords="9700,102,9919,158"/>
+<area shape="rect" id="node60" href="$unit_2testing-utils_2smt2irep_8h.html" title=" " alt="" coords="10671,102,10855,158"/>
 <area shape="rect" id="node3" href="$sese__regions_8cpp.html" title="Single&#45;entry, single&#45;exit region analysis." alt="" coords="5,221,189,277"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="619,221,877,277"/>
-<area shape="rect" id="node6" href="$c__typecast_8cpp.html" title=" " alt="" coords="2070,228,2298,269"/>
-<area shape="rect" id="node7" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1834,221,2046,277"/>
-<area shape="rect" id="node8" href="$c__typecheck__typecast_8cpp.html" title=" " alt="" coords="2322,221,2534,277"/>
-<area shape="rect" id="node9" href="$cpp__typecast_8h.html" title=" " alt="" coords="2559,228,2772,269"/>
+<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="623,221,881,277"/>
+<area shape="rect" id="node6" href="$c__typecast_8cpp.html" title=" " alt="" coords="1625,228,1853,269"/>
+<area shape="rect" id="node7" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1877,221,2089,277"/>
+<area shape="rect" id="node8" href="$c__typecheck__typecast_8cpp.html" title=" " alt="" coords="1389,221,1601,277"/>
 </map>

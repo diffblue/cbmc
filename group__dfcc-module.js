@@ -16,6 +16,7 @@ var group__dfcc_module =
       [ "wrap_replaced_functions", "classdfcct.html#aa9138d7ea308f92ef60dcfd0f2ad1eb8", null ],
       [ "allow_recursive_calls", "classdfcct.html#ad78406aba0a676602f290f1b0b0ed5e1", null ],
       [ "apply_loop_contracts", "classdfcct.html#aa8643cf6b29bd9cf3114418adca69053", null ],
+      [ "contract_clauses_codegen", "classdfcct.html#ac6a2dcacaf7442977384e6b1653d3cea", null ],
       [ "contract_handler", "classdfcct.html#adb05ff5aedeb6e09d3fc57aae0627146", null ],
       [ "function_pointer_contracts", "classdfcct.html#a0bb482ab8b55b83050e3d6079f0b9764", null ],
       [ "goto_model", "classdfcct.html#a07c825d1288b11c5c270c3b985522b63", null ],

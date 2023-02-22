@@ -158,6 +158,72 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a78e6b7048b19c4e405370f1b40eec91c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c">add_instrumented_functions_map_init_instructions</a> (const std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;instrumented_functions, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;dest)</td></tr>
 <tr class="memdesc:a78e6b7048b19c4e405370f1b40eec91c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates instructions to initialize the instrumented function map symbol from the given set of instrumented function.  <a href="classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c">More...</a><br /></td></tr>
 <tr class="separator:a78e6b7048b19c4e405370f1b40eec91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aced76510f1eaf5bb86c4f8d9a0b0884e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#aced76510f1eaf5bb86c4f8d9a0b0884e">write_set_create_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;contract_assigns_size, const <a class="el" href="classexprt.html">exprt</a> &amp;contract_frees_size, const <a class="el" href="classexprt.html">exprt</a> &amp;assume_requires_ctx, const <a class="el" href="classexprt.html">exprt</a> &amp;assert_requires_ctx, const <a class="el" href="classexprt.html">exprt</a> &amp;assume_ensures_ctx, const <a class="el" href="classexprt.html">exprt</a> &amp;assert_ensures_ctx, const <a class="el" href="classexprt.html">exprt</a> &amp;allow_allocate, const <a class="el" href="classexprt.html">exprt</a> &amp;allow_deallocate, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:aced76510f1eaf5bb86c4f8d9a0b0884e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_create.  <a href="classdfcc__libraryt.html#aced76510f1eaf5bb86c4f8d9a0b0884e">More...</a><br /></td></tr>
+<tr class="separator:aced76510f1eaf5bb86c4f8d9a0b0884e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a932780bd90557be4032e9c0ccf3c944b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a932780bd90557be4032e9c0ccf3c944b">write_set_release_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a932780bd90557be4032e9c0ccf3c944b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_release.  <a href="classdfcc__libraryt.html#a932780bd90557be4032e9c0ccf3c944b">More...</a><br /></td></tr>
+<tr class="separator:a932780bd90557be4032e9c0ccf3c944b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a725ab26d920ff6ee58bff0843e0f2211"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a725ab26d920ff6ee58bff0843e0f2211">write_set_add_allocated_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a725ab26d920ff6ee58bff0843e0f2211"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_add_allocated.  <a href="classdfcc__libraryt.html#a725ab26d920ff6ee58bff0843e0f2211">More...</a><br /></td></tr>
+<tr class="separator:a725ab26d920ff6ee58bff0843e0f2211"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55f8822b61366418b694ab405fee60db"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a55f8822b61366418b694ab405fee60db">write_set_add_decl_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a55f8822b61366418b694ab405fee60db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_add_decl.  <a href="classdfcc__libraryt.html#a55f8822b61366418b694ab405fee60db">More...</a><br /></td></tr>
+<tr class="separator:a55f8822b61366418b694ab405fee60db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a041b03574be0b6e0f64665ae32a7fbb3"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a041b03574be0b6e0f64665ae32a7fbb3">write_set_record_dead_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a041b03574be0b6e0f64665ae32a7fbb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_record_dead.  <a href="classdfcc__libraryt.html#a041b03574be0b6e0f64665ae32a7fbb3">More...</a><br /></td></tr>
+<tr class="separator:a041b03574be0b6e0f64665ae32a7fbb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5120019db5fa6364f70566d9e0103453"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a5120019db5fa6364f70566d9e0103453">write_set_record_deallocated_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a5120019db5fa6364f70566d9e0103453"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_record_deallocated.  <a href="classdfcc__libraryt.html#a5120019db5fa6364f70566d9e0103453">More...</a><br /></td></tr>
+<tr class="separator:a5120019db5fa6364f70566d9e0103453"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1773750eec470f57ceaa2e002d4aabbb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a1773750eec470f57ceaa2e002d4aabbb">write_set_check_allocated_deallocated_is_empty_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a1773750eec470f57ceaa2e002d4aabbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_allocated_deallocated_is_empty.  <a href="classdfcc__libraryt.html#a1773750eec470f57ceaa2e002d4aabbb">More...</a><br /></td></tr>
+<tr class="separator:a1773750eec470f57ceaa2e002d4aabbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22bd975f76706de353e3029a61db20b3"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a22bd975f76706de353e3029a61db20b3">write_set_check_assignment_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;size, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a22bd975f76706de353e3029a61db20b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_assignment.  <a href="classdfcc__libraryt.html#a22bd975f76706de353e3029a61db20b3">More...</a><br /></td></tr>
+<tr class="separator:a22bd975f76706de353e3029a61db20b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fcca3bb2f05b9d71b5a38cc7fff1f03"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a8fcca3bb2f05b9d71b5a38cc7fff1f03">write_set_check_array_set_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;dest, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a8fcca3bb2f05b9d71b5a38cc7fff1f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_array_set.  <a href="classdfcc__libraryt.html#a8fcca3bb2f05b9d71b5a38cc7fff1f03">More...</a><br /></td></tr>
+<tr class="separator:a8fcca3bb2f05b9d71b5a38cc7fff1f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60094dda42586e6813bc441607fcfa9a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a60094dda42586e6813bc441607fcfa9a">write_set_check_array_copy_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;dest, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a60094dda42586e6813bc441607fcfa9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_array_copy.  <a href="classdfcc__libraryt.html#a60094dda42586e6813bc441607fcfa9a">More...</a><br /></td></tr>
+<tr class="separator:a60094dda42586e6813bc441607fcfa9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a918e325b7326e748ab74eb55957eae7d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a918e325b7326e748ab74eb55957eae7d">write_set_check_array_replace_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;dest, const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a918e325b7326e748ab74eb55957eae7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_array_replace.  <a href="classdfcc__libraryt.html#a918e325b7326e748ab74eb55957eae7d">More...</a><br /></td></tr>
+<tr class="separator:a918e325b7326e748ab74eb55957eae7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9fe8921c2a5042ca752a536bf4fc259"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#ad9fe8921c2a5042ca752a536bf4fc259">write_set_check_havoc_object_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:ad9fe8921c2a5042ca752a536bf4fc259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_havoc_object.  <a href="classdfcc__libraryt.html#ad9fe8921c2a5042ca752a536bf4fc259">More...</a><br /></td></tr>
+<tr class="separator:ad9fe8921c2a5042ca752a536bf4fc259"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6f7eccedb3fe43b2cbad0f7840aa6dc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#ab6f7eccedb3fe43b2cbad0f7840aa6dc">write_set_check_deallocate_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:ab6f7eccedb3fe43b2cbad0f7840aa6dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_deallocate.  <a href="classdfcc__libraryt.html#ab6f7eccedb3fe43b2cbad0f7840aa6dc">More...</a><br /></td></tr>
+<tr class="separator:ab6f7eccedb3fe43b2cbad0f7840aa6dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac06bd70ec4b81832fcbb48df95b6a963"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#ac06bd70ec4b81832fcbb48df95b6a963">write_set_check_assigns_clause_inclusion_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;reference_write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;candidate_write_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:ac06bd70ec4b81832fcbb48df95b6a963"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_assigns_clause_inclusion.  <a href="classdfcc__libraryt.html#ac06bd70ec4b81832fcbb48df95b6a963">More...</a><br /></td></tr>
+<tr class="separator:ac06bd70ec4b81832fcbb48df95b6a963"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad604d4ec783223dadf04042d3063a66c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#ad604d4ec783223dadf04042d3063a66c">write_set_check_frees_clause_inclusion_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;check_var, const <a class="el" href="classexprt.html">exprt</a> &amp;reference_write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;candidate_write_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:ad604d4ec783223dadf04042d3063a66c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_check_frees_clause_inclusion.  <a href="classdfcc__libraryt.html#ad604d4ec783223dadf04042d3063a66c">More...</a><br /></td></tr>
+<tr class="separator:ad604d4ec783223dadf04042d3063a66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf614c1913728f7cc9e0f41977ec8dae"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#adf614c1913728f7cc9e0f41977ec8dae">write_set_deallocate_freeable_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;target_write_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:adf614c1913728f7cc9e0f41977ec8dae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_write_set_deallocate_freeable.  <a href="classdfcc__libraryt.html#adf614c1913728f7cc9e0f41977ec8dae">More...</a><br /></td></tr>
+<tr class="separator:adf614c1913728f7cc9e0f41977ec8dae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2becfde230f8b36f78519cbaba48d52"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#ac2becfde230f8b36f78519cbaba48d52">link_is_fresh_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;is_fresh_obj_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:ac2becfde230f8b36f78519cbaba48d52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_link_is_fresh.  <a href="classdfcc__libraryt.html#ac2becfde230f8b36f78519cbaba48d52">More...</a><br /></td></tr>
+<tr class="separator:ac2becfde230f8b36f78519cbaba48d52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45552de6be6bd545bd5c597586ed29ae"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a45552de6be6bd545bd5c597586ed29ae">link_allocated_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_postconditions_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_link_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a45552de6be6bd545bd5c597586ed29ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_link_allocated.  <a href="classdfcc__libraryt.html#a45552de6be6bd545bd5c597586ed29ae">More...</a><br /></td></tr>
+<tr class="separator:a45552de6be6bd545bd5c597586ed29ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8e1a581fe0cb96b7afc6e17491c7a97"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#ab8e1a581fe0cb96b7afc6e17491c7a97">link_deallocated_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_postconditions_ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_link_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:ab8e1a581fe0cb96b7afc6e17491c7a97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_link_deallocated.  <a href="classdfcc__libraryt.html#ab8e1a581fe0cb96b7afc6e17491c7a97">More...</a><br /></td></tr>
+<tr class="separator:ab8e1a581fe0cb96b7afc6e17491c7a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add4c897b142d77ba60e5e31f86d5050b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#add4c897b142d77ba60e5e31f86d5050b">check_replace_ensures_was_freed_preconditions_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;ptr, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:add4c897b142d77ba60e5e31f86d5050b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_check_replace_ensures_was_freed_preconditions.  <a href="classdfcc__libraryt.html#add4c897b142d77ba60e5e31f86d5050b">More...</a><br /></td></tr>
+<tr class="separator:add4c897b142d77ba60e5e31f86d5050b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c5c016b7f0975d13353b21f3742b0ab"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a1c5c016b7f0975d13353b21f3742b0ab">obj_set_create_indexed_by_object_id_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;obj_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:a1c5c016b7f0975d13353b21f3742b0ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_obj_set_create_indexed_by_object_id.  <a href="classdfcc__libraryt.html#a1c5c016b7f0975d13353b21f3742b0ab">More...</a><br /></td></tr>
+<tr class="separator:a1c5c016b7f0975d13353b21f3742b0ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2a78515fd797aaef1ae37e36ae9f0f0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcode__function__callt.html">code_function_callt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#aa2a78515fd797aaef1ae37e36ae9f0f0">obj_set_release_call</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;obj_set_ptr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
+<tr class="memdesc:aa2a78515fd797aaef1ae37e36ae9f0f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds call to __CPROVER_contracts_obj_set_release.  <a href="classdfcc__libraryt.html#aa2a78515fd797aaef1ae37e36ae9f0f0">More...</a><br /></td></tr>
+<tr class="separator:aa2a78515fd797aaef1ae37e36ae9f0f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -232,7 +298,7 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class interface to library types and functions defined in <code>cprover_contracts.c</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00151">151</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00155">155</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abf2a449239d88bc96d09b89d1830019e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abf2a449239d88bc96d09b89d1830019e">&#9670;&nbsp;</a></span>dfcc_libraryt()</h2>
@@ -268,7 +334,7 @@ Private Attributes</h2></td></tr>
 
 <p>Class constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00173">173</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00174">174</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -307,7 +373,45 @@ Private Attributes</h2></td></tr>
 
 <p>Generates instructions to initialize the instrumented function map symbol from the given set of instrumented function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00543">543</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00544">544</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="add4c897b142d77ba60e5e31f86d5050b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add4c897b142d77ba60e5e31f86d5050b">&#9670;&nbsp;</a></span>check_replace_ensures_was_freed_preconditions_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::check_replace_ensures_was_freed_preconditions_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_check_replace_ensures_was_freed_preconditions. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00836">836</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +433,7 @@ Private Attributes</h2></td></tr>
 <p>Adds "checked" pragmas to instructions of all library functions instructions. </p>
 <p>By default checks are not disabled. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00228">228</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00229">229</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +463,7 @@ Private Attributes</h2></td></tr>
 <p>Fixes function calls to malloc and free in library functions. </p>
 <p>Change calls to <code>__CPROVER_contracts_malloc</code> into calls to <code>malloc</code> Change calls to <code>__CPROVER_contracts_free</code> into calls to <code>free</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00462">462</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00463">463</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -381,7 +485,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the dfcc_funt that corresponds to the given id if any. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00365">365</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00366">366</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -403,7 +507,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the name of the given dfcc_funt. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00379">379</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00380">380</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +530,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the library instrumentation hook for the given built-in. </p>
 <p>function_id must be one of <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00208">208</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00209">209</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -450,7 +554,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the instrumentation function to use for a given front-end function.</p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>function_id</code> is a front end built-in as defined by <a class="el" href="classdfcc__libraryt.html#a4344ee9423b3135843a9087094531155">is_front_end_builtin</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00200">200</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00201">201</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -472,7 +576,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the "__dfcc_instrumented_functions" symbol or creates it if it does not exist already. </p>
 <p>This symbol is an unbounded map of booleans indexed by function pointer ID, meant to have value true for instrumented functions and false for non-instrumented functions. Initialisation instructions for this map are generated by <a class="el" href="classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c">add_instrumented_functions_map_init_instructions</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00522">522</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00523">523</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +605,7 @@ Private Attributes</h2></td></tr>
 
 <p>Collects the names of all library functions currently missing from the goto_model into <code>missing</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00240">240</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00241">241</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -522,7 +626,7 @@ Private Attributes</h2></td></tr>
 
 <p>Adds an ASSERT(false) body to all front-end functions __CPROVER_object_whole __CPROVER_object_upto __CPROVER_object_from __CPROVER_assignable __CPROVER_freeable An error will be triggered in case calls to these functions occur outside of a contrat clause and were hence not mapped to their library implementation. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00493">493</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00494">494</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +655,7 @@ Private Attributes</h2></td></tr>
 
 <p>Inlines library functions that need to be inlined before use. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00406">406</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00407">407</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +677,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the given id is one of the library symbols. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00374">374</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00375">375</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -596,7 +700,121 @@ Private Attributes</h2></td></tr>
 <p>Returns true iff the given function_id is one of <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code>, <code>__CPROVER_freeable</code> </p>
 <p>Returns the instrumentation function to use for a given front-end function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00194">194</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00195">195</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a45552de6be6bd545bd5c597586ed29ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45552de6be6bd545bd5c597586ed29ae">&#9670;&nbsp;</a></span>link_allocated_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::link_allocated_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_postconditions_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_to_link_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_link_allocated. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00811">811</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ab8e1a581fe0cb96b7afc6e17491c7a97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8e1a581fe0cb96b7afc6e17491c7a97">&#9670;&nbsp;</a></span>link_deallocated_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::link_deallocated_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_postconditions_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_to_link_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_link_deallocated. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00823">823</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ac2becfde230f8b36f78519cbaba48d52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2becfde230f8b36f78519cbaba48d52">&#9670;&nbsp;</a></span>link_is_fresh_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::link_is_fresh_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>is_fresh_obj_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_link_is_fresh. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00799">799</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -619,7 +837,71 @@ Private Attributes</h2></td></tr>
 <p>After calling this function, all library types and functions are present in the the goto_model. </p>
 <p>Any other functions that the DFCC functions rely on and need to be instrumented will be added to <code>to_instrument</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00279">279</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00280">280</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a1c5c016b7f0975d13353b21f3742b0ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c5c016b7f0975d13353b21f3742b0ab">&#9670;&nbsp;</a></span>obj_set_create_indexed_by_object_id_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::obj_set_create_indexed_by_object_id_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>obj_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_obj_set_create_indexed_by_object_id. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00850">850</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa2a78515fd797aaef1ae37e36ae9f0f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2a78515fd797aaef1ae37e36ae9f0f0">&#9670;&nbsp;</a></span>obj_set_release_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::obj_set_release_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>obj_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_obj_set_release. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00862">862</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -641,7 +923,7 @@ Private Attributes</h2></td></tr>
 
 <p>Sets the given hide flag on all instructions of all library functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00515">515</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00516">516</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +951,711 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00428">428</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00429">429</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a725ab26d920ff6ee58bff0843e0f2211"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a725ab26d920ff6ee58bff0843e0f2211">&#9670;&nbsp;</a></span>write_set_add_allocated_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_add_allocated_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_add_allocated. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00606">606</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a55f8822b61366418b694ab405fee60db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55f8822b61366418b694ab405fee60db">&#9670;&nbsp;</a></span>write_set_add_decl_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_add_decl_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_add_decl. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00618">618</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a1773750eec470f57ceaa2e002d4aabbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1773750eec470f57ceaa2e002d4aabbb">&#9670;&nbsp;</a></span>write_set_check_allocated_deallocated_is_empty_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_allocated_deallocated_is_empty_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_allocated_deallocated_is_empty. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00655">655</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a60094dda42586e6813bc441607fcfa9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60094dda42586e6813bc441607fcfa9a">&#9670;&nbsp;</a></span>write_set_check_array_copy_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_array_copy_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_array_copy. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00698">698</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a918e325b7326e748ab74eb55957eae7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a918e325b7326e748ab74eb55957eae7d">&#9670;&nbsp;</a></span>write_set_check_array_replace_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_array_replace_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_array_replace. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00712">712</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a8fcca3bb2f05b9d71b5a38cc7fff1f03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fcca3bb2f05b9d71b5a38cc7fff1f03">&#9670;&nbsp;</a></span>write_set_check_array_set_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_array_set_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_array_set. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00684">684</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a22bd975f76706de353e3029a61db20b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22bd975f76706de353e3029a61db20b3">&#9670;&nbsp;</a></span>write_set_check_assignment_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_assignment_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_assignment. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00669">669</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ac06bd70ec4b81832fcbb48df95b6a963"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac06bd70ec4b81832fcbb48df95b6a963">&#9670;&nbsp;</a></span>write_set_check_assigns_clause_inclusion_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_assigns_clause_inclusion_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>reference_write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>candidate_write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_assigns_clause_inclusion. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00756">756</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ab6f7eccedb3fe43b2cbad0f7840aa6dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6f7eccedb3fe43b2cbad0f7840aa6dc">&#9670;&nbsp;</a></span>write_set_check_deallocate_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_deallocate_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_deallocate. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00741">741</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ad604d4ec783223dadf04042d3063a66c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad604d4ec783223dadf04042d3063a66c">&#9670;&nbsp;</a></span>write_set_check_frees_clause_inclusion_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_frees_clause_inclusion_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>reference_write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>candidate_write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_frees_clause_inclusion. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00772">772</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ad9fe8921c2a5042ca752a536bf4fc259"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9fe8921c2a5042ca752a536bf4fc259">&#9670;&nbsp;</a></span>write_set_check_havoc_object_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_check_havoc_object_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>check_var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_check_havoc_object. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00727">727</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aced76510f1eaf5bb86c4f8d9a0b0884e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aced76510f1eaf5bb86c4f8d9a0b0884e">&#9670;&nbsp;</a></span>write_set_create_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_create_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>contract_assigns_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>contract_frees_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assume_requires_ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assert_requires_ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assume_ensures_ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assert_ensures_ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>allow_allocate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>allow_deallocate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_create. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00563">563</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="adf614c1913728f7cc9e0f41977ec8dae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf614c1913728f7cc9e0f41977ec8dae">&#9670;&nbsp;</a></span>write_set_deallocate_freeable_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_deallocate_freeable_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>target_write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_deallocate_freeable. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00787">787</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a041b03574be0b6e0f64665ae32a7fbb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a041b03574be0b6e0f64665ae32a7fbb3">&#9670;&nbsp;</a></span>write_set_record_dead_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_record_dead_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_record_dead. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00630">630</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5120019db5fa6364f70566d9e0103453"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5120019db5fa6364f70566d9e0103453">&#9670;&nbsp;</a></span>write_set_record_deallocated_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_record_deallocated_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_record_deallocated. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00642">642</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a932780bd90557be4032e9c0ccf3c944b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a932780bd90557be4032e9c0ccf3c944b">&#9670;&nbsp;</a></span>write_set_release_call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classcode__function__callt.html">code_function_callt</a> dfcc_libraryt::write_set_release_call </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>write_set_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>source_location</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds call to __CPROVER_contracts_write_set_release. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00595">595</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -696,7 +1682,7 @@ Private Attributes</h2></td></tr>
 
 <p>All built-in function names (front-end and instrumentation hooks) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00210">210</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00214">214</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -714,7 +1700,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps enum values to the actual function symbols (dynamically loaded) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00217">217</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00221">221</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -740,7 +1726,7 @@ Private Attributes</h2></td></tr>
 
 <p>enum to function name mapping </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00198">198</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00202">202</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -766,7 +1752,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps built-in function names to enums to use for instrumentation. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00204">204</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00208">208</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -790,7 +1776,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00201">201</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00205">205</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -816,7 +1802,7 @@ Private Attributes</h2></td></tr>
 
 <p>Swapped dfcc_type_to_name. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00195">195</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00199">199</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -834,7 +1820,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps enum values to the actual types (dynamically loaded) </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00214">214</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00218">218</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -860,7 +1846,7 @@ Private Attributes</h2></td></tr>
 
 <p>Enum to type name mapping. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00192">192</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00196">196</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -884,7 +1870,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00173">173</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00177">177</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -910,7 +1896,7 @@ Private Attributes</h2></td></tr>
 
 <p>Maps front-end functions to library functions giving their havoc semantics. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00207">207</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00211">211</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -936,7 +1922,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the library functions are inlined. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00164">164</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00168">168</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -962,7 +1948,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the contracts library symbols are loaded. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00161">161</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00165">165</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -986,7 +1972,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00176">176</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00180">180</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1013,7 +1999,7 @@ Private Attributes</h2></td></tr>
 <p>True iff the library functions uses of malloc and free are fixed. </p>
 <p>True iff the library functions have already been fixed. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00175">175</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1037,7 +2023,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00175">175</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00179">179</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1063,7 +2049,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the library functions are specialized to a particular contract. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00168">168</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>
@@ -1087,7 +2073,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00174">174</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8h_source.html#l00178">178</a> of file <a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>.</p>
 
 </div>
 </div>

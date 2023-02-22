@@ -4,7 +4,7 @@ var classdfcc__instrumentt =
     [ "do_not_instrument", "classdfcc__instrumentt.html#a9cab5285f589a99ca88184776f371a83", null ],
     [ "get_instrumented_functions", "classdfcc__instrumentt.html#a3bff56cbc0bb265762f9e128fac2d660", null ],
     [ "get_local_statics", "classdfcc__instrumentt.html#acd8f7d688222c7d6e0993ab536ef771e", null ],
-    [ "insert_add_allocated_call", "classdfcc__instrumentt.html#a1dfdaa2199bec04caf8454acc1703047", null ],
+    [ "insert_add_decl_call", "classdfcc__instrumentt.html#ae6235992c25224fb6ba891842b875a32", null ],
     [ "insert_record_dead_call", "classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035", null ],
     [ "instrument_assign", "classdfcc__instrumentt.html#a896d536f228a48d674ee733ccf17e018", null ],
     [ "instrument_call_instruction", "classdfcc__instrumentt.html#a1d0973dc98374bd5b63dcc7a8598c77c", null ],

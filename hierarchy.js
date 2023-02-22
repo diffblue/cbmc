@@ -417,6 +417,7 @@ var hierarchy =
     [ "destructor_treet", "classdestructor__treet.html", null ],
     [ "destructt< I, pointee_baset, Ts >", "structdestructt.html", null ],
     [ "destructt< 0, pointee_baset, Ts... >", "structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4.html", null ],
+    [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html", null ],
     [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html", null ],
     [ "dfcc_contract_handlert", "classdfcc__contract__handlert.html", null ],
     [ "dfcc_instrumentt", "classdfcc__instrumentt.html", null ],

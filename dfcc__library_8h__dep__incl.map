@@ -1,23 +1,24 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_library.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_library.h">
-<area shape="rect" id="node1" title="Dynamic frame condition checking library loading." alt="" coords="860,5,1057,76"/>
-<area shape="rect" id="node2" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1495,369,1735,425"/>
-<area shape="rect" id="node8" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="281,243,487,313"/>
-<area shape="rect" id="node9" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="1091,243,1288,313"/>
-<area shape="rect" id="node10" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="75,124,272,195"/>
-<area shape="rect" id="node11" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="296,124,493,195"/>
-<area shape="rect" id="node12" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="517,124,715,195"/>
-<area shape="rect" id="node13" href="$dfcc__library_8cpp.html" title=" " alt="" coords="739,124,936,195"/>
-<area shape="rect" id="node14" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="961,124,1202,195"/>
-<area shape="rect" id="node15" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="1227,124,1424,195"/>
-<area shape="rect" id="node16" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="1448,124,1645,195"/>
-<area shape="rect" id="node17" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="1652,243,1849,313"/>
-<area shape="rect" id="node18" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="1669,124,1867,195"/>
-<area shape="rect" id="node19" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="1873,243,2071,313"/>
-<area shape="rect" id="node21" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="1992,124,2195,195"/>
-<area shape="rect" id="node3" href="$dfcc_8cpp.html" title=" " alt="" coords="1395,480,1592,551"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1616,487,1859,543"/>
-<area shape="rect" id="node5" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1379,599,1613,655"/>
-<area shape="rect" id="node6" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1637,599,1837,655"/>
-<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1861,599,2120,655"/>
-<area shape="rect" id="node20" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1873,361,2071,432"/>
+<area shape="rect" id="node1" title="Dynamic frame condition checking library loading." alt="" coords="791,5,988,76"/>
+<area shape="rect" id="node2" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1547,369,1787,425"/>
+<area shape="rect" id="node8" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="108,243,367,313"/>
+<area shape="rect" id="node9" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="854,243,1061,313"/>
+<area shape="rect" id="node10" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="1316,243,1514,313"/>
+<area shape="rect" id="node11" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="127,124,324,195"/>
+<area shape="rect" id="node12" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="348,124,546,195"/>
+<area shape="rect" id="node13" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="570,124,767,195"/>
+<area shape="rect" id="node14" href="$dfcc__library_8cpp.html" title=" " alt="" coords="791,124,988,195"/>
+<area shape="rect" id="node15" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="1013,124,1254,195"/>
+<area shape="rect" id="node16" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="1279,124,1476,195"/>
+<area shape="rect" id="node17" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="1500,124,1698,195"/>
+<area shape="rect" id="node18" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="1704,243,1902,313"/>
+<area shape="rect" id="node19" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="1722,124,1919,195"/>
+<area shape="rect" id="node20" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="1926,243,2123,313"/>
+<area shape="rect" id="node22" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="2044,124,2247,195"/>
+<area shape="rect" id="node3" href="$dfcc_8cpp.html" title=" " alt="" coords="1447,480,1644,551"/>
+<area shape="rect" id="node4" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1668,487,1911,543"/>
+<area shape="rect" id="node5" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1431,599,1666,655"/>
+<area shape="rect" id="node6" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1690,599,1890,655"/>
+<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1914,599,2172,655"/>
+<area shape="rect" id="node21" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1926,361,2123,432"/>
 </map>

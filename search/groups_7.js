@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['langapi_42381',['langapi',['../group__langapi.html',1,'']]],
-  ['linking_42382',['linking',['../group__linking.html',1,'']]]
+  ['langapi_42442',['langapi',['../group__langapi.html',1,'']]],
+  ['linking_42443',['linking',['../group__linking.html',1,'']]]
 ];

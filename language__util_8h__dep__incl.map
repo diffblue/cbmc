@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h" name="/home/runner/work/cbmc/cbmc/src/langapi/language_util.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4473,5,4673,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="4637,5,4837,61"/>
 <area shape="rect" id="node2" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="5,117,212,173"/>
 <area shape="rect" id="node3" href="$custom__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="236,117,435,173"/>
 <area shape="rect" id="node4" href="$goto__rw_8cpp.html" title=" " alt="" coords="459,117,643,173"/>
@@ -11,34 +11,35 @@
 <area shape="rect" id="node10" href="$symex__coverage_8cpp.html" title="Record and print code coverage of symbolic execution." alt="" coords="1806,117,1990,173"/>
 <area shape="rect" id="node11" href="$call__sequences_8cpp.html" title="Printing function call sequences for Ofer." alt="" coords="2015,117,2208,173"/>
 <area shape="rect" id="node12" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2232,117,2425,173"/>
-<area shape="rect" id="node13" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="2449,109,2656,180"/>
-<area shape="rect" id="node14" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="2681,109,2878,180"/>
-<area shape="rect" id="node15" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2902,109,3099,180"/>
-<area shape="rect" id="node16" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="3123,109,3321,180"/>
-<area shape="rect" id="node17" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="3345,109,3542,180"/>
-<area shape="rect" id="node18" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3566,109,3763,180"/>
-<area shape="rect" id="node19" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="3787,109,3990,180"/>
-<area shape="rect" id="node20" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="4015,109,4213,180"/>
-<area shape="rect" id="node21" href="$utils_8cpp.html" title=" " alt="" coords="4237,117,4431,173"/>
-<area shape="rect" id="node22" href="$cover__instrument__condition_8cpp.html" title="Coverage Instrumentation for Conditions." alt="" coords="4455,117,4690,173"/>
-<area shape="rect" id="node23" href="$cover__instrument__decision_8cpp.html" title="Coverage Instrumentation for Decisions." alt="" coords="4715,117,4943,173"/>
-<area shape="rect" id="node24" href="$cover__instrument__mcdc_8cpp.html" title="Coverage Instrumentation for MC/DC." alt="" coords="4967,117,5176,173"/>
-<area shape="rect" id="node25" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="5200,117,5407,173"/>
-<area shape="rect" id="node26" href="$dot_8cpp.html" title="Dump Goto&#45;Program as DOT Graph." alt="" coords="5431,117,5624,173"/>
-<area shape="rect" id="node27" href="$rw__set_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="5648,117,5841,173"/>
-<area shape="rect" id="node28" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="5866,117,6050,173"/>
-<area shape="rect" id="node29" href="$goto__program_8cpp.html" title="Program Transformation." alt="" coords="6074,117,6258,173"/>
-<area shape="rect" id="node30" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="6282,117,6466,173"/>
-<area shape="rect" id="node31" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="6490,117,6674,173"/>
-<area shape="rect" id="node32" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="6698,117,6885,173"/>
-<area shape="rect" id="node33" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="6909,117,7093,173"/>
-<area shape="rect" id="node34" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="7117,117,7301,173"/>
-<area shape="rect" id="node35" href="$xml__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="7325,117,7509,173"/>
-<area shape="rect" id="node36" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="7533,117,7753,173"/>
-<area shape="rect" id="node37" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="7777,117,7981,173"/>
-<area shape="rect" id="node38" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="8005,117,8220,173"/>
-<area shape="rect" id="node39" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="8245,117,8442,173"/>
-<area shape="rect" id="node40" href="$language__util_8cpp.html" title=" " alt="" coords="8466,117,8666,173"/>
-<area shape="rect" id="node41" href="$linking_8cpp.html" title="ANSI&#45;C Linking." alt="" coords="8691,124,8897,165"/>
-<area shape="rect" id="node42" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="8921,117,9115,173"/>
+<area shape="rect" id="node13" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="2450,109,2709,180"/>
+<area shape="rect" id="node14" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="2733,109,2940,180"/>
+<area shape="rect" id="node15" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="2965,109,3162,180"/>
+<area shape="rect" id="node16" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3186,109,3383,180"/>
+<area shape="rect" id="node17" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="3407,109,3605,180"/>
+<area shape="rect" id="node18" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="3629,109,3826,180"/>
+<area shape="rect" id="node19" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3850,109,4047,180"/>
+<area shape="rect" id="node20" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="4071,109,4274,180"/>
+<area shape="rect" id="node21" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="4299,109,4497,180"/>
+<area shape="rect" id="node22" href="$utils_8cpp.html" title=" " alt="" coords="4521,117,4715,173"/>
+<area shape="rect" id="node23" href="$cover__instrument__condition_8cpp.html" title="Coverage Instrumentation for Conditions." alt="" coords="4739,117,4974,173"/>
+<area shape="rect" id="node24" href="$cover__instrument__decision_8cpp.html" title="Coverage Instrumentation for Decisions." alt="" coords="4999,117,5227,173"/>
+<area shape="rect" id="node25" href="$cover__instrument__mcdc_8cpp.html" title="Coverage Instrumentation for MC/DC." alt="" coords="5251,117,5460,173"/>
+<area shape="rect" id="node26" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="5484,117,5691,173"/>
+<area shape="rect" id="node27" href="$dot_8cpp.html" title="Dump Goto&#45;Program as DOT Graph." alt="" coords="5715,117,5908,173"/>
+<area shape="rect" id="node28" href="$rw__set_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="5932,117,6125,173"/>
+<area shape="rect" id="node29" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="6150,117,6334,173"/>
+<area shape="rect" id="node30" href="$goto__program_8cpp.html" title="Program Transformation." alt="" coords="6358,117,6542,173"/>
+<area shape="rect" id="node31" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="6566,117,6750,173"/>
+<area shape="rect" id="node32" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="6774,117,6958,173"/>
+<area shape="rect" id="node33" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="6982,117,7169,173"/>
+<area shape="rect" id="node34" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="7193,117,7377,173"/>
+<area shape="rect" id="node35" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="7401,117,7585,173"/>
+<area shape="rect" id="node36" href="$xml__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="7609,117,7793,173"/>
+<area shape="rect" id="node37" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="7817,117,8037,173"/>
+<area shape="rect" id="node38" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="8061,117,8265,173"/>
+<area shape="rect" id="node39" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="8289,117,8504,173"/>
+<area shape="rect" id="node40" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="8529,117,8726,173"/>
+<area shape="rect" id="node41" href="$language__util_8cpp.html" title=" " alt="" coords="8750,117,8950,173"/>
+<area shape="rect" id="node42" href="$linking_8cpp.html" title="ANSI&#45;C Linking." alt="" coords="8975,124,9181,165"/>
+<area shape="rect" id="node43" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="9205,117,9399,173"/>
 </map>

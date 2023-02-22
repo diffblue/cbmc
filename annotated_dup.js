@@ -381,6 +381,7 @@ var annotated_dup =
     [ "destructor_treet", "classdestructor__treet.html", "classdestructor__treet" ],
     [ "destructt", "structdestructt.html", "structdestructt" ],
     [ "destructt< 0, pointee_baset, Ts... >", "structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4.html", "structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4" ],
+    [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html", "classdfcc__contract__clauses__codegent" ],
     [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html", "classdfcc__contract__functionst" ],
     [ "dfcc_contract_handlert", "classdfcc__contract__handlert.html", "classdfcc__contract__handlert" ],
     [ "dfcc_instrumentt", "classdfcc__instrumentt.html", "classdfcc__instrumentt" ],

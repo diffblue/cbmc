@@ -1,10 +1,6 @@
 var classdfcc__contract__functionst =
 [
-    [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html#a2414dde140a37b793f7afb67182b2bd8", null ],
-    [ "encode_assignable_target", "classdfcc__contract__functionst.html#ad9a58f2f36839f818654f18937122af6", null ],
-    [ "encode_assignable_target_group", "classdfcc__contract__functionst.html#a9c049854dd9e876c063be0d0b11c8fb6", null ],
-    [ "encode_freeable_target", "classdfcc__contract__functionst.html#a871bb745793747bfd4ef1ac87783f92f", null ],
-    [ "encode_freeable_target_group", "classdfcc__contract__functionst.html#ab9cb3980f7abc9fc40f1402cbf559fb5", null ],
+    [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html#abd3639776bbbf994ae44830215fce1ed", null ],
     [ "gen_spec_assigns_function", "classdfcc__contract__functionst.html#ab3628a600c8e2572985a523031997218", null ],
     [ "gen_spec_frees_function", "classdfcc__contract__functionst.html#a03cf1476b1b5be9f6e89c81653081faf", null ],
     [ "get_nof_assigns_targets", "classdfcc__contract__functionst.html#a95d49490312711c43b55e8a4c451cf8c", null ],
@@ -12,8 +8,8 @@ var classdfcc__contract__functionst =
     [ "get_spec_assigns_function_symbol", "classdfcc__contract__functionst.html#a6ed654a56a84e97cfa7bd29035048a72", null ],
     [ "get_spec_assigns_havoc_function_symbol", "classdfcc__contract__functionst.html#aa9cf9a58780227fbcaa7071a154ed57f", null ],
     [ "get_spec_frees_function_symbol", "classdfcc__contract__functionst.html#a2dddbc0d8612c2d1cf5f416a19f39cd5", null ],
-    [ "inline_and_check_warnings", "classdfcc__contract__functionst.html#a23fa6a7b2c814aeb5346a36caf7fa63d", null ],
     [ "code_with_contract", "classdfcc__contract__functionst.html#a21f46a29ba726f2188690a32972d60d6", null ],
+    [ "contract_clauses_codegen", "classdfcc__contract__functionst.html#a4127c6d075f1bc349a5a9859c45b7b7f", null ],
     [ "goto_model", "classdfcc__contract__functionst.html#a39de861be490495f38be396bc740417b", null ],
     [ "language_mode", "classdfcc__contract__functionst.html#ace80dfe90df623141eb20a5cf9ab304c", null ],
     [ "library", "classdfcc__contract__functionst.html#adaac141b4be6e46a764695e8542c91d3", null ],

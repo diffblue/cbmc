@@ -1,17 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/journalling_symbol_table.h" name="/home/runner/work/cbmc/cbmc/src/util/journalling_symbol_table.h">
-<area shape="rect" id="node1" title="Author: Diffblue Ltd." alt="" coords="9861,5,10045,61"/>
+<area shape="rect" id="node1" title="Author: Diffblue Ltd." alt="" coords="9695,5,9879,61"/>
 <area shape="rect" id="node2" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="5202,109,5386,165"/>
-<area shape="rect" id="node56" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="9722,221,9941,277"/>
-<area shape="rect" id="node57" href="$java__bytecode__typecheck_8h.html" title="JAVA Bytecode Language Type Checking." alt="" coords="9722,109,9941,165"/>
-<area shape="rect" id="node58" href="$java__entry__point_8cpp.html" title=" " alt="" coords="9965,109,10183,165"/>
-<area shape="rect" id="node59" href="$lazy__goto__functions__map_8h.html" title="Author: Diffblue Ltd." alt="" coords="10207,109,10426,165"/>
-<area shape="rect" id="node60" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="10450,109,10669,165"/>
-<area shape="rect" id="node3" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="9385,347,9569,388"/>
-<area shape="rect" id="node4" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4537,451,4721,507"/>
-<area shape="rect" id="node5" href="$static__simplifier_8cpp.html" title=" " alt="" coords="9385,451,9569,507"/>
-<area shape="rect" id="node6" href="$static__verifier_8cpp.html" title=" " alt="" coords="9593,451,9777,507"/>
+<area shape="rect" id="node56" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="9557,221,9775,277"/>
+<area shape="rect" id="node57" href="$java__bytecode__typecheck_8h.html" title="JAVA Bytecode Language Type Checking." alt="" coords="9557,109,9775,165"/>
+<area shape="rect" id="node58" href="$java__entry__point_8cpp.html" title=" " alt="" coords="9799,109,10018,165"/>
+<area shape="rect" id="node59" href="$lazy__goto__functions__map_8h.html" title="Author: Diffblue Ltd." alt="" coords="10042,109,10261,165"/>
+<area shape="rect" id="node60" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="10285,109,10503,165"/>
+<area shape="rect" id="node3" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="9169,347,9353,388"/>
+<area shape="rect" id="node4" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4398,451,4582,507"/>
+<area shape="rect" id="node5" href="$static__simplifier_8cpp.html" title=" " alt="" coords="7783,451,7967,507"/>
+<area shape="rect" id="node6" href="$static__verifier_8cpp.html" title=" " alt="" coords="9298,451,9482,507"/>
 <area shape="rect" id="node7" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="77,221,261,277"/>
-<area shape="rect" id="node8" href="$is__threaded_8h.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="9413,221,9597,277"/>
+<area shape="rect" id="node8" href="$is__threaded_8h.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="9298,221,9482,277"/>
 <area shape="rect" id="node9" href="$lexical__loops_8h.html" title="Compute lexical loops in a goto_function." alt="" coords="285,221,479,277"/>
 <area shape="rect" id="node10" href="$natural__loops_8h.html" title="Compute natural loops in a goto_function." alt="" coords="503,221,699,277"/>
 <area shape="rect" id="node11" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="723,221,907,277"/>
@@ -35,28 +35,28 @@
 <area shape="rect" id="node29" href="$branch_8cpp.html" title="Branch Instrumentation." alt="" coords="4603,221,4796,277"/>
 <area shape="rect" id="node30" href="$call__sequences_8cpp.html" title="Printing function call sequences for Ofer." alt="" coords="4820,221,5013,277"/>
 <area shape="rect" id="node31" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="5037,221,5231,277"/>
-<area shape="rect" id="node32" href="$dfcc_8cpp.html" title=" " alt="" coords="4814,332,5011,403"/>
-<area shape="rect" id="node33" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="5257,332,5454,403"/>
-<area shape="rect" id="node34" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="5035,332,5233,403"/>
+<area shape="rect" id="node32" href="$dfcc_8cpp.html" title=" " alt="" coords="4699,332,4897,403"/>
+<area shape="rect" id="node33" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="5142,332,5339,403"/>
+<area shape="rect" id="node34" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="4921,332,5118,403"/>
 <area shape="rect" id="node35" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="5357,221,5551,277"/>
-<area shape="rect" id="node36" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="5478,332,5675,403"/>
-<area shape="rect" id="node37" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="5700,332,5907,403"/>
-<area shape="rect" id="node38" href="$dfcc__library_8cpp.html" title=" " alt="" coords="6046,213,6243,284"/>
-<area shape="rect" id="node39" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="6268,213,6509,284"/>
-<area shape="rect" id="node40" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="6534,213,6731,284"/>
-<area shape="rect" id="node41" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="5931,332,6129,403"/>
-<area shape="rect" id="node42" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="6153,332,6355,403"/>
-<area shape="rect" id="node43" href="$utils_8h.html" title=" " alt="" coords="5575,221,5768,277"/>
-<area shape="rect" id="node44" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="6756,221,6949,277"/>
-<area shape="rect" id="node45" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="6973,221,7167,277"/>
-<area shape="rect" id="node46" href="$document__properties_8cpp.html" title="Subgoal Documentation." alt="" coords="7191,221,7384,277"/>
-<area shape="rect" id="node47" href="$dot_8cpp.html" title="Dump Goto&#45;Program as DOT Graph." alt="" coords="7408,221,7601,277"/>
-<area shape="rect" id="node48" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="7625,221,7819,277"/>
-<area shape="rect" id="node49" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="7843,221,8065,277"/>
-<area shape="rect" id="node50" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="8089,221,8283,277"/>
-<area shape="rect" id="node51" href="$insert__final__assert__false_8cpp.html" title="Insert final assert false into a function." alt="" coords="8307,221,8518,277"/>
-<area shape="rect" id="node52" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="8543,221,8736,277"/>
-<area shape="rect" id="node53" href="$nondet__static_8cpp.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="8760,221,8953,277"/>
-<area shape="rect" id="node54" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="8977,221,9171,277"/>
-<area shape="rect" id="node55" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="9195,221,9388,277"/>
+<area shape="rect" id="node36" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="5363,332,5561,403"/>
+<area shape="rect" id="node37" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="5585,332,5843,403"/>
+<area shape="rect" id="node38" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="5868,332,6075,403"/>
+<area shape="rect" id="node39" href="$dfcc__library_8cpp.html" title=" " alt="" coords="6098,213,6295,284"/>
+<area shape="rect" id="node40" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="6320,213,6561,284"/>
+<area shape="rect" id="node41" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="6586,213,6783,284"/>
+<area shape="rect" id="node42" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="6099,332,6297,403"/>
+<area shape="rect" id="node43" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="6321,332,6523,403"/>
+<area shape="rect" id="node44" href="$utils_8h.html" title=" " alt="" coords="5627,221,5820,277"/>
+<area shape="rect" id="node45" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="6808,221,7001,277"/>
+<area shape="rect" id="node46" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="7025,221,7219,277"/>
+<area shape="rect" id="node47" href="$document__properties_8cpp.html" title="Subgoal Documentation." alt="" coords="7243,221,7436,277"/>
+<area shape="rect" id="node48" href="$dot_8cpp.html" title="Dump Goto&#45;Program as DOT Graph." alt="" coords="7460,221,7653,277"/>
+<area shape="rect" id="node49" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="7677,221,7871,277"/>
+<area shape="rect" id="node50" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="7895,221,8117,277"/>
+<area shape="rect" id="node51" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="8141,221,8335,277"/>
+<area shape="rect" id="node52" href="$insert__final__assert__false_8cpp.html" title="Insert final assert false into a function." alt="" coords="8359,221,8570,277"/>
+<area shape="rect" id="node53" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="8595,221,8788,277"/>
+<area shape="rect" id="node54" href="$nondet__static_8cpp.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="8812,221,9005,277"/>
+<area shape="rect" id="node55" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="9029,221,9223,277"/>
 </map>
