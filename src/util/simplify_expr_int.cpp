@@ -1897,6 +1897,43 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
         }
       }
     }
+
+    if(config.ansi_c.NULL_is_zero)
+    {
+      const exprt &maybe_tc_op = skip_typecast(expr.op0());
+      if(maybe_tc_op.type().id() == ID_pointer)
+      {
+        // make sure none of the type casts lose information
+        const pointer_typet &p_type = to_pointer_type(maybe_tc_op.type());
+        bool bitwidth_unchanged = true;
+        const exprt *ep = &(expr.op0());
+        while(bitwidth_unchanged && ep->id() == ID_typecast)
+        {
+          if(auto t = type_try_dynamic_cast<bitvector_typet>(ep->type()))
+          {
+            bitwidth_unchanged = t->get_width() == p_type.get_width();
+          }
+          else
+            bitwidth_unchanged = false;
+
+          ep = &to_typecast_expr(*ep).op();
+        }
+
+        if(bitwidth_unchanged)
+        {
+          if(expr.id() == ID_equal || expr.id() == ID_ge || expr.id() == ID_le)
+          {
+            return changed(simplify_rec(
+              equal_exprt{maybe_tc_op, null_pointer_exprt{p_type}}));
+          }
+          else
+          {
+            return changed(simplify_rec(
+              notequal_exprt{maybe_tc_op, null_pointer_exprt{p_type}}));
+          }
+        }
+      }
+    }
   }
 
   // are we comparing with a typecast from bool?
