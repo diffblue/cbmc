@@ -49,10 +49,11 @@ void dfcc_contract_clauses_codegent::gen_spec_assigns_instructions(
 {
   for(const auto &expr : assigns_clause)
   {
-    if(can_cast_expr<conditional_target_group_exprt>(expr))
+    if(
+      auto target_group =
+        expr_try_dynamic_cast<conditional_target_group_exprt>(expr))
     {
-      encode_assignable_target_group(
-        language_mode, to_conditional_target_group_expr(expr), dest);
+      encode_assignable_target_group(language_mode, *target_group, dest);
     }
     else
     {
@@ -75,10 +76,11 @@ void dfcc_contract_clauses_codegent::gen_spec_frees_instructions(
 {
   for(const auto &expr : frees_clause)
   {
-    if(can_cast_expr<conditional_target_group_exprt>(expr))
+    if(
+      auto target_group =
+        expr_try_dynamic_cast<conditional_target_group_exprt>(expr))
     {
-      encode_freeable_target_group(
-        language_mode, to_conditional_target_group_expr(expr), dest);
+      encode_freeable_target_group(language_mode, *target_group, dest);
     }
     else
     {
@@ -279,10 +281,9 @@ void dfcc_contract_clauses_codegent::inline_and_check_warnings(
   }
 
   INVARIANT(
-    recursive_call.size() == 0,
-    "recursive calls found when inlining goto program");
+    recursive_call.empty(), "recursive calls found when inlining goto program");
 
   INVARIANT(
-    not_enough_arguments.size() == 0,
+    not_enough_arguments.empty(),
     "not enough arguments when inlining goto program");
 }

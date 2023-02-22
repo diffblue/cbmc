@@ -152,11 +152,13 @@ public:
   /// `__CPROVER_object_from`, `__CPROVER_object_upto`.
   ///
   /// \param[in] write_set_to_fill write set to populate.
+  /// \param[in] language_mode used to format expressions.
   /// \param[inout] program function to transform in place
   /// \param[out] nof_targets receives the estimated size of the write set
   ///
   void to_spec_assigns_instructions(
     const exprt &write_set_to_fill,
+    const irep_idt &language_mode,
     goto_programt &program,
     std::size_t &nof_targets);
 
@@ -201,11 +203,13 @@ public:
   /// freeable targets: `__CPROVER_freeable`.
   ///
   /// \param[in] write_set_to_fill write set to populate.
+  /// \param[in] language_mode used to format expressions.
   /// \param[inout] program function to transform in place
   /// \param[out] nof_targets receives the estimated size of the write set
   ///
   void to_spec_frees_instructions(
     const exprt &write_set_to_fill,
+    const irep_idt &language_mode,
     goto_programt &program,
     std::size_t &nof_targets);
 

@@ -92,14 +92,14 @@ parse_function_contract_pair(const irep_idt &cli_flag)
   else if(split.size() == 2)
   {
     auto function_name = split[0];
-    if(function_name.size() == 0)
+    if(function_name.empty())
     {
       throw invalid_function_contract_pair_exceptiont{
         "couldn't find function name before '/' in '" + cli_flag_str + "'",
         correct_format_message};
     }
     auto contract_name = split[1];
-    if(contract_name.size() == 0)
+    if(contract_name.empty())
     {
       throw invalid_function_contract_pair_exceptiont{
         "couldn't find contract name after '/' in '" + cli_flag_str + "'",

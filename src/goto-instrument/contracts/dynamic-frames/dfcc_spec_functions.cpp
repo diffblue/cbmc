@@ -162,9 +162,9 @@ void dfcc_spec_functionst::generate_havoc_instructions(
       if(ins_it->call_function().id() != ID_symbol)
       {
         throw invalid_source_file_exceptiont(
-          "Function pointer call '" +
+          "Function pointer calls are not supported in assigns clauses: '" +
             from_expr(ns, function_id, ins_it->call_function()) +
-            "' in function '" + id2string(function_id) + "' is not supported",
+            "' called in function '" + id2string(function_id) + "'",
           ins_it->source_location());
       }
 
@@ -265,7 +265,10 @@ void dfcc_spec_functionst::to_spec_assigns_function(
       .symbol_expr();
 
   to_spec_assigns_instructions(
-    write_set_to_fill, goto_function.body, nof_targets);
+    write_set_to_fill,
+    utils.get_function_symbol(function_id).mode,
+    goto_function.body,
+    nof_targets);
 
   goto_model.goto_functions.update();
 
@@ -273,13 +276,14 @@ void dfcc_spec_functionst::to_spec_assigns_function(
   std::set<irep_idt> function_pointer_contracts;
   instrument.instrument_function(function_id, function_pointer_contracts);
   INVARIANT(
-    function_pointer_contracts.size() == 0,
+    function_pointer_contracts.empty(),
     "discovered function pointer contracts unexpectedly");
   utils.set_hide(function_id, true);
 }
 
 void dfcc_spec_functionst::to_spec_assigns_instructions(
   const exprt &write_set_to_fill,
+  const irep_idt &language_mode,
   goto_programt &program,
   std::size_t &nof_targets)
 {
@@ -295,9 +299,9 @@ void dfcc_spec_functionst::to_spec_assigns_instructions(
       if(ins_it->call_function().id() != ID_symbol)
       {
         throw invalid_source_file_exceptiont(
-          "Function pointer call '" +
-            from_expr(ns, "", ins_it->call_function()) +
-            "' are supported in assigns clauses",
+          "Function pointer calls are not supported in assigns clauses '" +
+            from_expr_using_mode(ns, language_mode, ins_it->call_function()) +
+            "'",
           ins_it->source_location());
       }
 
@@ -350,7 +354,10 @@ void dfcc_spec_functionst::to_spec_frees_function(
       .symbol_expr();
 
   to_spec_frees_instructions(
-    write_set_to_fill, goto_function.body, nof_targets);
+    write_set_to_fill,
+    utils.get_function_symbol(function_id).mode,
+    goto_function.body,
+    nof_targets);
 
   goto_model.goto_functions.update();
 
@@ -358,7 +365,7 @@ void dfcc_spec_functionst::to_spec_frees_function(
   std::set<irep_idt> function_pointer_contracts;
   instrument.instrument_function(function_id, function_pointer_contracts);
   INVARIANT(
-    function_pointer_contracts.size() == 0,
+    function_pointer_contracts.empty(),
     "discovered function pointer contracts unexpectedly");
 
   utils.set_hide(function_id, true);
@@ -366,6 +373,7 @@ void dfcc_spec_functionst::to_spec_frees_function(
 
 void dfcc_spec_functionst::to_spec_frees_instructions(
   const exprt &write_set_to_fill,
+  const irep_idt &language_mode,
   goto_programt &program,
   std::size_t &nof_targets)
 {
@@ -378,9 +386,9 @@ void dfcc_spec_functionst::to_spec_frees_instructions(
       if(ins_it->call_function().id() != ID_symbol)
       {
         throw invalid_source_file_exceptiont(
-          "Function pointer call '" +
-            from_expr(ns, "", ins_it->call_function()) +
-            "' are not supported in frees clauses",
+          "Function pointer calls are not supported in frees clauses: '" +
+            from_expr_using_mode(ns, language_mode, ins_it->call_function()) +
+            "'",
           ins_it->source_location());
       }
 

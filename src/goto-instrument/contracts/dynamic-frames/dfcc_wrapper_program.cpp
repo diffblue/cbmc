@@ -30,14 +30,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_lift_memory_predicates.h"
 #include "dfcc_utils.h"
 
-/// Lift a c++ bool to an exprt
-static exprt to_bool_expr(bool v)
-{
-  if(v)
-    return true_exprt();
-  return false_exprt();
-}
-
 /// Generate the contract write set
 const symbol_exprt create_contract_write_set(
   dfcc_utilst &utils,
@@ -312,8 +304,8 @@ void dfcc_wrapper_programt::encode_requires_write_set()
     address_of_write_set,
     from_integer(0, size_type()),
     from_integer(0, size_type()),
-    to_bool_expr(check_mode),
-    to_bool_expr(!check_mode),
+    make_boolean_expr(check_mode),
+    make_boolean_expr(!check_mode),
     false_exprt(),
     false_exprt(),
     true_exprt(),
@@ -387,8 +379,8 @@ void dfcc_wrapper_programt::encode_ensures_write_set()
     from_integer(0, size_type()),
     false_exprt(),
     false_exprt(),
-    to_bool_expr(!check_mode),
-    to_bool_expr(check_mode),
+    make_boolean_expr(!check_mode),
+    make_boolean_expr(check_mode),
     true_exprt(),
     true_exprt(),
     wrapper_sl);
