@@ -34,7 +34,17 @@ public:
     return (const template_parameterst &)find(ID_template_parameters).get_sub();
   }
 
-  using typet::subtype;
+  const typet &subtype() const
+  {
+    if(get_sub().empty())
+      return static_cast<const typet &>(get_nil_irep());
+    return static_cast<const typet &>(get_sub().front());
+  }
+
+  typet &subtype()
+  {
+    return add_subtype();
+  }
 };
 
 inline template_typet &to_template_type(typet &type)
