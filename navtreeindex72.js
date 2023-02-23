@@ -1,6 +1,5 @@
 var NAVTREEINDEX72 =
 {
-"contracts-dev-spec-dfcc.html#autotoc_md47":[1,1,0,5,1],
 "contracts-dev-spec-harness.html":[1,1,0,6],
 "contracts-dev-spec-is-freeable.html":[1,1,0,5,3,2],
 "contracts-dev-spec-is-fresh.html":[1,1,0,5,3,3],
@@ -249,5 +248,6 @@ var NAVTREEINDEX72 =
 "convert__int__literal_8cpp.html#ad982df2fe6e8701cb1ca08ebfe7831d1":[7,0,2,28,0,4,4],
 "convert__int__literal_8cpp.html#af2fc959a960d62e3c2e2fc76d6f8afc1":[7,0,2,28,0,4,6],
 "convert__int__literal_8cpp_source.html":[7,0,2,28,0,4],
-"convert__int__literal_8h.html":[7,0,2,28,0,5]
+"convert__int__literal_8h.html":[7,0,2,28,0,5],
+"convert__int__literal_8h.html#a05b33711ac2181f80ff3a197d2b2e40e":[7,0,2,28,0,5,4]
 };

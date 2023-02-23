@@ -1,6 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classxml__parsert.html#ab4cd01f17f70bdeeaf4e0f120ca05cac":[6,0,1346,2],
 "classxml__parsert.html#ac02dc72f47f05fafd06170164ad4fec8":[6,0,1346,0],
 "classxml__parsert.html#ae358b581f9caf0cde9b37db6daafe8ac":[6,0,1346,4],
 "classxmlt.html":[6,0,1347],
@@ -249,5 +248,6 @@ var NAVTREEINDEX71 =
 "contracts-dev-spec-dfcc-runtime.html#contracts-dev-spec-dfcc-runtime-data":[1,1,0,5,2,0],
 "contracts-dev-spec-dfcc-runtime.html#contracts-dev-spec-dfcc-runtime-ops":[1,1,0,5,2,1],
 "contracts-dev-spec-dfcc.html":[1,1,0,5],
-"contracts-dev-spec-dfcc.html#autotoc_md46":[1,1,0,5,0]
+"contracts-dev-spec-dfcc.html#autotoc_md46":[1,1,0,5,0],
+"contracts-dev-spec-dfcc.html#autotoc_md47":[1,1,0,5,1]
 };
