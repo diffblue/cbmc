@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^PARSING ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+--
+Checks that loop contracts for do-while loops cannot be attached after
+the `while` keyword.
