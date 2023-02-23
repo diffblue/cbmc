@@ -2225,9 +2225,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       {
         if(expr.arguments().size() != 1 && expr.arguments().size() != 2)
         {
-          error().source_location = f_op.source_location();
-          error() << identifier << " expects one or two operands" << eom;
-          throw 0;
+          throw invalid_source_file_exceptiont{
+            id2string(identifier) + " expects one or two operands",
+            f_op.source_location()};
         }
 
         // the first argument must be a pointer
@@ -2240,10 +2240,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         }
         else if(pointer_expr.type().id() != ID_pointer)
         {
-          error().source_location = f_op.source_location();
-          error() << identifier << " expects a pointer as first argument"
-                  << eom;
-          throw 0;
+          throw invalid_source_file_exceptiont{
+            id2string(identifier) + " expects a pointer as first argument",
+            f_op.source_location()};
         }
 
         // The second argument, when given, is a size_t.
@@ -2262,21 +2261,14 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
             to_pointer_type(pointer_expr.type()).base_type();
           if(subtype.id() == ID_empty)
           {
-            error().source_location = f_op.source_location();
-            error() << identifier << " expects a size when given a void pointer"
-                    << eom;
-            throw 0;
+            throw invalid_source_file_exceptiont{
+              id2string(identifier) +
+                " expects a size when given a void pointer",
+              f_op.source_location()};
           }
 
           auto size_expr_opt = size_of_expr(subtype, *this);
-          if(!size_expr_opt.has_value())
-          {
-            error().source_location = f_op.source_location();
-            error() << identifier << " was given object pointer without size"
-                    << eom;
-            throw 0;
-          }
-
+          CHECK_RETURN(size_expr_opt.has_value());
           size_expr = std::move(size_expr_opt.value());
         }
 

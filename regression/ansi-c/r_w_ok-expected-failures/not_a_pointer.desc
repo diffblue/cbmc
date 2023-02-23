@@ -1,0 +1,7 @@
+CORE
+main.c
+-DNOT_A_POINTER
+__CPROVER_r_ok expects a pointer as first argument$
+^CONVERSION ERROR$
+^EXIT=(64|1)$
+^SIGNAL=0$
