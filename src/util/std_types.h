@@ -780,16 +780,12 @@ public:
   }
 
   /// The type of the elements of the array.
-  /// This method is preferred over .subtype(),
-  /// which will eventually be deprecated.
   const typet &element_type() const
   {
     return subtype();
   }
 
   /// The type of the elements of the array.
-  /// This method is preferred over .subtype(),
-  /// which will eventually be deprecated.
   typet &element_type()
   {
     return subtype();
@@ -822,6 +818,10 @@ public:
   static void check(
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT);
+
+protected:
+  // Use element_type() instead
+  using type_with_subtypet::subtype;
 };
 
 /// Check whether a reference to a typet is a \ref array_typet.
@@ -1021,16 +1021,12 @@ public:
   }
 
   /// The type of the elements of the vector.
-  /// This method is preferred over .subtype(),
-  /// which will eventually be deprecated.
   const typet &element_type() const
   {
     return subtype();
   }
 
   /// The type of the elements of the vector.
-  /// This method is preferred over .subtype(),
-  /// which will eventually be deprecated.
   typet &element_type()
   {
     return subtype();
@@ -1038,6 +1034,10 @@ public:
 
   const constant_exprt &size() const;
   constant_exprt &size();
+
+protected:
+  // Use element_type() instead
+  using type_with_subtypet::subtype;
 };
 
 /// Check whether a reference to a typet is a \ref vector_typet.
