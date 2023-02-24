@@ -308,10 +308,10 @@ protected:
   /// on the given source location.
   void add_active_named_check_pragmas(source_locationt &source_location) const;
 
-  /// \brief Adds "disable" pragmas for all named checks
-  /// on the given source location.
+  /// \brief Adds "checked" pragmas for all named checks on the given source
+  /// location (prevents any the instanciation of any ulterior check).
   void
-  add_all_disable_named_check_pragmas(source_locationt &source_location) const;
+  add_all_checked_named_check_pragmas(source_locationt &source_location) const;
 
   /// activation statuses for named checks
   typedef enum
@@ -1726,7 +1726,7 @@ void goto_check_ct::add_guarded_property(
     annotated_location.set_comment(comment + " in " + source_expr_string);
     annotated_location.set_property_class(property_class);
 
-    add_all_disable_named_check_pragmas(annotated_location);
+    add_all_checked_named_check_pragmas(annotated_location);
 
     if(enable_assert_to_assume)
     {
@@ -2477,11 +2477,11 @@ void goto_check_ct::add_active_named_check_pragmas(
       source_location.add_pragma("checked:" + id2string(entry.first));
 }
 
-void goto_check_ct::add_all_disable_named_check_pragmas(
+void goto_check_ct::add_all_checked_named_check_pragmas(
   source_locationt &source_location) const
 {
   for(const auto &entry : name_to_flag)
-    source_location.add_pragma("disable:" + id2string(entry.first));
+    source_location.add_pragma("checked:" + id2string(entry.first));
 }
 
 goto_check_ct::named_check_statust
