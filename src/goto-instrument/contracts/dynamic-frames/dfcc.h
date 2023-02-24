@@ -58,8 +58,9 @@ class optionst;
 
 // clang-format off
 #define HELP_DFCC                                                              \
-  " --dfcc <harness>   activate dynamic frame condition checking for function\n"\
-  "                    contracts using the given harness as entry point\n"
+  " --dfcc <harness>             activate dynamic frame condition checking\n"\
+  "                              for function contracts using the given\n"\
+  "                              harness as entry point\n"
 
 #define FLAG_ENFORCE_CONTRACT_REC "enforce-contract-rec"
 #define OPT_ENFORCE_CONTRACT_REC "(" FLAG_ENFORCE_CONTRACT_REC "):"

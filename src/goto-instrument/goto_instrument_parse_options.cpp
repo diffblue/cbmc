@@ -1980,11 +1980,11 @@ void goto_instrument_parse_optionst::help()
     "                              used with aggressive-slice, preserves all functions within <n> function calls\n" // NOLINT(*)
     "                              of the functions on the shortest path\n"
     " --aggressive-slice-preserve-function <f>\n"
-    "                             force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
+    "                              force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
     " --aggressive-slice-preserve-functions-containing <f>\n"
     "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
     " --aggressive-slice-preserve-all-direct-paths \n"
-    "                             force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
+    "                              force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
     "\n"
     "Code contracts:\n"
     HELP_DFCC
