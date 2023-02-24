@@ -26,7 +26,7 @@ public:
   pointer_typet(typet _base_type, std::size_t width)
     : bitvector_typet(ID_pointer, width)
   {
-    subtype().swap(_base_type);
+    add_subtype() = std::move(_base_type);
   }
 
   /// The type of the data what we point to.
@@ -45,6 +45,20 @@ public:
     return subtype();
   }
 
+  // Use .base_type() instead -- this method will be removed
+  const typet &subtype() const
+  {
+    // The existence of get_sub() front is enforced by check(...)
+    return static_cast<const typet &>(get_sub().front());
+  }
+
+  // Use .base_type() instead -- this method will be removed
+  typet &subtype()
+  {
+    // The existence of get_sub() front is enforced by check(...)
+    return static_cast<typet &>(get_sub().front());
+  }
+
   signedbv_typet difference_type() const
   {
     return signedbv_typet(get_width());
@@ -54,8 +68,8 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+    bitvector_typet::check(type, vm);
     type_with_subtypet::check(type);
-    DATA_CHECK(vm, !type.get(ID_width).empty(), "pointer must have width");
   }
 };
 

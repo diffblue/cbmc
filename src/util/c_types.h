@@ -22,7 +22,7 @@ public:
   explicit c_bit_field_typet(typet _subtype, std::size_t width)
     : bitvector_typet(ID_c_bit_field, width)
   {
-    subtype().swap(_subtype);
+    add_subtype() = std::move(_subtype);
   }
 
   // These have a sub-type. The preferred way to access it
@@ -35,6 +35,28 @@ public:
   typet &underlying_type()
   {
     return subtype();
+  }
+
+  // Use .underlying_type() instead -- this method will be removed
+  const typet &subtype() const
+  {
+    // The existence of get_sub() front is enforced by check(...)
+    return static_cast<const typet &>(get_sub().front());
+  }
+
+  // Use .underlying_type() instead -- this method will be removed
+  typet &subtype()
+  {
+    // The existence of get_sub() front is enforced by check(...)
+    return static_cast<typet &>(get_sub().front());
+  }
+
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    bitvector_typet::check(type, vm);
+    type_with_subtypet::check(type, vm);
   }
 };
 
@@ -58,7 +80,7 @@ inline bool can_cast_type<c_bit_field_typet>(const typet &type)
 inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 {
   PRECONDITION(can_cast_type<c_bit_field_typet>(type));
-  type_with_subtypet::check(type);
+  c_bit_field_typet::check(type);
   return static_cast<const c_bit_field_typet &>(type);
 }
 

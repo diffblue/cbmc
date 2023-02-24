@@ -41,28 +41,10 @@ public:
 #else
   typet(irep_idt _id, typet _subtype) : irept(std::move(_id))
   {
-    subtype() = std::move(_subtype);
+    add_subtype() = std::move(_subtype);
   }
 #endif
 
-  // Deliberately protected -- use type-specific accessor methods instead.
-protected:
-  const typet &subtype() const
-  {
-    if(get_sub().empty())
-      return static_cast<const typet &>(get_nil_irep());
-    return static_cast<const typet &>(get_sub().front());
-  }
-
-  typet &subtype()
-  {
-    subt &sub=get_sub();
-    if(sub.empty())
-      sub.resize(1);
-    return static_cast<typet &>(sub.front());
-  }
-
-public:
   // This method allows the construction of a type with a subtype by
   // starting from a type without subtype.  It avoids copying the contents
   // of the type.  The primary use-case are parsers, where a copy could be
