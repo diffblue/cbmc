@@ -1,0 +1,12 @@
+CORE
+main.c
+--unwind 22
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.\d+\] line \d+ assertion 0: SUCCESS$
+^\[main.assertion.\d+\] line \d+ assertion history == 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This investigates whether red or blue is in the loop.
