@@ -1,0 +1,7 @@
+CORE
+main.c
+-DVOID_POINTER_NO_SIZE
+__CPROVER_r_ok expects a size when given a void pointer$
+^CONVERSION ERROR$
+^EXIT=(64|1)$
+^SIGNAL=0$
