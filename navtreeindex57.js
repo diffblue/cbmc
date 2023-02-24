@@ -1,5 +1,10 @@
 var NAVTREEINDEX57 =
 {
+"classshadow__memoryt.html#a7d8d00c4ab6ec63619abc6237c9c7594":[6,0,1024,4],
+"classshadow__memoryt.html#a913e530d91a291a1c317155ff194715d":[6,0,1024,8],
+"classshadow__memoryt.html#a9b58632647278dcd2d2fb59adfa4dd6b":[6,0,1024,11],
+"classshadow__memoryt.html#a9df5b6a4bd923493efb1a2f0d53610fc":[6,0,1024,12],
+"classshadow__memoryt.html#aab4949efe2faa15291d8a49125bc411a":[6,0,1024,6],
 "classshadow__memoryt.html#aabfb96e83698ddc414455e4c111ac702":[6,0,1024,0],
 "classshadow__memoryt.html#ab0b53e6704a02a4c810d631d7dde3062":[6,0,1024,3],
 "classshadow__memoryt.html#accc467c2c7e17133f220e96ca24080b6":[6,0,1024,10],
@@ -244,10 +249,5 @@ var NAVTREEINDEX57 =
 "classside__effect__expr__overflowt.html#a785659e87015a61e09fbd2b45f78b1a4":[6,0,1038,2],
 "classside__effect__expr__overflowt.html#a869d48f3067f9d298804f94712076848":[6,0,1038,6],
 "classside__effect__expr__overflowt.html#ad67b6a349025d62d4aa02c91ac8aa84e":[6,0,1038,5],
-"classside__effect__expr__overflowt.html#afd07c11c94956971e48ef49e92dfbb65":[6,0,1038,0],
-"classside__effect__expr__statement__expressiont.html":[6,0,1039],
-"classside__effect__expr__statement__expressiont.html#a0d6ee45d03422c23b16cd89e54ca71ad":[6,0,1039,1],
-"classside__effect__expr__statement__expressiont.html#a7b73b97acd8e4518ae2f60a53dba038e":[6,0,1039,2],
-"classside__effect__expr__statement__expressiont.html#afbe630529d76806c888692839e7b5964":[6,0,1039,0],
-"classside__effect__expr__throwt.html":[6,0,1040]
+"classside__effect__expr__overflowt.html#afd07c11c94956971e48ef49e92dfbb65":[6,0,1038,0]
 };

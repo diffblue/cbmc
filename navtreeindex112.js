@@ -1,5 +1,8 @@
 var NAVTREEINDEX112 =
 {
+"prefix__filter_8cpp_source.html":[7,0,2,30,167],
+"prefix__filter_8h.html":[7,0,2,30,168],
+"prefix__filter_8h_source.html":[7,0,2,30,168],
 "preprocessor_8h.html":[7,0,2,30,169],
 "preprocessor_8h_source.html":[7,0,2,30,169],
 "preprocessor__line_8cpp.html":[7,0,2,1,67],
@@ -246,8 +249,5 @@ var NAVTREEINDEX112 =
 "reference__counting_8h.html#aa55b0a305802f46ee3284c14bbf5db5e":[7,0,2,30,177,2],
 "reference__counting_8h_source.html":[7,0,2,30,177],
 "reference_guide.html":[0,2],
-"refine__arithmetic_8cpp.html":[7,0,2,27,6,2],
-"refine__arithmetic_8cpp.html#a090a0b2bbb0e01b8ec51121970d550c1":[7,0,2,27,6,2,1],
-"refine__arithmetic_8cpp.html#a5214830f24120bc5f48db5a26b1bcffa":[7,0,2,27,6,2,0],
-"refine__arithmetic_8cpp_source.html":[7,0,2,27,6,2]
+"refine__arithmetic_8cpp.html":[7,0,2,27,6,2]
 };

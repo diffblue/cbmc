@@ -12,8 +12,6 @@ var classtypet =
     [ "has_subtypes", "classtypet.html#a5cc3c23b7ec76774335b554a459cec78", null ],
     [ "remove_subtype", "classtypet.html#adf88b4372806117a9f20fa717951b848", null ],
     [ "source_location", "classtypet.html#a1096f778c7c3461521c759187a4ab6b0", null ],
-    [ "subtype", "classtypet.html#ae59ec330ca21a6f6208ac369eb588b9a", null ],
-    [ "subtype", "classtypet.html#a2a2f15c3475e2927162cab2e362082f1", null ],
     [ "validate", "classtypet.html#ad5c5c9efcf41db5bae19b91da2227fb8", null ],
     [ "validate_full", "classtypet.html#a57560fa2291d517915cfa988c33c23ba", null ]
 ];

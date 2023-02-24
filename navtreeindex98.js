@@ -1,5 +1,8 @@
 var NAVTREEINDEX98 =
 {
+"globals_func_i.html":[7,1,1,9],
+"globals_func_j.html":[7,1,1,10],
+"globals_func_k.html":[7,1,1,11],
 "globals_func_l.html":[7,1,1,12],
 "globals_func_m.html":[7,1,1,13],
 "globals_func_n.html":[7,1,1,14],
@@ -246,8 +249,5 @@ var NAVTREEINDEX98 =
 "goto__instrument__parse__options_8cpp.html":[7,0,2,13,49],
 "goto__instrument__parse__options_8cpp_source.html":[7,0,2,13,49],
 "goto__instrument__parse__options_8h.html":[7,0,2,13,50],
-"goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6":[7,0,2,13,50,1],
-"goto__instrument__parse__options_8h_source.html":[7,0,2,13,50],
-"goto__model_8h.html":[7,0,2,14,45],
-"goto__model_8h_source.html":[7,0,2,14,45]
+"goto__instrument__parse__options_8h.html#a3fe45de7b46288d5f774d2d01873e6b6":[7,0,2,13,50,1]
 };
