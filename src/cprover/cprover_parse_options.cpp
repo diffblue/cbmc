@@ -62,7 +62,7 @@ static void show_goto_functions(const goto_modelt &goto_model)
       std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
 
       std::cout << symbol.display_name() << " /* " << symbol.name << " */\n";
-      fun->second.body.output(ns, symbol.name, std::cout);
+      fun->second.body.output(std::cout);
     }
   }
 }
