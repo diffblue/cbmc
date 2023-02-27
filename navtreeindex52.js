@@ -1,5 +1,6 @@
 var NAVTREEINDEX52 =
 {
+"classpoints__tot.html#a852a4caa60ea059a7d91879e89ff87e3":[6,0,901,0],
 "classpoints__tot.html#ae8958eefedebb2200dcdb1a2fca59bb4":[6,0,901,9],
 "classpoints__tot.html#af3b291bc5c72f15f14058fe511afac23":[6,0,901,10],
 "classpoints__tot.html#af78e6be6481721782ef509ad79f3e943":[6,0,901,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX52 =
 "classqbf__bdd__certificatet.html#aad24d5636a068ac9c5957f1b25be73ff":[6,0,922,3],
 "classqbf__bdd__certificatet.html#abe1e5836a0a80798d6c830a226ee282a":[6,0,922,2],
 "classqbf__bdd__certificatet.html#aefa0038be141bef90bdf13ac6296bcd3":[6,0,922,8],
-"classqbf__bdd__certificatet.html#af9e5163108c13d1d4803c069abc53de5":[6,0,922,6],
-"classqbf__bdd__coret.html":[6,0,923]
+"classqbf__bdd__certificatet.html#af9e5163108c13d1d4803c069abc53de5":[6,0,922,6]
 };
