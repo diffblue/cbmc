@@ -967,7 +967,6 @@ void jbmc_parse_optionst::help()
     " --no-assumptions             ignore user assumptions\n"
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     HELP_REACHABILITY_SLICER
-    HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     "\n"
     "Java Bytecode frontend options:\n"

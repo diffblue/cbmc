@@ -902,7 +902,6 @@ void cbmc_parse_optionst::help()
     " --mm MM                      memory consistency model for concurrent programs (default: sc)\n" // NOLINT(*)
     HELP_CONFIG_LIBRARY
     HELP_REACHABILITY_SLICER
-    HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --havoc-undefined-functions\n"

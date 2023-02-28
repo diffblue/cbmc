@@ -42,18 +42,18 @@ void reachability_slicer(
   message_handlert &);
 
 // clang-format off
-#define OPT_REACHABILITY_SLICER                                                \
-  "(fp-reachability-slice):(reachability-slice)(reachability-slice-fb)" // NOLINT(*)
+#define OPT_FP_REACHABILITY_SLICER "(fp-reachability-slice):"
+#define OPT_REACHABILITY_SLICER "(reachability-slice)(reachability-slice-fb)"
 
-#define HELP_REACHABILITY_SLICER                                                      \
-  " --fp-reachability-slice f    remove instructions that cannot appear on a trace\n" \
-  "                              that visits all given functions. The list of\n"      \
-  "                              functions has to be given as a comma separated\n"    \
-  "                              list f.\n"                                           \
-  " --reachability-slice         remove instructions that cannot appear on a trace\n" \
-  "                              from entry point to a property\n" // NOLINT(*)
-#define HELP_REACHABILITY_SLICER_FB                                                   \
-  " --reachability-slice-fb      remove instructions that cannot appear on a trace\n" \
-  "                              from entry point through a property\n" // NOLINT(*)
+#define HELP_FP_REACHABILITY_SLICER \
+  " --fp-reachability-slice f    remove instructions that cannot appear on\n" \
+  "                              trace that visits all given functions.\n" \
+  "                              The list of functions has to be given as a\n" \
+  "                              comma separated list f.\n"
+#define HELP_REACHABILITY_SLICER \
+  " --reachability-slice         remove instructions that cannot appear on\n" \
+  "                              a trace from entry point to a property\n" \
+  " --reachability-slice-fb      remove instructions that cannot appear on\n" \
+  "                              a trace from entry point through a property\n"
 // clang-format on
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H

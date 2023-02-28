@@ -95,7 +95,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_volatile.h"
 #include "points_to.h"
 #include "race_check.h"
-#include "reachability_slicer.h"
 #include "remove_function.h"
 #include "rw_set.h"
 #include "show_locations.h"
@@ -1971,6 +1970,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Slicing:\n"
     HELP_REACHABILITY_SLICER
+    HELP_FP_REACHABILITY_SLICER
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
