@@ -1,31 +1,31 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover_basic_blocks.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover_basic_blocks.cpp">
-<area shape="rect" id="node1" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="373,5,566,61"/>
-<area shape="rect" id="node2" href="$cover__basic__blocks_8h.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="277,109,437,136"/>
-<area shape="rect" id="node29" href="$src_2util_2message_8h.html" title=" " alt="" coords="727,348,846,375"/>
-<area shape="rect" id="node3" href="$optional_8h.html" title=" " alt="" coords="188,497,300,524"/>
-<area shape="rect" id="node5" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="450,184,601,225"/>
-<area shape="rect" id="node27" href="$source__lines_8h.html" title="Set of source code lines contributing to a basic block." alt="" coords="41,423,156,449"/>
-<area shape="rect" id="node4" title=" " alt="" coords="169,572,319,599"/>
-<area shape="rect" id="node6" href="$goto__instruction__code_8h.html" title=" " alt="" coords="1029,273,1206,300"/>
-<area shape="rect" id="node12" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1009,572,1101,599"/>
-<area shape="rect" id="node14" title=" " alt="" coords="391,647,449,673"/>
-<area shape="rect" id="node18" title=" " alt="" coords="679,572,743,599"/>
-<area shape="rect" id="node22" title=" " alt="" coords="121,497,164,524"/>
-<area shape="rect" id="node23" title=" " alt="" coords="496,273,555,300"/>
-<area shape="rect" id="node24" href="$deprecate_8h.html" title=" " alt="" coords="575,497,673,524"/>
-<area shape="rect" id="node25" href="$source__location_8h.html" title=" " alt="" coords="356,423,492,449"/>
-<area shape="rect" id="node7" href="$std__code__base_8h.html" title=" " alt="" coords="1199,348,1353,375"/>
-<area shape="rect" id="node21" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1060,348,1175,375"/>
-<area shape="rect" id="node8" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1303,497,1401,524"/>
-<area shape="rect" id="node16" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1079,423,1177,449"/>
-<area shape="rect" id="node19" href="$validate_8h.html" title=" " alt="" coords="1425,497,1511,524"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1354,572,1430,599"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1270,647,1362,673"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1541,647,1627,673"/>
-<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="1215,572,1278,599"/>
-<area shape="rect" id="node13" title=" " alt="" coords="1415,647,1489,673"/>
-<area shape="rect" id="node17" href="$mp__arith_8h.html" title=" " alt="" coords="458,497,550,524"/>
-<area shape="rect" id="node20" title=" " alt="" coords="1002,497,1126,524"/>
-<area shape="rect" id="node26" href="$irep_8h.html" title=" " alt="" coords="324,497,383,524"/>
-<area shape="rect" id="node28" title=" " alt="" coords="47,497,97,524"/>
+<area shape="rect" id="node1" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="1390,5,1584,61"/>
+<area shape="rect" id="node2" href="$cover__basic__blocks_8h.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="1348,109,1508,136"/>
+<area shape="rect" id="node29" href="$src_2util_2message_8h.html" title=" " alt="" coords="1294,348,1413,375"/>
+<area shape="rect" id="node3" href="$optional_8h.html" title=" " alt="" coords="1467,497,1579,524"/>
+<area shape="rect" id="node5" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="889,184,1040,225"/>
+<area shape="rect" id="node27" href="$source__lines_8h.html" title="Set of source code lines contributing to a basic block." alt="" coords="1042,423,1156,449"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1428,572,1578,599"/>
+<area shape="rect" id="node6" href="$goto__instruction__code_8h.html" title=" " alt="" coords="396,273,573,300"/>
+<area shape="rect" id="node12" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="540,572,632,599"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1176,647,1235,673"/>
+<area shape="rect" id="node18" title=" " alt="" coords="782,572,846,599"/>
+<area shape="rect" id="node22" title=" " alt="" coords="968,497,1011,524"/>
+<area shape="rect" id="node23" title=" " alt="" coords="902,273,960,300"/>
+<area shape="rect" id="node24" href="$source__location_8h.html" title=" " alt="" coords="1371,423,1507,449"/>
+<area shape="rect" id="node7" href="$std__code__base_8h.html" title=" " alt="" coords="419,348,574,375"/>
+<area shape="rect" id="node21" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="280,348,395,375"/>
+<area shape="rect" id="node8" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="13,497,110,524"/>
+<area shape="rect" id="node16" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="306,423,404,449"/>
+<area shape="rect" id="node19" href="$validate_8h.html" title=" " alt="" coords="334,497,421,524"/>
+<area shape="rect" id="node9" title=" " alt="" coords="24,572,100,599"/>
+<area shape="rect" id="node10" title=" " alt="" coords="332,647,424,673"/>
+<area shape="rect" id="node11" title=" " alt="" coords="164,647,250,673"/>
+<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="176,572,238,599"/>
+<area shape="rect" id="node13" title=" " alt="" coords="1444,647,1519,673"/>
+<area shape="rect" id="node17" href="$mp__arith_8h.html" title=" " alt="" coords="852,497,944,524"/>
+<area shape="rect" id="node20" title=" " alt="" coords="186,497,310,524"/>
+<area shape="rect" id="node25" href="$deprecate_8h.html" title=" " alt="" coords="1294,497,1392,524"/>
+<area shape="rect" id="node26" href="$irep_8h.html" title=" " alt="" coords="1110,497,1168,524"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1035,497,1086,524"/>
 </map>

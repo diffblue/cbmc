@@ -1,51 +1,50 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/goto_program.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/goto_program.cpp">
-<area shape="rect" id="node1" title="Program Transformation." alt="" coords="1547,5,1731,61"/>
-<area shape="rect" id="node2" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1493,109,1619,136"/>
-<area shape="rect" id="node9" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1130,781,1222,808"/>
-<area shape="rect" id="node19" href="$validate_8h.html" title=" " alt="" coords="326,632,413,659"/>
-<area shape="rect" id="node28" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="445,259,560,285"/>
-<area shape="rect" id="node31" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="931,408,1074,435"/>
-<area shape="rect" id="node35" href="$find__symbols_8h.html" title=" " alt="" coords="1645,408,1790,435"/>
-<area shape="rect" id="node37" href="$format__expr_8h.html" title=" " alt="" coords="1913,333,2052,360"/>
-<area shape="rect" id="node39" href="$format__type_8h.html" title=" " alt="" coords="2015,109,2153,136"/>
-<area shape="rect" id="node40" href="$namespace_8h.html" title=" " alt="" coords="1855,632,1990,659"/>
-<area shape="rect" id="node41" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="730,184,870,211"/>
-<area shape="rect" id="node43" href="$std__code_8h.html" title=" " alt="" coords="460,184,577,211"/>
-<area shape="rect" id="node45" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="767,408,873,435"/>
-<area shape="rect" id="node46" href="$language__util_8h.html" title=" " alt="" coords="2077,333,2251,360"/>
-<area shape="rect" id="node47" href="$validate__code_8h.html" title=" " alt="" coords="2177,109,2303,136"/>
-<area shape="rect" id="node48" title=" " alt="" coords="2327,109,2401,136"/>
-<area shape="rect" id="node49" title=" " alt="" coords="2425,109,2476,136"/>
-<area shape="rect" id="node3" href="$goto__instruction__code_8h.html" title=" " alt="" coords="894,184,1071,211"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1741,856,1800,883"/>
-<area shape="rect" id="node16" href="$source__location_8h.html" title=" " alt="" coords="1644,632,1780,659"/>
-<area shape="rect" id="node17" href="$deprecate_8h.html" title=" " alt="" coords="1593,707,1692,733"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1388,483,1452,509"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1476,483,1519,509"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1460,184,1519,211"/>
-<area shape="rect" id="node4" href="$std__code__base_8h.html" title=" " alt="" coords="584,259,739,285"/>
-<area shape="rect" id="node5" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="225,408,322,435"/>
-<area shape="rect" id="node23" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="562,333,659,360"/>
-<area shape="rect" id="node6" title=" " alt="" coords="246,483,322,509"/>
-<area shape="rect" id="node7" title=" " alt="" coords="54,856,146,883"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1051,557,1138,584"/>
-<area shape="rect" id="node13" href="$expr_8h.html" title=" " alt="" coords="605,483,667,509"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1143,856,1209,883"/>
-<area shape="rect" id="node11" title=" " alt="" coords="2029,856,2104,883"/>
-<area shape="rect" id="node14" href="$as__const_8h.html" title=" " alt="" coords="747,557,837,584"/>
-<area shape="rect" id="node15" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="913,557,975,584"/>
-<area shape="rect" id="node20" href="$validation__mode_8h.html" title=" " alt="" coords="803,707,946,733"/>
-<area shape="rect" id="node21" href="$validate__types_8h.html" title=" " alt="" coords="963,632,1093,659"/>
-<area shape="rect" id="node22" href="$validate__expressions_8h.html" title=" " alt="" coords="550,557,722,584"/>
-<area shape="rect" id="node18" href="$irep_8h.html" title=" " alt="" coords="1817,707,1876,733"/>
-<area shape="rect" id="node24" href="$mp__arith_8h.html" title=" " alt="" coords="1223,408,1315,435"/>
-<area shape="rect" id="node27" title=" " alt="" coords="449,408,573,435"/>
-<area shape="rect" id="node26" title=" " alt="" coords="1188,483,1313,509"/>
-<area shape="rect" id="node32" title=" " alt="" coords="845,483,907,509"/>
-<area shape="rect" id="node33" title=" " alt="" coords="983,483,1054,509"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1079,483,1164,509"/>
-<area shape="rect" id="node36" title=" " alt="" coords="1644,483,1759,509"/>
-<area shape="rect" id="node38" href="$format_8h.html" title=" " alt="" coords="2141,408,2219,435"/>
-<area shape="rect" id="node42" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="763,259,898,285"/>
-<area shape="rect" id="node44" title=" " alt="" coords="379,259,421,285"/>
+<area shape="rect" id="node1" title="Program Transformation." alt="" coords="1295,5,1479,61"/>
+<area shape="rect" id="node2" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1668,109,1793,136"/>
+<area shape="rect" id="node9" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1001,781,1093,808"/>
+<area shape="rect" id="node18" href="$validate_8h.html" title=" " alt="" coords="307,632,394,659"/>
+<area shape="rect" id="node27" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="341,259,456,285"/>
+<area shape="rect" id="node30" href="$expr__iterator_8h.html" title="Forward depth&#45;first search iterators These iterators&#39; copy operations are expensive,..." alt="" coords="878,408,1021,435"/>
+<area shape="rect" id="node34" href="$find__symbols_8h.html" title=" " alt="" coords="1266,408,1411,435"/>
+<area shape="rect" id="node36" href="$format__expr_8h.html" title=" " alt="" coords="1977,333,2116,360"/>
+<area shape="rect" id="node38" href="$format__type_8h.html" title=" " alt="" coords="2079,109,2217,136"/>
+<area shape="rect" id="node39" href="$namespace_8h.html" title=" " alt="" coords="1382,632,1517,659"/>
+<area shape="rect" id="node40" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="115,184,255,211"/>
+<area shape="rect" id="node42" href="$std__code_8h.html" title=" " alt="" coords="280,184,397,211"/>
+<area shape="rect" id="node44" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1135,408,1241,435"/>
+<area shape="rect" id="node45" href="$language__util_8h.html" title=" " alt="" coords="2141,333,2315,360"/>
+<area shape="rect" id="node46" href="$validate__code_8h.html" title=" " alt="" coords="2241,109,2367,136"/>
+<area shape="rect" id="node47" title=" " alt="" coords="2391,109,2465,136"/>
+<area shape="rect" id="node48" title=" " alt="" coords="2489,109,2540,136"/>
+<area shape="rect" id="node3" href="$goto__instruction__code_8h.html" title=" " alt="" coords="473,184,650,211"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1776,856,1835,883"/>
+<area shape="rect" id="node16" href="$source__location_8h.html" title=" " alt="" coords="1767,632,1903,659"/>
+<area shape="rect" id="node24" title=" " alt="" coords="1737,483,1801,509"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1129,483,1172,509"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1793,184,1852,211"/>
+<area shape="rect" id="node4" href="$std__code__base_8h.html" title=" " alt="" coords="480,259,635,285"/>
+<area shape="rect" id="node5" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="345,408,442,435"/>
+<area shape="rect" id="node22" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="243,333,341,360"/>
+<area shape="rect" id="node6" title=" " alt="" coords="345,483,421,509"/>
+<area shape="rect" id="node7" title=" " alt="" coords="110,856,202,883"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1085,557,1171,584"/>
+<area shape="rect" id="node13" href="$expr_8h.html" title=" " alt="" coords="598,483,661,509"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1014,856,1079,883"/>
+<area shape="rect" id="node11" title=" " alt="" coords="2000,856,2075,883"/>
+<area shape="rect" id="node14" href="$as__const_8h.html" title=" " alt="" coords="817,557,908,584"/>
+<area shape="rect" id="node15" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="534,557,597,584"/>
+<area shape="rect" id="node19" href="$validation__mode_8h.html" title=" " alt="" coords="534,707,677,733"/>
+<area shape="rect" id="node20" href="$validate__types_8h.html" title=" " alt="" coords="736,632,867,659"/>
+<area shape="rect" id="node21" href="$validate__expressions_8h.html" title=" " alt="" coords="621,557,793,584"/>
+<area shape="rect" id="node17" href="$irep_8h.html" title=" " alt="" coords="1739,707,1797,733"/>
+<area shape="rect" id="node23" href="$mp__arith_8h.html" title=" " alt="" coords="1565,408,1657,435"/>
+<area shape="rect" id="node26" title=" " alt="" coords="145,408,269,435"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1537,483,1663,509"/>
+<area shape="rect" id="node31" title=" " alt="" coords="787,483,850,509"/>
+<area shape="rect" id="node32" title=" " alt="" coords="874,483,945,509"/>
+<area shape="rect" id="node33" title=" " alt="" coords="969,483,1055,509"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1247,483,1361,509"/>
+<area shape="rect" id="node37" href="$format_8h.html" title=" " alt="" coords="2079,408,2158,435"/>
+<area shape="rect" id="node41" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="115,259,250,285"/>
+<area shape="rect" id="node43" title=" " alt="" coords="275,259,317,285"/>
 </map>

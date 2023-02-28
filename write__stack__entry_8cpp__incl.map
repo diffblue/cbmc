@@ -1,45 +1,44 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/write_stack_entry.cpp" name="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/write_stack_entry.cpp">
-<area shape="rect" id="node1" title="Represents an entry in the write_stackt." alt="" coords="840,5,1080,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="747,109,861,136"/>
-<area shape="rect" id="node3" href="$abstract__environment_8h.html" title="An abstract version of a program environment." alt="" coords="1058,109,1235,136"/>
-<area shape="rect" id="node43" href="$write__stack__entry_8h.html" title="Represents an entry in the write_stackt." alt="" coords="886,109,1034,136"/>
-<area shape="rect" id="node4" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="986,184,1121,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="2092,661,2169,688"/>
-<area shape="rect" id="node6" title=" " alt="" coords="939,497,981,524"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1006,497,1063,524"/>
-<area shape="rect" id="node8" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="573,259,723,300"/>
-<area shape="rect" id="node26" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="1157,423,1299,449"/>
-<area shape="rect" id="node9" href="$goto__instruction__code_8h.html" title=" " alt="" coords="222,348,399,375"/>
-<area shape="rect" id="node14" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="569,661,661,688"/>
-<area shape="rect" id="node15" title=" " alt="" coords="585,736,644,763"/>
-<area shape="rect" id="node19" title=" " alt="" coords="996,661,1060,688"/>
-<area shape="rect" id="node20" title=" " alt="" coords="1571,661,1629,688"/>
-<area shape="rect" id="node21" href="$deprecate_8h.html" title=" " alt="" coords="469,497,568,524"/>
-<area shape="rect" id="node22" href="$source__location_8h.html" title=" " alt="" coords="475,423,611,449"/>
-<area shape="rect" id="node10" href="$std__code__base_8h.html" title=" " alt="" coords="239,423,393,449"/>
-<area shape="rect" id="node18" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="100,423,215,449"/>
-<area shape="rect" id="node11" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="206,579,303,606"/>
-<area shape="rect" id="node16" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="246,497,343,524"/>
-<area shape="rect" id="node17" href="$validate_8h.html" title=" " alt="" coords="327,579,414,606"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1165,736,1257,763"/>
-<area shape="rect" id="node13" title=" " alt="" coords="365,661,451,688"/>
-<area shape="rect" id="node23" href="$irep_8h.html" title=" " alt="" coords="643,497,701,524"/>
-<area shape="rect" id="node25" href="$optional_8h.html" title=" " alt="" coords="726,497,813,524"/>
-<area shape="rect" id="node24" title=" " alt="" coords="795,579,858,606"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1341,497,1392,524"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1573,497,1659,524"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1102,661,1157,688"/>
-<area shape="rect" id="node30" href="$as__const_8h.html" title=" " alt="" coords="2052,579,2143,606"/>
-<area shape="rect" id="node31" href="$sharing__node_8h.html" title="Sharing node." alt="" coords="1427,497,1549,524"/>
-<area shape="rect" id="node42" href="$threeval_8h.html" title=" " alt="" coords="984,579,1072,606"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1652,579,1751,606"/>
-<area shape="rect" id="node33" href="$small__map_8h.html" title="Small map." alt="" coords="1775,579,1881,606"/>
-<area shape="rect" id="node39" href="$make__unique_8h.html" title=" " alt="" coords="1906,579,2027,606"/>
-<area shape="rect" id="node40" href="$small__shared__n__way__ptr_8h.html" title=" " alt="" coords="1418,572,1577,613"/>
-<area shape="rect" id="node41" href="$small__shared__ptr_8h.html" title=" " alt="" coords="1249,579,1394,606"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1960,661,2019,688"/>
-<area shape="rect" id="node35" title=" " alt="" coords="1704,661,1771,688"/>
-<area shape="rect" id="node36" title=" " alt="" coords="1795,661,1861,688"/>
-<area shape="rect" id="node37" title=" " alt="" coords="1886,661,1935,688"/>
-<area shape="rect" id="node38" title=" " alt="" coords="1399,661,1459,688"/>
+<area shape="rect" id="node1" title="Represents an entry in the write_stackt." alt="" coords="835,5,1075,61"/>
+<area shape="rect" id="node2" title=" " alt="" coords="741,109,856,136"/>
+<area shape="rect" id="node3" href="$abstract__environment_8h.html" title="An abstract version of a program environment." alt="" coords="1053,109,1230,136"/>
+<area shape="rect" id="node42" href="$write__stack__entry_8h.html" title="Represents an entry in the write_stackt." alt="" coords="881,109,1029,136"/>
+<area shape="rect" id="node4" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="981,184,1115,211"/>
+<area shape="rect" id="node5" title=" " alt="" coords="2036,661,2113,688"/>
+<area shape="rect" id="node6" title=" " alt="" coords="816,497,859,524"/>
+<area shape="rect" id="node7" title=" " alt="" coords="883,497,941,524"/>
+<area shape="rect" id="node8" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="662,259,813,300"/>
+<area shape="rect" id="node25" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="1086,423,1229,449"/>
+<area shape="rect" id="node9" href="$goto__instruction__code_8h.html" title=" " alt="" coords="362,348,539,375"/>
+<area shape="rect" id="node14" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="453,661,545,688"/>
+<area shape="rect" id="node15" title=" " alt="" coords="469,736,528,763"/>
+<area shape="rect" id="node19" title=" " alt="" coords="940,661,1004,688"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1563,661,1621,688"/>
+<area shape="rect" id="node21" href="$source__location_8h.html" title=" " alt="" coords="595,423,731,449"/>
+<area shape="rect" id="node10" href="$std__code__base_8h.html" title=" " alt="" coords="373,423,528,449"/>
+<area shape="rect" id="node18" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="217,423,332,449"/>
+<area shape="rect" id="node11" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="261,579,358,606"/>
+<area shape="rect" id="node16" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="347,497,445,524"/>
+<area shape="rect" id="node17" href="$validate_8h.html" title=" " alt="" coords="485,579,571,606"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1343,736,1435,763"/>
+<area shape="rect" id="node13" title=" " alt="" coords="214,661,301,688"/>
+<area shape="rect" id="node22" href="$irep_8h.html" title=" " alt="" coords="571,497,629,524"/>
+<area shape="rect" id="node24" href="$optional_8h.html" title=" " alt="" coords="654,497,741,524"/>
+<area shape="rect" id="node23" title=" " alt="" coords="698,579,761,606"/>
+<area shape="rect" id="node26" title=" " alt="" coords="1179,497,1229,524"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1355,497,1442,524"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1163,661,1218,688"/>
+<area shape="rect" id="node29" href="$as__const_8h.html" title=" " alt="" coords="1041,579,1132,606"/>
+<area shape="rect" id="node30" href="$sharing__node_8h.html" title="Sharing node." alt="" coords="1466,497,1587,524"/>
+<area shape="rect" id="node41" href="$threeval_8h.html" title=" " alt="" coords="1067,497,1155,524"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1940,579,2039,606"/>
+<area shape="rect" id="node32" href="$small__map_8h.html" title="Small map." alt="" coords="1663,579,1769,606"/>
+<area shape="rect" id="node38" href="$make__unique_8h.html" title=" " alt="" coords="1794,579,1915,606"/>
+<area shape="rect" id="node39" href="$small__shared__n__way__ptr_8h.html" title=" " alt="" coords="1429,572,1587,613"/>
+<area shape="rect" id="node40" href="$small__shared__ptr_8h.html" title=" " alt="" coords="1207,579,1353,606"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1696,661,1755,688"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1779,661,1845,688"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1869,661,1936,688"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1961,661,2010,688"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1478,661,1538,688"/>
 </map>

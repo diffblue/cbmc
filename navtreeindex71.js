@@ -1,8 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classxml__parse__treet.html#a51085ecca507566dc7f8fa816f73aa05":[7,0,1345,1],
-"classxml__parse__treet.html#ae0588b71e82c38fd9b3363abc6b6e828":[7,0,1345,2],
-"classxml__parse__treet.html#aeb7d1877b47fb2154765d0683ec56511":[7,0,1345,3],
 "classxml__parsert.html":[7,0,1346],
 "classxml__parsert.html#a17f37af99fc8f5e4e6ed98ab1f7eff94":[7,0,1346,3],
 "classxml__parsert.html#a5ac7abbada6ab786184740252f1a1ed5":[7,0,1346,5],
@@ -249,5 +246,8 @@ var NAVTREEINDEX71 =
 "contracts-dev-spec-dfcc-instrument.html#autotoc_md40":[1,1,0,5,3,1,4,0],
 "contracts-dev-spec-dfcc-instrument.html#autotoc_md41":[1,1,0,5,3,1,4,1],
 "contracts-dev-spec-dfcc-instrument.html#autotoc_md42":[1,1,0,5,3,1,5],
-"contracts-dev-spec-dfcc-instrument.html#autotoc_md43":[1,1,0,5,3,1,6]
+"contracts-dev-spec-dfcc-instrument.html#autotoc_md43":[1,1,0,5,3,1,6],
+"contracts-dev-spec-dfcc-instrument.html#contracts-dev-spec-dfcc-instrument-body":[1,1,0,5,3,1],
+"contracts-dev-spec-dfcc-instrument.html#contracts-dev-spec-dfcc-instrument-signature":[1,1,0,5,3,0],
+"contracts-dev-spec-dfcc-runtime.html":[1,1,0,5,2]
 };
