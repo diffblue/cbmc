@@ -1,8 +1,8 @@
 [CPROVER Manual TOC](../)
 
-## Automatically Generating Properties
+# Automatically Generating Properties
 
-### What is a "Property"?
+## What is a "Property"?
 
 We have mentioned *properties* several times so far, but we never
 explained *what* kind of properties CBMC can verify. We cover
@@ -67,7 +67,7 @@ of the Eclipse plugin can step through these counterexamples in a way
 that is similar to debugging programs. The installation of this plugin
 is explained [here](http://www.cprover.org/eclipse-plugin/).
 
-### Using goto-instrument
+## Using goto-instrument
 
 The goto-instrument static analyzer operates on goto-binaries, which is
 a binary representation of control-flow graphs. The goto-binary is
@@ -207,7 +207,7 @@ unsigned foo(unsigned x)
   x = x + 2;
 ```
 
-#### Flag --nan-check limitations
+### Flag --nan-check limitations
 
 Please note that `--nan-check` flag is adding not-a-number checks only for
 generation of NaN value. Current implementation of `--nan-check` flag is not
@@ -222,7 +222,7 @@ float f = 0.0/0.0; // will generate NaN - CBMC will add assertion
 float g = NAN+0.0; // propagation of NaN value - no assertion generated
 ```
 
-#### Generating function bodies
+### Generating function bodies
 
 Sometimes implementations for called functions are not available in the goto
 program, or it is desirable to replace bodies of functions with certain

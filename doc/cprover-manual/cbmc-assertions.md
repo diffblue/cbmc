@@ -1,6 +1,6 @@
 [CPROVER Manual TOC](../../)
 
-### Assertion Checking
+## Assertion Checking
 
 [Assertions](http://en.wikipedia.org/wiki/Assertion_%28computing%29) are
 statements within the program that attempt to capture the programmer's

@@ -1,13 +1,13 @@
 [CPROVER Manual TOC](../)
 
-## The CPROVER API Reference
+# The CPROVER API Reference
 
 The following sections summarize the functions available to programs
 that are passed to the CPROVER tools.
 
-### Functions
+## Functions
 
-#### \_\_CPROVER\_assume, \_\_CPROVER\_assert, assert
+### \_\_CPROVER\_assume, \_\_CPROVER\_assert, assert
 
 ```C
 void __CPROVER_assume(_Bool assumption);
@@ -20,7 +20,7 @@ to the program. If the expression evaluates to false, the execution
 aborts without failure. More detail on the use of assumptions is in the
 section on [Assumptions](../modeling/assumptions/).
 
-#### \_\_CPROVER\_input, \_\_CPROVER\_output
+### \_\_CPROVER\_input, \_\_CPROVER\_output
 
 ```C
 void __CPROVER_input(const char *id, ...);
@@ -35,7 +35,7 @@ using nondeterminism, as described [here](../modeling/nondeterminism/)). The
 string constant is followed by an arbitrary number of values of
 arbitrary types.
 
-#### \_\_CPROVER\_printf
+### \_\_CPROVER\_printf
 
 ```C
 void __CPROVER_printf(const char *format, ...);
@@ -45,7 +45,7 @@ The function **\_\_CPROVER\_printf** implements the C `printf` function (without
 any return value). The observable effect is that its output is shown within a
 counterexample trace.
 
-#### \_\_CPROVER\_cover
+### \_\_CPROVER\_cover
 
 ```C
 void __CPROVER_cover(_Bool condition);
@@ -54,7 +54,7 @@ void __CPROVER_cover(_Bool condition);
 This statement defines a custom coverage criterion, for usage with the
 [test suite generation feature](../test-suite/).
 
-#### \_\_CPROVER\_isnan, \_\_CPROVER\_isfinite, \_\_CPROVER\_isinf, \_\_CPROVER\_isnormal, \_\_CPROVER\_sign
+### \_\_CPROVER\_isnan, \_\_CPROVER\_isfinite, \_\_CPROVER\_isinf, \_\_CPROVER\_isnormal, \_\_CPROVER\_sign
 
 ```C
 _Bool __CPROVER_isnan(double f);
@@ -83,7 +83,7 @@ number.
 This function **\_\_CPROVER\_sign** returns true if the double-precision
 floating-point number passed as argument is negative.
 
-#### \_\_CPROVER\_abs, \_\_CPROVER\_labs, \_\_CPROVER\_fabs, \_\_CPROVER\_fabsl, \_\_CPROVER\_fabsf
+### \_\_CPROVER\_abs, \_\_CPROVER\_labs, \_\_CPROVER\_fabs, \_\_CPROVER\_fabsl, \_\_CPROVER\_fabsf
 
 ```C
 int __CPROVER_abs(int x);
@@ -95,7 +95,7 @@ float __CPROVER_fabsf(float x);
 
 These functions return the absolute value of the given argument.
 
-#### \_\_CPROVER\_overflow\_minus, \_\_CPROVER\_overflow\_mult, \_\_CPROVER\_overflow\_plus, \_\_CPROVER\_overflow\_shl, \_\_CPROVER\_overflow\_unary\_minus
+### \_\_CPROVER\_overflow\_minus, \_\_CPROVER\_overflow\_mult, \_\_CPROVER\_overflow\_plus, \_\_CPROVER\_overflow\_shl, \_\_CPROVER\_overflow\_unary\_minus
 
 ```C
 __CPROVER_bool __CPROVER_overflow_minus();
@@ -111,7 +111,7 @@ operation would overflow when applied to the arguments. For example,
 `__CPROVER_overflow_plus(x, y)` returns true if `x + y` would result in an
 arithmetic overflow.
 
-#### \_\_CPROVER\_array\_equal, \_\_CPROVER\_array\_copy, \_\_CPROVER\_array\_set
+### \_\_CPROVER\_array\_equal, \_\_CPROVER\_array\_copy, \_\_CPROVER\_array\_set
 
 ```C
 _Bool __CPROVER_array_equal(const void array1[], const void array2[]);
@@ -126,7 +126,7 @@ the array **dest**. The function **\_\_CPROVER\_array\_set** initializes
 the array **dest** with the given value.
 
 
-#### \_\_CPROVER\_enum\_is\_in\_range
+### \_\_CPROVER\_enum\_is\_in\_range
 
 ```C
 __CPROVER_bool __CPROVER_enum_is_in_range();
@@ -157,16 +157,16 @@ int main()
 ```
 
 
-#### Uninterpreted Functions
+## Uninterpreted Functions
 
-Uninterpreted functions are documented [here](../modeling/nondeterminism/)).
+Uninterpreted functions are documented [here](../modeling/nondeterminism/).
 
-### Memory-Related Functions
+## Memory-Related Functions
 
 The semantics of the primitives listed in this section is described in more detail in the
 document about [Memory Primitives](../memory-primitives/).
 
-#### \_\_CPROVER\_POINTER\_OBJECT, \_\_CPROVER\_POINTER\_OFFSET, \_\_CPROVER\_same\_object
+### \_\_CPROVER\_POINTER\_OBJECT, \_\_CPROVER\_POINTER\_OFFSET, \_\_CPROVER\_same\_object
 
 ```C
 __CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *p);
@@ -180,7 +180,7 @@ offset of the given pointer relative to the base address of the object. The
 function **\_\_CPROVER\_same\_object** returns true if the two pointers given as
 arguments point to the same object.
 
-#### \_\_CPROVER\_OBJECT\_SIZE, \_\_CPROVER\_DYNAMIC\_OBJECT, \_\_CPROVER\_r\_ok, \_\_CPROVER\_w\_ok
+### \_\_CPROVER\_OBJECT\_SIZE, \_\_CPROVER\_DYNAMIC\_OBJECT, \_\_CPROVER\_r\_ok, \_\_CPROVER\_w\_ok
 
 The following primitives require a pointer that is null or valid in order to
 have well-defined semantics in all usage cases. See the document about
@@ -211,7 +211,7 @@ returns true when it is safe to do both.  These predicates can be given an
 optional size; when the size argument is not given, the size of the subtype
 (which must not be **void**) of the pointer type is used.
 
-#### \_\_CPROVER\_havoc\_object
+### \_\_CPROVER\_havoc\_object
 
 
 This function requires a valid pointer and updates **all bytes** of the
@@ -243,7 +243,7 @@ __CPROVER_assert(thefoo.y == 2, "fails because `thefoo.y` is now nondet");
 __CPROVER_assert(thefoo.z == 3, "fails because `thefoo.z` is now nondet");
 ```
 
-#### \_\_CPROVER\_havoc\_slice
+### \_\_CPROVER\_havoc\_slice
 
 This function requires requires that `__CPROVER_w_ok(p, size)` holds,
 and updates `size` consecutive bytes of the underlying object, starting at `p`,
@@ -262,9 +262,9 @@ void __CPROVER_havoc_slice(void *p, __CPROVER_size_t size);
   by the program, then havocing the slice is equivalent to making the
   interpretation of these bytes nondeterministic.
 
-### Predefined Types and Symbols
+## Predefined Types and Symbols
 
-#### \_\_CPROVER\_bitvector
+### \_\_CPROVER\_bitvector
 
 ```C
 __CPROVER_bitvector [ expression ]
@@ -275,7 +275,7 @@ bit vector with arbitrary but fixed size. The usual integer type
 modifiers **signed** and **unsigned** can be applied. The usual
 arithmetic promotions will be applied to operands of this type.
 
-#### \_\_CPROVER\_floatbv
+### \_\_CPROVER\_floatbv
 
 ```C
 __CPROVER_floatbv [ expression ] [ expression ]
@@ -287,7 +287,7 @@ parameter is the total size (in bits) of the number, and the second is
 the size (in bits) of the mantissa, or significand (not including the
 hidden bit, thus for single precision this should be 23).
 
-#### \_\_CPROVER\_fixedbv
+### \_\_CPROVER\_fixedbv
 
 ```C
 __CPROVER_fixedbv [ expression ] [ expression ]
@@ -298,11 +298,11 @@ fixed-point bit vector with arbitrary but fixed size. The first
 parameter is the total size (in bits) of the type, and the second is the
 number of bits after the radix point.
 
-#### \_\_CPROVER\_size\_t
+### \_\_CPROVER\_size\_t
 
 The type of sizeof expressions.
 
-#### \_\_CPROVER\_rounding\_mode
+### \_\_CPROVER\_rounding\_mode
 
 ```C
 extern int __CPROVER_rounding_mode;
@@ -310,16 +310,16 @@ extern int __CPROVER_rounding_mode;
 
 This variable contains the IEEE floating-point arithmetic rounding mode.
 
-#### \_\_CPROVER\_constant\_infinity\_uint
+### \_\_CPROVER\_constant\_infinity\_uint
 
 This is a constant that models a large unsigned integer.
 
-#### \_\_CPROVER\_integer, \_\_CPROVER\_rational
+### \_\_CPROVER\_integer, \_\_CPROVER\_rational
 
 **\_\_CPROVER\_integer** is an unbounded, signed integer type.
 **\_\_CPROVER\_rational** is an unbounded, signed rational number type.
 
-#### \_\_CPROVER\_memory
+### \_\_CPROVER\_memory
 
 ```C
 extern unsigned char __CPROVER_memory[];
@@ -327,22 +327,22 @@ extern unsigned char __CPROVER_memory[];
 
 This array models the contents of integer-addressed memory.
 
-#### \_\_CPROVER::unsignedbv&lt;N&gt; (C++ only)
+### \_\_CPROVER::unsignedbv&lt;N&gt; (C++ only)
 
 This type is the equivalent of **unsigned \_\_CPROVER\_bitvector\[N\]**
 in the C++ front-end.
 
-#### \_\_CPROVER::signedbv&lt;N&gt; (C++ only)
+### \_\_CPROVER::signedbv&lt;N&gt; (C++ only)
 
 This type is the equivalent of **signed \_\_CPROVER\_bitvector\[N\]** in
 the C++ front-end.
 
-#### \_\_CPROVER::fixedbv&lt;N&gt; (C++ only)
+### \_\_CPROVER::fixedbv&lt;N&gt; (C++ only)
 
 This type is the equivalent of **\_\_CPROVER\_fixedbv\[N,m\]** in the
 C++ front-end.
 
-### Concurrency
+## Concurrency
 
 Asynchronous threads are created by preceding an instruction with a
 label with the prefix **\_\_CPROVER\_ASYNC\_**.

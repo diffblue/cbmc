@@ -4,10 +4,10 @@ This document describes the semantics and usage of memory-related and
 pointer-related primitives in CBMC.
 
 
-# Background
+## Background
 
 
-## Memory and pointers in CBMC
+### Memory and pointers in CBMC
 
 When CBMC analyzes a program, by default it uses the architectural parameters of
 the platform it is running on. That is, on a 64-bit system, CBMC will treat
@@ -41,7 +41,7 @@ the object IDs of the two given pointers. That is, it is true if and only if
 to apply these three primitives to a pointer (i.e., they do not have any special
 preconditions).
 
-## Memory Objects
+### Memory Objects
 
 Seeing that pointers consist of an object ID and an offset, it remains to
 describe how CBMC assigns object IDs to memory objects (such as local variables
@@ -90,7 +90,7 @@ point into another memory object (such as could happen when running on a real
 machine). To verify that pointers stay within the bounds of their pointees, the
 CBMC option `--pointer-overflow-check` can be used.
 
-### Malloc modelling
+#### Malloc modelling
 
 CBMC ships a model of `malloc` that seeks to emulate the behaviour of the C
 standard library. This model is configurable to suit the assumptions the
@@ -147,7 +147,7 @@ do so via \ref goto-instrument (using `goto-instrument --add-library`), then the
 malloc failure mode needs to be specified with that `goto-instrument`
 invocation, i.e., as an option to `goto-instrument`.
 
-## Uninitialized pointers
+### Uninitialized pointers
 
 In verification tools, uninitialized variables are typically treated as having a
 nondeterministic value. Programs can thus be verified on a set of potential
@@ -169,7 +169,7 @@ pointers should be explicitely initialized to ensure that they are backed by
 valid memory.
 
 
-# Memory Primitives
+## Memory Primitives
 
 In this section, we describe further memory primitives of CBMC. Above, we have
 already encountered the primitives `__CPROVER_POINTER_OBJECT(p)`,
@@ -194,7 +194,7 @@ null nor valid. CBMC has an option `--pointer-primitive-check` (see section
 to check that pointers used in the primitives are either null or valid.
 
 
-## Retrieving the size of a memory object
+### Retrieving the size of a memory object
 
 The following primitive can be used to retrieve the size of the memory object a
 pointer points to:
@@ -209,7 +209,7 @@ necessarily to the start). The result is the same as if the pointer would point
 to the start of the memory object (i.e., would have offset 0).
 
 
-## Checking if a pointer points to dynamic memory
+### Checking if a pointer points to dynamic memory
 
 The following primitive can be used to check whether a pointer points to dynamic
 (malloced, heap) memory:
@@ -223,7 +223,7 @@ unspecified. Like `__CPROVER_OBJECT_SIZE()`, it is valid to apply the primitive
 to pointers that point to within a memory object.
 
 
-## Checking if a memory segment has at least a given size
+### Checking if a memory segment has at least a given size
 
 The following two primitives can be used to check whether there is a memory
 segment starting at the given pointer and extending for at least the given
@@ -247,7 +247,7 @@ assert(__CPROVER_r_ok(p, 3));  // valid
 assert(__CPROVER_r_ok(p, 10)); // fails
 ```
 
-# Detecting potential misuses of memory primitives
+## Detecting potential misuses of memory primitives
 
 As described above, the primitives listed in the Memory Primitives section
 require a pointer that is either null or valid to have well-defined semantics.
