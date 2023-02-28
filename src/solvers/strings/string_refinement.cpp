@@ -927,7 +927,7 @@ void string_refinementt::add_lemma(
     {
       it.mutate() = array_of_exprt(
         from_integer(
-          CHARACTER_FOR_UNKNOWN, to_array_type(it->type()).subtype()),
+          CHARACTER_FOR_UNKNOWN, to_array_type(it->type()).element_type()),
         to_array_type(it->type()));
       it.next_sibling_or_parent();
     }
@@ -1032,7 +1032,7 @@ static optionalt<exprt> get_array(
   }
 
   const exprt arr_val = simplify_expr(super_get(arr), ns);
-  const typet char_type = to_array_type(arr.type()).subtype();
+  const typet char_type = to_array_type(arr.type()).element_type();
   const typet &index_type = size.value().type();
 
   if(
