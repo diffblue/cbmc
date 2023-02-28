@@ -1964,8 +1964,8 @@ void goto_program2codet::copy_source_location(
   goto_programt::const_targett src,
   codet &dst)
 {
-  if(src->get_code().source_location().is_not_nil())
-    dst.add_source_location() = src->get_code().source_location();
+  if(src->code().source_location().is_not_nil())
+    dst.add_source_location() = src->code().source_location();
   else if(src->source_location().is_not_nil())
     dst.add_source_location() = src->source_location();
 }

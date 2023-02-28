@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <limits>
 #include <string>
 
-#include <util/deprecate.h>
 #include <util/invariant.h>
 #include <util/source_location.h>
 
@@ -184,13 +183,6 @@ public:
     goto_instruction_codet _code;
 
   public:
-    /// Get the code represented by this instruction
-    DEPRECATED(SINCE(2021, 10, 12, "Use code() instead"))
-    const goto_instruction_codet &get_code() const
-    {
-      return _code;
-    }
-
     /// Get the code represented by this instruction
     const goto_instruction_codet &code() const
     {
@@ -734,29 +726,8 @@ public:
     return add(instructiont(type));
   }
 
-  /// Output goto program to given stream
-  DEPRECATED(SINCE(2022, 5, 29, "Use output(out) instead"))
-  std::ostream &output(
-    const namespacet &ns,
-    const irep_idt &identifier,
-    std::ostream &out) const
-  {
-    return output(out);
-  }
-
   /// Output goto-program to given stream
   std::ostream &output(std::ostream &out) const;
-
-  /// Output a single instruction
-  DEPRECATED(SINCE(2022, 5, 29, "Use instruction.output(out) instead"))
-  std::ostream &output_instruction(
-    const namespacet &ns,
-    const irep_idt &identifier,
-    std::ostream &out,
-    const instructionst::value_type &instruction) const
-  {
-    return instruction.output(out);
-  }
 
   /// Compute the target numbers
   void compute_target_numbers();
