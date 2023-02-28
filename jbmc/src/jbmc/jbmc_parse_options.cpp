@@ -98,6 +98,7 @@ void jbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("refine-strings", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
+  options.set_option("simplify-phi", true);
   options.set_option("show-goto-symex-steps", false);
 
   // Other default
@@ -159,6 +160,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
+
+  if(cmdline.isset("no-simplify-phi"))
+    options.set_option("simplify-phi", false);
 
   if(cmdline.isset("stop-on-fail") ||
      cmdline.isset("dimacs") ||

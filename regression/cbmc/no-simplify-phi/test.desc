@@ -1,0 +1,11 @@
+CORE
+main.c
+--no-simplify-phi --program-only
+x!0@1#4 == \(\\guard#1 \? 1 : 1\)
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+x!0@1#4 == 1
+--
+With --no-simplify-phi the phi function producing x!0@1#4 is not simplified.

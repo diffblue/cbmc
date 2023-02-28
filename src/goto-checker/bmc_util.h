@@ -170,6 +170,10 @@ void run_property_decider(
   bool set_pass = true);
 
 // clang-format off
+#define OPT_SYMEX_SIMPLIFY \
+  "(no-simplify)" \
+  "(no-simplify-phi)" \
+
 #define OPT_BMC \
   "(program-only)" \
   "(show-byte-ops)" \
@@ -195,6 +199,13 @@ void run_property_decider(
   "(ignore-properties-before-unwind-min)" \
   "(symex-cache-dereferences)" \
   OPT_UNWINDSET \
+  OPT_SYMEX_SIMPLIFY \
+
+#define HELP_SYMEX_SIMPLIFY \
+  " --no-simplify                do not simplify any expressions during" \
+  "                              symbolic execution\n" \
+  " --no-simplify-phi            do not simplify phi functions during" \
+  "                              symbolic execution\n" \
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -246,6 +257,7 @@ void run_property_decider(
   "                              gets blacklisted\n" \
   " --graphml-witness filename   write the witness in GraphML format to filename\n" /* NOLINT(*) */ \
   " --symex-cache-dereferences   enable caching of repeated dereferences" \
+  HELP_SYMEX_SIMPLIFY \
 // clang-format on
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H
