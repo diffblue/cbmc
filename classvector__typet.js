@@ -6,5 +6,7 @@ var classvector__typet =
     [ "index_type", "classvector__typet.html#adb32d62ccb2158739abc4127bcabe06b", null ],
     [ "index_type_nonconst", "classvector__typet.html#a81603ace84b5e56c334f850fc19677f5", null ],
     [ "size", "classvector__typet.html#a54c1e0373af58b96ad80ff480cec2a42", null ],
-    [ "size", "classvector__typet.html#aa6ddea165503b9ced5f6591314a48a75", null ]
+    [ "size", "classvector__typet.html#aa6ddea165503b9ced5f6591314a48a75", null ],
+    [ "subtype", "classvector__typet.html#a73479f67c82551dd96a93d78b2e06f33", null ],
+    [ "subtype", "classvector__typet.html#a125f9b1e5848c32d031a35532f3b5780", null ]
 ];

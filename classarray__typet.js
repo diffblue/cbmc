@@ -9,5 +9,7 @@ var classarray__typet =
     [ "is_complete", "classarray__typet.html#a8d9a0ecf5a95e84dde67addf8a6868bb", null ],
     [ "is_incomplete", "classarray__typet.html#a386a9ca24d6b843857b776d6e7cfd0b1", null ],
     [ "size", "classarray__typet.html#a041f26ac66c0162490fdfe0d4b6d7aaa", null ],
-    [ "size", "classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6", null ]
+    [ "size", "classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6", null ],
+    [ "subtype", "classarray__typet.html#a73479f67c82551dd96a93d78b2e06f33", null ],
+    [ "subtype", "classarray__typet.html#a125f9b1e5848c32d031a35532f3b5780", null ]
 ];

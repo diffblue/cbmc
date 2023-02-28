@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"ansi__c__declaration_8h.html#abd2ad6cf8237a12b0b1836234a0c5797":[7,0,2,1,8,3],
 "ansi__c__declaration_8h_source.html":[7,0,2,1,8],
 "ansi__c__entry__point_8cpp.html":[7,0,2,1,9],
 "ansi__c__entry__point_8cpp.html#a02cf3646d20c33e7f0c5a34cf8af95ae":[7,0,2,1,9,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "as__mode_8cpp.html":[7,0,2,9,8],
 "as__mode_8cpp.html#a2ea7020b16069f24354c21f6342170dd":[7,0,2,9,8,0],
 "as__mode_8cpp_source.html":[7,0,2,9,8],
-"as__mode_8h.html":[7,0,2,9,9],
-"as__mode_8h_source.html":[7,0,2,9,9]
+"as__mode_8h.html":[7,0,2,9,9]
 };

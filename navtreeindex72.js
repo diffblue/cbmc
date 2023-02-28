@@ -1,5 +1,10 @@
 var NAVTREEINDEX72 =
 {
+"contracts-dev-spec-dfcc-instrument.html#contracts-dev-spec-dfcc-instrument-body":[1,1,0,5,3,1],
+"contracts-dev-spec-dfcc-instrument.html#contracts-dev-spec-dfcc-instrument-signature":[1,1,0,5,3,0],
+"contracts-dev-spec-dfcc-runtime.html":[1,1,0,5,2],
+"contracts-dev-spec-dfcc-runtime.html#contracts-dev-spec-dfcc-runtime-data":[1,1,0,5,2,0],
+"contracts-dev-spec-dfcc-runtime.html#contracts-dev-spec-dfcc-runtime-ops":[1,1,0,5,2,1],
 "contracts-dev-spec-dfcc.html":[1,1,0,5],
 "contracts-dev-spec-dfcc.html#autotoc_md46":[1,1,0,5,0],
 "contracts-dev-spec-dfcc.html#autotoc_md47":[1,1,0,5,1],
@@ -244,10 +249,5 @@ var NAVTREEINDEX72 =
 "convert__int__literal_8cpp.html#a9790e5175d14d017c55b938e59276307":[7,0,2,28,0,4,8],
 "convert__int__literal_8cpp.html#a97f8392ca15e0b99d61ec0633e52c837":[7,0,2,28,0,4,2],
 "convert__int__literal_8cpp.html#a9b8cd268d6560dc6501fad6630608527":[7,0,2,28,0,4,1],
-"convert__int__literal_8cpp.html#aaf5851fa2d15c84c59f73f8f7e5ef799":[7,0,2,28,0,4,10],
-"convert__int__literal_8cpp.html#ab7b03b833c4e00440835b74a81d67780":[7,0,2,28,0,4,9],
-"convert__int__literal_8cpp.html#ac6410d47194e017867f56e0f48bbb3b6":[7,0,2,28,0,4,3],
-"convert__int__literal_8cpp.html#ad2acac4f7d29902e4d4421e8946fdf88":[7,0,2,28,0,4,12],
-"convert__int__literal_8cpp.html#ad982df2fe6e8701cb1ca08ebfe7831d1":[7,0,2,28,0,4,4],
-"convert__int__literal_8cpp.html#af2fc959a960d62e3c2e2fc76d6f8afc1":[7,0,2,28,0,4,6]
+"convert__int__literal_8cpp.html#aaf5851fa2d15c84c59f73f8f7e5ef799":[7,0,2,28,0,4,10]
 };

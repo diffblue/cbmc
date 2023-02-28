@@ -1,5 +1,10 @@
 var NAVTREEINDEX131 =
 {
+"substitute__symbols_8h.html":[7,0,2,30,235],
+"substitute__symbols_8h.html#ae3b461d5a1cdc178521c05333ea8204f":[7,0,2,30,235,0],
+"substitute__symbols_8h_source.html":[7,0,2,30,235],
+"subsumed_8h.html":[7,0,2,13,0,26],
+"subsumed_8h.html#ac860e80806ed69972029d7671519d961":[7,0,2,13,0,26,1],
 "subsumed_8h_source.html":[7,0,2,13,0,26],
 "suffix_8h.html":[7,0,2,30,236],
 "suffix_8h.html#a01816fa76558ff033b634a5d15c52014":[7,0,2,30,236,0],
@@ -244,10 +249,5 @@ var NAVTREEINDEX131 =
 "two__value__pointer__abstract__object_8cpp_source.html":[7,0,2,0,0,33],
 "two__value__pointer__abstract__object_8h.html":[7,0,2,0,0,34],
 "two__value__pointer__abstract__object_8h_source.html":[7,0,2,0,0,34],
-"two__value__struct__abstract__object_8h.html":[7,0,2,0,0,35],
-"two__value__struct__abstract__object_8h_source.html":[7,0,2,0,0,35],
-"two__value__union__abstract__object_8h.html":[7,0,2,0,0,36],
-"two__value__union__abstract__object_8h_source.html":[7,0,2,0,0,36],
-"type2name_8cpp.html":[7,0,2,1,69],
-"type2name_8cpp.html#a5da985d5e62cbd457568b381449f2724":[7,0,2,1,69,1]
+"two__value__struct__abstract__object_8h.html":[7,0,2,0,0,35]
 };
