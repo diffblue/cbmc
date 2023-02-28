@@ -94,14 +94,14 @@ $(document).ready(function(){initNavTree('satabs.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><p>We document two programs that try to achieve formal guarantees of the absence of specific problems: CBMC and SATABS. The algorithms implemented by CBMC and SATABS are complementary, and often, one tool is able to solve a problem that the other cannot solve.</p>
 <p>Both CBMC and SATABS are verification tools for ANSI-C/C++ programs. They verify array bounds (buffer overflows), pointer safety, exceptions and user-specified assertions. Both tools model integer arithmetic accurately, and are able to reason about machine-level artifacts such as integer overflow. CBMC and SATABS are therefore able to detect a class of bugs that has so far gone unnoticed by many other verification tools. This manual also covers some variants of CBMC, which includes HW-CBMC for <a href="http://www.cprover.org/cprover-manual/hwsw.html">hardware/software co-verification</a>.</p>
-<h2><a class="anchor" id="autotoc_md200"></a>
+<h2><a class="anchor" id="autotoc_md204"></a>
 Automatic Program Verification with SATABS</h2>
 <p>In many cases, lightweight properties such as array bounds do not rely on the entire program. A large fraction of the program is <em>irrelevant</em> to the property. SATABS exploits this observation and computes an <em>abstraction</em> of the program in order to handle large amounts of code.</p>
 <p>In order to use SATABS it is not necessary to understand the abstraction refinement process. For the interested reader, a high-level introduction to abstraction refinement is provided <a class="el" href="satabs.html#man_satabs-overview">here</a>. We also provide <a class="el" href="satabs.html#man_satabs-tutorials">tutorials on how to use SATABS</a>.</p>
 <p>Just as CBMC, SATABS attempts to build counterexamples that refute the property. If such a counterexample is found, it is presented to the engineer to facilitate localization and repair of the program.</p>
 <h2><a class="anchor" id="man_install-satabs"></a>
 Installing SATABS</h2>
-<h3><a class="anchor" id="autotoc_md201"></a>
+<h3><a class="anchor" id="autotoc_md205"></a>
 Requirements</h3>
 <p>SATABS is available for Windows, i86 Linux, and MacOS X. SATABS requires a code pre-processing environment including a suitable preprocessor and a set of header files.</p>
 <ol type="1">
@@ -111,7 +111,7 @@ Requirements</h3>
 </ol>
 <p>Important note for Windows users: Visual Studio's <code>cl.exe</code> relies on a complex set of environment variables to identify the target architecture and the directories that contain the header files. You must run SATABS from within the <em>Visual Studio Command Prompt</em>.</p>
 <p>Note that the distribution files for the <a href="http://www.cprover.org/eclipse-plugin/">Eclipse plugin</a> include the command-line tools. Therefore, if you intend to run SATABS exclusively within Eclipse, you can skip the installation of the command-line tools. However, you still have to install the compiler environment as described above.</p>
-<h3><a class="anchor" id="autotoc_md202"></a>
+<h3><a class="anchor" id="autotoc_md206"></a>
 Choosing and Installing a Model Checker</h3>
 <p>You need to install a Model Checker in order to be able to run SATABS. You can choose between following alternatives:</p>
 <ul>
@@ -122,14 +122,14 @@ Choosing and Installing a Model Checker</h3>
 </pre> when you call SATABS and want it to use BOPPO instead of SMV.</li>
 <li><b>BOOM</b>. Available from <a href="http://www.cprover.org/boom/">http://www.cprover.org/boom/</a>. Boom has a number of unique features, including the verification of programs with unbounded thread creation.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md203"></a>
+<h3><a class="anchor" id="autotoc_md207"></a>
 Installing SATABS</h3>
 <ol type="1">
 <li>Download SATABS for your operating system. The binaries are available from <a href="http://www.cprover.org/satabs/">http://www.cprover.org/satabs/</a>.</li>
 <li>Unzip/untar the archive into a directory of your choice. We recommend to add this directory to your <code>PATH</code> environment variable.</li>
 </ol>
 <p>Now you can execute SATABS. Try running SATABS on the small examples presented in the <a class="el" href="satabs.html#man_satabs-tutorials">SATABS tutorial</a>. If you use the Cadence SMV model checker, the only command line arguments you have to specify are the names of the files that contain your program.</p>
-<h3><a class="anchor" id="autotoc_md204"></a>
+<h3><a class="anchor" id="autotoc_md208"></a>
 Requirements</h3>
 <p>We provide a graphical user interface to CBMC and SATABS, which is realized as a plugin to the Eclipse framework. Eclipse is available at <a href="http://www.eclipse.org">http://www.eclipse.org</a>. We do not provide installation instructions for Eclipse (basically, you only have to download the current version and extract the files to your hard-disk) and assume that you have already installed the current version.</p>
 <p>CBMC and SATABS have their own requirements. As an example, both CBMC and SATABS require a suitable preprocessor and a set of header files. As first step, you should therefore follow the installation instructions for <a href="http://www.cprover.org/cprover-manual/installation-cbmc.html">CBMC</a> and <a href="http://www.cprover.org/cprover-manual/installation-satabs.html">SATABS</a>.</p>
@@ -177,7 +177,7 @@ Overview</h2>
 <div class="line">  }</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>The two assertions in the program model that the functions <code>lock()</code> and <code>unlock()</code> are called in the right order. Note that the value of <code>times</code> is chosen non-deterministically and is not bounded. The program has no run-time bound, and thus, unwinding the code with CBMC will never terminate.</p>
-<h3><a class="anchor" id="autotoc_md205"></a>
+<h3><a class="anchor" id="autotoc_md209"></a>
 Working with Claims</h3>
 <p>The two assertions will give rise to two <em>properties</em>. Each property is associated to a specific line of code, i.e., a property is violated when some condition can become false at the corresponding program location. SATABS will generate a list of all properties for the programs as follows: </p><pre class="fragment">satabs lock-example-fixed.c --show-properties
 </pre><p> SATABS will list two properties; each property corresponds to one of the two assertions. We can use SATABS to verify both properties as follows: </p><pre class="fragment">satabs lock-example-fixed.c
@@ -190,7 +190,7 @@ Programs that use Libraries</h2>
 Unit Testing with SATABS</h2>
 <p>The example presented <a class="el" href="satabs.html#man_satabs-tutorial-driver">here</a> is obviously a toy example and can hardly be used to convince your project manager to use static verification in your next project. Even though we recommend to use formal verification and specification already in the early phases of your project, the sad truth is that in most projects verification (of any kind) is still pushed to the very end of the development cycle. Therefore, this section is dedicated to the verification of legacy code. However, the techniques presented here can also be used for <em>unit testing</em>.</p>
 <p>Unit testing is used in most software development projects, and static verification with SATABS can be very well combined with this technique. Unit testing relies on a number test cases that yield the desired code coverage. Such test cases are implemented by a software testing engineer in terms of a test harness (aka test driver) and a set of function stubs. Typically, a slight modification to the test harness allows it to be used with SATABS. Replacing the explicit input values with non-deterministic inputs (as explained in <a class="el" href="satabs.html#man_satabs-tutorial-aeon">here</a> and <a class="el" href="satabs.html#man_satabs-tutorial-driver">here</a>)) guarantees that SATABS will try to achieve <b>full</b> path and state coverage (due to the fact that predicate abstraction implicitly detects equivalence classes). However, it is not guaranteed that SATABS terminates in all cases. Keep in mind that you must not make any assumptions about the validity of the properties if SATABS did not run to completion!</p>
-<h3><a class="anchor" id="autotoc_md206"></a>
+<h3><a class="anchor" id="autotoc_md210"></a>
 Further Reading</h3>
 <ul>
 <li><a href="http://www.kroening.com/publications/view-publications-wbwk2007.html">Model Checking Concurrent Linux Device Drivers</a></li>
@@ -199,7 +199,7 @@ Further Reading</h3>
 </ul>
 <h2><a class="anchor" id="man_satabs-background"></a>
 Background</h2>
-<h3><a class="anchor" id="autotoc_md207"></a>
+<h3><a class="anchor" id="autotoc_md211"></a>
 Sound Abstractions</h3>
 <p>This section provides background information on how SATABS operates. Even for very trivial C programs it is impossible to exhaustively examine their state space (which is potentially unbounded). However, not all details in a C program necessarily contribute to a bug, so it may be sufficient to only examine those parts of the program that are somehow related to a bug.</p>
 <p>In practice, many static verification tools (such as <code>lint</code>) try to achieve this goal by applying heuristics. This approach comes at a cost: bugs might be overlooked because the heuristics do not cover all relevant aspects of the program. Therefore, the conclusion that a program is correct whenever such a static verification tool is unable to find an error is invalid.</p>
@@ -211,11 +211,11 @@ CEGAR Loop</div></div>
 <p>In the resulting <em>abstract program</em>, a set of concrete states is subsumed by means of a single abstract state. Consider the following figure:</p>
 <p><img src="states.png" alt="" class="inline"/></p>
 <p>The concrete states <em>x</em>~1~ and <em>x</em>~2~ are mapped to an abstract state <em>X</em>, and similarly <em>Y</em> subsumes <em>y</em>~1~ and <em>y</em>~2~. However, all transitions that are possible in the concrete program are also possible in the abstract model. The abstract transition <em>X</em> → <em>Y</em> summarizes the concrete transitions <em>x</em>~1~ → <em>y</em>~1~ and <em>x</em>~1~ → <em>x</em>~1~, and <em>Y</em> → <em>X</em> corresponds to <em>x</em>~1~ → <em>x</em>~2~. The behavior <em>X</em> → <em>Y</em> → <em>X</em> is feasible in the original program, because it maps to <em>x</em>~1~ → <em>x</em>~1~ → <em>x</em>~2~. However, <em>Y</em> → <em>X</em> → <em>Y</em> is feasible only in the abstract model.</p>
-<h3><a class="anchor" id="autotoc_md208"></a>
+<h3><a class="anchor" id="autotoc_md212"></a>
 Spurious Counterexamples</h3>
 <p>The consequence is that the model checker (component number two in the figure above) possibly reports a <em>spurious</em> counterexample. We call a counterexample spurious whenever it is feasible in the current abstract model but not in the original program. However, whenever the model checker is unable to find an execution trace that violates the given property, we can conclude that there is no such trace in the original program, either.</p>
 <p>The feasibility of counterexamples is checked by <em>symbolic simulation</em> (performed by component three in the figure above). If the counterexample is indeed feasible, SATABS found a bug in the original program and reports it to the user.</p>
-<h3><a class="anchor" id="autotoc_md209"></a>
+<h3><a class="anchor" id="autotoc_md213"></a>
 Automatic Refinement</h3>
 <p>On the other hand, infeasible counterexamples (that originate from abstract behaviors that result from the omission of details and are not present in the original program) are never reported to the user. Instead, the information is used in order to refine the abstraction such that the spurious counterexample is not part of the refined model anymore. For instance, the reason for the infeasibility of <em>Y</em> → <em>X</em> → <em>Y</em> is that neither <em>y</em>~1~ nor <em>x</em>~1~ can be reached from <em>x</em>~2~. Therefore, the abstraction can be refined by partitioning <em>X</em>.</p>
 <p>The refinement steps can be illustrated as follows:</p>
@@ -348,7 +348,7 @@ matches, `getenv` returns a pointer to the associated value.
 </pre><p> SATABS runs for quite a while and will eventually give up, telling us that its upper bound for abstraction refinement iterations has been exceeded. This is not exactly the result we were hoping for, and we could now increase the bound for iterations with help of the <code>--iterations</code> command line switch of SATABS.</p>
 <p>Before we do this, let us investigate why SATABS has failed to provide a useful result. The function <code>strcpy</code> contains a loop that counts from 1 to the length of the input string. Predicate abstraction, the mechanism SATABS is based on, is unable to detect such loops and will therefore unroll the loop body as often as necessary. The array <code>home</code> has <code>MAX_LEN</code> elements, and <code>MAX_LEN</code> is defined to be 512 in <code>aeon.h</code>. Therefore, SATABS would have to run through at least 512 iterations, only to verify (or reject) one of the more than 300 properties! Does this fact defeat the purpose of static verification?</p>
 <p>We can make the job easier: after reducing the value of <code>MAX_LEN</code> in <code>aeon.h</code> to a small value, say to 10, SATABS provides a counterexample trace that demonstrates how the buffer overflow be reproduced. If you use the Eclipse plugin (as described <a href="http://www.cprover.org/cprover-manual/installation-plugin.html">here</a>), you can step through this counterexample. The trace contains the string that is returned by <code>getenv</code>.</p>
-<p>Last modified: 2023-02-28 10:42:00 +0100 </p>
+<p>Last modified: 2023-02-28 11:23:06 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
