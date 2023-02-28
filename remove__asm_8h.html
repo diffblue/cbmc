@@ -119,6 +119,20 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Remove 'asm' statements by compiling them into suitable standard goto program instructions. </p>
+<p>Inline assembly statements in the source program (in either gcc- or msc-style) are represented by instructions of kind <code>OTHER</code> with a <code>code</code> member of type <code><a class="el" href="classcode__asmt.html" title="codet representation of an inline assembler statement.">code_asmt</a></code> in the goto program.</p>
+<p>For example, the gcc inline assembly statement below</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> input = 1;</div>
+<div class="line"><span class="keywordtype">int</span> result;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">asm</span> <span class="keyword">volatile</span> (</div>
+<div class="line">  <span class="stringliteral">&quot;mov %1, %0; add $1, %0&quot;</span></div>
+<div class="line">  : <span class="stringliteral">&quot;=r&quot;</span> (result)</div>
+<div class="line">  : <span class="stringliteral">&quot;r&quot;</span> (input)</div>
+<div class="line">  : <span class="stringliteral">&quot;cc&quot;</span>);</div>
+</div><!-- fragment --><p>would be represented by a <code><a class="el" href="classcode__asmt.html" title="codet representation of an inline assembler statement.">code_asmt</a></code> statement with <code>op0()</code> being the string literal "mov %1, %0; add $1, %0" (as a <code><a class="el" href="classstring__constantt.html">string_constantt</a></code> expression) and <code>op1()</code>, <code>op2()</code>, and <code>op3()</code>, respectively, containing the output list, input list, and clobbered registers.</p>
+<p>The <code><a class="el" href="remove__asm_8h.html#aa6aab20cb4186635f3a262634c8fb7a0" title="Replaces inline assembly instructions in the goto program (i.e., instructions of kind OTHER with a co...">remove_asm()</a></code> function replaces the inline assembly statements in a given goto program with appropriate (sequences of) non-assembly goto program instructions.</p>
+<p>It first parses the assembly instructions string (via <code><a class="el" href="classassembler__parsert.html">assembler_parsert</a></code>) and inspects the input/output/clobber lists. Then, it generates a sequence of goto program instructions that either directly implement the assembly instructions, or call a suitable library function (see <code>library/x86_assembler.c</code>).</p>
+<p>At present only a small number of x86 and Power instructions are supported. Unrecognised assembly instructions are ignored (i.e., they are simply removed from the goto program). </p>
 
 <p class="definition">Definition in file <a class="el" href="remove__asm_8h_source.html">remove_asm.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
