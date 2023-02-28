@@ -17,7 +17,7 @@ struct api_session_implementationt;
 // a pragma like below to silence the warning (at least as long
 // as the design principle is to be followed.)
 
-#include "options.h" // IWYU pragma: keep
+#include "api_options.h" // IWYU pragma: keep
 
 /// Opaque message type. Properties of messages to be fetched through further
 /// api calls.
