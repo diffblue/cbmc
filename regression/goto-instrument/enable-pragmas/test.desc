@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^\[main.array_bounds.\d+\] line \d+ array 'a' upper bound in a\[\(signed .* int\)2\]: FAILURE
+^VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Checks that enable pragmas do not cause invariant failures when running goto-instrument
+and cbmc in sequence.
