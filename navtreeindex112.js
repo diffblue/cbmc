@@ -1,6 +1,5 @@
 var NAVTREEINDEX112 =
 {
-"prefix__filter_8cpp.html":[7,0,2,30,167],
 "prefix__filter_8cpp_source.html":[7,0,2,30,167],
 "prefix__filter_8h.html":[7,0,2,30,168],
 "prefix__filter_8h_source.html":[7,0,2,30,168],
@@ -249,5 +248,6 @@ var NAVTREEINDEX112 =
 "reference__counting_8h.html#a3b8d287ea0fd8ef05d4f9485dc1bacd6":[7,0,2,30,177,3],
 "reference__counting_8h.html#aa55b0a305802f46ee3284c14bbf5db5e":[7,0,2,30,177,2],
 "reference__counting_8h_source.html":[7,0,2,30,177],
-"reference_guide.html":[0,2]
+"reference_guide.html":[0,2],
+"refine__arithmetic_8cpp.html":[7,0,2,27,6,2]
 };

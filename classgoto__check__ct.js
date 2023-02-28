@@ -16,7 +16,7 @@ var classgoto__check__ct =
     ] ],
     [ "goto_check_ct", "classgoto__check__ct.html#acdb1949ddd21f25997f4ed0539035fb4", null ],
     [ "add_active_named_check_pragmas", "classgoto__check__ct.html#ac26d1d516674e7e693f6bea0c93e48a3", null ],
-    [ "add_all_disable_named_check_pragmas", "classgoto__check__ct.html#ada8af369be283b9c14edbebaeaebef1f", null ],
+    [ "add_all_checked_named_check_pragmas", "classgoto__check__ct.html#ab82c7ee9b4b5d275830acdc41322d1c3", null ],
     [ "add_guarded_property", "classgoto__check__ct.html#a7fc9b8e104fbf5cd5a11233a76f18daa", null ],
     [ "array_name", "classgoto__check__ct.html#a2267d82c1e9e7365ead2d53bdcb7f11c", null ],
     [ "bounds_check", "classgoto__check__ct.html#a7e399a3cd8a1fbd13e69cab02caa4f38", null ],

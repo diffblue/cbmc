@@ -1,6 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"as__mode_8h_source.html":[7,0,2,9,9],
 "assembler__parser_8cpp.html":[7,0,2,2,0],
 "assembler__parser_8cpp.html#a8c075bff2b919b27fc1fdbe8faf1f847":[7,0,2,2,0,0],
 "assembler__parser_8cpp.html#ac83ace5f35e36ecf1b1b2ff17c030702":[7,0,2,2,0,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX2 =
 "boolbv__array__of_8cpp_source.html":[7,0,2,27,1,7],
 "boolbv__bitreverse_8cpp.html":[7,0,2,27,1,8],
 "boolbv__bitreverse_8cpp_source.html":[7,0,2,27,1,8],
-"boolbv__bitwise_8cpp.html":[7,0,2,27,1,9]
+"boolbv__bitwise_8cpp.html":[7,0,2,27,1,9],
+"boolbv__bitwise_8cpp_source.html":[7,0,2,27,1,9]
 };

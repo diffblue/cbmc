@@ -241,9 +241,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ac26d1d516674e7e693f6bea0c93e48a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ac26d1d516674e7e693f6bea0c93e48a3">add_active_named_check_pragmas</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location) const</td></tr>
 <tr class="memdesc:ac26d1d516674e7e693f6bea0c93e48a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds "checked" pragmas for all currently active named checks on the given source location.  <a href="classgoto__check__ct.html#ac26d1d516674e7e693f6bea0c93e48a3">More...</a><br /></td></tr>
 <tr class="separator:ac26d1d516674e7e693f6bea0c93e48a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada8af369be283b9c14edbebaeaebef1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ada8af369be283b9c14edbebaeaebef1f">add_all_disable_named_check_pragmas</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location) const</td></tr>
-<tr class="memdesc:ada8af369be283b9c14edbebaeaebef1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds "disable" pragmas for all named checks on the given source location.  <a href="classgoto__check__ct.html#ada8af369be283b9c14edbebaeaebef1f">More...</a><br /></td></tr>
-<tr class="separator:ada8af369be283b9c14edbebaeaebef1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab82c7ee9b4b5d275830acdc41322d1c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ab82c7ee9b4b5d275830acdc41322d1c3">add_all_checked_named_check_pragmas</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location) const</td></tr>
+<tr class="memdesc:ab82c7ee9b4b5d275830acdc41322d1c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds "checked" pragmas for all named checks on the given source location (prevents any the instanciation of any ulterior check).  <a href="classgoto__check__ct.html#ab82c7ee9b4b5d275830acdc41322d1c3">More...</a><br /></td></tr>
+<tr class="separator:ab82c7ee9b4b5d275830acdc41322d1c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05a462d9a079d7ad6c891fc25437fe25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8">named_check_statust</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a05a462d9a079d7ad6c891fc25437fe25">match_named_check</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;named_check) const</td></tr>
 <tr class="memdesc:a05a462d9a079d7ad6c891fc25437fe25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matches a named-check string of the form.  <a href="classgoto__check__ct.html#a05a462d9a079d7ad6c891fc25437fe25">More...</a><br /></td></tr>
 <tr class="separator:a05a462d9a079d7ad6c891fc25437fe25"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -606,8 +606,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ada8af369be283b9c14edbebaeaebef1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada8af369be283b9c14edbebaeaebef1f">&#9670;&nbsp;</a></span>add_all_disable_named_check_pragmas()</h2>
+<a id="ab82c7ee9b4b5d275830acdc41322d1c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab82c7ee9b4b5d275830acdc41322d1c3">&#9670;&nbsp;</a></span>add_all_checked_named_check_pragmas()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -616,7 +616,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void goto_check_ct::add_all_disable_named_check_pragmas </td>
+          <td class="memname">void goto_check_ct::add_all_checked_named_check_pragmas </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
           <td class="paramname"><em>source_location</em></td><td>)</td>
@@ -630,7 +630,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Adds "disable" pragmas for all named checks on the given source location. </p>
+<p>Adds "checked" pragmas for all named checks on the given source location (prevents any the instanciation of any ulterior check). </p>
 
 <p class="definition">Definition at line <a class="el" href="goto__check__c_8cpp_source.html#l02480">2480</a> of file <a class="el" href="goto__check__c_8cpp_source.html">goto_check_c.cpp</a>.</p>
 
