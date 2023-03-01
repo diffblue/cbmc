@@ -4,7 +4,7 @@
 #include <util/exception_utils.h>
 
 #include <libcprover-cpp/api.h>
-#include <libcprover-cpp/options.h>
+#include <libcprover-cpp/api_options.h>
 
 #include "goto_model.h"
 

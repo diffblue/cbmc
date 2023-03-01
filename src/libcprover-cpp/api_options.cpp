@@ -1,6 +1,6 @@
 // Author: Fotis Koutoulakis for Diffblue Ltd.
 
-#include "options.h"
+#include "api_options.h"
 
 #include <util/cmdline.h>
 #include <util/make_unique.h>

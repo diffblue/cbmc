@@ -1,4 +1,12 @@
-project(CBMC)
+file(STRINGS
+        "${CMAKE_CURRENT_SOURCE_DIR}/config.inc"
+        cbmc_version_string
+        REGEX "CBMC_VERSION.*")
+
+string(REGEX REPLACE "CBMC_VERSION = (.*)" "\\1" CBMC_VERSION "${cbmc_version_string}")
+unset(cbmc_version_string)
+
+project(CBMC VERSION ${CBMC_VERSION})
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
@@ -102,7 +110,6 @@ add_subdirectory(jsil)
 add_subdirectory(json)
 add_subdirectory(json-symtab-language)
 add_subdirectory(langapi)
-add_subdirectory(libcprover-cpp)
 add_subdirectory(linking)
 add_subdirectory(pointer-analysis)
 add_subdirectory(solvers)
@@ -119,6 +126,7 @@ add_subdirectory(goto-diff)
 add_subdirectory(goto-harness)
 add_subdirectory(goto-synthesizer)
 add_subdirectory(symtab2gb)
+add_subdirectory(libcprover-cpp)
 
 if(UNIX OR WITH_MEMORY_ANALYZER)
 add_subdirectory(memory-analyzer)

@@ -111,28 +111,6 @@ fn main() {
         "cargo:rustc-link-search=native={}",
         libraries_path.display()
     );
-    println!("cargo:rustc-link-lib=static=goto-programs");
-    println!("cargo:rustc-link-lib=static=util");
-    println!("cargo:rustc-link-lib=static=langapi");
-    println!("cargo:rustc-link-lib=static=ansi-c");
-    println!("cargo:rustc-link-lib=static=analyses");
-    println!("cargo:rustc-link-lib=static=goto-instrument-lib");
-    println!("cargo:rustc-link-lib=static=big-int");
-    println!("cargo:rustc-link-lib=static=linking");
-    println!("cargo:rustc-link-lib=static=goto-checker");
-    println!("cargo:rustc-link-lib=static=solvers");
-    println!("cargo:rustc-link-lib=static=assembler");
-    println!("cargo:rustc-link-lib=static=xml");
-    println!("cargo:rustc-link-lib=static=json");
-    println!("cargo:rustc-link-lib=static=json-symtab-language");
-    println!("cargo:rustc-link-lib=static=cpp");
-    println!("cargo:rustc-link-lib=static=jsil");
-    println!("cargo:rustc-link-lib=static=statement-list");
-    println!("cargo:rustc-link-lib=static=goto-symex");
-    println!("cargo:rustc-link-lib=static=pointer-analysis");
-    for solver_lib in solver_libs {
-        println!("cargo:rustc-link-lib=static={}", solver_lib);
-    }
-    println!("cargo:rustc-link-lib=static=cbmc-lib");
-    println!("cargo:rustc-link-lib=static=cprover-api-cpp");
+
+    println!("cargo:rustc-link-lib=static=cprover.5.77.0");
 }
