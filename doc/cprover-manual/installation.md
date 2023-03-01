@@ -1,8 +1,8 @@
 [CPROVER Manual TOC](../)
 
-## Installation
+# Installation
 
-### Requirements
+## Requirements
 
 CBMC is available for Windows, i86 Linux, and MacOS X. CBMC requires a
 code pre-processing environment comprising of a suitable preprocessor
@@ -32,7 +32,7 @@ exclusively within Eclipse, you can skip the installation of the CBMC
 executable.  However, you still have to install the compiler environment as
 described above.
 
-### Installing the CBMC Binaries
+## Installing the CBMC Binaries
 
 1.  Download CBMC for your operating system. The binaries are available
     from http://www.cprover.org/cbmc/.
@@ -42,13 +42,13 @@ described above.
 You are now ready to use CBMC. We recommend you follow the
 [tutorial](../cbmc/tutorial/).
 
-### Building CBMC from Source
+## Building CBMC from Source
 
 See the [CPROVER Developer Documentation](https://diffblue.github.io/cbmc/compilation-and-development.html).
 
-## Installing the Eclipse Plugin
+# Installing the Eclipse Plugin
 
-### Requirements
+## Requirements
 
 We provide a graphical user interface to CBMC which is
 realized as a plugin to the Eclipse framework. Eclipse is available at
@@ -60,7 +60,7 @@ complex set of environment variables to identify the target architecture
 and the directories that contain the header files. You must run Eclipse
 from within the *Visual Studio Command Prompt*.
 
-### Installing the Eclipse Plugin
+## Installing the Eclipse Plugin
 
 The installation instructions for the Eclipse Plugin, including the link
 to the download site, are available

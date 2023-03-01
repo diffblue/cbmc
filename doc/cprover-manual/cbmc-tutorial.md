@@ -1,6 +1,6 @@
 [CPROVER Manual TOC](../../)
 
-### Example: Buffer Overflows
+## Example: Buffer Overflows
 
 To give a brief overview of the capabilities of CBMC
 we start with a simple example. The issue of *[buffer
@@ -30,7 +30,7 @@ lower and upper bounds, even for arrays with dynamic size. A detailed
 discussion of the properties that CBMC can check
 automatically is [here](../../properties/).
 
-### First Steps
+## First Steps
 
 We assume you have already installed CBMC and the necessary support
 files on your system. If not so, please follow the instructions
@@ -113,7 +113,7 @@ property for the object bounds of `argv` does not hold, and will display:
 [main.pointer_dereference.6] line 7 dereference failure: pointer outside object bounds in argv[(signed long int)2]: FAILURE
 ```
 
-### Counterexample Traces
+## Counterexample Traces
 
 Let us have a closer look at this property and why it fails. To aid the
 understanding of the problem, CBMC can generate a *counterexample trace*
@@ -137,7 +137,7 @@ possible output format.
     cbmc file1.c --bounds-check --pointer-check --trace --xml-ui
 ```
 
-### Verifying Modules
+## Verifying Modules
 
 In the example above, we used a program that starts with a `main`
 function. However, CBMC is aimed at embedded software, and these kinds
@@ -169,7 +169,7 @@ cbmc file2.c --function sum --bounds-check
 It is often necessary to build a suitable *harness* for the function in
 order to set up the environment appropriately.
 
-### Loop Unwinding
+## Loop Unwinding
 
 When running the previous example, you will have noted that CBMC unwinds
 the `for` loop in the program. As CBMC performs Bounded Model Checking,
@@ -218,7 +218,7 @@ iterations. Thus, CBMC will report that the unwinding assertion has
 failed. As usual, a counterexample trace that documents this can be
 obtained with the option `--property`.
 
-### Unbounded Loops
+## Unbounded Loops
 
 CBMC can also be used for programs with unbounded loops.  In this case, CBMC
 is used for bug hunting only; CBMC does not attempt to find all bugs.  The
@@ -293,7 +293,7 @@ but it can be helpful to find program bugs. The various command line
 options that CBMC offers for loop unwinding are described in the section
 on [understanding loop unwinding](../../cbmc/unwinding/).
 
-### A Note About Compilers and the ANSI-C Library
+## A Note About Compilers and the ANSI-C Library
 
 Most C programs make use of functions provided by a library; instances
 are functions from the standard ANSI-C library such as `malloc` or
@@ -307,14 +307,14 @@ requirements:
 Most C compilers come with header files for the ANSI C library
 functions. We briefly discuss how to obtain/install these library files.
 
-#### Linux
+### Linux
 
 Linux systems that are able to compile software are usually equipped
 with the appropriate header files. Consult the documentation of your
 distribution on how to install the compiler and the header files. First
 try to compile some significant program before attempting to verify it.
 
-#### Windows
+### Windows
 
 On Microsoft Windows, CBMC is pre-configured to use the compiler that is
 part of Microsoft's Visual Studio. Microsoft's [Visual Studio
@@ -331,7 +331,7 @@ comes with a small set of definitions, which includes functions such as
 `malloc`. Detailed information about the built-in definitions is
 [here](../../goto-cc/).
 
-### Further Reading
+## Further Reading
 
 -   [Understanding Loop Unwinding](../../cbmc/unwinding/)
 -   [Hardware Verification using ANSI-C Programs as a

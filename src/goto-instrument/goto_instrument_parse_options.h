@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "generate_function_bodies.h"
 #include "insert_final_assert_false.h"
 #include "nondet_volatile.h"
+#include "reachability_slicer.h"
 #include "replace_calls.h"
 #include "uninitialized.h"
 #include "unwindset.h"
@@ -77,8 +78,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "(custom-bitvector-analysis)" \
   "(show-struct-alignment)(interval-analysis)(show-intervals)" \
   "(show-uninitialized)(show-locations)" \
-  "(full-slice)(reachability-slice)(slice-global-inits)" \
-  "(fp-reachability-slice):" \
+  "(full-slice)(slice-global-inits)" \
+  OPT_REACHABILITY_SLICER \
+  OPT_FP_REACHABILITY_SLICER \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
   "(value-set-fi-fp-removal)" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \

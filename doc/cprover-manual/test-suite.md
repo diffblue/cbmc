@@ -1,8 +1,8 @@
 [CPROVER Manual TOC](../)
 
-## Test Suite Generation with CBMC
+# Test Suite Generation with CBMC
 
-### A Small Tutorial with a Case Study
+## A Small Tutorial with a Case Study
 
 We assume that CBMC is installed on your system. If not, follow
 [these instructions](../installation/).
@@ -206,7 +206,7 @@ a PID controller case study. In addition to `--cover mcdc`, other
 coverage criteria such as `branch`, `decision`, and `path` are also
 available when calling CBMC.
 
-### Coverage Criteria
+## Coverage Criteria
 
 The table below summarizes the coverage criteria that CBMC supports.
 

@@ -1,6 +1,6 @@
 [CPROVER Manual TOC](../)
 
-## Goto Analyzer
+# Goto Analyzer
 
 `goto-analyzer` is an abstract interpreter which uses the same
 front-end and GOTO binary representation as CBMC.  It is built along
@@ -29,7 +29,7 @@ number of points of execution.
 * The [storage](#storage) that links points of execution and domains.
 
 
-### Quick Start
+## Quick Start
 
 As the space of configuration options is quite large and their
 interactions can sometimes be subtle and complex, here are some
@@ -60,7 +60,7 @@ goto-analyzer --show --dot depgraph.dot --dependence-graph-vs
 
 
 
-### Task
+## Task
 
 `goto-analyzer` first runs the abstract interpreter until it reaches a
 fix-point, then it will perform the task the user has chosen.
@@ -125,7 +125,7 @@ traces that reach them.
 
 
 
-### Output
+## Output
 
 These options control how the result of the task is output.  The
 default is text to the standard output.  In the case of tasks that
@@ -148,7 +148,7 @@ only supported by some domains and tasks (for example
 `--show --dependence-graph`).
 
 
-### Abstract Interpreter
+## Abstract Interpreter
 
 These options control which abstract interpreter is used and how
 the analysis is performed.  In principle this can significantly change
@@ -187,7 +187,7 @@ If you are using `--vsd` this is recommended as it is more accurate
 with little extra cost.
 
 
-### Domain
+## Domain
 
 One of the most important options; this controls how the possible
 states at a given execution point are represented and manipulated.
@@ -237,7 +237,7 @@ means it can be configured using the VSD options and give more precise
 analysis (for example, field aware) of the dependencies.
 
 
-#### Configuration of the Variable Sensitivity Domain
+### Configuration of the Variable Sensitivity Domain
 
 VSD has a wide range of options that allow you to choose what kind of
 abstract objects (and thus abstractions) are used to represent
@@ -324,7 +324,7 @@ is why the default is to do the reduction.  It can be useful for
 debugging issues with the reduction.
 
 
-### History
+## History
 
 To over-approximate what a program does, it is necessary to consider
 all of the paths of execution through the program.  As there are a
@@ -399,7 +399,7 @@ each function.
 
 
 
-### Storage
+## Storage
 
 The histories described above are used to keep track of where in the
 computation needs to be explored.  The most precise option is to keep
@@ -422,7 +422,7 @@ a significant increase in the amount of memory used.
 
 
 
-### Other Options
+## Other Options
 
 `goto-analyzer` supports a number of other options for the C/C++
 frontend, the platform, displaying program representations and

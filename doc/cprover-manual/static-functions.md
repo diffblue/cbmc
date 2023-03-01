@@ -1,6 +1,6 @@
 [CPROVER Manual TOC](../)
 
-# Modular Verification of Static Functions
+## Modular Verification of Static Functions
 
 This page describes how to use CBMC on static functions.
 
@@ -48,7 +48,7 @@ The following commands build and check this function:
 > cbmc --function harness to_check.gb
 ```
 
-## Stubbing out static functions
+### Stubbing out static functions
 
 For performance reasons, it might be desirable to analyze the API
 function independently of the static function. We can analyze the API
@@ -81,7 +81,7 @@ object file:
 > cbmc --function harness to_check.gb
 ```
 
-## Separately checking static functions
+### Separately checking static functions
 
 We should now also write a harness for `private_function`. However,
 since that function is marked `static`, it is not possible for functions

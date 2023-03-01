@@ -95,7 +95,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_volatile.h"
 #include "points_to.h"
 #include "race_check.h"
-#include "reachability_slicer.h"
 #include "remove_function.h"
 #include "rw_set.h"
 #include "show_locations.h"
@@ -1743,6 +1742,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
 
+    log.warning() << "**** WARNING: Experimental option --full-slice, "
+                  << "analysis results may be unsound. See "
+                  << "https://github.com/diffblue/cbmc/issues/260"
+                  << messaget::eom;
     log.status() << "Performing a full slice" << messaget::eom;
     if(cmdline.isset("property"))
       property_slicer(goto_model, cmdline.get_values("property"));
@@ -1971,6 +1974,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Slicing:\n"
     HELP_REACHABILITY_SLICER
+    HELP_FP_REACHABILITY_SLICER
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)

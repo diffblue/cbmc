@@ -245,7 +245,7 @@ void run_property_decider(
   "                              complexity violations before the loop\n" \
   "                              gets blacklisted\n" \
   " --graphml-witness filename   write the witness in GraphML format to filename\n" /* NOLINT(*) */ \
-  " --symex-cache-dereferences   enable caching of repeated dereferences" \
+  " --symex-cache-dereferences   enable caching of repeated dereferences\n" \
 // clang-format on
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H
