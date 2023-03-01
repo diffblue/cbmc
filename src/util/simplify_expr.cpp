@@ -2590,6 +2590,58 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
     if(op_type_id != ID_signedbv && op_type_id != ID_unsignedbv)
       return unchanged(expr);
 
+    // a special case of overflow-minus checking with operands (X + n) and X
+    if(expr.id() == ID_overflow_result_minus)
+    {
+      const exprt &tc_op0 = skip_typecast(expr.op0());
+      const exprt &tc_op1 = skip_typecast(expr.op1());
+
+      if(auto sum = expr_try_dynamic_cast<plus_exprt>(tc_op0))
+      {
+        if(skip_typecast(sum->op0()) == tc_op1 && sum->operands().size() == 2)
+        {
+          optionalt<exprt> offset;
+          if(sum->type().id() == ID_pointer)
+          {
+            offset = std::move(simplify_pointer_offset(
+                                 pointer_offset_exprt{*sum, expr.op0().type()})
+                                 .expr);
+            if(offset->id() == ID_pointer_offset)
+              return unchanged(expr);
+          }
+          else
+            offset = std::move(
+              simplify_typecast(typecast_exprt{sum->op1(), expr.op0().type()})
+                .expr);
+
+          exprt offset_op = skip_typecast(*offset);
+          if(
+            offset_op.type().id() != ID_signedbv &&
+            offset_op.type().id() != ID_unsignedbv)
+          {
+            return unchanged(expr);
+          }
+
+          const std::size_t width =
+            to_bitvector_type(expr.op0().type()).get_width();
+          const integer_bitvector_typet bv_type{op_type_id, width};
+
+          or_exprt not_representable{
+            binary_relation_exprt{
+              offset_op,
+              ID_lt,
+              from_integer(bv_type.smallest(), offset_op.type())},
+            binary_relation_exprt{
+              offset_op,
+              ID_gt,
+              from_integer(bv_type.largest(), offset_op.type())}};
+
+          return struct_exprt{
+            {*offset, simplify_rec(not_representable)}, expr.type()};
+        }
+      }
+    }
+
     if(!expr.op0().is_constant() || !expr.op1().is_constant())
       return unchanged(expr);
 
