@@ -66,8 +66,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href=".">CPROVER Manual TOC</a></p>
-<h3><a class="anchor" id="assertion-checking"></a>
-Assertion Checking</h3>
+<h2><a class="anchor" id="assertion-checking"></a>
+Assertion Checking</h2>
 <p><a href="http://en.wikipedia.org/wiki/Assertion_%28computing%29">Assertions</a> are statements within the program that attempt to capture the programmer’s intent. The ANSI C standard defines a header file <a href="http://en.wikipedia.org/wiki/Assert.h">assert.h</a>, which offers a macro <code>assert(cond)</code>. When executing a statement such as:</p>
 <div class="fragment"><div class="line">assert(p!=NULL);</div>
 </div><!-- fragment --><p>the execution is aborted with an error message if the condition evaluates to <em>false</em>, that is, if <code>p</code> is NULL in the example above. The CPROVER tools can check the validity of the programmer-annotated assertions statically. Specifically, the CPROVER tools will check that the assertions hold for <em>any</em> nondeterministic choice that the program can make. The static assertion checks can be disabled using the <code>--no-assertions</code> command line option.</p>
@@ -103,7 +103,7 @@ Assertion Checking</h3>
 <p>Future CPROVER releases will support explicit quantifiers with a syntax that resembles Spec#:</p>
 <div class="fragment"><div class="line">__CPROVER_forall { *type identifier* ; *expression* }</div>
 <div class="line">__CPROVER_exists { *type identifier* ; *expression* }</div>
-</div><!-- fragment --><p>Last modified: 2023-02-28 17:25:19 +0000 </p>
+</div><!-- fragment --><p>Last modified: 2023-03-01 10:46:49 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

@@ -66,10 +66,10 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href=".">CPROVER Manual TOC</a></p>
-<h2><a class="anchor" id="automatically-generating-properties"></a>
-Automatically Generating Properties</h2>
-<h3><a class="anchor" id="what-is-a-property"></a>
-What is a “Property”?</h3>
+<h1><a class="anchor" id="automatically-generating-properties"></a>
+Automatically Generating Properties</h1>
+<h2><a class="anchor" id="what-is-a-property"></a>
+What is a “Property”?</h2>
 <p>We have mentioned <em>properties</em> several times so far, but we never explained <em>what</em> kind of properties CBMC can verify. We cover this topic in more detail in this section.</p>
 <p>CBMC uses <a href="http://en.wikipedia.org/wiki/Assertion_(computing)">assertions</a> to specify program properties. Assertions are properties of the state of the program when the program reaches a particular program location. Assertions are often written by the programmer using the <code>assert</code> macro.</p>
 <p>In addition to the assertions written by the programmer, assertions for specific properties can also be generated automatically by CBMC, often relieving the programmer from expressing properties that should hold in any well-behaved program.</p>
@@ -88,8 +88,8 @@ What is a “Property”?</h3>
 <p>All the properties described above are <em>reachability</em> properties. They are always of the form</p>
 <p>“*Is there a path through the program such that some property is violated?*”</p>
 <p>The counterexamples to such properties are always program paths. Users of the Eclipse plugin can step through these counterexamples in a way that is similar to debugging programs. The installation of this plugin is explained <a href="http://www.cprover.org/eclipse-plugin/">here</a>.</p>
-<h3><a class="anchor" id="using-goto-instrument"></a>
-Using goto-instrument</h3>
+<h2><a class="anchor" id="using-goto-instrument"></a>
+Using goto-instrument</h2>
 <p>The goto-instrument static analyzer operates on goto-binaries, which is a binary representation of control-flow graphs. The goto-binary is extracted from program source code using goto-cc, which is explained <a class="el" href="md_goto_cc.html">here</a>. Given a goto-program, goto-instrument operates as follows:</p>
 <ol type="1">
 <li>A goto-binary is read in.</li>
@@ -190,13 +190,13 @@ unsigned foo(unsigned x)
   x = x + 3;
 #pragma CPROVER check pop
   x = x + 2;
-</pre> <h4><a class="anchor" id="flag-nan-check-limitations"></a>
-Flag –nan-check limitations</h4>
+</pre> <h3><a class="anchor" id="flag-nan-check-limitations"></a>
+Flag –nan-check limitations</h3>
 <p>Please note that <code>--nan-check</code> flag is adding not-a-number checks only for generation of NaN value. Current implementation of <code>--nan-check</code> flag is not providing checks for propagation of NaN values. Generating assertions on type casting or structure/union member access is unsupported and such operation will not be examined.</p>
 <p>For example: </p><pre class="fragment">float f = 0.0/0.0; // will generate NaN - CBMC will add assertion
 float g = NAN+0.0; // propagation of NaN value - no assertion generated
-</pre> <h4><a class="anchor" id="generating-function-bodies"></a>
-Generating function bodies</h4>
+</pre> <h3><a class="anchor" id="generating-function-bodies"></a>
+Generating function bodies</h3>
 <p>Sometimes implementations for called functions are not available in the goto program, or it is desirable to replace bodies of functions with certain predetermined stubs (for example to confirm that these functions are never called, or to indicate that these functions will never return). For this purpose goto-instrument provides the <code>--generate-function-body</code> option, that takes a regular expression (in <a href="http://en.cppreference.com/w/cpp/regex/ecmascript">ECMAScript syntax</a>) that describes the names of the functions to generate. Note that this will only generate bodies for functions that do not already have one; If one wishes to replace the body of a function with an existing definition, the <code>--remove-function-body</code> option can be used to remove the body of the function prior to generating a new one.</p>
 <p>The shape of the stub itself can be chosen with the <code>--generate-function-body-options</code> parameter, which can take these values:</p>
 <table class="markdownTable">
@@ -302,7 +302,7 @@ VERIFICATION FAILED
 <div class="line">}</div>
 </div><!-- fragment --><p>Note that no attempt to follow the <code>next</code> pointer is made. If an array of unknown (or 0) size is encountered, a diagnostic is emitted and the array is not further examined.</p>
 <p>Some care must be taken when choosing the regular expressions for globals and functions. Names starting with <code>__</code> are reserved for internal purposes; For example, replacing functions or setting global variables with the <code>__CPROVER</code> prefix might make analysis impossible. To avoid doing this by accident, negative lookahead can be used. For example, <code>(?!__).*</code> matches all names not starting with <code>__</code>.</p>
-<p>Last modified: 2023-02-28 17:25:19 +0000 </p>
+<p>Last modified: 2023-03-01 10:46:49 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

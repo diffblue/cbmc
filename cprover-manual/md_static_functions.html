@@ -66,8 +66,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href=".">CPROVER Manual TOC</a></p>
-<h1><a class="anchor" id="modular-verification-of-static-functions"></a>
-Modular Verification of Static Functions</h1>
+<h2><a class="anchor" id="modular-verification-of-static-functions"></a>
+Modular Verification of Static Functions</h2>
 <p>This page describes how to use CBMC on static functions.</p>
 <p>CBMC can check libraries and other codebases that expose several entry points. To do this, users typically write a <em>harness</em> that captures the entry points’ API contract, and that calls into the API with unconstrained values. The example below shows such a library and harness:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> public_api_function(<span class="keyword">const</span> <span class="keywordtype">int</span> *a, <span class="keywordtype">int</span> *b)</div>
@@ -97,8 +97,8 @@ Modular Verification of Static Functions</h1>
 <div class="line">&gt; goto-cc -c -o harness.o harness.c</div>
 <div class="line">&gt; goto-cc -o to_check.gb library.o harness.o</div>
 <div class="line">&gt; cbmc --function harness to_check.gb</div>
-</div><!-- fragment --><h2><a class="anchor" id="stubbing-out-static-functions"></a>
-Stubbing out static functions</h2>
+</div><!-- fragment --><h3><a class="anchor" id="stubbing-out-static-functions"></a>
+Stubbing out static functions</h3>
 <p>For performance reasons, it might be desirable to analyze the API function independently of the static function. We can analyze the API function by “stubbing out” the static function, replacing it with a function that does nothing apart from asserting that its inputs satisfy the function’s contract. (“Stubbing out” a function is sometimes known as “modelling” or “abstracting it out”.) Add the following to <code>harness.c</code>:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> private_function(<span class="keyword">const</span> <span class="keywordtype">int</span> *a, <span class="keywordtype">int</span> *b)</div>
 <div class="line">{</div>
@@ -115,8 +115,8 @@ Stubbing out static functions</h2>
 <div class="line">&gt; # private_function whose body has been removed</div>
 <div class="line">&gt; goto-cc -o to_check.gb library-no-private.o harness.o</div>
 <div class="line">&gt; cbmc --function harness to_check.gb</div>
-</div><!-- fragment --><h2><a class="anchor" id="separately-checking-static-functions"></a>
-Separately checking static functions</h2>
+</div><!-- fragment --><h3><a class="anchor" id="separately-checking-static-functions"></a>
+Separately checking static functions</h3>
 <p>We should now also write a harness for <code>private_function</code>. However, since that function is marked <code>static</code>, it is not possible for functions in external files to call it. We can write and link a harness by stripping the <code>static</code> attribute from <code>private_function</code> using goto-cc’s <code>--export-file-local-symbols</code> flag.</p>
 <div class="fragment"><div class="line">&gt; goto-cc -c -o --export-file-local-symbols library_with_static.o library.c</div>
 </div><!-- fragment --><p><code>library_with_static.o</code> now contains an implementation of <code>private_function()</code> with a mangled name. We can display the mangled name with goto-instrument:</p>
@@ -153,7 +153,7 @@ Separately checking static functions</h2>
        \_ b.c &lt;- also contains static function "qux"
 </pre><p> The solution is to use the <code>--mangle-suffix</code> option to goto-cc. This allows you to specify a different suffix for name-mangling. By specifying a custom, different suffix for each of the two files, the mangled names are unique and the files can be successfully linked.</p>
 <p>More examples are in <code>regression/goto-cc-file-local</code>.</p>
-<p>Last modified: 2023-02-28 17:25:19 +0000 </p>
+<p>Last modified: 2023-03-01 10:46:49 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

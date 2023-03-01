@@ -134,19 +134,19 @@ $(document).ready(function(){initNavTree('reachability__slicer_8h_source.html','
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#a5cf49530c10f07d704e367bc43d0ae76">   45</a></span>&#160;<span class="preprocessor">#define OPT_REACHABILITY_SLICER                                                \</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">  &quot;(fp-reachability-slice):(reachability-slice)(reachability-slice-fb)&quot;</span> <span class="comment">// NOLINT(*)</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#a2385be0328069ce898ffd749208bf13c">   45</a></span>&#160;<span class="preprocessor">#define OPT_FP_REACHABILITY_SLICER &quot;(fp-reachability-slice):&quot;</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#a5cf49530c10f07d704e367bc43d0ae76">   46</a></span>&#160;<span class="preprocessor">#define OPT_REACHABILITY_SLICER &quot;(reachability-slice)(reachability-slice-fb)&quot;</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#aa56a50a38931598888e4f24d96f0d0ab">   48</a></span>&#160;<span class="preprocessor">#define HELP_REACHABILITY_SLICER                                                      \</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">  &quot; --fp-reachability-slice f    remove instructions that cannot appear on a trace\n&quot;</span> \</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  &quot;                              that visits all given functions. The list of\n&quot;      \</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  &quot;                              functions has to be given as a comma separated\n&quot;    \</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  &quot;                              list f.\n&quot;                                           \</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  &quot; --reachability-slice         remove instructions that cannot appear on a trace\n&quot; \</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  &quot;                              from entry point to a property\n&quot; <span class="comment">// NOLINT(*)</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#a29402c93af56050e8b99d97ec6ef63be">   55</a></span>&#160;<span class="preprocessor">#define HELP_REACHABILITY_SLICER_FB                                                   \</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">  &quot; --reachability-slice-fb      remove instructions that cannot appear on a trace\n&quot;</span> \</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  &quot;                              from entry point through a property\n&quot; <span class="comment">// NOLINT(*)</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#a4060725bbb0a4d3de1a9f2a11c27be47">   48</a></span>&#160;<span class="preprocessor">#define HELP_FP_REACHABILITY_SLICER \</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">  &quot; --fp-reachability-slice f    remove instructions that cannot appear on\n&quot;</span> \</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  &quot;                              trace that visits all given functions.\n&quot; \</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  &quot;                              The list of functions has to be given as a\n&quot; \</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  &quot;                              comma separated list f.\n&quot;</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="reachability__slicer_8h.html#aa56a50a38931598888e4f24d96f0d0ab">   53</a></span>&#160;<span class="preprocessor">#define HELP_REACHABILITY_SLICER \</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">  &quot; --reachability-slice         remove instructions that cannot appear on\n&quot;</span> \</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  &quot;                              a trace from entry point to a property\n&quot; \</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  &quot; --reachability-slice-fb      remove instructions that cannot appear on\n&quot; \</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  &quot;                              a trace from entry point through a property\n&quot;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">// clang-format on</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H</span></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>

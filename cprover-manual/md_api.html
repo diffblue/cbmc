@@ -66,32 +66,32 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href=".">CPROVER Manual TOC</a></p>
-<h2><a class="anchor" id="the-cprover-api-reference"></a>
-The CPROVER API Reference</h2>
+<h1><a class="anchor" id="the-cprover-api-reference"></a>
+The CPROVER API Reference</h1>
 <p>The following sections summarize the functions available to programs that are passed to the CPROVER tools.</p>
-<h3><a class="anchor" id="functions"></a>
-Functions</h3>
-<h4><a class="anchor" id="cprover_assume-__cprover_assert-assert"></a>
-__CPROVER_assume, __CPROVER_assert, assert</h4>
+<h2><a class="anchor" id="functions"></a>
+Functions</h2>
+<h3><a class="anchor" id="cprover_assume-__cprover_assert-assert"></a>
+__CPROVER_assume, __CPROVER_assert, assert</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> __CPROVER_assume(_Bool assumption);</div>
 <div class="line"><span class="keywordtype">void</span> __CPROVER_assert(_Bool assertion, <span class="keyword">const</span> <span class="keywordtype">char</span> *description);</div>
 <div class="line"><span class="keywordtype">void</span> assert(_Bool assertion);</div>
 </div><!-- fragment --><p>The function **__CPROVER_assume** adds an expression as a constraint to the program. If the expression evaluates to false, the execution aborts without failure. More detail on the use of assumptions is in the section on <a class="el" href="md_modeling_assumptions.html">Assumptions</a>.</p>
-<h4><a class="anchor" id="cprover_input-__cprover_output"></a>
-__CPROVER_input, __CPROVER_output</h4>
+<h3><a class="anchor" id="cprover_input-__cprover_output"></a>
+__CPROVER_input, __CPROVER_output</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> __CPROVER_input(<span class="keyword">const</span> <span class="keywordtype">char</span> *<span class="keywordtype">id</span>, ...);</div>
 <div class="line"><span class="keywordtype">void</span> __CPROVER_output(<span class="keyword">const</span> <span class="keywordtype">char</span> *<span class="keywordtype">id</span>, ...);</div>
 </div><!-- fragment --><p>The functions **__CPROVER_input** and **__CPROVER_output** are used to report an input or output value. Note that they do not generate input or output values. The first argument is a string constant to distinguish multiple inputs and outputs (inputs are typically generated using nondeterminism, as described <a class="el" href="md_modeling_nondeterminism.html">here</a>). The string constant is followed by an arbitrary number of values of arbitrary types.</p>
-<h4><a class="anchor" id="cprover_printf"></a>
-__CPROVER_printf</h4>
+<h3><a class="anchor" id="cprover_printf"></a>
+__CPROVER_printf</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> __CPROVER_printf(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...);</div>
 </div><!-- fragment --><p>The function **__CPROVER_printf** implements the C <code>printf</code> function (without any return value). The observable effect is that its output is shown within a counterexample trace.</p>
-<h4><a class="anchor" id="cprover_cover"></a>
-__CPROVER_cover</h4>
+<h3><a class="anchor" id="cprover_cover"></a>
+__CPROVER_cover</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> __CPROVER_cover(_Bool condition);</div>
 </div><!-- fragment --><p>This statement defines a custom coverage criterion, for usage with the <a class="el" href="md_test_suite.html">test suite generation feature</a>.</p>
-<h4><a class="anchor" id="cprover_isnan-__cprover_isfinite-__cprover_isinf-__cprover_isnormal-__cprover_sign"></a>
-__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isinf, __CPROVER_isnormal, __CPROVER_sign</h4>
+<h3><a class="anchor" id="cprover_isnan-__cprover_isfinite-__cprover_isinf-__cprover_isnormal-__cprover_sign"></a>
+__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isinf, __CPROVER_isnormal, __CPROVER_sign</h3>
 <div class="fragment"><div class="line">_Bool __CPROVER_isnan(<span class="keywordtype">double</span> f);</div>
 <div class="line">_Bool __CPROVER_isfinite(<span class="keywordtype">double</span> f);</div>
 <div class="line">_Bool __CPROVER_isinf(<span class="keywordtype">double</span> f);</div>
@@ -102,30 +102,30 @@ __CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isinf, __CPROVER_isnormal, __CPRO
 <p>This function **__CPROVER_isinf** returns true if the double-precision floating-point number passed as argument is plus or minus infinity.</p>
 <p>The function **__CPROVER_isnormal** returns true if the double-precision floating-point number passed as argument is a normal number.</p>
 <p>This function **__CPROVER_sign** returns true if the double-precision floating-point number passed as argument is negative.</p>
-<h4><a class="anchor" id="cprover_abs-__cprover_labs-__cprover_fabs-__cprover_fabsl-__cprover_fabsf"></a>
-__CPROVER_abs, __CPROVER_labs, __CPROVER_fabs, __CPROVER_fabsl, __CPROVER_fabsf</h4>
+<h3><a class="anchor" id="cprover_abs-__cprover_labs-__cprover_fabs-__cprover_fabsl-__cprover_fabsf"></a>
+__CPROVER_abs, __CPROVER_labs, __CPROVER_fabs, __CPROVER_fabsl, __CPROVER_fabsf</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> __CPROVER_abs(<span class="keywordtype">int</span> x);</div>
 <div class="line"><span class="keywordtype">long</span> <span class="keywordtype">int</span> __CPROVER_labs(<span class="keywordtype">long</span> <span class="keywordtype">int</span> x);</div>
 <div class="line"><span class="keywordtype">double</span> __CPROVER_fabs(<span class="keywordtype">double</span> x);</div>
 <div class="line"><span class="keywordtype">long</span> <span class="keywordtype">double</span> __CPROVER_fabsl(<span class="keywordtype">long</span> <span class="keywordtype">double</span> x);</div>
 <div class="line"><span class="keywordtype">float</span> __CPROVER_fabsf(<span class="keywordtype">float</span> x);</div>
 </div><!-- fragment --><p>These functions return the absolute value of the given argument.</p>
-<h4><a class="anchor" id="cprover_overflow_minus-__cprover_overflow_mult-__cprover_overflow_plus-__cprover_overflow_shl-__cprover_overflow_unary_minus"></a>
-__CPROVER_overflow_minus, __CPROVER_overflow_mult, __CPROVER_overflow_plus, __CPROVER_overflow_shl, __CPROVER_overflow_unary_minus</h4>
+<h3><a class="anchor" id="cprover_overflow_minus-__cprover_overflow_mult-__cprover_overflow_plus-__cprover_overflow_shl-__cprover_overflow_unary_minus"></a>
+__CPROVER_overflow_minus, __CPROVER_overflow_mult, __CPROVER_overflow_plus, __CPROVER_overflow_shl, __CPROVER_overflow_unary_minus</h3>
 <div class="fragment"><div class="line">__CPROVER_bool __CPROVER_overflow_minus();</div>
 <div class="line">__CPROVER_bool __CPROVER_overflow_mult();</div>
 <div class="line">__CPROVER_bool __CPROVER_overflow_plus();</div>
 <div class="line">__CPROVER_bool __CPROVER_overflow_shl();</div>
 <div class="line">__CPROVER_bool __CPROVER_overflow_unary_minus();</div>
 </div><!-- fragment --><p>These functions take two (<code>__CPROVER_overflow_unary_minus</code> only takes one) arguments of any numeric type. They return true, if, and only if, the named operation would overflow when applied to the arguments. For example, <code>__CPROVER_overflow_plus(x, y)</code> returns true if <code>x + y</code> would result in an arithmetic overflow.</p>
-<h4><a class="anchor" id="cprover_array_equal-__cprover_array_copy-__cprover_array_set"></a>
-__CPROVER_array_equal, __CPROVER_array_copy, __CPROVER_array_set</h4>
+<h3><a class="anchor" id="cprover_array_equal-__cprover_array_copy-__cprover_array_set"></a>
+__CPROVER_array_equal, __CPROVER_array_copy, __CPROVER_array_set</h3>
 <div class="fragment"><div class="line">_Bool __CPROVER_array_equal(<span class="keyword">const</span> <span class="keywordtype">void</span> array1[], <span class="keyword">const</span> <span class="keywordtype">void</span> array2[]);</div>
 <div class="line"><span class="keywordtype">void</span> __CPROVER_array_copy(<span class="keyword">const</span> <span class="keywordtype">void</span> dest[], <span class="keyword">const</span> <span class="keywordtype">void</span> src[]);</div>
 <div class="line"><span class="keywordtype">void</span> __CPROVER_array_set(<span class="keyword">const</span> <span class="keywordtype">void</span> dest[], value);</div>
 </div><!-- fragment --><p>The function **__CPROVER_array_equal** returns true if the values stored in the given arrays are equal. The function **__CPROVER_array_copy** copies the contents of the array <b>src</b> to the array <b>dest</b>. The function **__CPROVER_array_set** initializes the array <b>dest</b> with the given value.</p>
-<h4><a class="anchor" id="cprover_enum_is_in_range"></a>
-__CPROVER_enum_is_in_range</h4>
+<h3><a class="anchor" id="cprover_enum_is_in_range"></a>
+__CPROVER_enum_is_in_range</h3>
 <div class="fragment"><div class="line">__CPROVER_bool __CPROVER_enum_is_in_range();</div>
 </div><!-- fragment --><p>The function **__CPROVER_enum_is_in_range** is used to check that an enumeration has one of the defined enumeration values. In the following example <code>__CPROVER_enum_is_in_range(ev1)</code> will return true and the assertion will pass</p>
 <div class="fragment"><div class="line"><span class="keyword">enum</span> my_enum { first, second };</div>
@@ -143,20 +143,20 @@ __CPROVER_enum_is_in_range</h4>
 <div class="line">  <span class="keyword">enum</span> my_enum ev1 = second + 1;</div>
 <div class="line">  assert(__CPROVER_enum_is_in_range(ev1));</div>
 <div class="line">}</div>
-</div><!-- fragment --><h4><a class="anchor" id="uninterpreted-functions"></a>
-Uninterpreted Functions</h4>
-<p>Uninterpreted functions are documented <a class="el" href="md_modeling_nondeterminism.html">here</a>).</p>
-<h3><a class="anchor" id="memory-related-functions"></a>
-Memory-Related Functions</h3>
+</div><!-- fragment --><h2><a class="anchor" id="uninterpreted-functions"></a>
+Uninterpreted Functions</h2>
+<p>Uninterpreted functions are documented <a class="el" href="md_modeling_nondeterminism.html">here</a>.</p>
+<h2><a class="anchor" id="memory-related-functions"></a>
+Memory-Related Functions</h2>
 <p>The semantics of the primitives listed in this section is described in more detail in the document about <a class="el" href="md_memory_primitives.html">Memory Primitives</a>.</p>
-<h4><a class="anchor" id="cprover_pointer_object-__cprover_pointer_offset-__cprover_same_object"></a>
-__CPROVER_POINTER_OBJECT, __CPROVER_POINTER_OFFSET, __CPROVER_same_object</h4>
+<h3><a class="anchor" id="cprover_pointer_object-__cprover_pointer_offset-__cprover_same_object"></a>
+__CPROVER_POINTER_OBJECT, __CPROVER_POINTER_OFFSET, __CPROVER_same_object</h3>
 <div class="fragment"><div class="line">__CPROVER_size_t __CPROVER_POINTER_OBJECT(<span class="keyword">const</span> <span class="keywordtype">void</span> *p);</div>
 <div class="line">__CPROVER_ssize_t __CPROVER_POINTER_OFFSET(<span class="keyword">const</span> <span class="keywordtype">void</span> *p);</div>
 <div class="line">_Bool __CPROVER_same_object(<span class="keyword">const</span> <span class="keywordtype">void</span> *p, <span class="keyword">const</span> <span class="keywordtype">void</span> *q);</div>
 </div><!-- fragment --><p>The function **__CPROVER_POINTER_OBJECT** returns the ID of the object the pointer points to. The function **__CPROVER_POINTER_OFFSET** returns the offset of the given pointer relative to the base address of the object. The function **__CPROVER_same_object** returns true if the two pointers given as arguments point to the same object.</p>
-<h4><a class="anchor" id="cprover_object_size-__cprover_dynamic_object-__cprover_r_ok-__cprover_w_ok"></a>
-__CPROVER_OBJECT_SIZE, __CPROVER_DYNAMIC_OBJECT, __CPROVER_r_ok, __CPROVER_w_ok</h4>
+<h3><a class="anchor" id="cprover_object_size-__cprover_dynamic_object-__cprover_r_ok-__cprover_w_ok"></a>
+__CPROVER_OBJECT_SIZE, __CPROVER_DYNAMIC_OBJECT, __CPROVER_r_ok, __CPROVER_w_ok</h3>
 <p>The following primitives require a pointer that is null or valid in order to have well-defined semantics in all usage cases. See the document about <a class="el" href="md_memory_primitives.html">Memory Primitives</a> for more details. It also includes a description of the <code>--pointer-primitive-check</code> option to verify the preconditions of the primitives.</p>
 <div class="fragment"><div class="line">__CPROVER_size_t __CPROVER_OBJECT_SIZE(<span class="keyword">const</span> <span class="keywordtype">void</span> *p);</div>
 <div class="line">_Bool __CPROVER_DYNAMIC_OBJECT(<span class="keyword">const</span> <span class="keywordtype">void</span> *p);</div>
@@ -168,8 +168,8 @@ __CPROVER_OBJECT_SIZE, __CPROVER_DYNAMIC_OBJECT, __CPROVER_r_ok, __CPROVER_w_ok<
 <div class="line"><span class="keywordtype">void</span> __CPROVER_rw_ok(<span class="keyword">const</span> <span class="keywordtype">void</span> *p, <span class="keywordtype">size_t</span> size);</div>
 </div><!-- fragment --><p>The function **__CPROVER__OBJECT_SIZE** returns the size of the object the given pointer points to. The function **__CPROVER_DYNAMIC_OBJECT** returns true if the pointer passed as an argument points to a dynamically allocated object.</p>
 <p>The function **__CPROVER_r_ok** returns true if reading the piece of memory starting at the given pointer with the given size is safe. **__CPROVER_w_ok** does the same with writing, and **__CPROVER_rw_ok** returns true when it is safe to do both. These predicates can be given an optional size; when the size argument is not given, the size of the subtype (which must not be <b>void</b>) of the pointer type is used.</p>
-<h4><a class="anchor" id="cprover_havoc_object"></a>
-__CPROVER_havoc_object</h4>
+<h3><a class="anchor" id="cprover_havoc_object"></a>
+__CPROVER_havoc_object</h3>
 <p>This function requires a valid pointer and updates <b>all bytes</b> of the underlying object with nondeterministic values.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> __CPROVER_havoc_object(<span class="keywordtype">void</span> *p);</div>
 </div><!-- fragment --><p><b>Warning</b></p>
@@ -188,8 +188,8 @@ __CPROVER_havoc_object</h4>
 <div class="line">__CPROVER_assert(thefoo.x == 1, <span class="stringliteral">&quot;fails because `thefoo.x` is now nondet&quot;</span>);</div>
 <div class="line">__CPROVER_assert(thefoo.y == 2, <span class="stringliteral">&quot;fails because `thefoo.y` is now nondet&quot;</span>);</div>
 <div class="line">__CPROVER_assert(thefoo.z == 3, <span class="stringliteral">&quot;fails because `thefoo.z` is now nondet&quot;</span>);</div>
-</div><!-- fragment --><h4><a class="anchor" id="cprover_havoc_slice"></a>
-__CPROVER_havoc_slice</h4>
+</div><!-- fragment --><h3><a class="anchor" id="cprover_havoc_slice"></a>
+__CPROVER_havoc_slice</h3>
 <p>This function requires requires that <code>__CPROVER_w_ok(p, size)</code> holds, and updates <code>size</code> consecutive bytes of the underlying object, starting at <code>p</code>, with nondeterministic values.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> __CPROVER_havoc_slice(<span class="keywordtype">void</span> *p, __CPROVER_size_t size);</div>
 </div><!-- fragment --><p><b>Caveat</b></p>
@@ -197,50 +197,50 @@ __CPROVER_havoc_slice</h4>
 <li>If the slice contains bytes that can be interpreted as pointers by the program, this will cause these pointers to become invalid (i.e.&#160;they will not point to anything meaningful).</li>
 <li>If this slice only contains bytes that are not interpreted as pointers by the program, then havocing the slice is equivalent to making the interpretation of these bytes nondeterministic.</li>
 </ul>
-<h3><a class="anchor" id="predefined-types-and-symbols"></a>
-Predefined Types and Symbols</h3>
-<h4><a class="anchor" id="cprover_bitvector"></a>
-__CPROVER_bitvector</h4>
+<h2><a class="anchor" id="predefined-types-and-symbols"></a>
+Predefined Types and Symbols</h2>
+<h3><a class="anchor" id="cprover_bitvector"></a>
+__CPROVER_bitvector</h3>
 <div class="fragment"><div class="line">__CPROVER_bitvector [ expression ]</div>
 </div><!-- fragment --><p>This type is only available in the C frontend. It is used to specify a bit vector with arbitrary but fixed size. The usual integer type modifiers <b>signed</b> and <b>unsigned</b> can be applied. The usual arithmetic promotions will be applied to operands of this type.</p>
-<h4><a class="anchor" id="cprover_floatbv"></a>
-__CPROVER_floatbv</h4>
+<h3><a class="anchor" id="cprover_floatbv"></a>
+__CPROVER_floatbv</h3>
 <div class="fragment"><div class="line">__CPROVER_floatbv [ expression ] [ expression ]</div>
 </div><!-- fragment --><p>This type is only available in the C frontend. It is used to specify an IEEE-754 floating point number with arbitrary but fixed size. The first parameter is the total size (in bits) of the number, and the second is the size (in bits) of the mantissa, or significand (not including the hidden bit, thus for single precision this should be 23).</p>
-<h4><a class="anchor" id="cprover_fixedbv"></a>
-__CPROVER_fixedbv</h4>
+<h3><a class="anchor" id="cprover_fixedbv"></a>
+__CPROVER_fixedbv</h3>
 <div class="fragment"><div class="line">__CPROVER_fixedbv [ expression ] [ expression ]</div>
 </div><!-- fragment --><p>This type is only available in the C frontend. It is used to specify a fixed-point bit vector with arbitrary but fixed size. The first parameter is the total size (in bits) of the type, and the second is the number of bits after the radix point.</p>
-<h4><a class="anchor" id="cprover_size_t"></a>
-__CPROVER_size_t</h4>
+<h3><a class="anchor" id="cprover_size_t"></a>
+__CPROVER_size_t</h3>
 <p>The type of sizeof expressions.</p>
-<h4><a class="anchor" id="cprover_rounding_mode"></a>
-__CPROVER_rounding_mode</h4>
+<h3><a class="anchor" id="cprover_rounding_mode"></a>
+__CPROVER_rounding_mode</h3>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">int</span> __CPROVER_rounding_mode;</div>
 </div><!-- fragment --><p>This variable contains the IEEE floating-point arithmetic rounding mode.</p>
-<h4><a class="anchor" id="cprover_constant_infinity_uint"></a>
-__CPROVER_constant_infinity_uint</h4>
+<h3><a class="anchor" id="cprover_constant_infinity_uint"></a>
+__CPROVER_constant_infinity_uint</h3>
 <p>This is a constant that models a large unsigned integer.</p>
-<h4><a class="anchor" id="cprover_integer-__cprover_rational"></a>
-__CPROVER_integer, __CPROVER_rational</h4>
+<h3><a class="anchor" id="cprover_integer-__cprover_rational"></a>
+__CPROVER_integer, __CPROVER_rational</h3>
 <p>**__CPROVER_integer** is an unbounded, signed integer type. **__CPROVER_rational** is an unbounded, signed rational number type.</p>
-<h4><a class="anchor" id="cprover_memory"></a>
-__CPROVER_memory</h4>
+<h3><a class="anchor" id="cprover_memory"></a>
+__CPROVER_memory</h3>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> __CPROVER_memory[];</div>
 </div><!-- fragment --><p>This array models the contents of integer-addressed memory.</p>
-<h4><a class="anchor" id="cproverunsignedbvn-c-only"></a>
-__CPROVER::unsignedbv&lt;N&gt; (C++ only)</h4>
+<h3><a class="anchor" id="cproverunsignedbvn-c-only"></a>
+__CPROVER::unsignedbv&lt;N&gt; (C++ only)</h3>
 <p>This type is the equivalent of <b>unsigned __CPROVER_bitvector[N]</b> in the C++ front-end.</p>
-<h4><a class="anchor" id="cproversignedbvn-c-only"></a>
-__CPROVER::signedbv&lt;N&gt; (C++ only)</h4>
+<h3><a class="anchor" id="cproversignedbvn-c-only"></a>
+__CPROVER::signedbv&lt;N&gt; (C++ only)</h3>
 <p>This type is the equivalent of <b>signed __CPROVER_bitvector[N]</b> in the C++ front-end.</p>
-<h4><a class="anchor" id="cproverfixedbvn-c-only"></a>
-__CPROVER::fixedbv&lt;N&gt; (C++ only)</h4>
+<h3><a class="anchor" id="cproverfixedbvn-c-only"></a>
+__CPROVER::fixedbv&lt;N&gt; (C++ only)</h3>
 <p>This type is the equivalent of **__CPROVER_fixedbv[N,m]** in the C++ front-end.</p>
-<h3><a class="anchor" id="concurrency"></a>
-Concurrency</h3>
+<h2><a class="anchor" id="concurrency"></a>
+Concurrency</h2>
 <p>Asynchronous threads are created by preceding an instruction with a label with the prefix **__CPROVER_ASYNC_**.</p>
-<p>Last modified: 2023-02-28 17:25:19 +0000 </p>
+<p>Last modified: 2023-03-01 10:46:49 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

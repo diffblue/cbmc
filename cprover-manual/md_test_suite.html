@@ -66,10 +66,10 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href=".">CPROVER Manual TOC</a></p>
-<h2><a class="anchor" id="test-suite-generation-with-cbmc"></a>
-Test Suite Generation with CBMC</h2>
-<h3><a class="anchor" id="a-small-tutorial-with-a-case-study"></a>
-A Small Tutorial with a Case Study</h3>
+<h1><a class="anchor" id="test-suite-generation-with-cbmc"></a>
+Test Suite Generation with CBMC</h1>
+<h2><a class="anchor" id="a-small-tutorial-with-a-case-study"></a>
+A Small Tutorial with a Case Study</h2>
 <p>We assume that CBMC is installed on your system. If not, follow <a class="el" href="md_installation.html">these instructions</a>.</p>
 <p>CBMC can be used to automatically generate test cases that satisfy a certain <a href="https://en.wikipedia.org/wiki/Code_coverage">code coverage</a> criteria. Common coverage criteria include branch coverage, condition coverage and <a href="https://en.wikipedia.org/wiki/Modified_condition/decision_coverage">Modified Condition/Decision Coverage (MC/DC)</a>. Among others, MC/DC is required by several avionics software development guidelines to ensure adequate testing of safety critical software. Briefly, in order to satisfy MC/DC, for every conditional statement containing boolean decisions, each Boolean variable should be evaluated one time to “true” and one time to “false”, in a way that affects the outcome of the decision.</p>
 <p>In the following, we are going to demonstrate how to apply the test suite generation functionality in CBMC, by means of a case study. The following program is an excerpt from a real-time embedded benchmark <a href="https://www.irit.fr/recherches/ARCHI/MARCH/rubrique.php3?id_rubrique=97">PapaBench</a>, and implements part of a fly-by-wire autopilot for an Unmanned Aerial Vehicle (UAV). We have adjusted it slightly for our purposes.</p>
@@ -187,8 +187,8 @@ Test 5.
   (iteration 6) desired_climb=-1.000000f, estimator_z_dot=1.000000f
 </pre><p> The option <code>--unwind 6</code> unwinds the loop inside the main function body six times. To achieve complete coverage on all the instrumented goals in the PID function <code>climb_pid_run</code>, the loop must be unwound enough times. For example, <code>climb_pid_run</code> needs to be called at least six times for evaluating the condition <code>climb_sum_err&gt;MAX_CLIMB_SUM_ERR</code> in line 48 to <em>true</em>. This corresponds to Test 5. To learn more about loop unwinding take a look at <a class="el" href="md_cbmc_unwinding.html">Understanding Loop Unwinding</a>.</p>
 <p>In this tutorial, we present the automatic test suite generation functionality of CBMC, by applying the MC/DC code coverage criterion to a PID controller case study. In addition to <code>--cover mcdc</code>, other coverage criteria such as <code>branch</code>, <code>decision</code>, and <code>path</code> are also available when calling CBMC.</p>
-<h3><a class="anchor" id="coverage-criteria"></a>
-Coverage Criteria</h3>
+<h2><a class="anchor" id="coverage-criteria"></a>
+Coverage Criteria</h2>
 <p>The table below summarizes the coverage criteria that CBMC supports.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -212,7 +212,7 @@ Coverage Criteria</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">cover   </td><td class="markdownTableBodyNone">Generate a test for every <code>__CPROVER_cover</code> statement   </td></tr>
 </table>
-<p>Last modified: 2023-02-28 17:25:19 +0000 </p>
+<p>Last modified: 2023-03-01 10:46:49 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
