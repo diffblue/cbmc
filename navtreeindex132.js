@@ -1,5 +1,8 @@
 var NAVTREEINDEX132 =
 {
+"two__value__pointer__abstract__object_8cpp_source.html":[8,0,2,0,0,33],
+"two__value__pointer__abstract__object_8h.html":[8,0,2,0,0,34],
+"two__value__pointer__abstract__object_8h_source.html":[8,0,2,0,0,34],
 "two__value__struct__abstract__object_8h.html":[8,0,2,0,0,35],
 "two__value__struct__abstract__object_8h_source.html":[8,0,2,0,0,35],
 "two__value__union__abstract__object_8h.html":[8,0,2,0,0,36],
@@ -216,10 +219,6 @@ var NAVTREEINDEX132 =
 "use__catch_8h.html#ab712ff9c62245ced9e513413016b4c93":[8,0,3,0,20,1],
 "use__catch_8h_source.html":[8,0,3,0,20],
 "user_guide.html":[0,1],
-"util_2options_8cpp.html":[8,0,2,30,150],
-"util_2options_8cpp_source.html":[8,0,2,30,150],
-"util_2options_8h.html":[8,0,2,30,151],
-"util_2options_8h_source.html":[8,0,2,30,151],
 "util_8cpp.html":[8,0,2,13,0,29],
 "util_8cpp.html#a0d4714cfb438bd416ffc4c8cb1f66c57":[8,0,2,13,0,29,3],
 "util_8cpp.html#a1541c9d453d0bd1a38540053ff3de409":[8,0,2,13,0,29,5],
@@ -249,5 +248,6 @@ var NAVTREEINDEX132 =
 "utils_8cpp.html#a5da8544cddc0cac684c91b55b4d2ab4f":[8,0,2,13,1,13,9],
 "utils_8cpp.html#a7d81c043b086199641b0e686cdd27234":[8,0,2,13,1,13,7],
 "utils_8cpp.html#a8ec8b1b695a472d1ee3ffc455fb07995":[8,0,2,13,1,13,17],
-"utils_8cpp.html#a9d1167acb38516d35006111efc44f571":[8,0,2,13,1,13,11]
+"utils_8cpp.html#a9d1167acb38516d35006111efc44f571":[8,0,2,13,1,13,11],
+"utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024":[8,0,2,13,1,13,16]
 };

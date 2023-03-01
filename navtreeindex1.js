@@ -1,6 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"ansi__c__declaration_8h.html#abd2ad6cf8237a12b0b1836234a0c5797":[8,0,2,1,8,3],
 "ansi__c__declaration_8h_source.html":[8,0,2,1,8],
 "ansi__c__entry__point_8cpp.html":[8,0,2,1,9],
 "ansi__c__entry__point_8cpp.html#a02cf3646d20c33e7f0c5a34cf8af95ae":[8,0,2,1,9,2],
@@ -116,6 +115,11 @@ var NAVTREEINDEX1 =
 "api_8h.html#ab3927ad5888f46073d051dc0490d2c32":[8,0,2,21,1,2],
 "api_8h.html#aef5c168f63b0af20b228b52e58e6b5c2":[8,0,2,21,1,1],
 "api_8h_source.html":[8,0,2,21,1],
+"api__options_8cpp.html":[8,0,2,21,2],
+"api__options_8cpp.html#aa7769251023684264061cc9f93608128":[8,0,2,21,2,0],
+"api__options_8cpp_source.html":[8,0,2,21,2],
+"api__options_8h.html":[8,0,2,21,3],
+"api__options_8h_source.html":[8,0,2,21,3],
 "arith__tools_8cpp.html":[8,0,2,30,0],
 "arith__tools_8cpp.html#a0d723e7fcdf6ef8322b386bc05abd6ad":[8,0,2,30,0,1],
 "arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318":[8,0,2,30,0,7],
@@ -245,9 +249,5 @@ var NAVTREEINDEX1 =
 "as__const_8h.html#a37898bc9977a702de0778a9bb660ec3e":[8,0,2,30,6,0],
 "as__const_8h.html#a3f867a238882d97da88bccd5aeb93c19":[8,0,2,30,6,1],
 "as__const_8h.html#aacfa8ae594f0e89e740896da858090d7":[8,0,2,30,6,2],
-"as__const_8h_source.html":[8,0,2,30,6],
-"as__mode_8cpp.html":[8,0,2,9,8],
-"as__mode_8cpp.html#a2ea7020b16069f24354c21f6342170dd":[8,0,2,9,8,0],
-"as__mode_8cpp_source.html":[8,0,2,9,8],
-"as__mode_8h.html":[8,0,2,9,9]
+"as__const_8h_source.html":[8,0,2,30,6]
 };
