@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr.h>
 
+#include "merge_irep.h"
+
 /// This is unused by this implementation of guards, but can be used by other
 /// implementations of the same interface.
 struct guard_expr_managert
@@ -34,6 +36,10 @@ public:
   {
     expr = other.expr;
     return *this;
+  }
+
+  void merge_guard(merge_irept& merge_irep){
+    merge_irep(expr);
   }
 
   void add(const exprt &expr);

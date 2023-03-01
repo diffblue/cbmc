@@ -54,7 +54,7 @@ public:
   // to be executed. The easiest example is an if/else: each instruction along
   // the if branch will be guarded by the condition of the if (and if there
   // is an else branch then instructions on it will be guarded by the negation
-  // of the condition of the if).
+  // of the condition of the if). Invariant: guard is always merged.
   guardt guard;
 
   /// Is this code reachable? If not we can take shortcuts such as not entering

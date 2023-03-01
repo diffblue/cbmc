@@ -232,8 +232,10 @@ void symex_assignt::assign_non_struct_symbol(
       ? symex_targett::assignment_typet::HIDDEN
       : assignment_type;
 
+  exprt assignment_guard = make_and(state.guard.as_expr(), conjunction(guard));
+  target.merge_irep(assignment_guard);
   target.assignment(
-    make_and(state.guard.as_expr(), conjunction(guard)),
+    assignment_guard,
     l2_lhs,
     l2_full_lhs,
     get_original_name(l2_full_lhs),

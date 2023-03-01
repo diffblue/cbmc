@@ -29,7 +29,7 @@ struct framet
   std::map<goto_programt::const_targett, goto_state_listt> goto_state_map;
   symex_targett::sourcet calling_location;
   std::vector<irep_idt> parameter_names;
-  guardt guard_at_function_start;
+  guardt guard_at_function_start; // merged
   goto_programt::const_targett end_of_function;
   exprt call_lhs = nil_exprt();                // cleaned, but not renamed
   optionalt<symbol_exprt> return_value_symbol; // not renamed

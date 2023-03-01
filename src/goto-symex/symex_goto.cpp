@@ -537,7 +537,9 @@ void goto_symext::symex_goto(statet &state)
         state.guard.add(guard_expr);
         new_state.guard.add(boolean_negate(guard_expr));
       }
+      new_state.guard.merge_guard(target.merge_irep);
     }
+    state.guard.merge_guard(target.merge_irep);
   }
 }
 
@@ -643,8 +645,10 @@ void goto_symext::merge_gotos(statet &state)
   frame.goto_state_map.erase(state_map_it);
 }
 
-static guardt
-merge_state_guards(goto_statet &goto_state, goto_symex_statet &state)
+static guardt merge_state_guards(
+  goto_statet &goto_state,
+  goto_symex_statet &state,
+  merge_irept &merge_irep)
 {
   // adjust guard, even using guards from unreachable states. This helps to
   // shrink the state guard if the incoming edge is from a path that was
@@ -663,6 +667,7 @@ merge_state_guards(goto_statet &goto_state, goto_symex_statet &state)
     state.guard.disjunction_may_simplify(goto_state.guard))
   {
     state.guard |= goto_state.guard;
+    state.guard.merge_guard(merge_irep);
     return std::move(state.guard);
   }
   else if(!state.reachable && goto_state.reachable)
@@ -688,7 +693,7 @@ void goto_symext::merge_goto(
 
   // Merge guards. Don't write this to `state` yet because we might move
   // goto_state over it below.
-  guardt new_guard = merge_state_guards(goto_state, state);
+  guardt new_guard = merge_state_guards(goto_state, state, target.merge_irep);
 
   // Merge constant propagator, value-set etc. only if the incoming state is
   // reachable:

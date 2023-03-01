@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 
 #include <util/invariant.h>
-#include <util/merge_irep.h>
 #include <util/message.h>
 #include <util/narrow.h>
 
@@ -286,7 +285,6 @@ protected:
   messaget log;
 
   // for enforcing sharing in the expressions stored
-  merge_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
 
   // for unique I/O identifiers
