@@ -61,6 +61,7 @@ var NAVTREEINDEX2 =
 "background-concepts.html#representations_section":[0,4,8,0],
 "background-concepts.html#smt_etc_subsubsection":[0,4,8,1,0,3],
 "background-concepts.html#static_analysis_section":[0,4,8,1,1],
+"background-concepts.html#symbol_table_section":[0,4,8,0,0,0],
 "background-concepts.html#verification_condition_subsection":[0,4,8,2,2],
 "base__exceptions_8h.html":[8,0,2,30,7],
 "base__exceptions_8h_source.html":[8,0,2,30,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "boolbv__add__sub_8cpp_source.html":[8,0,2,27,1,5],
 "boolbv__array_8cpp.html":[8,0,2,27,1,6],
 "boolbv__array_8cpp_source.html":[8,0,2,27,1,6],
-"boolbv__array__of_8cpp.html":[8,0,2,27,1,7],
-"boolbv__array__of_8cpp_source.html":[8,0,2,27,1,7]
+"boolbv__array__of_8cpp.html":[8,0,2,27,1,7]
 };
