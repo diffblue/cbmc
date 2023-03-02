@@ -112,5 +112,5 @@ fn main() {
         libraries_path.display()
     );
 
-    println!("cargo:rustc-link-lib=static=cprover.5.77.0");
+    println!("cargo:rustc-link-lib=static=cprover.5.78.0");
 }
