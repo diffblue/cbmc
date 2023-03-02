@@ -1,5 +1,6 @@
 var NAVTREEINDEX12 =
 {
+"classbinary__exprt.html#ad171bd5ad107f54276a64faf3e9917ba":[7,0,107,11],
 "classbinary__exprt.html#aecf3ca7a02c27960ed5764c3d95cf8c1":[7,0,107,8],
 "classbinary__functional__enumeratort.html":[7,0,108],
 "classbinary__functional__enumeratort.html#a077cc6544f6478e79533709ba12e6de1":[7,0,108,6],
@@ -187,6 +188,9 @@ var NAVTREEINDEX12 =
 "classboolbvt.html#afc30e3a26633fdd144110fdba10050db":[7,0,122,16],
 "classboolbvt.html#afdbcfa89e7f566b60de0fdab83ad01cb":[7,0,122,100],
 "classboolbvt_1_1quantifiert.html":[7,0,122,0],
+"classboolbvt_1_1quantifiert.html#a4a18882112bb42f20e82f10959e39dff":[7,0,122,0,0],
+"classboolbvt_1_1quantifiert.html#a70229148e94ceb4fc902befe35c923dc":[7,0,122,0,2],
+"classboolbvt_1_1quantifiert.html#a845311bd0bef084cfc67a08df743d875":[7,0,122,0,1],
 "classbswap__exprt.html":[7,0,124],
 "classbswap__exprt.html#a07b52c385c5a9c931cfbcd2a4101bb77":[7,0,124,1],
 "classbswap__exprt.html#a92423b8af0a54075314441dcf674d78c":[7,0,124,2],
@@ -210,11 +214,6 @@ var NAVTREEINDEX12 =
 "classbv__arithmetict.html#a760827203558b065c064cebae5a386d8":[7,0,125,25],
 "classbv__arithmetict.html#a840b0d070648e2e531baa9795626f857":[7,0,125,5],
 "classbv__arithmetict.html#a917ade3f7ac5711155ab77755bed15e5":[7,0,125,3],
-"classbv__refinementt.html#a04644ff79d5e61f4e6eeff9549438904":[7,0,132,14],
-"":[6,0,11],
-"classboolbvt_1_1quantifiert.html#a4a18882112bb42f20e82f10959e39dff":[7,0,122,0,0],
-"classboolbvt_1_1quantifiert.html#a70229148e94ceb4fc902befe35c923dc":[7,0,122,0,2],
-"classboolbvt_1_1quantifiert.html#a845311bd0bef084cfc67a08df743d875":[7,0,122,0,1],
 "classbv__arithmetict.html#a9a7a8e87a1b807a9889597a5b5843857":[7,0,125,8],
 "classbv__arithmetict.html#aaa288de4e57f66e1f97d23cb73587b68":[7,0,125,14],
 "classbv__arithmetict.html#aae6a9ba7fb1d61fe5146bd8c9fe59241":[7,0,125,11],
@@ -249,5 +248,6 @@ var NAVTREEINDEX12 =
 "classbv__minimizet.html#acba2107f752b631557918b86c4668fc9":[7,0,128,3],
 "classbv__minimizing__dect.html":[7,0,129],
 "classbv__minimizing__dect.html#a2ab8a4a3b6b21defd4828773eb1c4edd":[7,0,129,2],
-"classbv__minimizing__dect.html#a492cac51939ec108aeb9679d332272cd":[7,0,129,1]
+"classbv__minimizing__dect.html#a492cac51939ec108aeb9679d332272cd":[7,0,129,1],
+"classbv__minimizing__dect.html#a95d0b08bcfe7b8ad2c555a56f68e813f":[7,0,129,3]
 };
