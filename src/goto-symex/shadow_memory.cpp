@@ -112,8 +112,7 @@ shadow_memory_field_definitionst shadow_memoryt::gather_field_declarations(
       if(!target->is_function_call())
         continue;
 
-      const auto &code_function_call =
-        to_code_function_call(target->get_code());
+      const auto &code_function_call = to_code_function_call(target->code());
       const exprt &function = code_function_call.function();
 
       if(function.id() != ID_symbol)
