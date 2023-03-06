@@ -1,4 +1,4 @@
-project(CBMC)
+project(CBMC VERSION ${CBMC_VERSION})
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
