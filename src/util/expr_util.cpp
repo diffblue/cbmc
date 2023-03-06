@@ -239,8 +239,12 @@ bool is_constantt::is_constant(const exprt &expr) const
     expr.id() == ID_typecast || expr.id() == ID_array_of ||
     expr.id() == ID_plus || expr.id() == ID_mult || expr.id() == ID_array ||
     expr.id() == ID_with || expr.id() == ID_struct || expr.id() == ID_union ||
-    expr.id() == ID_empty_union ||
-    expr.id() == ID_byte_update_big_endian ||
+    expr.id() == ID_empty_union || expr.id() == ID_equal ||
+    expr.id() == ID_notequal || expr.id() == ID_lt || expr.id() == ID_le ||
+    expr.id() == ID_gt || expr.id() == ID_ge || expr.id() == ID_if ||
+    expr.id() == ID_not || expr.id() == ID_and || expr.id() == ID_or ||
+    expr.id() == ID_bitnot || expr.id() == ID_bitand || expr.id() == ID_bitor ||
+    expr.id() == ID_bitxor || expr.id() == ID_byte_update_big_endian ||
     expr.id() == ID_byte_update_little_endian)
   {
     return std::all_of(
