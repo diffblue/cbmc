@@ -1,5 +1,6 @@
 var NAVTREEINDEX97 =
 {
+"gcc__builtin__headers__ubsan_8h.html#a81a68a9c2cf4012c58ef3c14bdc24d22":[8,0,2,1,0,18,118],
 "gcc__builtin__headers__ubsan_8h.html#a832fa179d694593981caa661921783f3":[8,0,2,1,0,18,93],
 "gcc__builtin__headers__ubsan_8h.html#a838e9729d01e75d2ace4c7e04f9eec10":[8,0,2,1,0,18,126],
 "gcc__builtin__headers__ubsan_8h.html#a854fb774a94a4aaac39b6f417bba442a":[8,0,2,1,0,18,86],
@@ -189,8 +190,8 @@ var NAVTREEINDEX97 =
 "global__may__alias_8cpp_source.html":[8,0,2,0,29],
 "global__may__alias_8h.html":[8,0,2,0,30],
 "global__may__alias_8h_source.html":[8,0,2,0,30],
-"globals.html":[8,1,0,0],
 "globals.html":[8,1,0],
+"globals.html":[8,1,0,0],
 "globals_a.html":[8,1,0,1],
 "globals_b.html":[8,1,0,2],
 "globals_c.html":[8,1,0,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX97 =
 "globals_f.html":[8,1,0,6],
 "globals_func.html":[8,1,1],
 "globals_func.html":[8,1,1,0],
-"globals_func_a.html":[8,1,1,1],
-"globals_func_b.html":[8,1,1,2]
+"globals_func_a.html":[8,1,1,1]
 };
