@@ -1,4 +1,4 @@
-project(JBMC)
+project(JBMC VERSION ${CBMC_VERSION})
 
 #   Set the public include locations for a target.
 macro(generic_includes name)

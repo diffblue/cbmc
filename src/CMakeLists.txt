@@ -1,11 +1,3 @@
-file(STRINGS
-        "${CMAKE_CURRENT_SOURCE_DIR}/config.inc"
-        cbmc_version_string
-        REGEX "CBMC_VERSION.*")
-
-string(REGEX REPLACE "CBMC_VERSION = (.*)" "\\1" CBMC_VERSION "${cbmc_version_string}")
-unset(cbmc_version_string)
-
 project(CBMC VERSION ${CBMC_VERSION})
 
 find_package(BISON REQUIRED)
