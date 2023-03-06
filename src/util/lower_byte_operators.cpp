@@ -337,16 +337,21 @@ static exprt bv_to_expr(
 {
   PRECONDITION(can_cast_type<bitvector_typet>(bitvector_expr.type()));
 
-  if(
-    can_cast_type<bitvector_typet>(target_type) ||
-    target_type.id() == ID_c_enum || target_type.id() == ID_c_enum_tag ||
-    target_type.id() == ID_string)
+  if(target_type.id() == ID_floatbv)
   {
     std::size_t width = to_bitvector_type(bitvector_expr.type()).get_width();
     exprt bv_expr =
       typecast_exprt::conditional_cast(bitvector_expr, bv_typet{width});
     return simplify_expr(
       typecast_exprt::conditional_cast(bv_expr, target_type), ns);
+  }
+  else if(
+    can_cast_type<bitvector_typet>(target_type) ||
+    target_type.id() == ID_c_enum || target_type.id() == ID_c_enum_tag ||
+    target_type.id() == ID_string)
+  {
+    return simplify_expr(
+      typecast_exprt::conditional_cast(bitvector_expr, target_type), ns);
   }
 
   if(target_type.id() == ID_struct)
