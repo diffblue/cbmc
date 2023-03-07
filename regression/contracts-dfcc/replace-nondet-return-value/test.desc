@@ -1,4 +1,4 @@
-CORE dfcc-only
+CORE
 main.c
 --dfcc main --replace-call-with-contract cmp
 ^EXIT=10$

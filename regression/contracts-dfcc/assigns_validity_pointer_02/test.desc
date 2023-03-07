@@ -1,9 +1,9 @@
-CORE dfcc-only
+CORE
 main.c
 --dfcc main --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
-^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^\[foo.postcondition.\d+\] line \d+ Check ensures clause( of contract contract::foo for function foo)?: SUCCESS$
 ^\[bar.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^\[bar.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
 ^\[baz.assigns.\d+\] line \d+ Check that \*z is assignable: SUCCESS$

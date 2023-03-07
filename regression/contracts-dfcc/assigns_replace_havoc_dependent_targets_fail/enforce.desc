@@ -1,4 +1,4 @@
-CORE dfcc-only
+CORE
 main_enforce.c
 --dfcc main --enforce-contract resize_vec _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
 ^VERIFICATION SUCCESSFUL$

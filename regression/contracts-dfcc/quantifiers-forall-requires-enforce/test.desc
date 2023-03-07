@@ -1,9 +1,9 @@
-CORE dfcc-only
+CORE
 main.c
 --dfcc main --enforce-contract f1
 ^EXIT=0$
 ^SIGNAL=0$
-^\[f1.postcondition.\d+\] line \d+ Check ensures clause of contract contract::f1 for function f1: SUCCESS$
+^\[f1.postcondition.\d+\] line \d+ Check ensures clause( of contract contract::f1 for function f1)?: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

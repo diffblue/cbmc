@@ -1,9 +1,9 @@
-CORE dfcc-only
+CORE
 main.c
 --dfcc main --replace-call-with-contract f1
 ^EXIT=0$
 ^SIGNAL=0$
-^\[f1.precondition.\d+\] line \d+ Check requires clause of contract contract::f1 for function f1: SUCCESS$
+^\[f1.precondition.\d+\] line \d+ Check requires clause of (contract contract::f1 for function f1|f1 in main): SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

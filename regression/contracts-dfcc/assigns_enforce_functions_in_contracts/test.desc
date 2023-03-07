@@ -1,4 +1,4 @@
-CORE dfcc-only
+CORE
 main.c
 --dfcc main --enforce-contract foo
 ^EXIT=0$
