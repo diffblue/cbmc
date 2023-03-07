@@ -166,7 +166,7 @@ $(document).ready(function(){initNavTree('printf__formatter_8cpp_source.html',''
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    ch=<a class="code" href="classprintf__formattert.html#a50469d1baa32040e7e468daf8df1919c">next</a>();</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">while</span>(isdigit(ch)) <span class="comment">// width</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">while</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(ch)) <span class="comment">// width</span></div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    format_constant.<a class="code" href="classformat__spect.html#aa1cd8144e313718797fa2b93fdaffe8f">min_width</a>*=10;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    format_constant.<a class="code" href="classformat__spect.html#aa1cd8144e313718797fa2b93fdaffe8f">min_width</a>+=ch-<span class="charliteral">&#39;0&#39;</span>;</div>
@@ -178,7 +178,7 @@ $(document).ready(function(){initNavTree('printf__formatter_8cpp_source.html',''
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    format_constant.<a class="code" href="classformat__spect.html#a9f6bb006aa64107b59a663f544297086">precision</a>=0;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    ch=<a class="code" href="classprintf__formattert.html#a50469d1baa32040e7e468daf8df1919c">next</a>();</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">while</span>(isdigit(ch))</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">while</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(ch))</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      format_constant.<a class="code" href="classformat__spect.html#a9f6bb006aa64107b59a663f544297086">precision</a>*=10;</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      format_constant.<a class="code" href="classformat__spect.html#a9f6bb006aa64107b59a663f544297086">precision</a>+=ch-<span class="charliteral">&#39;0&#39;</span>;</div>
@@ -316,6 +316,7 @@ $(document).ready(function(){initNavTree('printf__formatter_8cpp_source.html',''
 <div class="ttc" id="aclassprintf__formattert_html_af5c34cba8bfce498b41ee474801cbf97"><div class="ttname"><a href="classprintf__formattert.html#af5c34cba8bfce498b41ee474801cbf97">printf_formattert::process_char</a></div><div class="ttdeci">void process_char(std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="printf__formatter_8cpp_source.html#l00183">printf_formatter.cpp:183</a></div></div>
 <div class="ttc" id="aclasstypecast__exprt_html"><div class="ttname"><a href="classtypecast__exprt.html">typecast_exprt</a></div><div class="ttdoc">Semantic type conversion.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02016">std_expr.h:2017</a></div></div>
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
+<div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
 <div class="ttc" id="aformat__constant_8h_html"><div class="ttname"><a href="format__constant_8h.html">format_constant.h</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html"><div class="ttname"><a href="pointer__expr_8h.html">pointer_expr.h</a></div><div class="ttdoc">API to expression classes for Pointers.</div></div>
 <div class="ttc" id="apointer__expr_8h_html_af3c9bf0da53bd25369f3d3095d471bcc"><div class="ttname"><a href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a></div><div class="ttdeci">const address_of_exprt &amp; to_address_of_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an address_of_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00489">pointer_expr.h:489</a></div></div>

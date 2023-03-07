@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('ctokenit_8cpp_source.html',''); initRe
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">return</span> pre_increment;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">   33</a></span>&#160;<a class="code" href="classctokenitt.html">ctokenitt</a> <a class="code" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">match_bracket</a>(<a class="code" href="classctokenitt.html">ctokenitt</a> t, <span class="keywordtype">char</span> open, <span class="keywordtype">char</span> close)</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">   33</a></span>&#160;<a class="code" href="classctokenitt.html">ctokenitt</a> <a class="code" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">match_bracket</a>(<a class="code" href="classctokenitt.html">ctokenitt</a> t, <span class="keywordtype">char</span> open, <span class="keywordtype">char</span> <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>)</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">if</span>(!t)</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">return</span> t;</div>
@@ -138,13 +138,13 @@ $(document).ready(function(){initNavTree('ctokenit_8cpp_source.html',''); initRe
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  {</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">if</span>(!t)</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classinvalid__input__exceptiont.html">invalid_input_exceptiont</a>(<span class="stringliteral">&quot;expected &quot;</span> + std::string(1, close));</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classinvalid__input__exceptiont.html">invalid_input_exceptiont</a>(<span class="stringliteral">&quot;expected &quot;</span> + std::string(1, <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>));</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;token = *(t++);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span>(token == open)</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      bracket_count++;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(token == close)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(token == <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    {</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      bracket_count--;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordflow">if</span>(bracket_count == 0)</div>
@@ -154,9 +154,9 @@ $(document).ready(function(){initNavTree('ctokenit_8cpp_source.html',''); initRe
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<a class="code" href="classctokenitt.html">ctokenitt</a></div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="ctokenit_8cpp.html#a27719fbc762d9ce417ed531ca2f5dabc">   65</a></span>&#160;<a class="code" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">match_bracket</a>(<a class="code" href="classctokenitt.html">ctokenitt</a> t, <span class="keywordtype">char</span> open, <span class="keywordtype">char</span> close, <a class="code" href="classctokenitt.html#acac9027e8683d923dc197710e9fed8df">ctokenitt::tokenst</a> &amp;dest)</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="ctokenit_8cpp.html#a27719fbc762d9ce417ed531ca2f5dabc">   65</a></span>&#160;<a class="code" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">match_bracket</a>(<a class="code" href="classctokenitt.html">ctokenitt</a> t, <span class="keywordtype">char</span> open, <span class="keywordtype">char</span> <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>, <a class="code" href="classctokenitt.html#acac9027e8683d923dc197710e9fed8df">ctokenitt::tokenst</a> &amp;dest)</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;{</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">auto</span> end = <a class="code" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">match_bracket</a>(t, open, close);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">auto</span> end = <a class="code" href="ctokenit_8cpp.html#aa98e278a76f50ea00db5bbb6f3850a5b">match_bracket</a>(t, open, <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  std::copy(t.<a class="code" href="classctokenitt.html#a04a8d8a061abc233df0884a88677d19a">cit</a>(), end.cit(), dest.end());</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keywordflow">return</span> end;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
@@ -178,6 +178,7 @@ $(document).ready(function(){initNavTree('ctokenit_8cpp_source.html',''); initRe
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
+<div class="ttc" id="aunistd_8c_html_aacad1d135ca2779b583623678e36db7c"><div class="ttname"><a href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a></div><div class="ttdeci">int close(int fildes)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00104">unistd.c:104</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

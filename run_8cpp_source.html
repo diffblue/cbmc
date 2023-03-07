@@ -215,7 +215,7 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  }</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordflow">if</span>(result_fd == INVALID_HANDLE_VALUE)</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    perror((<span class="stringliteral">&quot;Failed to open &quot;</span> + name + <span class="stringliteral">&quot; file &quot;</span> + file).c_str());</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <a class="code" href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">perror</a>((<span class="stringliteral">&quot;Failed to open &quot;</span> + name + <span class="stringliteral">&quot; file &quot;</span> + file).c_str());</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
@@ -246,7 +246,7 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="keyword">const</span> <a class="code" href="run_8cpp.html#a1cab91719aa9c403a21a4cf4e8cf8d37">fdt</a> result_fd = open(file.c_str(), flags, mode);</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keywordflow">if</span>(result_fd == -1)</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    perror((<span class="stringliteral">&quot;Failed to open &quot;</span> + name + <span class="stringliteral">&quot; file &quot;</span> + file).c_str());</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <a class="code" href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">perror</a>((<span class="stringliteral">&quot;Failed to open &quot;</span> + name + <span class="stringliteral">&quot; file &quot;</span> + file).c_str());</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordflow">return</span> result_fd;</div>
@@ -463,7 +463,7 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160; </div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;      std::vector&lt;char *&gt; _argv(argv.size()+1);</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;argv.size(); i++)</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        _argv[i]=strdup(argv[i].c_str());</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        _argv[i]=<a class="code" href="string_8c.html#a2c4f14c424a31db9c57fd046c3b9f0df">strdup</a>(argv[i].c_str());</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      _argv[argv.size()]=<span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
@@ -478,8 +478,8 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      execvp(what.c_str(), _argv.data());</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      <span class="comment">/* usually no return */</span></div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      perror(std::string(<span class="stringliteral">&quot;execvp &quot;</span>+what+<span class="stringliteral">&quot; failed&quot;</span>).c_str());</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      exit(1);</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <a class="code" href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">perror</a>(std::string(<span class="stringliteral">&quot;execvp &quot;</span>+what+<span class="stringliteral">&quot; failed&quot;</span>).c_str());</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <a class="code" href="stdlib_8c.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a>(1);</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    }</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">else</span> <span class="comment">/* fork() returns new pid to the parent process */</span></div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    {</div>
@@ -500,13 +500,13 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        {</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;          <a class="code" href="signal__catcher_8cpp.html#ac2fe251653825161c628a05a4ba646c2">unregister_child</a>();</div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;          perror(<span class="stringliteral">&quot;Waiting for child process failed&quot;</span>);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;          <a class="code" href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">perror</a>(<span class="stringliteral">&quot;Waiting for child process failed&quot;</span>);</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;          <span class="keywordflow">if</span>(stdin_fd!=STDIN_FILENO)</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;            close(stdin_fd);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;            <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stdin_fd);</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;          <span class="keywordflow">if</span>(stdout_fd!=STDOUT_FILENO)</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;            close(stdout_fd);</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;            <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stdout_fd);</div>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;          <span class="keywordflow">if</span>(stderr_fd != STDERR_FILENO)</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            close(stderr_fd);</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stderr_fd);</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;          <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        }</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      }</div>
@@ -514,11 +514,11 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      <a class="code" href="signal__catcher_8cpp.html#ac2fe251653825161c628a05a4ba646c2">unregister_child</a>();</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      <span class="keywordflow">if</span>(stdin_fd!=STDIN_FILENO)</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        close(stdin_fd);</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stdin_fd);</div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;      <span class="keywordflow">if</span>(stdout_fd!=STDOUT_FILENO)</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        close(stdout_fd);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stdout_fd);</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;      <span class="keywordflow">if</span>(stderr_fd != STDERR_FILENO)</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        close(stderr_fd);</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stderr_fd);</div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160; </div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;      <span class="keywordflow">return</span> WEXITSTATUS(status);</div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
@@ -529,11 +529,11 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    sigprocmask(SIG_SETMASK, &amp;old_mask, <span class="keyword">nullptr</span>);</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160; </div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="keywordflow">if</span>(stdin_fd!=STDIN_FILENO)</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;      close(stdin_fd);</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;      <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stdin_fd);</div>
 <div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="keywordflow">if</span>(stdout_fd!=STDOUT_FILENO)</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;      close(stdout_fd);</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;      <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stdout_fd);</div>
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    <span class="keywordflow">if</span>(stderr_fd != STDERR_FILENO)</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      close(stderr_fd);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(stderr_fd);</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  }</div>
@@ -659,7 +659,7 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;  <span class="keywordflow">if</span>(stream!=<span class="keyword">nullptr</span>)</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;  {</div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;    <span class="keywordtype">int</span> ch;</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="keywordflow">while</span>((ch=fgetc(stream))!=EOF)</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="keywordflow">while</span>((ch=<a class="code" href="stdio_8c.html#ab11a990e4f8863a1e7736e3c1d430092">fgetc</a>(stream))!=EOF)</div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;      std_output &lt;&lt; (<span class="keywordtype">unsigned</span> char)ch;</div>
 <div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="keywordtype">int</span> result = pclose(stream);</div>
@@ -681,9 +681,14 @@ $(document).ready(function(){initNavTree('run_8cpp_source.html',''); initResizab
 <div class="ttc" id="asignal__catcher_8cpp_html_ac2fe251653825161c628a05a4ba646c2"><div class="ttname"><a href="signal__catcher_8cpp.html#ac2fe251653825161c628a05a4ba646c2">unregister_child</a></div><div class="ttdeci">void unregister_child()</div><div class="ttdef"><b>Definition:</b> <a href="signal__catcher_8cpp_source.html#l00033">signal_catcher.cpp:33</a></div></div>
 <div class="ttc" id="asignal__catcher_8h_html"><div class="ttname"><a href="signal__catcher_8h.html">signal_catcher.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
+<div class="ttc" id="astdio_8c_html_ab11a990e4f8863a1e7736e3c1d430092"><div class="ttname"><a href="stdio_8c.html#ab11a990e4f8863a1e7736e3c1d430092">fgetc</a></div><div class="ttdeci">int fgetc(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00567">stdio.c:567</a></div></div>
+<div class="ttc" id="astdio_8c_html_ab39f9634fa53ffd52b87431f3afab11b"><div class="ttname"><a href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">perror</a></div><div class="ttdeci">void perror(const char *s)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00809">stdio.c:809</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a55e99c539cf7723ec15e856b7e0a8cee"><div class="ttname"><a href="stdlib_8c.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a></div><div class="ttdeci">void exit(int status)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00069">stdlib.c:69</a></div></div>
+<div class="ttc" id="astring_8c_html_a2c4f14c424a31db9c57fd046c3b9f0df"><div class="ttname"><a href="string_8c.html#a2c4f14c424a31db9c57fd046c3b9f0df">strdup</a></div><div class="ttdeci">char * strdup(const char *str)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00590">string.c:590</a></div></div>
 <div class="ttc" id="atempfile_8h_html"><div class="ttname"><a href="tempfile_8h.html">tempfile.h</a></div></div>
 <div class="ttc" id="aunicode_8cpp_html_a684683d701fe53be069b2e5f883044cd"><div class="ttname"><a href="unicode_8cpp.html#a684683d701fe53be069b2e5f883044cd">widen</a></div><div class="ttdeci">std::wstring widen(const char *s)</div><div class="ttdef"><b>Definition:</b> <a href="unicode_8cpp_source.html#l00048">unicode.cpp:48</a></div></div>
 <div class="ttc" id="aunicode_8h_html"><div class="ttname"><a href="unicode_8h.html">unicode.h</a></div></div>
+<div class="ttc" id="aunistd_8c_html_aacad1d135ca2779b583623678e36db7c"><div class="ttname"><a href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a></div><div class="ttdeci">int close(int fildes)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00104">unistd.c:104</a></div></div>
 <div class="ttc" id="aunit_2testing-utils_2invariant_8h_html"><div class="ttname"><a href="unit_2testing-utils_2invariant_8h.html">invariant.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

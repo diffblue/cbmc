@@ -946,7 +946,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;  <span class="comment">// As such, any path that jumps outside of the loop or jumps backwards</span></div>
 <div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;  <span class="comment">// to a location other than the loop header (i.e. a nested loop) is not</span></div>
 <div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;  <span class="comment">// one we&#39;re interested in, and we&#39;ll redirect it to this assume(false).</span></div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> kill =</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a> =</div>
 <div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    <a class="code" href="classdisjunctive__polynomial__accelerationt.html#a73c48d5dad1ae1f1926e84c4b2be73de">fixed</a>.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
 <div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160; </div>
 <div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;  <span class="comment">// Make a sentinel instruction to mark the end of the loop body.</span></div>
@@ -1033,7 +1033,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;          {</div>
 <div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;            <span class="comment">// Case 2: a forward jump out of the loop.  Kill.</span></div>
 <div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
+<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;            fixedt-&gt;targets.push_back(<a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a>);</div>
 <div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;          }</div>
 <div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;        }</div>
 <div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;        <span class="keywordflow">else</span></div>
@@ -1050,7 +1050,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;          {</div>
 <div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;            <span class="comment">// Case 4: a nested loop.  Kill.</span></div>
 <div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
+<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;            fixedt-&gt;targets.push_back(<a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a>);</div>
 <div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;          }</div>
 <div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;        }</div>
 <div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;      }</div>
@@ -1227,6 +1227,7 @@ $(document).ready(function(){initNavTree('disjunctive__polynomial__acceleration_
 <div class="ttc" id="areplace__expr_8cpp_html_aab92a05844d0a7899fc516fe37f4e786"><div class="ttname"><a href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a></div><div class="ttdeci">bool replace_expr(const exprt &amp;what, const exprt &amp;by, exprt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="replace__expr_8cpp_source.html#l00012">replace_expr.cpp:12</a></div></div>
 <div class="ttc" id="areplace__expr_8h_html"><div class="ttname"><a href="replace__expr_8h.html">replace_expr.h</a></div></div>
 <div class="ttc" id="ascratch__program_8h_html"><div class="ttname"><a href="scratch__program_8h.html">scratch_program.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
+<div class="ttc" id="asignal_8c_html_a4539db972bcf3dd8c8b429af0dc3789d"><div class="ttname"><a href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a></div><div class="ttdeci">int kill(pid_t pid, int sig)</div><div class="ttdef"><b>Definition:</b> <a href="signal_8c_source.html#l00015">signal.c:15</a></div></div>
 <div class="ttc" id="asimplify__expr_8cpp_html_a02e7eaea06c1c477751552efb37dd4b1"><div class="ttname"><a href="simplify__expr_8cpp.html#a02e7eaea06c1c477751552efb37dd4b1">simplify</a></div><div class="ttdeci">bool simplify(exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03071">simplify_expr.cpp:3071</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>

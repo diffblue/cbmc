@@ -308,11 +308,13 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="keywordtype">void</span> resize(vect *v)</div>
 <div class="line">__CPROVER_assigns(v-&gt;arr, v-&gt;size, <a class="code" href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a>(v-&gt;arr))</div>
 <div class="line">{</div>
-<div class="line">  free(v-&gt;arr);</div>
+<div class="line">  <a class="code" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(v-&gt;arr);</div>
 <div class="line">  v-&gt;size += 10 * <span class="keyword">sizeof</span>(int);</div>
-<div class="line">  v-&gt;arr = malloc(v-&gt;size);</div>
+<div class="line">  v-&gt;arr = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(v-&gt;size);</div>
 <div class="line">}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a84fcea3f7109884566cb6e4e934abf13"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a></div><div class="ttdeci">__CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *)</div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
+<div class="ttc" id="astdlib_8c_html_afbedc913aa4651b3c3b4b3aecd9b4711"><div class="ttname"><a href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a></div><div class="ttdeci">void free(void *ptr)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00284">stdlib.c:284</a></div></div>
 </div><!-- fragment --><p>To havoc these dependent targets simultaneously, we first take snapshots of their addresses, and havoc them in a second time. Snapshotting and havocking are both guarded by the validity of the target. </p>
 
 <p class="definition">Definition at line <a class="el" href="havoc__assigns__clause__targets_8h_source.html#l00042">42</a> of file <a class="el" href="havoc__assigns__clause__targets_8h_source.html">havoc_assigns_clause_targets.h</a>.</p>

@@ -1,6 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="5,31,112,57"/>
-<area shape="rect" id="node2" href="$structscratch__program__symext.html" title=" " alt="" coords="160,5,347,32"/>
-<area shape="rect" id="node3" href="$classsymex__bmct.html" title=" " alt="" coords="200,56,307,83"/>
-<area shape="rect" id="node4" href="$classsymex__bmc__incremental__one__loopt.html" title=" " alt="" coords="395,49,581,90"/>
+<area shape="rect" id="node1" href="$classgoto__statet.html" title="Container for data that varies per program point, e.g." alt="" coords="5,5,101,32"/>
+<area shape="rect" id="node2" href="$classgoto__symex__statet.html" title="Central data structure: state." alt="" coords="149,5,296,32"/>
 </map>

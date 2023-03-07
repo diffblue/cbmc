@@ -557,7 +557,7 @@ $(document).ready(function(){initNavTree('acceleration__utils_8cpp_source.html',
 <div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160; </div>
 <div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160; </div>
 <div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  time_t now=time(0);</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  time_t now=<a class="code" href="time_8c.html#a99ef1cb2c789827dd5db3886dccf9067">time</a>(0);</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;Adding overflow checks at &quot;</span> &lt;&lt; now &lt;&lt; <span class="stringliteral">&quot;...\n&quot;</span>;</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
@@ -570,7 +570,7 @@ $(document).ready(function(){initNavTree('acceleration__utils_8cpp_source.html',
 <div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="comment">// fn.body.instructions.swap(program.instructions);</span></div>
 <div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  now=time(0);</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  now=<a class="code" href="time_8c.html#a99ef1cb2c789827dd5db3886dccf9067">time</a>(0);</div>
 <div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;Done at &quot;</span> &lt;&lt; now &lt;&lt; <span class="stringliteral">&quot;.\n&quot;</span>;</div>
 <div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;}</div>
@@ -1061,10 +1061,10 @@ $(document).ready(function(){initNavTree('acceleration__utils_8cpp_source.html',
 <div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;    }</div>
 <div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;  }</div>
 <div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160; </div>
-<div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;write : array_writes)</div>
+<div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a> : array_writes)</div>
 <div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;  {</div>
-<div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;lhs = write;</div>
-<div class="line"><a name="l00975"></a><span class="lineno">  975</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;rhs = state[write];</div>
+<div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;lhs = <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>;</div>
+<div class="line"><a name="l00975"></a><span class="lineno">  975</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;rhs = state[<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>];</div>
 <div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160; </div>
 <div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classacceleration__utilst.html#a6a47876bcd631532228df421d7d29c81">assign_array</a>(lhs, rhs, program))</div>
 <div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;    {</div>
@@ -1493,6 +1493,8 @@ $(document).ready(function(){initNavTree('acceleration__utils_8cpp_source.html',
 <div class="ttc" id="astructmonomialt_1_1termt_html"><div class="ttname"><a href="structmonomialt_1_1termt.html">monomialt::termt</a></div><div class="ttdef"><b>Definition:</b> <a href="polynomial_8h_source.html#l00023">polynomial.h:24</a></div></div>
 <div class="ttc" id="astructmonomialt_1_1termt_html_ae2d4efe23c25127248961cb6b755dcf6"><div class="ttname"><a href="structmonomialt_1_1termt.html#ae2d4efe23c25127248961cb6b755dcf6">monomialt::termt::var</a></div><div class="ttdeci">exprt var</div><div class="ttdef"><b>Definition:</b> <a href="polynomial_8h_source.html#l00025">polynomial.h:25</a></div></div>
 <div class="ttc" id="astructmonomialt_1_1termt_html_af7f31a0408f3bc346c2c50c8319312ce"><div class="ttname"><a href="structmonomialt_1_1termt.html#af7f31a0408f3bc346c2c50c8319312ce">monomialt::termt::exp</a></div><div class="ttdeci">unsigned int exp</div><div class="ttdef"><b>Definition:</b> <a href="polynomial_8h_source.html#l00026">polynomial.h:26</a></div></div>
+<div class="ttc" id="atime_8c_html_a99ef1cb2c789827dd5db3886dccf9067"><div class="ttname"><a href="time_8c.html#a99ef1cb2c789827dd5db3886dccf9067">time</a></div><div class="ttdeci">time_t time(time_t *tloc)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00012">time.c:12</a></div></div>
+<div class="ttc" id="aunistd_8c_html_a9e58c2a6f572a2d2cdad1306d7d2b802"><div class="ttname"><a href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a></div><div class="ttdeci">ssize_t write(int fildes, const void *buf, size_t nbyte)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00160">unistd.c:160</a></div></div>
 <div class="ttc" id="autil_8cpp_html_a1541c9d453d0bd1a38540053ff3de409"><div class="ttname"><a href="util_8cpp.html#a1541c9d453d0bd1a38540053ff3de409">unsigned_poly_type</a></div><div class="ttdeci">unsignedbv_typet unsigned_poly_type()</div><div class="ttdef"><b>Definition:</b> <a href="util_8cpp_source.html#l00025">util.cpp:25</a></div></div>
 <div class="ttc" id="autil_8cpp_html_aca44eef45f84680c27689f503ea0591f"><div class="ttname"><a href="util_8cpp.html#aca44eef45f84680c27689f503ea0591f">signed_poly_type</a></div><div class="ttdeci">signedbv_typet signed_poly_type()</div><div class="ttdef"><b>Definition:</b> <a href="util_8cpp_source.html#l00020">util.cpp:20</a></div></div>
 <div class="ttc" id="autil_8h_html"><div class="ttname"><a href="util_8h.html">util.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>

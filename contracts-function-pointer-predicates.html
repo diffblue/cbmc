@@ -239,7 +239,7 @@ Replacement</h2>
 <div class="line">{</div>
 <div class="line">  <span class="keywordflow">if</span> (size &gt; 0) {</div>
 <div class="line">    <span class="keywordtype">char</span> *arr;</div>
-<div class="line">    arr = malloc(size);</div>
+<div class="line">    arr = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(size);</div>
 <div class="line">    <span class="keywordflow">if</span> (arr &amp;&amp; foo(arr, size, get_arr_fun()))</div>
 <div class="line">      <span class="keywordflow">return</span> arr;</div>
 <div class="line"> </div>
@@ -253,6 +253,7 @@ Replacement</h2>
 <div class="line">  <span class="keywordtype">size_t</span> size;</div>
 <div class="line">  <span class="keywordtype">char</span> *arr = bar(size);</div>
 <div class="line">}</div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
 </div><!-- fragment --><p> We compile, instrument and analyse the program as follows:</p>
 <div class="fragment"><div class="line">goto-cc fptr.c</div>
 <div class="line">goto-instrument \</div>

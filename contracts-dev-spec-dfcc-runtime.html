@@ -100,135 +100,160 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-dfcc-runtime.html',
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_developer_contracts_dev_spec_dfcc_runtime"></a> Back to <a class="el" href="contracts-dev-spec-dfcc.html">Dynamic Frame Condition Checking</a></p>
 <h1><a class="anchor" id="contracts-dev-spec-dfcc-runtime-data"></a>
 Write Set Data Structure</h1>
-<p>The write set type and its basic operations are implemented in the file cprover_contracts.c.</p>
-<p>Assignable ranges of bytes specified in assigns clauses are represented by the __CPROVER_contracts_car_t :</p>
+<p>The write set type and its basic operations are implemented in the file <a class="el" href="cprover__contracts_8c.html">cprover_contracts.c</a>.</p>
+<p>Assignable ranges of bytes specified in assigns clauses are represented by the <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a> :</p>
 <div class="fragment"><div class="line"><span class="comment">// A conditionally writable range of bytes.</span></div>
-<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_contracts_car_t</div>
+<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a></div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// True iff __CPROVER_w_ok(lb, size) holds at creation</span></div>
-<div class="line">  __CPROVER_bool is_writable;</div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#aabe06217f3c369d10eb6a2c5e8689aab">is_writable</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">//Size of the range in bytes</span></div>
-<div class="line">  __CPROVER_size_t size;</div>
+<div class="line">  __CPROVER_size_t <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#a1899abf178fd7fb2178171529df1befc">size</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">//Lower bound address of the range</span></div>
-<div class="line">  <span class="keywordtype">void</span> *lb;</div>
+<div class="line">  <span class="keywordtype">void</span> *<a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#a679d4a483943064e3aed3cebd45b298d">lb</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">//Upper bound address of the range</span></div>
-<div class="line">  <span class="keywordtype">void</span> *ub;</div>
-<div class="line">} __CPROVER_contracts_car_t;</div>
-</div><!-- fragment --><p>Sets of __CPROVER_contracts_car_t are represented as dynamic arrays __CPROVER_contracts_car_set_t, allocated by the __CPROVER_contracts_car_set_create function.</p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_contracts_car_set_t</div>
+<div class="line">  <span class="keywordtype">void</span> *<a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#aca0f4ed581c006aa8de5a814fdde5d66">ub</a>;</div>
+<div class="line">} <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a>;</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a></div><div class="ttdoc">A conditionally writable range of bytes.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00021">cprover_contracts.c:22</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__t_html_a1899abf178fd7fb2178171529df1befc"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#a1899abf178fd7fb2178171529df1befc">__CPROVER_contracts_car_t::size</a></div><div class="ttdeci">__CPROVER_size_t size</div><div class="ttdoc">Size of the range in bytes.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00026">cprover_contracts.c:26</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__t_html_a679d4a483943064e3aed3cebd45b298d"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#a679d4a483943064e3aed3cebd45b298d">__CPROVER_contracts_car_t::lb</a></div><div class="ttdeci">void * lb</div><div class="ttdoc">Lower bound address of the range.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00028">cprover_contracts.c:28</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__t_html_aabe06217f3c369d10eb6a2c5e8689aab"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#aabe06217f3c369d10eb6a2c5e8689aab">__CPROVER_contracts_car_t::is_writable</a></div><div class="ttdeci">__CPROVER_bool is_writable</div><div class="ttdoc">True iff __CPROVER_w_ok(lb, size) holds at creation.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00024">cprover_contracts.c:24</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__t_html_aca0f4ed581c006aa8de5a814fdde5d66"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__t.html#aca0f4ed581c006aa8de5a814fdde5d66">__CPROVER_contracts_car_t::ub</a></div><div class="ttdeci">void * ub</div><div class="ttdoc">Upper bound address of the range.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00030">cprover_contracts.c:30</a></div></div>
+</div><!-- fragment --><p>Sets of <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a> are represented as dynamic arrays <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a>, allocated by the <a class="el" href="cprover__contracts_8c.html#a747e352671906d078fedc02550639064">__CPROVER_contracts_car_set_create</a> function.</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a></div>
 <div class="line">{</div>
-<div class="line">  __CPROVER_size_t max_elems;</div>
-<div class="line">  __CPROVER_contracts_car_t *elems;</div>
-<div class="line">} __CPROVER_contracts_car_set_t;</div>
+<div class="line">  __CPROVER_size_t <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html#ab9cd5b5bd3f2fe7b815a7e4b85555c8a">max_elems</a>;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a> *<a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html#abedc8580b412ed3a87e7241e0ee26f5d">elems</a>;</div>
+<div class="line">} <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a>;</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a></div><div class="ttdoc">A set of __CPROVER_contracts_car_t.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00034">cprover_contracts.c:35</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__set__t_html_ab9cd5b5bd3f2fe7b815a7e4b85555c8a"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html#ab9cd5b5bd3f2fe7b815a7e4b85555c8a">__CPROVER_contracts_car_set_t::max_elems</a></div><div class="ttdeci">__CPROVER_size_t max_elems</div><div class="ttdoc">Maximum number of elements that can be stored in the set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00037">cprover_contracts.c:37</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__set__t_html_abedc8580b412ed3a87e7241e0ee26f5d"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html#abedc8580b412ed3a87e7241e0ee26f5d">__CPROVER_contracts_car_set_t::elems</a></div><div class="ttdeci">__CPROVER_contracts_car_t * elems</div><div class="ttdoc">An array of car_t of size max_elems.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00039">cprover_contracts.c:39</a></div></div>
 </div><!-- fragment --><p> The allocated size of a set is determined by the maximum number of targets found in the assigns clause of the contract of interest.</p>
-<p>Objects for which all bytes are assignable (or freeable) do not need to be represented as __CPROVER_contracts_car_t. They can be tracked using a single pointer or object identifier.</p>
-<p>Such sets of pointers are represented by the __CPROVER_contracts_obj_set_t data type.</p>
+<p>Objects for which all bytes are assignable (or freeable) do not need to be represented as <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a>. They can be tracked using a single pointer or object identifier.</p>
+<p>Such sets of pointers are represented by the <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> data type.</p>
 <div class="fragment"><div class="line"><span class="comment">// A set of pointers.</span></div>
-<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_contracts_obj_set_t</div>
+<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a></div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// Maximum number of elements that can be stored in the set</span></div>
-<div class="line">  __CPROVER_size_t max_elems;</div>
+<div class="line">  __CPROVER_size_t <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#accd057205d1a4243a29393598ab08493">max_elems</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// next usable index in elems if less than max_elems</span></div>
-<div class="line"><span class="comment"></span>  __CPROVER_size_t watermark;</div>
+<div class="line"><span class="comment"></span>  __CPROVER_size_t <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a65f4ae66f66d8154caf192edd0675909">watermark</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Number of elements currently in the elems array</span></div>
-<div class="line">  __CPROVER_size_t nof_elems;</div>
+<div class="line">  __CPROVER_size_t <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a9ee54f4510ae905429518e9a6b323c81">nof_elems</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff nof_elems is 0</span></div>
-<div class="line">  __CPROVER_bool <a class="code" href="document__properties_8cpp.html#a0aff1735dc2e315e2f1c4b229ea7a00d">is_empty</a>;</div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a018e3b182ffbbaf61b704cabbc43a4d3">is_empty</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff elems is indexed by the object id of the pointers</span></div>
-<div class="line">  __CPROVER_bool indexed_by_object_id;</div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a600c574843730ad00c4817cc73d60b08">indexed_by_object_id</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Array of void *pointers, indexed by their object ID or some arbitrary order</span></div>
-<div class="line">  <span class="keywordtype">void</span> **elems;</div>
-<div class="line">} __CPROVER_contracts_obj_set_t;</div>
-<div class="ttc" id="adocument__properties_8cpp_html_a0aff1735dc2e315e2f1c4b229ea7a00d"><div class="ttname"><a href="document__properties_8cpp.html#a0aff1735dc2e315e2f1c4b229ea7a00d">is_empty</a></div><div class="ttdeci">bool is_empty(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00138">document_properties.cpp:138</a></div></div>
+<div class="line">  <span class="keywordtype">void</span> **<a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a2d53c705f6ae51e32a12f5f005d790ef">elems</a>;</div>
+<div class="line">} <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a>;</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a></div><div class="ttdoc">A set of pointers.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00046">cprover_contracts.c:47</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html_a018e3b182ffbbaf61b704cabbc43a4d3"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a018e3b182ffbbaf61b704cabbc43a4d3">__CPROVER_contracts_obj_set_t::is_empty</a></div><div class="ttdeci">__CPROVER_bool is_empty</div><div class="ttdoc">True iff nof_elems is 0.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00056">cprover_contracts.c:56</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html_a2d53c705f6ae51e32a12f5f005d790ef"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a2d53c705f6ae51e32a12f5f005d790ef">__CPROVER_contracts_obj_set_t::elems</a></div><div class="ttdeci">void ** elems</div><div class="ttdoc">Array of void *pointers, indexed by their object ID or some other order.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00061">cprover_contracts.c:61</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html_a600c574843730ad00c4817cc73d60b08"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a600c574843730ad00c4817cc73d60b08">__CPROVER_contracts_obj_set_t::indexed_by_object_id</a></div><div class="ttdeci">__CPROVER_bool indexed_by_object_id</div><div class="ttdoc">True iff elems is indexed by the object id of the pointers.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00058">cprover_contracts.c:58</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html_a65f4ae66f66d8154caf192edd0675909"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a65f4ae66f66d8154caf192edd0675909">__CPROVER_contracts_obj_set_t::watermark</a></div><div class="ttdeci">__CPROVER_size_t watermark</div><div class="ttdoc">next usable index in elems if less than max_elems (1 + greatest used index in elems)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00052">cprover_contracts.c:52</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html_a9ee54f4510ae905429518e9a6b323c81"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a9ee54f4510ae905429518e9a6b323c81">__CPROVER_contracts_obj_set_t::nof_elems</a></div><div class="ttdeci">__CPROVER_size_t nof_elems</div><div class="ttdoc">Number of elements currently in the elems array.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00054">cprover_contracts.c:54</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html_accd057205d1a4243a29393598ab08493"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#accd057205d1a4243a29393598ab08493">__CPROVER_contracts_obj_set_t::max_elems</a></div><div class="ttdeci">__CPROVER_size_t max_elems</div><div class="ttdoc">Maximum number of elements that can be stored in the set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00049">cprover_contracts.c:49</a></div></div>
 </div><!-- fragment --><p>The <code>void **elem</code> array can be used in two distinct modes, controlled by the field <code>indexed_by_object_id</code>:</p><ol type="1">
 <li>When <code>indexed_by_object_id</code> is true, the container works in <em>indexed mode</em>. The <code>elems</code> array is allocated to a size <code>2^OBJECT_BITS</code>, and adding a pointer <code>p</code> to the set stores it at <code>elems[__CPROVER_POINTER_OBJECT(p)]</code>. This mode allows for efficient insertions and lookups but results in a sparse array;</li>
 <li>When <code>indexed_by_object_id</code> is false, the container works in <em>append mode</em>. <code>elems</code> is allocated to a manually specified size, and adding pointer <code>p</code> stores it at <code>elems[watermark]</code> and increments <code>watermark</code> by one. This mode densely packs all pointers at the beginning of the array and allows for iteration over the stored pointers.</li>
 </ol>
-<p>Last, actual write sets are represented by the type __CPROVER_contracts_write_set_t :</p>
+<p>Last, actual write sets are represented by the type <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> :</p>
 <div class="fragment"><div class="line"><span class="comment">// Runtime representation of a write set.</span></div>
-<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_contracts_write_set_t</div>
+<div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// Set of car derived from the contract</span></div>
-<div class="line">  __CPROVER_contracts_car_set_t contract_assigns;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a699e83e1cd0b809044b5ed21441e94b6">contract_assigns</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Set of freeable pointers derived from the contract (indexed mode)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t contract_frees;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a2a808bb121ae467d407d7add298b1535">contract_frees</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Set of freeable pointers derived from the contract (append mode)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t contract_frees_replacement;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> contract_frees_replacement;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Set of objects allocated by the function under analysis (indexed mode)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t allocated;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#adec765cab807ff3a1d1b3a5627bb95de">allocated</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Set of objects deallocated by the function under analysis (indexed mode)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t <a class="code" href="pointer__predicates_8cpp.html#a4dbdbf9567d2fe2b2eb84d2df6685aa3">deallocated</a>;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a326e808257b93a2f4e8597be24736069">deallocated</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Object set supporting the is_fresh predicate checks (indexed mode)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_ptr_t linked_is_fresh;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_ptr_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a67b3fe4cc4fdc8d7d46763a13db417c2">linked_is_fresh</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Object set recording the is_fresh allocations in post conditions</span></div>
 <div class="line">  <span class="comment">// (replacement mode only)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_ptr_t linked_allocated;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_ptr_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a094c06736a103da364ae90eab97adde4">linked_allocated</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Object set recording the deallocations (used by predicate was_freed)</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_ptr_t linked_deallocated;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_ptr_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a665a7f349c6c3f6b7fadebb7b877bbbc">linked_deallocated</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff this write set is used for contract replacement</span></div>
 <div class="line">  __CPROVER_bool replacement;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff the write set checks requires clauses in an assumption ctx</span></div>
-<div class="line">  __CPROVER_bool assume_requires_ctx;</div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a9cb6920e7f9cf4e02f19e6672e3923b2">assume_requires_ctx</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff the write set checks requires clauses in an assertion ctx</span></div>
-<div class="line">  __CPROVER_bool assert_requires_ctx;</div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a74af0cee0d0e3f6c6774c19631d7a2fa">assert_requires_ctx</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff the write set checks ensures clauses in an assumption ctx</span></div>
-<div class="line">  __CPROVER_bool assume_ensures_ctx;</div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#ae1267b986cc5aebdc5bbb380366fb22f">assume_ensures_ctx</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// True iff this write set checks ensures clauses in an assertion ctx</span></div>
-<div class="line">  __CPROVER_bool assert_ensures_ctx;</div>
-<div class="line">} __CPROVER_contracts_write_set_t;</div>
-<div class="ttc" id="apointer__predicates_8cpp_html_a4dbdbf9567d2fe2b2eb84d2df6685aa3"><div class="ttname"><a href="pointer__predicates_8cpp.html#a4dbdbf9567d2fe2b2eb84d2df6685aa3">deallocated</a></div><div class="ttdeci">exprt deallocated(const exprt &amp;pointer, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__predicates_8cpp_source.html#l00043">pointer_predicates.cpp:43</a></div></div>
+<div class="line">  __CPROVER_bool <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#ad67533ded3bb1fed61501224ffb801b5">assert_ensures_ctx</a>;</div>
+<div class="line">} <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a>;</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a094c06736a103da364ae90eab97adde4"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a094c06736a103da364ae90eab97adde4">__CPROVER_contracts_write_set_t::linked_allocated</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_ptr_t linked_allocated</div><div class="ttdoc">Object set recording the is_fresh allocations in post conditions.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00086">cprover_contracts.c:86</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a2a808bb121ae467d407d7add298b1535"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a2a808bb121ae467d407d7add298b1535">__CPROVER_contracts_write_set_t::contract_frees</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_t contract_frees</div><div class="ttdoc">Set of freeable pointers derived from the contract (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00073">cprover_contracts.c:73</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a326e808257b93a2f4e8597be24736069"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a326e808257b93a2f4e8597be24736069">__CPROVER_contracts_write_set_t::deallocated</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_t deallocated</div><div class="ttdoc">Set of objects deallocated by the function under analysis (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00081">cprover_contracts.c:81</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a665a7f349c6c3f6b7fadebb7b877bbbc"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a665a7f349c6c3f6b7fadebb7b877bbbc">__CPROVER_contracts_write_set_t::linked_deallocated</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_ptr_t linked_deallocated</div><div class="ttdoc">Object set recording the deallocations (used by was_freed)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00088">cprover_contracts.c:88</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a67b3fe4cc4fdc8d7d46763a13db417c2"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a67b3fe4cc4fdc8d7d46763a13db417c2">__CPROVER_contracts_write_set_t::linked_is_fresh</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_ptr_t linked_is_fresh</div><div class="ttdoc">Pointer to object set supporting the is_fresh predicate checks (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00084">cprover_contracts.c:84</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a699e83e1cd0b809044b5ed21441e94b6"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a699e83e1cd0b809044b5ed21441e94b6">__CPROVER_contracts_write_set_t::contract_assigns</a></div><div class="ttdeci">__CPROVER_contracts_car_set_t contract_assigns</div><div class="ttdoc">Set of car derived from the contract.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00071">cprover_contracts.c:71</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a74af0cee0d0e3f6c6774c19631d7a2fa"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a74af0cee0d0e3f6c6774c19631d7a2fa">__CPROVER_contracts_write_set_t::assert_requires_ctx</a></div><div class="ttdeci">__CPROVER_bool assert_requires_ctx</div><div class="ttdoc">True iff the write set checks requires clauses in an assertion ctx.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00092">cprover_contracts.c:92</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a9cb6920e7f9cf4e02f19e6672e3923b2"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a9cb6920e7f9cf4e02f19e6672e3923b2">__CPROVER_contracts_write_set_t::assume_requires_ctx</a></div><div class="ttdeci">__CPROVER_bool assume_requires_ctx</div><div class="ttdoc">True iff the write set checks requires clauses in an assumption ctx.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00090">cprover_contracts.c:90</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_ad67533ded3bb1fed61501224ffb801b5"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#ad67533ded3bb1fed61501224ffb801b5">__CPROVER_contracts_write_set_t::assert_ensures_ctx</a></div><div class="ttdeci">__CPROVER_bool assert_ensures_ctx</div><div class="ttdoc">True iff this write set checks ensures clauses in an assertion ctx.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00096">cprover_contracts.c:96</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_adec765cab807ff3a1d1b3a5627bb95de"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#adec765cab807ff3a1d1b3a5627bb95de">__CPROVER_contracts_write_set_t::allocated</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_t allocated</div><div class="ttdoc">Set of objects allocated by the function under analysis (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00078">cprover_contracts.c:78</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_ae1267b986cc5aebdc5bbb380366fb22f"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#ae1267b986cc5aebdc5bbb380366fb22f">__CPROVER_contracts_write_set_t::assume_ensures_ctx</a></div><div class="ttdeci">__CPROVER_bool assume_ensures_ctx</div><div class="ttdoc">True iff the write set checks ensures clauses in an assumption ctx.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00094">cprover_contracts.c:94</a></div></div>
 </div><!-- fragment --><h1><a class="anchor" id="contracts-dev-spec-dfcc-runtime-ops"></a>
 Write Set Operations</h1>
-<p>Direct links to __CPROVER_contracts_write_set_t operations documentation (full documentation available at cprover_contracts.c) :</p><ul>
-<li>__CPROVER_contracts_write_set_create</li>
-<li>__CPROVER_contracts_write_set_release</li>
-<li>__CPROVER_contracts_write_set_insert_assignable</li>
-<li>__CPROVER_contracts_write_set_insert_object_whole</li>
-<li>__CPROVER_contracts_write_set_insert_object_from</li>
-<li>__CPROVER_contracts_write_set_insert_object_upto</li>
-<li>__CPROVER_contracts_write_set_add_freeable</li>
-<li>__CPROVER_contracts_write_set_add_allocated</li>
-<li>__CPROVER_contracts_write_set_record_dead</li>
-<li>__CPROVER_contracts_write_set_record_deallocated</li>
-<li>__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty</li>
-<li>__CPROVER_contracts_write_set_check_assignment</li>
-<li>__CPROVER_contracts_write_set_check_array_set</li>
-<li>__CPROVER_contracts_write_set_check_array_copy</li>
-<li>__CPROVER_contracts_write_set_check_array_replace</li>
-<li>__CPROVER_contracts_write_set_check_havoc_object</li>
-<li>__CPROVER_contracts_write_set_check_deallocate</li>
-<li>__CPROVER_contracts_write_set_check_assigns_clause_inclusion</li>
-<li>__CPROVER_contracts_write_set_check_frees_clause_inclusion</li>
-<li>__CPROVER_contracts_write_set_deallocate_freeable</li>
-<li>__CPROVER_contracts_link_allocated</li>
-<li>__CPROVER_contracts_link_deallocated</li>
-<li>__CPROVER_contracts_is_fresh</li>
-<li>__CPROVER_contracts_write_set_havoc_get_assignable_target</li>
-<li>__CPROVER_contracts_write_set_havoc_object_whole</li>
-<li>__CPROVER_contracts_write_set_havoc_slice</li>
-<li>__CPROVER_contracts_is_freeable</li>
-<li>__CPROVER_contracts_was_freed</li>
-<li>__CPROVER_contracts_check_replace_ensures_was_freed_preconditions</li>
+<p>Direct links to <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> operations documentation (full documentation available at <a class="el" href="cprover__contracts_8c.html">cprover_contracts.c</a>) :</p><ul>
+<li><a class="el" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a183aa1a05a9396dfb4172803dc36a735">__CPROVER_contracts_write_set_insert_assignable</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a023059357223606573f59223b91628d7">__CPROVER_contracts_write_set_insert_object_whole</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#aec33025b8c4b9537c4fbf900bf5d26b6">__CPROVER_contracts_write_set_insert_object_from</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#ac83b4cc05ebd6ddd02086dc39622b9ac">__CPROVER_contracts_write_set_insert_object_upto</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a9001c894ac1e81478ade6472ef0f97b9">__CPROVER_contracts_write_set_add_freeable</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#af9410e73f11747d2c05b4670cbf1ad59">__CPROVER_contracts_write_set_add_allocated</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a275983123d6a0efe37c2292ff6d94acb">__CPROVER_contracts_write_set_record_dead</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a0d15ef1621aaeab7b113315bace80158">__CPROVER_contracts_write_set_record_deallocated</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#ad6b0d79ca5c998eb350b993c2fb364a6">__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#aa194dfba197e43707ff5b99ed45a542d">__CPROVER_contracts_write_set_check_assignment</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#afe1a3f3922f3d20be5c3eff10135456d">__CPROVER_contracts_write_set_check_array_set</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a5110f848c04f97d14ab26b1976d60cf7">__CPROVER_contracts_write_set_check_array_copy</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a700f2f33a49198001f1d0168c5ca2f55">__CPROVER_contracts_write_set_check_array_replace</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a13a068c5664dbdb170faaf882dee9a04">__CPROVER_contracts_write_set_check_havoc_object</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#aaa11edbaf34a651c60f3024fc9488df1">__CPROVER_contracts_write_set_check_deallocate</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a9884139906c3e0ee3e8400ad6fe8ed9a">__CPROVER_contracts_write_set_check_assigns_clause_inclusion</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#abac6c9f45b98a3fdf581867f033a0568">__CPROVER_contracts_write_set_check_frees_clause_inclusion</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a5a77e5845872e1f36559d4f8a1d3eb58">__CPROVER_contracts_write_set_deallocate_freeable</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#adf9fba247bc34e6fb97a9677ce9eb17c">__CPROVER_contracts_link_allocated</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a018a0d9ca28d2b11eda9af5f9f1f3058">__CPROVER_contracts_link_deallocated</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#adcedcf0706b81db9e8f217d87227f836">__CPROVER_contracts_write_set_havoc_get_assignable_target</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a5eff0ab58907fa3ed9d697ca24f14b60">__CPROVER_contracts_write_set_havoc_object_whole</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a7a0908dacc098f6878b21eb139d08ecd">__CPROVER_contracts_write_set_havoc_slice</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a94dc1661eaeee9d04229f924a61e9832">__CPROVER_contracts_is_freeable</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a947ac49e226fbeab880aa2f195d5daf1">__CPROVER_contracts_was_freed</a></li>
+<li><a class="el" href="cprover__contracts_8c.html#a32aea85f6c7e488872e663c0df6eca8c">__CPROVER_contracts_check_replace_ensures_was_freed_preconditions</a></li>
 </ul>
 <hr  />
  <table class="markdownTable">

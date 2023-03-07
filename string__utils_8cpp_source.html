@@ -110,18 +110,18 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="string__utils_8cpp.html#a7ddecd6d2b1681912e81f9911c74c111">   21</a></span>&#160;std::string <a class="code" href="string__utils_8cpp.html#a7ddecd6d2b1681912e81f9911c74c111">strip_string</a>(<span class="keyword">const</span> std::string &amp;s)</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;{</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keyword">auto</span> pred=[](<span class="keywordtype">char</span> c){ <span class="keywordflow">return</span> std::isspace(c); };</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keyword">auto</span> pred=[](<span class="keywordtype">char</span> c){ <span class="keywordflow">return</span> <a class="code" href="ctype_8c.html#a56be4166e4673843042a548a7f513dbc">std::isspace</a>(c); };</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::string::const_iterator left</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    =std::find_if_not(s.begin(), s.end(), pred);</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">if</span>(left==s.end())</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> i=std::distance(s.begin(), left);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> i=std::distance(s.begin(), left);</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  std::string::const_reverse_iterator right</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    =std::find_if_not(s.rbegin(), s.rend(), pred);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> j=std::distance(right, s.rend())-1;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> j=std::distance(right, s.rend())-1;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">return</span> s.substr(i, (j-i+1));</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
@@ -135,7 +135,7 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(result.empty());</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="comment">// delim can&#39;t be a space character if using strip</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!std::isspace(delim) || !strip);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="ctype_8c.html#a56be4166e4673843042a548a7f513dbc">std::isspace</a>(delim) || !strip);</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">if</span>(s.empty())</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  {</div>
@@ -144,11 +144,11 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> n=s.length();</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> n=s.length();</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(n &gt; 0, <span class="stringliteral">&quot;Empty string case should already be handled&quot;</span>);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> start=0;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> i;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> start=0;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> i;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">for</span>(i=0; i&lt;n; i++)</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  {</div>
@@ -186,7 +186,7 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keywordtype">bool</span> strip)</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;{</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="comment">// delim can&#39;t be a space character if using strip</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!std::isspace(delim) || !strip);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code" href="ctype_8c.html#a56be4166e4673843042a548a7f513dbc">std::isspace</a>(delim) || !strip);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  std::vector&lt;std::string&gt; result = <a class="code" href="string__utils_8cpp.html#a6ed2086ccc7c5dffe024855536192cd6">split_string</a>(s, delim, strip);</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
@@ -255,7 +255,7 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> uch{<span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">char</span><span class="keyword">&gt;</span>(ch)};</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">if</span>(ch == <span class="charliteral">&#39;_&#39;</span>)</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      escaped &lt;&lt; <span class="stringliteral">&quot;__&quot;</span>;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(isalnum(uch))</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#adf38e126f73a010f30af76db2a28c6e1">isalnum</a>(uch))</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      escaped &lt;&lt; ch;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      escaped &lt;&lt; <span class="charliteral">&#39;_&#39;</span> &lt;&lt; std::hex &lt;&lt; std::setfill(<span class="charliteral">&#39;0&#39;</span>) &lt;&lt; std::setw(2) &lt;&lt; uch;</div>
@@ -267,7 +267,7 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keywordflow">if</span>(str.empty())</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">return</span> str;</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  std::string capitalized = str;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  capitalized[0] = toupper(capitalized[0]);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  capitalized[0] = <a class="code" href="ctype_8c.html#a9c2f57ac3865af9006fdbfd5db9fd517">toupper</a>(capitalized[0]);</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="keywordflow">return</span> capitalized;</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;}</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
@@ -342,8 +342,10 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;}</div>
-<div class="ttc" id="ac__types_8cpp_html_a63b72e8e2d309c23fcb5700dd3fe4e64"><div class="ttname"><a href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">size_type</a></div><div class="ttdeci">unsignedbv_typet size_type()</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00055">c_types.cpp:55</a></div></div>
 <div class="ttc" id="aclassdeserialization__exceptiont_html"><div class="ttname"><a href="classdeserialization__exceptiont.html">deserialization_exceptiont</a></div><div class="ttdoc">Thrown when failing to deserialize a value from some low level format, like JSON or raw bytes.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00079">exception_utils.h:80</a></div></div>
+<div class="ttc" id="actype_8c_html_a56be4166e4673843042a548a7f513dbc"><div class="ttname"><a href="ctype_8c.html#a56be4166e4673843042a548a7f513dbc">isspace</a></div><div class="ttdeci">int isspace(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00080">ctype.c:80</a></div></div>
+<div class="ttc" id="actype_8c_html_a9c2f57ac3865af9006fdbfd5db9fd517"><div class="ttname"><a href="ctype_8c.html#a9c2f57ac3865af9006fdbfd5db9fd517">toupper</a></div><div class="ttdeci">int toupper(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00105">ctype.c:105</a></div></div>
+<div class="ttc" id="actype_8c_html_adf38e126f73a010f30af76db2a28c6e1"><div class="ttname"><a href="ctype_8c.html#adf38e126f73a010f30af76db2a28c6e1">isalnum</a></div><div class="ttdeci">int isalnum(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00004">ctype.c:4</a></div></div>
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
@@ -357,6 +359,7 @@ $(document).ready(function(){initNavTree('string__utils_8cpp_source.html',''); i
 <div class="ttc" id="astring__utils_8cpp_html_ab616e469cc350c81586756a6532d6a3d"><div class="ttname"><a href="string__utils_8cpp.html#ab616e469cc350c81586756a6532d6a3d">wrap_line</a></div><div class="ttdeci">std::string wrap_line(const std::string &amp;line, const std::size_t left_margin, const std::size_t width)</div><div class="ttdoc">Wrap line at spaces to not extend past the right margin, and include given padding with spaces to the...</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00184">string_utils.cpp:184</a></div></div>
 <div class="ttc" id="astring__utils_8cpp_html_aedf7437a6cb42083fa91ef582fe323a2"><div class="ttname"><a href="string__utils_8cpp.html#aedf7437a6cb42083fa91ef582fe323a2">capitalize</a></div><div class="ttdeci">std::string capitalize(const std::string &amp;str)</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00175">string_utils.cpp:175</a></div></div>
 <div class="ttc" id="astring__utils_8h_html"><div class="ttname"><a href="string__utils_8h.html">string_utils.h</a></div></div>
+<div class="ttc" id="aunistd_8c_html_adead3ef83e9181db3b1d4d7d098a18c0"><div class="ttname"><a href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a></div><div class="ttdeci">#define size_type</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00312">unistd.c:312</a></div></div>
 <div class="ttc" id="aunit_2testing-utils_2invariant_8h_html"><div class="ttname"><a href="unit_2testing-utils_2invariant_8h.html">invariant.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

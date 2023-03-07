@@ -293,7 +293,7 @@ $(document).ready(function(){initNavTree('sat__path__enumerator_8cpp_source.html
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="comment">// As such, any path that jumps outside of the loop or jumps backwards</span></div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="comment">// to a location other than the loop header (i.e. a nested loop) is not</span></div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="comment">// one we&#39;re interested in, and we&#39;ll redirect it to this assume(false).</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> kill =</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a> =</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="classsat__path__enumeratort.html#af8135227f1a09328747a4fd4d9dc6dba">fixed</a>.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a00263b318e5b3c4b70799b4e9a8c00d9">goto_programt::make_assumption</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>()));</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="comment">// Make a sentinel instruction to mark the end of the loop body.</span></div>
@@ -380,7 +380,7 @@ $(document).ready(function(){initNavTree('sat__path__enumerator_8cpp_source.html
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;          {</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;            <span class="comment">// Case 2: a forward jump out of the loop.  Kill.</span></div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            fixedt-&gt;targets.push_back(<a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a>);</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;          }</div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        }</div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keywordflow">else</span></div>
@@ -397,7 +397,7 @@ $(document).ready(function(){initNavTree('sat__path__enumerator_8cpp_source.html
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;          {</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;            <span class="comment">// Case 4: a nested loop.  Kill.</span></div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;            fixedt-&gt;targets.clear();</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            fixedt-&gt;targets.push_back(kill);</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            fixedt-&gt;targets.push_back(<a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a>);</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;          }</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        }</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      }</div>
@@ -488,6 +488,7 @@ $(document).ready(function(){initNavTree('sat__path__enumerator_8cpp_source.html
 <div class="ttc" id="aremove__skip_8h_html"><div class="ttname"><a href="remove__skip_8h.html">remove_skip.h</a></div><div class="ttdoc">Program Transformation.</div></div>
 <div class="ttc" id="asat__path__enumerator_8h_html"><div class="ttname"><a href="sat__path__enumerator_8h.html">sat_path_enumerator.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
 <div class="ttc" id="ascratch__program_8h_html"><div class="ttname"><a href="scratch__program_8h.html">scratch_program.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
+<div class="ttc" id="asignal_8c_html_a4539db972bcf3dd8c8b429af0dc3789d"><div class="ttname"><a href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a></div><div class="ttdeci">int kill(pid_t pid, int sig)</div><div class="ttdef"><b>Definition:</b> <a href="signal_8c_source.html#l00015">signal.c:15</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00510">invariant.h:510</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>

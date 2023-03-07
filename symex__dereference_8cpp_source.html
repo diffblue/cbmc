@@ -330,7 +330,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00262"></a><span class="lineno"><a class="line" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">  262</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">goto_symext::dereference_rec</a>(</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  <a class="code" href="classgoto__symex__statet.html">statet</a> &amp;state,</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="keywordtype">bool</span> write,</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>,</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="keywordtype">bool</span> is_in_binding_expression)</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;{</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_dereference)</div>
@@ -418,7 +418,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="comment">//     (p == &amp;something ? something : ...))</span></div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="comment">// Otherwise we should just return it unchanged.</span></div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      <a class="code" href="classgoto__symext.html#ad0052c7fac2ec990504f85d80f72e451">symex_config</a>.<a class="code" href="structsymex__configt.html#adb4378bf82f7dbfe323401afd186294d">cache_dereferences</a> &amp;&amp; !write &amp;&amp; !is_in_binding_expression &amp;&amp;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      <a class="code" href="classgoto__symext.html#ad0052c7fac2ec990504f85d80f72e451">symex_config</a>.<a class="code" href="structsymex__configt.html#adb4378bf82f7dbfe323401afd186294d">cache_dereferences</a> &amp;&amp; !<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a> &amp;&amp; !is_in_binding_expression &amp;&amp;</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      (tmp2.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_if || tmp2.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_let))</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    {</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      expr = <a class="code" href="classgoto__symext.html#ace878dcabea05afc08d31faa881044fe">cache_dereference</a>(tmp2, state);</div>
@@ -445,7 +445,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    tmp.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>();</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <span class="comment">// recursive call</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(tmp, state, write, is_in_binding_expression);</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(tmp, state, <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>, is_in_binding_expression);</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160; </div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    expr.<a class="code" href="classirept.html#ad18d7e80452e8f3e26217db334ad5105">swap</a>(tmp);</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  }</div>
@@ -479,11 +479,11 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      expr = <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>(<a class="code" href="classindex__exprt.html">index_exprt</a>(</div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        <a class="code" href="pointer__expr_8h.html#af3c9bf0da53bd25369f3d3095d471bcc">to_address_of_expr</a>(tc_op).<span class="keywordtype">object</span>(), <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#ac04e289766cd89f5a98137e2a2ebfb83">c_index_type</a>())));</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;      <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(expr, state, write, is_in_binding_expression);</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;      <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(expr, state, <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>, is_in_binding_expression);</div>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    }</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    {</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(tc_op, state, write, is_in_binding_expression);</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(tc_op, state, <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>, is_in_binding_expression);</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    }</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  }</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  <span class="keywordflow">else</span></div>
@@ -493,7 +493,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <a class="code" href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a>(it, expr)</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    {</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;      <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        *it, state, write, is_in_binding_expression || is_binding_expression);</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        *it, state, <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>, is_in_binding_expression || is_binding_expression);</div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    }</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  }</div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;}</div>
@@ -512,7 +512,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  <span class="keywordflow">return</span> e;</div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;}</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
-<div class="line"><a name="l00484"></a><span class="lineno"><a class="line" href="classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0">  484</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0">goto_symext::dereference</a>(<a class="code" href="classexprt.html">exprt</a> &amp;expr, <a class="code" href="classgoto__symex__statet.html">statet</a> &amp;state, <span class="keywordtype">bool</span> write)</div>
+<div class="line"><a name="l00484"></a><span class="lineno"><a class="line" href="classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0">  484</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0">goto_symext::dereference</a>(<a class="code" href="classexprt.html">exprt</a> &amp;expr, <a class="code" href="classgoto__symex__statet.html">statet</a> &amp;state, <span class="keywordtype">bool</span> <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)</div>
 <div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;{</div>
 <div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!state.<a class="code" href="classgoto__symex__statet.html#a471c34fb97f4dc36a645db6a40f0b4a9">call_stack</a>().empty());</div>
 <div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160; </div>
@@ -525,7 +525,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  });</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160; </div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  <span class="comment">// start the recursion!</span></div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(expr, state, write, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <a class="code" href="classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e">dereference_rec</a>(expr, state, <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>, <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  <span class="comment">// dereferencing may introduce new symbol_exprt</span></div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  <span class="comment">// (like __CPROVER_memory)</span></div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  expr = state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>&lt;<a class="code" href="renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7ae5bc7ee7d6dda5340a28f91834f10543">L1</a>&gt;(std::move(expr), <a class="code" href="classgoto__symext.html#a930625b05387d69db989ef3b3556bc88">ns</a>).get();</div>
@@ -556,7 +556,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;      <span class="stringliteral">&quot;simplify re-introduced dereferencing&quot;</span>);</div>
 <div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;  }</div>
 <div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160; </div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;  expr = state.<a class="code" href="classgoto__symex__statet.html#ab8a20fcfb8165beb4f7f9c5966b31917">field_sensitivity</a>.<a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(<a class="code" href="classgoto__symext.html#a930625b05387d69db989ef3b3556bc88">ns</a>, state, std::move(expr), write);</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;  expr = state.<a class="code" href="classgoto__symex__statet.html#ab8a20fcfb8165beb4f7f9c5966b31917">field_sensitivity</a>.<a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(<a class="code" href="classgoto__symext.html#a930625b05387d69db989ef3b3556bc88">ns</a>, state, std::move(expr), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
@@ -674,6 +674,7 @@ $(document).ready(function(){initNavTree('symex__dereference_8cpp_source.html','
 <div class="ttc" id="asymex__dereference_8cpp_html_a1504c6ef82dbf32fc5c4c2e6ec9fb766"><div class="ttname"><a href="symex__dereference_8cpp.html#a1504c6ef82dbf32fc5c4c2e6ec9fb766">apply_to_objects_in_dereference</a></div><div class="ttdeci">static exprt apply_to_objects_in_dereference(exprt e, const std::function&lt; exprt(exprt)&gt; &amp;f)</div><div class="ttdef"><b>Definition:</b> <a href="symex__dereference_8cpp_source.html#l00434">symex_dereference.cpp:434</a></div></div>
 <div class="ttc" id="asymex__dereference__state_8h_html"><div class="ttname"><a href="symex__dereference__state_8h.html">symex_dereference_state.h</a></div><div class="ttdoc">Symbolic Execution of ANSI-C.</div></div>
 <div class="ttc" id="atype_8h_html_a6cc4de5c7bd632a9b0d55bd66889abf3"><div class="ttname"><a href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a></div><div class="ttdeci">const type_with_subtypet &amp; to_type_with_subtype(const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00175">type.h:175</a></div></div>
+<div class="ttc" id="aunistd_8c_html_a9e58c2a6f572a2d2cdad1306d7d2b802"><div class="ttname"><a href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a></div><div class="ttdeci">ssize_t write(int fildes, const void *buf, size_t nbyte)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00160">unistd.c:160</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 <div class="ttc" id="avalue__set__dereference_8h_html"><div class="ttname"><a href="value__set__dereference_8h.html">value_set_dereference.h</a></div><div class="ttdoc">Pointer Dereferencing.</div></div>
 </div><!-- fragment --></div><!-- contents -->

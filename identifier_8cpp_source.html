@@ -127,9 +127,9 @@ $(document).ready(function(){initNavTree('identifier_8cpp_source.html',''); init
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  {</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">for</span>(; i&lt;s.size(); i++)</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">if</span>(strncmp(s.c_str()+i, <a class="code" href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a>, strlen(<a class="code" href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a>))==0)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="string_8c.html#a07f4a84c11c106e95c32b6ab509346ef">strncmp</a>(s.c_str()+i, <a class="code" href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a>, <a class="code" href="string_8c.html#aa383452fe445bfae989358c9d7d96f4f">strlen</a>(<a class="code" href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a>))==0)</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        i+=strlen(<a class="code" href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a>);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        i+=<a class="code" href="string_8c.html#aa383452fe445bfae989358c9d7d96f4f">strlen</a>(<a class="code" href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a>);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      }</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordflow">else</span></div>
@@ -146,6 +146,8 @@ $(document).ready(function(){initNavTree('identifier_8cpp_source.html',''); init
 <div class="ttc" id="aidentifier_8h_html"><div class="ttname"><a href="identifier_8h.html">identifier.h</a></div></div>
 <div class="ttc" id="aidentifier_8h_html_a4dad848390315c75eea999a0b3046e3c"><div class="ttname"><a href="identifier_8h.html#a4dad848390315c75eea999a0b3046e3c">ID_SEPARATOR</a></div><div class="ttdeci">#define ID_SEPARATOR</div><div class="ttdef"><b>Definition:</b> <a href="identifier_8h_source.html#l00016">identifier.h:16</a></div></div>
 <div class="ttc" id="astd__expr_8cpp_html_ac90ae77b82997e0b8d1091b112e694b4"><div class="ttname"><a href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a></div><div class="ttdeci">auto component(T &amp;struct_expr, const irep_idt &amp;name, const namespacet &amp;ns) -&gt; decltype(struct_expr.op0())</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8cpp_source.html#l00077">std_expr.cpp:77</a></div></div>
+<div class="ttc" id="astring_8c_html_a07f4a84c11c106e95c32b6ab509346ef"><div class="ttname"><a href="string_8c.html#a07f4a84c11c106e95c32b6ab509346ef">strncmp</a></div><div class="ttdeci">int strncmp(const char *s1, const char *s2, size_t n)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00464">string.c:464</a></div></div>
+<div class="ttc" id="astring_8c_html_aa383452fe445bfae989358c9d7d96f4f"><div class="ttname"><a href="string_8c.html#aa383452fe445bfae989358c9d7d96f4f">strlen</a></div><div class="ttdeci">size_t strlen(const char *s)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00561">string.c:561</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

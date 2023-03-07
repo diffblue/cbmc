@@ -147,13 +147,13 @@ $(document).ready(function(){initNavTree('lispexpr_8cpp_source.html',''); initRe
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
 <div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classlispexprt.html#a9ca071f4d8950e7cdbfa53a4108449ee">   54</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classlispexprt.html#a9ca071f4d8950e7cdbfa53a4108449ee">lispexprt::parse</a>(<span class="keyword">const</span> std::string &amp;s)</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> ptr=0;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> ptr=0;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classlispexprt.html#a9ca071f4d8950e7cdbfa53a4108449ee">parse</a>(s, ptr);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
 <div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classlispexprt.html#aa3fe0f88802eabce05c3612c95ee6ea9">   60</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classlispexprt.html#a9ca071f4d8950e7cdbfa53a4108449ee">lispexprt::parse</a>(</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">const</span> std::string &amp;s,</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> &amp;ptr)</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> &amp;ptr)</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  clear();</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>.clear();</div>
@@ -219,12 +219,12 @@ $(document).ready(function(){initNavTree('lispexpr_8cpp_source.html',''); initRe
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">if</span>(ptr&lt;s.size())</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      ptr++;</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(isdigit(s[ptr])) <span class="comment">// LispNumber</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(s[ptr])) <span class="comment">// LispNumber</span></div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  {</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>.reserve(10); <span class="comment">// guessing - will be adjusted automatically</span></div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <a class="code" href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">type</a>=<a class="code" href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192da4bae5a3ab699f96ab7b86ec8f219aa3b">Number</a>;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">for</span>(; ptr&lt;s.size() &amp;&amp; (isdigit(s[ptr]) || s[ptr]==<span class="charliteral">&#39;.&#39;</span>); ptr++)</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">for</span>(; ptr&lt;s.size() &amp;&amp; (<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(s[ptr]) || s[ptr]==<span class="charliteral">&#39;.&#39;</span>); ptr++)</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <a class="code" href="classlispexprt.html#a4f71fed42dc98a555c50a9735229dd61">value</a>+=s[ptr];</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  }</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordflow">else</span> <span class="comment">// must be LispSymbol</span></div>
@@ -254,7 +254,7 @@ $(document).ready(function(){initNavTree('lispexpr_8cpp_source.html',''); initRe
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">if</span>(!std::cin.read(&amp;ch, 1))</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">if</span>(!std::cin.<a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>(&amp;ch, 1))</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordflow">if</span>(ch==<span class="charliteral">&#39;\n&#39;</span>)</div>
@@ -274,7 +274,6 @@ $(document).ready(function(){initNavTree('lispexpr_8cpp_source.html',''); initRe
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;}</div>
-<div class="ttc" id="ac__types_8cpp_html_a63b72e8e2d309c23fcb5700dd3fe4e64"><div class="ttname"><a href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">size_type</a></div><div class="ttdeci">unsignedbv_typet size_type()</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00055">c_types.cpp:55</a></div></div>
 <div class="ttc" id="aclasslispexprt_html"><div class="ttname"><a href="classlispexprt.html">lispexprt</a></div><div class="ttdef"><b>Definition:</b> <a href="lispexpr_8h_source.html#l00073">lispexpr.h:74</a></div></div>
 <div class="ttc" id="aclasslispexprt_html_a08cdc5ce8a4ef959bb8969ec97fa192da19bed25bbdc77c31f5e2200525aa27d3"><div class="ttname"><a href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192da19bed25bbdc77c31f5e2200525aa27d3">lispexprt::List</a></div><div class="ttdeci">@ List</div><div class="ttdef"><b>Definition:</b> <a href="lispexpr_8h_source.html#l00076">lispexpr.h:76</a></div></div>
 <div class="ttc" id="aclasslispexprt_html_a08cdc5ce8a4ef959bb8969ec97fa192da4bae5a3ab699f96ab7b86ec8f219aa3b"><div class="ttname"><a href="classlispexprt.html#a08cdc5ce8a4ef959bb8969ec97fa192da4bae5a3ab699f96ab7b86ec8f219aa3b">lispexprt::Number</a></div><div class="ttdeci">@ Number</div><div class="ttdef"><b>Definition:</b> <a href="lispexpr_8h_source.html#l00076">lispexpr.h:76</a></div></div>
@@ -284,11 +283,14 @@ $(document).ready(function(){initNavTree('lispexpr_8cpp_source.html',''); initRe
 <div class="ttc" id="aclasslispexprt_html_a7ab33d484ad576ad6f34136560cff6f7"><div class="ttname"><a href="classlispexprt.html#a7ab33d484ad576ad6f34136560cff6f7">lispexprt::type</a></div><div class="ttdeci">enum lispexprt::@7 type</div></div>
 <div class="ttc" id="aclasslispexprt_html_a843c4983715b6505183bb6cc6da8ea13"><div class="ttname"><a href="classlispexprt.html#a843c4983715b6505183bb6cc6da8ea13">lispexprt::expr2string</a></div><div class="ttdeci">std::string expr2string() const</div><div class="ttdef"><b>Definition:</b> <a href="lispexpr_8cpp_source.html#l00015">lispexpr.cpp:15</a></div></div>
 <div class="ttc" id="aclasslispexprt_html_a9ca071f4d8950e7cdbfa53a4108449ee"><div class="ttname"><a href="classlispexprt.html#a9ca071f4d8950e7cdbfa53a4108449ee">lispexprt::parse</a></div><div class="ttdeci">bool parse(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="lispexpr_8cpp_source.html#l00054">lispexpr.cpp:54</a></div></div>
+<div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
 <div class="ttc" id="adot_8cpp_html_aa7d89ec1a8200563a90f26afed25c859"><div class="ttname"><a href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a></div><div class="ttdeci">void dot(const goto_modelt &amp;src, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00353">dot.cpp:353</a></div></div>
+<div class="ttc" id="ajava_8io_8c_html_ae816852877fb8911b6730f7b73ea93f8"><div class="ttname"><a href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a></div><div class="ttdeci">int __CPROVER_ID java::java io InputStream read</div><div class="ttdef"><b>Definition:</b> <a href="java_8io_8c_source.html#l00003">java.io.c:5</a></div></div>
 <div class="ttc" id="alispexpr_8cpp_html_a181bbc4c1165cd2f0d66838e8ce207a2"><div class="ttname"><a href="lispexpr_8cpp.html#a181bbc4c1165cd2f0d66838e8ce207a2">test_lispexpr</a></div><div class="ttdeci">int test_lispexpr()</div><div class="ttdef"><b>Definition:</b> <a href="lispexpr_8cpp_source.html#l00152">lispexpr.cpp:152</a></div></div>
 <div class="ttc" id="alispexpr_8h_html"><div class="ttname"><a href="lispexpr_8h.html">lispexpr.h</a></div></div>
 <div class="ttc" id="astring__utils_8cpp_html_a9a40340afaae9904742db399a12452ee"><div class="ttname"><a href="string__utils_8cpp.html#a9a40340afaae9904742db399a12452ee">escape</a></div><div class="ttdeci">std::string escape(const std::string &amp;s)</div><div class="ttdoc">Generic escaping of strings; this is not meant to be a particular programming language.</div><div class="ttdef"><b>Definition:</b> <a href="string__utils_8cpp_source.html#l00138">string_utils.cpp:138</a></div></div>
 <div class="ttc" id="astring__utils_8h_html"><div class="ttname"><a href="string__utils_8h.html">string_utils.h</a></div></div>
+<div class="ttc" id="aunistd_8c_html_adead3ef83e9181db3b1d4d7d098a18c0"><div class="ttname"><a href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a></div><div class="ttdeci">#define size_type</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00312">unistd.c:312</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

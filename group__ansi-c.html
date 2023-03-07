@@ -99,7 +99,7 @@ Folder ansi-c</h1>
 Overview</h1>
 <p>Contains the front-end for ANSI C, plus a variety of common extensions. This parses the file, performs some basic sanity checks (this is one area in which the UI could be improved; patches most welcome) and then produces a goto-program (see below). The parser is a traditional Flex / Bison system.</p>
 <p><code>internal_addition.c</code> contains the implementation of various ‘magic’ functions that are that allow control of the analysis from the source code level. These include assertions, assumptions, atomic blocks, memory fences and rounding modes.</p>
-<p>The <code>library/</code> subdirectory contains versions of some of the C standard header files that make use of the CPROVER built-in functions. This allows CPROVER programs to be ‘aware’ of the functionality and model it correctly. Examples include <code>stdio.c</code>, <code>string.c</code>, <code>setjmp.c</code> and various threading interfaces.</p>
+<p>The <code>library/</code> subdirectory contains versions of some of the C standard header files that make use of the CPROVER built-in functions. This allows CPROVER programs to be ‘aware’ of the functionality and model it correctly. Examples include <code><a class="el" href="stdio_8c.html">stdio.c</a></code>, <code><a class="el" href="string_8c.html">string.c</a></code>, <code><a class="el" href="setjmp_8c.html">setjmp.c</a></code> and various threading interfaces.</p>
 <h1><a class="anchor" id="preprocessing"></a>
 Preprocessing &amp; Parsing</h1>
 <p>In the <a class="el" href="group__ansi-c.html">ansi-c</a> directory</p>

@@ -198,10 +198,10 @@ $(document).ready(function(){initNavTree('race__check_8cpp_source.html',''); ini
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">  109</a></span>&#160;<span class="keyword">static</span> std::string <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>(<span class="keyword">const</span> <a class="code" href="structrw__set__baset_1_1entryt.html">rw_set_baset::entryt</a> &amp;entry, <span class="keywordtype">bool</span> write)</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">  109</a></span>&#160;<span class="keyword">static</span> std::string <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>(<span class="keyword">const</span> <a class="code" href="structrw__set__baset_1_1entryt.html">rw_set_baset::entryt</a> &amp;entry, <span class="keywordtype">bool</span> <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  std::string result;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordflow">if</span>(write)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    result=<span class="stringliteral">&quot;W/W&quot;</span>;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    result=<span class="stringliteral">&quot;R/W&quot;</span>;</div>
@@ -484,6 +484,7 @@ $(document).ready(function(){initNavTree('race__check_8cpp_source.html',''); ini
 <div class="ttc" id="astatic__lifetime__init_8h_html_a2f0ae8a1c812a7205d351da820888c98"><div class="ttname"><a href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a></div><div class="ttdeci">#define INITIALIZE_FUNCTION</div><div class="ttdef"><b>Definition:</b> <a href="static__lifetime__init_8h_source.html#l00022">static_lifetime_init.h:22</a></div></div>
 <div class="ttc" id="astructrw__set__baset_1_1entryt_html"><div class="ttname"><a href="structrw__set__baset_1_1entryt.html">rw_set_baset::entryt</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00043">rw_set.h:44</a></div></div>
 <div class="ttc" id="astructrw__set__baset_1_1entryt_html_a48ed22e9dbb0c6731765727f453767a4"><div class="ttname"><a href="structrw__set__baset_1_1entryt.html#a48ed22e9dbb0c6731765727f453767a4">rw_set_baset::entryt::object</a></div><div class="ttdeci">irep_idt object</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00046">rw_set.h:46</a></div></div>
+<div class="ttc" id="aunistd_8c_html_a9e58c2a6f572a2d2cdad1306d7d2b802"><div class="ttname"><a href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a></div><div class="ttdeci">ssize_t write(int fildes, const void *buf, size_t nbyte)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00160">unistd.c:160</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

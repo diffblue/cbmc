@@ -135,13 +135,14 @@ Overview</h1>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
 <div class="line">  <span class="keywordtype">int</span> val, size;</div>
-<div class="line">  <span class="keywordtype">int</span> *buf = size &gt;= 0 ? malloc(size * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)) : NULL;</div>
+<div class="line">  <span class="keywordtype">int</span> *buf = size &gt;= 0 ? <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(size * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)) : NULL;</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordtype">int</span> idx = binary_search(val, buf, size);</div>
 <div class="line">  <span class="keywordflow">if</span>(idx != NOT_FOUND)</div>
 <div class="line">    assert(buf[idx] == val);</div>
 <div class="line">}</div>
 <div class="ttc" id="afile__converter_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="file__converter_8cpp_source.html#l00041">file_converter.cpp:41</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
 </div><!-- fragment --><p>The function stores a lower bound <code>lb</code> and an upper bound <code>ub</code> initialized to the bounds on the buffer <code>buf</code>, i.e., to <code>0</code> and <code>size-1</code> respectively. In each iteration, the midpoint <code>mid</code> is compared against the target value <code>val</code> and in case of a mismatch either the lower half or the upper half of the buffer is searched recursively. A developer might be interested in verifying two high-level properties on the loop on all possible buffers <code>buf</code> and values <code>val</code>:</p><ol type="1">
 <li>an out-of-bound access should never occur (at <code>buf[mid]</code> lookup)</li>
 <li>the loop must eventually always terminate</li>
@@ -180,7 +181,7 @@ Overview</h1>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
 <div class="line">  <span class="keywordtype">int</span> val, size;</div>
-<div class="line">  <span class="keywordtype">int</span> *buf = size &gt;= 0 ? malloc(size * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)) : NULL;</div>
+<div class="line">  <span class="keywordtype">int</span> *buf = size &gt;= 0 ? <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(size * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)) : NULL;</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordtype">int</span> idx = binary_search(val, buf, size);</div>
 <div class="line">  <span class="keywordflow">if</span>(idx != NOT_FOUND)</div>

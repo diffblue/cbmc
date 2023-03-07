@@ -189,7 +189,7 @@ $(document).ready(function(){initNavTree('unescape__string_8cpp_source.html','')
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        {</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;          std::string hex;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;          <span class="keywordflow">while</span>(i&lt;src.size() &amp;&amp; isxdigit(src[i]))</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;          <span class="keywordflow">while</span>(i&lt;src.size() &amp;&amp; <a class="code" href="ctype_8c.html#adaf3aadefe3fc4fb07b6be0d7b880f53">isxdigit</a>(src[i]))</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;          {</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            hex+=src[i];</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            i++;</div>
@@ -209,11 +209,11 @@ $(document).ready(function(){initNavTree('unescape__string_8cpp_source.html','')
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">if</span>(isdigit(ch)) <span class="comment">// octal</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(ch)) <span class="comment">// octal</span></div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        {</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;          std::string octal;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;          <span class="keywordflow">while</span>(i&lt;src.size() &amp;&amp; isdigit(src[i]))</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;          <span class="keywordflow">while</span>(i&lt;src.size() &amp;&amp; <a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(src[i]))</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;          {</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            octal+=src[i];</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            i++;</div>
@@ -264,10 +264,10 @@ $(document).ready(function(){initNavTree('unescape__string_8cpp_source.html','')
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    value&lt;&lt;=4;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">if</span>(isdigit(ch))</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(ch))</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      value|=ch-<span class="charliteral">&#39;0&#39;</span>;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(isxdigit(ch))</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      value|=10+tolower(ch)-<span class="charliteral">&#39;a&#39;</span>;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#adaf3aadefe3fc4fb07b6be0d7b880f53">isxdigit</a>(ch))</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      value|=10+<a class="code" href="ctype_8c.html#ac79d6114c9df7350cedcd8cf921a6ea4">tolower</a>(ch)-<span class="charliteral">&#39;a&#39;</span>;</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  }</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="keywordflow">return</span> value;</div>
@@ -286,12 +286,15 @@ $(document).ready(function(){initNavTree('unescape__string_8cpp_source.html','')
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    value&lt;&lt;=3;</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">if</span>(isdigit(ch))</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(ch))</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      value|=ch-<span class="charliteral">&#39;0&#39;</span>;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  }</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">return</span> value;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;}</div>
+<div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
+<div class="ttc" id="actype_8c_html_ac79d6114c9df7350cedcd8cf921a6ea4"><div class="ttname"><a href="ctype_8c.html#ac79d6114c9df7350cedcd8cf921a6ea4">tolower</a></div><div class="ttdeci">int tolower(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00100">ctype.c:100</a></div></div>
+<div class="ttc" id="actype_8c_html_adaf3aadefe3fc4fb07b6be0d7b880f53"><div class="ttname"><a href="ctype_8c.html#adaf3aadefe3fc4fb07b6be0d7b880f53">isxdigit</a></div><div class="ttdeci">int isxdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00095">ctype.c:95</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
 <div class="ttc" id="aunescape__string_8cpp_html_a965857588e1f444979f3460f903ab440"><div class="ttname"><a href="unescape__string_8cpp.html#a965857588e1f444979f3460f903ab440">octal_to_unsigned</a></div><div class="ttdeci">unsigned octal_to_unsigned(const char *octal, std::size_t digits)</div><div class="ttdef"><b>Definition:</b> <a href="unescape__string_8cpp_source.html#l00184">unescape_string.cpp:184</a></div></div>

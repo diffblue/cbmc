@@ -117,12 +117,13 @@ Translating Assigns Clauses to GOTO Functions</h1>
 <div class="line">  foo-parameters,</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// write set to populate with new targets</span></div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t __write_set_to_fill,</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_fill,</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// write set against which to check itself for unwanted side effects</span></div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t __write_set_to_check);</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_check);</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
 </div><!-- fragment --><p>The rewriting step <a class="el" href="contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-havoc">Generating Havoc Functions from Assigns Clause Functions</a> is also applied to the function in order to generate a havoc function that can be used to model contract replacement:</p>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> contract::foo::havoc(__CPROVER_contracts_write_set_ptr_t __write_set_to_havoc);</div>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> contract::foo::havoc(<a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_havoc);</div>
 </div><!-- fragment --><h1><a class="anchor" id="contracts-dev-spec-codegen-frees"></a>
 Translating Frees Clauses to GOTO Functions</h1>
 <p>Let's consider a contract <code>foo</code> (with corresponding pure contract <code>contract::foo</code>) with a <code>__CPROVER_frees(F)</code> clause.</p>
@@ -143,10 +144,10 @@ Translating Frees Clauses to GOTO Functions</h1>
 <div class="line">  foo-parameters,</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// write set to populate with new targets</span></div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t __write_set_to_fill,</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_fill,</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// write set against which to check itself for unwanted side effects</span></div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t __write_set_to_check);</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> __write_set_to_check);</div>
 </div><!-- fragment --><hr  />
  <table class="markdownTable">
 <tr class="markdownTableHead">

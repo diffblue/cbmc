@@ -147,7 +147,7 @@ $(document).ready(function(){initNavTree('small__map_8h_source.html',''); initRe
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span>(n == 0)</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    T *mem = (T *)malloc(<span class="keyword">sizeof</span>(T) * n);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    T *mem = (T *)<a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(T) * n);</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">if</span>(!mem)</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      <span class="keywordflow">throw</span> std::bad_alloc();</div>
@@ -163,7 +163,7 @@ $(document).ready(function(){initNavTree('small__map_8h_source.html',''); initRe
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="comment">// explicitly cast to char * as GCC 8 warns about not using new/delete for</span></div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="comment">// class sharing_node_innert&lt;dstringt, std::basic_string&lt;char&gt;,</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="comment">// std::equal_to&lt;dstringt&gt; &gt;</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    T *mem = (T *)realloc((<span class="keywordtype">char</span> *)ptr, <span class="keyword">sizeof</span>(T) * n);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    T *mem = (T *)<a class="code" href="stdlib_8c.html#a11470e6f926d85f7cf07f521cf458e6d">realloc</a>((<span class="keywordtype">char</span> *)ptr, <span class="keyword">sizeof</span>(T) * n);</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordflow">if</span>(!mem)</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <span class="keywordflow">throw</span> std::bad_alloc();</div>
@@ -209,7 +209,7 @@ $(document).ready(function(){initNavTree('small__map_8h_source.html',''); initRe
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        (<a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a> + i)-&gt;~T();</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      }</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      free(<a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a>);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <a class="code" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(<a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a>);</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    }</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  }</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
@@ -493,7 +493,7 @@ $(document).ready(function(){initNavTree('small__map_8h_source.html',''); initRe
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;        <span class="comment">// for</span></div>
 <div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;        <span class="comment">// class sharing_node_innert&lt;dstringt, std::basic_string&lt;char&gt;,</span></div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;        <span class="comment">// std::equal_to&lt;dstringt&gt; &gt;</span></div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        memmove((<span class="keywordtype">char</span> *)(<a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a> + ii), <a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a> + ii + 1, <span class="keyword">sizeof</span>(T) * (n - ii - 1));</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <a class="code" href="string_8c.html#a802c986820d3866639922b6bc9484f90">memmove</a>((<span class="keywordtype">char</span> *)(<a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a> + ii), <a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a> + ii + 1, <span class="keyword">sizeof</span>(T) * (n - ii - 1));</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;      }</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160; </div>
 <div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;      <a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a> = <a class="code" href="classsmall__mapt.html#a25f69350508797b8298dc0cd71ae2513">allocate</a>(<a class="code" href="classsmall__mapt.html#a9906f5e160d398e77b670c29afe7f667">p</a>, n - 1);</div>
@@ -654,6 +654,10 @@ $(document).ready(function(){initNavTree('small__map_8h_source.html',''); initRe
 <div class="ttc" id="aclasssmall__mapt_html_ae3efe3a052487a016198c3d930ed1560"><div class="ttname"><a href="classsmall__mapt.html#ae3efe3a052487a016198c3d930ed1560">small_mapt::allocate</a></div><div class="ttdeci">T * allocate(T *ptr, std::size_t n) const</div><div class="ttdef"><b>Definition:</b> <a href="small__map_8h_source.html#l00105">small_map.h:105</a></div></div>
 <div class="ttc" id="aclasssmall__mapt_html_af35cd707106fdeeab0d2a43d0d9df61d"><div class="ttname"><a href="classsmall__mapt.html#af35cd707106fdeeab0d2a43d0d9df61d">small_mapt::index_fieldt</a></div><div class="ttdeci">Ind index_fieldt</div><div class="ttdef"><b>Definition:</b> <a href="small__map_8h_source.html#l00078">small_map.h:76</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a11470e6f926d85f7cf07f521cf458e6d"><div class="ttname"><a href="stdlib_8c.html#a11470e6f926d85f7cf07f521cf458e6d">realloc</a></div><div class="ttdeci">void * realloc(void *ptr, __CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00509">stdlib.c:509</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
+<div class="ttc" id="astdlib_8c_html_afbedc913aa4651b3c3b4b3aecd9b4711"><div class="ttname"><a href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a></div><div class="ttdeci">void free(void *ptr)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00284">stdlib.c:284</a></div></div>
+<div class="ttc" id="astring_8c_html_a802c986820d3866639922b6bc9484f90"><div class="ttname"><a href="string_8c.html#a802c986820d3866639922b6bc9484f90">memmove</a></div><div class="ttdeci">void * memmove(void *dest, const void *src, size_t n)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00837">string.c:837</a></div></div>
 <div class="ttc" id="aunit_2testing-utils_2invariant_8h_html"><div class="ttname"><a href="unit_2testing-utils_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 </div><!-- fragment --></div><!-- contents -->

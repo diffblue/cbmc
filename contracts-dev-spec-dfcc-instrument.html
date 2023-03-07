@@ -115,7 +115,8 @@ Signature Extension</h1>
 <p>The signature of a function:</p>
 <div class="fragment"><div class="line">ret_t foo(foo-parameters);</div>
 </div><!-- fragment --><p>is turned into the extended version:</p>
-<div class="fragment"><div class="line">ret_t  foo(foo-parameters,  __CPROVER_contracts_write_set_ptr_t write_set);</div>
+<div class="fragment"><div class="line">ret_t  foo(foo-parameters,  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set);</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
 </div><!-- fragment --><p>After this step the <code>write_set</code> parameter is in scope in the function and can be used to implement checks.</p>
 <p>It is valid to pass a <code>NULL</code> pointer for the <code>write_set</code> parameter. When the <code>write_set</code> parameter is NULL, no checks are performed in the function.</p>
 <h1><a class="anchor" id="contracts-dev-spec-dfcc-instrument-body"></a>
@@ -171,13 +172,14 @@ LHS Instrumentation</h3>
 <div class="fragment"><div class="line">IF !write_set <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a> skip_target;</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a> check_assign: bool;</div>
 <div class="line">CALL check_assign =</div>
-<div class="line">  __CPROVER_contracts_write_set_check_assignment(</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#aa194dfba197e43707ff5b99ed45a542d">__CPROVER_contracts_write_set_check_assignment</a>(</div>
 <div class="line">    write_set, &amp;lhs, <span class="keyword">sizeof</span>(lhs));</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba61d9e0e93eb9635173764c5ba45666f1">ASSERT</a> check_assign;</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a> check_assign;</div>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
 <div class="line">----</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba52a9b031766fa116251f70e65a84c01a">ASSIGN</a> lhs := rhs;</div>
+<div class="ttc" id="acprover__contracts_8c_html_aa194dfba197e43707ff5b99ed45a542d"><div class="ttname"><a href="cprover__contracts_8c.html#aa194dfba197e43707ff5b99ed45a542d">__CPROVER_contracts_write_set_check_assignment</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_write_set_check_assignment(__CPROVER_contracts_write_set_ptr_t set, void *ptr, __CPROVER_size_t size)</div><div class="ttdoc">Checks if an assignment to the range of bytes starting at ptr and of size bytes is allowed according ...</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00736">cprover_contracts.c:736</a></div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md41"></a>
 RHS Instrumentation</h3>
 <p>For the write set updates we consider the following cases.</p>
@@ -185,16 +187,18 @@ RHS Instrumentation</h3>
 <div class="fragment"><div class="line">CALL lhs := <a class="code" href="classside__effect__exprt.html">side_effect_exprt</a>(statement = ID_allocate, args = {size, clear});</div>
 <div class="line">----</div>
 <div class="line">IF !write_set <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a> skip_target;</div>
-<div class="line">CALL __CPROVER_contracts_write_set_add_allocated(write_set, lhs);</div>
+<div class="line">CALL <a class="code" href="cprover__contracts_8c.html#af9410e73f11747d2c05b4670cbf1ad59">__CPROVER_contracts_write_set_add_allocated</a>(write_set, lhs);</div>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
 <div class="ttc" id="aclassside__effect__exprt_html"><div class="ttname"><a href="classside__effect__exprt.html">side_effect_exprt</a></div><div class="ttdoc">An expression containing a side effect.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01449">std_code.h:1450</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_af9410e73f11747d2c05b4670cbf1ad59"><div class="ttname"><a href="cprover__contracts_8c.html#af9410e73f11747d2c05b4670cbf1ad59">__CPROVER_contracts_write_set_add_allocated</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_add_allocated(__CPROVER_contracts_write_set_ptr_t set, void *ptr)</div><div class="ttdoc">Adds the dynamically allocated pointer ptr to set-&gt;allocated.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00595">cprover_contracts.c:595</a></div></div>
 </div><!-- fragment --><p>If the assignment is an nondeterministic update to the <code>__CPROVER_dead_object</code>, it in fact models a dynamic deallocation. Such instructions are generated to deallocate objects allocated with the dynamic stack allocation function <code>__builtin_alloca</code> and are always legal. We just record the deallocation.</p>
 <div class="fragment"><div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba52a9b031766fa116251f70e65a84c01a">ASSIGN</a> __CPROVER_dead_object := <a class="code" href="classif__exprt.html">if_exprt</a>(nondet, ptr, <a class="code" href="pointer__predicates_8cpp.html#aa7ca966850696433c45b4cb96de2f681">dead_object</a>);</div>
 <div class="line">----</div>
 <div class="line">IF !write_set <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a> skip_target;</div>
-<div class="line">CALL __CPROVER_contracts_write_set_record_deallocated(write_set, ptr);</div>
+<div class="line">CALL <a class="code" href="cprover__contracts_8c.html#a0d15ef1621aaeab7b113315bace80158">__CPROVER_contracts_write_set_record_deallocated</a>(write_set, ptr);</div>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
 <div class="ttc" id="aclassif__exprt_html"><div class="ttname"><a href="classif__exprt.html">if_exprt</a></div><div class="ttdoc">The trinary if-then-else operator.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02322">std_expr.h:2323</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_a0d15ef1621aaeab7b113315bace80158"><div class="ttname"><a href="cprover__contracts_8c.html#a0d15ef1621aaeab7b113315bace80158">__CPROVER_contracts_write_set_record_deallocated</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_record_deallocated(__CPROVER_contracts_write_set_ptr_t set, void *ptr)</div><div class="ttdoc">Records that an object is deallocated by adding the pointer ptr to set-&gt;deallocated.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00667">cprover_contracts.c:667</a></div></div>
 <div class="ttc" id="apointer__predicates_8cpp_html_aa7ca966850696433c45b4cb96de2f681"><div class="ttname"><a href="pointer__predicates_8cpp.html#aa7ca966850696433c45b4cb96de2f681">dead_object</a></div><div class="ttdeci">exprt dead_object(const exprt &amp;pointer, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__predicates_8cpp_source.html#l00051">pointer_predicates.cpp:51</a></div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md42"></a>
 Instrumenting CALL Instructions</h2>
@@ -202,14 +206,15 @@ Instrumenting CALL Instructions</h2>
 <div class="fragment"><div class="line">IF !write_set <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a> skip_target;</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a> check_deallocate: bool;</div>
 <div class="line">CALL check_deallocate :=</div>
-<div class="line"> __CPROVER_contracts_write_set_check_deallocate(write_set, ptr);</div>
+<div class="line"> <a class="code" href="cprover__contracts_8c.html#aaa11edbaf34a651c60f3024fc9488df1">__CPROVER_contracts_write_set_check_deallocate</a>(write_set, ptr);</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba61d9e0e93eb9635173764c5ba45666f1">ASSERT</a>(check_deallocate);</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a> check_deallocate;</div>
-<div class="line">CALL __CPROVER_contracts_write_set_record_deallocated(write_set, lhs);</div>
+<div class="line">CALL <a class="code" href="cprover__contracts_8c.html#a0d15ef1621aaeab7b113315bace80158">__CPROVER_contracts_write_set_record_deallocated</a>(write_set, lhs);</div>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
 <div class="line">----</div>
 <div class="line">CALL <a class="code" href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a>(ptr);</div>
-<div class="ttc" id="aansi-c_2library_2cprover_8h_html_a5ef264d7c09f165e1d72b108c150dd32"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a></div><div class="ttdeci">void __CPROVER_deallocate(void *)</div></div>
+<div class="ttc" id="aansi-c_2library_2cprover_8h_html_a5ef264d7c09f165e1d72b108c150dd32"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a5ef264d7c09f165e1d72b108c150dd32">__CPROVER_deallocate</a></div><div class="ttdeci">void __CPROVER_deallocate(void *)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00637">stdlib.c:637</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_aaa11edbaf34a651c60f3024fc9488df1"><div class="ttname"><a href="cprover__contracts_8c.html#aaa11edbaf34a651c60f3024fc9488df1">__CPROVER_contracts_write_set_check_deallocate</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_write_set_check_deallocate(__CPROVER_contracts_write_set_ptr_t set, void *ptr)</div><div class="ttdoc">Checks if the deallocation of ptr is allowed according to set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00914">cprover_contracts.c:914</a></div></div>
 </div><!-- fragment --><p>Calls to <code>__CPROVER_was_freed</code> or <code>__CPROVER_is_freeable</code> are rewritten as described in <a class="el" href="contracts-dev-spec-is-freeable.html">Rewriting Calls to __CPROVER_is_freeable and __CPROVER_was_freed Predicates</a></p>
 <p>Calls to <code>__CPROVER_is_fresh</code> are rewritten as described in <a class="el" href="contracts-dev-spec-is-fresh.html">Rewriting Calls to the __CPROVER_is_fresh Predicate</a></p>
 <p>Calls to <code>__CPROVER_obeys_contract</code> are rewritten as described in <a class="el" href="contracts-dev-spec-obeys-contract.html">Rewriting Calls to the __CPROVER_obeys_contract Predicate</a></p>
@@ -220,7 +225,7 @@ Instrumenting CALL Instructions</h2>
 <div class="line">IF !write_set <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a> skip_target;</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a> check_assign: bool;</div>
 <div class="line">CALL check_assign =</div>
-<div class="line">__CPROVER_contracts_write_set_check_assignment(write_set, &amp;lhs, <span class="keyword">sizeof</span>(lhs));</div>
+<div class="line"><a class="code" href="cprover__contracts_8c.html#aa194dfba197e43707ff5b99ed45a542d">__CPROVER_contracts_write_set_check_assignment</a>(write_set, &amp;lhs, <span class="keyword">sizeof</span>(lhs));</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba61d9e0e93eb9635173764c5ba45666f1">ASSERT</a>(check_assign);</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a> check_assign;</div>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
@@ -254,12 +259,13 @@ Instrumenting OTHER Instructions</h2>
 <div class="fragment"><div class="line">IF !write_set <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadf1256e4198172eedfbf12c770d11589">GOTO</a> skip_target;</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a> check_array_set: bool;</div>
 <div class="line">CALL check_array_set = </div>
-<div class="line"> __CPROVER_contracts_write_set_check_array_set(write_set, dest);</div>
+<div class="line"> <a class="code" href="cprover__contracts_8c.html#afe1a3f3922f3d20be5c3eff10135456d">__CPROVER_contracts_write_set_check_array_set</a>(write_set, dest);</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba61d9e0e93eb9635173764c5ba45666f1">ASSERT</a>(check_array_set);</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a> check_array_set;</div>
 <div class="line">skip_target: <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a>;</div>
 <div class="line">----</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadbf1dee1b8cd7ea3c82661943c7b74f4">OTHER</a> {statement = array_set, args = {dest, value}};</div>
+<div class="ttc" id="acprover__contracts_8c_html_afe1a3f3922f3d20be5c3eff10135456d"><div class="ttname"><a href="cprover__contracts_8c.html#afe1a3f3922f3d20be5c3eff10135456d">__CPROVER_contracts_write_set_check_array_set</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_write_set_check_array_set(__CPROVER_contracts_write_set_ptr_t set, void *dest)</div><div class="ttdoc">Checks if the operation array_set(dest, ...) is allowed according to set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00828">cprover_contracts.c:828</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296bebadbf1dee1b8cd7ea3c82661943c7b74f4"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebadbf1dee1b8cd7ea3c82661943c7b74f4">OTHER</a></div><div class="ttdeci">@ OTHER</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00036">goto_program.h:36</a></div></div>
 </div><!-- fragment --><p>The ranges of bytes <code>(void *lb, size_t size)</code> updated by the different operations are:</p>
 <ul>

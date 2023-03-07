@@ -67,5 +67,6 @@ var dir_40e09ba5875136afe5f64e800a389a0d =
     [ "state_encoding_targets.cpp", "state__encoding__targets_8cpp.html", null ],
     [ "state_encoding_targets.h", "state__encoding__targets_8h.html", "state__encoding__targets_8h" ],
     [ "variable_encoding.cpp", "variable__encoding_8cpp.html", "variable__encoding_8cpp" ],
-    [ "variable_encoding.h", "variable__encoding_8h.html", "variable__encoding_8h" ]
+    [ "variable_encoding.h", "variable__encoding_8h.html", "variable__encoding_8h" ],
+    [ "wcwidth.c", "wcwidth_8c.html", "wcwidth_8c" ]
 ];

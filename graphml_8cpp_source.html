@@ -241,7 +241,7 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  std::map&lt;std::string, std::map&lt;std::string, std::string&gt; &gt; defaults;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  std::string entrynode;</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> err=</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="err_8c.html#aac7e66a886f062322beba3cb396968aa">err</a>=</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <a class="code" href="graphml_8cpp.html#ab18197bd247fc6133ae5dcfee6c96866">build_graph_rec</a>(</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <a class="code" href="properties_8cpp.html#acd585c0c596ee5156e84358863fb8794">xml</a>,</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      name_to_node,</div>
@@ -250,7 +250,7 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      entrynode);</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(!entrynode.empty());</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; !err &amp;&amp; i&lt;dest.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++i)</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; !<a class="code" href="err_8c.html#aac7e66a886f062322beba3cb396968aa">err</a> &amp;&amp; i&lt;dest.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++i)</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  {</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">const</span> <a class="code" href="structxml__graph__nodet.html">graphmlt::nodet</a> &amp;n=dest[i];</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
@@ -261,7 +261,7 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(it != name_to_node.end());</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  entry=it-&gt;second;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">return</span> err;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="err_8c.html#aac7e66a886f062322beba3cb396968aa">err</a>;</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
 <div class="line"><a name="l00175"></a><span class="lineno"><a class="line" href="graphml_8cpp.html#a0b125ac9d88ac12dba14241e3790e648">  175</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="graphml_8cpp.html#a0b125ac9d88ac12dba14241e3790e648">read_graphml</a>(</div>
@@ -657,6 +657,7 @@ $(document).ready(function(){initNavTree('graphml_8cpp_source.html',''); initRes
 <div class="ttc" id="aclassxmlt_html_a97973df33b55e81165c8b2e70a71ff79"><div class="ttname"><a href="classxmlt.html#a97973df33b55e81165c8b2e70a71ff79">xmlt::elements</a></div><div class="ttdeci">elementst elements</div><div class="ttdef"><b>Definition:</b> <a href="xml_8h_source.html#l00042">xml.h:42</a></div></div>
 <div class="ttc" id="aclassxmlt_html_a9f837b4aff43fcd190093bf3af0e33d7"><div class="ttname"><a href="classxmlt.html#a9f837b4aff43fcd190093bf3af0e33d7">xmlt::data</a></div><div class="ttdeci">std::string data</div><div class="ttdef"><b>Definition:</b> <a href="xml_8h_source.html#l00039">xml.h:39</a></div></div>
 <div class="ttc" id="aclassxmlt_html_ad3deb6174398551599e5392d9dac014d"><div class="ttname"><a href="classxmlt.html#ad3deb6174398551599e5392d9dac014d">xmlt::name</a></div><div class="ttdeci">std::string name</div><div class="ttdef"><b>Definition:</b> <a href="xml_8h_source.html#l00039">xml.h:39</a></div></div>
+<div class="ttc" id="aerr_8c_html_aac7e66a886f062322beba3cb396968aa"><div class="ttname"><a href="err_8c.html#aac7e66a886f062322beba3cb396968aa">err</a></div><div class="ttdeci">void err(int eval, const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> <a href="err_8c_source.html#l00013">err.c:13</a></div></div>
 <div class="ttc" id="agraphml_8cpp_html_a0b125ac9d88ac12dba14241e3790e648"><div class="ttname"><a href="graphml_8cpp.html#a0b125ac9d88ac12dba14241e3790e648">read_graphml</a></div><div class="ttdeci">bool read_graphml(std::istream &amp;is, graphmlt &amp;dest, graphmlt::node_indext &amp;entry, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="graphml_8cpp_source.html#l00175">graphml.cpp:175</a></div></div>
 <div class="ttc" id="agraphml_8cpp_html_a5f48d218f92fde539e8fc299467f1317"><div class="ttname"><a href="graphml_8cpp.html#a5f48d218f92fde539e8fc299467f1317">add_node</a></div><div class="ttdeci">static graphmlt::node_indext add_node(const std::string &amp;name, name_mapt &amp;name_to_node, graphmlt &amp;graph)</div><div class="ttdef"><b>Definition:</b> <a href="graphml_8cpp_source.html#l00020">graphml.cpp:20</a></div></div>
 <div class="ttc" id="agraphml_8cpp_html_a68963603fee566e7c0cbf3d49d345c34"><div class="ttname"><a href="graphml_8cpp.html#a68963603fee566e7c0cbf3d49d345c34">write_graphml</a></div><div class="ttdeci">bool write_graphml(const graphmlt &amp;src, std::ostream &amp;os)</div><div class="ttdef"><b>Definition:</b> <a href="graphml_8cpp_source.html#l00203">graphml.cpp:203</a></div></div>

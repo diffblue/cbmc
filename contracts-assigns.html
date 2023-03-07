@@ -173,7 +173,7 @@ Object slice targets</h2>
 <div class="line">    size = MAX_SIZE;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// allocate the struct + data + 1 extra hidden byte</span></div>
-<div class="line">  <span class="keyword">struct </span>vec_t *vec = malloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
+<div class="line">  <span class="keyword">struct </span>vec_t *vec = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
 <div class="line">  <span class="keywordflow">if</span> (vec) {</div>
 <div class="line">    vec-&gt;size = size;</div>
 <div class="line">    vec-&gt;data = ((<span class="keywordtype">char</span> *)vec) + <span class="keyword">sizeof</span>(<span class="keyword">struct </span>vec_t);</div>
@@ -205,6 +205,7 @@ Object slice targets</h2>
 <div class="line">  vec_clear(vec);</div>
 <div class="line">}</div>
 <div class="ttc" id="afile__converter_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="file__converter_8cpp_source.html#l00041">file_converter.cpp:41</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
 </div><!-- fragment --><hr  />
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="cprover__builtin__headers_8h.html#abca0337cfd5268f7bce166885ccd74ba">__CPROVER_object_from</a>(<span class="keywordtype">void</span> *ptr);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_abca0337cfd5268f7bce166885ccd74ba"><div class="ttname"><a href="cprover__builtin__headers_8h.html#abca0337cfd5268f7bce166885ccd74ba">__CPROVER_object_from</a></div><div class="ttdeci">void __CPROVER_object_from(void *ptr)</div></div>
@@ -227,7 +228,7 @@ Object slice targets</h2>
 <div class="line">    size = MAX_SIZE;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// allocate the struct + data + 1 extra hidden byte</span></div>
-<div class="line">  <span class="keyword">struct </span>vec_t *vec = malloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
+<div class="line">  <span class="keyword">struct </span>vec_t *vec = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
 <div class="line">  <span class="keywordflow">if</span> (vec) {</div>
 <div class="line">    vec-&gt;size = size;</div>
 <div class="line">    vec-&gt;data = ((<span class="keywordtype">char</span> *)vec) + <span class="keyword">sizeof</span>(<span class="keyword">struct </span>vec_t);</div>
@@ -280,7 +281,7 @@ Object slice targets</h2>
 <div class="line">    size = MAX_SIZE;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// allocate the struct + data + 1 extra hidden byte</span></div>
-<div class="line">  <span class="keyword">struct </span>vec_t *vec = malloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
+<div class="line">  <span class="keyword">struct </span>vec_t *vec = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> vec_t) + size + 1);</div>
 <div class="line">  <span class="keywordflow">if</span> (vec) {</div>
 <div class="line">    vec-&gt;size = size;</div>
 <div class="line">    vec-&gt;data = ((<span class="keywordtype">char</span> *)vec) + <span class="keyword">sizeof</span>(<span class="keyword">struct </span>vec_t);</div>

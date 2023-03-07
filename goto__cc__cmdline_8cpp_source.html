@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('goto__cc__cmdline_8cpp_source.html',''
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">if</span>(result!=0)</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    {</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="comment">// Let&#39;s print the error to stderr instead of ignoring it completely</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      std::perror(<span class="stringliteral">&quot;Remove failed&quot;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <a class="code" href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">std::perror</a>(<span class="stringliteral">&quot;Remove failed&quot;</span>);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    }</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  }</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}</div>
@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('goto__cc__cmdline_8cpp_source.html',''
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; list[i]!=<span class="keyword">nullptr</span>; i++)</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">if</span>(strcmp(option, list[i])==0)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="string_8c.html#a11bd144d7d44914099a3aeddf1c8567d">strcmp</a>(option, list[i])==0)</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
@@ -200,13 +200,13 @@ $(document).ready(function(){initNavTree('goto__cc__cmdline_8cpp_source.html',''
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  {</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="classgoto__cc__cmdlinet.html#a5d44a30bebc5fb0f94d726cceb8de7f1">stdin_file</a>=<a class="code" href="tempfile_8cpp.html#ac46ba35d3f8a6368030c92dd8b6a1cb6">get_temporary_file</a>(<span class="stringliteral">&quot;goto-cc&quot;</span>, <span class="stringliteral">&quot;stdin&quot;</span>);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    FILE *tmp=fopen(<a class="code" href="classgoto__cc__cmdlinet.html#a5d44a30bebc5fb0f94d726cceb8de7f1">stdin_file</a>.c_str(), <span class="stringliteral">&quot;wt&quot;</span>);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    FILE *tmp=<a class="code" href="stdio_8c.html#afffa3e442e49895773d564f422e1be1c">fopen</a>(<a class="code" href="classgoto__cc__cmdlinet.html#a5d44a30bebc5fb0f94d726cceb8de7f1">stdin_file</a>.c_str(), <span class="stringliteral">&quot;wt&quot;</span>);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">char</span> ch;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">while</span>(std::cin.read(&amp;ch, 1))</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">while</span>(std::cin.<a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>(&amp;ch, 1))</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      fputc(ch, tmp);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    fclose(tmp);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="stdio_8c.html#a76370407f9ab0402564c2bb9bc9664e0">fclose</a>(tmp);</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  }</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;}</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
@@ -228,10 +228,15 @@ $(document).ready(function(){initNavTree('goto__cc__cmdline_8cpp_source.html',''
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html_aee31079e8e1bee1b20fbe2de58c5065b"><div class="ttname"><a href="classgoto__cc__cmdlinet.html#aee31079e8e1bee1b20fbe2de58c5065b">goto_cc_cmdlinet::~goto_cc_cmdlinet</a></div><div class="ttdeci">~goto_cc_cmdlinet()</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__cmdline_8cpp_source.html#l00025">goto_cc_cmdline.cpp:25</a></div></div>
 <div class="ttc" id="aconverter_8cpp_html_ad8e2b943a39300fa9ca5cd4b40266848"><div class="ttname"><a href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a></div><div class="ttdeci">bool has_prefix(const std::string &amp;s, const std::string &amp;prefix)</div><div class="ttdef"><b>Definition:</b> <a href="converter_8cpp_source.html#l00013">converter.cpp:13</a></div></div>
 <div class="ttc" id="agoto__cc__cmdline_8h_html"><div class="ttname"><a href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a></div><div class="ttdoc">Command line interpretation for goto-cc.</div></div>
+<div class="ttc" id="ajava_8io_8c_html_ae816852877fb8911b6730f7b73ea93f8"><div class="ttname"><a href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a></div><div class="ttdeci">int __CPROVER_ID java::java io InputStream read</div><div class="ttdef"><b>Definition:</b> <a href="java_8io_8c_source.html#l00003">java.io.c:5</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
+<div class="ttc" id="astdio_8c_html_a76370407f9ab0402564c2bb9bc9664e0"><div class="ttname"><a href="stdio_8c.html#a76370407f9ab0402564c2bb9bc9664e0">fclose</a></div><div class="ttdeci">int fclose(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00190">stdio.c:190</a></div></div>
+<div class="ttc" id="astdio_8c_html_ab39f9634fa53ffd52b87431f3afab11b"><div class="ttname"><a href="stdio_8c.html#ab39f9634fa53ffd52b87431f3afab11b">perror</a></div><div class="ttdeci">void perror(const char *s)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00809">stdio.c:809</a></div></div>
+<div class="ttc" id="astdio_8c_html_afffa3e442e49895773d564f422e1be1c"><div class="ttname"><a href="stdio_8c.html#afffa3e442e49895773d564f422e1be1c">fopen</a></div><div class="ttdeci">FILE * fopen(const char *filename, const char *mode)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00076">stdio.c:76</a></div></div>
+<div class="ttc" id="astring_8c_html_a11bd144d7d44914099a3aeddf1c8567d"><div class="ttname"><a href="string_8c.html#a11bd144d7d44914099a3aeddf1c8567d">strcmp</a></div><div class="ttdeci">int strcmp(const char *s1, const char *s2)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00363">string.c:363</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html"><div class="ttname"><a href="structcmdlinet_1_1optiont.html">cmdlinet::optiont</a></div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00155">cmdline.h:156</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html_a1a21143b04ed6ec0468d581449f6afb6"><div class="ttname"><a href="structcmdlinet_1_1optiont.html#a1a21143b04ed6ec0468d581449f6afb6">cmdlinet::optiont::optchar</a></div><div class="ttdeci">char optchar</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00160">cmdline.h:160</a></div></div>
 <div class="ttc" id="astructcmdlinet_1_1optiont_html_a947e7b6c4f77c34384b125b3e6f5962e"><div class="ttname"><a href="structcmdlinet_1_1optiont.html#a947e7b6c4f77c34384b125b3e6f5962e">cmdlinet::optiont::optstring</a></div><div class="ttdeci">std::string optstring</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00161">cmdline.h:161</a></div></div>

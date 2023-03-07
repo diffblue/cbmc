@@ -159,51 +159,54 @@ Swapping-and-Wrapping Functions</h1>
 <div class="line">  foo_check_started = <span class="keyword">true</span>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// create an empty write set to check for side effects in requires clauses</span></div>
-<div class="line">  __CPROVER_contracts_write_set_t __requires_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t requires_write_set = &amp; __requires_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_create(requires_write_set, 0, 0);</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> __requires_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> requires_write_set = &amp; __requires_write_set;</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(requires_write_set, 0, 0);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// assume requires clauses</span></div>
 <div class="line">  assume(contract::requires(foo_params, requires_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check that requires clause do not allocate or deallocate dynamic memory</span></div>
 <div class="line">  assert(__CPROVER_contracts_write_set_allocated_deallocated_is_empty(requires_write_set));</div>
-<div class="line">  __CPROVER_contracts_write_set_release(requires_write_set);</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>(requires_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// snapshot history variables</span></div>
 <div class="line">  hist1_t hist1 = ...;</div>
 <div class="line">  hist2_t hist2 = ...;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// populate the contract write set</span></div>
-<div class="line">  __CPROVER_contracts_write_set_t __contract_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t contract_write_set = &amp;__contract_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> __contract_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> contract_write_set = &amp;__contract_write_set;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// allocate and populate the contract write set</span></div>
-<div class="line">  __CPROVER_contracts_write_set_create(contract_write_set, assigns_clause_size(c), frees_clause_size(c));</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(contract_write_set, assigns_clause_size(c), frees_clause_size(c));</div>
 <div class="line">  contract::assigns(contract_write_set, empty_write_set);</div>
 <div class="line">  contract::frees(contract_write_set, empty_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// call the function</span></div>
 <div class="line">  ret_t retval;</div>
 <div class="line">  retval = foo_swapped(foo_params, contact_write_set);</div>
-<div class="line">  __CPROVER_contracts_write_set_release(contract_write_set);</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>(contract_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// create an empty write set to check for side effects in requires clauses</span></div>
-<div class="line">  __CPROVER_contracts_write_set_t __ensures_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t ensures_write_set = &amp; __ensures_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_create(ensures_write_set, 0, 0);</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> __ensures_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> ensures_write_set = &amp; __ensures_write_set;</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(ensures_write_set, 0, 0);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check post conditions</span></div>
 <div class="line">  assert(contract::ensures(foo_params, ensures_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check that requires clause do not allocate or deallocate dynamic memory</span></div>
 <div class="line">  assert(__CPROVER_contracts_write_set_allocated_deallocated_is_empty(ensures_write_set));</div>
-<div class="line">  __CPROVER_contracts_write_set_release(ensures_write_set);</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>(ensures_write_set);</div>
 <div class="line"> </div>
 <div class="line">  foo_check_completed = <span class="keyword">true</span>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> retval;</div>
 <div class="line">}</div>
+<div class="ttc" id="acprover__contracts_8c_html_a6b104b988f01f52cacd9dec8b2621c79"><div class="ttname"><a href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_release(__CPROVER_contracts_write_set_ptr_t set)</div><div class="ttdoc">Releases resources used by set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00441">cprover_contracts.c:441</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_ab79449fced8abf348ef2c38bc7cce15a"><div class="ttname"><a href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_create(__CPROVER_contracts_write_set_ptr_t set, __CPROVER_size_t contract_assigns_size, __CPROVER_size_t contract_frees_size, __CPROVER_bool assume_requires_ctx, __CPROVER_bool assert_requires_ctx, __CPROVER_bool assume_ensures_ctx, __CPROVER_bool assert_ensures_ctx, __CPROVER_bool allow_allocate, __CPROVER_bool allow_deallocate)</div><div class="ttdoc">Initialises a __CPROVER_contracts_write_set_t object.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00404">cprover_contracts.c:404</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md32"></a>
 Wrapping Recursive Functions</h1>
 <p>If the function to be checked is potentially recursive, we generate the wrapper function body such that the first call trigger the contract checking, and any subsequent call triggers the contract replacement logic as described in <a class="el" href="contracts-dev-spec-contract-replacement.html">Replacing a Function by a Contract</a> :</p>

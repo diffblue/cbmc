@@ -467,17 +467,17 @@ $(document).ready(function(){initNavTree('simplify__expr__floatbv_8cpp_source.ht
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <span class="keywordflow">if</span>(lhs_sorted == rhs_sorted)</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  {</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="comment">// x!=x is the same as saying isnan(op)</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <a class="code" href="classexprt.html">exprt</a> isnan = <a class="code" href="classisnan__exprt.html">isnan_exprt</a>(expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>());</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <a class="code" href="classexprt.html">exprt</a> <a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a> = <a class="code" href="classisnan__exprt.html">isnan_exprt</a>(expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>());</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160; </div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_ieee_float_notequal)</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    {</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    }</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_ieee_float_equal)</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      isnan = <a class="code" href="classnot__exprt.html">not_exprt</a>(isnan);</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      <a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a> = <a class="code" href="classnot__exprt.html">not_exprt</a>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>);</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160; </div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordflow">return</span> std::move(isnan);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordflow">return</span> std::move(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>);</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  }</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160; </div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
@@ -546,6 +546,7 @@ $(document).ready(function(){initNavTree('simplify__expr__floatbv_8cpp_source.ht
 <div class="ttc" id="afloatbv__expr_8h_html"><div class="ttname"><a href="floatbv__expr_8h.html">floatbv_expr.h</a></div><div class="ttdoc">API to expression classes for floating-point arithmetic.</div></div>
 <div class="ttc" id="aieee__float_8h_html"><div class="ttname"><a href="ieee__float_8h.html">ieee_float.h</a></div></div>
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
+<div class="ttc" id="amath_8c_html_ab3f108437bca4812aef4b47a226495a1"><div class="ttname"><a href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a></div><div class="ttdeci">int isnan(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00163">math.c:163</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
 <div class="ttc" id="asimplify__expr_8cpp_html_adebe9c3e4a7aac67777c20e448f6f2bc"><div class="ttname"><a href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a></div><div class="ttdeci">exprt simplify_expr(exprt src, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03076">simplify_expr.cpp:3076</a></div></div>
 <div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>

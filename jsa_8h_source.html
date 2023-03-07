@@ -1022,7 +1022,7 @@ $(document).ready(function(){initNavTree('jsa_8h_source.html',''); initResizable
 <div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;<span class="keyword">typedef</span> <a class="code" href="jsa_8h.html#a22007ebd5a42609118f7be181712e9c1">__CPROVER_jsa_word_t</a> __CPROVER_jsa_opt;</div>
 <div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_jsa_pred_instruction</div>
 <div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;{</div>
-<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;  __CPROVER_jsa_opcodet opcode;</div>
+<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;  __CPROVER_jsa_opcodet <a class="code" href="cegis_8c.html#ad5438d21e4d4ba2b143e00d8680465e9">opcode</a>;</div>
 <div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;  __CPROVER_jsa_opt result_op;</div>
 <div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;  __CPROVER_jsa_opt op0;</div>
 <div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;  __CPROVER_jsa_opt op1;</div>
@@ -1275,7 +1275,7 @@ $(document).ready(function(){initNavTree('jsa_8h_source.html',''); initResizable
 <div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160; </div>
 <div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_jsa_query_instruction</div>
 <div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;{</div>
-<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;  __CPROVER_jsa_opcodet opcode;</div>
+<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;  __CPROVER_jsa_opcodet <a class="code" href="cegis_8c.html#ad5438d21e4d4ba2b143e00d8680465e9">opcode</a>;</div>
 <div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;  __CPROVER_jsa_opt op0;</div>
 <div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;  __CPROVER_jsa_opt op1;</div>
 <div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;} __CPROVER_jsa_query_instructiont;</div>
@@ -1290,7 +1290,7 @@ $(document).ready(function(){initNavTree('jsa_8h_source.html',''); initResizable
 <div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;  <a class="code" href="jsa_8h.html#a9a13d0786cfd21db2d871ca0a4b9902b">__CPROVER_jsa_assume</a>(query_size &gt;= 2);</div>
 <div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;  <a class="code" href="jsa_8h.html#a9a13d0786cfd21db2d871ca0a4b9902b">__CPROVER_jsa_assume</a>(query_size &lt;= __CPROVER_JSA_MAX_QUERY_SIZE);</div>
 <div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;  <a class="code" href="jsa_8h.html#a9a13d0786cfd21db2d871ca0a4b9902b">__CPROVER_jsa_assume</a>(query[0].op1 == 0);</div>
-<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;  <a class="code" href="jsa_8h.html#ae3892633cc3be7b176680b2ad0d6176f">__CPROVER_jsa_assume_valid_list</a>(heap, query[0].opcode);</div>
+<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;  <a class="code" href="jsa_8h.html#ae3892633cc3be7b176680b2ad0d6176f">__CPROVER_jsa_assume_valid_list</a>(heap, query[0].<a class="code" href="cegis_8c.html#ad5438d21e4d4ba2b143e00d8680465e9">opcode</a>);</div>
 <div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;  <a class="code" href="jsa_8h.html#a3a41528a440a07e9e80c2b8a05dace15">__CPROVER_jsa_assume_valid_iterator</a>(heap, query[0].op0);</div>
 <div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160; </div>
 <div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="jsa_8h.html#ab24cb0c1864a7ff57ee2fdf93b174d9d">__CPROVER_jsa__internal_index_t</a> i=1; i&lt;__CPROVER_JSA_MAX_QUERY_SIZE; ++i)</div>
@@ -1390,7 +1390,7 @@ $(document).ready(function(){initNavTree('jsa_8h_source.html',''); initResizable
 <div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160; </div>
 <div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>__CPROVER_jsa_invariant_instruction</div>
 <div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;{</div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;  __CPROVER_jsa_opcodet opcode;</div>
+<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;  __CPROVER_jsa_opcodet <a class="code" href="cegis_8c.html#ad5438d21e4d4ba2b143e00d8680465e9">opcode</a>;</div>
 <div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;} __CPROVER_jsa_invariant_instructiont;</div>
 <div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160; </div>
 <div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;<span class="preprocessor">#define __CPROVER_JSA_NUM_INV_INSTRUCTIONS 1u</span></div>
@@ -1402,7 +1402,7 @@ $(document).ready(function(){initNavTree('jsa_8h_source.html',''); initResizable
 <div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;    <span class="keyword">const</span> <a class="code" href="jsa_8h.html#ab24cb0c1864a7ff57ee2fdf93b174d9d">__CPROVER_jsa__internal_index_t</a> inv_size)</div>
 <div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;{</div>
 <div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;  <a class="code" href="jsa_8h.html#a9a13d0786cfd21db2d871ca0a4b9902b">__CPROVER_jsa_assume</a>(inv_size == 1u);</div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;  <a class="code" href="jsa_8h.html#a9a13d0786cfd21db2d871ca0a4b9902b">__CPROVER_jsa_assume</a>(inv[0].opcode == 0); <span class="comment">// Single instruction</span></div>
+<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;  <a class="code" href="jsa_8h.html#a9a13d0786cfd21db2d871ca0a4b9902b">__CPROVER_jsa_assume</a>(inv[0].<a class="code" href="cegis_8c.html#ad5438d21e4d4ba2b143e00d8680465e9">opcode</a> == 0); <span class="comment">// Single instruction</span></div>
 <div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;  <span class="keywordflow">return</span> __CPROVER_jsa_verify_invariant_execute(heap, queried_heap);</div>
 <div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;}</div>
 <div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160; </div>
@@ -1418,6 +1418,7 @@ $(document).ready(function(){initNavTree('jsa_8h_source.html',''); initResizable
 <div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160; </div>
 <div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANSI_C_LIBRARY_JSA_H</span></div>
+<div class="ttc" id="acegis_8c_html_ad5438d21e4d4ba2b143e00d8680465e9"><div class="ttname"><a href="cegis_8c.html#ad5438d21e4d4ba2b143e00d8680465e9">opcode</a></div><div class="ttdeci">#define opcode</div></div>
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
 <div class="ttc" id="ajsa_8h_html_a00a258b3eb5b2e66ada08be3529ac866"><div class="ttname"><a href="jsa_8h.html#a00a258b3eb5b2e66ada08be3529ac866">__CPROVER_jsa_div</a></div><div class="ttdeci">static __CPROVER_jsa_word_t __CPROVER_jsa_div(const __CPROVER_jsa_word_t lhs, const __CPROVER_jsa_word_t rhs)</div><div class="ttdef"><b>Definition:</b> <a href="jsa_8h_source.html#l00884">jsa.h:884</a></div></div>
 <div class="ttc" id="ajsa_8h_html_a020c7dc76f848acad59cd25037841120"><div class="ttname"><a href="jsa_8h.html#a020c7dc76f848acad59cd25037841120">__CPROVER_jsa_add</a></div><div class="ttdeci">static void __CPROVER_jsa_add(__CPROVER_jsa_abstract_heapt *const heap, const __CPROVER_jsa_list_id_t list, const __CPROVER_jsa_word_t value)</div><div class="ttdef"><b>Definition:</b> <a href="jsa_8h_source.html#l00777">jsa.h:777</a></div></div>

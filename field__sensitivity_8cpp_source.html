@@ -117,9 +117,9 @@ $(document).ready(function(){initNavTree('field__sensitivity_8cpp_source.html','
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state,</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classssa__exprt.html">ssa_exprt</a> ssa_expr,</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordtype">bool</span> write)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">if</span>(write)</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">return</span> std::move(ssa_expr);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">get_fields</a>(ns, state, ssa_expr, <span class="keyword">true</span>);</div>
@@ -129,27 +129,27 @@ $(document).ready(function(){initNavTree('field__sensitivity_8cpp_source.html','
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state,</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <a class="code" href="classexprt.html">exprt</a> expr,</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keywordtype">bool</span> write)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_address_of)</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="expr_8h.html#aa4c7b7e1741461e72adae54944e86d49">Forall_operands</a>(it, expr)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      *it = <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(*it), write);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      *it = <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(*it), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span>(!write &amp;&amp; <a class="code" href="ssa__expr_8h.html#a39d1862ec21dfc7d579f1f5ff1997c00">is_ssa_expr</a>(expr))</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a> &amp;&amp; <a class="code" href="ssa__expr_8h.html#a39d1862ec21dfc7d579f1f5ff1997c00">is_ssa_expr</a>(expr))</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  {</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">get_fields</a>(ns, state, <a class="code" href="ssa__expr_8h.html#a0d6ec0cda4eca485f9240435186d72c9">to_ssa_expr</a>(expr), <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  }</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    !write &amp;&amp; expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_member &amp;&amp;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    !<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a> &amp;&amp; expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_member &amp;&amp;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="std__expr_8h.html#ab4e213ed656e2c729a3e85fa99f08fd4">to_member_expr</a>(expr).struct_op().<span class="keywordtype">id</span>() == ID_struct)</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  {</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#aa3bac8a76ca90048cd93cd1bf4967478">simplify_opt</a>(std::move(expr), ns);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    !write &amp;&amp; expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_index &amp;&amp;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    !<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a> &amp;&amp; expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_index &amp;&amp;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr).array().<span class="keywordtype">id</span>() == ID_array)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  {</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#aa3bac8a76ca90048cd93cd1bf4967478">simplify_opt</a>(std::move(expr), ns);</div>
@@ -178,13 +178,13 @@ $(document).ready(function(){initNavTree('field__sensitivity_8cpp_source.html','
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      member.<a class="code" href="classmember__exprt.html#a3214a570c6a3afdf34f6cac5ecff8ace">struct_op</a>() = tmp.<a class="code" href="classssa__exprt.html#ae583eaf02fa5aceb0c64a2b2b49765fd">get_original_expr</a>();</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      tmp.<a class="code" href="classssa__exprt.html#a93b3780c52912a7b361cfa3845f28d34">set_expression</a>(member);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="keywordflow">if</span>(was_l2)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>(std::move(tmp), ns).get(), write);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>(std::move(tmp), ns).get(), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(tmp), write);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(tmp), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  }</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    !write &amp;&amp; (expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_extract_little_endian ||</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    !<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a> &amp;&amp; (expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_extract_little_endian ||</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;               expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_byte_extract_big_endian))</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  {</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keyword">const</span> <a class="code" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;be = <a class="code" href="byte__operators_8h.html#af1763b1e9181575ca253edca181f1a1f">to_byte_extract_expr</a>(expr);</div>
@@ -212,10 +212,10 @@ $(document).ready(function(){initNavTree('field__sensitivity_8cpp_source.html','
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;          <span class="keywordflow">if</span>(was_l2)</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;          {</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;              ns, state, state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>(std::move(tmp), ns).get(), write);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;              ns, state, state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>(std::move(tmp), ns).get(), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;          }</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(tmp), write);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(tmp), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        }</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      }</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
@@ -270,12 +270,12 @@ $(document).ready(function(){initNavTree('field__sensitivity_8cpp_source.html','
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;          <span class="keywordflow">if</span>(was_l2)</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;          {</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;              ns, state, state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>(std::move(tmp), ns).get(), write);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;              ns, state, state.<a class="code" href="classgoto__symex__statet.html#a934d3a7b0f55daa4a41ff697bdd96913">rename</a>(std::move(tmp), ns).get(), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;          }</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;          <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(tmp), write);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a>(ns, state, std::move(tmp), <a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>);</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        }</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!write)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!<a class="code" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>)</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        {</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          <span class="comment">// Expand the array and return `{array[0]; array[1]; ...}[index]`</span></div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;          <a class="code" href="classexprt.html">exprt</a> expanded_array =</div>
@@ -713,6 +713,7 @@ $(document).ready(function(){initNavTree('field__sensitivity_8cpp_source.html','
 <div class="ttc" id="astd__types_8h_html_a6ceae55cfc16506fda77e87c30d4bd68"><div class="ttname"><a href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a></div><div class="ttdeci">const array_typet &amp; to_array_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to an array_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00844">std_types.h:844</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a87428d539e489cce31742459e3ed3206"><div class="ttname"><a href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a></div><div class="ttdeci">const struct_union_typet &amp; to_struct_union_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_union_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00214">std_types.h:214</a></div></div>
 <div class="ttc" id="asymex__target_8h_html"><div class="ttname"><a href="symex__target_8h.html">symex_target.h</a></div><div class="ttdoc">Generate Equation using Symbolic Execution.</div></div>
+<div class="ttc" id="aunistd_8c_html_a9e58c2a6f572a2d2cdad1306d7d2b802"><div class="ttname"><a href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a></div><div class="ttdeci">ssize_t write(int fildes, const void *buf, size_t nbyte)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00160">unistd.c:160</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

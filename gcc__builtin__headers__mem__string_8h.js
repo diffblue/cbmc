@@ -34,7 +34,7 @@ var gcc__builtin__headers__mem__string_8h =
     [ "__builtin___vsprintf_chk", "gcc__builtin__headers__mem__string_8h.html#a2531f16c48d616fddb9ca9b2fa0b7073", null ],
     [ "__builtin_aggregate_incoming_address", "gcc__builtin__headers__mem__string_8h.html#a1a7bba5d9980999259d51ff6936b60db", null ],
     [ "__builtin_aligned_alloc", "gcc__builtin__headers__mem__string_8h.html#a71a077e57674487a89448576a17f8f50", null ],
-    [ "__builtin_alloca", "gcc__builtin__headers__mem__string_8h.html#aa9c998671d34f063434f1a7720a9d25b", null ],
+    [ "__builtin_alloca", "gcc__builtin__headers__mem__string_8h.html#a62fb75f5b4144cdcdc1a1318425f3928", null ],
     [ "__builtin_assume_aligned", "gcc__builtin__headers__mem__string_8h.html#ae6836dee0e516199ae7bb25ba0846a8b", null ],
     [ "__builtin_bcmp", "gcc__builtin__headers__mem__string_8h.html#a5781db341dfc3bf2df7eb649ef1ca503", null ],
     [ "__builtin_bcopy", "gcc__builtin__headers__mem__string_8h.html#adf7ecc3abf36fa4e714e7fd039df6f61", null ],

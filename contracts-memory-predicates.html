@@ -140,12 +140,13 @@ Semantics</h2>
 <div class="line">__CPROVER_assigns(*out, err_signal)</div>
 <div class="line">{</div>
 <div class="line">  <span class="keyword">const</span> uint64_t result = ((uint64_t) a) + ((uint64_t) b);</div>
-<div class="line">  err_signal = malloc(<span class="keyword">sizeof</span>(*err_signal));</div>
+<div class="line">  err_signal = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(*err_signal));</div>
 <div class="line">  <span class="keywordflow">if</span> (!err_signal) <span class="keywordflow">return</span>;</div>
 <div class="line">  <span class="keywordflow">if</span> (result &gt; UINT32_MAX) *err_signal = FAILURE;</div>
 <div class="line">  *out = (uint32_t) result;</div>
 <div class="line">  *err_signal = SUCCESS;</div>
 <div class="line">}</div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md108"></a>
 Enforcement</h3>
 <p>When checking the contract abstracts a function a <code>__CPROVER_is_fresh</code> in a <em>requires</em> clause will cause fresh memory to be allocated. In an <em>ensures</em> clause it will check that memory was freshly allocated.</p>
@@ -154,7 +155,7 @@ Enforcement</h3>
 <div class="line"><span class="keywordtype">int</span> __CPROVER_contracts_original_sum(<span class="keyword">const</span> uint32_t a, <span class="keyword">const</span> uint32_t b, uint32_t* out)</div>
 <div class="line">{</div>
 <div class="line">  <span class="keyword">const</span> uint64_t result = ((uint64_t) a) + ((uint64_t) b);</div>
-<div class="line">  err_signal = malloc(<span class="keyword">sizeof</span>(*err_signal));</div>
+<div class="line">  err_signal = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(*err_signal));</div>
 <div class="line">  <span class="keywordflow">if</span> (!err_signal) <span class="keywordflow">return</span>;</div>
 <div class="line">  <span class="keywordflow">if</span> (result &gt; UINT32_MAX) *err_signal = FAILURE;</div>
 <div class="line">  *out = (uint32_t) result;</div>

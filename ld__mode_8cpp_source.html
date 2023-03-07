@@ -132,7 +132,7 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(cmdline.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;native-linker&quot;</span>))</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">return</span> cmdline.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="stringliteral">&quot;native-linker&quot;</span>);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">std::string::size_type</a> <a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> = base_name.find(<span class="stringliteral">&quot;goto-ld&quot;</span>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> <a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> = base_name.find(<span class="stringliteral">&quot;goto-ld&quot;</span>);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">if</span>(</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a> == std::string::npos || base_name == <span class="stringliteral">&quot;goto-gcc&quot;</span> ||</div>
@@ -337,7 +337,7 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> mv_result = rename(bin_name.c_str(), object_file.c_str());</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keywordflow">if</span>(mv_result != 0)</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      {</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        log.debug() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; std::strerror(errno)</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        log.debug() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno)</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;                    &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      }</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div>
@@ -366,7 +366,6 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;ld plus the following.\n\n&quot;</span>;</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;}</div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
-<div class="ttc" id="ac__types_8cpp_html_a63b72e8e2d309c23fcb5700dd3fe4e64"><div class="ttname"><a href="c__types_8cpp.html#a63b72e8e2d309c23fcb5700dd3fe4e64">size_type</a></div><div class="ttdeci">unsignedbv_typet size_type()</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00055">c_types.cpp:55</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html"><div class="ttname"><a href="classcmdlinet.html">cmdlinet</a></div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00020">cmdline.h:21</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html_a0340b7d3ea2d96c8939e831433b7ad0d"><div class="ttname"><a href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">cmdlinet::get_value</a></div><div class="ttdeci">std::string get_value(char option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00048">cmdline.cpp:48</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html_a48cdeec07eb4cd4648b6b226544ec4da"><div class="ttname"><a href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">cmdlinet::isset</a></div><div class="ttdeci">virtual bool isset(char option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00030">cmdline.cpp:30</a></div></div>
@@ -428,6 +427,8 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="ttc" id="arun_8h_html"><div class="ttname"><a href="run_8h.html">run.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
+<div class="ttc" id="astring_8c_html_add46ab98f32b76457852dbb872842bf2"><div class="ttname"><a href="string_8c.html#add46ab98f32b76457852dbb872842bf2">strerror</a></div><div class="ttdeci">char * strerror(int errnum)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l01014">string.c:1014</a></div></div>
+<div class="ttc" id="aunistd_8c_html_adead3ef83e9181db3b1d4d7d098a18c0"><div class="ttname"><a href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a></div><div class="ttdeci">#define size_type</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00312">unistd.c:312</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

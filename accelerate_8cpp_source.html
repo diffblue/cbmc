@@ -475,15 +475,15 @@ $(document).ready(function(){initNavTree('accelerate_8cpp_source.html',''); init
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="comment">// Find which symbols are read, i.e. those appearing in a guard or on</span></div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="comment">// the right hand side of an assignment.  Assume each is not dirty.</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    std::set&lt;symbol_exprt&gt; read;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    std::set&lt;symbol_exprt&gt; <a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>;</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160; </div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keywordflow">if</span>(it-&gt;has_condition())</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(it-&gt;condition(), read);</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(it-&gt;condition(), <a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>);</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160; </div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_assign())</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(it-&gt;assign_rhs(), read);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(it-&gt;assign_rhs(), <a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>);</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;var : read)</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;var : <a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>)</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    {</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      expr_mapt::iterator dirty_var=<a class="code" href="classacceleratet.html#a7663dcca7393013d6f75c0893bc60817">dirty_vars_map</a>.find(var);</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
@@ -861,6 +861,7 @@ $(document).ready(function(){initNavTree('accelerate_8cpp_source.html',''); init
 <div class="ttc" id="aformat__expr_8h_html"><div class="ttname"><a href="format__expr_8h.html">format_expr.h</a></div></div>
 <div class="ttc" id="agoto__functions_8h_html"><div class="ttname"><a href="goto__functions_8h.html">goto_functions.h</a></div><div class="ttdoc">Goto Programs with Functions.</div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba998eded080e73768c0b44bf4891df984">SKIP</a></div><div class="ttdeci">@ SKIP</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00037">goto_program.h:37</a></div></div>
+<div class="ttc" id="ajava_8io_8c_html_ae816852877fb8911b6730f7b73ea93f8"><div class="ttname"><a href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a></div><div class="ttdeci">int __CPROVER_ID java::java io InputStream read</div><div class="ttdef"><b>Definition:</b> <a href="java_8io_8c_source.html#l00003">java.io.c:5</a></div></div>
 <div class="ttc" id="anatural__loops_8h_html"><div class="ttname"><a href="natural__loops_8h.html">natural_loops.h</a></div><div class="ttdoc">Compute natural loops in a goto_function.</div></div>
 <div class="ttc" id="aoverflow__instrumenter_8h_html"><div class="ttname"><a href="overflow__instrumenter_8h.html">overflow_instrumenter.h</a></div><div class="ttdoc">Loop Acceleration.</div></div>
 <div class="ttc" id="apath_8cpp_html_aad50be1e9c297a10f9d5f41e401e4f13"><div class="ttname"><a href="path_8cpp.html#aad50be1e9c297a10f9d5f41e401e4f13">output_path</a></div><div class="ttdeci">void output_path(const patht &amp;path, std::ostream &amp;str)</div><div class="ttdef"><b>Definition:</b> <a href="path_8cpp_source.html#l00016">path.cpp:16</a></div></div>

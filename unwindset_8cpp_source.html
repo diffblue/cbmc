@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;unsigned&gt;</a> thread_nr;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(isdigit(val[0]))</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(val[0]))</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">auto</span> c_pos = val.find(<span class="charliteral">&#39;:&#39;</span>);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">if</span>(c_pos != std::string::npos)</div>
@@ -186,7 +186,7 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keyword">const</span> <a class="code" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function =</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <a class="code" href="classunwindsett.html#a965e53d6124668a1d4b59be398c5cdc7">goto_model</a>.<a class="code" href="classabstract__goto__modelt.html#a2333a60a1d158c1936ba8541d4d00870">get_goto_function</a>(function_id);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">if</span>(isdigit(loop_nr_label[0]))</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(loop_nr_label[0]))</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      {</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keyword">auto</span> nr = <a class="code" href="string2int_8cpp.html#a705a41a400940b8bf2df7b0fcee51c72">string2optional_unsigned</a>(loop_nr_label);</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">if</span>(!nr.has_value())</div>
@@ -361,6 +361,7 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="ttc" id="aclassunwindsett_html_a965e53d6124668a1d4b59be398c5cdc7"><div class="ttname"><a href="classunwindsett.html#a965e53d6124668a1d4b59be398c5cdc7">unwindsett::goto_model</a></div><div class="ttdeci">abstract_goto_modelt &amp; goto_model</div><div class="ttdef"><b>Definition:</b> <a href="unwindset_8h_source.html#l00054">unwindset.h:54</a></div></div>
 <div class="ttc" id="aclassunwindsett_html_a9ab84176b57b4c9f4f8c3b2bfe488b3c"><div class="ttname"><a href="classunwindsett.html#a9ab84176b57b4c9f4f8c3b2bfe488b3c">unwindsett::get_limit</a></div><div class="ttdeci">optionalt&lt; unsigned &gt; get_limit(const irep_idt &amp;loop, unsigned thread_id) const</div><div class="ttdef"><b>Definition:</b> <a href="unwindset_8cpp_source.html#l00200">unwindset.cpp:200</a></div></div>
 <div class="ttc" id="aclassunwindsett_html_aae4a4878d4234816708a4861f17420c3"><div class="ttname"><a href="classunwindsett.html#aae4a4878d4234816708a4861f17420c3">unwindsett::parse_unwindset</a></div><div class="ttdeci">void parse_unwindset(const std::list&lt; std::string &gt; &amp;unwindset, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="unwindset_8cpp_source.html#l00191">unwindset.cpp:191</a></div></div>
+<div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>

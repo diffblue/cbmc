@@ -197,34 +197,36 @@ Rewriting user-defined memory predicates</h1>
 <p>The last step of the rewriting is to apply the normal DFCC instrumentation which adds a write set parameter to the function, instruments it for side effect checking, and maps core memory predicates to their implementations.</p>
 <p>On our previous list example, this yields the following result:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> is_list(list_t **l, <span class="keywordtype">size_t</span> len,</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t write_set)</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set)</div>
 <div class="line">{</div>
 <div class="line">  <span class="keywordflow">if</span>(len == 0)</div>
 <div class="line">    <span class="keywordflow">return</span> (*l) == NULL;</div>
 <div class="line">  <span class="keywordflow">else</span></div>
-<div class="line">    <span class="keywordflow">return</span> __CPROVER_contracts_is_fresh(&amp;(*l), <span class="keyword">sizeof</span>(*(*l)), write_set) &amp;&amp;</div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a>(&amp;(*l), <span class="keyword">sizeof</span>(*(*l)), write_set) &amp;&amp;</div>
 <div class="line">      -10 &lt;= (*l)-&gt;value &amp;&amp; (*l)-&gt;value &lt;= 10 &amp;&amp;</div>
 <div class="line">      is_list(&amp;((*l)-&gt;next), len-1, write_set);</div>
 <div class="line">}</div>
+<div class="ttc" id="acprover__contracts_8c_html_a618ed6892d91825d0becba82c6df28b6"><div class="ttname"><a href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_is_fresh(void **elem, __CPROVER_size_t size, __CPROVER_contracts_write_set_ptr_t write_set)</div><div class="ttdoc">Implementation of the is_fresh front-end predicate.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l01151">cprover_contracts.c:1151</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
 </div><!-- fragment --><p>On the nested structs example, it gives the following result:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> is_sized_array(<span class="keywordtype">char</span> **arr, <span class="keywordtype">size_t</span> size,</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t write_set)</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set)</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordflow">return</span> __CPROVER_contracts_is_fresh(&amp;(*arr), size, write_set);</div>
+<div class="line">  <span class="keywordflow">return</span> <a class="code" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a>(&amp;(*arr), size, write_set);</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">bool</span> is_buffer(buffer_t **b,</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t write_set)</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set)</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordflow">return</span> __CPROVER_contracts_is_fresh(&amp;(*b), <span class="keyword">sizeof</span>(*(*b)), write_set) &amp;&amp;</div>
+<div class="line">  <span class="keywordflow">return</span> <a class="code" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a>(&amp;(*b), <span class="keyword">sizeof</span>(*(*b)), write_set) &amp;&amp;</div>
 <div class="line">    (0 &lt; (*b)-&gt;size &amp;&amp; (*b)-&gt;size &lt;= 10) &amp;&amp;</div>
 <div class="line">    is_sized_array(&amp;(*b)-&gt;arr, (*b)-&gt;size, write_set);</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">bool</span> is_double_buffer(double_buffer_t **b,</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t write_set)</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set)</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordflow">return</span> __CPROVER_contracts_is_fresh(&amp;(*b), <span class="keyword">sizeof</span>(*(*b)), write_set) &amp;&amp;</div>
+<div class="line">  <span class="keywordflow">return</span> <a class="code" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a>(&amp;(*b), <span class="keyword">sizeof</span>(*(*b)), write_set) &amp;&amp;</div>
 <div class="line">      is_buffer(&amp;((*b)-&gt;first), write_set) &amp;&amp;</div>
 <div class="line">      is_buffer(&amp;((*b)-&gt;second), write_set);</div>
 <div class="line">}</div>

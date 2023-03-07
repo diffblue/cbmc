@@ -173,9 +173,9 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;PBS COMMAND IS: &quot;</span> &lt;&lt; command &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">if</span> (!(getenv(<span class="stringliteral">&quot;PBS_PATH&quot;</span>)==NULL))</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordflow">if</span> (!(<a class="code" href="stdlib_8c.html#abc6595dbf6880c71628fecf0dbb23d66">getenv</a>(<span class="stringliteral">&quot;PBS_PATH&quot;</span>)==NULL))</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    command=getenv(<span class="stringliteral">&quot;PBS_PATH&quot;</span>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    command=<a class="code" href="stdlib_8c.html#abc6595dbf6880c71628fecf0dbb23d66">getenv</a>(<span class="stringliteral">&quot;PBS_PATH&quot;</span>);</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  {</div>
@@ -262,14 +262,14 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      std::cout &lt;&lt; line;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      sscanf(line.c_str(), <span class="stringliteral">&quot;%*s %*s %*s %d&quot;</span>, &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <a class="code" href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a>(line.c_str(), <span class="stringliteral">&quot;%*s %*s %*s %d&quot;</span>, &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    }</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(strstr(line.c_str(), <span class="stringliteral">&quot;SAT - All implied&quot;</span>) != <span class="keyword">nullptr</span>)</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    {</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      std::cout &lt;&lt; line;</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      sscanf(</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      <a class="code" href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a>(</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        line.c_str(),</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="stringliteral">&quot;%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d&quot;</span>,</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
@@ -279,7 +279,7 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      std::cout &lt;&lt; line;</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      sscanf(line.c_str(), <span class="stringliteral">&quot;%*s %*s %*s %d&quot;</span>, &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <a class="code" href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a>(line.c_str(), <span class="stringliteral">&quot;%*s %*s %*s %d&quot;</span>, &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    }</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(strstr(line.c_str(), <span class="stringliteral">&quot;Optimal Soln&quot;</span>) != <span class="keyword">nullptr</span>)</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    {</div>
@@ -292,7 +292,7 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                     &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <span class="keywordflow">return</span> satisfied;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      }</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      sscanf(line.c_str(), <span class="stringliteral">&quot;%*s %*s %*s %d&quot;</span>, &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <a class="code" href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a>(line.c_str(), <span class="stringliteral">&quot;%*s %*s %*s %d&quot;</span>, &amp;<a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a>);</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    }</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  }</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
@@ -414,6 +414,8 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="ttc" id="aliteral_8h_html_a5f1735d8dc11129d5a7270b90ac04495"><div class="ttname"><a href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a></div><div class="ttdeci">literalt neg(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00193">literal.h:193</a></div></div>
 <div class="ttc" id="apbs__dimacs__cnf_8h_html"><div class="ttname"><a href="pbs__dimacs__cnf_8h.html">pbs_dimacs_cnf.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
+<div class="ttc" id="astdio_8c_html_a43e2eb12f1a4a1186ac1cee67b2435ad"><div class="ttname"><a href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a></div><div class="ttdeci">int sscanf(const char *restrict s, const char *restrict format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00935">stdio.c:935</a></div></div>
+<div class="ttc" id="astdlib_8c_html_abc6595dbf6880c71628fecf0dbb23d66"><div class="ttname"><a href="stdlib_8c.html#abc6595dbf6880c71628fecf0dbb23d66">getenv</a></div><div class="ttdeci">char * getenv(const char *name)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00463">stdlib.c:463</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

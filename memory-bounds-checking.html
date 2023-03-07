@@ -94,14 +94,15 @@ $(document).ready(function(){initNavTree('memory-bounds-checking.html',''); init
 <div class="contents">
 <div class="textblock"><p>cbmc provides means to verify that pointers are within the bounds of (statically or dynamically) allocated memory blocks. When the option <code>--pointer-check</code> is used, cbmc checks the safety of each pointer dereference in the program. Similarly, the primitive <code>__CPROVER_r_ok(pointer, size)</code> returns true when it is safe to read from the memory segment starting at <code>pointer</code> and extending for <code>size</code> bytes. <code>__CPROVER_w_ok(pointer, size)</code> indicates if writing to the given segment is safe. At present, both primitives behave the same.</p>
 <p>Each memory segment is referred to internally in cbmc via an object id. Pointers are represented as bitvectors (typically of length 32 or 64). The topmost <code>n</code> bits encode the id of the memory segment the pointer is pointing to, and the remaining bits encode the offset within the segment. The number of bits used to represent the object id can be specified via <code>--object-bits n</code>. Object offsets are signed. This allows to distinguish the case of when a pointer has been incremented too much from the case of when a pointer has been decremented too much. In the latter case, a negative value would be visible for the offset portion of a pointer in an error trace.</p>
-<p>In the following, we describe how the memory bounds checks are implemented in cbmc for dynamically allocated memory. Dynamic memory is allocated in C via the <code>malloc()</code> library function. Its model in cbmc looks as follows (see <code>src/ansi-c/library/stdlib.c</code>, details not related to memory bounds checking are left off):</p>
-<div class="fragment"><div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> *malloc(__CPROVER_size_t malloc_size)</div>
+<p>In the following, we describe how the memory bounds checks are implemented in cbmc for dynamically allocated memory. Dynamic memory is allocated in C via the <code><a class="el" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc()</a></code> library function. Its model in cbmc looks as follows (see <code><a class="el" href="stdlib_8c.html">src/ansi-c/library/stdlib.c</a></code>, details not related to memory bounds checking are left off):</p>
+<div class="fragment"><div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> *<a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(__CPROVER_size_t malloc_size)</div>
 <div class="line">{</div>
 <div class="line">  <span class="keywordtype">void</span> *malloc_res;</div>
 <div class="line">  malloc_res = <a class="code" href="ansi-c_2library_2cprover_8h.html#a029d5bb1f9ca638d7cb1cd449410e255">__CPROVER_allocate</a>(malloc_size, 0);</div>
 <div class="line">  <span class="keywordflow">return</span> malloc_res;</div>
 <div class="line">}</div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a029d5bb1f9ca638d7cb1cd449410e255"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a029d5bb1f9ca638d7cb1cd449410e255">__CPROVER_allocate</a></div><div class="ttdeci">void * __CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero)</div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
 </div><!-- fragment --><p>When the option <code>--pointer-check</code> is used, cbmc generates the following verification condition for each pointer dereference expression (e.g., <code>*pointer</code>):</p>
 <div class="fragment"><div class="line"><a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(pointer) &gt;= 0 &amp;&amp;</div>
 <div class="line"><a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(pointer) &lt; <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(pointer)</div>
@@ -111,15 +112,15 @@ $(document).ready(function(){initNavTree('memory-bounds-checking.html',''); init
 <p>To illustrate how the bounds checking works, consider the following example program which is unsafe:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>()</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordtype">char</span> *p1 = malloc(1);</div>
+<div class="line">  <span class="keywordtype">char</span> *p1 = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(1);</div>
 <div class="line">  p1++;</div>
-<div class="line">  <span class="keywordtype">char</span> *p2 = malloc(2);</div>
+<div class="line">  <span class="keywordtype">char</span> *p2 = <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(2);</div>
 <div class="line"> </div>
 <div class="line">  *p1 = 1;</div>
 <div class="line">}</div>
 <div class="ttc" id="afile__converter_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="file__converter_8cpp_source.html#l00041">file_converter.cpp:41</a></div></div>
 </div><!-- fragment --><p>Here the verification condition generated for the pointer dereference should fail: for <code>p1</code> in <code>*p1</code>, <code>__CPROVER_POINTER_OFFSET</code> will evaluate to 1 (owing to the increment <code>p1++</code>, and <code>__CPROVER_OBJECT_SIZE</code> will also evaluate to 1. Consequently, the less-than comparison in the verification condition evaluates to false.</p>
-<p>Last modified: 2023-03-07 16:03:15 +0100 </p>
+<p>Last modified: 2023-03-07 22:22:25 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

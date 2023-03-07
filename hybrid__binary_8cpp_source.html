@@ -175,7 +175,7 @@ $(document).ready(function(){initNavTree('hybrid__binary_8cpp_source.html',''); 
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordtype">bool</span> remove_result = <a class="code" href="file__util_8cpp.html#ad4a5323bae5fbabc27a7d3b9da02ae1f">file_remove</a>(goto_binary_file);</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordflow">if</span>(!remove_result)</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Remove failed: &quot;</span> &lt;&lt; std::strerror(errno)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Remove failed: &quot;</span> &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno)</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                    &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">if</span>(result == 0)</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      result = remove_result;</div>
@@ -210,7 +210,7 @@ $(document).ready(function(){initNavTree('hybrid__binary_8cpp_source.html',''); 
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="keywordflow">if</span>(chmod_result != 0)</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      {</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Setting execute permissions failed: &quot;</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;                        &lt;&lt; std::strerror(errno) &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;                        &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno) &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        result = chmod_result;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      }</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
@@ -235,7 +235,7 @@ $(document).ready(function(){initNavTree('hybrid__binary_8cpp_source.html',''); 
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keywordtype">bool</span> remove_result = <a class="code" href="file__util_8cpp.html#ad4a5323bae5fbabc27a7d3b9da02ae1f">file_remove</a>(goto_binary_file);</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordflow">if</span>(!remove_result)</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Remove failed: &quot;</span> &lt;&lt; std::strerror(errno)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Remove failed: &quot;</span> &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno)</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                    &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">if</span>(result == 0)</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      result = remove_result;</div>
@@ -268,6 +268,7 @@ $(document).ready(function(){initNavTree('hybrid__binary_8cpp_source.html',''); 
 <div class="ttc" id="arun_8cpp_html_a32e6ac327187b7ac705f730a35ab0628"><div class="ttname"><a href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a></div><div class="ttdeci">int run(const std::string &amp;what, const std::vector&lt; std::string &gt; &amp;argv)</div><div class="ttdef"><b>Definition:</b> <a href="run_8cpp_source.html#l00048">run.cpp:48</a></div></div>
 <div class="ttc" id="arun_8h_html"><div class="ttname"><a href="run_8h.html">run.h</a></div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>
+<div class="ttc" id="astring_8c_html_add46ab98f32b76457852dbb872842bf2"><div class="ttname"><a href="string_8c.html#add46ab98f32b76457852dbb872842bf2">strerror</a></div><div class="ttdeci">char * strerror(int errnum)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l01014">string.c:1014</a></div></div>
 <div class="ttc" id="asuffix_8h_html"><div class="ttname"><a href="suffix_8h.html">suffix.h</a></div></div>
 <div class="ttc" id="asuffix_8h_html_a01816fa76558ff033b634a5d15c52014"><div class="ttname"><a href="suffix_8h.html#a01816fa76558ff033b634a5d15c52014">has_suffix</a></div><div class="ttdeci">bool has_suffix(const std::string &amp;s, const std::string &amp;suffix)</div><div class="ttdef"><b>Definition:</b> <a href="suffix_8h_source.html#l00017">suffix.h:17</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

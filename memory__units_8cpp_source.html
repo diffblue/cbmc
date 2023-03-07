@@ -156,16 +156,16 @@ $(document).ready(function(){initNavTree('memory__units_8cpp_source.html',''); i
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
 <div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="classmemory__sizet.html#a4f95b4861880e5a684dc0a37c7873ac0">   63</a></span>&#160;std::string <a class="code" href="classmemory__sizet.html#a4f95b4861880e5a684dc0a37c7873ac0">memory_sizet::to_string</a>()<span class="keyword"> const</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  std::size_t remainder = <a class="code" href="classmemory__sizet.html#a0bea8c79b4426584dfd8f1660aa17f3b">get_bytes</a>();</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  std::size_t <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> = <a class="code" href="classmemory__sizet.html#a0bea8c79b4426584dfd8f1660aa17f3b">get_bytes</a>();</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  std::ostringstream out;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">const</span> std::size_t gib = remainder / (1024 * 1024 * 1024);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  remainder -= gib * 1024 * 1024 * 1024;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">const</span> std::size_t gib = <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> / (1024 * 1024 * 1024);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> -= gib * 1024 * 1024 * 1024;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keywordflow">if</span>(gib &gt; 0)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    out &lt;&lt; gib &lt;&lt; <a class="code" href="classmemory__sizet.html#a3a7b30851ac9be472785632aa48f16af">si_gibibyte_symbol</a>;</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">const</span> std::size_t mib = remainder / (1024 * 1024);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  remainder -= mib * 1024 * 1024;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">const</span> std::size_t mib = <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> / (1024 * 1024);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> -= mib * 1024 * 1024;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keywordflow">if</span>(mib &gt; 0)</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  {</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">if</span>(gib &gt; 0)</div>
@@ -174,8 +174,8 @@ $(document).ready(function(){initNavTree('memory__units_8cpp_source.html',''); i
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    }</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    out &lt;&lt; mib &lt;&lt; <a class="code" href="classmemory__sizet.html#a57885e7eb044e9b515da6263cf12a463">si_mebibyte_symbol</a>;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keyword">const</span> std::size_t kib = remainder / 1024;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  remainder -= kib * 1024;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keyword">const</span> std::size_t kib = <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> / 1024;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> -= kib * 1024;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordflow">if</span>(kib &gt; 0)</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  {</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">if</span>(mib &gt; 0 || gib &gt; 0)</div>
@@ -188,7 +188,7 @@ $(document).ready(function(){initNavTree('memory__units_8cpp_source.html',''); i
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  {</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    out &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  out &lt;&lt; remainder &lt;&lt; <a class="code" href="classmemory__sizet.html#af1aa7d0128f01ec3241ac2cc8a56475c">si_byte_symbol</a>;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  out &lt;&lt; <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> &lt;&lt; <a class="code" href="classmemory__sizet.html#af1aa7d0128f01ec3241ac2cc8a56475c">si_byte_symbol</a>;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordflow">return</span> out.str();</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
@@ -223,6 +223,7 @@ $(document).ready(function(){initNavTree('memory__units_8cpp_source.html',''); i
 <div class="ttc" id="aclassmemory__sizet_html_a94f30a6a85a3d77443da6b19f6abd551"><div class="ttname"><a href="classmemory__sizet.html#a94f30a6a85a3d77443da6b19f6abd551">memory_sizet::get_mebibytes</a></div><div class="ttdeci">std::size_t get_mebibytes() const</div><div class="ttdef"><b>Definition:</b> <a href="memory__units_8cpp_source.html#l00053">memory_units.cpp:53</a></div></div>
 <div class="ttc" id="aclassmemory__sizet_html_ad3ac8b8056262023678c4963a2885a9c"><div class="ttname"><a href="classmemory__sizet.html#ad3ac8b8056262023678c4963a2885a9c">memory_sizet::operator+=</a></div><div class="ttdeci">memory_sizet &amp; operator+=(const memory_sizet &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="memory__units_8cpp_source.html#l00106">memory_units.cpp:106</a></div></div>
 <div class="ttc" id="aclassmemory__sizet_html_af1aa7d0128f01ec3241ac2cc8a56475c"><div class="ttname"><a href="classmemory__sizet.html#af1aa7d0128f01ec3241ac2cc8a56475c">memory_sizet::si_byte_symbol</a></div><div class="ttdeci">static const char * si_byte_symbol</div><div class="ttdef"><b>Definition:</b> <a href="memory__units_8h_source.html#l00036">memory_units.h:36</a></div></div>
+<div class="ttc" id="amath_8c_html_af7df01c4a9038dbf3562b41bc8c3be03"><div class="ttname"><a href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a></div><div class="ttdeci">double remainder(double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02330">math.c:2330</a></div></div>
 <div class="ttc" id="amemory__units_8h_html"><div class="ttname"><a href="memory__units_8h.html">memory_units.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

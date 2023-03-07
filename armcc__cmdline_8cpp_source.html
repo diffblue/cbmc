@@ -374,7 +374,7 @@ $(document).ready(function(){initNavTree('armcc__cmdline_8cpp_source.html',''); 
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;{</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=1; i&lt;argc; i++)</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  {</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keywordflow">if</span>(strcmp(argv[i], <span class="stringliteral">&quot;-&quot;</span>)==0 ||</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="string_8c.html#a11bd144d7d44914099a3aeddf1c8567d">strcmp</a>(argv[i], <span class="stringliteral">&quot;-&quot;</span>)==0 ||</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;       argv[i][0]!=<span class="charliteral">&#39;-&#39;</span>)</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    {</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      <a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>.push_back(argv[i]);</div>
@@ -392,7 +392,7 @@ $(document).ready(function(){initNavTree('armcc__cmdline_8cpp_source.html',''); 
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>((prefix = <a class="code" href="armcc__cmdline_8cpp.html#aeeb750f5c89574da6fafdc8ddd623cbd">prefix_in_list</a>(argv[i], <a class="code" href="armcc__cmdline_8cpp.html#a6ff3ef5280c0d006051884486da40360">options_with_arg</a>)))</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    {</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="comment">// options that have a separated _or_ concatenated argument</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordflow">if</span>(strlen(argv[i]) &gt; prefix-&gt;size()) <span class="comment">// Concatenated.</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="string_8c.html#aa383452fe445bfae989358c9d7d96f4f">strlen</a>(argv[i]) &gt; prefix-&gt;size()) <span class="comment">// Concatenated.</span></div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <a class="code" href="classgoto__cc__cmdlinet.html#a054bdc02e35b5bbd7e9ffe771c28856a">set</a>(*prefix, std::string(argv[i], prefix-&gt;size(), std::string::npos));</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      {</div>
@@ -431,6 +431,8 @@ $(document).ready(function(){initNavTree('armcc__cmdline_8cpp_source.html',''); 
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html_ac32a013f44be26fff72c427f28f1d0dd"><div class="ttname"><a href="classgoto__cc__cmdlinet.html#ac32a013f44be26fff72c427f28f1d0dd">goto_cc_cmdlinet::parse</a></div><div class="ttdeci">virtual bool parse(int argc, const char **argv, const char *optstring)</div><div class="ttdoc">Parses a commandline according to a specification given in optstring.</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00075">cmdline.cpp:153</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
+<div class="ttc" id="astring_8c_html_a11bd144d7d44914099a3aeddf1c8567d"><div class="ttname"><a href="string_8c.html#a11bd144d7d44914099a3aeddf1c8567d">strcmp</a></div><div class="ttdeci">int strcmp(const char *s1, const char *s2)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00363">string.c:363</a></div></div>
+<div class="ttc" id="astring_8c_html_aa383452fe445bfae989358c9d7d96f4f"><div class="ttname"><a href="string_8c.html#aa383452fe445bfae989358c9d7d96f4f">strlen</a></div><div class="ttdeci">size_t strlen(const char *s)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00561">string.c:561</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

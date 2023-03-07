@@ -148,7 +148,7 @@ $(document).ready(function(){initNavTree('format__strings_8cpp_source.html','');
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  std::string tmp;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">for</span>( ; isdigit(*it); it++) tmp+=*it;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">for</span>( ; <a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(*it); it++) tmp+=*it;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  curtok.<a class="code" href="classformat__tokent.html#a2ccf3d4159fd8d7aa29dacc2d4ba58cc">field_width</a>=<a class="code" href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a>(tmp);</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
@@ -168,7 +168,7 @@ $(document).ready(function(){initNavTree('format__strings_8cpp_source.html','');
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    {</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      std::string tmp;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <span class="keywordflow">for</span>( ; isdigit(*it); it++) tmp+=*it;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <span class="keywordflow">for</span>( ; <a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(*it); it++) tmp+=*it;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      curtok.<a class="code" href="classformat__tokent.html#a0d5ce18f514f66b4ca28ad25f1cb054f">precision</a>=<a class="code" href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a>(tmp);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
@@ -465,6 +465,7 @@ $(document).ready(function(){initNavTree('format__strings_8cpp_source.html','');
 <div class="ttc" id="aclassformat__tokent_html_aff8f70f36dd5a24e413a9564b4f15eaf"><div class="ttname"><a href="classformat__tokent.html#aff8f70f36dd5a24e413a9564b4f15eaf">format_tokent::value</a></div><div class="ttdeci">irep_idt value</div><div class="ttdef"><b>Definition:</b> <a href="format__strings_8h_source.html#l00087">format_strings.h:87</a></div></div>
 <div class="ttc" id="aclassnil__exprt_html"><div class="ttname"><a href="classnil__exprt.html">nil_exprt</a></div><div class="ttdoc">The NIL expression.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03025">std_expr.h:3026</a></div></div>
 <div class="ttc" id="aclassunsupported__operation__exceptiont_html"><div class="ttname"><a href="classunsupported__operation__exceptiont.html">unsupported_operation_exceptiont</a></div><div class="ttdoc">Thrown when we encounter an instruction, parameters to an instruction etc.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00144">exception_utils.h:145</a></div></div>
+<div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="aformat__strings_8cpp_html_a2e2ad3843e0852239c1c58a0ec273674"><div class="ttname"><a href="format__strings_8cpp.html#a2e2ad3843e0852239c1c58a0ec273674">parse_field_width</a></div><div class="ttdeci">void parse_field_width(std::string::const_iterator &amp;it, format_tokent &amp;curtok)</div><div class="ttdef"><b>Definition:</b> <a href="format__strings_8cpp_source.html#l00048">format_strings.cpp:48</a></div></div>
 <div class="ttc" id="aformat__strings_8cpp_html_a617502161d4c25449851e27f1a4a2193"><div class="ttname"><a href="format__strings_8cpp.html#a617502161d4c25449851e27f1a4a2193">parse_conversion_specifier</a></div><div class="ttdeci">void parse_conversion_specifier(const std::string &amp;arg_string, std::string::const_iterator &amp;it, format_tokent &amp;curtok)</div><div class="ttdef"><b>Definition:</b> <a href="format__strings_8cpp_source.html#l00120">format_strings.cpp:120</a></div></div>

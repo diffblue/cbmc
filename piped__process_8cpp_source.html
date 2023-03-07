@@ -330,18 +330,18 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classsystem__exceptiont.html">system_exceptiont</a>(<span class="stringliteral">&quot;Process creation failed.&quot;</span>);</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">#  else</span></div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="keywordflow">if</span>(pipe(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>) == -1)</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="unistd_8c.html#ae43dae6b7c84d11ec3036b822b28a179">pipe</a>(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>) == -1)</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  {</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classsystem__exceptiont.html">system_exceptiont</a>(<span class="stringliteral">&quot;Input pipe creation failed&quot;</span>);</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  }</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="keywordflow">if</span>(pipe(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>) == -1)</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="unistd_8c.html#ae43dae6b7c84d11ec3036b822b28a179">pipe</a>(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>) == -1)</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  {</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classsystem__exceptiont.html">system_exceptiont</a>(<span class="stringliteral">&quot;Output pipe creation failed&quot;</span>);</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  }</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">if</span>(fcntl(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0], F_SETFL, O_NONBLOCK) &lt; 0)</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="fcntl_8c.html#ad39ebe4c4767eaa9a680777400cfaafe">fcntl</a>(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0], F_SETFL, O_NONBLOCK) &lt; 0)</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  {</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classsystem__exceptiont.html">system_exceptiont</a>(<span class="stringliteral">&quot;Setting pipe non-blocking failed&quot;</span>);</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  }</div>
@@ -355,8 +355,8 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="comment">// Close pipes that will be used by the parent so we do</span></div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="comment">// not have our own copies and conflicts.</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    close(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[1]);</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    close(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0]);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[1]);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0]);</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="comment">// Duplicate pipes so we have the ones we need.</span></div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    dup2(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[0], STDIN_FILENO);</div>
@@ -366,12 +366,12 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="comment">// Create a char** for the arguments (all the contents of commandvec</span></div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="comment">// except the first element, i.e. the command itself).</span></div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordtype">char</span> **args =</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(malloc((commandvec.size()) * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span> *)));</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(<a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>((commandvec.size()) * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span> *)));</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="comment">// Add all the arguments to the args array of char *.</span></div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> i = 0;</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordflow">while</span>(i &lt; commandvec.size())</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    {</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      args[i] = strdup(commandvec[i].c_str());</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      args[i] = <a class="code" href="string_8c.html#a2c4f14c424a31db9c57fd046c3b9f0df">strdup</a>(commandvec[i].c_str());</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      i++;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    }</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    args[i] = NULL;</div>
@@ -382,25 +382,25 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">while</span>(i &gt; 0)</div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    {</div>
 <div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      i--;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      free(args[i]);</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <a class="code" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(args[i]);</div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    }</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    free(args);</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <a class="code" href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a>(args);</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="comment">// Only reachable if execvp failed</span></div>
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="comment">// Note that here we send to std::cerr since we are in the child process</span></div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="comment">// here and this is received by the parent process.</span></div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;Launching &quot;</span> &lt;&lt; commandvec[0]</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;              &lt;&lt; <span class="stringliteral">&quot; failed with error: &quot;</span> &lt;&lt; std::strerror(errno) &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    abort();</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;              &lt;&lt; <span class="stringliteral">&quot; failed with error: &quot;</span> &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno) &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <a class="code" href="stdlib_8c.html#a8dec7c95227ff149687066cf04029191">abort</a>();</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  }</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  {</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="comment">// parent process here</span></div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="comment">// Close pipes to be used by the child process</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    close(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[0]);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    close(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[1]);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[0]);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[1]);</div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="comment">// Get stream for sending to the child process</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a> = fdopen(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[1], <span class="stringliteral">&quot;w&quot;</span>);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a> = <a class="code" href="stdio_8c.html#a44c4efdc467f2672636145f559aa0556">fdopen</a>(<a class="code" href="classpiped__processt.html#af27cb4e81909780a58d0b81375cf2218">pipe_input</a>[1], <span class="stringliteral">&quot;w&quot;</span>);</div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  }</div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="preprocessor">#  endif</span></div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <a class="code" href="classpiped__processt.html#a1c30497781e82cc8513c3c19d1640771">process_state</a> = <a class="code" href="classpiped__processt.html#aafb07ee63f8650b8a358470d6231116da43491564ebcfd38568918efbd6e840fd">statet::RUNNING</a>;</div>
@@ -422,11 +422,11 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  CloseHandle(proc_info-&gt;hThread);</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="preprocessor">#  else</span></div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <span class="comment">// Close the parent side of the remaining pipes</span></div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  fclose(<a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a>);</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  <a class="code" href="stdio_8c.html#a76370407f9ab0402564c2bb9bc9664e0">fclose</a>(<a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a>);</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="comment">// Note that the above will call close(pipe_input[1]);</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  close(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0]);</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <a class="code" href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a>(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0]);</div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="comment">// Send signal to the child process to terminate</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  kill(<a class="code" href="classpiped__processt.html#a052a901412df584b05f961ac3b0a3913">child_process_id</a>, SIGTERM);</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <a class="code" href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a>(<a class="code" href="classpiped__processt.html#a052a901412df584b05f961ac3b0a3913">child_process_id</a>, SIGTERM);</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="preprocessor">#  endif</span></div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;}</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160; </div>
@@ -475,8 +475,8 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <span class="stringliteral">&quot; bytes were written.&quot;</span>);</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  <span class="comment">// send message to solver process</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keywordtype">int</span> send_status = fputs(message.c_str(), <a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a>);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  fflush(<a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a>);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keywordtype">int</span> send_status = <a class="code" href="stdio_8c.html#a68236e664c1f0da049b25fba1c1695f6">fputs</a>(message.c_str(), <a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a>);</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <a class="code" href="stdio_8c.html#adb974f28765a31026ee6bf71d5175951">fflush</a>(<a class="code" href="classpiped__processt.html#a9f5eef032340ee66b5e01912c5e27b01">command_stream</a>);</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="keywordflow">if</span>(send_status == EOF)</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  {</div>
@@ -504,7 +504,7 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    success = ReadFile(child_std_OUT_Rd, buff, <a class="code" href="piped__process_8cpp.html#aeca034f67218340ecb2261a22c2f3dcd">BUFSIZE</a>, &amp;nbytes, NULL);</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    nbytes = read(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0], buff, <a class="code" href="piped__process_8cpp.html#aeca034f67218340ecb2261a22c2f3dcd">BUFSIZE</a>);</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    nbytes = <a class="code" href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a>(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[0], buff, <a class="code" href="piped__process_8cpp.html#aeca034f67218340ecb2261a22c2f3dcd">BUFSIZE</a>);</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="comment">// Added the status back in here to keep parity with old implementation</span></div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="comment">// TODO: check which statuses are really used/needed.</span></div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">if</span>(nbytes == 0) <span class="comment">// Update if the pipe is stopped</span></div>
@@ -640,6 +640,8 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="ttc" id="aclasspiped__processt_html_aff217e6daeba2a467e59cb77aa8ae511"><div class="ttname"><a href="classpiped__processt.html#aff217e6daeba2a467e59cb77aa8ae511">piped_processt::wait_receive</a></div><div class="ttdeci">std::string wait_receive()</div><div class="ttdoc">Wait until a string is available and read a string from the child process' output.</div><div class="ttdef"><b>Definition:</b> <a href="piped__process_8cpp_source.html#l00439">piped_process.cpp:439</a></div></div>
 <div class="ttc" id="aclasssystem__exceptiont_html"><div class="ttname"><a href="classsystem__exceptiont.html">system_exceptiont</a></div><div class="ttdoc">Thrown when some external system fails unexpectedly.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00071">exception_utils.h:72</a></div></div>
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
+<div class="ttc" id="afcntl_8c_html_ad39ebe4c4767eaa9a680777400cfaafe"><div class="ttname"><a href="fcntl_8c.html#ad39ebe4c4767eaa9a680777400cfaafe">fcntl</a></div><div class="ttdeci">int fcntl(int fd, int cmd,...)</div><div class="ttdef"><b>Definition:</b> <a href="fcntl_8c_source.html#l00010">fcntl.c:10</a></div></div>
+<div class="ttc" id="ajava_8io_8c_html_ae816852877fb8911b6730f7b73ea93f8"><div class="ttname"><a href="java_8io_8c.html#ae816852877fb8911b6730f7b73ea93f8">read</a></div><div class="ttdeci">int __CPROVER_ID java::java io InputStream read</div><div class="ttdef"><b>Definition:</b> <a href="java_8io_8c_source.html#l00003">java.io.c:5</a></div></div>
 <div class="ttc" id="amake__unique_8h_html"><div class="ttname"><a href="make__unique_8h.html">make_unique.h</a></div></div>
 <div class="ttc" id="anarrow_8h_html"><div class="ttname"><a href="narrow_8h.html">narrow.h</a></div></div>
 <div class="ttc" id="anodiscard_8h_html_abf13e44576a768044e199191d4f26f7e"><div class="ttname"><a href="nodiscard_8h.html#abf13e44576a768044e199191d4f26f7e">NODISCARD</a></div><div class="ttdeci">#define NODISCARD</div><div class="ttdef"><b>Definition:</b> <a href="nodiscard_8h_source.html#l00022">nodiscard.h:22</a></div></div>
@@ -649,11 +651,23 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="ttc" id="apiped__process_8h_html"><div class="ttname"><a href="piped__process_8h.html">piped_process.h</a></div><div class="ttdoc">Subprocess communication with pipes.</div></div>
 <div class="ttc" id="apiped__process_8h_html_ae2a7932674f7aa3fa127556c42de3305"><div class="ttname"><a href="piped__process_8h.html#ae2a7932674f7aa3fa127556c42de3305">PIPED_PROCESS_INFINITE_TIMEOUT</a></div><div class="ttdeci">#define PIPED_PROCESS_INFINITE_TIMEOUT</div><div class="ttdef"><b>Definition:</b> <a href="piped__process_8h_source.html#l00022">piped_process.h:22</a></div></div>
 <div class="ttc" id="arun_8h_html"><div class="ttname"><a href="run_8h.html">run.h</a></div></div>
+<div class="ttc" id="asignal_8c_html_a4539db972bcf3dd8c8b429af0dc3789d"><div class="ttname"><a href="signal_8c.html#a4539db972bcf3dd8c8b429af0dc3789d">kill</a></div><div class="ttdeci">int kill(pid_t pid, int sig)</div><div class="ttdef"><b>Definition:</b> <a href="signal_8c_source.html#l00015">signal.c:15</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="astatic__verifier_8h_html_a69a2fc438b669cb2de3fbe5150e26bdaac0d83f0b82a6b30de8811e69e6d95c61"><div class="ttname"><a href="static__verifier_8h.html#a69a2fc438b669cb2de3fbe5150e26bdaac0d83f0b82a6b30de8811e69e6d95c61">ai_verifier_statust::TRUE</a></div><div class="ttdeci">@ TRUE</div></div>
+<div class="ttc" id="astdio_8c_html_a44c4efdc467f2672636145f559aa0556"><div class="ttname"><a href="stdio_8c.html#a44c4efdc467f2672636145f559aa0556">fdopen</a></div><div class="ttdeci">FILE * fdopen(int handle, const char *mode)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00216">stdio.c:216</a></div></div>
+<div class="ttc" id="astdio_8c_html_a68236e664c1f0da049b25fba1c1695f6"><div class="ttname"><a href="stdio_8c.html#a68236e664c1f0da049b25fba1c1695f6">fputs</a></div><div class="ttdeci">int fputs(const char *s, FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00474">stdio.c:474</a></div></div>
+<div class="ttc" id="astdio_8c_html_a76370407f9ab0402564c2bb9bc9664e0"><div class="ttname"><a href="stdio_8c.html#a76370407f9ab0402564c2bb9bc9664e0">fclose</a></div><div class="ttdeci">int fclose(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00190">stdio.c:190</a></div></div>
+<div class="ttc" id="astdio_8c_html_adb974f28765a31026ee6bf71d5175951"><div class="ttname"><a href="stdio_8c.html#adb974f28765a31026ee6bf71d5175951">fflush</a></div><div class="ttdeci">int fflush(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00510">stdio.c:510</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a8dec7c95227ff149687066cf04029191"><div class="ttname"><a href="stdlib_8c.html#a8dec7c95227ff149687066cf04029191">abort</a></div><div class="ttdeci">void abort(void)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00095">stdlib.c:95</a></div></div>
+<div class="ttc" id="astdlib_8c_html_afbedc913aa4651b3c3b4b3aecd9b4711"><div class="ttname"><a href="stdlib_8c.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a></div><div class="ttdeci">void free(void *ptr)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00284">stdlib.c:284</a></div></div>
+<div class="ttc" id="astring_8c_html_a2c4f14c424a31db9c57fd046c3b9f0df"><div class="ttname"><a href="string_8c.html#a2c4f14c424a31db9c57fd046c3b9f0df">strdup</a></div><div class="ttdeci">char * strdup(const char *str)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00590">string.c:590</a></div></div>
+<div class="ttc" id="astring_8c_html_add46ab98f32b76457852dbb872842bf2"><div class="ttname"><a href="string_8c.html#add46ab98f32b76457852dbb872842bf2">strerror</a></div><div class="ttdeci">char * strerror(int errnum)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l01014">string.c:1014</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 <div class="ttc" id="aunicode_8cpp_html_a684683d701fe53be069b2e5f883044cd"><div class="ttname"><a href="unicode_8cpp.html#a684683d701fe53be069b2e5f883044cd">widen</a></div><div class="ttdeci">std::wstring widen(const char *s)</div><div class="ttdef"><b>Definition:</b> <a href="unicode_8cpp_source.html#l00048">unicode.cpp:48</a></div></div>
 <div class="ttc" id="aunicode_8h_html"><div class="ttname"><a href="unicode_8h.html">unicode.h</a></div></div>
+<div class="ttc" id="aunistd_8c_html_aacad1d135ca2779b583623678e36db7c"><div class="ttname"><a href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a></div><div class="ttdeci">int close(int fildes)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00104">unistd.c:104</a></div></div>
+<div class="ttc" id="aunistd_8c_html_ae43dae6b7c84d11ec3036b822b28a179"><div class="ttname"><a href="unistd_8c.html#ae43dae6b7c84d11ec3036b822b28a179">pipe</a></div><div class="ttdeci">int pipe(int fildes[2])</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00055">unistd.c:55</a></div></div>
 <div class="ttc" id="aunit_2testing-utils_2invariant_8h_html"><div class="ttname"><a href="unit_2testing-utils_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 </div><!-- fragment --></div><!-- contents -->

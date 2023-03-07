@@ -107,31 +107,36 @@ Overview</h1>
 <li>extending all functions of the model to accept an additional dynamic frame parameter;</li>
 <li>instrumenting all functions to check that the side effects or the deallocation they perform are within what is allowed by the dynamic frame parameter.</li>
 </ul>
-<p>In our approach a dynamic frame is represented by the __CPROVER_contracts_write_set_t data type defined in cprover_contracts.c.</p>
-<p>From an simple point of view, a __CPROVER_contracts_write_set_t tracks 4 sets of memory locations:</p>
-<div class="fragment"><div class="line"><span class="keyword">struct </span>__CPROVER_contracts_write_set_t {</div>
+<p>In our approach a dynamic frame is represented by the <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> data type defined in <a class="el" href="cprover__contracts_8c.html">cprover_contracts.c</a>.</p>
+<p>From an simple point of view, a <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> tracks 4 sets of memory locations:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span><a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> {</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// from the contract&#39;s __CPROVER_assigns clause</span></div>
-<div class="line">  __CPROVER_contracts_car_set_t contract_assign;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a> contract_assign;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// from the contract&#39;s __CPROVER_frees clause</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t contract_frees;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a2a808bb121ae467d407d7add298b1535">contract_frees</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// records local allocations</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t allocated;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#adec765cab807ff3a1d1b3a5627bb95de">allocated</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// records deallocations</span></div>
-<div class="line">  __CPROVER_contracts_obj_set_t <a class="code" href="pointer__predicates_8cpp.html#a4dbdbf9567d2fe2b2eb84d2df6685aa3">deallocated</a>;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a> <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a326e808257b93a2f4e8597be24736069">deallocated</a>;</div>
 <div class="line"> </div>
-<div class="line">} __CPROVER_contracts_write_set_t;</div>
-<div class="ttc" id="apointer__predicates_8cpp_html_a4dbdbf9567d2fe2b2eb84d2df6685aa3"><div class="ttname"><a href="pointer__predicates_8cpp.html#a4dbdbf9567d2fe2b2eb84d2df6685aa3">deallocated</a></div><div class="ttdeci">exprt deallocated(const exprt &amp;pointer, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__predicates_8cpp_source.html#l00043">pointer_predicates.cpp:43</a></div></div>
+<div class="line">} <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a>;</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__car__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__car__set__t.html">__CPROVER_contracts_car_set_t</a></div><div class="ttdoc">A set of __CPROVER_contracts_car_t.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00034">cprover_contracts.c:35</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__obj__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html">__CPROVER_contracts_obj_set_t</a></div><div class="ttdoc">A set of pointers.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00046">cprover_contracts.c:47</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a2a808bb121ae467d407d7add298b1535"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a2a808bb121ae467d407d7add298b1535">__CPROVER_contracts_write_set_t::contract_frees</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_t contract_frees</div><div class="ttdoc">Set of freeable pointers derived from the contract (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00073">cprover_contracts.c:73</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_a326e808257b93a2f4e8597be24736069"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#a326e808257b93a2f4e8597be24736069">__CPROVER_contracts_write_set_t::deallocated</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_t deallocated</div><div class="ttdoc">Set of objects deallocated by the function under analysis (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00081">cprover_contracts.c:81</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html_adec765cab807ff3a1d1b3a5627bb95de"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html#adec765cab807ff3a1d1b3a5627bb95de">__CPROVER_contracts_write_set_t::allocated</a></div><div class="ttdeci">__CPROVER_contracts_obj_set_t allocated</div><div class="ttdoc">Set of objects allocated by the function under analysis (indexed mode)</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00078">cprover_contracts.c:78</a></div></div>
 </div><!-- fragment --><ul>
 <li><code>contract_assigns</code> is the set of memory locations specified in the <em>assigns clause</em> of the contract of interest;</li>
 <li><code>contract_frees</code> is the set of pointers specified in the <em>frees clause</em> of the contract of interest;</li>
 <li><code>allocated</code> is the set of identifiers of objects (as given by <code>__CPROVER_POINTER_OBJECT(x)</code>) that were locally allocated since first entering the function under verification (on the stack using <code>DECL x</code> or on the heap using <code>x = __CPROVER_allocate(...)</code>);</li>
 <li><code>deallocated</code> is the set of pointers <code>p</code> that were deallocated using <code>__CPROVER_deallocate(p)</code> since first entering the function under verification.</li>
 </ul>
-<p>The __CPROVER_contracts_write_set_t type is accompanied by functions allowing to (cf cprover_contracts.c):</p><ul>
+<p>The <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> type is accompanied by functions allowing to (cf <a class="el" href="cprover__contracts_8c.html">cprover_contracts.c</a>):</p><ul>
 <li>add contents to <code>contract_assigns</code>;</li>
 <li>add contents to <code>contract_frees</code>;</li>
 <li>record an object allocation in <code>allocated</code>;</li>
@@ -140,8 +145,8 @@ Overview</h1>
 <li>check wether the object pointed to by a given pointer about to be freed is contained in <code>contract_frees</code> or <code>allocated</code>;</li>
 <li>check weither all memory locations of a candidate write set are included in some element of a given reference write set.</li>
 </ul>
-<p>The instrumentation adds a __CPROVER_contracts_write_set_ptr_t parameter to all functions of the GOTO model as follows:</p>
-<div class="fragment"><div class="line">ret_t f(&lt;original-parameters&gt;, __CPROVER_contracts_write_set_ptr_t write_set);</div>
+<p>The instrumentation adds a <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> parameter to all functions of the GOTO model as follows:</p>
+<div class="fragment"><div class="line">ret_t f(&lt;original-parameters&gt;, <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set);</div>
 </div><!-- fragment --><p>The bodies of the functions are instrumented so that:</p><ul>
 <li>when the given <code>write_set</code> is <code>NULL</code>, no checks are performed;</li>
 <li>when the given <code>write_set</code> is not <code>NULL</code>, the following checks are performed:<ul>

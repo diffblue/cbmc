@@ -110,9 +110,9 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-contract-replacemen
 <div class="fragment"><div class="line">ret_t foo(foo_params, write_set_t caller_write_set) {</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// create empty write set to check side effects in requires clauses</span></div>
-<div class="line">  __CPROVER_contracts_write_set_t __requires_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t requires_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_create(requires_write_set, 0, 0);</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> __requires_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> requires_write_set;</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(requires_write_set, 0, 0);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// assert requires clauses</span></div>
 <div class="line">  assert(contract::requires(foo_params, requires_write_set));</div>
@@ -122,33 +122,33 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-contract-replacemen
 <div class="line">  hist2_t hist2 = ...;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// create contract write set</span></div>
-<div class="line">  __CPROVER_contracts_write_set_t __contract_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t contract_write_set = &amp;__contract_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_create(contract_write_set, assigns_clause_size(contract), frees_clause_size(contract));</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> __contract_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> contract_write_set = &amp;__contract_write_set;</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(contract_write_set, assigns_clause_size(contract), frees_clause_size(contract));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// populate the write set</span></div>
 <div class="line">  contract::assigns(contract_write_set, empty_write_set);</div>
 <div class="line">  contract::frees(contract_write_set, empty_write_set);</div>
-<div class="line">  assert(__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(requires_write_set));</div>
+<div class="line">  assert(<a class="code" href="cprover__contracts_8c.html#ad6b0d79ca5c998eb350b993c2fb364a6">__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty</a>(requires_write_set));</div>
 <div class="line"> </div>
-<div class="line">  __CPROVER_contracts_write_set_release(requires_write_set);</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>(requires_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// check inclusion with caller write set</span></div>
-<div class="line">  assert(__CPROVER_contracts_write_set_check_assigns_clause_inclusion(caller_write_set, contract_write_set));</div>
+<div class="line">  assert(<a class="code" href="cprover__contracts_8c.html#a9884139906c3e0ee3e8400ad6fe8ed9a">__CPROVER_contracts_write_set_check_assigns_clause_inclusion</a>(caller_write_set, contract_write_set));</div>
 <div class="line"> </div>
-<div class="line">  assert(__CPROVER_contracts_write_set_check_frees_clause_inclusion(caller_write_set, contract_write_set));</div>
+<div class="line">  assert(<a class="code" href="cprover__contracts_8c.html#abac6c9f45b98a3fdf581867f033a0568">__CPROVER_contracts_write_set_check_frees_clause_inclusion</a>(caller_write_set, contract_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// havoc assigns clause targets</span></div>
 <div class="line">  contract::havoc(contract_write_set);</div>
 <div class="line">  ret_t retval = nondet();</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// free freeable pointers</span></div>
-<div class="line">  __CPROVER_contracts_write_set_deallocate_freeable(contract_write_set);</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#a5a77e5845872e1f36559d4f8a1d3eb58">__CPROVER_contracts_write_set_deallocate_freeable</a>(contract_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Create empty write set to check side effects in ensures clauses</span></div>
-<div class="line">  __CPROVER_contracts_write_set_t __ensures_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_ptr_t ensures_write_set;</div>
-<div class="line">  __CPROVER_contracts_write_set_create(ensures_write_set, 0, 0);</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a> __ensures_write_set;</div>
+<div class="line">  <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> ensures_write_set;</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>(ensures_write_set, 0, 0);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Link caller write set and write set so that allocations due to is_fresh</span></div>
 <div class="line">  <span class="comment">// in post conditions are recorded in the caller write set</span></div>
@@ -162,11 +162,18 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-contract-replacemen
 <div class="line">  assume(contract::ensures(foo_params, ensures_write_set));</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// postamble</span></div>
-<div class="line">  assert(__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(ensures_write_set));</div>
-<div class="line">  __CPROVER_contracts_write_set_release(ensures_write_set);</div>
+<div class="line">  assert(<a class="code" href="cprover__contracts_8c.html#ad6b0d79ca5c998eb350b993c2fb364a6">__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty</a>(ensures_write_set));</div>
+<div class="line">  <a class="code" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>(ensures_write_set);</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> retval;</div>
 <div class="line">}</div>
+<div class="ttc" id="acprover__contracts_8c_html_a5a77e5845872e1f36559d4f8a1d3eb58"><div class="ttname"><a href="cprover__contracts_8c.html#a5a77e5845872e1f36559d4f8a1d3eb58">__CPROVER_contracts_write_set_deallocate_freeable</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_deallocate_freeable(__CPROVER_contracts_write_set_ptr_t set, __CPROVER_contracts_write_set_ptr_t target)</div><div class="ttdoc">Non-deterministically call __CPROVER_contracts_free on all elements of set-&gt;contract_frees,...</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l01019">cprover_contracts.c:1019</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_a6b104b988f01f52cacd9dec8b2621c79"><div class="ttname"><a href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_release(__CPROVER_contracts_write_set_ptr_t set)</div><div class="ttdoc">Releases resources used by set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00441">cprover_contracts.c:441</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_a9884139906c3e0ee3e8400ad6fe8ed9a"><div class="ttname"><a href="cprover__contracts_8c.html#a9884139906c3e0ee3e8400ad6fe8ed9a">__CPROVER_contracts_write_set_check_assigns_clause_inclusion</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_write_set_check_assigns_clause_inclusion(__CPROVER_contracts_write_set_ptr_t reference, __CPROVER_contracts_write_set_ptr_t candidate)</div><div class="ttdoc">Checks the inclusion of the candidate-&gt;contract_assigns elements in reference-&gt;contract_assigns or re...</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00943">cprover_contracts.c:943</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_ab79449fced8abf348ef2c38bc7cce15a"><div class="ttname"><a href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_create(__CPROVER_contracts_write_set_ptr_t set, __CPROVER_size_t contract_assigns_size, __CPROVER_size_t contract_frees_size, __CPROVER_bool assume_requires_ctx, __CPROVER_bool assert_requires_ctx, __CPROVER_bool assume_ensures_ctx, __CPROVER_bool assert_ensures_ctx, __CPROVER_bool allow_allocate, __CPROVER_bool allow_deallocate)</div><div class="ttdoc">Initialises a __CPROVER_contracts_write_set_t object.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00404">cprover_contracts.c:404</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_abac6c9f45b98a3fdf581867f033a0568"><div class="ttname"><a href="cprover__contracts_8c.html#abac6c9f45b98a3fdf581867f033a0568">__CPROVER_contracts_write_set_check_frees_clause_inclusion</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_write_set_check_frees_clause_inclusion(__CPROVER_contracts_write_set_ptr_t reference, __CPROVER_contracts_write_set_ptr_t candidate)</div><div class="ttdoc">Checks the inclusion of the candidate-&gt;contract_frees elements in reference-&gt;contract_frees or refere...</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00974">cprover_contracts.c:974</a></div></div>
+<div class="ttc" id="acprover__contracts_8c_html_ad6b0d79ca5c998eb350b993c2fb364a6"><div class="ttname"><a href="cprover__contracts_8c.html#ad6b0d79ca5c998eb350b993c2fb364a6">__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_write_set_check_allocated_deallocated_is_empty(__CPROVER_contracts_write_set_ptr_t set)</div><div class="ttdoc">Returns true iff set-&gt;deallocated is empty.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00721">cprover_contracts.c:721</a></div></div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
 </div><!-- fragment --><p>After applying this transformation, any function that called the initial <code>bar</code> now calls the abstraction derived from the contract.</p>
 <hr  />
  <table class="markdownTable">

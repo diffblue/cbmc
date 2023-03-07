@@ -98,15 +98,17 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-obeys-contract.html
 <div class="fragment"><div class="line">CALL retval := <a class="code" href="cprover__builtin__headers_8h.html#afb98fc4ff28173835ed64fa8192343d2">__CPROVER_obeys_contract</a>(function_pointer, contract);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_afb98fc4ff28173835ed64fa8192343d2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#afb98fc4ff28173835ed64fa8192343d2">__CPROVER_obeys_contract</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_obeys_contract(void(*)(void), void(*)(void))</div></div>
 </div><!-- fragment --><p>into calls to the library function implementation:</p>
-<div class="fragment"><div class="line">CALL retval := __CPROVER_contracts_obeys_contract(</div>
+<div class="fragment"><div class="line">CALL retval := <a class="code" href="cprover__contracts_8c.html#a75e072b13a1a23ee80665cb9a23e197d">__CPROVER_contracts_obeys_contract</a>(</div>
 <div class="line">    &amp;function_pointer,</div>
 <div class="line">    contract,</div>
 <div class="line">    write_set);</div>
+<div class="ttc" id="acprover__contracts_8c_html_a75e072b13a1a23ee80665cb9a23e197d"><div class="ttname"><a href="cprover__contracts_8c.html#a75e072b13a1a23ee80665cb9a23e197d">__CPROVER_contracts_obeys_contract</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_contracts_obeys_contract(void(**function_pointer)(void), void(*contract)(void), __CPROVER_contracts_write_set_ptr_t set)</div><div class="ttdoc">Implementation of the obeys_contract front-end predicate.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l01523">cprover_contracts.c:1523</a></div></div>
 </div><!-- fragment --><p>One thing to notice is that the library implementation function takes the <code>function_pointer</code> argument by reference:</p>
-<div class="fragment"><div class="line">__CPROVER_contracts_obeys_contract(</div>
+<div class="fragment"><div class="line"><a class="code" href="cprover__contracts_8c.html#a75e072b13a1a23ee80665cb9a23e197d">__CPROVER_contracts_obeys_contract</a>(</div>
 <div class="line">    <span class="keywordtype">void</span> (**function_pointer)(<span class="keywordtype">void</span>),</div>
 <div class="line">    <span class="keywordtype">void</span> (*contract)(<span class="keywordtype">void</span>),</div>
-<div class="line">    __CPROVER_contracts_write_set_ptr_t write_set);</div>
+<div class="line">    <a class="code" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_ptr_t</a> write_set);</div>
+<div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
 </div><!-- fragment --><p>This function implements the <code>__CPROVER_obeys_contract</code> behaviour for all different contexts (contract checking vs replacement, requires vs ensures clause context, as described by the flags carried by the write set parameter).</p>
 <p>In an assumption context, the predicate turns into a nondet assignment that makes <code>function_pointer</code> point to the <code>contract</code> function:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span>(nondet_bool()) {</div>

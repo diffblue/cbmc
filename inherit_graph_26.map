@@ -1,6 +1,15 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="5,35,139,61"/>
-<area shape="rect" id="node2" href="$classtrace__map__storaget.html" title=" " alt="" coords="187,35,339,61"/>
-<area shape="rect" id="node3" href="$classhistory__sensitive__storaget.html" title=" " alt="" coords="387,5,581,32"/>
-<area shape="rect" id="node4" href="$classlocation__sensitive__storaget.html" title="The most conventional storage; one domain per location." alt="" coords="414,57,554,98"/>
+<area shape="rect" id="node1" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="5,274,139,301"/>
+<area shape="rect" id="node2" href="$classconstant__propagator__domaint.html" title=" " alt="" coords="207,5,363,47"/>
+<area shape="rect" id="node3" href="$classcustom__bitvector__domaint.html" title=" " alt="" coords="187,71,383,98"/>
+<area shape="rect" id="node4" href="$classdep__graph__domaint.html" title=" " alt="" coords="210,122,361,149"/>
+<area shape="rect" id="node5" href="$classescape__domaint.html" title=" " alt="" coords="221,173,350,199"/>
+<area shape="rect" id="node6" href="$classglobal__may__alias__domaint.html" title=" " alt="" coords="187,223,384,250"/>
+<area shape="rect" id="node7" href="$classinterval__domaint.html" title=" " alt="" coords="219,274,352,301"/>
+<area shape="rect" id="node8" href="$classinvariant__set__domaint.html" title=" " alt="" coords="201,325,369,351"/>
+<area shape="rect" id="node9" href="$classis__threaded__domaint.html" title=" " alt="" coords="206,375,365,402"/>
+<area shape="rect" id="node10" href="$classrd__range__domaint.html" title="Because the class is inherited from ai_domain_baset, its instance represents an element of a domain o..." alt="" coords="215,426,355,453"/>
+<area shape="rect" id="node11" href="$classuninitialized__domaint.html" title=" " alt="" coords="204,477,367,503"/>
+<area shape="rect" id="node12" href="$classvariable__sensitivity__domaint.html" title=" " alt="" coords="210,528,361,569"/>
+<area shape="rect" id="node13" href="$classvariable__sensitivity__dependence__domaint.html" title=" " alt="" coords="432,528,601,569"/>
 </map>

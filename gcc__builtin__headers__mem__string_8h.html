@@ -167,8 +167,8 @@ Functions</h2></td></tr>
 <tr class="separator:a1a7bba5d9980999259d51ff6936b60db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71a077e57674487a89448576a17f8f50"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gcc__builtin__headers__mem__string_8h.html#a71a077e57674487a89448576a17f8f50">__builtin_aligned_alloc</a> (__CPROVER_size_t, __CPROVER_size_t)</td></tr>
 <tr class="separator:a71a077e57674487a89448576a17f8f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9c998671d34f063434f1a7720a9d25b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gcc__builtin__headers__mem__string_8h.html#aa9c998671d34f063434f1a7720a9d25b">__builtin_alloca</a> (__CPROVER_size_t)</td></tr>
-<tr class="separator:aa9c998671d34f063434f1a7720a9d25b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62fb75f5b4144cdcdc1a1318425f3928"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gcc__builtin__headers__mem__string_8h.html#a62fb75f5b4144cdcdc1a1318425f3928">__builtin_alloca</a> (__CPROVER_size_t)</td></tr>
+<tr class="separator:a62fb75f5b4144cdcdc1a1318425f3928"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6836dee0e516199ae7bb25ba0846a8b"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gcc__builtin__headers__mem__string_8h.html#ae6836dee0e516199ae7bb25ba0846a8b">__builtin_assume_aligned</a> (const void *, __CPROVER_size_t,...)</td></tr>
 <tr class="separator:ae6836dee0e516199ae7bb25ba0846a8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5781db341dfc3bf2df7eb649ef1ca503"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gcc__builtin__headers__mem__string_8h.html#a5781db341dfc3bf2df7eb649ef1ca503">__builtin_bcmp</a> (const void *, const void *, __CPROVER_size_t)</td></tr>
@@ -811,25 +811,25 @@ Functions</h2></td></tr>
           <td class="memname">void* __builtin___memcpy_chk </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const void *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -838,6 +838,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00659">659</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -931,25 +933,25 @@ Functions</h2></td></tr>
           <td class="memname">void* __builtin___memset_chk </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>c</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -958,6 +960,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00789">789</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -1205,19 +1209,19 @@ Functions</h2></td></tr>
           <td class="memname">char* __builtin___strcat_chk </td>
           <td>(</td>
           <td class="paramtype">char *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1226,6 +1230,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00037">37</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -1239,19 +1245,19 @@ Functions</h2></td></tr>
           <td class="memname">char* __builtin___strcpy_chk </td>
           <td>(</td>
           <td class="paramtype">char *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1260,6 +1266,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00003">3</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -1273,25 +1281,25 @@ Functions</h2></td></tr>
           <td class="memname">char* __builtin___strncat_chk </td>
           <td>(</td>
           <td class="paramtype">char *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>n</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>s</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1300,6 +1308,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00081">81</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>
@@ -1560,21 +1570,23 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa9c998671d34f063434f1a7720a9d25b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9c998671d34f063434f1a7720a9d25b">&#9670;&nbsp;</a></span>__builtin_alloca()</h2>
+<a id="a62fb75f5b4144cdcdc1a1318425f3928"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62fb75f5b4144cdcdc1a1318425f3928">&#9670;&nbsp;</a></span>__builtin_alloca()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* __builtin_alloca </td>
+          <td class="memname">void * __builtin_alloca </td>
           <td>(</td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname"><em>alloca_size</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdlib_8c_source.html#l00237">237</a> of file <a class="el" href="stdlib_8c_source.html">stdlib.c</a>.</p>
 
 </div>
 </div>
@@ -3590,19 +3602,19 @@ Functions</h2></td></tr>
           <td class="memname">void* __builtin_memset </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>c</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">__CPROVER_size_t&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -3611,6 +3623,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="string_8c_source.html#l00750">750</a> of file <a class="el" href="string_8c_source.html">string.c</a>.</p>
 
 </div>
 </div>

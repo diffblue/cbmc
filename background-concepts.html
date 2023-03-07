@@ -107,8 +107,8 @@ Representations</h1>
 <div class="line"><span class="comment"> * For simplicity&#39;s sake, we just give the forward</span></div>
 <div class="line"><span class="comment"> * declarations of atoi and printf.</span></div>
 <div class="line"><span class="comment"> */</span></div>
-<div class="line"><span class="keywordtype">int</span> atoi(<span class="keyword">const</span> <span class="keywordtype">char</span> *);</div>
-<div class="line"><span class="keywordtype">int</span> printf(<span class="keyword">const</span> <span class="keywordtype">char</span> *, ...);</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *);</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a98631211a4a8aee62f572375d5b637be">printf</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *, ...);</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> factorial(<span class="keywordtype">unsigned</span> n) {</div>
 <div class="line">  <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> fac = 1;</div>
@@ -120,11 +120,13 @@ Representations</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Error handling elided - this is just for illustration. */</span></div>
 <div class="line"><span class="keywordtype">int</span> <a class="code" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> **argv) {</div>
-<div class="line">  <span class="keywordtype">unsigned</span> n = atoi(argv[1]);</div>
-<div class="line">  printf(<span class="stringliteral">&quot;%u! = %lu\n&quot;</span>, n, factorial(n));</div>
+<div class="line">  <span class="keywordtype">unsigned</span> n = <a class="code" href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a>(argv[1]);</div>
+<div class="line">  <a class="code" href="stdio_8c.html#a98631211a4a8aee62f572375d5b637be">printf</a>(<span class="stringliteral">&quot;%u! = %lu\n&quot;</span>, n, factorial(n));</div>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="afile__converter_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="file__converter_8cpp_source.html#l00041">file_converter.cpp:41</a></div></div>
+<div class="ttc" id="astdio_8c_html_a98631211a4a8aee62f572375d5b637be"><div class="ttname"><a href="stdio_8c.html#a98631211a4a8aee62f572375d5b637be">printf</a></div><div class="ttdeci">int printf(const char *format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01279">stdio.c:1279</a></div></div>
+<div class="ttc" id="astdlib_8c_html_ad228deceea1bac4d9f171f647c265059"><div class="ttname"><a href="stdlib_8c.html#ad228deceea1bac4d9f171f647c265059">atoi</a></div><div class="ttdeci">int atoi(const char *nptr)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00432">stdlib.c:432</a></div></div>
 </div><!-- fragment --><p>The question of this first section is: how do we represent this program in memory so that we can do something useful with it?</p>
 <p>One possibility would be to just store the program as a string, but this is clearly impractical: even finding whether there is an assignment to a specific variable would require significant parsing effort. For this reason, the first step is to parse the program text into a more abstract representation.</p>
 <h2><a class="anchor" id="AST_section"></a>
@@ -622,7 +624,7 @@ Flattening and Lowering</h2>
 <h2><a class="anchor" id="verification_condition_subsection"></a>
 Verification Condition</h2>
 <p>In the CPROVER framework, the term <b>verification condition</b> is used in a somewhat non-standard way. Let a program and a set of assertions be given. We transform the program into an (acyclic) SSA (i.e., an SSA with all loops unrolled a finite number of times) and turn it into a logical formula, as described above. Note that in this case, the formula will also contain information about what the program does after the assertion is reached: this part of the formula, is, in fact, irrelevant for deciding whether the program can satisfy the assertion or not. The <em>verification condition</em> is the part of the formula that only covers the program execution until the line that checks the assertion has been executed, with everything that comes after it removed.</p>
-<p>Last modified: 2023-03-07 16:03:15 +0100 </p>
+<p>Last modified: 2023-03-07 22:22:25 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

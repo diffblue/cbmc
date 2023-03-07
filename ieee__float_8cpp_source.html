@@ -286,10 +286,10 @@ $(document).ready(function(){initNavTree('ieee__float_8cpp_source.html',''); ini
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keywordflow">if</span>(position&gt;precision)</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      {</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>=<a class="code" href="arith__tools_8cpp.html#aeb16c38f897b6b8d22a2c6d169e9f456">power</a>(10, position-precision);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> remainder=_fraction%<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a>=_fraction%<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>;</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        _fraction/=<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>;</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="comment">// not sure if this is the right kind of rounding here</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">if</span>(remainder&gt;=<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>/2)</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a>&gt;=<a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>/2)</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;          ++_fraction;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        position=precision;</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      }</div>
@@ -362,16 +362,16 @@ $(document).ready(function(){initNavTree('ieee__float_8cpp_source.html',''); ini
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="comment">// re-align</span></div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> distance=<a class="code" href="classieee__floatt.html#ac414432dbce7b285c70e5102e48c4567">base10_digits</a>(_fraction)-(precision+1);</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> p=<a class="code" href="arith__tools_8cpp.html#aeb16c38f897b6b8d22a2c6d169e9f456">power</a>(10, distance);</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> remainder=_fraction%p;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a>=_fraction%p;</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      _fraction/=p;</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      _exponent+=distance;</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keywordflow">if</span>(remainder==p/2)</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a>==p/2)</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      {</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="comment">// need to do rounding mode here</span></div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        ++_fraction;</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      }</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(remainder&gt;p/2)</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a>&gt;p/2)</div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        ++_fraction;</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    }</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
@@ -743,21 +743,21 @@ $(document).ready(function(){initNavTree('ieee__float_8cpp_source.html',''); ini
 <div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;dividend,</div>
 <div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;divisor)</div>
 <div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;{</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> remainder = dividend % divisor;</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> = dividend % divisor;</div>
 <div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  dividend /= divisor;</div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160; </div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="keywordflow">if</span>(remainder!=0)</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a>!=0)</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  {</div>
 <div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classieee__floatt.html#ac39e74028a72be0278368ef2f4cc24d4">rounding_mode</a>)</div>
 <div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    {</div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5aafff1a3b5dba4ec1746fbe14f7f562a2">ROUND_TO_EVEN</a>:</div>
 <div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;      {</div>
 <div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> divisor_middle = divisor / 2;</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;        <span class="keywordflow">if</span>(remainder &lt; divisor_middle)</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> &lt; divisor_middle)</div>
 <div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;        {</div>
 <div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;          <span class="comment">// crop</span></div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        }</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(remainder &gt; divisor_middle)</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a> &gt; divisor_middle)</div>
 <div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        {</div>
 <div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;          ++dividend;</div>
 <div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;        }</div>
@@ -1487,6 +1487,7 @@ $(document).ready(function(){initNavTree('ieee__float_8cpp_source.html',''); ini
 <div class="ttc" id="afloatbv__expr_8h_html"><div class="ttname"><a href="floatbv__expr_8h.html">floatbv_expr.h</a></div><div class="ttdoc">API to expression classes for floating-point arithmetic.</div></div>
 <div class="ttc" id="aieee__float_8h_html"><div class="ttname"><a href="ieee__float_8h.html">ieee_float.h</a></div></div>
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
+<div class="ttc" id="amath_8c_html_af7df01c4a9038dbf3562b41bc8c3be03"><div class="ttname"><a href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a></div><div class="ttdeci">double remainder(double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02330">math.c:2330</a></div></div>
 <div class="ttc" id="amp__arith_8cpp_html_a8ba48a3c9deb8ae1f6834b75d8e8157e"><div class="ttname"><a href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a></div><div class="ttdeci">const std::string integer2string(const mp_integer &amp;n, unsigned base)</div><div class="ttdef"><b>Definition:</b> <a href="mp__arith_8cpp_source.html#l00103">mp_arith.cpp:103</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
