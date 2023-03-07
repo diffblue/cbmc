@@ -1,0 +1,13 @@
+CORE
+extern_definition1.c
+extern_definition2.c
+^EXIT=0$
+^SIGNAL=0$
+^file \S+\.c line \d+: pointer parameter types differ between declaration and definition 'foo'$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Invariant check failed
+--
+A declaration with different pointer parameter types must not replace the type
+of an extern definition (which made goto conversion fail an invariant).
