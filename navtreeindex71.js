@@ -1,6 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classxml__parse__treet.html":[7,0,1345],
 "classxml__parse__treet.html#a0da20e9bab4193e945bedcd289090c7f":[7,0,1345,0],
 "classxml__parse__treet.html#a51085ecca507566dc7f8fa816f73aa05":[7,0,1345,1],
 "classxml__parse__treet.html#ae0588b71e82c38fd9b3363abc6b6e828":[7,0,1345,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX71 =
 "contracts-dev-spec-dfcc-instrument.html#autotoc_md38":[1,1,0,5,3,1,3],
 "contracts-dev-spec-dfcc-instrument.html#autotoc_md39":[1,1,0,5,3,1,4],
 "contracts-dev-spec-dfcc-instrument.html#autotoc_md40":[1,1,0,5,3,1,4,0],
-"contracts-dev-spec-dfcc-instrument.html#autotoc_md41":[1,1,0,5,3,1,4,1]
+"contracts-dev-spec-dfcc-instrument.html#autotoc_md41":[1,1,0,5,3,1,4,1],
+"contracts-dev-spec-dfcc-instrument.html#autotoc_md42":[1,1,0,5,3,1,5]
 };
