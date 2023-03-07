@@ -1,8 +1,0 @@
-CORE
-main.c
---replace-call-with-contract get_at_idx
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
---

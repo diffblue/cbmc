@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --restrict-function-pointer foo.CALL/return_0,return_1 --nondet-static-exclude vtable_0 --nondet-static-exclude vtable_1 --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
 ^EXIT=0$

@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f1
 ^\[f1.assigns.\d+\] line 8 Check that a\[.*0\] is assignable: SUCCESS$

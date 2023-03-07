@@ -1,4 +1,4 @@
-KNOWNBUG
+KNOWNBUG dfcc-only
 main.c
 --dfcc main --apply-code-contracts
 ^EXIT=10$

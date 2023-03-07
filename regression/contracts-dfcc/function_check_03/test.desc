@@ -1,4 +1,4 @@
-KNOWNBUG
+KNOWNBUG dfcc-only
 main.c
 --dfcc main --check-code-contracts
 ^EXIT=0$

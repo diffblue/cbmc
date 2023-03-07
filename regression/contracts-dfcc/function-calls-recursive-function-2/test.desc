@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract sum
 ^\[sum.postcondition.\d+\].*Check ensures clause of contract contract::sum for function sum: SUCCESS$

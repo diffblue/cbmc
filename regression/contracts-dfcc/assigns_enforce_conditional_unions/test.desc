@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract update _ --pointer-check --pointer-overflow-check --signed-overflow-check --unsigned-overflow-check --conversion-check
 ^\[is_high_level.assigns.\d+\] line 52 Check that latch is assignable: SUCCESS$

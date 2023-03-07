@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract baz _ --pointer-primitive-check
 ^\[free.frees.\d+\].*Check that ptr is freeable: FAILURE

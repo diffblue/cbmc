@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main_even.c
 --dfcc main --enforce-contract-rec even
 ^\[even.precondition.\d+\] .* Check requires clause of contract contract::even for function even: FAILURE$

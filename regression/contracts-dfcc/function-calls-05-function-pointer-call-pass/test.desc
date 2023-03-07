@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
 \[foo.postcondition.\d+\] line \d+ Check ensures clause of contract contract::foo for function foo: SUCCESS$

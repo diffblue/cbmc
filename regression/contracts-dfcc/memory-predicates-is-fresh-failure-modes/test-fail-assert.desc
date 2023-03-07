@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --malloc-may-fail --malloc-fail-assert --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^\[__CPROVER_contracts_is_fresh.assertion.\d+\] line \d+ __CPROVER_is_fresh max allocation size exceeded: FAILURE$

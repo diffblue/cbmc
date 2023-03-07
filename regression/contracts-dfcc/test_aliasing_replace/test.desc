@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --replace-call-with-contract foo
 ^EXIT=10$

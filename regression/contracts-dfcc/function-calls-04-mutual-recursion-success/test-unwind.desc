@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main_unwind.c
 --dfcc main _ --unwind 20 --unwinding-assertions
 ^EXIT=0$

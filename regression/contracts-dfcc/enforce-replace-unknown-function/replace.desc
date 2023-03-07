@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --replace-call-with-contract goo
 ^Function to replace 'goo' not found$

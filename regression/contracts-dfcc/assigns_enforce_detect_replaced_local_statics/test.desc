@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --pointer-check
 ^\[main.assertion.\d+\] line \d+ expecting FAILURE: FAILURE$

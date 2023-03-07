@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main_odd.c
 --dfcc main --enforce-contract odd --replace-call-with-contract even
 ^\[even.assigns.\d+\].*Check that the assigns clause of contract::even is included in the caller's assigns clause: SUCCESS$

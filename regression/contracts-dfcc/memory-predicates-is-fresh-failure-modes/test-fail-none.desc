@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^\[__CPROVER_contracts_car_set_insert.assertion.\d+\] line \d+ CAR size is less than __CPROVER_max_malloc_size: FAILURE$

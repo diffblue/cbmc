@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
 ^.*error: the first and second arguments of __CPROVER_obeys_contract must have the same function pointer type$

@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\] line 6 Check that \*x is assignable: FAILURE$

@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract bar
 ^\[foo.assigns.\d+\] line 17 Check that \*y is assignable: SUCCESS$

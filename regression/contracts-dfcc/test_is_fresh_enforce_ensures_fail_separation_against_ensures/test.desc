@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\].*Check that \*out1 is assignable: SUCCESS$

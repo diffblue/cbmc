@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f1 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$

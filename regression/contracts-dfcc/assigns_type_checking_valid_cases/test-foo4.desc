@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo4 _ --pointer-primitive-check
 ^EXIT=0$

@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f1
 ^\[f3.assigns.\d+\] line 13 Check that \*x3 is assignable: SUCCESS$
