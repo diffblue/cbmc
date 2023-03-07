@@ -310,7 +310,10 @@ validate_valuation_pair(
       smt_to_smt2_string(valid_descriptor.get_sort()) + "\nValue has sort " +
       smt_to_smt2_string(valid_value.get_sort())};
   }
-  return resultt{{valid_descriptor, valid_value}};
+  // see https://github.com/diffblue/cbmc/issues/7464 for why we explicitly name
+  // the valuation_pairt type here:
+  return resultt{
+    smt_get_value_responset::valuation_pairt{valid_descriptor, valid_value}};
 }
 
 /// \returns: A response or error in the case where the parse tree appears to be
