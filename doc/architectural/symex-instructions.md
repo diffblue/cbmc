@@ -23,12 +23,12 @@ Symex is, at its core, a GOTO-program interpreter that uses symbolic values inst
 This produces a formula which describes all possible outputs rather than a single output value.
 While Symex is interpreting the program, it also builds a list of Static Single Assignment (SSA)
 steps that form part of the equation that is to be sent to the solver. For more information see
-[src/goto-symex](../../src/goto-symex/README.md).
+\ref symbolic-execution.
 
 You can see the main instruction dispatcher (what corresponds to the main interpreter
 loop) at `goto_symext::execute_next_instruction`.
 
-Symex's source code is available under [src/goto-symex](../../src/goto-symex/).
+Symex's source code is available under \ref goto-symex.
 
 ## Instruction Types
 
@@ -115,7 +115,7 @@ case ASSUME:
   break;
 ```
 
-The way the [`symex` subfolder](../../src/goto-symex/) is structured, the different
+The way the \ref goto-symex subfolder is structured, the different
 dispatching functions are usually in their own file, designated by the instruction's
 name. As an example, you can find the code for the function goto_symext::symex_goto
 in [symex_goto.cpp](../../src/goto-symex/symex_goto.cpp)
