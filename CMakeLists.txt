@@ -274,7 +274,7 @@ else()
 
     corrosion_import_crate(MANIFEST_PATH src/libcprover-rust/Cargo.toml)
     list(JOIN sat_impl " " sat_impl_str)
-    corrosion_set_env_vars(cprover-api-rust CBMC_BUILD_DIR=${CMAKE_BINARY_DIR} "SAT_IMPL=${sat_impl_str}")
+    corrosion_set_env_vars(cprover-api-rust CBMC_BUILD_DIR=${CMAKE_BINARY_DIR})
     corrosion_link_libraries(cprover-api-rust cprover-api-cpp)
     install(TARGETS cprover-api-rust RUNTIME DESTINATION lib)
     # NOTE: We want to rename to a name consistent with the name of the
