@@ -12,6 +12,13 @@ fn get_build_directory() -> Result<String, VarError> {
     env::var("CBMC_BUILD_DIR")
 }
 
+// Passed by the top-level CMakeLists.txt to control which version of the
+// static library of CBMC we're linking against. A user can also change the
+// environment variable to link against different versions of CBMC.
+fn get_cbmc_version() -> Result<String, VarError> {
+    env::var("CBMC_VERSION")
+}
+
 fn get_library_build_dir() -> std::io::Result<PathBuf> {
     let env_var_fetch_result = get_build_directory();
     if let Ok(build_dir) = env_var_fetch_result {
@@ -50,5 +57,10 @@ fn main() {
         libraries_path.display()
     );
 
-    println!("cargo:rustc-link-lib=static=cprover.5.78.0");
+    let cprover_static_libname = match get_cbmc_version() {
+        Ok(version) => String::from("cprover.") + &version,
+        Err(err) => panic!("Error: {}", err),
+    };
+
+    println!("cargo:rustc-link-lib=static={}", cprover_static_libname);
 }
