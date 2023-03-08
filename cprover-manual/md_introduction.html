@@ -82,7 +82,7 @@ Bounded Model Checking with CBMC</h2>
 <p>CBMC implements a technique called <em>Bounded Model Checking</em> (BMC). In BMC, the transition relation for a complex state machine and its specification are jointly unwound to obtain a Boolean formula, which is then checked for satisfiability by using an efficient SAT procedure. If the formula is satisfiable, a counterexample is extracted from the output of the SAT procedure. If the formula is not satisfiable, the program can be unwound more to determine if a longer counterexample exists.</p>
 <p>In many engineering domains, real-time guarantees are a strict requirement. An example is software embedded in automotive controllers. As a consequence, the loop constructs in these types of programs often have a strict bound on the number of iterations. CBMC is able to formally verify such bounds by means of <em>unwinding assertions</em>. Once this bound is established, CBMC is able to prove the absence of errors.</p>
 <p>A more detailed description of how to apply CBMC to verify programs is in our <a class="el" href="md_cbmc_tutorial.html">CBMC Tutorial</a>.</p>
-<p>Last modified: 2023-03-07 22:22:25 +0100 </p>
+<p>Last modified: 2023-03-08 22:07:29 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
