@@ -379,9 +379,9 @@ def symbols_from(object_file):
     cmd = ["objdump", "--syms", object_file]
     proc = subprocess.Popen(cmd, universal_newlines=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if proc.wait():
-        logging.error("`%s` failed. Output:\n%s", " ".join(cmd),
-                      proc.stdout.read())
+    proc_output, _ = proc.communicate()
+    if proc.returncode:
+        logging.error("`%s` failed. Output:\n%s", " ".join(cmd), proc_output)
         exit(1)
     pat = re.compile(r"(?P<addr>[^\s]+)\s+"
                      r"(?P<flags>[lgu! ][w ][C ][W ][Ii ][Dd ][FfO ])\s+"
@@ -391,7 +391,7 @@ def symbols_from(object_file):
                     )
     matching = False
     ret = {}
-    for line in proc.stdout.read().splitlines():
+    for line in proc_output.splitlines():
         if not line:
             continue
         if not matching and re.match("SYMBOL TABLE:", line):
