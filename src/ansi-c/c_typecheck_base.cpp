@@ -668,6 +668,10 @@ void c_typecheck_baset::apply_asm_label(
   {
     symbol.name=asm_label;
     symbol.base_name=asm_label;
+    // asm renaming may be combined with varied return types - make sure the
+    // actual definition sets the final type
+    if(symbol.type.id() == ID_code)
+      symbol.type.set(ID_C_incomplete, true);
   }
 
   if(symbol.name!=orig_name)
