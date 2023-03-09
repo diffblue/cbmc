@@ -1,6 +1,6 @@
 int main()
 {
-  void *table[]={ &&l0, &&l1, &&l2 };
+  static void *table[] = {&&l0, &&l1, &&l2};
   int in, out;
 
   if(in>=0 && in<=2)
