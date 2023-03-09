@@ -4520,6 +4520,8 @@ protected:
     }
     else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
       return true;
+    else if(e.id() == ID_label)
+      return true;
     else
       return is_constantt::is_constant_address_of(e);
   }
