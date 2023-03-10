@@ -19,6 +19,7 @@
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/gcc_version.h>
 #include <assembler/remove_asm.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>
@@ -59,6 +60,13 @@ api_sessiont::api_sessiont(const api_optionst &options)
   config.set(cmdline);
   // Initialise C language mode
   register_language(new_ansi_c_language);
+  // configure gcc, if required -- get_goto_program will have set the config
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    configure_gcc(gcc_version);
+  }
 }
 
 api_sessiont::~api_sessiont() = default;

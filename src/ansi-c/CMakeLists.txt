@@ -72,6 +72,7 @@ make_inc(compiler_headers/gcc_builtin_headers_omp)
 make_inc(compiler_headers/gcc_builtin_headers_power)
 make_inc(compiler_headers/gcc_builtin_headers_tm)
 make_inc(compiler_headers/gcc_builtin_headers_types)
+make_inc(compiler_headers/gcc_builtin_headers_types_gcc7plus)
 make_inc(compiler_headers/gcc_builtin_headers_ubsan)
 make_inc(compiler_headers/windows_builtin_headers)
 make_inc(cprover_builtin_headers)
@@ -95,6 +96,7 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_power.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_tm.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_types.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_types_gcc7plus.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ubsan.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/windows_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc

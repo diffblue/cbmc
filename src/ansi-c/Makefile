@@ -68,6 +68,7 @@ BUILTIN_FILES = \
   compiler_headers/gcc_builtin_headers_power.inc \
   compiler_headers/gcc_builtin_headers_tm.inc \
   compiler_headers/gcc_builtin_headers_types.inc \
+  compiler_headers/gcc_builtin_headers_types_gcc7plus.inc \
   compiler_headers/gcc_builtin_headers_ubsan.inc \
   compiler_headers/windows_builtin_headers.inc
 
