@@ -1,5 +1,10 @@
 var NAVTREEINDEX48 =
 {
+"classmathematical__function__typet.html#af34940a4bff11116a6c2c8ea8da5ccd1":[7,0,787,6],
+"classmax__exprt.html":[7,0,788],
+"classmax__exprt.html#a33d908d5eb6fd594fca8a5c2241179a5":[7,0,788,0],
+"classmax__exprt.html#a96e1401ca743c43c25201b6158c648b5":[7,0,788,1],
+"classmember__designatort.html":[7,0,789],
 "classmember__designatort.html#a094824f89ee4fa22ce9a0aedbc4e5b3f":[7,0,789,1],
 "classmember__designatort.html#a60454b72e00e9fb9af0f7d16d4c700ad":[7,0,789,0],
 "classmember__exprt.html":[7,0,790],
@@ -244,10 +249,5 @@ var NAVTREEINDEX48 =
 "classmini__bdd__applyt.html#a654ed951a75a010a33a172993f1baa67":[7,0,810,0],
 "classmini__bdd__applyt.html#a71bab0a627fd7d656392329be4ed44c2":[7,0,810,6],
 "classmini__bdd__applyt.html#aafdb507cdb006bbca13a9c7f4ccff1da":[7,0,810,2],
-"classmini__bdd__applyt.html#ad6d3e5a6588a5d7da26d4d78e1f6ff9a":[7,0,810,3],
-"classmini__bdd__applyt.html#af604328d9af55ba403bd28f16649bd31":[7,0,810,1],
-"classmini__bdd__mgrt.html":[7,0,811],
-"classmini__bdd__mgrt.html#a0a0aaf71bc2f8adfb682d5479d0acc1b":[7,0,811,17],
-"classmini__bdd__mgrt.html#a0dd60a067235f056ff9f4fe942f4cdb1":[7,0,811,15],
-"classmini__bdd__mgrt.html#a1f7e9452e67c588f835c5fefc2cf41c9":[7,0,811,13]
+"classmini__bdd__applyt.html#ad6d3e5a6588a5d7da26d4d78e1f6ff9a":[7,0,810,3]
 };
