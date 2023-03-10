@@ -29,7 +29,7 @@ char* __builtin___strncat_chk(char*, const char*, __CPROVER_size_t, __CPROVER_si
 char* __builtin___strncpy_chk(char*, const char*, __CPROVER_size_t, __CPROVER_size_t);
 int __builtin___vfprintf_chk(void*, int, const char*, __builtin_va_list);
 int __builtin___vprintf_chk(int, const char*, __builtin_va_list);
-int __builtin___vsnprintf_chk (char *s, __CPROVER_size_t maxlen, int flag, __CPROVER_size_t os, const char *fmt, __builtin_va_list ap);
+int __builtin___vsnprintf_chk(char *s, __CPROVER_size_t maxlen, int flag, __CPROVER_size_t os, const char *fmt, __builtin_va_list ap);
 int __builtin___vsprintf_chk(char*, int, __CPROVER_size_t, const char*, __builtin_va_list);
 void* __builtin_aggregate_incoming_address();
 void* __builtin_aligned_alloc(__CPROVER_size_t, __CPROVER_size_t);
