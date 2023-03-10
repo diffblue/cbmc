@@ -99,7 +99,7 @@ void __builtin_ia32_pmovusdw256mem_mask(__gcc_v8hi*, __gcc_v8si, unsigned char);
 void __builtin_ia32_pmovusdw128mem_mask(unsigned long long int *, __gcc_v4si, unsigned char);
 unsigned int __builtin_ia32_rdpkru(void);
 void __builtin_ia32_wrpkru(unsigned int);
-__gcc_v8si __builtin_ia32_vec_pack_sfix256 (__gcc_v4df, __gcc_v4df);
+__gcc_v8si __builtin_ia32_vec_pack_sfix256(__gcc_v4df, __gcc_v4df);
 unsigned short __builtin_ia32_lzcnt_u16(unsigned short);
 unsigned short __builtin_ia32_tzcnt_u16(unsigned short);
 unsigned int __builtin_ia32_tzcnt_u32(unsigned int);
