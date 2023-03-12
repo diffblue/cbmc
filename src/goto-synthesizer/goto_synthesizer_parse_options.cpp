@@ -16,6 +16,7 @@ Author: Qinheping Hu
 #include <goto-programs/set_properties.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <ansi-c/gcc_version.h>
 #include <goto-instrument/contracts/contracts.h>
 #include <goto-instrument/nondet_volatile.h>
 
@@ -51,6 +52,14 @@ int goto_synthesizer_parse_optionst::doit()
   const auto result_get_goto_program = get_goto_program();
   if(result_get_goto_program != CPROVER_EXIT_SUCCESS)
     return result_get_goto_program;
+
+  // configure gcc, if required -- get_goto_program will have set the config
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    configure_gcc(gcc_version);
+  }
 
   // Synthesize loop invariants and annotate them into `goto_model`
   enumerative_loop_contracts_synthesizert synthesizer(goto_model, log);
