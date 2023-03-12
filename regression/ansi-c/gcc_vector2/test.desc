@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+We previously got a spurious type conflict for both unions got the same tag name
+(as type2name did not correctly name vectors of different size).
