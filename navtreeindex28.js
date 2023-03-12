@@ -1,6 +1,5 @@
 var NAVTREEINDEX28 =
 {
-"classescape__domaint.html#ae623e680b8456ae643048954e6e166f4":[7,0,433,1],
 "classescape__domaint.html#aeb003eddf56f4fdfae363730b96f50e9":[7,0,433,23],
 "classeuclidean__mod__exprt.html":[7,0,434],
 "classeuclidean__mod__exprt.html#a1f5322bd71a7e0487ed7976c80e1f83c":[7,0,434,0],
@@ -249,5 +248,6 @@ var NAVTREEINDEX28 =
 "classexpr2ct.html#a8f0ba2c6285cbbd0267fc4bbbcbcd0b6":[7,0,443,63],
 "classexpr2ct.html#a90a230ece8aeb5c76cc4ce3a29ab1875":[7,0,443,69],
 "classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2":[7,0,443,87],
-"classexpr2ct.html#a97e08695517156f87c9ca5ee1bad8157":[7,0,443,15]
+"classexpr2ct.html#a97e08695517156f87c9ca5ee1bad8157":[7,0,443,15],
+"classexpr2ct.html#a9a4161c4f89ad18786d0ac05e83f9b46":[7,0,443,40]
 };
