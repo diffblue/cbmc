@@ -1,5 +1,6 @@
 var NAVTREEINDEX40 =
 {
+"classinterpretert.html#a068309bcf73dbff842f533ecdc4eea54":[7,0,624,17],
 "classinterpretert.html#a06c857524cd449d8343758c2337f8791":[7,0,624,19],
 "classinterpretert.html#a08299d26cc49d20744155e1c8c70a0eb":[7,0,624,13],
 "classinterpretert.html#a0fd907a0593a04ea25b6e5ca4eeabf1b":[7,0,624,87],
@@ -248,6 +249,5 @@ var NAVTREEINDEX40 =
 "classinvalid__function__contract__pair__exceptiont.html#a7855be2df63483f60c483b7f294879e1":[7,0,635,1],
 "classinvalid__function__contract__pair__exceptiont.html#aa121c9e0519bc23b9e1af6321e82090e":[7,0,635,2],
 "classinvalid__input__exceptiont.html":[7,0,636],
-"classinvalid__input__exceptiont.html#ad6c096a438e1d1b6ec5bc276c5a281fd":[7,0,636,0],
-"classinvalid__restriction__exceptiont.html":[7,0,637]
+"classinvalid__input__exceptiont.html#ad6c096a438e1d1b6ec5bc276c5a281fd":[7,0,636,0]
 };

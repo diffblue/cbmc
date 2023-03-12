@@ -1,5 +1,6 @@
 var NAVTREEINDEX98 =
 {
+"gcc__cmdline_8h_source.html":[8,0,2,9,19],
 "gcc__message__handler_8cpp.html":[8,0,2,9,20],
 "gcc__message__handler_8cpp_source.html":[8,0,2,9,20],
 "gcc__message__handler_8h.html":[8,0,2,9,21],
@@ -113,8 +114,8 @@ var NAVTREEINDEX98 =
 "globals_b.html":[8,1,0,2],
 "globals_c.html":[8,1,0,3],
 "globals_d.html":[8,1,0,4],
-"globals_defs.html":[8,1,6,0],
 "globals_defs.html":[8,1,6],
+"globals_defs.html":[8,1,6,0],
 "globals_defs_a.html":[8,1,6,1],
 "globals_defs_b.html":[8,1,6,2],
 "globals_defs_c.html":[8,1,6,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX98 =
 "goto__cc__main_8cpp.html#a217dbf8b442f20279ea00b898af96f52":[8,0,2,9,27,0],
 "goto__cc__main_8cpp.html#a4f394003faeb180fc37c869686fdb730":[8,0,2,9,27,1],
 "goto__cc__main_8cpp_source.html":[8,0,2,9,27],
-"goto__cc__mode_8cpp.html":[8,0,2,9,28],
-"goto__cc__mode_8cpp_source.html":[8,0,2,9,28]
+"goto__cc__mode_8cpp.html":[8,0,2,9,28]
 };
