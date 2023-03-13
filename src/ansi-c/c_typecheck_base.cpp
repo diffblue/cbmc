@@ -375,7 +375,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
     if(
       old_ct.return_type() != new_ct.return_type() &&
-      !old_ct.get_bool(ID_C_incomplete))
+      !old_ct.get_bool(ID_C_incomplete) &&
+      new_ct.return_type().id() != ID_constructor &&
+      new_ct.return_type().id() != ID_destructor)
     {
       throw invalid_source_file_exceptiont{
         "function symbol '" + id2string(new_symbol.display_name()) +
