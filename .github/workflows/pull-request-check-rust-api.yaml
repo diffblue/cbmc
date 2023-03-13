@@ -61,9 +61,10 @@ jobs:
       # by the other jobs already present in `pull-request-checks.yaml`.
       - name: Run Rust API tests
         run: |
+          VERSION=$(ruby -ne 'puts $~.captures if /^CBMC_VERSION\ =\ (\d+.\d+.\d+)$/' src/config.inc)
           cd src/libcprover-rust;\
           cargo clean;\
-          CBMC_BUILD_DIR=../../${{env.default_build_dir}} SAT_IMPL=${{env.default_solver}} cargo test -- --test-threads=1
+          CBMC_BUILD_DIR=../../${{env.default_build_dir}} CBMC_VERSION=$VERSION cargo test -- --test-threads=1
 
 
   check-macos-12-cmake-clang-rust:
@@ -100,6 +101,7 @@ jobs:
       # by the other jobs already present in `pull-request-checks.yaml`.
       - name: Run Rust API tests
         run: |
+          VERSION=$(ruby -ne 'puts $~.captures if /^CBMC_VERSION\ =\ (\d+.\d+.\d+)$/' src/config.inc)
           cd src/libcprover-rust;\
           cargo clean;\
-          CBMC_BUILD_DIR=../../${{env.default_build_dir}} SAT_IMPL=${{env.default_solver}} cargo test -- --test-threads=1
+          CBMC_BUILD_DIR=../../${{env.default_build_dir}} CBMC_VERSION=$VERSION cargo test -- --test-threads=1
