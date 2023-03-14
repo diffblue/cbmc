@@ -93,4 +93,8 @@ unsigned int __builtin_rotateright32(unsigned int, unsigned int);
 unsigned long long __builtin_rotateright64(unsigned long long, unsigned long long);
 
 void __builtin_assume(__CPROVER_bool);
+
+void __builtin_cpu_init(void);
+_Bool __builtin_cpu_is(const char *);
+_Bool __builtin_cpu_supports(const char *);
 // clang-format on

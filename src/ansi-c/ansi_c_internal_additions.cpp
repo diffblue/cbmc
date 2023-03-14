@@ -11,13 +11,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+
 #include <linking/static_lifetime_init.h>
 
-#include <goto-programs/adjust_float_expressions.h>
+#include "ansi_c_parser.h"
 
 const char gcc_builtin_headers_types[] =
   "#line 1 \"gcc_builtin_headers_types.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_types.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_types_gcc7plus[] =
+  "#line 1 \"gcc_builtin_headers_types_gcc7plus.h\"\n"
+// NOLINTNEXTLINE(whitespace/line_length)
+#include "compiler_headers/gcc_builtin_headers_types_gcc7plus.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_generic[] =
@@ -64,6 +72,9 @@ const char gcc_builtin_headers_ia32_4[] =
   ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_5[] =
 #include "compiler_headers/gcc_builtin_headers_ia32-5.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_6[] =
+#include "compiler_headers/gcc_builtin_headers_ia32-6.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[] =
@@ -229,6 +240,10 @@ void ansi_c_internal_additions(std::string &code)
     config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_types;
+    // check the parser and not config.ansi_c.ts_18661_3_Floatn_types to adjust
+    // behaviour depending on C or C++ context
+    if(ansi_c_parser.ts_18661_3_Floatn_types)
+      code += gcc_builtin_headers_types_gcc7plus;
 
     // there are many more, e.g., look at
     // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html
