@@ -8,8 +8,8 @@ fn get_current_working_dir() -> std::io::Result<PathBuf> {
     env::current_dir()
 }
 
-fn get_build_directory() -> Result<String, VarError> {
-    env::var("CBMC_BUILD_DIR")
+fn get_lib_directory() -> Result<String, VarError> {
+    env::var("CBMC_LIB_DIR")
 }
 
 // Passed by the top-level CMakeLists.txt to control which version of the
@@ -20,16 +20,15 @@ fn get_cbmc_version() -> Result<String, VarError> {
 }
 
 fn get_library_build_dir() -> std::io::Result<PathBuf> {
-    let env_var_fetch_result = get_build_directory();
+    let env_var_fetch_result = get_lib_directory();
     if let Ok(build_dir) = env_var_fetch_result {
         let mut path = PathBuf::new();
         path.push(build_dir);
-        path.push("lib/");
         return Ok(path);
     }
     Err(Error::new(
         ErrorKind::Other,
-        "failed to get build output directory",
+        "Please set the environment variable CBMC_LIB_DIR with the path that contains the libcprover.x.y.z.a library on your system",
     ))
 }
 
