@@ -330,14 +330,10 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     }
   }
 
-  // Is the struct packed, without any alignment specification?
-  if(type.get_bool(ID_C_packed) &&
-     type.find(ID_C_alignment).is_nil())
-    return; // done
-
   mp_integer offset=0;
   mp_integer max_alignment=0;
   std::size_t bit_field_bits=0;
+  const bool struct_is_packed = type.get_bool(ID_C_packed);
 
   for(struct_typet::componentst::iterator
       it=components.begin();
@@ -346,9 +342,6 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
   {
     const typet it_type=it->type();
     mp_integer a=1;
-
-    const bool packed=it_type.get_bool(ID_C_packed) ||
-                      ns.follow(it_type).get_bool(ID_C_packed);
 
     if(it_type.id()==ID_c_bit_field)
     {
@@ -392,13 +385,19 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       bit_field_bits == 0, "padding ensures offset at byte boundaries");
 
     // check minimum alignment
-    if(a<config.ansi_c.alignment && !packed)
+    if(
+      a < config.ansi_c.alignment && !it_type.get_bool(ID_C_packed) &&
+      !ns.follow(it_type).get_bool(ID_C_packed))
+    {
       a=config.ansi_c.alignment;
+    }
 
     if(max_alignment<a)
       max_alignment=a;
 
-    if(a!=1)
+    if(
+      a != 1 &&
+      (!struct_is_packed || it_type.find(ID_C_alignment).is_not_nil()))
     {
       // we may need to align it
       const mp_integer displacement = offset % a;
@@ -433,7 +432,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     }
   }
   // Is the struct packed, without any alignment specification?
-  else if(type.get_bool(ID_C_packed))
+  else if(struct_is_packed)
     return; // done
 
   // There may be a need for 'end of struct' padding.

@@ -1741,12 +1741,14 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
-          if(!PARSER.pragma_pack.empty() &&
+          if(parser_stack($2).id() != ID_struct &&
+             parser_stack($2).id() != ID_union &&
+             !PARSER.pragma_pack.empty() &&
              !PARSER.pragma_pack.back().is_zero())
           {
             // communicate #pragma pack(n) alignment constraints by
-            // by both setting packing AND alignment; see padding.cpp
-            // for more details
+            // by both setting packing AND alignment for individual struct/union
+            // members; see padding.cpp for more details
             init($$);
             set($$, ID_packed);
             $2=merge($2, $$);
