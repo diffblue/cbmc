@@ -65,6 +65,7 @@ make_inc(compiler_headers/gcc_builtin_headers_ia32-2)
 make_inc(compiler_headers/gcc_builtin_headers_ia32-3)
 make_inc(compiler_headers/gcc_builtin_headers_ia32-4)
 make_inc(compiler_headers/gcc_builtin_headers_ia32-5)
+make_inc(compiler_headers/gcc_builtin_headers_ia32-6)
 make_inc(compiler_headers/gcc_builtin_headers_math)
 make_inc(compiler_headers/gcc_builtin_headers_mem_string)
 make_inc(compiler_headers/gcc_builtin_headers_mips)
@@ -88,6 +89,7 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-3.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-4.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-5.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32-6.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_ia32.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_math.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/gcc_builtin_headers_mem_string.inc

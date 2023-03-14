@@ -43,7 +43,7 @@ typespec_map = {
         'v': 'void',
         'w': 'wchar_t',
         'x': '_Float16',
-        'y': '__bf16',
+        'y': '_Float16', # would be '__bf16', but we don't support that yet
         'z': '__CPROVER_size_t'
         }
 
@@ -209,7 +209,7 @@ def process_line(name, types, attributes):
     i = 0
     while i < len(types):
         (t, i_updated) = build_type(types, i)
-        assert i_updated > i, ('failed to parse type spec of' + name + ': ' +
+        assert i_updated > i, ('failed to parse type spec of ' + name + ': ' +
                                types[i:])
         i = i_updated
         type_specs.append(t)

@@ -73,6 +73,9 @@ const char gcc_builtin_headers_ia32_4[] =
 const char gcc_builtin_headers_ia32_5[] =
 #include "compiler_headers/gcc_builtin_headers_ia32-5.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_6[] =
+#include "compiler_headers/gcc_builtin_headers_ia32-6.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[] =
   "#line 1 \"gcc_builtin_headers_alpha.h\"\n"
