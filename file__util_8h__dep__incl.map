@@ -1,54 +1,55 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/file_util.h" name="/home/runner/work/cbmc/cbmc/src/util/file_util.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1932,5,2116,47"/>
-<area shape="rect" id="node2" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="321,95,537,151"/>
-<area shape="rect" id="node3" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="561,102,788,143"/>
-<area shape="rect" id="node4" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="812,102,1031,143"/>
-<area shape="rect" id="node5" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="1055,95,1239,151"/>
-<area shape="rect" id="node6" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="1263,95,1447,151"/>
-<area shape="rect" id="node7" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="1471,102,1694,143"/>
-<area shape="rect" id="node8" href="$ms__cl__mode_8cpp.html" title="Visual Studio CL Mode." alt="" coords="1719,95,1903,151"/>
-<area shape="rect" id="node9" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="1927,95,2121,151"/>
-<area shape="rect" id="node10" href="$file__util_8cpp.html" title="File Utilities." alt="" coords="2145,102,2333,143"/>
-<area shape="rect" id="node11" href="$parser_8h.html" title="Parser utilities." alt="" coords="2357,102,2541,143"/>
-<area shape="rect" id="node48" href="$source__location_8cpp.html" title=" " alt="" coords="2565,95,2749,151"/>
-<area shape="rect" id="node49" href="$tempdir_8cpp.html" title=" " alt="" coords="2774,102,2965,143"/>
-<area shape="rect" id="node50" href="$tempfile_8cpp.html" title=" " alt="" coords="2989,102,3184,143"/>
-<area shape="rect" id="node51" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="3208,95,3427,151"/>
-<area shape="rect" id="node52" href="$load__java__class_8cpp.html" title=" " alt="" coords="3451,95,3659,151"/>
-<area shape="rect" id="node12" href="$ansi__c__parser_8h.html" title=" " alt="" coords="525,199,709,255"/>
-<area shape="rect" id="node16" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="837,317,1035,359"/>
-<area shape="rect" id="node21" href="$preprocessor__line_8cpp.html" title="ANSI&#45;C Language Conversion." alt="" coords="1187,199,1402,255"/>
-<area shape="rect" id="node22" href="$assembler__parser_8h.html" title=" " alt="" coords="1426,199,1654,255"/>
-<area shape="rect" id="node25" href="$jsil__parser_8h.html" title="Jsil Language." alt="" coords="1803,206,1992,247"/>
-<area shape="rect" id="node28" href="$json__parser_8h.html" title=" " alt="" coords="2899,206,3104,247"/>
-<area shape="rect" id="node39" href="$statement__list__parser_8h.html" title="Statement List Language Parser." alt="" coords="3783,199,3967,255"/>
-<area shape="rect" id="node42" href="$parser_8cpp.html" title=" " alt="" coords="3991,206,4175,247"/>
-<area shape="rect" id="node43" href="$xml__parser_8h.html" title=" " alt="" coords="4900,199,5084,255"/>
-<area shape="rect" id="node47" href="$java__bytecode__parser_8cpp.html" title=" " alt="" coords="5108,199,5327,255"/>
-<area shape="rect" id="node13" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="5,310,189,366"/>
-<area shape="rect" id="node14" href="$ansi__c__parser_8cpp.html" title=" " alt="" coords="213,310,397,366"/>
-<area shape="rect" id="node15" href="$builtin__factory_8cpp.html" title=" " alt="" coords="421,310,605,366"/>
-<area shape="rect" id="node20" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="629,310,813,366"/>
-<area shape="rect" id="node17" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="573,421,805,463"/>
-<area shape="rect" id="node18" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="830,421,1042,463"/>
-<area shape="rect" id="node19" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="1067,421,1251,463"/>
-<area shape="rect" id="node23" href="$assembler__parser_8cpp.html" title=" " alt="" coords="1059,310,1287,366"/>
-<area shape="rect" id="node24" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="1312,310,1523,366"/>
-<area shape="rect" id="node26" href="$jsil__language_8cpp.html" title="Jsil Language." alt="" coords="1547,317,1771,359"/>
-<area shape="rect" id="node27" href="$jsil__parser_8cpp.html" title="Jsil Language." alt="" coords="1795,317,1999,359"/>
-<area shape="rect" id="node29" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="2023,310,2222,366"/>
-<area shape="rect" id="node30" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="2247,310,2431,366"/>
-<area shape="rect" id="node31" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2455,310,2639,366"/>
-<area shape="rect" id="node32" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="2663,303,2868,373"/>
-<area shape="rect" id="node33" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="2892,310,3111,366"/>
-<area shape="rect" id="node34" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="3135,317,3374,359"/>
-<area shape="rect" id="node35" href="$json__parser_8cpp.html" title=" " alt="" coords="3398,317,3618,359"/>
-<area shape="rect" id="node36" href="$json__symtab__language_8cpp.html" title=" " alt="" coords="3642,310,3910,366"/>
-<area shape="rect" id="node37" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="3935,310,4153,366"/>
-<area shape="rect" id="node38" href="$java__class__loader__limit_8cpp.html" title="limit class path loading" alt="" coords="4177,310,4396,366"/>
-<area shape="rect" id="node40" href="$statement__list__language_8cpp.html" title="Statement List Language Interface." alt="" coords="4421,310,4635,366"/>
-<area shape="rect" id="node41" href="$statement__list__parser_8cpp.html" title="Statement List Language Parser." alt="" coords="4660,310,4855,366"/>
-<area shape="rect" id="node44" href="$graphml_8cpp.html" title="Read/write graphs as GraphML." alt="" coords="4879,317,5105,359"/>
-<area shape="rect" id="node45" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="5129,310,5313,366"/>
-<area shape="rect" id="node46" href="$xml__parser_8cpp.html" title=" " alt="" coords="5337,310,5521,366"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2143,5,2327,47"/>
+<area shape="rect" id="node2" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="532,95,748,151"/>
+<area shape="rect" id="node3" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="772,102,999,143"/>
+<area shape="rect" id="node4" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="1023,102,1241,143"/>
+<area shape="rect" id="node5" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="1265,95,1449,151"/>
+<area shape="rect" id="node6" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="1473,95,1657,151"/>
+<area shape="rect" id="node7" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="1682,102,1905,143"/>
+<area shape="rect" id="node8" href="$ms__cl__mode_8cpp.html" title="Visual Studio CL Mode." alt="" coords="1929,95,2113,151"/>
+<area shape="rect" id="node9" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="2138,95,2331,151"/>
+<area shape="rect" id="node10" href="$file__util_8cpp.html" title="File Utilities." alt="" coords="2355,102,2543,143"/>
+<area shape="rect" id="node11" href="$parser_8h.html" title="Parser utilities." alt="" coords="2568,102,2752,143"/>
+<area shape="rect" id="node49" href="$source__location_8cpp.html" title=" " alt="" coords="2776,95,2960,151"/>
+<area shape="rect" id="node50" href="$tempdir_8cpp.html" title=" " alt="" coords="2985,102,3175,143"/>
+<area shape="rect" id="node51" href="$tempfile_8cpp.html" title=" " alt="" coords="3200,102,3395,143"/>
+<area shape="rect" id="node52" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="3419,95,3637,151"/>
+<area shape="rect" id="node53" href="$load__java__class_8cpp.html" title=" " alt="" coords="3661,95,3869,151"/>
+<area shape="rect" id="node12" href="$ansi__c__parser_8h.html" title=" " alt="" coords="632,199,816,255"/>
+<area shape="rect" id="node17" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="1048,317,1245,359"/>
+<area shape="rect" id="node22" href="$preprocessor__line_8cpp.html" title="ANSI&#45;C Language Conversion." alt="" coords="1398,199,1613,255"/>
+<area shape="rect" id="node23" href="$assembler__parser_8h.html" title=" " alt="" coords="1637,199,1865,255"/>
+<area shape="rect" id="node26" href="$jsil__parser_8h.html" title="Jsil Language." alt="" coords="2013,206,2203,247"/>
+<area shape="rect" id="node29" href="$json__parser_8h.html" title=" " alt="" coords="3109,206,3315,247"/>
+<area shape="rect" id="node40" href="$statement__list__parser_8h.html" title="Statement List Language Parser." alt="" coords="3993,199,4177,255"/>
+<area shape="rect" id="node43" href="$parser_8cpp.html" title=" " alt="" coords="4201,206,4385,247"/>
+<area shape="rect" id="node44" href="$xml__parser_8h.html" title=" " alt="" coords="5111,199,5295,255"/>
+<area shape="rect" id="node48" href="$java__bytecode__parser_8cpp.html" title=" " alt="" coords="5319,199,5537,255"/>
+<area shape="rect" id="node13" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="5,310,192,366"/>
+<area shape="rect" id="node14" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="216,310,400,366"/>
+<area shape="rect" id="node15" href="$ansi__c__parser_8cpp.html" title=" " alt="" coords="424,310,608,366"/>
+<area shape="rect" id="node16" href="$builtin__factory_8cpp.html" title=" " alt="" coords="632,310,816,366"/>
+<area shape="rect" id="node21" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="840,310,1024,366"/>
+<area shape="rect" id="node18" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="784,421,1016,463"/>
+<area shape="rect" id="node19" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="1041,421,1253,463"/>
+<area shape="rect" id="node20" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="1277,421,1461,463"/>
+<area shape="rect" id="node24" href="$assembler__parser_8cpp.html" title=" " alt="" coords="1270,310,1498,366"/>
+<area shape="rect" id="node25" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="1523,310,1733,366"/>
+<area shape="rect" id="node27" href="$jsil__language_8cpp.html" title="Jsil Language." alt="" coords="1757,317,1981,359"/>
+<area shape="rect" id="node28" href="$jsil__parser_8cpp.html" title="Jsil Language." alt="" coords="2006,317,2210,359"/>
+<area shape="rect" id="node30" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="2234,310,2433,366"/>
+<area shape="rect" id="node31" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="2457,310,2641,366"/>
+<area shape="rect" id="node32" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2665,310,2849,366"/>
+<area shape="rect" id="node33" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="2873,303,3079,373"/>
+<area shape="rect" id="node34" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="3103,310,3321,366"/>
+<area shape="rect" id="node35" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="3346,317,3585,359"/>
+<area shape="rect" id="node36" href="$json__parser_8cpp.html" title=" " alt="" coords="3609,317,3829,359"/>
+<area shape="rect" id="node37" href="$json__symtab__language_8cpp.html" title=" " alt="" coords="3853,310,4121,366"/>
+<area shape="rect" id="node38" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="4145,310,4364,366"/>
+<area shape="rect" id="node39" href="$java__class__loader__limit_8cpp.html" title="limit class path loading" alt="" coords="4388,310,4607,366"/>
+<area shape="rect" id="node41" href="$statement__list__language_8cpp.html" title="Statement List Language Interface." alt="" coords="4631,310,4846,366"/>
+<area shape="rect" id="node42" href="$statement__list__parser_8cpp.html" title="Statement List Language Parser." alt="" coords="4871,310,5065,366"/>
+<area shape="rect" id="node45" href="$graphml_8cpp.html" title="Read/write graphs as GraphML." alt="" coords="5089,317,5316,359"/>
+<area shape="rect" id="node46" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="5340,310,5524,366"/>
+<area shape="rect" id="node47" href="$xml__parser_8cpp.html" title=" " alt="" coords="5548,310,5732,366"/>
 </map>

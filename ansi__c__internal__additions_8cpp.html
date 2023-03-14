@@ -98,9 +98,11 @@ $(document).ready(function(){initNavTree('ansi__c__internal__additions_8cpp.html
 <div class="textblock"><code>#include &quot;<a class="el" href="ansi__c__internal__additions_8h_source.html">ansi_c_internal_additions.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="adjust__float__expressions_8h_source.html">goto-programs/adjust_float_expressions.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="ansi__c__parser_8h_source.html">ansi_c_parser.h</a>&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_types.inc&quot;</code><br />
+<code>#include &quot;compiler_headers/gcc_builtin_headers_types_gcc7plus.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_generic.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_math.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_mem_string.inc&quot;</code><br />
@@ -112,6 +114,7 @@ $(document).ready(function(){initNavTree('ansi__c__internal__additions_8cpp.html
 <code>#include &quot;compiler_headers/gcc_builtin_headers_ia32-3.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_ia32-4.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_ia32-5.inc&quot;</code><br />
+<code>#include &quot;compiler_headers/gcc_builtin_headers_ia32-6.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_alpha.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_arm.inc&quot;</code><br />
 <code>#include &quot;compiler_headers/gcc_builtin_headers_mips.inc&quot;</code><br />
@@ -126,7 +129,7 @@ $(document).ready(function(){initNavTree('ansi__c__internal__additions_8cpp.html
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="ansi__c__internal__additions_8cpp__incl.svg" width="5142" height="1156"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="ansi__c__internal__additions_8cpp__incl.svg" width="5803" height="708"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -151,6 +154,8 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a155c9b7f110109b8361afeda9b74db50"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#a155c9b7f110109b8361afeda9b74db50">gcc_builtin_headers_types</a> []</td></tr>
 <tr class="separator:a155c9b7f110109b8361afeda9b74db50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf7da312c7dba78cbc8aa386a5697921"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#acf7da312c7dba78cbc8aa386a5697921">gcc_builtin_headers_types_gcc7plus</a> []</td></tr>
+<tr class="separator:acf7da312c7dba78cbc8aa386a5697921"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67900a980f530231255f110eabc651c0"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#a67900a980f530231255f110eabc651c0">gcc_builtin_headers_generic</a> []</td></tr>
 <tr class="separator:a67900a980f530231255f110eabc651c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad8da005b4fbdea97d2e2f812690032b"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#aad8da005b4fbdea97d2e2f812690032b">gcc_builtin_headers_math</a> []</td></tr>
@@ -173,6 +178,8 @@ Variables</h2></td></tr>
 <tr class="separator:a6213d4a84e9de205daf09ad71a32ee75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b294dd4337e017ebe468c9491988258"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#a2b294dd4337e017ebe468c9491988258">gcc_builtin_headers_ia32_5</a> [] =</td></tr>
 <tr class="separator:a2b294dd4337e017ebe468c9491988258"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab66cca61fd38313c7ab497769b68a4d8"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#ab66cca61fd38313c7ab497769b68a4d8">gcc_builtin_headers_ia32_6</a> [] =</td></tr>
+<tr class="separator:ab66cca61fd38313c7ab497769b68a4d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6eb792b40894b375dd0a0883540103f"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#ac6eb792b40894b375dd0a0883540103f">gcc_builtin_headers_alpha</a> []</td></tr>
 <tr class="separator:ac6eb792b40894b375dd0a0883540103f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0753ee9c9b15b75f95b0d97e509dc15"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ansi__c__internal__additions_8cpp.html#ab0753ee9c9b15b75f95b0d97e509dc15">gcc_builtin_headers_arm</a> [] = &quot;#line 1 \&quot;gcc_builtin_headers_arm.h\&quot;\n&quot;</td></tr>
@@ -209,7 +216,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00305">305</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00320">320</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -229,7 +236,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00150">150</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00161">161</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +274,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00108">108</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00119">119</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -307,7 +314,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00115">115</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00126">126</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -356,7 +363,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The size in bytes of the maximum allocation supported. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00137">137</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00148">148</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -373,7 +380,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00088">88</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00099">99</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +396,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00096">96</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00107">107</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -405,7 +412,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00100">100</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00111">111</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +428,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00092">92</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00103">103</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +446,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_alpha.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00069">69</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00080">80</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -455,7 +462,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00074">74</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00085">85</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -473,7 +480,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_generic.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00023">23</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00031">31</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +498,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_ia32.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00052">52</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00060">60</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -507,7 +514,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00056">56</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00064">64</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -523,7 +530,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00059">59</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00067">67</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -539,7 +546,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00062">62</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00070">70</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -555,7 +562,23 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00065">65</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00073">73</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ab66cca61fd38313c7ab497769b68a4d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab66cca61fd38313c7ab497769b68a4d8">&#9670;&nbsp;</a></span>gcc_builtin_headers_ia32_6</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char gcc_builtin_headers_ia32_6[] =</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00076">76</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -573,7 +596,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_math.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00028">28</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00036">36</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -591,7 +614,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_mem_string.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00033">33</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00041">41</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -609,7 +632,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_mips.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00078">78</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00089">89</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +648,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00039">39</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00047">47</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +666,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_power.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00083">83</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00094">94</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -659,7 +682,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00043">43</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00051">51</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -677,7 +700,25 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_types.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00018">18</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00020">20</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+
+</div>
+</div>
+<a id="acf7da312c7dba78cbc8aa386a5697921"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf7da312c7dba78cbc8aa386a5697921">&#9670;&nbsp;</a></span>gcc_builtin_headers_types_gcc7plus</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char gcc_builtin_headers_types_gcc7plus[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_types_gcc7plus.h\&quot;\n&quot;</span></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00025">25</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -695,7 +736,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">  <span class="stringliteral">&quot;#line 1 \&quot;gcc_builtin_headers_ubsan.h\&quot;\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00047">47</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00055">55</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>
@@ -711,7 +752,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00104">104</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ansi__c__internal__additions_8cpp_source.html#l00115">115</a> of file <a class="el" href="ansi__c__internal__additions_8cpp_source.html">ansi_c_internal_additions.cpp</a>.</p>
 
 </div>
 </div>

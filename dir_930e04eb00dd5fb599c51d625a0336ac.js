@@ -10,6 +10,7 @@ var dir_930e04eb00dd5fb599c51d625a0336ac =
     [ "gcc_builtin_headers_ia32-3.h", "gcc__builtin__headers__ia32-3_8h.html", "gcc__builtin__headers__ia32-3_8h" ],
     [ "gcc_builtin_headers_ia32-4.h", "gcc__builtin__headers__ia32-4_8h.html", "gcc__builtin__headers__ia32-4_8h" ],
     [ "gcc_builtin_headers_ia32-5.h", "gcc__builtin__headers__ia32-5_8h.html", "gcc__builtin__headers__ia32-5_8h" ],
+    [ "gcc_builtin_headers_ia32-6.h", "gcc__builtin__headers__ia32-6_8h.html", "gcc__builtin__headers__ia32-6_8h" ],
     [ "gcc_builtin_headers_ia32.h", "gcc__builtin__headers__ia32_8h.html", "gcc__builtin__headers__ia32_8h" ],
     [ "gcc_builtin_headers_math.h", "gcc__builtin__headers__math_8h.html", "gcc__builtin__headers__math_8h" ],
     [ "gcc_builtin_headers_mem_string.h", "gcc__builtin__headers__mem__string_8h.html", "gcc__builtin__headers__mem__string_8h" ],
@@ -18,6 +19,7 @@ var dir_930e04eb00dd5fb599c51d625a0336ac =
     [ "gcc_builtin_headers_power.h", "gcc__builtin__headers__power_8h.html", null ],
     [ "gcc_builtin_headers_tm.h", "gcc__builtin__headers__tm_8h.html", "gcc__builtin__headers__tm_8h" ],
     [ "gcc_builtin_headers_types.h", "gcc__builtin__headers__types_8h.html", "gcc__builtin__headers__types_8h" ],
+    [ "gcc_builtin_headers_types_gcc7plus.h", "gcc__builtin__headers__types__gcc7plus_8h.html", "gcc__builtin__headers__types__gcc7plus_8h" ],
     [ "gcc_builtin_headers_ubsan.h", "gcc__builtin__headers__ubsan_8h.html", "gcc__builtin__headers__ubsan_8h" ],
     [ "windows_builtin_headers.h", "windows__builtin__headers_8h.html", "windows__builtin__headers_8h" ]
 ];
