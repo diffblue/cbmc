@@ -52,7 +52,7 @@ jobs:
       # local experiments on the same platform, but it seems to be doing no harm to the build overall
       # and allows us to test the Rust API on Linux without issues.
       - name: Configure using CMake
-        run: cmake -S. -B${{env.default_build_dir}} -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_COMPILER=/usr/bin/clang-13 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-13 -DWITH_RUST_API=ON
+        run: cmake -S. -B${{env.default_build_dir}} -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_COMPILER=/usr/bin/clang-13 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-13
       - name: Build with CMake
         run: cmake --build ${{env.default_build_dir}} -j2
       - name: Print ccache stats
@@ -92,7 +92,7 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Configure using CMake
-        run: cmake -S. -B${{env.default_build_dir}} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DWITH_RUST_API=ON
+        run: cmake -S. -B${{env.default_build_dir}} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
       - name: Build with Ninja
         run: cd ${{env.default_build_dir}}; ninja -j3
       - name: Print ccache stats

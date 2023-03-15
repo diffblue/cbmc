@@ -257,33 +257,4 @@ if(WITH_JBMC)
     add_subdirectory(jbmc)
 endif()
 
-option(WITH_RUST_API "Build with the CPROVER Rust API" OFF)
-if(${CMAKE_VERSION} VERSION_LESS "3.19.0" AND WITH_RUST_API)
-    message("Unable to build the Rust API without version CMake 3.19.0")
-    message(FATAL_ERROR "(The Rust build depends on CMake plugins with dependencies on CMake 3.19.0 and above)")
-else()
-    if(WITH_RUST_API)
-    include(FetchContent)
-
-    FetchContent_Declare(
-        Corrosion
-        GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
-        GIT_TAG v0.3.1
-    )
-
-    FetchContent_MakeAvailable(Corrosion)
-
-    corrosion_import_crate(MANIFEST_PATH src/libcprover-rust/Cargo.toml)
-    list(JOIN sat_impl " " sat_impl_str)
-    corrosion_set_env_vars(cprover-api-rust CBMC_LIB_DIR=${CMAKE_BINARY_DIR} CBMC_VERSION=${CBMC_VERSION})
-    corrosion_link_libraries(cprover-api-rust cprover-api-cpp)
-    install(TARGETS cprover-api-rust RUNTIME DESTINATION lib)
-    # NOTE: We want to rename to a name consistent with the name of the
-    # rest of the static libraries built as a result of a build. The reason
-    # we cannot set the target name directly is that Cargo doesn't support
-    # hyphens in names of packages, so it builds the name by default with
-    # an underscore.
-    endif()
-endif()
-
 include(cmake/packaging.cmake)
