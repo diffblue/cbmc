@@ -1,5 +1,5 @@
 [package]
-name = "cprover-api-rust"
+name = "libcprover_rust"
 version = "0.1.0"
 edition = "2021"
 description = "Rust API for CBMC and assorted CProver tools"
@@ -17,4 +17,4 @@ cxx = "1.0"
 cxx-build = "1.0"
 
 [lib]
-crate-type = ["staticlib"]
+crate-type = ["rlib"]

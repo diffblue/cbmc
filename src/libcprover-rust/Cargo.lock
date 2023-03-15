@@ -19,14 +19,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cprover-api-rust"
-version = "0.1.0"
-dependencies = [
- "cxx",
- "cxx-build",
-]
-
-[[package]]
 name = "cxx"
 version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -68,6 +60,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "libcprover_rust"
+version = "0.1.0"
+dependencies = [
+ "cxx",
+ "cxx-build",
 ]
 
 [[package]]
