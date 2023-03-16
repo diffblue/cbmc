@@ -61,7 +61,7 @@ jobs:
       # by the other jobs already present in `pull-request-checks.yaml`.
       - name: Run Rust API tests
         run: |
-          VERSION=$(ruby -ne 'puts $~.captures if /^CBMC_VERSION\ =\ (\d+.\d+.\d+)$/' src/config.inc)
+          VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
           cd src/libcprover-rust;\
           cargo clean;\
           CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
@@ -101,7 +101,7 @@ jobs:
       # by the other jobs already present in `pull-request-checks.yaml`.
       - name: Run Rust API tests
         run: |
-          VERSION=$(ruby -ne 'puts $~.captures if /^CBMC_VERSION\ =\ (\d+.\d+.\d+)$/' src/config.inc)
+          VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
           cd src/libcprover-rust;\
           cargo clean;\
           CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
