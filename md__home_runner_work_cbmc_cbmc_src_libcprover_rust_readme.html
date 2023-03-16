@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CBMC: /home/runner/work/cbmc/cbmc/src/goto-instrument/accelerate -&gt; analyses Relation</title>
+<title>CBMC: CProver (CBMC) Rust API</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,7 +69,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('dir_6299ea566f0780fdfe4a304b3be6fd1f.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('md__home_runner_work_cbmc_cbmc_src_libcprover_rust_readme.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -87,13 +87,42 @@ $(document).ready(function(){initNavTree('dir_6299ea566f0780fdfe4a304b3be6fd1f.h
 </iframe>
 </div>
 
+<div class="PageDoc"><div class="header">
+  <div class="headertitle">
+<div class="title">CProver (CBMC) Rust API </div>  </div>
+</div><!--header-->
 <div class="contents">
-<h3>accelerate &rarr; analyses Relation</h3><table class="dirtab"><tr class="dirtab"><th class="dirtab">File in src/goto-instrument/accelerate</th><th class="dirtab">Includes file in src/analyses</th></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="accelerate_8cpp.html">accelerate.cpp</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="accelerate_8h.html">accelerate.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="acceleration__utils_8h.html">acceleration_utils.h</a></td><td class="dirtab"><a class="el" href="guard_8h.html">guard.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="acceleration__utils_8h.html">acceleration_utils.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="accelerator_8h.html">accelerator.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="all__paths__enumerator_8h.html">all_paths_enumerator.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="disjunctive__polynomial__acceleration_8h.html">disjunctive_polynomial_acceleration.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="enumerating__loop__acceleration_8h.html">enumerating_loop_acceleration.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="path__enumerator_8h.html">path_enumerator.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr><tr class="dirtab"><td class="dirtab"><a class="el" href="sat__path__enumerator_8h.html">sat_path_enumerator.h</a></td><td class="dirtab"><a class="el" href="natural__loops_8h.html">natural_loops.h</a></td></tr></table></div><!-- contents -->
+<div class="textblock"><p>This folder contains the implementation of the Rust API of the CProver (CBMC) project.</p>
+<h1><a class="anchor" id="autotoc_md148"></a>
+Building instructions</h1>
+<p>To build the Rust project you need the Rust language toolchain installed (you can install from <a href="https://rustup.rs">rustup.rs</a>).</p>
+<p>With that instaled, you can execute <code>cargo build</code> under this (<code>src/libcprover-rust</code>) directory.</p>
+<p>For this to work, you need to supply two environment variables to the project:</p>
+<ul>
+<li><code>CBMC_LIB_DIR</code>, for selecting where the <code>libcprover-x.y.z.a</code> is located (say, if you have downloaded a pre-packaged release which contains the static library), and</li>
+<li><code>CBMC_VERSION</code>, for selecting the version of the library to link against (this is useful if you have multiple versions of the library in the same location and you want to control which version you compile against).</li>
+</ul>
+<p>As an example, a command sequence to build the API through <code>cargo</code> would look like this (assuming you're executing these instructions from the root level directory of the CBMC project.)</p>
+<div class="fragment"><div class="line">$ cd src/libcprover-rust</div>
+<div class="line">$ cargo clean</div>
+<div class="line">$ CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo build</div>
+</div><!-- fragment --><p>To build the project and run its associated tests, the command sequence would look like this:</p>
+<div class="fragment"><div class="line">$ cd src/libcprover-rust</div>
+<div class="line">$ cargo clean</div>
+<div class="line">$ CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo test -- --test-threads=1 --nocapture</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md149"></a>
+Notes</h1>
+<ul>
+<li>The functions supported by the Rust API are catalogued within the <code>ffi</code> module within <code>lib.rs</code>.</li>
+<li>The API supports exception handling from inside CBMC by catching the exceptions in a C++ shim, and then translating the exception into the Rust <code>Result</code> type.</li>
+<li>Because of limitations from the C++ side of CBMC, the API is not thread-safe. </li>
+</ul>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_4cd183c173ff5cfcfce420f655b591bf.html">goto-instrument</a></li><li class="navelem"><a class="el" href="dir_6299ea566f0780fdfe4a304b3be6fd1f.html">accelerate</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
