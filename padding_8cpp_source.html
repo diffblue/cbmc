@@ -422,192 +422,191 @@ $(document).ready(function(){initNavTree('padding_8cpp_source.html',''); initRes
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    }</div>
 <div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  }</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  <span class="comment">// Is the struct packed, without any alignment specification?</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed) &amp;&amp;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;     type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_C_alignment).<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keywordflow">return</span>; <span class="comment">// done</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> offset=0;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> max_alignment=0;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  std::size_t bit_field_bits=0;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> struct_is_packed = type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed);</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160; </div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> offset=0;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> max_alignment=0;</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  std::size_t bit_field_bits=0;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160; </div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keywordflow">for</span>(struct_typet::componentst::iterator</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      it=components.begin();</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;      it!=components.end();</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;      it++)</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  {</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> it_type=it-&gt;type();</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> a=1;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <span class="keywordflow">for</span>(struct_typet::componentst::iterator</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      it=components.begin();</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      it!=components.end();</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      it++)</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  {</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> it_type=it-&gt;type();</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> a=1;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160; </div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">if</span>(it_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bit_field)</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    {</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;      a = <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(it_type).underlying_type(), ns);</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> packed=it_type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed) ||</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;                      ns.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(it_type).<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed);</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="keywordflow">if</span>(it_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_c_bit_field)</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    {</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      a = <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(it_type).underlying_type(), ns);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      <span class="comment">// A zero-width bit-field causes alignment to the base-type.</span></div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(it_type).get_width()==0)</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      {</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      }</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      {</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        <span class="comment">// Otherwise, ANSI-C says that bit-fields do not get padded!</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <span class="comment">// We consider the type for max_alignment, however.</span></div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keywordflow">if</span>(max_alignment&lt;a)</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;          max_alignment=a;</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160; </div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        std::size_t w=<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(it_type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        bit_field_bits += w;</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        <span class="keyword">const</span> std::size_t bytes = bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        bit_field_bits %= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        offset+=bytes;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      }</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    }</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool)</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    {</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      a = <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(it_type, ns);</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="keywordflow">if</span>(max_alignment &lt; a)</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;        max_alignment = a;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160; </div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      ++bit_field_bits;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      <span class="keyword">const</span> std::size_t bytes = bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      bit_field_bits %= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      offset += bytes;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    }</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      a=<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(it_type, ns);</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160; </div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      bit_field_bits == 0, <span class="stringliteral">&quot;padding ensures offset at byte boundaries&quot;</span>);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="comment">// check minimum alignment</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordflow">if</span>(a&lt;<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#abee3d3d223361202f82dd400bc393aca">alignment</a> &amp;&amp; !packed)</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      a=<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#abee3d3d223361202f82dd400bc393aca">alignment</a>;</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;      <span class="comment">// A zero-width bit-field causes alignment to the base-type.</span></div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(it_type).get_width()==0)</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;      {</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      }</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      {</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <span class="comment">// Otherwise, ANSI-C says that bit-fields do not get padded!</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;        <span class="comment">// We consider the type for max_alignment, however.</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;        <span class="keywordflow">if</span>(max_alignment&lt;a)</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;          max_alignment=a;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160; </div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        std::size_t w=<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(it_type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        bit_field_bits += w;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        <span class="keyword">const</span> std::size_t bytes = bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        bit_field_bits %= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        offset+=bytes;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      }</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    }</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool)</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    {</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;      a = <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(it_type, ns);</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      <span class="keywordflow">if</span>(max_alignment &lt; a)</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        max_alignment = a;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      ++bit_field_bits;</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keyword">const</span> std::size_t bytes = bit_field_bits / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;      bit_field_bits %= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      offset += bytes;</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    }</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      a=<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(it_type, ns);</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      bit_field_bits == 0, <span class="stringliteral">&quot;padding ensures offset at byte boundaries&quot;</span>);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="comment">// check minimum alignment</span></div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      a &lt; <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#abee3d3d223361202f82dd400bc393aca">alignment</a> &amp;&amp; !it_type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed) &amp;&amp;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      !ns.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(it_type).<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed))</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    {</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      a=<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#abee3d3d223361202f82dd400bc393aca">alignment</a>;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    }</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordflow">if</span>(max_alignment&lt;a)</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      max_alignment=a;</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">if</span>(max_alignment&lt;a)</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;      max_alignment=a;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordflow">if</span>(a!=1)</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    {</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;      <span class="comment">// we may need to align it</span></div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> displacement = offset % a;</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      <span class="keywordflow">if</span>(displacement!=0)</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;      {</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> pad_bytes = a - displacement;</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keyword">const</span> std::size_t pad_bits =</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;          numeric_cast_v&lt;std::size_t&gt;(pad_bytes * <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>);</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        it = <a class="code" href="padding_8cpp.html#ae5d7716dd42f147757b5e856254bc1db">pad</a>(components, it, pad_bits);</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        offset += pad_bytes;</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;      }</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    }</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160; </div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    <span class="keyword">auto</span> size = <a class="code" href="pointer__offset__size_8cpp.html#a7ee4b81e0982aa273d7341124350bd18">pointer_offset_size</a>(it_type, ns);</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keywordflow">if</span>(size.has_value())</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      offset += *size;</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  }</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="comment">// any explicit alignment for the struct?</span></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a> =</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_C_alignment));</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>.is_not_nil())</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  {</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>.id()!=ID_default)</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> tmp_i = numeric_cast&lt;mp_integer&gt;(<a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>, ns));</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160; </div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;      <span class="keywordflow">if</span>(tmp_i.has_value() &amp;&amp; *tmp_i &gt; max_alignment)</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;        max_alignment = *tmp_i;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    }</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  }</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  <span class="comment">// Is the struct packed, without any alignment specification?</span></div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed))</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="keywordflow">return</span>; <span class="comment">// done</span></div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160; </div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  <span class="comment">// There may be a need for &#39;end of struct&#39; padding.</span></div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;  <span class="comment">// We use &#39;max_alignment&#39;.</span></div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  <span class="keywordflow">if</span>(max_alignment&gt;1)</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;  {</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="comment">// we may need to align it</span></div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> displacement=offset%max_alignment;</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="keywordflow">if</span>(displacement!=0)</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    {</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> pad_bytes = max_alignment - displacement;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;      std::size_t pad_bits =</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;        numeric_cast_v&lt;std::size_t&gt;(pad_bytes * <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>);</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;      <a class="code" href="padding_8cpp.html#ae5d7716dd42f147757b5e856254bc1db">pad</a>(components, components.end(), pad_bits);</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    }</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  }</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;}</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
-<div class="line"><a name="l00457"></a><span class="lineno"><a class="line" href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">  457</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">add_padding</a>(<a class="code" href="classstruct__typet.html">struct_typet</a> &amp;type, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;{</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  <span class="comment">// padding depends greatly on compiler</span></div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#af249a411a92a3effeb3155adbe35ea5c">mode</a> == <a class="code" href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a4e039bbec176af81eb7f5ac299517216">configt::ansi_ct::flavourt::VISUAL_STUDIO</a>)</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <a class="code" href="padding_8cpp.html#a99d3d8f78529edfda0e8828fe4d0fafd">add_padding_msvc</a>(type, ns);</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <a class="code" href="padding_8cpp.html#a9ac9627e514b409ffd5e8ea4315175d0">add_padding_gcc</a>(type, ns);</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;}</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160; </div>
-<div class="line"><a name="l00466"></a><span class="lineno"><a class="line" href="padding_8cpp.html#aa1e15c315479e9154a8667b171ec1332">  466</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">add_padding</a>(<a class="code" href="classunion__typet.html">union_typet</a> &amp;type, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;{</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> max_alignment_bits =</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(type, ns) * <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> size_bits=0;</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;  <span class="comment">// check per component, and ignore those without fixed size</span></div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  {</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    <span class="keyword">auto</span> s = <a class="code" href="pointer__offset__size_8cpp.html#ab6189bf186fc1fee24690c8586bc7118">pointer_offset_bits</a>(c.type(), ns);</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    <span class="keywordflow">if</span>(s.has_value())</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;      size_bits = std::max(size_bits, *s);</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  }</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  <span class="comment">// Is the union packed?</span></div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed))</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  {</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    <span class="comment">// The size needs to be a multiple of 1 char only.</span></div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    max_alignment_bits = <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  }</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160; </div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#af249a411a92a3effeb3155adbe35ea5c">mode</a> == <a class="code" href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a4e039bbec176af81eb7f5ac299517216">configt::ansi_ct::flavourt::VISUAL_STUDIO</a>)</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  {</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="comment">// Visual Studio pads up to the underlying width of</span></div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <span class="comment">// any bit field.</span></div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;      <span class="keywordflow">if</span>(c.type().id() == ID_c_bit_field)</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      {</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;        <span class="keyword">auto</span> w = <a class="code" href="padding_8cpp.html#a648e1998ace1df439e69d1f9b2151a46">underlying_width</a>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(c.type()), ns);</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;        <span class="keywordflow">if</span>(w.has_value() &amp;&amp; w.value() &gt; max_alignment_bits)</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;          max_alignment_bits = w.value();</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      }</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  }</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160; </div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  <span class="comment">// The size must be a multiple of the alignment, or</span></div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  <span class="comment">// we add a padding member to the union.</span></div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160; </div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  <span class="keywordflow">if</span>(size_bits%max_alignment_bits!=0)</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;  {</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> padding_bits=</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;      max_alignment_bits-(size_bits%max_alignment_bits);</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160; </div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;    <a class="code" href="classunsignedbv__typet.html">unsignedbv_typet</a> padding_type(</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;      numeric_cast_v&lt;std::size_t&gt;(size_bits + padding_bits));</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160; </div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_typet::componentt</a> <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>;</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type()=padding_type;</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.set_name(<span class="stringliteral">&quot;$pad&quot;</span>);</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.set_is_padding(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160; </div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().push_back(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>);</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  }</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;}</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;      a != 1 &amp;&amp;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;      (!struct_is_packed || it_type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_C_alignment).<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>()))</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    {</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      <span class="comment">// we may need to align it</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;      <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> displacement = offset % a;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160; </div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;      <span class="keywordflow">if</span>(displacement!=0)</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      {</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> pad_bytes = a - displacement;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;        <span class="keyword">const</span> std::size_t pad_bits =</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;          numeric_cast_v&lt;std::size_t&gt;(pad_bytes * <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        it = <a class="code" href="padding_8cpp.html#ae5d7716dd42f147757b5e856254bc1db">pad</a>(components, it, pad_bits);</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;        offset += pad_bytes;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;      }</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    }</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160; </div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    <span class="keyword">auto</span> size = <a class="code" href="pointer__offset__size_8cpp.html#a7ee4b81e0982aa273d7341124350bd18">pointer_offset_size</a>(it_type, ns);</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    <span class="keywordflow">if</span>(size.has_value())</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      offset += *size;</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  }</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160; </div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  <span class="comment">// any explicit alignment for the struct?</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a> =</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_C_alignment));</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>.is_not_nil())</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  {</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>.id()!=ID_default)</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    {</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> tmp_i = numeric_cast&lt;mp_integer&gt;(<a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(<a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>, ns));</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160; </div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;      <span class="keywordflow">if</span>(tmp_i.has_value() &amp;&amp; *tmp_i &gt; max_alignment)</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        max_alignment = *tmp_i;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    }</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  }</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="comment">// Is the struct packed, without any alignment specification?</span></div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(struct_is_packed)</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="keywordflow">return</span>; <span class="comment">// done</span></div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160; </div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <span class="comment">// There may be a need for &#39;end of struct&#39; padding.</span></div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  <span class="comment">// We use &#39;max_alignment&#39;.</span></div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160; </div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  <span class="keywordflow">if</span>(max_alignment&gt;1)</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  {</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="comment">// we may need to align it</span></div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> displacement=offset%max_alignment;</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160; </div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <span class="keywordflow">if</span>(displacement!=0)</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    {</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;      <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> pad_bytes = max_alignment - displacement;</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      std::size_t pad_bits =</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        numeric_cast_v&lt;std::size_t&gt;(pad_bytes * <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>);</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;      <a class="code" href="padding_8cpp.html#ae5d7716dd42f147757b5e856254bc1db">pad</a>(components, components.end(), pad_bits);</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    }</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  }</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;}</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160; </div>
+<div class="line"><a name="l00456"></a><span class="lineno"><a class="line" href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">  456</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">add_padding</a>(<a class="code" href="classstruct__typet.html">struct_typet</a> &amp;type, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;{</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  <span class="comment">// padding depends greatly on compiler</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#af249a411a92a3effeb3155adbe35ea5c">mode</a> == <a class="code" href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a4e039bbec176af81eb7f5ac299517216">configt::ansi_ct::flavourt::VISUAL_STUDIO</a>)</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <a class="code" href="padding_8cpp.html#a99d3d8f78529edfda0e8828fe4d0fafd">add_padding_msvc</a>(type, ns);</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <a class="code" href="padding_8cpp.html#a9ac9627e514b409ffd5e8ea4315175d0">add_padding_gcc</a>(type, ns);</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;}</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160; </div>
+<div class="line"><a name="l00465"></a><span class="lineno"><a class="line" href="padding_8cpp.html#aa1e15c315479e9154a8667b171ec1332">  465</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">add_padding</a>(<a class="code" href="classunion__typet.html">union_typet</a> &amp;type, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;{</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> max_alignment_bits =</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <a class="code" href="padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a">alignment</a>(type, ns) * <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> size_bits=0;</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  <span class="comment">// check per component, and ignore those without fixed size</span></div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  {</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    <span class="keyword">auto</span> s = <a class="code" href="pointer__offset__size_8cpp.html#ab6189bf186fc1fee24690c8586bc7118">pointer_offset_bits</a>(c.type(), ns);</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    <span class="keywordflow">if</span>(s.has_value())</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;      size_bits = std::max(size_bits, *s);</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  }</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160; </div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  <span class="comment">// Is the union packed?</span></div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a030ec896c0bc2a939c90834d0fb4cbc1">get_bool</a>(ID_C_packed))</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  {</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    <span class="comment">// The size needs to be a multiple of 1 char only.</span></div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    max_alignment_bits = <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  }</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#af249a411a92a3effeb3155adbe35ea5c">mode</a> == <a class="code" href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a4e039bbec176af81eb7f5ac299517216">configt::ansi_ct::flavourt::VISUAL_STUDIO</a>)</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  {</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    <span class="comment">// Visual Studio pads up to the underlying width of</span></div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="comment">// any bit field.</span></div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      <span class="keywordflow">if</span>(c.type().id() == ID_c_bit_field)</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;      {</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        <span class="keyword">auto</span> w = <a class="code" href="padding_8cpp.html#a648e1998ace1df439e69d1f9b2151a46">underlying_width</a>(<a class="code" href="c__types_8h.html#a7a7e49976309fdf13562d08f83b4167c">to_c_bit_field_type</a>(c.type()), ns);</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;        <span class="keywordflow">if</span>(w.has_value() &amp;&amp; w.value() &gt; max_alignment_bits)</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;          max_alignment_bits = w.value();</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;      }</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  }</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160; </div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  <span class="comment">// The size must be a multiple of the alignment, or</span></div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  <span class="comment">// we add a padding member to the union.</span></div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160; </div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;  <span class="keywordflow">if</span>(size_bits%max_alignment_bits!=0)</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  {</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;    <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> padding_bits=</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;      max_alignment_bits-(size_bits%max_alignment_bits);</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160; </div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    <a class="code" href="classunsignedbv__typet.html">unsignedbv_typet</a> padding_type(</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;      numeric_cast_v&lt;std::size_t&gt;(size_bits + padding_bits));</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160; </div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_typet::componentt</a> <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>;</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type()=padding_type;</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.set_name(<span class="stringliteral">&quot;$pad&quot;</span>);</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.set_is_padding(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160; </div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().push_back(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>);</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  }</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;}</div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="abitvector__types_8h_html_a433c459efaa932bc95c4736b8363bce5"><div class="ttname"><a href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a></div><div class="ttdeci">const bitvector_typet &amp; to_bitvector_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a bitvector_typet.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__types_8h_source.html#l00032">bitvector_types.h:32</a></div></div>
@@ -625,7 +624,6 @@ $(document).ready(function(){initNavTree('padding_8cpp_source.html',''); initRes
 <div class="ttc" id="aclassirept_html_a292bcd2cd3f022dc7896b6dc9ee154f9"><div class="ttname"><a href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">irept::find</a></div><div class="ttdeci">const irept &amp; find(const irep_idt &amp;name) const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00101">irep.cpp:101</a></div></div>
 <div class="ttc" id="aclassirept_html_a70e48f2856c19edbcb43777235a18cf3"><div class="ttname"><a href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">irept::is_not_nil</a></div><div class="ttdeci">bool is_not_nil() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00380">irep.h:380</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
-<div class="ttc" id="aclassirept_html_afa2098e6870bd6fb415025781a3a5db1"><div class="ttname"><a href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">irept::is_nil</a></div><div class="ttdeci">bool is_nil() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00376">irep.h:376</a></div></div>
 <div class="ttc" id="aclassnamespace__baset_html_a08ff1828dbaf894a44a23f50a700255a"><div class="ttname"><a href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">namespace_baset::follow</a></div><div class="ttdeci">const typet &amp; follow(const typet &amp;) const</div><div class="ttdoc">Resolve type symbol to the type it points to.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00049">namespace.cpp:49</a></div></div>
 <div class="ttc" id="aclassnamespace__baset_html_a9a5ad94024723d598ae0b8b67e7a3710"><div class="ttname"><a href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">namespace_baset::follow_tag</a></div><div class="ttdeci">const union_typet &amp; follow_tag(const union_tag_typet &amp;) const</div><div class="ttdoc">Follow type tag of union type.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00063">namespace.cpp:63</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
@@ -643,7 +641,7 @@ $(document).ready(function(){initNavTree('padding_8cpp_source.html',''); initRes
 <div class="ttc" id="apadding_8cpp_html_a648e1998ace1df439e69d1f9b2151a46"><div class="ttname"><a href="padding_8cpp.html#a648e1998ace1df439e69d1f9b2151a46">underlying_width</a></div><div class="ttdeci">static optionalt&lt; std::size_t &gt; underlying_width(const c_bit_field_typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00105">padding.cpp:105</a></div></div>
 <div class="ttc" id="apadding_8cpp_html_a99d3d8f78529edfda0e8828fe4d0fafd"><div class="ttname"><a href="padding_8cpp.html#a99d3d8f78529edfda0e8828fe4d0fafd">add_padding_msvc</a></div><div class="ttdeci">static void add_padding_msvc(struct_typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00170">padding.cpp:170</a></div></div>
 <div class="ttc" id="apadding_8cpp_html_a9ac9627e514b409ffd5e8ea4315175d0"><div class="ttname"><a href="padding_8cpp.html#a9ac9627e514b409ffd5e8ea4315175d0">add_padding_gcc</a></div><div class="ttdeci">static void add_padding_gcc(struct_typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00286">padding.cpp:286</a></div></div>
-<div class="ttc" id="apadding_8cpp_html_ab04fe4f1a4f793415c7d0274cbcda583"><div class="ttname"><a href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">add_padding</a></div><div class="ttdeci">void add_padding(struct_typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00457">padding.cpp:457</a></div></div>
+<div class="ttc" id="apadding_8cpp_html_ab04fe4f1a4f793415c7d0274cbcda583"><div class="ttname"><a href="padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583">add_padding</a></div><div class="ttdeci">void add_padding(struct_typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00456">padding.cpp:456</a></div></div>
 <div class="ttc" id="apadding_8cpp_html_ae5d7716dd42f147757b5e856254bc1db"><div class="ttname"><a href="padding_8cpp.html#ae5d7716dd42f147757b5e856254bc1db">pad</a></div><div class="ttdeci">static struct_typet::componentst::iterator pad(struct_typet::componentst &amp;components, struct_typet::componentst::iterator where, std::size_t pad_bits)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00154">padding.cpp:154</a></div></div>
 <div class="ttc" id="apadding_8cpp_html_af42f1594de19c0ff6ddc3b254d3f0f10"><div class="ttname"><a href="padding_8cpp.html#af42f1594de19c0ff6ddc3b254d3f0f10">pad_bit_field</a></div><div class="ttdeci">static struct_typet::componentst::iterator pad_bit_field(struct_typet::componentst &amp;components, struct_typet::componentst::iterator where, std::size_t pad_bits)</div><div class="ttdef"><b>Definition:</b> <a href="padding_8cpp_source.html#l00137">padding.cpp:137</a></div></div>
 <div class="ttc" id="apadding_8h_html"><div class="ttname"><a href="padding_8h.html">padding.h</a></div><div class="ttdoc">ANSI-C Language Type Checking.</div></div>
