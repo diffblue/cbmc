@@ -1,7 +1,12 @@
 [package]
-name = "cprover-api-rust"
+name = "libcprover_rust"
 version = "0.1.0"
 edition = "2021"
+description = "Rust API for CBMC and assorted CProver tools"
+repository = "https://github.com/diffblue/cbmc"
+documentation = "https://diffblue.github.io/cbmc/"
+license = "BSD-4-Clause"
+exclude = ["other/", "module_dependencies.txt"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,4 +17,4 @@ cxx = "1.0"
 cxx-build = "1.0"
 
 [lib]
-crate-type = ["staticlib"]
+crate-type = ["rlib"]
