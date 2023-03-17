@@ -1,11 +1,7 @@
+#![doc = include_str!("../tutorial.md")]
 #![warn(missing_docs)]
 
-//! # Libcprover_rust
-//!
-//! A Rust interface for convenient interaction with the CProver tools.
-
-/// The main API module for interfacing with CProver tools (`cbmc`,
-/// `goto-analyzer`, etc).
+/// The main API module for interfacing with CProver tools (`cbmc`, `goto-analyzer`, etc).
 #[cxx::bridge]
 pub mod cprover_api {
 
@@ -67,12 +63,8 @@ pub mod ffi_util {
     }
 
     /// This function aims to simplify direct printing of the messages that we get
-    /// from CBMC's C++ API. Underneath, it's using [translate_cpp_vector_to_rust]
-    /// to translate the C++ types into Rust types and then prints out the strings
-    /// contained in the resultant Rust vector.
-    pub fn print_response(vec: &CxxVector<CxxString>) {
-        let vec: Vec<String> = translate_response_buffer(vec);
-
+    /// from CBMC's C++ API.
+    pub fn print_response(vec: &Vec<String>) {
         for s in vec {
             println!("{}", s);
         }
@@ -87,7 +79,7 @@ pub mod ffi_util {
 
 // To test run "CBMC_LIB_DIR=<path_to_build/libs> CBMC_VERSION=<version> cargo test -- --test-threads=1 --nocapture"
 #[cfg(test)]
-mod tests 
+mod tests {
     use super::*;
     use cxx::let_cxx_string;
     use std::process;
@@ -145,7 +137,7 @@ mod tests
 
         assert!(msgs_assert.contains(&String::from(validation_msg)));
 
-        // print_response(msgs);
+        // ffi_util::print_response(msgs_assert);
     }
 
     #[test]
