@@ -869,7 +869,8 @@ void code_contractst::apply_loop_contract(
   for(const auto &loop_head_and_content : natural_loops.loop_map)
   {
     const auto &loop_content = loop_head_and_content.second;
-    if(loop_content.empty())
+    // Skip empty loops and self-looped node.
+    if(loop_content.size() <= 1)
       continue;
 
     auto loop_head = loop_head_and_content.first;
