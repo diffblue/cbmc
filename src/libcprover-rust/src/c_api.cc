@@ -20,7 +20,7 @@ std::vector<std::string> output;
 extern bool cbmc_invariants_should_throw;
 
 std::vector<std::string> const &
-translate_vector_of_string(rust::Vec<rust::String> elements)
+_translate_vector_of_string(rust::Vec<rust::String> elements)
 {
   std::vector<std::string> *stdv = new std::vector<std::string>{};
   std::transform(

@@ -15,20 +15,24 @@ pub mod cprover_api {
         fn validate_goto_model(&self) -> Result<()>;
         fn drop_unused_functions(&self) -> Result<()>;
 
-        // Helper/Utility functions
-        fn translate_vector_of_string(elements: Vec<String>) -> &'static CxxVector<CxxString>;
+        // WARNING: Please don't use this function - use its public interface in [ffi_util::translate_rust_vector_to_cpp].
+        // The reason this is here is that it's implemented on the C++ shim, and to link this function against
+        // its implementation it needs to be declared within the `unsafe extern "C++"` block of the FFI bridge.
+        #[doc(hidden)]
+        fn _translate_vector_of_string(elements: Vec<String>) -> &'static CxxVector<CxxString>;
         fn get_messages() -> &'static CxxVector<CxxString>;
     }
 }
 
 pub mod ffi_util {
+    use crate::cprover_api::_translate_vector_of_string;
     use cxx::CxxString;
     use cxx::CxxVector;
 
-    /// This is a utility function, whose job is to translate the responses from the C++
-    /// API (which we get in the form of a C++ std::vector<std:string>) into a form that
-    /// can be easily consumed by other Rust programs.
-    pub fn translate_response_buffer(vec: &CxxVector<CxxString>) -> Vec<String> {
+    /// This function translates the responses from the C++ API (which we get in the
+    /// form of a C++ std::vector<std:string>) into the equivalent Rust type `Vec<String>`.
+    /// Dual to [translate_rust_vector_to_cpp].
+    pub fn translate_cpp_vector_to_rust(vec: &CxxVector<CxxString>) -> Vec<String> {
         vec.iter()
             .map(|s| s.to_string_lossy().into_owned())
             .collect()
@@ -44,6 +48,12 @@ pub mod ffi_util {
         for s in vec {
             println!("{}", s);
         }
+    }
+
+    /// Translate a Rust `Vec<String>` into a C++ acceptable `std::vector<std::string>`.
+    /// Dual to [translate_cpp_vector_to_rust].
+    pub fn translate_rust_vector_to_cpp(elements: Vec<String>) -> &'static CxxVector<CxxString> {
+        _translate_vector_of_string(elements)
     }
 }
 
@@ -67,7 +77,7 @@ mod tests {
     fn translate_vector_of_rust_string_to_cpp() {
         let vec: Vec<String> = vec!["other/example.c".to_owned(), "/tmp/example2.c".to_owned()];
 
-        let vect = cprover_api::translate_vector_of_string(vec);
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
         assert_eq!(vect.len(), 2);
     }
 
@@ -81,7 +91,7 @@ mod tests {
 
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
-        let vect = cprover_api::translate_vector_of_string(vec);
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
         assert_eq!(vect.len(), 1);
 
         // Invoke load_model_from_files and see if the model
@@ -103,7 +113,7 @@ mod tests {
         // else in case they want to inspect the output).
         let validation_msg = "Validating consistency of goto-model supplied to API session";
         let msgs = cprover_api::get_messages();
-        let msgs_assert = ffi_util::translate_response_buffer(msgs).clone();
+        let msgs_assert = ffi_util::translate_cpp_vector_to_rust(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(validation_msg)));
 
@@ -116,7 +126,7 @@ mod tests {
 
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
-        let vect = cprover_api::translate_vector_of_string(vec);
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
 
         if let Err(_) = client.load_model_from_files(vect) {
             eprintln!("Failed to load model from files: {:?}", vect);
@@ -137,7 +147,7 @@ mod tests {
         let verification_msg = "VERIFICATION FAILED";
 
         let msgs = cprover_api::get_messages();
-        let msgs_assert = ffi_util::translate_response_buffer(msgs).clone();
+        let msgs_assert = ffi_util::translate_cpp_vector_to_rust(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(verification_msg)));
     }
@@ -152,7 +162,7 @@ mod tests {
 
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
-        let vect = cprover_api::translate_vector_of_string(vec);
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
         assert_eq!(vect.len(), 1);
 
         if let Err(_) = client.load_model_from_files(vect) {
@@ -170,7 +180,7 @@ mod tests {
         let instrumentation_msg2 = "Dropping 8 of 11 functions (3 used)";
 
         let msgs = cprover_api::get_messages();
-        let msgs_assert = ffi_util::translate_response_buffer(msgs).clone();
+        let msgs_assert = ffi_util::translate_cpp_vector_to_rust(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(instrumentation_msg)));
         assert!(msgs_assert.contains(&String::from(instrumentation_msg2)));
