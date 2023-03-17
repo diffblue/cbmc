@@ -24,6 +24,8 @@ pub mod cprover_api {
     }
 }
 
+/// Module containing utility functions for translating between types across
+/// the FFI boundary.
 pub mod ffi_util {
     use crate::cprover_api::_translate_vector_of_string;
     use cxx::CxxString;
@@ -38,10 +40,10 @@ pub mod ffi_util {
             .collect()
     }
 
-    /// This is a utility function, whose aim is to simplify direct printing of the messages
-    /// that we get from CBMC's C++ API. Underneath, it's using translate_response_buffer
-    /// to translate the C++ types into Rust types and then prints out the strings contained
-    /// in the resultant rust vector.
+    /// This function aims to simplify direct printing of the messages that we get
+    /// from CBMC's C++ API. Underneath, it's using [translate_cpp_vector_to_rust]
+    /// to translate the C++ types into Rust types and then prints out the strings
+    /// contained in the resultant Rust vector.
     pub fn print_response(vec: &CxxVector<CxxString>) {
         let vec: Vec<String> = translate_response_buffer(vec);
 
@@ -59,7 +61,7 @@ pub mod ffi_util {
 
 // To test run "CBMC_LIB_DIR=<path_to_build/libs> SAT_IMPL=minisat2 cargo test -- --test-threads=1 --nocapture"
 #[cfg(test)]
-mod tests {
+mod tests 
     use super::*;
     use cxx::let_cxx_string;
     use std::process;
