@@ -1,5 +1,3 @@
-use cxx::{CxxString, CxxVector};
-
 #[cxx::bridge]
 pub mod cprover_api {
 
@@ -21,31 +19,31 @@ pub mod cprover_api {
         fn translate_vector_of_string(elements: Vec<String>) -> &'static CxxVector<CxxString>;
         fn get_messages() -> &'static CxxVector<CxxString>;
     }
+}
 
-    extern "Rust" {
-        fn print_response(vec: &CxxVector<CxxString>);
-        fn translate_response_buffer(vec: &CxxVector<CxxString>) -> Vec<String>;
+pub mod ffi_util {
+    use cxx::CxxString;
+    use cxx::CxxVector;
+
+    /// This is a utility function, whose job is to translate the responses from the C++
+    /// API (which we get in the form of a C++ std::vector<std:string>) into a form that
+    /// can be easily consumed by other Rust programs.
+    pub fn translate_response_buffer(vec: &CxxVector<CxxString>) -> Vec<String> {
+        vec.iter()
+            .map(|s| s.to_string_lossy().into_owned())
+            .collect()
     }
-}
 
-/// This is a utility function, whose job is to translate the responses from the C++
-/// API (which we get in the form of a C++ std::vector<std:string>) into a form that
-/// can be easily consumed by other Rust programs.
-pub fn translate_response_buffer(vec: &CxxVector<CxxString>) -> Vec<String> {
-    vec.iter()
-        .map(|s| s.to_string_lossy().into_owned())
-        .collect()
-}
+    /// This is a utility function, whose aim is to simplify direct printing of the messages
+    /// that we get from CBMC's C++ API. Underneath, it's using translate_response_buffer
+    /// to translate the C++ types into Rust types and then prints out the strings contained
+    /// in the resultant rust vector.
+    pub fn print_response(vec: &CxxVector<CxxString>) {
+        let vec: Vec<String> = translate_response_buffer(vec);
 
-/// This is a utility function, whose aim is to simplify direct printing of the messages
-/// that we get from CBMC's C++ API. Underneath, it's using translate_response_buffer
-/// to translate the C++ types into Rust types and then prints out the strings contained
-/// in the resultant rust vector.
-pub fn print_response(vec: &CxxVector<CxxString>) {
-    let vec: Vec<String> = translate_response_buffer(vec);
-
-    for s in vec {
-        println!("{}", s);
+        for s in vec {
+            println!("{}", s);
+        }
     }
 }
 
@@ -105,7 +103,7 @@ mod tests {
         // else in case they want to inspect the output).
         let validation_msg = "Validating consistency of goto-model supplied to API session";
         let msgs = cprover_api::get_messages();
-        let msgs_assert = translate_response_buffer(msgs).clone();
+        let msgs_assert = ffi_util::translate_response_buffer(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(validation_msg)));
 
@@ -139,7 +137,7 @@ mod tests {
         let verification_msg = "VERIFICATION FAILED";
 
         let msgs = cprover_api::get_messages();
-        let msgs_assert = translate_response_buffer(msgs).clone();
+        let msgs_assert = ffi_util::translate_response_buffer(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(verification_msg)));
     }
@@ -172,7 +170,7 @@ mod tests {
         let instrumentation_msg2 = "Dropping 8 of 11 functions (3 used)";
 
         let msgs = cprover_api::get_messages();
-        let msgs_assert = translate_response_buffer(msgs).clone();
+        let msgs_assert = ffi_util::translate_response_buffer(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(instrumentation_msg)));
         assert!(msgs_assert.contains(&String::from(instrumentation_msg2)));
