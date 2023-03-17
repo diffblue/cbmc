@@ -1,7 +1,7 @@
 use cxx::{CxxString, CxxVector};
 
 #[cxx::bridge]
-pub mod ffi {
+pub mod cprover_api {
 
     unsafe extern "C++" {
         include!("libcprover-cpp/api.h");
@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let client = ffi::new_api_session();
+        let client = cprover_api::new_api_session();
         let result = client.get_api_version();
 
         let_cxx_string!(expected_version = "0.1");
@@ -69,13 +69,13 @@ mod tests {
     fn translate_vector_of_rust_string_to_cpp() {
         let vec: Vec<String> = vec!["other/example.c".to_owned(), "/tmp/example2.c".to_owned()];
 
-        let vect = ffi::translate_vector_of_string(vec);
+        let vect = cprover_api::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 2);
     }
 
     #[test]
     fn it_can_load_model_from_file() {
-        let binding = ffi::new_api_session();
+        let binding = cprover_api::new_api_session();
         let client = match binding.as_ref() {
             Some(api_ref) => api_ref,
             None => panic!("Failed to acquire API session handle"),
@@ -83,7 +83,7 @@ mod tests {
 
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
-        let vect = ffi::translate_vector_of_string(vec);
+        let vect = cprover_api::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
 
         // Invoke load_model_from_files and see if the model
@@ -104,7 +104,7 @@ mod tests {
         // This is also why a print instruction is commented out (as a guide for someone
         // else in case they want to inspect the output).
         let validation_msg = "Validating consistency of goto-model supplied to API session";
-        let msgs = ffi::get_messages();
+        let msgs = cprover_api::get_messages();
         let msgs_assert = translate_response_buffer(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(validation_msg)));
@@ -114,11 +114,11 @@ mod tests {
 
     #[test]
     fn it_can_verify_the_loaded_model() {
-        let client = ffi::new_api_session();
+        let client = cprover_api::new_api_session();
 
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
-        let vect = ffi::translate_vector_of_string(vec);
+        let vect = cprover_api::translate_vector_of_string(vec);
 
         if let Err(_) = client.load_model_from_files(vect) {
             eprintln!("Failed to load model from files: {:?}", vect);
@@ -138,7 +138,7 @@ mod tests {
 
         let verification_msg = "VERIFICATION FAILED";
 
-        let msgs = ffi::get_messages();
+        let msgs = cprover_api::get_messages();
         let msgs_assert = translate_response_buffer(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(verification_msg)));
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn it_can_drop_unused_functions_from_model() {
-        let binding = ffi::new_api_session();
+        let binding = cprover_api::new_api_session();
         let client = match binding.as_ref() {
             Some(api_ref) => api_ref,
             None => panic!("Failed to acquire API session handle"),
@@ -154,7 +154,7 @@ mod tests {
 
         let vec: Vec<String> = vec!["other/example.c".to_owned()];
 
-        let vect = ffi::translate_vector_of_string(vec);
+        let vect = cprover_api::translate_vector_of_string(vec);
         assert_eq!(vect.len(), 1);
 
         if let Err(_) = client.load_model_from_files(vect) {
@@ -171,7 +171,7 @@ mod tests {
         let instrumentation_msg = "Performing instrumentation pass: dropping unused functions";
         let instrumentation_msg2 = "Dropping 8 of 11 functions (3 used)";
 
-        let msgs = ffi::get_messages();
+        let msgs = cprover_api::get_messages();
         let msgs_assert = translate_response_buffer(msgs).clone();
 
         assert!(msgs_assert.contains(&String::from(instrumentation_msg)));
