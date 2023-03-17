@@ -93,13 +93,13 @@ $(document).ready(function(){initNavTree('tutorial.html',''); initResizable(); }
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#cbmc_tutorial">CBMC Developer Tutorial</a><ul><li class="level2"><a href="#autotoc_md194">Initial setup</a></li>
-<li class="level2"><a href="#autotoc_md195">Whirlwind tour of the tools</a><ul><li class="level3"><a href="#autotoc_md196">Compiling with &lt;tt&gt;goto-cc&lt;/tt&gt;</a></li>
-<li class="level3"><a href="#autotoc_md197">Viewing goto-programs</a></li>
+<ul><li class="level1"><a href="#cbmc_tutorial">CBMC Developer Tutorial</a><ul><li class="level2"><a href="#autotoc_md198">Initial setup</a></li>
+<li class="level2"><a href="#autotoc_md199">Whirlwind tour of the tools</a><ul><li class="level3"><a href="#autotoc_md200">Compiling with &lt;tt&gt;goto-cc&lt;/tt&gt;</a></li>
+<li class="level3"><a href="#autotoc_md201">Viewing goto-programs</a></li>
 </ul>
 </li>
-<li class="level2"><a href="#autotoc_md198">Learning about goto-programs</a><ul><li class="level3"><a href="#autotoc_md199">First steps with &lt;tt&gt;goto-instrument&lt;/tt&gt;</a></li>
-<li class="level3"><a href="#autotoc_md200">Goto-program basics</a></li>
+<li class="level2"><a href="#autotoc_md202">Learning about goto-programs</a><ul><li class="level3"><a href="#autotoc_md203">First steps with &lt;tt&gt;goto-instrument&lt;/tt&gt;</a></li>
+<li class="level3"><a href="#autotoc_md204">Goto-program basics</a></li>
 </ul>
 </li>
 </ul>
@@ -110,7 +110,7 @@ $(document).ready(function(){initNavTree('tutorial.html',''); initResizable(); }
 CBMC Developer Tutorial</h1>
 <dl class="section author"><dt>Author</dt><dd>Kareem Khazem</dd></dl>
 <p>This is an introduction to hacking on the <code>cprover</code> codebase. It is not intended as a user guide to <code>CBMC</code> or related tools. It is structured as a series of programming exercises that aim to acclimatise the reader to the basic data structures and workflow needed for contributing to <code>CBMC</code>.</p>
-<h2><a class="anchor" id="autotoc_md194"></a>
+<h2><a class="anchor" id="autotoc_md198"></a>
 Initial setup</h2>
 <p>Clone the <a href="https://github.com/diffblue/cbmc/">CBMC repository</a> and build it. The build instructions are written in a file called COMPILING.md in the top level of the repository. I recommend that you build using CMake&mdash;this will place all of the CBMC tools in a single directory, which you can add to your <code>$PATH</code>. For example, if you built the codebase with the following two commands at the top level of the repository: </p><pre class="fragment">cmake -DCMAKE_BUILD_TYPE=Debug                  \
       -DCMAKE_CXX_COMPILER=/usr/bin/clang++     \
@@ -127,16 +127,16 @@ doxygen doxyfile
 # View the documentation in a web browser
 firefox ~/code/cbmc/doc/html/index.html
 </pre><p> If you've never used doxygen documentation before, get familiar with the layout. Open the generated HTML page in a web browser; search for the class <code><a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a></code> in the search bar, and jump to the documentation for that class; and read through the copious documentation.</p>
-<h2><a class="anchor" id="autotoc_md195"></a>
+<h2><a class="anchor" id="autotoc_md199"></a>
 Whirlwind tour of the tools</h2>
 <p>CBMC's code is located under the <code>src</code> directory. Even if you plan to contribute only to CBMC, it is important to be familiar with several other of cprover's auxiliary tools.</p>
-<h3><a class="anchor" id="autotoc_md196"></a>
+<h3><a class="anchor" id="autotoc_md200"></a>
 Compiling with &lt;tt&gt;goto-cc&lt;/tt&gt;</h3>
 <p>If you built using CMake on Unix, you should be able to run the <code>goto-gcc</code> command. Find or write a moderately-interesting C program; we'll call it <code>main.c</code>. Run the following commands: </p><pre class="fragment">goto-gcc -o main.gb main.c
 cc -o main.exe main.c
 </pre><p> Invoke <code>./main.gb</code> and <code>./main.exe</code> and observe that they run identically. The version that was compiled with <code>goto-gcc</code> is larger, though: </p><pre class="fragment">du -hs *.{goto,exe}
 </pre><p> Programs compiled with <code>goto-gcc</code> are mostly identical to their <code>clang</code>- or <code>gcc</code>-compiled counterparts, but contain additional object code in cprover's intermediate representation. The intermediate representation is (informally) called a <em>goto-program</em>.</p>
-<h3><a class="anchor" id="autotoc_md197"></a>
+<h3><a class="anchor" id="autotoc_md201"></a>
 Viewing goto-programs</h3>
 <p><code>goto-instrument</code> is a Swiss army knife for viewing goto-programs and performing single program analyses on them. Run the following command: </p><pre class="fragment">goto-instrument --show-goto-functions main.gb
 </pre><p> Many of the instructions in the goto-program intermediate representation are similar to their C counterparts. <code>if</code> and <code>goto</code> statements replace structured programming constructs.</p>
@@ -144,10 +144,10 @@ Viewing goto-programs</h3>
 open main.png
 </pre><p> (the invocation of <code>tail</code> is used to filter out the first line of <code>goto-instrument</code> output. If <code>goto-instrument</code> writes more or less debug output by the time you read this, read the output of <code>goto-instrument --dot main</code> and change the invocation of <code>tail</code> accordingly.)</p>
 <p>There are a few other views of goto-programs. Run <code>goto-instrument -h</code> and try the various switches under the "Diagnosis" section.</p>
-<h2><a class="anchor" id="autotoc_md198"></a>
+<h2><a class="anchor" id="autotoc_md202"></a>
 Learning about goto-programs</h2>
 <p>In this section, you will learn about the basic goto-program data structures. Reading from and manipulating these data structures form the core of writing an analysis for CBMC.</p>
-<h3><a class="anchor" id="autotoc_md199"></a>
+<h3><a class="anchor" id="autotoc_md203"></a>
 First steps with &lt;tt&gt;goto-instrument&lt;/tt&gt;</h3>
 <div class="memdoc"> <b>Task:</b> Write a simple C program with a few functions, each containing a few statements. Compile the program with <code>goto-gcc</code> into a binary called <code>main</code>. </div><p>The entry point of <code>goto-instrument</code> is in <code><a class="el" href="goto__instrument__main_8cpp.html" title="Main Module.">goto_instrument_main.cpp</a></code>. Follow the control flow into <code><a class="el" href="classgoto__instrument__parse__optionst.html#af8821207915bba43813f040f8266aeba" title="invoke main modules">goto_instrument_parse_optionst::doit()</a></code>, located in <code><a class="el" href="goto__instrument__parse__options_8cpp.html" title="Main Module.">goto_instrument_parse_options.cpp</a></code>. At some point in that function, there will be a long sequence of <code>if</code> statements.</p>
 <div class="memdoc"> <b>Task:</b> Add a <code>--greet</code> switch to <code>goto-instrument</code>, taking an optional argument, with the following behaviour: </div> <pre class="fragment">$ goto-instrument --greet main.gb
@@ -156,7 +156,7 @@ $ goto-instrument --greet Leperina main
 hello, Leperina!
 </pre><p> You will also need to add the <code>greet</code> option to the <code><a class="el" href="goto__instrument__parse__options_8h.html" title="Command Line Parsing.">goto_instrument_parse_options.h</a></code> file in order for this to work. Notice that in the <code>.h</code> file, options that take an argument are followed by a colon (like <code>(property):</code>), while simple switches have no colon. Make sure that you <code>return 0;</code> after printing the message.</p>
 <p>The idea behind <code>goto-instrument</code> is that it parses a goto-program and then performs one single analysis on that goto-program, and then returns. Each of the switches in <code>doit</code> function of <code>goto_instrument_parse_options</code> does something different with the goto-program that was supplied on the command line.</p>
-<h3><a class="anchor" id="autotoc_md200"></a>
+<h3><a class="anchor" id="autotoc_md204"></a>
 Goto-program basics</h3>
 <p>At this point in <code>goto-instrument_parse_options</code> (where the <code>if</code> statements are), the goto-program will have been loaded into the object <code>goto_functions</code>, of type <code><a class="el" href="classgoto__functionst.html" title="A collection of goto functions.">goto_functionst</a></code>. This has a field called <code>function_map</code>, a map from function names to functions.</p>
 <div class="memdoc"> <b>Task:</b> Add a <code>--print-function-names</code> switch to <code>goto-instrument</code> that prints out the name of every function in the goto-binary. Are there any functions that you didn't expect to see? </div><p>The following is quite difficult to follow from doxygen, but: the value type of <code>function_map</code> is <code>goto_function_templatet&lt;<a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a>&gt;</code>.</p>
@@ -192,7 +192,7 @@ Goto-program basics</h3>
 <li>the value of every constant in the program;</li>
 <li>the value of every symbol in the program.</li>
 </ul>
-<p>Last modified: 2023-03-16 15:45:52 +0000 </p>
+<p>Last modified: 2023-03-17 17:57:01 +0000 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
