@@ -13,7 +13,7 @@ struct api_sessiont;
 
 // Helper function
 std::vector<std::string> const &
-translate_vector_of_string(rust::Vec<rust::String> elements);
+_translate_vector_of_string(rust::Vec<rust::String> elements);
 
 // Exposure of the C++ object oriented API through free-standing functions.
 std::unique_ptr<api_sessiont> new_api_session();
