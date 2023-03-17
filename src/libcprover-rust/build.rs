@@ -8,16 +8,18 @@ fn get_current_working_dir() -> std::io::Result<PathBuf> {
     env::current_dir()
 }
 
-// Passed by the top-level CMakeLists.txt to control which version of the
-// static library of CBMC we're linking against. A user can also change the
-// environment variable to link against different versions of CBMC.
+// Initially passed by the top-level CMakeLists.txt to control which version
+// of the static library of CBMC we were linking against. Staying in order to
+// allow users to be able to easily change the version of the CBMC static
+// library that's being looked up.
 fn get_cbmc_version() -> Result<String, VarError> {
     env::var("CBMC_VERSION")
 }
 
-// Passed by the top-level CMakeLists.txt to control where the static library we
-// link against is located. A user can also change the location of the library
-// on their system by supplying the environment variable themselves.
+// Initially passed by the top-level CMakeLists.txt to control where the static
+// library we link against was located. Now staying for backward compatibility of
+// the build system, and to allow fine grained control for a user as to where the
+// static library is located (be it in a build folder or a system `/lib` folder).
 fn get_lib_directory() -> Result<String, VarError> {
     env::var("CBMC_LIB_DIR")
 }

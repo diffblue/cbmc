@@ -85,7 +85,7 @@ pub mod ffi_util {
     }
 }
 
-// To test run "CBMC_LIB_DIR=<path_to_build/libs> SAT_IMPL=minisat2 cargo test -- --test-threads=1 --nocapture"
+// To test run "CBMC_LIB_DIR=<path_to_build/libs> CBMC_VERSION=<version> cargo test -- --test-threads=1 --nocapture"
 #[cfg(test)]
 mod tests 
     use super::*;
