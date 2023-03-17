@@ -258,7 +258,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instruments <code>wrapper_function</code> adding assumptions based on requires clauses and assertions based on ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01231">1231</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01232">1232</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -358,7 +358,7 @@ Protected Attributes</h2></td></tr>
 <p>Applies loop contract transformations. </p>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01437">1437</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01438">1438</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -380,7 +380,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Throws an exception if some function <code>functions</code> is found in the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01382">1382</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01383">1383</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -480,7 +480,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Instrument functions to check frame conditions. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01084">1084</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01085">1085</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -502,7 +502,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Enforce contract of a single function. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01175">1175</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01176">1176</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -538,7 +538,7 @@ Protected Attributes</h2></td></tr>
 <p>Static variables of the model are nondet-initialized, except for the ones specified in to_exclude_from_nondet_init.</p>
 <p>Implementation: mangle the name of each function F into a new name, <code>__CPROVER_contracts_original_F</code> (<code>CF</code> for short). Then mint a new function called <code>F</code> that assumes <code>CF</code>'s <code>requires</code> clause, calls <code>CF</code>, and then asserts <code>CF</code>'s <code>ensures</code> clause. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01518">1518</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01519">1519</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -557,7 +557,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01079">1079</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01080">1080</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -630,7 +630,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01074">1074</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01075">1075</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
@@ -654,7 +654,7 @@ Protected Attributes</h2></td></tr>
 <p>Throws an exception if some <code>to_replace</code> functions are not found.</p>
 <p>Use this function when proving code that calls into an expensive function, <code>F</code>. You can write a contract for F using __CPROVER_requires and __CPROVER_ensures, and then use this function to replace all calls to <code>F</code> with an assertion that the <code>requires</code> clause holds followed by an assumption that the <code>ensures</code> clause holds. In order to ensure that <code>F</code> actually abides by its <code>ensures</code> and <code>requires</code> clauses, you should separately call <code><a class="el" href="classcode__contractst.html#a8586b536a8698cc300693bc21a3f7455" title="Turn requires &amp; ensures into assumptions and assertions for each of the named functions.">code_contractst::enforce_contracts()</a></code> on <code>F</code> and verify it using <code>cbmc --function F</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01397">1397</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="contracts_8cpp_source.html#l01398">1398</a> of file <a class="el" href="contracts_8cpp_source.html">contracts.cpp</a>.</p>
 
 </div>
 </div>
