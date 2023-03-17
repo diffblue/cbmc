@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Check if empty loops are correctly skipped.

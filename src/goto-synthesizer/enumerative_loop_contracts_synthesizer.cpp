@@ -88,6 +88,10 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
     // Initialize invariants for unannotated loops as true
     for(const auto &loop_head_and_content : natural_loops.loop_map)
     {
+      // Ignore empty loops and self-looped node.
+      if(loop_head_and_content.second.size() <= 1)
+        continue;
+
       goto_programt::const_targett loop_end =
         get_loop_end_from_loop_head_and_content(
           loop_head_and_content.first, loop_head_and_content.second);
