@@ -1,3 +1,11 @@
+#![warn(missing_docs)]
+
+//! # Libcprover_rust
+//!
+//! A Rust interface for convenient interaction with the CProver tools.
+
+/// The main API module for interfacing with CProver tools (`cbmc`,
+/// `goto-analyzer`, etc).
 #[cxx::bridge]
 pub mod cprover_api {
 
@@ -5,14 +13,31 @@ pub mod cprover_api {
         include!("libcprover-cpp/api.h");
         include!("include/c_api.h");
 
+        /// Central organisational handle of the API. This directly corresponds to the
+        /// C++-API type `api_sessiont`. To initiate a session interaction, call [new_api_session].
         type api_sessiont;
 
-        // API Functions
+        /// Provide a unique pointer to the API handle. This will be required to interact
+        /// with the API calls, and thus, is expected to be the first call before any other
+        /// interaction with the API.
         fn new_api_session() -> UniquePtr<api_sessiont>;
+
+        /// Return the API version - note that this is coming from the C++ API, which
+        /// returns the API version of CBMC (which should map to the version of `libcprover.a`)
+        /// the Rust API has mapped against.
         fn get_api_version(&self) -> UniquePtr<CxxString>;
+        /// Provided a C++ Vector of Strings (use [translate_vector_of_string] to translate
+        /// a Rust `Vec<String` into a `CxxVector<CxxString>` before passing it to the function),
+        /// load the models from the files in the vector and link them together.
         fn load_model_from_files(&self, files: &CxxVector<CxxString>) -> Result<()>;
+        /// Execute a verification engine run against the loaded model.
+        /// *ATTENTION*: A model must be loaded before this function is run.
         fn verify_model(&self) -> Result<()>;
+        /// Run a validation check on the goto-model that has been loaded.
+        /// Corresponds to the CProver CLI option `--validate-goto-model`.
         fn validate_goto_model(&self) -> Result<()>;
+        /// Drop functions that aren't used from the model. Corresponds to
+        /// the CProver CLI option `--drop-unused-functions`
         fn drop_unused_functions(&self) -> Result<()>;
 
         // WARNING: Please don't use this function - use its public interface in [ffi_util::translate_rust_vector_to_cpp].
@@ -20,6 +45,7 @@ pub mod cprover_api {
         // its implementation it needs to be declared within the `unsafe extern "C++"` block of the FFI bridge.
         #[doc(hidden)]
         fn _translate_vector_of_string(elements: Vec<String>) -> &'static CxxVector<CxxString>;
+        /// Print messages accumulated into the message buffer from CProver's end.
         fn get_messages() -> &'static CxxVector<CxxString>;
     }
 }
