@@ -31,7 +31,8 @@ public:
   enumerative_loop_contracts_synthesizert(
     goto_modelt &goto_model,
     messaget &log)
-    : loop_contracts_synthesizer_baset(goto_model, log)
+    : loop_contracts_synthesizer_baset(goto_model, log),
+      ns(goto_model.symbol_table)
   {
   }
 
@@ -44,6 +45,8 @@ public:
   {
     return assigns_map;
   }
+
+  namespacet ns;
 
 private:
   /// Initialize invariants as true for all unannotated loops.

@@ -19,8 +19,12 @@ Author: Qinheping Hu
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 
+#include <analyses/local_may_alias.h>
 #include <analyses/natural_loops.h>
+#include <goto-instrument/contracts/cfg_info.h>
+#include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/havoc_utils.h>
+#include <goto-instrument/loop_utils.h>
 
 #include "cegis_verifier.h"
 #include "expr_enumerator.h"
@@ -82,17 +86,21 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
 {
   for(auto &function_p : goto_model.goto_functions.function_map)
   {
-    natural_loopst natural_loops;
+    natural_loops_mutablet natural_loops;
     natural_loops(function_p.second.body);
+
+    // TODO: use global may alias instead.
+    local_may_aliast local_may_alias(function_p.second);
 
     // Initialize invariants for unannotated loops as true
     for(const auto &loop_head_and_content : natural_loops.loop_map)
     {
       goto_programt::const_targett loop_end =
-        get_loop_end_from_loop_head_and_content(
+        get_loop_end_from_loop_head_and_content_mutable(
           loop_head_and_content.first, loop_head_and_content.second);
 
       loop_idt new_id(function_p.first, loop_end->loop_number);
+      loop_cfg_infot cfg_info(function_p.second, loop_head_and_content.second);
 
       log.debug() << "Initialize candidates for the loop at "
                   << loop_end->source_location() << messaget::eom;
@@ -116,6 +124,17 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
         if(loop_end->condition().find(ID_C_spec_assigns).is_nil())
         {
           assigns_map[new_id] = {};
+
+          // Infer loop assigns using alias analysis.
+          get_assigns(
+            local_may_alias, loop_head_and_content.second, assigns_map[new_id]);
+
+          // remove loop-local symbols from the inferred set
+          cfg_info.erase_locals(assigns_map[new_id]);
+
+          // If the set contains pairs (i, a[i]),
+          // we widen them to (i, __CPROVER_POINTER_OBJECT(a))
+          widen_assigns(assigns_map[new_id], ns);
         }
       }
     }
@@ -127,7 +146,6 @@ void enumerative_loop_contracts_synthesizert::synthesize_assigns(
   const exprt &checked_pointer,
   const std::list<loop_idt> cause_loop_ids)
 {
-  namespacet ns(goto_model.symbol_table);
   auto new_assign = checked_pointer;
 
   // Add the new assigns target to the most-inner loop that doesn't contain
@@ -242,7 +260,6 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
   //              | StartBool <= StartBool | StartBool < StartBool
   // Start -> Start + Start | terminal_symbols
   // where a0, and a1 are symbol expressions.
-  namespacet ns(goto_model.symbol_table);
   enumerator_factoryt factory = enumerator_factoryt(ns);
   recursive_enumerator_placeholdert start_bool_ph(factory, "StartBool", ns);
   recursive_enumerator_placeholdert start_ph(factory, "Start", ns);
