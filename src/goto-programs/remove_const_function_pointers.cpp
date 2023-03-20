@@ -74,7 +74,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
     {
       const symbolt &symbol =
         symbol_table.lookup_ref(to_symbol_expr(expression).get_identifier());
-      if(symbol.type.id()!=ID_code)
+      if(symbol.type.id() != ID_code && symbol.value.is_not_nil())
       {
         const exprt &symbol_value=symbol.value;
         return replace_const_symbols(symbol_value);
