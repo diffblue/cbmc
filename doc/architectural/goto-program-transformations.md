@@ -58,7 +58,7 @@ in \ref remove_function_pointers.h
 
 This pass finds pointer dereferences and adds corresponding calls to the
 `__CPROVER_mm_io_r` and `__CPROVER_mm_io_w` modelling functions if they exist.
-See [modeling-mmio.md](Device-behavior) for details of
+See the device behaviour section of `modeling-mmio.md` for details of
 modeling memory-mapped I/O regions of device interfaces. This pass is always
 carried out but will only make changes if one of the modelling functions exist.
 
