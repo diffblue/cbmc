@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main_bar.c
 --dfcc main --enforce-contract bar
 ^\[bar.postcondition.\d+\].*Check ensures clause of contract contract::bar for function bar: SUCCESS$

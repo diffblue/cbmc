@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f
 ^\[.*\].*No recursive call to function f when checking contract f: FAILURE$

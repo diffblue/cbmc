@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main_even.c
 --dfcc main --enforce-contract even --replace-call-with-contract odd
 ^\[even.postcondition.\d+\] .* Check ensures clause of contract contract::even for function even: FAILURE$

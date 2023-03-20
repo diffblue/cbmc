@@ -6,11 +6,12 @@ goto_cc=$1
 goto_instrument=$2
 cbmc=$3
 is_windows=$4
+use_dfcc=$5
 
 name=${*:$#}
 name=${name%.c}
 
-args=${*:5:$#-5}
+args=${*:6:$#-6}
 if [[ "$args" != *" _ "* ]]
 then
   args_inst=$args
@@ -18,6 +19,19 @@ then
 else
   args_inst="${args%%" _ "*}"
   args_cbmc="${args#*" _ "}"
+fi
+
+if [[ "${use_dfcc}" == "false" ]]; then
+  set -- $args_inst
+  args_inst=""
+  while [[ $# -gt 0 ]]; do
+    if [[ "x$1" == "x--dfcc" ]]; then
+      shift 2
+    else
+      args_inst+=" $1"
+      shift
+    fi
+  done
 fi
 
 if [[ "${is_windows}" == "true" ]]; then

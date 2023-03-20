@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
 ^could not determine instrumentation order for memory predicates, most likely due to mutual recursion$

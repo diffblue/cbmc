@@ -1,9 +1,0 @@
-CORE
-main.c
---replace-call-with-contract bar _ --pointer-primitive-check
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
---
-This test checks that a havocked variable can be constrained by a function post-condition.

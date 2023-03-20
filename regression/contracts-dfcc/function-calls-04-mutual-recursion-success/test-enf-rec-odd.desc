@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main_odd.c
 --dfcc main --enforce-contract-rec odd
 ^\[odd.assigns.\d+\].*Check that the assigns clause of contract::odd is included in the caller's assigns clause: SUCCESS$

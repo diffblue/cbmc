@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main --enforce-contract baz
 ^\[baz.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$

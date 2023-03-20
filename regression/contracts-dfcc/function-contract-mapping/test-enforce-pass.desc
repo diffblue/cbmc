@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/my_contract _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^EXIT=0$

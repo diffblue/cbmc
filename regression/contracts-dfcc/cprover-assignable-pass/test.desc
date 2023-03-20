@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --dfcc main
 CALL __CPROVER_object_whole

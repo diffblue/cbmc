@@ -3,7 +3,7 @@ main.c
 --dfcc main --replace-call-with-contract sub_ptr_values
 ^EXIT=0$
 ^SIGNAL=0$
-^\[sub_ptr_values.precondition.\d+\] line \d+ Check requires clause of contract contract::sub_ptr_values for function sub_ptr_values: SUCCESS$
+^\[sub_ptr_values.precondition.\d+\] line \d+ Check requires clause of (contract contract::sub_ptr_values for function sub_ptr_values|sub_ptr_values in main): SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

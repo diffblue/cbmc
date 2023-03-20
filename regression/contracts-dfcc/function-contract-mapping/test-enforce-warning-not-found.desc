@@ -1,4 +1,4 @@
-CORE
+CORE dfcc-only
 main.c
 --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/my_contractt _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^Contract 'my_contractt' not found, deriving empty pure contract 'contract::my_contractt' from function 'foo'$
