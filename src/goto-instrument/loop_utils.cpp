@@ -52,7 +52,7 @@ void get_assigns_lhs(
       const typecast_exprt typed_mod{mod, ptr.pointer.type()};
       if(mod.id() == ID_unknown)
       {
-        throw analysis_exceptiont("Alias analysis returned UNKNOWN!");
+        continue;
       }
       if(ptr.offset.is_nil())
         assigns.insert(dereference_exprt{typed_mod});
