@@ -1,5 +1,6 @@
 var NAVTREEINDEX21 =
 {
+"classcover__goalst_1_1observert.html":[9,0,292,1],
 "classcover__goalst_1_1observert.html#a4478e8965da1142ef7f7a190a4cd5fb5":[9,0,292,1,0],
 "classcover__goalst_1_1observert.html#aadf422c1c9e518e4dcb229a17842ca97":[9,0,292,1,1],
 "classcover__instrumenter__baset.html":[9,0,293],
@@ -248,6 +249,5 @@ var NAVTREEINDEX21 =
 "classcpp__namet.html#a3b1dd3d445bddc36192ed5573169adc9":[9,0,310,10],
 "classcpp__namet.html#a5be24f46bc15e2b1bcbeb64ddb3f8564":[9,0,310,6],
 "classcpp__namet.html#a6f9cb7dffeed31d3f1cc448ca2862664":[9,0,310,13],
-"classcpp__namet.html#a7999b258c4c5f624c8e278cc6ff0f5f3":[9,0,310,7],
-"classcpp__namet.html#a8e12a8a21639a58debe46be1de2f15a4":[9,0,310,11]
+"classcpp__namet.html#a7999b258c4c5f624c8e278cc6ff0f5f3":[9,0,310,7]
 };

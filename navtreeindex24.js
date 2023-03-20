@@ -1,5 +1,6 @@
 var NAVTREEINDEX24 =
 {
+"classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063":[9,0,339,11],
 "classcustom__bitvector__domaint.html#ada9e8cd22ab2268dbfca64a754dc5c85":[9,0,339,17],
 "classcustom__bitvector__domaint.html#add2c91c400c9a08463ffacfe5b5bfd5d":[9,0,339,10],
 "classcustom__bitvector__domaint.html#ae3ea1b056f4268e41f7c59c830db1d31":[9,0,339,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX24 =
 "classdestructor__and__idt.html#ada71b6fb08d0f7413066897affa4dbf6":[9,0,365,1],
 "classdestructor__and__idt.html#addba29af262669f98e6566058e863911":[9,0,365,0],
 "classdestructor__treet.html":[9,0,366],
-"classdestructor__treet.html#a15595822effb642100055ace8cda7b33":[9,0,366,9],
-"classdestructor__treet.html#a16d09c9599f5d9885d52e8b64d5420db":[9,0,366,2]
+"classdestructor__treet.html#a15595822effb642100055ace8cda7b33":[9,0,366,9]
 };
