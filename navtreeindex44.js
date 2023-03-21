@@ -1,5 +1,6 @@
 var NAVTREEINDEX44 =
 {
+"classjava__implicitly__generic__class__typet.html#aae4199eaabd79813ac07a386ceab7876":[9,0,693,1],
 "classjava__implicitly__generic__class__typet.html#ae891b2320b972f909a06a64126304303":[9,0,693,0],
 "classjava__instanceof__exprt.html":[9,0,694],
 "classjava__instanceof__exprt.html#a36706568b9c5e1969b34743d1d5335b7":[9,0,694,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX44 =
 "classjsil__languaget.html#a94d1839720011d1ef6cd04410edbcb03":[9,0,715,6],
 "classjsil__languaget.html#a9b368048f964a7fc19d63c52787f8666":[9,0,715,8],
 "classjsil__languaget.html#ab73a3594a0a04dc1e4f012eadff3a718":[9,0,715,13],
-"classjsil__languaget.html#ac25bf836a76ca513526d7d1f102838ac":[9,0,715,9],
-"classjsil__languaget.html#ac55b516a9e4f1970ca5cb442a70dae8c":[9,0,715,10]
+"classjsil__languaget.html#ac25bf836a76ca513526d7d1f102838ac":[9,0,715,9]
 };
