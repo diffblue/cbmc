@@ -18,13 +18,17 @@ resulting program as GOTO binary on disk.
 .SH OPTIONS
 .TP
 \fB\-loop\-contracts\-no\-unwind\fR
-Do not unwind transformed loops after applying the synthesized loop contracts.
+do not unwind transformed loops after applying the synthesized loop contracts
 .TP
 \fB\-\-dump\-loop\-contracts
-Dump the synthesized loop contracts as JSON.
+dump the synthesized loop contracts as JSON
 .TP
 \fB\-\-json-\output\fR \fIfile\fR
-Specify the output destination of the loop-contracts JSON.
+specify the output destination of the loop-contracts JSON
+.SS "Backend options:"
+.TP
+\fB\-\-object\-bits\fR n
+number of bits used for object addresses
 .SS "User-interface options:"
 .TP
 \fB\-\-xml\-ui\fR

@@ -48,7 +48,7 @@ echo "Running goto-synthesizer: "
 if echo $args_synthesizer | grep -q -- "--dump-loop-contracts" ; then
   $goto_synthesizer ${args_synthesizer} "${name}-mod.gb"
 else
-  $goto_synthesizer "${name}-mod.gb" "${name}-mod-2.gb"
+  $goto_synthesizer ${args_synthesizer} "${name}-mod.gb" "${name}-mod-2.gb"
   echo "Running CBMC: "
   $cbmc "${name}-mod-2.gb"
 fi

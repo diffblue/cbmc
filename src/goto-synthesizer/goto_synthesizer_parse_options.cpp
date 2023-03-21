@@ -8,7 +8,6 @@ Author: Qinheping Hu
 
 #include "goto_synthesizer_parse_options.h"
 
-#include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/version.h>
 
@@ -195,6 +194,9 @@ void goto_synthesizer_parse_optionst::help()
     "Main options:\n"
     HELP_DUMP_LOOP_CONTRACTS
     HELP_LOOP_CONTRACTS_NO_UNWIND
+    "\n"
+    "Backend options:\n"
+    HELP_CONFIG_BACKEND
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
