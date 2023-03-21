@@ -9,6 +9,7 @@ Author: Qinheping Hu
 #ifndef CPROVER_GOTO_SYNTHESIZER_GOTO_SYNTHESIZER_PARSE_OPTIONS_H
 #define CPROVER_GOTO_SYNTHESIZER_GOTO_SYNTHESIZER_PARSE_OPTIONS_H
 
+#include <util/config.h>
 #include <util/parse_options.h>
 
 #include <goto-programs/goto_model.h>
@@ -21,6 +22,7 @@ Author: Qinheping Hu
 #define GOTO_SYNTHESIZER_OPTIONS \
   OPT_DUMP_LOOP_CONTRACTS \
   "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
+  OPT_CONFIG_BACKEND \
   "(verbosity):(version)(xml-ui)(json-ui)" \
   // empty last line
 
