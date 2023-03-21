@@ -379,12 +379,21 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       new_ct.return_type().id() != ID_constructor &&
       new_ct.return_type().id() != ID_destructor)
     {
-      throw invalid_source_file_exceptiont{
-        "function symbol '" + id2string(new_symbol.display_name()) +
-          "' redefined with a different type:\n" +
-          "Original: " + to_string(old_symbol.type) + "\n" +
-          "     New: " + to_string(new_symbol.type),
-        new_symbol.location};
+      if(
+        old_ct.return_type().id() == ID_constructor ||
+        old_ct.return_type().id() == ID_destructor)
+      {
+        new_ct = old_ct;
+      }
+      else
+      {
+        throw invalid_source_file_exceptiont{
+          "function symbol '" + id2string(new_symbol.display_name()) +
+            "' redefined with a different type:\n" +
+            "Original: " + to_string(old_symbol.type) + "\n" +
+            "     New: " + to_string(new_symbol.type),
+          new_symbol.location};
+      }
     }
     const bool inlined = old_ct.get_inlined() || new_ct.get_inlined();
 
