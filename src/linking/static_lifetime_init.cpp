@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_lifetime_init.h"
 
-#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
@@ -53,11 +52,8 @@ static std::optional<codet> static_lifetime_init(
 
   if(symbol.type.id() == ID_array && to_array_type(symbol.type).size().is_nil())
   {
-    // C standard 6.9.2, paragraph 5
-    // adjust the type to an array of size 1
-    symbolt &writable_symbol = symbol_table.get_writeable_ref(identifier);
-    writable_symbol.type = symbol.type;
-    writable_symbol.type.set(ID_size, from_integer(1, size_type()));
+    DATA_INVARIANT(symbol.is_extern, "arrays must have a size");
+    return {};
   }
 
   if(

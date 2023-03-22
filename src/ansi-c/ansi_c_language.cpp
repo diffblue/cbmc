@@ -8,8 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/replace_symbol.h>
 #include <util/symbol_table.h>
 
 #include <linking/linking.h>
@@ -122,6 +125,36 @@ bool ansi_c_languaget::typecheck(
   if(ansi_c_typecheck(parse_tree, new_symbol_table, module, message_handler))
   {
     return true;
+  }
+
+  unchecked_replace_symbolt array_type_updates;
+  for(auto it = new_symbol_table.begin(); it != new_symbol_table.end(); ++it)
+  {
+    // C standard 6.9.2, paragraph 5
+    // adjust the type of an external array without size to an array of size 1
+    symbolt &symbol = it.get_writeable_symbol();
+    if(
+      symbol.is_static_lifetime && !symbol.is_extern && !symbol.is_type &&
+      !symbol.is_macro && symbol.type.id() == ID_array &&
+      to_array_type(symbol.type).size().is_nil())
+    {
+      symbol_exprt previous_expr = symbol.symbol_expr();
+      to_array_type(symbol.type).size() = from_integer(1, size_type());
+      array_type_updates.insert(previous_expr, symbol.symbol_expr());
+    }
+  }
+  if(!array_type_updates.empty())
+  {
+    // Apply type updates to initializers
+    for(auto it = new_symbol_table.begin(); it != new_symbol_table.end(); ++it)
+    {
+      if(
+        !it->second.is_type && !it->second.is_macro &&
+        it->second.value.is_not_nil())
+      {
+        array_type_updates(it.get_writeable_symbol().value);
+      }
+    }
   }
 
   remove_internal_symbols(
