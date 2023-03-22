@@ -282,6 +282,11 @@ This pass removes unused functions from the goto model. In practice this builds
 a collection of all the functions that are potentially called, and then removes
 any function not in this collection.
 
+This pass cannot handle function calls via function pointers. Attempting to run
+this pass against a goto model which contains such a function call will result
+in an invariant violation. Therefore the function pointer removal pass must
+always be applied to the goto model before the remove unused functions pass.
+
 The implementation of this pass is called via the \ref
 remove_unused_functions(goto_modelt &, message_handlert &) function.
 
