@@ -199,9 +199,9 @@ unused-functions-transform if it is being used.</em>
 
 \subsection properties-transform Label Properties
 
-This transformation adds information to assert instructions. This includes
-- Adding source locations to asserts where they are missing
-- Populating the locations's property ID
+This transformation adds newly generated unique property identifiers to assert
+instructions. The property identifiers are stored in the location data structure
+associated with each instruction.
 
 The implementation of this pass is called via \ref
 label_properties(goto_modelt &)
