@@ -1,6 +1,5 @@
 var NAVTREEINDEX48 =
 {
-"classmap__iteratort.html#af84bdff422566c8dd0d1ea520cbfd722":[9,0,786,3],
 "classmathematical__function__typet.html":[9,0,787],
 "classmathematical__function__typet.html#a6a1f2ae5c61693970e13f39120dee6dd":[9,0,787,3],
 "classmathematical__function__typet.html#a6b12ce7b1021b02dd2b21d7643ab7874":[9,0,787,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX48 =
 "classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8cae2fecf9f42a624fa45b97dc04d80f1a8":[9,0,808,0,6],
 "classmethod__handle__infot.html#ac145e280586f24123f74bc8db902aa8caf13de62ae9018af44d6e2f1d1b657776":[9,0,808,0,2],
 "classmin__exprt.html":[9,0,809],
-"classmin__exprt.html#a71d11ea0b04221d7afd56c909fc6fba0":[9,0,809,0]
+"classmin__exprt.html#a71d11ea0b04221d7afd56c909fc6fba0":[9,0,809,0],
+"classmin__exprt.html#ad79501a947ac36f9b4f88d01e0ea1a40":[9,0,809,1]
 };
