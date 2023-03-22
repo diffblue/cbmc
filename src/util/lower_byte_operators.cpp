@@ -510,6 +510,19 @@ static exprt unpack_array_vector_no_known_bounds(
                                     ? to_vector_type(src.type()).size()
                                     : to_array_type(src.type()).size();
 
+  if(array_vector_size.is_nil())
+  {
+    // The source array/vector has no statically known size (an incomplete
+    // type whose extent is genuinely unknown here, e.g. an extern array
+    // declared without a bound). Represent it as a zero-length comprehension;
+    // any byte access into it is then out of bounds and becomes nondet/fails,
+    // which is the behaviour the extern6 regression exercises.
+    return array_comprehension_exprt{
+      std::move(array_comprehension_index),
+      std::move(body),
+      array_typet{bv_typet{bits_per_byte}, from_integer(0, size_type())}};
+  }
+
   return array_comprehension_exprt{
     std::move(array_comprehension_index),
     std::move(body),

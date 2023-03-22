@@ -54,11 +54,16 @@ static std::optional<codet> static_lifetime_init(
 
   if(symbol.type.id() == ID_array && to_array_type(symbol.type).size().is_nil())
   {
-    // C standard 6.9.2, paragraph 5
-    // adjust the type to an array of size 1
-    symbolt &writable_symbol = symbol_table.get_writeable_ref(identifier);
-    writable_symbol.type = symbol.type;
-    writable_symbol.type.set(ID_size, from_integer(1, size_type()));
+    if(symbol.is_extern)
+      return {};
+    // The C front-end adjusts non-extern tentative array definitions to size 1
+    // during typecheck (C standard 6.9.2, paragraph 5), keeping the symbol's
+    // type and its uses in code consistent. As a safety net for symbols
+    // produced by other means (other front-ends, instrumentation, or
+    // pre-existing goto binaries) that did not undergo that adjustment, patch
+    // the size in place here rather than aborting.
+    symbol_table.get_writeable_ref(identifier)
+      .type.set(ID_size, from_integer(1, size_type()));
   }
 
   if(
