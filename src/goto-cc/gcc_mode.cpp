@@ -308,13 +308,6 @@ bool gcc_modet::needs_preprocessing(const std::string &file)
 /// does it.
 int gcc_modet::doit()
 {
-  if(cmdline.isset('?') ||
-     cmdline.isset("help"))
-  {
-    help();
-    return EX_OK;
-  }
-
   native_tool_name=
     compiler_name(cmdline, base_name);
 
@@ -373,6 +366,20 @@ int gcc_modet::doit()
       std::cout << "gcc: " << gcc_version << '\n';
 
     return EX_OK; // Exit!
+  }
+
+  // In hybrid mode, when --help is requested, just reproduce the output of the
+  // original compiler. This is so as not to confuse configure scripts that
+  // depend on particular information (such as the list of supported targets).
+  if(cmdline.isset("help") && produce_hybrid_binary)
+  {
+    help();
+    return run_gcc(compiler);
+  }
+  else if(cmdline.isset('?') || cmdline.isset("help"))
+  {
+    help();
+    return EX_OK;
   }
 
   if(

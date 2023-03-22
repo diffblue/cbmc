@@ -62,16 +62,18 @@ ld_modet::ld_modet(goto_cc_cmdlinet &_cmdline, const std::string &_base_name)
 /// does it.
 int ld_modet::doit()
 {
-  if(cmdline.isset("help"))
-  {
-    help();
-    return EX_OK;
-  }
-
   native_tool_name = linker_name(cmdline, base_name);
 
-  if(cmdline.isset("version") || cmdline.isset("print-sysroot"))
+  // When --help is requested, just reproduce the output of the original
+  // compiler. This is so as not to confuse configure scripts that depend on
+  // particular information (such as the list of supported targets).
+  if(
+    cmdline.isset("help") || cmdline.isset("version") ||
+    cmdline.isset("print-sysroot"))
+  {
+    help();
     return run_ld();
+  }
 
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_ERROR, gcc_message_handler);
