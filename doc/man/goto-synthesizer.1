@@ -29,6 +29,98 @@ specify the output destination of the loop-contracts JSON
 .TP
 \fB\-\-object\-bits\fR n
 number of bits used for object addresses
+.TP
+\fB\-\-sat\-solver\fR solver
+use specified SAT solver
+.TP
+\fB\-\-external\-sat\-solver\fR cmd
+command to invoke SAT solver process
+.TP
+\fB\-\-no\-sat\-preprocessor\fR
+disable the SAT solver's simplifier
+.TP
+\fB\-\-dimacs\fR
+generate CNF in DIMACS format
+.TP
+\fB\-\-beautify\fR
+beautify the counterexample
+(greedy heuristic)
+.TP
+\fB\-\-smt1\fR
+use default SMT1 solver (obsolete)
+.TP
+\fB\-\-smt2\fR
+use default SMT2 solver (Z3)
+.TP
+\fB\-\-bitwuzla\fR
+use Bitwuzla
+.TP
+\fB\-\-boolector\fR
+use Boolector
+.TP
+\fB\-\-cprover\-smt2\fR
+use CPROVER SMT2 solver
+.TP
+\fB\-\-cvc3\fR
+use CVC3
+.TP
+\fB\-\-cvc4\fR
+use CVC4
+.TP
+\fB\-\-cvc5\fR
+use CVC5
+.TP
+\fB\-\-mathsat\fR
+use MathSAT
+.TP
+\fB\-\-yices\fR
+use Yices
+.TP
+\fB\-\-z3\fR
+use Z3
+.TP
+\fB\-\-fpa\fR
+use theory of floating\-point arithmetic
+.TP
+\fB\-\-refine\fR
+use refinement procedure (experimental)
+.TP
+\fB\-\-refine\-arrays\fR
+use refinement for arrays only
+.TP
+\fB\-\-refine\-arithmetic\fR
+refinement of arithmetic expressions only
+.TP
+\fB\-\-max\-node\-refinement\fR
+maximum refinement iterations for
+arithmetic expressions
+.TP
+\fB\-\-incremental\-smt2\-solver\fR \fIcmd\fR
+Use the incremental SMT backend where \fIcmd\fR is the command to invoke the SMT
+solver of choice.
+.br
+Example invocations:
+.br
+  --incremental-smt2-solver 'z3 -smt2 -in' (use the Z3 solver).
+.br
+  --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the CVC5 solver).
+.sp
+Note that:
+.br
+The solver name must be in the "PATH" or be an executable with full path.
+.br
+The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.
+.br
+The SMT solver should support the QF_AUFBV logic.
+.TP
+\fB\-\-outfile\fR filename
+output formula to given file
+.TP
+\fB\-\-dump\-smt\-formula\fR filename
+output smt incremental formula to the given file
+.TP
+\fB\-\-write\-solver\-stats\-to\fR json\-file
+collect the solver query complexity
 .SS "User-interface options:"
 .TP
 \fB\-\-xml\-ui\fR

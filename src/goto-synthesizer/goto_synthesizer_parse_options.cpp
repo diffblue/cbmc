@@ -60,8 +60,11 @@ int goto_synthesizer_parse_optionst::doit()
     configure_gcc(gcc_version);
   }
 
+  // Get options and preprocess `goto_model`.
+  const auto &options = get_options();
+
   // Synthesize loop invariants and annotate them into `goto_model`
-  enumerative_loop_contracts_synthesizert synthesizer(goto_model, log);
+  enumerative_loop_contracts_synthesizert synthesizer(goto_model, options, log);
   const auto &invariant_map = synthesizer.synthesize_all();
   const auto &assigns_map = synthesizer.get_assigns_map();
 
@@ -176,6 +179,37 @@ int goto_synthesizer_parse_optionst::get_goto_program()
   return CPROVER_EXIT_SUCCESS;
 }
 
+optionst goto_synthesizer_parse_optionst::get_options()
+{
+  optionst options;
+
+  // Default options
+  // These options are the same as we run CBMC without any set flag.
+  options.set_option("built-in-assertions", true);
+  options.set_option("propagation", true);
+  options.set_option("simple-slice", true);
+  options.set_option("simplify", true);
+  options.set_option("show-goto-symex-steps", false);
+  options.set_option("show-points-to-sets", false);
+  options.set_option("show-array-constraints", false);
+  options.set_option("built-in-assertions", true);
+  options.set_option("assertions", true);
+  options.set_option("assumptions", true);
+  options.set_option("arrays-uf", "auto");
+  options.set_option("depth", UINT32_MAX);
+  options.set_option("exploration-strategy", "lifo");
+  options.set_option("symex-cache-dereferences", false);
+  options.set_option("rewrite-union", true);
+  options.set_option("self-loops-to-assumptions", true);
+
+  // Generating trace for counterexamples.
+  options.set_option("trace", true);
+
+  parse_solver_options(cmdline, options);
+
+  return options;
+}
+
 /// display command line help
 void goto_synthesizer_parse_optionst::help()
 {
@@ -197,6 +231,7 @@ void goto_synthesizer_parse_optionst::help()
     "\n"
     "Backend options:\n"
     HELP_CONFIG_BACKEND
+    HELP_SOLVER
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

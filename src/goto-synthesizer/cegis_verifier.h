@@ -103,11 +103,14 @@ public:
     const invariant_mapt &invariant_candidates,
     const std::map<loop_idt, std::set<exprt>> &assigns_map,
     goto_modelt &goto_model,
+    const optionst &options,
     messaget &log)
     : invariant_candidates(invariant_candidates),
       assigns_map(assigns_map),
       goto_model(goto_model),
-      log(log)
+      options(options),
+      log(log),
+      ns(goto_model.symbol_table)
   {
   }
 
@@ -120,11 +123,6 @@ public:
   irep_idt target_violation_id;
 
 protected:
-  // Get the options same as using CBMC api without any flag, and
-  // preprocess `goto_model`.
-  // TODO: replace the checker with CBMC api once it is implemented.
-  optionst get_options();
-
   // Compute the cause loops of `violation`.
   // We say a loop is the cause loop if the violated predicate is dependent
   // upon the write set of the loop.
@@ -168,10 +166,15 @@ protected:
     const goto_functiont &function,
     unsigned location_number_of_target);
 
+  /// Preprocess the goto model to prepare for verification.
+  void preprocess_goto_model();
+
   const invariant_mapt &invariant_candidates;
   const std::map<loop_idt, std::set<exprt>> &assigns_map;
   goto_modelt &goto_model;
+  const optionst &options;
   messaget log;
+  const namespacet ns;
 
   /// Map from function names to original functions. It is used to
   /// restore functions with annotated loops to original functions.
