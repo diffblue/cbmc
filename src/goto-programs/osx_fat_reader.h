@@ -14,6 +14,7 @@ Author:
 
 #include <util/message.h>
 
+#include <cstdint>
 #include <fstream>
 #include <map>
 #include <string>

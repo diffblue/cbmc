@@ -10,6 +10,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2019
 
 #include <util/get_base_name.h>
 
+#include <cstdint>
 #include <iomanip>
 #include <sstream>
 
