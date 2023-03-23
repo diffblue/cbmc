@@ -1422,13 +1422,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   enum_tag_symbol.type.add_subtype() = underlying_type;
 
   // is it in the symbol table already?
-  symbol_table_baset::symbolst::const_iterator s_it =
-    symbol_table.symbols.find(identifier);
+  symbolt *existing_symbol = symbol_table.get_writeable(identifier);
 
-  if(s_it!=symbol_table.symbols.end())
+  if(existing_symbol)
   {
     // Yes.
-    const symbolt &symbol=s_it->second;
+    const symbolt &symbol = *existing_symbol;
 
     if(symbol.type.id() != ID_c_enum)
     {
@@ -1441,7 +1440,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     {
       // Ok, overwrite the type in the symbol table.
       // This gives us the members and the subtype.
-      symbol_table.get_writeable_ref(symbol.name).type=enum_tag_symbol.type;
+      existing_symbol->type = enum_tag_symbol.type;
     }
     else
     {

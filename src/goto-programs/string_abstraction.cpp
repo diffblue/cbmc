@@ -136,7 +136,8 @@ void string_abstractiont::apply()
   // the symbol table and can thus invalidate iterators
   for(auto &sym_name : symbol_table.sorted_symbol_names())
   {
-    const typet &type = symbol_table.lookup_ref(sym_name).type;
+    symbolt &symbol = symbol_table.get_writeable_ref(sym_name);
+    const typet &type = symbol.type;
 
     if(type.id() != ID_code)
       continue;
@@ -147,15 +148,13 @@ void string_abstractiont::apply()
       dest.function_map.find(sym_name);
     if(fct_entry != dest.function_map.end())
     {
-      add_str_parameters(
-        symbol_table.get_writeable_ref(sym_name),
-        fct_entry->second.parameter_identifiers);
+      add_str_parameters(symbol, fct_entry->second.parameter_identifiers);
     }
     else
     {
       goto_functiont::parameter_identifierst dummy(
         to_code_type(type).parameters().size(), irep_idt{});
-      add_str_parameters(symbol_table.get_writeable_ref(sym_name), dummy);
+      add_str_parameters(symbol, dummy);
     }
   }
 

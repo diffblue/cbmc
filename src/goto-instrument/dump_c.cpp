@@ -83,9 +83,10 @@ void dump_ct::operator()(std::ostream &os)
   // add copies of struct types when ID_C_transparent_union is only
   // annotated to parameter
   symbol_tablet additional_symbols;
-  for(const auto &named_symbol : copied_symbol_table.symbols)
+  for(auto it = copied_symbol_table.begin(); it != copied_symbol_table.end();
+      ++it)
   {
-    const symbolt &symbol=named_symbol.second;
+    const symbolt &symbol = it->second;
 
     if(
       (symbol.type.id() == ID_union || symbol.type.id() == ID_struct) &&
@@ -99,8 +100,7 @@ void dump_ct::operator()(std::ostream &os)
       else
         UNREACHABLE;
       type_symbolt ts{tag_name, symbol.type, symbol.mode};
-      typet &type =
-        copied_symbol_table.get_writeable_ref(named_symbol.first).type;
+      typet &type = it.get_writeable_symbol().type;
       if(ts.type.id() == ID_union)
         type = union_tag_typet{ts.name};
       else
@@ -111,8 +111,7 @@ void dump_ct::operator()(std::ostream &os)
     if(symbol.type.id()!=ID_code)
       continue;
 
-    code_typet &code_type=to_code_type(
-      copied_symbol_table.get_writeable_ref(named_symbol.first).type);
+    code_typet &code_type = to_code_type(it.get_writeable_symbol().type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator
@@ -149,9 +148,10 @@ void dump_ct::operator()(std::ostream &os)
   // add tags to anonymous union/struct/enum,
   // and prepare lexicographic order
   std::set<std::string> symbols_sorted;
-  for(const auto &named_symbol : copied_symbol_table.symbols)
+  for(auto it = copied_symbol_table.begin(); it != copied_symbol_table.end();
+      ++it)
   {
-    symbolt &symbol = copied_symbol_table.get_writeable_ref(named_symbol.first);
+    symbolt &symbol = it.get_writeable_symbol();
     bool tag_added=false;
 
     // TODO we could get rid of some of the ID_anonymous by looking up
@@ -172,7 +172,7 @@ void dump_ct::operator()(std::ostream &os)
       tag_added=true;
     }
 
-    const std::string name_str=id2string(named_symbol.first);
+    const std::string name_str = id2string(it->first);
     if(symbol.is_type &&
        (symbol.type.id()==ID_union ||
         symbol.type.id()==ID_struct ||

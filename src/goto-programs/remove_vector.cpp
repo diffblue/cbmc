@@ -344,10 +344,10 @@ static void remove_vector(symbolt &symbol)
 }
 
 /// removes vector data type
-static void remove_vector(symbol_tablet &symbol_table)
+static void remove_vector(symbol_table_baset &symbol_table)
 {
-  for(const auto &named_symbol : symbol_table.symbols)
-    remove_vector(symbol_table.get_writeable_ref(named_symbol.first));
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+    remove_vector(it.get_writeable_symbol());
 }
 
 /// removes vector data type
@@ -374,7 +374,7 @@ static void remove_vector(goto_functionst &goto_functions)
 
 /// removes vector data type
 void remove_vector(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
   remove_vector(symbol_table);

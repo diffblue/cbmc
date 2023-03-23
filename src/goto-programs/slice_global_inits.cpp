@@ -116,15 +116,17 @@ void slice_global_inits(
 
   // now remove unnecessary initializations
   bool changed = false;
-  for(auto &entry : goto_model.symbol_table)
+  for(auto it = goto_model.symbol_table.begin();
+      it != goto_model.symbol_table.end();
+      ++it)
   {
     if(
-      entry.second.is_static_lifetime && !entry.second.is_type &&
-      !entry.second.is_macro && entry.second.type.id() != ID_code &&
-      !has_prefix(id2string(entry.first), CPROVER_PREFIX) &&
-      symbols_to_keep.find(entry.first) == symbols_to_keep.end())
+      it->second.is_static_lifetime && !it->second.is_type &&
+      !it->second.is_macro && it->second.type.id() != ID_code &&
+      !has_prefix(id2string(it->first), CPROVER_PREFIX) &&
+      symbols_to_keep.find(it->first) == symbols_to_keep.end())
     {
-      symbolt &symbol = goto_model.symbol_table.get_writeable_ref(entry.first);
+      symbolt &symbol = it.get_writeable_symbol();
       symbol.is_extern = true;
       symbol.value.make_nil();
       symbol.value.set(ID_C_no_nondet_initialization, 1);

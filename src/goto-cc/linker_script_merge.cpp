@@ -225,26 +225,26 @@ int linker_script_merget::pointerize_linker_defined_symbols(
 
   // Next, find all occurrences of linker-defined symbols that are _values_
   // of some symbol in the symbol table, and pointerize them too
-  for(const auto &pair : goto_model.symbol_table.symbols)
+  for(auto it = goto_model.symbol_table.begin();
+      it != goto_model.symbol_table.end();
+      ++it)
   {
     std::list<symbol_exprt> to_pointerize;
-    symbols_to_pointerize(linker_values, pair.second.value, to_pointerize);
+    symbols_to_pointerize(linker_values, it->second.value, to_pointerize);
 
     if(to_pointerize.empty())
       continue;
-    log.debug() << "Pointerizing the symbol-table value of symbol "
-                << pair.first << messaget::eom;
+    log.debug() << "Pointerizing the symbol-table value of symbol " << it->first
+                << messaget::eom;
     int fail = pointerize_subexprs_of(
-      goto_model.symbol_table.get_writeable_ref(pair.first).value,
-      to_pointerize,
-      linker_values);
+      it.get_writeable_symbol().value, to_pointerize, linker_values);
     if(to_pointerize.empty() && fail==0)
       continue;
     ret=1;
     for(const auto &sym : to_pointerize)
     {
       log.error() << " Could not pointerize '" << sym.get_identifier()
-                  << "' in symbol table entry " << pair.first << ". Pretty:\n"
+                  << "' in symbol table entry " << it->first << ". Pretty:\n"
                   << sym.pretty() << "\n";
     }
     log.error() << messaget::eom;

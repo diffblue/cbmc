@@ -1230,14 +1230,10 @@ void cpp_typecheckt::typecheck_expr_member(
   if(expr.type().id()==ID_code)
   {
     // Check if the function body has to be typechecked
-    symbol_table_baset::symbolst::const_iterator it =
-      symbol_table.symbols.find(component_name);
+    symbolt &component_symbol = symbol_table.get_writeable_ref(component_name);
 
-    CHECK_RETURN(it != symbol_table.symbols.end());
-
-    if(it->second.value.id() == ID_cpp_not_typechecked)
-      symbol_table.get_writeable_ref(component_name)
-        .value.set(ID_is_used, true);
+    if(component_symbol.value.id() == ID_cpp_not_typechecked)
+      component_symbol.value.set(ID_is_used, true);
   }
 }
 
@@ -1938,9 +1934,9 @@ void cpp_typecheckt::typecheck_method_application(
   exprt member_expr;
   member_expr.swap(expr.function());
 
-  const symbolt &symbol=lookup(member_expr.get(ID_component_name));
-  symbolt &method_symbol=symbol_table.get_writeable_ref(symbol.name);
-  const symbolt &tag_symbol = lookup(symbol.type.get(ID_C_member_name));
+  symbolt &method_symbol =
+    symbol_table.get_writeable_ref(member_expr.get(ID_component_name));
+  const symbolt &tag_symbol = lookup(method_symbol.type.get(ID_C_member_name));
 
   // build the right template map
   // if this is an instantiated template class method
@@ -1954,7 +1950,7 @@ void cpp_typecheckt::typecheck_method_application(
       static_cast<const cpp_template_args_tct &>(template_args));
     add_method_body(&method_symbol);
 #ifdef DEBUG
-    std::cout << "MAP for " << symbol << ":\n";
+    std::cout << "MAP for " << method_symbol << ":\n";
     template_map.print(std::cout);
 #endif
   }
@@ -1962,13 +1958,13 @@ void cpp_typecheckt::typecheck_method_application(
     add_method_body(&method_symbol);
 
   // build new function expression
-  exprt new_function(cpp_symbol_expr(symbol));
+  exprt new_function(cpp_symbol_expr(method_symbol));
   new_function.add_source_location()=member_expr.source_location();
   expr.function().swap(new_function);
 
   if(!expr.function().type().get_bool(ID_C_is_static))
   {
-    const code_typet &func_type=to_code_type(symbol.type);
+    const code_typet &func_type = to_code_type(method_symbol.type);
     typet this_type=func_type.parameters().front().type();
 
     // Special case. Make it a reference.
@@ -2002,10 +1998,10 @@ void cpp_typecheckt::typecheck_method_application(
   }
 
   if(
-    symbol.value.id() == ID_cpp_not_typechecked &&
-    !symbol.value.get_bool(ID_is_used))
+    method_symbol.value.id() == ID_cpp_not_typechecked &&
+    !method_symbol.value.get_bool(ID_is_used))
   {
-    symbol_table.get_writeable_ref(symbol.name).value.set(ID_is_used, true);
+    method_symbol.value.set(ID_is_used, true);
   }
 }
 
@@ -2253,13 +2249,11 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
   if(expr.id()==ID_symbol)
   {
     // Check if the function body has to be typechecked
-    symbol_table_baset::symbolst::const_iterator it =
-      symbol_table.symbols.find(expr.get(ID_identifier));
+    symbolt &function_symbol =
+      symbol_table.get_writeable_ref(expr.get(ID_identifier));
 
-    CHECK_RETURN(it != symbol_table.symbols.end());
-
-    if(it->second.value.id() == ID_cpp_not_typechecked)
-      symbol_table.get_writeable_ref(it->first).value.set(ID_is_used, true);
+    if(function_symbol.value.id() == ID_cpp_not_typechecked)
+      function_symbol.value.set(ID_is_used, true);
   }
 
   c_typecheck_baset::typecheck_expr_function_identifier(expr);

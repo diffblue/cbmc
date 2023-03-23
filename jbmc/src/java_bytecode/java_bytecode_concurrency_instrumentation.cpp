@@ -605,9 +605,9 @@ void convert_synchronized_methods(
   message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
-  for(const auto &entry : symbol_table)
+  for(auto s_it = symbol_table.begin(); s_it != symbol_table.end(); ++s_it)
   {
-    const symbolt &symbol = entry.second;
+    const symbolt &symbol = s_it->second;
 
     if(symbol.type.id() != ID_code)
       continue;
@@ -619,11 +619,10 @@ void convert_synchronized_methods(
     if(symbol.type.get_bool(ID_is_static))
     {
       messaget message(message_handler);
-      message.warning() << "Java method '" << entry.first
+      message.warning() << "Java method '" << s_it->first
                         << "' is static and synchronized."
                         << " This is unsupported, the synchronized keyword"
-                        << " will be ignored."
-                        << messaget::eom;
+                        << " will be ignored." << messaget::eom;
       continue;
     }
 
@@ -638,7 +637,7 @@ void convert_synchronized_methods(
       continue;
 
     // get writeable reference and instrument the method
-    symbolt &w_symbol = symbol_table.get_writeable_ref(entry.first);
+    symbolt &w_symbol = s_it.get_writeable_symbol();
     instrument_synchronized_code(
       symbol_table, w_symbol, it->second.symbol_expr());
   }

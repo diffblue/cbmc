@@ -60,7 +60,7 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
   new_code.add_to_operands(code_frontend_declt(cpp_symbol_expr(symbol)));
 
   // do scoping
-  symbolt union_symbol =
+  symbolt &union_symbol =
     symbol_table.get_writeable_ref(follow(symbol.type).get(ID_name));
 
   for(const auto &c : to_union_type(union_symbol.type).components())
@@ -89,8 +89,7 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
     id.is_member=true;
   }
 
-  symbol_table.get_writeable_ref(union_symbol.name)
-    .type.set(ID_C_unnamed_object, symbol.base_name);
+  union_symbol.type.set(ID_C_unnamed_object, symbol.base_name);
 
   return new_code;
 }

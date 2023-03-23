@@ -240,14 +240,14 @@ void cpp_typecheckt::typecheck_function_template(
 
   // check if we have it already
 
-  symbol_table_baset::symbolst::const_iterator previous_symbol =
-    symbol_table.symbols.find(symbol_name);
+  symbolt *previous_symbol = symbol_table.get_writeable(symbol_name);
 
-  if(previous_symbol!=symbol_table.symbols.end())
+  if(previous_symbol)
   {
-    bool previous_has_value =
-     to_cpp_declaration(previous_symbol->second.type).
-       declarators()[0].find(ID_value).is_not_nil();
+    bool previous_has_value = to_cpp_declaration(previous_symbol->type)
+                                .declarators()[0]
+                                .find(ID_value)
+                                .is_not_nil();
 
     if(has_value && previous_has_value)
     {
@@ -255,13 +255,13 @@ void cpp_typecheckt::typecheck_function_template(
       error() << "function template symbol '" << base_name
               << "' declared previously\n"
               << "location of previous definition: "
-              << previous_symbol->second.location << eom;
+              << previous_symbol->location << eom;
       throw 0;
     }
 
     if(has_value)
     {
-      symbol_table.get_writeable_ref(symbol_name).type.swap(declaration);
+      previous_symbol->type.swap(declaration);
       cpp_scopes.id_map[symbol_name]=&template_scope;
     }
 
