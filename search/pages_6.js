@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['history_20variables_45223',['History Variables',['../contracts-history-variables.html',1,'contracts-user']]],
-  ['howto_45224',['howto',['../group__module__hidden.html',1,'']]]
+  ['history_20variables_45229',['History Variables',['../contracts-history-variables.html',1,'contracts-user']]],
+  ['howto_45230',['howto',['../group__module__hidden.html',1,'']]]
 ];

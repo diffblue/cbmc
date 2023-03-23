@@ -1,5 +1,6 @@
 var NAVTREEINDEX64 =
 {
+"classstring__abstractiont.html#a655a8bbf2d5f9622a449f23ac8b7d7aa":[9,0,1178,27],
 "classstring__abstractiont.html#a6ae5a6f08a7cc33274d1eb859bac74b0":[9,0,1178,3],
 "classstring__abstractiont.html#a6b94730ef3457302b87cd67e8f10beb8":[9,0,1178,21],
 "classstring__abstractiont.html#a6c45bfc4d5f7501e47964d5c7b78e565":[9,0,1178,33],
@@ -248,6 +249,5 @@ var NAVTREEINDEX64 =
 "classstring__insertion__builtin__functiont.html#a26fd9a7dffe37f08db6717341948d1de":[9,0,1194,2],
 "classstring__insertion__builtin__functiont.html#a378a836e06e2825b1d7de76a4eeae21a":[9,0,1194,0],
 "classstring__insertion__builtin__functiont.html#a49b88aed042eba6cca642dd79dbfcffc":[9,0,1194,5],
-"classstring__insertion__builtin__functiont.html#a4effc109bc11aa2c59f43d5e1e4f5d8c":[9,0,1194,7],
-"classstring__insertion__builtin__functiont.html#a813ece39c9ba40fbbfc99ac78f6883ad":[9,0,1194,11]
+"classstring__insertion__builtin__functiont.html#a4effc109bc11aa2c59f43d5e1e4f5d8c":[9,0,1194,7]
 };

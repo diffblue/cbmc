@@ -22,5 +22,34 @@ var cbmc_architecture =
         [ "source_locationt", "central-data-structures.html#autotoc_md184", null ],
         [ "irept", "central-data-structures.html#autotoc_md185", null ]
       ] ]
+    ] ],
+    [ "Goto Program Transformations", "goto-program-transformations.html", [
+      [ "Core Transformation Passes", "goto-program-transformations.html#required-transforms", [
+        [ "Removal/Lowering of Assembly", "goto-program-transformations.html#assembly-transform", null ],
+        [ "Linking of Standard Libraries", "goto-program-transformations.html#linking-transform", null ],
+        [ "Removal/Lowering of Function Pointers", "goto-program-transformations.html#function-pointer-transform", null ],
+        [ "Memory Mapped IO Instrumentation", "goto-program-transformations.html#mmio-transform", null ],
+        [ "Instrument/Remove Preconditions", "goto-program-transformations.html#precondition-transform", null ],
+        [ "Removal/Lowering of Return Statements", "goto-program-transformations.html#returns-transform", null ],
+        [ "Remove/Lower Vector Typed Expressions", "goto-program-transformations.html#vector-transform", null ],
+        [ "Remove/Lower Complex Typed Expressions", "goto-program-transformations.html#complex-transform", null ],
+        [ "Rewrite Unions", "goto-program-transformations.html#unions-transform", null ],
+        [ "goto_check_c", "goto-program-transformations.html#check-c-transform", null ],
+        [ "Adjust Float Expressions", "goto-program-transformations.html#floats-transform", null ],
+        [ "Goto Functions Update", "goto-program-transformations.html#update-transform", null ],
+        [ "Add Failed Symbols", "goto-program-transformations.html#failed-symbols-transform", null ],
+        [ "Remove Skip Instructions", "goto-program-transformations.html#remove-skip-transform", null ],
+        [ "Label Properties", "goto-program-transformations.html#properties-transform", null ]
+      ] ],
+      [ "Optional Transformation Passes", "goto-program-transformations.html#optional-transforms", [
+        [ "String Instrumentation", "goto-program-transformations.html#string-instrument-transform", null ],
+        [ "Partial Inlining", "goto-program-transformations.html#inlining-transform", null ],
+        [ "Transform Assertions Assumptions", "goto-program-transformations.html#assertions-transform", null ],
+        [ "String Abstraction", "goto-program-transformations.html#string-abstraction-transform", null ],
+        [ "Add Non-Deterministic Initialisation of Global Scoped Variables", "goto-program-transformations.html#nondet-transform", null ],
+        [ "Remove Unused Functions", "goto-program-transformations.html#unused-functions-transform", null ],
+        [ "Add Coverage Goals", "goto-program-transformations.html#coverage-transform", null ],
+        [ "Slicing", "goto-program-transformations.html#slicing-transforms", null ]
+      ] ]
     ] ]
 ];

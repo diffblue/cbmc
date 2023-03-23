@@ -31,6 +31,7 @@ var group__module__hidden =
     [ "code-walkthrough", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_code_walkthrough", null ],
     [ "compilation-and-development", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_compilation_and_development", null ],
     [ "folder-walkthrough", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_folder_walkthrough", null ],
+    [ "goto-program-transformations", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_goto_program_transformations", null ],
     [ "howto", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_howto", null ],
     [ "memory-bounds-checking", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_memory_bounds_checking", null ],
     [ "other-tools", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_doc_architectural_other_tools", null ],
