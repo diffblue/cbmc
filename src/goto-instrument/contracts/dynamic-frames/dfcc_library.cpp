@@ -585,6 +585,24 @@ const code_function_callt dfcc_libraryt::write_set_create_call(
   return call;
 }
 
+const code_function_callt dfcc_libraryt::write_set_create_call(
+  const exprt &address_of_write_set,
+  const exprt &max_assigns_clause_size,
+  const source_locationt &source_location)
+{
+  return write_set_create_call(
+    address_of_write_set,
+    max_assigns_clause_size,
+    from_integer(0, size_type()),
+    false_exprt(),
+    false_exprt(),
+    false_exprt(),
+    false_exprt(),
+    false_exprt(),
+    false_exprt(),
+    source_location);
+}
+
 const code_function_callt dfcc_libraryt::write_set_release_call(
   const exprt &write_set_ptr,
   const source_locationt &source_location)

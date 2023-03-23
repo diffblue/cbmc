@@ -26,6 +26,7 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_root_object.cpp \
       contracts/dynamic-frames/dfcc_infer_loop_assigns.cpp \
       contracts/dynamic-frames/dfcc_cfg_info.cpp \
+      contracts/dynamic-frames/dfcc_instrument_loop.cpp \
       contracts/dynamic-frames/dfcc_library.cpp \
       contracts/dynamic-frames/dfcc_is_cprover_symbol.cpp \
       contracts/dynamic-frames/dfcc_is_fresh.cpp \
