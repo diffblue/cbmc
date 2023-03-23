@@ -14,6 +14,8 @@ Author: Qinheping Hu
 // NOLINTNEXTLINE(whitespace/line_length)
 #define CPROVER_GOTO_SYNTHESIZER_ENUMERATIVE_LOOP_CONTRACTS_SYNTHESIZER_H
 
+#include <util/options.h>
+
 #include "loop_contracts_synthesizer_base.h"
 
 class messaget;
@@ -30,8 +32,10 @@ class enumerative_loop_contracts_synthesizert
 public:
   enumerative_loop_contracts_synthesizert(
     goto_modelt &goto_model,
+    const optionst &options,
     messaget &log)
     : loop_contracts_synthesizer_baset(goto_model, log),
+      options(options),
       ns(goto_model.symbol_table)
   {
   }
@@ -46,6 +50,7 @@ public:
     return assigns_map;
   }
 
+  const optionst &options;
   namespacet ns;
 
 private:

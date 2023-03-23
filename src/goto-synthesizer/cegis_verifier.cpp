@@ -81,32 +81,8 @@ get_checked_pointer_from_null_pointer_check(const exprt &violation)
   UNREACHABLE;
 }
 
-optionst cegis_verifiert::get_options()
+void cegis_verifiert::preprocess_goto_model()
 {
-  optionst options;
-
-  // Default options
-  // These options are the same as we run CBMC without any set flag.
-  options.set_option("built-in-assertions", true);
-  options.set_option("propagation", true);
-  options.set_option("simple-slice", true);
-  options.set_option("simplify", true);
-  options.set_option("show-goto-symex-steps", false);
-  options.set_option("show-points-to-sets", false);
-  options.set_option("show-array-constraints", false);
-  options.set_option("built-in-assertions", true);
-  options.set_option("assertions", true);
-  options.set_option("assumptions", true);
-  options.set_option("arrays-uf", "auto");
-  options.set_option("depth", UINT32_MAX);
-  options.set_option("exploration-strategy", "lifo");
-  options.set_option("symex-cache-dereferences", false);
-  options.set_option("rewrite-union", true);
-  options.set_option("self-loops-to-assumptions", true);
-
-  // Generating trace for counterexamples.
-  options.set_option("trace", true);
-
   // Preprocess `goto_model`. Copied from `cbmc_parse_options.cpp`.
   remove_asm(goto_model);
   link_to_library(
@@ -119,7 +95,6 @@ optionst cegis_verifiert::get_options()
 
   remove_skip(goto_model);
   label_properties(goto_model);
-  return options;
 }
 
 cext::violation_typet
@@ -203,7 +178,6 @@ std::list<loop_idt> cegis_verifiert::get_cause_loop_id(
   std::list<loop_idt> result;
 
   // build the dependence graph
-  const namespacet ns(goto_model.symbol_table);
   dependence_grapht dependence_graph(ns);
   dependence_graph(goto_model);
 
@@ -382,8 +356,6 @@ cext cegis_verifiert::build_cex(
   const goto_tracet &goto_trace,
   const source_locationt &loop_entry_loc)
 {
-  const namespacet ns(goto_model.symbol_table);
-
   // Valuations of havoced variables right after havoc instructions.
   std::unordered_map<exprt, mp_integer, irep_hash> object_sizes;
   std::unordered_map<exprt, mp_integer, irep_hash> havoced_values;
@@ -588,8 +560,6 @@ optionalt<cext> cegis_verifiert::verify()
   // 3. construct the formatted counterexample from the violated property and
   //    its trace.
 
-  const namespacet ns(goto_model.symbol_table);
-
   // Store the original functions. We will restore them after the verification.
   for(const auto &fun_entry : goto_model.goto_functions.function_map)
   {
@@ -618,7 +588,7 @@ optionalt<cext> cegis_verifiert::verify()
   // Get the checker same as CBMC api without any flag.
   // TODO: replace the checker with CBMC api once it is implemented.
   ui_message_handlert ui_message_handler(log.get_message_handler());
-  const auto options = get_options();
+  preprocess_goto_model();
   std::unique_ptr<
     all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>
     checker = util_make_unique<

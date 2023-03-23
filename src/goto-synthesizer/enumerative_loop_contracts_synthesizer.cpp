@@ -334,7 +334,7 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
 
       // The verifier we use to check current invariant candidates.
       cegis_verifiert verifier(
-        combined_invariant, assigns_map, goto_model, log);
+        combined_invariant, assigns_map, goto_model, options, log);
 
       // A good strengthening clause if
       // 1. all checks pass, or
@@ -367,7 +367,8 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
     in_invariant_clause_map, pos_invariant_clause_map, neg_guards);
 
   // The verifier we use to check current invariant candidates.
-  cegis_verifiert verifier(combined_invariant, assigns_map, goto_model, log);
+  cegis_verifiert verifier(
+    combined_invariant, assigns_map, goto_model, options, log);
 
   // Set of symbols the violation may be dependent on.
   // We enumerate strengthening clauses built from symbols from the set.

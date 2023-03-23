@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check _ --sat-solver cadical --verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+Solving with CaDiCaL|The specified solver, 'cadical', is not available. The default solver will be used instead.
+^\[main.pointer\_dereference.\d+\] .* SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Check if solver options can be correctly parsed.
