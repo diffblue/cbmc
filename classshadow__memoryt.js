@@ -2,8 +2,8 @@ var classshadow__memoryt =
 [
     [ "shadow_memoryt", "classshadow__memoryt.html#aabfb96e83698ddc414455e4c111ac702", null ],
     [ "add_field", "classshadow__memoryt.html#a61e985bce34f23a0867ec635972d85fa", null ],
-    [ "convert_field_declaration", "classshadow__memoryt.html#a21545b310584eb33f770b97353c78bad", null ],
-    [ "gather_field_declarations", "classshadow__memoryt.html#ab0b53e6704a02a4c810d631d7dde3062", null ],
+    [ "convert_field_declaration", "classshadow__memoryt.html#a32e09dd0f0bad2ad4b7a6944b3c799c2", null ],
+    [ "gather_field_declarations", "classshadow__memoryt.html#aa88918dceff1b0e01bbb112606d7205e", null ],
     [ "initialize_shadow_memory", "classshadow__memoryt.html#a7d8d00c4ab6ec63619abc6237c9c7594", null ],
     [ "symex_field_dynamic_init", "classshadow__memoryt.html#a4bf8c6f61f60c01712006a56cda5eead", null ],
     [ "symex_field_local_init", "classshadow__memoryt.html#aab4949efe2faa15291d8a49125bc411a", null ],
