@@ -38,7 +38,6 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
 #include <goto-instrument/contracts/cfg_info.h>
-#include <goto-instrument/contracts/instrument_spec_assigns.h>
 #include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/nondet_static.h>
 #include <langapi/language.h>
@@ -122,6 +121,7 @@ void dfcc(
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
   const bool apply_loop_contracts,
+  const bool unwind_transformed_loops,
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler)
 {
@@ -138,6 +138,7 @@ void dfcc(
     allow_recursive_calls,
     to_replace_map,
     apply_loop_contracts,
+    unwind_transformed_loops,
     to_exclude_from_nondet_static,
     message_handler);
 }
@@ -150,6 +151,7 @@ void dfcc(
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
   const bool apply_loop_contracts,
+  const bool unwind_transformed_loops,
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler)
 {
@@ -160,7 +162,8 @@ void dfcc(
     to_check,
     allow_recursive_calls,
     to_replace,
-    apply_loop_contracts,
+    dfcc_loop_contract_mode_from_bools(
+      apply_loop_contracts, unwind_transformed_loops),
     message_handler,
     to_exclude_from_nondet_static};
 }
@@ -172,7 +175,7 @@ dfcct::dfcct(
   const optionalt<std::pair<irep_idt, irep_idt>> &to_check,
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
-  const bool apply_loop_contracts,
+  const dfcc_loop_contract_modet loop_contract_mode,
   message_handlert &message_handler,
   const std::set<std::string> &to_exclude_from_nondet_static)
   : options(options),
@@ -181,22 +184,23 @@ dfcct::dfcct(
     to_check(to_check),
     allow_recursive_calls(allow_recursive_calls),
     to_replace(to_replace),
-    apply_loop_contracts(apply_loop_contracts),
+    loop_contract_mode(loop_contract_mode),
     to_exclude_from_nondet_static(to_exclude_from_nondet_static),
     message_handler(message_handler),
     log(message_handler),
     utils(goto_model, message_handler),
     library(goto_model, utils, message_handler),
     ns(goto_model.symbol_table),
-    instrument(goto_model, message_handler, utils, library),
-    memory_predicates(goto_model, utils, library, instrument, message_handler),
-    spec_functions(goto_model, message_handler, utils, library, instrument),
-    contract_clauses_codegen(
+    spec_functions(goto_model, message_handler, utils, library),
+    contract_clauses_codegen(goto_model, message_handler, utils, library),
+    instrument(
       goto_model,
       message_handler,
       utils,
       library,
-      spec_functions),
+      spec_functions,
+      contract_clauses_codegen),
+    memory_predicates(goto_model, utils, library, instrument, message_handler),
     contract_handler(
       goto_model,
       message_handler,
@@ -340,7 +344,7 @@ void dfcct::instrument_harness_function()
                << messaget::eom;
 
   instrument.instrument_harness_function(
-    harness_id, function_pointer_contracts);
+    harness_id, loop_contract_mode, function_pointer_contracts);
 
   other_symbols.erase(harness_id);
 }
@@ -369,6 +373,7 @@ void dfcct::wrap_checked_function()
                  << contract_id << "' in CHECK mode" << messaget::eom;
 
     swap_and_wrap.swap_and_wrap_check(
+      loop_contract_mode,
       wrapper_id,
       contract_id,
       function_pointer_contracts,
@@ -377,7 +382,7 @@ void dfcct::wrap_checked_function()
     if(other_symbols.find(wrapper_id) != other_symbols.end())
       other_symbols.erase(wrapper_id);
 
-    // upate max contract size
+    // update max contract size
     const std::size_t assigns_clause_size =
       contract_handler.get_assigns_clause_size(contract_id);
     if(assigns_clause_size > max_assigns_clause_size)
@@ -485,20 +490,11 @@ void dfcct::instrument_other_functions()
 
     log.status() << "Instrumenting '" << function_id << "'" << messaget::eom;
 
-    instrument.instrument_function(function_id, function_pointer_contracts);
+    instrument.instrument_function(
+      function_id, loop_contract_mode, function_pointer_contracts);
   }
 
   goto_model.goto_functions.update();
-
-  // TODO specialise the library functions for the max size of
-  // loop and function contracts
-  if(to_check.has_value())
-  {
-    log.status() << "Specializing cprover_contracts functions for assigns "
-                    "clauses of at most "
-                 << max_assigns_clause_size << " targets" << messaget::eom;
-    library.specialize(max_assigns_clause_size);
-  }
 }
 
 void dfcct::transform_goto_model()
@@ -511,6 +507,17 @@ void dfcct::transform_goto_model()
   wrap_replaced_functions();
   wrap_discovered_function_pointer_contracts();
   instrument_other_functions();
+
+  // take the max of function of loop contracts assigns clauses
+  auto assigns_clause_size = instrument.get_max_assigns_clause_size();
+  if(assigns_clause_size > max_assigns_clause_size)
+    max_assigns_clause_size = assigns_clause_size;
+
+  log.status() << "Specializing cprover_contracts functions for assigns "
+                  "clauses of at most "
+               << max_assigns_clause_size << " targets" << messaget::eom;
+  library.specialize(max_assigns_clause_size);
+
   library.inhibit_front_end_builtins();
 
   // TODO implement a means to inhibit unreachable functions (possibly via the

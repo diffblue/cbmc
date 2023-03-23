@@ -386,7 +386,9 @@ void dfcc_lift_memory_predicatest::lift_predicate(
   // instrument the function for side effects: adds the write_set parameter,
   // adds checks for side effects, maps core predicates to their implementation.
   instrument.instrument_function(
-    function_id, discovered_function_pointer_contracts);
+    function_id,
+    dfcc_loop_contract_modet::NONE,
+    discovered_function_pointer_contracts);
 }
 
 void dfcc_lift_memory_predicatest::fix_calls(goto_programt &program)
