@@ -18,6 +18,7 @@ SRC = accelerate/accelerate.cpp \
       call_sequences.cpp \
       contracts/contracts.cpp \
       contracts/dynamic-frames/dfcc_utils.cpp \
+      contracts/dynamic-frames/dfcc_loop_nesting_graph.cpp \
       contracts/dynamic-frames/dfcc_library.cpp \
       contracts/dynamic-frames/dfcc_is_fresh.cpp \
       contracts/dynamic-frames/dfcc_pointer_in_range.cpp \
