@@ -21,6 +21,7 @@ Date: August 2022
 class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
+class dfcc_cfg_infot;
 class exprt;
 
 /// Rewrites calls to pointer_in_range predicates into calls
@@ -37,7 +38,7 @@ public:
   /// Rewrites calls to pointer_in_range predicates into calls
   /// to the library implementation in the given program, passing the
   /// given write_set expression as parameter to the library function.
-  void rewrite_calls(goto_programt &program, const exprt &write_set);
+  void rewrite_calls(goto_programt &program, dfcc_cfg_infot cfg_info);
 
   /// Rewrites calls to pointer_in_range predicates into calls
   /// to the library implementation in the given program between
@@ -47,7 +48,7 @@ public:
     goto_programt &program,
     goto_programt::targett first_instruction,
     const goto_programt::targett &last_instruction,
-    const exprt &write_set);
+    dfcc_cfg_infot cfg_info);
 
 protected:
   dfcc_libraryt &library;
