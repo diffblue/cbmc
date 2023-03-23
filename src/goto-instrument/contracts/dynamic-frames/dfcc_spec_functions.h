@@ -21,7 +21,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_utils.h"
 
@@ -32,19 +31,15 @@ class goto_modelt;
 class message_handlert;
 class symbolt;
 class conditional_target_group_exprt;
-class cfg_infot;
 
-/// This class transforms (in place) declarative assigns clause and frees clause
-/// specification functions expressed in terms of the builtins:
+/// This class rewrites GOTO functions that use the built-ins:
 /// - `__CPROVER_assignable`,
 /// - `__CPROVER_object_whole`,
 /// - `__CRPOVER_object_from`,
 /// - `__CPROVER_object_upto`,
 /// - `__CPROVER_freeable`
-/// into active functions by transforming the builtin calls into calls to
-/// dfcc library functions that actually built frame descriptions.
-/// The resulting function is then itself instrumented for frame condition
-/// checking to be able to prove the absence of side effects.
+/// into GOTO functions that populate a write set instance or havoc a write set
+/// by calling the library implementation of these built-ins.
 class dfcc_spec_functionst
 {
 public:
@@ -52,8 +47,7 @@ public:
     goto_modelt &goto_model,
     message_handlert &message_handler,
     dfcc_utilst &utils,
-    dfcc_libraryt &library,
-    dfcc_instrumentt &instrument);
+    dfcc_libraryt &library);
 
   /// From a function:
   ///
@@ -122,13 +116,11 @@ public:
   /// void function_id(
   ///   params,
   ///   __CPROVER_assignable_set_t write_set_to_fill,
-  ///   __CPROVER_assignable_set_t write_set_to_check
   /// )
   /// ```
   ///
   /// Where:
   /// - `write_set_to_fill` is the write set to populate.
-  /// - `write_set_to_check` is the write set to use for checking side effects.
   ///
   /// \param function_id function to transform in place
   /// \param nof_targets receives the estimated size of the write set
@@ -174,13 +166,11 @@ public:
   /// void function_id(
   ///   params,
   ///   __CPROVER_assignable_set_t write_set_to_fill,
-  ///   __CPROVER_assignable_set_t write_set_to_check
   /// )
   /// ```
   ///
   /// Where:
   /// - `write_set_to_fill` is the write set to populate.
-  /// - `write_set_to_check` is the write set to use for checking side effects.
   ///
   /// The function must be fully inlined and loop free.
   ///
@@ -219,7 +209,6 @@ protected:
   messaget log;
   dfcc_utilst &utils;
   dfcc_libraryt &library;
-  dfcc_instrumentt &instrument;
   namespacet ns;
 
   /// Extracts the type of an assigns clause target expression

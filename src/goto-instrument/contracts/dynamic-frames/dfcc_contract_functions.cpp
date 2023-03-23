@@ -23,6 +23,7 @@ Date: August 2022
 #include <langapi/language_util.h>
 
 #include "dfcc_contract_clauses_codegen.h"
+#include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_spec_functions.h"
 #include "dfcc_utils.h"
@@ -34,7 +35,8 @@ dfcc_contract_functionst::dfcc_contract_functionst(
   dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_spec_functionst &spec_functions,
-  dfcc_contract_clauses_codegent &contract_clauses_codegen)
+  dfcc_contract_clauses_codegent &contract_clauses_codegen,
+  dfcc_instrumentt &instrument)
   : pure_contract_symbol(pure_contract_symbol),
     code_with_contract(to_code_with_contract_type(pure_contract_symbol.type)),
     spec_assigns_function_id(
@@ -50,6 +52,7 @@ dfcc_contract_functionst::dfcc_contract_functionst(
     library(library),
     spec_functions(spec_functions),
     contract_clauses_codegen(contract_clauses_codegen),
+    instrument(instrument),
     ns(goto_model.symbol_table)
 {
   gen_spec_assigns_function();
@@ -66,6 +69,28 @@ dfcc_contract_functionst::dfcc_contract_functionst(
 
   spec_functions.to_spec_frees_function(
     spec_frees_function_id, nof_frees_targets);
+
+  instrument_without_loop_contracts_check_no_pointer_contracts(
+    spec_assigns_function_id);
+
+  instrument_without_loop_contracts_check_no_pointer_contracts(
+    spec_frees_function_id);
+}
+
+void dfcc_contract_functionst::
+  instrument_without_loop_contracts_check_no_pointer_contracts(
+    const irep_idt &spec_function_id)
+{
+  std::set<irep_idt> function_pointer_contracts;
+  instrument.instrument_function(
+    spec_function_id,
+    dfcc_loop_contract_modet::NONE,
+    function_pointer_contracts);
+
+  INVARIANT(
+    function_pointer_contracts.empty(),
+    id2string(spec_function_id) + " shall not contain calls to " CPROVER_PREFIX
+                                  "obeys_contract");
 }
 
 const symbolt &

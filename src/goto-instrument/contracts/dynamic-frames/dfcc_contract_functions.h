@@ -29,6 +29,7 @@ class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
 class dfcc_utilst;
+class dfcc_instrumentt;
 class dfcc_spec_functionst;
 class dfcc_contract_clauses_codegent;
 class code_with_contract_typet;
@@ -36,24 +37,26 @@ class conditional_target_group_exprt;
 
 /// Generates GOTO functions modelling a contract assigns and frees clauses.
 ///
-/// The generated functions are the following.
+/// The generated functions are the following:
 ///
-/// Populates write_set_to_fill with targets of the assigns clause
-/// checks its own body against write_set_to_check:
 /// ```c
+/// // Populates write_set_to_fill with targets of the assigns clause
+/// // checks its own body against write_set_to_check:
 /// void contract_id::assigns(
 ///     function-params,
 ///     write_set_to_fill,
 ///     write_set_to_check);
 /// ```
-/// Havocs the targets specified in the assigns clause, assuming
-/// write_set_to_havoc is a snapshot created using contract_id::assigns:
+///
 /// ```c
+/// // Havocs the targets specified in the assigns clause, assuming
+/// // write_set_to_havoc is a snapshot created using contract_id::assigns
 /// void contract_id::assigns::havoc(write_set_to_havoc);
 /// ```
-/// Populates write_set_to_fill with targets of the frees clause
-/// checks its own body against write_set_to_check:
+///
 /// ```c
+/// // Populates write_set_to_fill with targets of the frees clause
+/// // checks its own body against write_set_to_check:
 /// void contract_id::frees(
 ///     function-params,
 ///     write_set_to_fill,
@@ -70,6 +73,7 @@ public:
   /// \param spec_functions provides translation methods for assignable set
   /// \param contract_clauses_codegen provides GOTO code generation methods
   /// for assigns and free clauses.
+  /// \param instrument Used to instrument generated functions for side effects
   dfcc_contract_functionst(
     const symbolt &pure_contract_symbol,
     goto_modelt &goto_model,
@@ -77,7 +81,13 @@ public:
     dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_spec_functionst &spec_functions,
-    dfcc_contract_clauses_codegent &contract_clauses_codegen);
+    dfcc_contract_clauses_codegent &contract_clauses_codegen,
+    dfcc_instrumentt &instrument);
+
+  /// Instruments the given function without loop contracts and checks that no
+  /// function pointer contracts were discovered.
+  void instrument_without_loop_contracts_check_no_pointer_contracts(
+    const irep_idt &spec_function_id);
 
   /// Returns the contract::assigns function symbol
   const symbolt &get_spec_assigns_function_symbol() const;
@@ -120,6 +130,7 @@ protected:
   dfcc_libraryt &library;
   dfcc_spec_functionst &spec_functions;
   dfcc_contract_clauses_codegent &contract_clauses_codegen;
+  dfcc_instrumentt &instrument;
   namespacet ns;
   std::size_t nof_assigns_targets;
   std::size_t nof_frees_targets;
