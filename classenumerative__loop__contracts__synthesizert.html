@@ -116,14 +116,14 @@ $(document).ready(function(){initNavTree('classenumerative__loop__contracts__syn
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classenumerative__loop__contracts__synthesizert__coll__graph.svg" width="2700" height="964"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classenumerative__loop__contracts__synthesizert__coll__graph.svg" width="2700" height="1168"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aaa901fa00443c9a2fb8409e54370af79"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classenumerative__loop__contracts__synthesizert.html#aaa901fa00443c9a2fb8409e54370af79">enumerative_loop_contracts_synthesizert</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;<a class="el" href="classloop__contracts__synthesizer__baset.html#a7258b0991e84a1042cda2057cac67680">goto_model</a>, <a class="el" href="classmessaget.html">messaget</a> &amp;<a class="el" href="classloop__contracts__synthesizer__baset.html#aa14a68e0af87c4fac38ca5582817629c">log</a>)</td></tr>
-<tr class="separator:aaa901fa00443c9a2fb8409e54370af79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8faea0b8f1a91028d638a45947768dbf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classenumerative__loop__contracts__synthesizert.html#a8faea0b8f1a91028d638a45947768dbf">enumerative_loop_contracts_synthesizert</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;<a class="el" href="classloop__contracts__synthesizer__baset.html#a7258b0991e84a1042cda2057cac67680">goto_model</a>, const <a class="el" href="classoptionst.html">optionst</a> &amp;<a class="el" href="classenumerative__loop__contracts__synthesizert.html#aecea81b41c570f76c9ba7f3aa82ddfc4">options</a>, <a class="el" href="classmessaget.html">messaget</a> &amp;<a class="el" href="classloop__contracts__synthesizer__baset.html#aa14a68e0af87c4fac38ca5582817629c">log</a>)</td></tr>
+<tr class="separator:a8faea0b8f1a91028d638a45947768dbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a354306e9bec3c6b7e74aa36ba985d15c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classenumerative__loop__contracts__synthesizert.html#a354306e9bec3c6b7e74aa36ba985d15c">synthesize_all</a> () override</td></tr>
 <tr class="memdesc:a354306e9bec3c6b7e74aa36ba985d15c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This synthesizer guarantees that, with the synthesized loop contracts, all checks in the annotated GOTO program pass.  <a href="classenumerative__loop__contracts__synthesizert.html#a354306e9bec3c6b7e74aa36ba985d15c">More...</a><br /></td></tr>
 <tr class="separator:a354306e9bec3c6b7e74aa36ba985d15c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,6 +140,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:aecea81b41c570f76c9ba7f3aa82ddfc4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classoptionst.html">optionst</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classenumerative__loop__contracts__synthesizert.html#aecea81b41c570f76c9ba7f3aa82ddfc4">options</a></td></tr>
+<tr class="separator:aecea81b41c570f76c9ba7f3aa82ddfc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b303809c556be8b7427248bcd09cf21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamespacet.html">namespacet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classenumerative__loop__contracts__synthesizert.html#a6b303809c556be8b7427248bcd09cf21">ns</a></td></tr>
 <tr class="separator:a6b303809c556be8b7427248bcd09cf21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -195,10 +197,10 @@ Additional Inherited Members</h2></td></tr>
 <div class="textblock"><p>Enumerative loop contracts synthesizers. </p>
 <p>It is designed for <code>goto_model</code> containing only checks instrumented by <code>goto-instrument</code> with the <code>--pointer-check</code> flag. When other checks present, it will just enumerate candidates and check if they are valid. </p>
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00027">27</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00029">29</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aaa901fa00443c9a2fb8409e54370af79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa901fa00443c9a2fb8409e54370af79">&#9670;&nbsp;</a></span>enumerative_loop_contracts_synthesizert()</h2>
+<a id="a8faea0b8f1a91028d638a45947768dbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8faea0b8f1a91028d638a45947768dbf">&#9670;&nbsp;</a></span>enumerative_loop_contracts_synthesizert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,6 +213,12 @@ Additional Inherited Members</h2></td></tr>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
           <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classoptionst.html">optionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -231,7 +239,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00031">31</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00033">33</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -334,7 +342,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00044">44</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00048">48</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -395,7 +403,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classloop__contracts__synthesizer__baset.html#a080656e0ee6bbabbdeba2ff50fe2fff1">loop_contracts_synthesizer_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html#l00486">486</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html">enumerative_loop_contracts_synthesizer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html#l00487">487</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8cpp_source.html">enumerative_loop_contracts_synthesizer.cpp</a>.</p>
 
 </div>
 </div>
@@ -599,7 +607,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Synthesized assigns clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00091">91</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00096">96</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -625,7 +633,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Synthesize invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv) </p>
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00086">86</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00091">91</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -649,7 +657,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00088">88</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00093">93</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -665,7 +673,23 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00049">49</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00054">54</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+
+</div>
+</div>
+<a id="aecea81b41c570f76c9ba7f3aa82ddfc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecea81b41c570f76c9ba7f3aa82ddfc4">&#9670;&nbsp;</a></span>options</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classoptionst.html">optionst</a>&amp; enumerative_loop_contracts_synthesizert::options</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00053">53</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -689,7 +713,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00087">87</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00092">92</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>
@@ -715,7 +739,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Map from tmp_post variables to their original variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00094">94</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html#l00099">99</a> of file <a class="el" href="enumerative__loop__contracts__synthesizer_8h_source.html">enumerative_loop_contracts_synthesizer.h</a>.</p>
 
 </div>
 </div>

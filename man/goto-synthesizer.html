@@ -31,6 +31,90 @@
 <dt><strong>--object-bits</strong> n</dt>
 <dd><p>number of bits used for object addresses</p>
 </dd>
+<dt><strong>--sat-solver</strong> solver</dt>
+<dd><p>use specified SAT solver</p>
+</dd>
+<dt><strong>--external-sat-solver</strong> cmd</dt>
+<dd><p>command to invoke SAT solver process</p>
+</dd>
+<dt><strong>--no-sat-preprocessor</strong></dt>
+<dd><p>disable the SAT solver's simplifier</p>
+</dd>
+<dt><strong>--dimacs</strong></dt>
+<dd><p>generate CNF in DIMACS format</p>
+</dd>
+<dt><strong>--beautify</strong></dt>
+<dd><p>beautify the counterexample (greedy heuristic)</p>
+</dd>
+<dt><strong>--smt1</strong></dt>
+<dd><p>use default SMT1 solver (obsolete)</p>
+</dd>
+<dt><strong>--smt2</strong></dt>
+<dd><p>use default SMT2 solver (Z3)</p>
+</dd>
+<dt><strong>--bitwuzla</strong></dt>
+<dd><p>use Bitwuzla</p>
+</dd>
+<dt><strong>--boolector</strong></dt>
+<dd><p>use Boolector</p>
+</dd>
+<dt><strong>--cprover-smt2</strong></dt>
+<dd><p>use CPROVER SMT2 solver</p>
+</dd>
+<dt><strong>--cvc3</strong></dt>
+<dd><p>use CVC3</p>
+</dd>
+<dt><strong>--cvc4</strong></dt>
+<dd><p>use CVC4</p>
+</dd>
+<dt><strong>--cvc5</strong></dt>
+<dd><p>use CVC5</p>
+</dd>
+<dt><strong>--mathsat</strong></dt>
+<dd><p>use MathSAT</p>
+</dd>
+<dt><strong>--yices</strong></dt>
+<dd><p>use Yices</p>
+</dd>
+<dt><strong>--z3</strong></dt>
+<dd><p>use Z3</p>
+</dd>
+<dt><strong>--fpa</strong></dt>
+<dd><p>use theory of floating-point arithmetic</p>
+</dd>
+<dt><strong>--refine</strong></dt>
+<dd><p>use refinement procedure (experimental)</p>
+</dd>
+<dt><strong>--refine-arrays</strong></dt>
+<dd><p>use refinement for arrays only</p>
+</dd>
+<dt><strong>--refine-arithmetic</strong></dt>
+<dd><p>refinement of arithmetic expressions only</p>
+</dd>
+<dt><strong>--max-node-refinement</strong></dt>
+<dd><p>maximum refinement iterations for arithmetic expressions</p>
+</dd>
+<dt><strong>--incremental-smt2-solver</strong> <em>cmd</em></dt>
+<dd><p>Use the incremental SMT backend where <em>cmd</em> is the command to invoke the SMT solver of choice.<br />
+Example invocations:<br />
+--incremental-smt2-solver 'z3 -smt2 -in' (use the Z3 solver).<br />
+--incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the CVC5 solver).</p>
+</dd>
+</dl>
+<p>Note that:<br />
+The solver name must be in the "PATH" or be an executable with full path.<br />
+The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.<br />
+The SMT solver should support the QF_AUFBV logic.</p>
+<dl>
+<dt><strong>--outfile</strong> filename</dt>
+<dd><p>output formula to given file</p>
+</dd>
+<dt><strong>--dump-smt-formula</strong> filename</dt>
+<dd><p>output smt incremental formula to the given file</p>
+</dd>
+<dt><strong>--write-solver-stats-to</strong> json-file</dt>
+<dd><p>collect the solver query complexity</p>
+</dd>
 </dl>
 <h2>User-interface options:</h2>
 <dl>
