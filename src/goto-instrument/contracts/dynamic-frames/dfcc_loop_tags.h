@@ -21,26 +21,31 @@ void dfcc_set_loop_id(
   std::size_t loop_id);
 
 bool dfcc_has_loop_id(
-  const goto_programt::instructiont::targett &target,
+  const goto_programt::instructiont::const_targett &target,
   std::size_t loop_id);
 
 optionalt<std::size_t>
-dfcc_get_loop_id(const goto_programt::instructiont::targett &target);
+dfcc_get_loop_id(const goto_programt::instructiont::const_targett &target);
 
 void dfcc_set_loop_head(goto_programt::instructiont::targett &target);
-bool dfcc_is_loop_head(const goto_programt::instructiont::targett &target);
+bool dfcc_is_loop_head(
+  const goto_programt::instructiont::const_targett &target);
 
 void dfcc_set_loop_body(goto_programt::instructiont::targett &target);
-bool dfcc_is_loop_body(const goto_programt::instructiont::targett &target);
+bool dfcc_is_loop_body(
+  const goto_programt::instructiont::const_targett &target);
 
 void dfcc_set_loop_exiting(goto_programt::instructiont::targett &target);
-bool dfcc_is_loop_exiting(const goto_programt::instructiont::targett &target);
+bool dfcc_is_loop_exiting(
+  const goto_programt::instructiont::const_targett &target);
 
 void dfcc_set_loop_latch(goto_programt::instructiont::targett &target);
-bool dfcc_is_loop_latch(const goto_programt::instructiont::targett &target);
+bool dfcc_is_loop_latch(
+  const goto_programt::instructiont::const_targett &target);
 
 void dfcc_set_loop_top_level(goto_programt::instructiont::targett &target);
-bool dfcc_is_loop_top_level(const goto_programt::instructiont::targett &target);
+bool dfcc_is_loop_top_level(
+  const goto_programt::instructiont::const_targett &target);
 
 void dfcc_remove_loop_tags(source_locationt &source_location);
 void dfcc_remove_loop_tags(goto_programt &goto_program);
