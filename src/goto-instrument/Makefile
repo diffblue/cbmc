@@ -22,6 +22,7 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_contract_mode.cpp \
       contracts/dynamic-frames/dfcc_loop_contract_mode.cpp \
       contracts/dynamic-frames/dfcc_loop_tags.cpp \
+      contracts/dynamic-frames/dfcc_check_loop_normal_form.cpp \
       contracts/dynamic-frames/dfcc_library.cpp \
       contracts/dynamic-frames/dfcc_is_cprover_symbol.cpp \
       contracts/dynamic-frames/dfcc_is_fresh.cpp \
