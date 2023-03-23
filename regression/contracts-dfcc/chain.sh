@@ -21,6 +21,7 @@ else
   args_cbmc="${args#*" _ "}"
 fi
 
+dfcc_suffix=""
 if [[ "${use_dfcc}" == "false" ]]; then
   set -- $args_inst
   args_inst=""
@@ -32,28 +33,30 @@ if [[ "${use_dfcc}" == "false" ]]; then
       shift
     fi
   done
+else
+  dfcc_suffix="dfcc"
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "${name}.c" "/Fe${name}.gb"
+  $goto_cc "${name}.c" "/Fe${name}${dfcc_suffix}.gb"
 else
-  $goto_cc -o "${name}.gb" "${name}.c"
+  $goto_cc -o "${name}${dfcc_suffix}.gb" "${name}.c"
 fi
 
-rm -f "${name}-mod.gb"
-$goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"
-if [ ! -e "${name}-mod.gb" ] ; then
-  cp "$name.gb" "${name}-mod.gb"
+rm -f "${name}${dfcc_suffix}-mod.gb"
+$goto_instrument ${args_inst} "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
+if [ ! -e "${name}${dfcc_suffix}-mod.gb" ] ; then
+  cp "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
 elif echo $args_inst | grep -q -- "--dump-c" ; then
-  mv "${name}-mod.gb" "${name}-mod.c"
+  mv "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.c"
 
   if [[ "${is_windows}" == "true" ]]; then
-    $goto_cc "${name}-mod.c" "/Fe${name}-mod.gb"
+    $goto_cc "${name}${dfcc_suffix}-mod.c" "/Fe${name}${dfcc_suffix}-mod.gb"
   else
-    $goto_cc -o "${name}-mod.gb" "${name}-mod.c"
+    $goto_cc -o "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.c"
   fi
 
-  rm "${name}-mod.c"
+  rm "${name}${dfcc_suffix}-mod.c"
 fi
-$goto_instrument --show-goto-functions "${name}-mod.gb"
-$cbmc "${name}-mod.gb" ${args_cbmc}
+$goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
+$cbmc "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}
