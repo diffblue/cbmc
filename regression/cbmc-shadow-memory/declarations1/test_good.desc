@@ -1,0 +1,12 @@
+CORE
+good.c
+--function good_declarations --verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^Shadow memory: declare local field field1 of type c_bool\[8\]
+^Shadow memory: declare global field field2 of type unsignedbv\[6\]
+--
+^A shadow memory field must
+--
+Test that shadow memory declarations are correctly gathered.

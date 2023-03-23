@@ -50,7 +50,7 @@ public:
   /// \param message_handler For logging
   /// \return The field definitions
   static shadow_memory_field_definitionst gather_field_declarations(
-    abstract_goto_modelt &goto_model,
+    const abstract_goto_modelt &goto_model,
     message_handlert &message_handler);
 
   /// Initialize global-scope shadow memory for global/static variables.
@@ -100,9 +100,13 @@ private:
   /// Converts a field declaration
   /// \param code_function_call The __CPROVER_field_decl_* call
   /// \param fields The field declaration to be extended
-  void convert_field_declaration(
+  /// \param is_global True if the declaration is global
+  /// \param message_handler For logging
+  static void convert_field_declaration(
     const code_function_callt &code_function_call,
-    shadow_memory_field_definitionst::field_definitiont &fields);
+    shadow_memory_field_definitionst::field_definitiont &fields,
+    bool is_global,
+    message_handlert &message_handler);
 
   /// Allocates and initializes a shadow memory field for the given original
   /// memory.
