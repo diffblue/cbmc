@@ -1481,6 +1481,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("slice-global-inits"))
   {
+    do_indirect_call_and_rtti_removal();
+
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
     slice_global_inits(goto_model, ui_message_handler);
