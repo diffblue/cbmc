@@ -200,4 +200,6 @@ inline bool is_true (const literalt &l) { return (l.is_true()); }
 // bit-vectors
 typedef std::vector<literalt> bvt;
 
+std::ostream &operator<<(std::ostream &out, const bvt &bv);
+
 #endif // CPROVER_SOLVERS_PROP_LITERAL_H
