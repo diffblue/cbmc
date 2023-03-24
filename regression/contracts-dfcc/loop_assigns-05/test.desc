@@ -1,0 +1,20 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[body_1.assigns.\d+\] .* Check that j is assignable: SUCCESS$
+^\[body_2.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[body_3.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[incr.assigns.\d+\] .* Check that \*i is assignable: SUCCESS$
+^\[main.loop_assigns.\d+\] line 43 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 43 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 43 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 43 Check step was unwound for loop .*: SUCCESS$
+^\[main.assertion.\d+\] .* assertion j == 9: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks write set inclusion checks in presence of function calls,
+which are inlined, and also checks that DEAD instructions introduced during
+inlining is correctly handled.

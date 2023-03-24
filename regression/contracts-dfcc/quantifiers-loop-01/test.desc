@@ -1,0 +1,20 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[main.loop_assigns.\d+\] line 10 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 10 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 10 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 10 Check step was unwound for loop .*: SUCCESS$
+^\[main.assigns.\d+\] line .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] line .* Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] line .* assertion a\[10\] == 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test case checks the handling of a `forall` quantifier within a loop invariant.
+
+This test case uses explicit constant bounds on the quantified variable,
+so that it can be unrolled (to conjunctions) with the SAT backend.

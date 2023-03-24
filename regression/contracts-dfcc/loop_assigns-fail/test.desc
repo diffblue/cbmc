@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[main.assigns.\d+\] line 20 Check that b->data\[\(.*\)i\] is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test shows the need for assigns clauses on loops. The assigns the local may
+alias analysis cannot identify the target of `b->data\[\(.*\)i\]` and assigns
+clause inference computes an incomplete set of targets,
+which makes the analysis fail with an assigns clause violation.

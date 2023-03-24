@@ -1,0 +1,17 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --unsigned-overflow-check
+\[main.loop_assigns.\d+\] line 16 Check assigns clause inclusion for loop .*: SUCCESS$
+\[main.loop_invariant_base.\d+\] line 16 Check invariant before entry for loop .*: SUCCESS$
+\[main.loop_invariant_step.\d+\] line 16 Check invariant after step for loop .*: SUCCESS$
+\[main.loop_step_unwinding.\d+\] line 16 Check step was unwound for loop .*: SUCCESS$
+\[check.assigns.\d+\] line \d+ Check that \*j is assignable: FAILURE$
+\[main.assigns.\d+\] line \d+ Check that i is assignable: SUCCESS$
+\[main.assertion.\d+\] line \d+ assertion i == k: SUCCESS$
+^EXIT=(6|10)$
+^SIGNAL=0$
+--
+--
+This test demonstrates a case where the loop guard has side effects.
+The writes performed in the guard must also be specified
+in the assigns clause of the loop.

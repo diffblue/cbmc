@@ -1,0 +1,20 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[main.loop_assigns.\d+\] line 21 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 21 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 21 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 21 Check step was unwound for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that b->data\[\(.*\)i\] is assignable: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[0\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[1\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[2\] == 0: FAILURE$
+^\[main.assertion.\d+\] .* assertion b->data\[3\] == 0: SUCCESS$
+^\[main.assertion.\d+\] .* assertion b->data\[4\] == 0: SUCCESS$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test hows that __CPROVER_object_upto is supported in loop contracts.

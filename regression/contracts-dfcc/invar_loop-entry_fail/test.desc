@@ -1,0 +1,16 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=(10|6)$
+^SIGNAL=0$
+^\[main.loop_assigns.\d+] line 8 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+] line 8 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+] line 8 Check invariant after step for loop .*: FAILURE$
+^\[main.loop_step_unwinding.\d+] line 8 Check step was unwound for loop .*: SUCCESS$
+^\[main.assigns.\d+\] line 11 Check that y is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 12 Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 13 Check that x is assignable: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+This test ensures that __CPROVER_loop_entry violations are checked.

@@ -1,0 +1,16 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[main.loop_assigns.\d+\] line 6 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 6 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 6 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 6 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 6 Check variant decreases after step for loop .*: SUCCESS$
+^\[main.assigns.\d+\] line \d+ Check that x is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that decreases clause is properly initialized
+when the loop head and loop invariant compilation emit several goto instructions.

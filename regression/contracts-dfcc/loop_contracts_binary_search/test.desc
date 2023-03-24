@@ -1,0 +1,18 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --pointer-check --bounds-check --signed-overflow-check
+^EXIT=0$
+^SIGNAL=0$
+^\[binary_search.loop_assigns.\d+\] line 15 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[binary_search.loop_invariant_base.\d+\] line 15 Check invariant before entry for loop .*: SUCCESS$
+^\[binary_search.loop_invariant_step.\d+\] line 15 Check invariant after step for loop .*: SUCCESS$
+^\[binary_search.loop_step_unwinding.\d+\] line 15 Check step was unwound for loop .*: SUCCESS$
+^\[binary_search.loop_decreases.\d+\] line 15 Check variant decreases after step for loop .*: SUCCESS$
+^\[binary_search.assigns.\d+\] .* Check that lb is assignable: SUCCESS$
+^\[binary_search.assigns.\d+\] .* Check that ub is assignable: SUCCESS$
+^\[binary_search.assigns.\d+\] .* Check that mid is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion buf\[idx\] == val: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test case verifies memory safety and termination of a binary search implementation.

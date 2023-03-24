@@ -1,0 +1,17 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[main.loop_invariant_base.\d+\] line 6 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 6 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 6 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 6 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 6 Check variant decreases after step for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The purpose of this test is to check whether a decreases clause can
+successfully prove the termination of a loop (i) whose exit condition is
+1 == 1 (i.e. true) and (ii) that will eventually exit via a break statement.

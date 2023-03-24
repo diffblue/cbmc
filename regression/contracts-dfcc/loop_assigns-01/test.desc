@@ -1,0 +1,18 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[foo.loop_assigns.\d+\] line 22 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_invariant_base.\d+\] line 22 Check invariant before entry for loop .*: SUCCESS$
+^\[foo.loop_invariant_step.\d+\] line 22 Check invariant after step for loop .*: SUCCESS$
+^\[foo.loop_step_unwinding.\d+\] line 22 Check step was unwound for loop .*: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: SUCCESS$
+^\[foo.assertion.\d+\] .* assertion b->data\[5\] == 0: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+This test (taken from #6021) shows the need for assigns clauses on loops.
+The alias analysis in this case returns `unknown`,
+and so we must manually annotate an assigns clause on the loop.

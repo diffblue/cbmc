@@ -1,0 +1,17 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.loop_assigns.\d+\] line 8 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 8 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 8 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 8 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 8 Check variant decreases after step for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that r is assignable: SUCCESS$
+^\[main\.assertion\.1\] .* assertion r == 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+This test checks that a loop invariant can be proven to be inductive,
+and is used in conjunction with the negation of the loop guard
+to establish the postcondition.
