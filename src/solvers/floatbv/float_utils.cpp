@@ -195,6 +195,10 @@ bvt float_utilst::conversion(
     if(dest_spec.e > spec.e)
     {
       normalization_shift(result.fraction, result.exponent);
+      // normalization_shift unconditionally extends the exponent size to avoid
+      // arithmetic overflow, but this cannot have happened here as the exponent
+      // had already been extended to dest_spec's size
+      result.exponent.resize(dest_spec.e);
     }
 
     // the flags get copied
@@ -792,8 +796,9 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   PRECONDITION(!fraction.empty());
   std::size_t depth = address_bits(fraction.size() - 1);
 
-  if(exponent.size()<depth)
-    exponent=bv_utils.sign_extension(exponent, depth);
+  // sign-extend to ensure the arithmetic below cannot result in overflow/underflow
+  exponent =
+    bv_utils.sign_extension(exponent, std::max(depth, exponent.size() + 1));
 
   bvt exponent_delta=bv_utils.zeros(exponent.size());
 
