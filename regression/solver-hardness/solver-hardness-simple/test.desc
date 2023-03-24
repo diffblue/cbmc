@@ -5,6 +5,5 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 \"SAT_hardness\":\{(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+),(\"ClauseSet\":\[.*\]|\"Clauses\":\d+|\"Variables\":\d+|\"Literals\":\d+)\}
-\"GOTO_ID\":32,\"SAT_hardness\":\{\"ClauseSet\":\[.*,571\],\"Clauses\":571
 --
 ^warning: ignoring

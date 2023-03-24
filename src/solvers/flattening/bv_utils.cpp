@@ -1201,22 +1201,31 @@ literalt bv_utilst::lt_or_le(
     size_t start;
     size_t i;
 
-    compareBelow = prop.new_variables(bv0.size());
-    result = prop.new_variable();
-
     if(rep == representationt::SIGNED)
     {
+      if(top0.is_false() && top1.is_true())
+        return const_literal(false);
+      else if(top0.is_true() && top1.is_false())
+        return const_literal(true);
+
       INVARIANT(
         bv0.size() >= 2, "signed bitvectors should have at least two bits");
-      start = compareBelow.size() - 2;
+      compareBelow = prop.new_variables(bv0.size() - 1);
+      start = compareBelow.size() - 1;
 
-      literalt firstComp=compareBelow[start];
+      literalt &firstComp = compareBelow[start];
+      if(top0.is_false())
+        firstComp = !top1;
+      else if(top0.is_true())
+        firstComp = top1;
+      else if(top1.is_false())
+        firstComp = !top0;
+      else if(top1.is_true())
+        firstComp = top0;
+
+      result = prop.new_variable();
 
       // When comparing signs we are comparing the top bit
-#ifdef INCLUDE_REDUNDANT_CLAUSES
-      prop.l_set_to_true(compareBelow[start + 1])
-#endif
-
       // Four cases...
       prop.lcnf(top0, top1, firstComp);  // + + compare needed
       prop.lcnf(top0, !top1, !result); // + - result false and no compare needed
@@ -1231,8 +1240,10 @@ literalt bv_utilst::lt_or_le(
     else
     {
       // Unsigned is much easier
+      compareBelow = prop.new_variables(bv0.size() - 1);
+      compareBelow.push_back(const_literal(true));
       start = compareBelow.size() - 1;
-      prop.l_set_to_true(compareBelow[start]);
+      result = prop.new_variable();
     }
 
     // Determine the output
@@ -1241,6 +1252,16 @@ literalt bv_utilst::lt_or_le(
     i = start;
     do
     {
+      if(compareBelow[i].is_false())
+        continue;
+      else if(compareBelow[i].is_true())
+      {
+        if(bv0[i].is_false() && bv1[i].is_true())
+          return const_literal(true);
+        else if(bv0[i].is_true() && bv1[i].is_false())
+          return const_literal(false);
+      }
+
       prop.lcnf(!compareBelow[i],  bv0[i], !bv1[i],  result);
       prop.lcnf(!compareBelow[i], !bv0[i],  bv1[i], !result);
     }
