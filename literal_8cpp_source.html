@@ -112,6 +112,17 @@ $(document).ready(function(){initNavTree('literal_8cpp_source.html',''); initRes
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordflow">return</span> out &lt;&lt; (l.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>()?<span class="stringliteral">&quot;-&quot;</span>:<span class="stringliteral">&quot;&quot;</span>) &lt;&lt; l.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>();</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;}</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="literal_8cpp.html#a0548af1b401c9e014e60f3979f932f4a">   24</a></span>&#160;std::ostream &amp;<a class="code" href="literal_8cpp.html#aa469695121ae5ebd2f215096c26bbabc">operator&lt;&lt;</a>(std::ostream &amp;out, <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = bv.begin(); it != bv.end(); ++it)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    out &lt;&lt; *it;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">if</span>(std::next(it) != bv.end())</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      out &lt;&lt; <span class="charliteral">&#39; &#39;</span>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  }</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">return</span> out;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;}</div>
 <div class="ttc" id="aclassliteralt_html"><div class="ttname"><a href="classliteralt.html">literalt</a></div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00025">literal.h:26</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a0a901bd96c00af27c04d0aa63581f71b"><div class="ttname"><a href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">literalt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00156">literal.h:156</a></div></div>
 <div class="ttc" id="aclassliteralt_html_a155aee401f2145171e9fe78a2578584a"><div class="ttname"><a href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">literalt::sign</a></div><div class="ttdeci">bool sign() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00088">literal.h:88</a></div></div>
@@ -119,6 +130,7 @@ $(document).ready(function(){initNavTree('literal_8cpp_source.html',''); initRes
 <div class="ttc" id="aclassliteralt_html_a5d14de13ca0a861587b0d187eee1b03a"><div class="ttname"><a href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">literalt::var_no</a></div><div class="ttdeci">var_not var_no() const</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00083">literal.h:83</a></div></div>
 <div class="ttc" id="aliteral_8cpp_html_aa469695121ae5ebd2f215096c26bbabc"><div class="ttname"><a href="literal_8cpp.html#aa469695121ae5ebd2f215096c26bbabc">operator&lt;&lt;</a></div><div class="ttdeci">std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, literalt l)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8cpp_source.html#l00016">literal.cpp:16</a></div></div>
 <div class="ttc" id="aliteral_8h_html"><div class="ttname"><a href="literal_8h.html">literal.h</a></div></div>
+<div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
