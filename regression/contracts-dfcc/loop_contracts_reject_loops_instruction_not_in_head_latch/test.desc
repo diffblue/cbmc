@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^Found loop body instruction outside of the \[head, latch\] instruction span$
+^EXIT=(6|10)$
+^SIGNAL=0$
+--
+--
+This test checks that our loop contract instrumentation verifies that loops
+nested in loops with contracts also have contracts.

@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^file main.c line 10 function main: Found loop without contract nested in a loop with a contract.$
+^Please provide a contract or unwind this loop before applying loop contracts.$
+^EXIT=(6|10)$
+^SIGNAL=0$
+--
+--
+This test checks that our loop contract instrumentation verifies that loops
+nested in loops with contracts also have contracts.
