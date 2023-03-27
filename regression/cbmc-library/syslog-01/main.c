@@ -1,9 +1,13 @@
 #include <assert.h>
-#include <syslog.h>
+#ifndef _WIN32
+#  include <syslog.h>
+#else
+void syslog(int priority, const char *format, ...);
+#endif
 
-int main()
+int main(int argc, char *argv[])
 {
-  syslog();
-  assert(0);
+  int some_priority;
+  syslog(some_priority, "%d\n", argc);
   return 0;
 }

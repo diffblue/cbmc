@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check --bounds-check -D_FORTIFY_SOURCE=2 -D__OPTIMIZE__=2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\*\*\*\* WARNING: no body for function __vfprintf_chk
+^warning: ignoring
