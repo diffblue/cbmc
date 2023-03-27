@@ -383,23 +383,42 @@ def symbols_from(object_file):
     if proc.returncode:
         logging.error("`%s` failed. Output:\n%s", " ".join(cmd), proc_output)
         exit(1)
-    pat = re.compile(r"(?P<addr>[^\s]+)\s+"
-                     r"(?P<flags>[lgu! ][w ][C ][W ][Ii ][Dd ][FfO ])\s+"
-                     r"(?P<section>[^\s]+)\s+"
-                     r"(?P<size>[0-9a-f]+)\s+"
+    # example: "[  6](sec  1)(fl 0x00)(ty   0)(scl   2) (nx 0) 0x00000000 fred"
+    pat = re.compile(r"\[\s*\d+\]" # number of the entry
+                r"\(sec\s+-?\d+\)" # section number
+                r"\(fl\s+0x[\da-f]+\)" # flag bits
+                r"\(ty\s+\d+\)" # type
+                r"\(scl\s+\d+\)\s+" # storage class
+                r"\(nx\s+\d+\)\s+" # number of auxiliary entries
+                r"0x(?P<addr>[\da-f]+)\s+"
+                r"(?P<name>[^\s]*)" # Can be empty!
+                )
+    # example: "00000000 g       .text  00000000 fred"
+    pat_elf = re.compile(r"(?P<addr>[\da-f]+)\s+"
+                     r"[lgu! ][w ][C ][W ][Ii ][Dd ][FfO ]\s+" # flags
+                     r"[^\s]+\s+" # section
+                     r"[\da-f]+\s+" # size
+                     r"(?:\.hidden\s+)?"
                      r"(?P<name>[^\s]*)" # Can be empty!
                     )
+    elf_format = False
     matching = False
     ret = {}
     for line in proc_output.splitlines():
         if not line:
             continue
-        if not matching and re.match("SYMBOL TABLE:", line):
-            matching = True
-            continue
         if not matching:
+            if re.match(r"^.+:\s+file format .*elf.*$", line):
+                elf_format = True
+            elif re.match(r"^SYMBOL TABLE:$", line):
+                matching = True
             continue
-        m = pat.match(line)
+        if elf_format:
+            m = pat_elf.match(line)
+        elif re.match(r"^File\s*$", line):
+            continue
+        else:
+            m = pat.match(line)
         if not m:
             logging.error("Unexpected line from `%s`:\n%s",
                     " ".join(cmd), line)
