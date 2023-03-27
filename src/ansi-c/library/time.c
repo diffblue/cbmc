@@ -218,3 +218,50 @@ char *ctime(const time_t *clock)
   return ctime_result;
   #endif
 }
+
+/* FUNCTION: strftime */
+
+#ifndef __CPROVER_TIME_H_INCLUDED
+#  include <time.h>
+#  define __CPROVER_TIME_H_INCLUDED
+#endif
+
+__CPROVER_size_t __VERIFIER_nondet_size_t(void);
+
+__CPROVER_size_t
+strftime(char *s, __CPROVER_size_t max, const char *format, const struct tm *tm)
+{
+  (void)*format;
+  (void)*tm;
+  __CPROVER_havoc_slice(s, max);
+  __CPROVER_size_t length = __VERIFIER_nondet_size_t();
+  if(length >= max)
+    return 0;
+  s[length] = '\0';
+  return length;
+}
+
+/* FUNCTION: _strftime */
+
+#ifndef __CPROVER_TIME_H_INCLUDED
+#  include <time.h>
+#  define __CPROVER_TIME_H_INCLUDED
+#endif
+
+__CPROVER_size_t __VERIFIER_nondet_size_t(void);
+
+__CPROVER_size_t _strftime(
+  char *s,
+  __CPROVER_size_t max,
+  const char *format,
+  const struct tm *tm)
+{
+  (void)*format;
+  (void)*tm;
+  __CPROVER_havoc_slice(s, max);
+  __CPROVER_size_t length = __VERIFIER_nondet_size_t();
+  if(length >= max)
+    return 0;
+  s[length] = '\0';
+  return length;
+}
