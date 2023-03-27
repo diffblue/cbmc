@@ -22,6 +22,41 @@ unsigned int _sleep(unsigned int seconds)
   return sleep(seconds);
 }
 
+/* FUNCTION: usleep */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
+int usleep(unsigned int usec)
+{
+__CPROVER_HIDE:;
+  // do nothing, but return nondet value
+  __CPROVER_bool error = __VERIFIER_nondet___CPROVER_bool();
+  if(error)
+  {
+    if(usec >= 1000000)
+      errno = EINVAL;
+    else
+      errno = EINTR;
+    return -1;
+  }
+  return 0;
+}
+
+/* FUNCTION: _usleep */
+
+int usleep(unsigned int);
+
+int _usleep(unsigned int usec)
+{
+__CPROVER_HIDE:;
+  return usleep(usec);
+}
+
 /* FUNCTION: unlink */
 
 int __VERIFIER_nondet_int(void);
