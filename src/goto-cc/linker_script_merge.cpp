@@ -728,16 +728,19 @@ int linker_script_merget::get_linker_script_data(
 
 int linker_script_merget::goto_and_object_mismatch(
     const std::list<irep_idt> &linker_defined_symbols,
-    const linker_valuest &linker_values)
+    linker_valuest &linker_values)
 {
   int fail=0;
   for(const auto &sym : linker_defined_symbols)
     if(linker_values.find(sym)==linker_values.end())
     {
-      fail=1;
-      log.error() << "Variable '" << sym
+      log.warning() << "Variable '" << sym
                   << "' was declared extern but never given "
                   << "a value, even in a linker script" << messaget::eom;
+
+      null_pointer_exprt null_pointer(pointer_type(char_type()));
+      symbol_exprt null_sym(sym, pointer_type(char_type()));
+      linker_values.emplace(sym, std::make_pair(null_sym, null_pointer));
     }
 
   for(const auto &pair : linker_values)
