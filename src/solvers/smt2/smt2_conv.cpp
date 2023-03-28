@@ -782,12 +782,21 @@ void smt2_convt::convert_address_of_rec(
     expr.id() == ID_symbol || expr.is_constant() ||
     expr.id() == ID_string_constant || expr.id() == ID_label)
   {
-    out
-      << "(concat (_ bv"
-      << pointer_logic.add_object(expr) << " "
-      << config.bv_encoding.object_bits << ")"
-      << " (_ bv0 "
-      << boolbv_width(result_type)-config.bv_encoding.object_bits << "))";
+    const std::size_t object_bits = config.bv_encoding.object_bits;
+    const std::size_t max_objects = std::size_t(1) << object_bits;
+    const mp_integer object_id = pointer_logic.add_object(expr);
+
+    if(object_id >= max_objects)
+    {
+      throw analysis_exceptiont{
+        "too many addressed objects: maximum number of objects is set to 2^n=" +
+        std::to_string(max_objects) +
+        " (with n=" + std::to_string(object_bits) + "); " +
+        "use the `--object-bits n` option to increase the maximum number"};
+    }
+
+    out << "(concat (_ bv" << object_id << " " << object_bits << ")"
+        << " (_ bv0 " << boolbv_width(result_type) - object_bits << "))";
   }
   else if(expr.id()==ID_index)
   {
