@@ -36,6 +36,7 @@ erDiagram
   goto_functiont {
     goto_programt body
     ordered_collection_of parameter_identifiers
+    ordered_collection_of completed_transformations
   }
   goto_functiont ||--|| goto_programt : ""
   goto_programt {
@@ -87,13 +88,15 @@ and documented in [`src/util/symbol.h`](../../src/util/symbol.h) and the
 
 ## goto_functiont
 
-A `goto_functiont` is also defined as a pair. It's designed to represent a function
-at the goto level, and effectively it's the following data type (in pseudocode):
+A `goto_functiont` is also a collection of data fields. It's designed to
+represent a function at the goto level, and effectively it's the following data
+type (in pseudocode):
 
 ```js
 type goto_functiont {
     goto_programt body
     list<identifiers> parameters
+    list<transform> history
 }
 ```
 
@@ -104,6 +107,13 @@ are included in the serialised goto binaries.
 
 The `parameters` subcomponent is a list of identifiers that are to be looked-up
 in the symbol-table for their definitions.
+
+A historical record is kept of each of the transformation passes which have been
+applied to each individual function. This record is kept at the function level
+in order to potentially record different transformations being applied to
+different goto binaries before they are linked together. Although for
+simplicity it may be preferable to require that all goto binaries being linked
+have compatible (or identical) histories.
 
 ## goto_programt
 
