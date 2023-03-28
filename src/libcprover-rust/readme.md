@@ -15,7 +15,9 @@ project:
 
 * `CBMC_LIB_DIR`, for selecting where the `libcprover-x.y.z.a` is located
   (say, if you have downloaded a pre-packaged release which contains
-   the static library), and
+   the static library),
+* `CBMC_INCLUDE_DIR`, for selecting where the `cprover/api.h` is located,
+  and
 * `CBMC_VERSION`, for selecting the version of the library to link against
   (this is useful if you have multiple versions of the library in the same
    location and you want to control which version you compile against).
@@ -27,7 +29,7 @@ directory of the CBMC project.)
 ```sh
 $ cd src/libcprover-rust
 $ cargo clean
-$ CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo build
+$ CBMC_INCLUDE_DIR=../../build/include CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo build
 ```
 
 To build the project and run its associated tests, the command sequence would
@@ -36,7 +38,7 @@ look like this:
 ```sh
 $ cd src/libcprover-rust
 $ cargo clean
-$ CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo test -- --test-threads=1 --nocapture
+$ CBMC_INCLUDE_DIR=../../build/include CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo test -- --test-threads=1 --nocapture
 ```
 
 ## Notes
