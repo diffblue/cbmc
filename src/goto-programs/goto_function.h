@@ -17,6 +17,7 @@ Date: May 2018
 #include <util/std_types.h>
 
 #include "goto_program.h"
+#include "goto_transform_history.h"
 
 /// A goto function, consisting of function body (see #body) and parameter
 /// identifiers (see #parameter_identifiers).
@@ -31,6 +32,10 @@ public:
   /// Note: This is now the preferred way of getting the identifiers of the
   /// parameters. The identifiers in the type will go away.
   parameter_identifierst parameter_identifiers;
+
+  /// The ordered collection of transformations which have been applied to this
+  /// function.
+  goto_transform_historyt history;
 
   bool body_available() const
   {
@@ -64,6 +69,7 @@ public:
     body.clear();
     parameter_identifiers.clear();
     function_is_hidden = false;
+    history = {};
   }
 
   void swap(goto_functiont &other)
@@ -71,6 +77,7 @@ public:
     body.swap(other.body);
     parameter_identifiers.swap(other.parameter_identifiers);
     std::swap(function_is_hidden, other.function_is_hidden);
+    std::swap(history, other.history);
   }
 
   void copy_from(const goto_functiont &other)
@@ -78,6 +85,7 @@ public:
     body.copy_from(other.body);
     parameter_identifiers = other.parameter_identifiers;
     function_is_hidden = other.function_is_hidden;
+    history = other.history;
   }
 
   goto_functiont(const goto_functiont &) = delete;
@@ -86,6 +94,7 @@ public:
   goto_functiont(goto_functiont &&other)
     : body(std::move(other.body)),
       parameter_identifiers(std::move(other.parameter_identifiers)),
+      history(std::move(other.history)),
       function_is_hidden(other.function_is_hidden)
   {
   }
@@ -95,6 +104,7 @@ public:
     body = std::move(other.body);
     parameter_identifiers = std::move(other.parameter_identifiers);
     function_is_hidden = other.function_is_hidden;
+    history = other.history;
     return *this;
   }
 
