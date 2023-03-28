@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "literal.h"
 
+#include <cstdint>
+
 /*! \brief TO_BE_DOCUMENTED
 */
 class propt

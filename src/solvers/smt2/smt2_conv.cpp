@@ -42,6 +42,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
+#include <cstdint>
+
 // Mark different kinds of error conditions
 
 // Unexpected types and other combinations not implemented and not

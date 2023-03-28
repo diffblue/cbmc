@@ -8,13 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ieee_float.h"
 
-#include <limits>
-
 #include "arith_tools.h"
 #include "bitvector_types.h"
 #include "floatbv_expr.h"
 #include "invariant.h"
 #include "std_expr.h"
+
+#include <cstdint>
+#include <limits>
 
 mp_integer ieee_float_spect::bias() const
 {

@@ -8,12 +8,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unicode.h"
 
+#include "invariant.h"
+
 #include <codecvt>
+#include <cstdint>
 #include <iomanip>
 #include <locale>
 #include <sstream>
-
-#include "invariant.h"
 
 #ifdef _WIN32
 #  include <util/pragma_push.def>
