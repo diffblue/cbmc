@@ -2,12 +2,13 @@
 
 #pragma once
 
-#include <util/exception_utils.h>
-
 #include <memory>
+#include <string>
 
 // NOLINTNEXTLINE(build/include)
 #include "rust/cxx.h"
+// NOLINTNEXTLINE(build/include)
+#include "include/c_errors.h"
 
 struct api_sessiont;
 
