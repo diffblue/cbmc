@@ -1,0 +1,19 @@
+THOROUGH dfcc-only
+main.c
+--dfcc main --enforce-contract-rec foo --apply-loop-contracts --malloc-may-fail --malloc-fail-null _ --bounds-check --pointer-check --signed-overflow-check --unsigned-overflow-check --conversion-check --sat-solver cadical
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test illustrates the analysis of a function with a combination of features:
+- the function is recursive
+- the function contains loops
+- the function assigns local static variables
+
+The following write set checks are performed:
+- the write set of the recursive call is included in the caller'set
+- the write set of each loop is included in the outer write set, either the
+  function's write set or some loop's write set)
+- local statics are automatically detected and added to each write set
+- the instructions are checked against their respective write sets
