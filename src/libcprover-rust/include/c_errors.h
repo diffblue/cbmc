@@ -9,10 +9,11 @@
 // in that we don't want to export internal headers to the clients, and our
 // current build system architecture on the C++ end doesn't allow us to do so.
 //
-// At the same time, we want to allow the Rust API to be able to catch at the shim
-// level the errors generated within CBMC, which are C++ types (and subtypes of
-// those), and so because of the mechanism that cxx.rs uses, we need to have the
-// types present at compilation time (an incomplete type won't do - I've tried).
+// At the same time, we want to allow the Rust API to be able to catch at the
+// shimlevel the errors generated within CBMC, which are C++ types (and
+// subtypes of those), and so because of the mechanism that cxx.rs uses, we
+// need to have thetypes present at compilation time (an incomplete type won't
+// do - I've tried).
 //
 // This is the best way that we have currently to be have the type definitions
 // around so that the exception handling code knows what our exceptions look
@@ -23,7 +24,7 @@
 // This should mirror the definition in `util/invariant.h`.
 class invariant_failedt
 {
- private:
+private:
   const std::string file;
   const std::string function;
   const int line;
@@ -56,7 +57,7 @@ public:
 // This is needed here because the original definition is in the file
 // <util/exception_utils.h> which is including <util/source_location.h>, which
 // being an `irep` is a no-go for our needs as we will need to expose internal
-// headers as well. 
+// headers as well.
 class cprover_exception_baset
 {
 public:

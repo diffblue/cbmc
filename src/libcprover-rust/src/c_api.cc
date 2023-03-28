@@ -3,7 +3,9 @@
 // NOLINTNEXTLINE(build/include)
 #include "include/c_api.h"
 
-#include <cprover/api.h>
+// clang-format off
+#include <api.h>
+// clang-format on
 
 #include <algorithm>
 #include <cassert>
@@ -26,6 +28,7 @@ _translate_vector_of_string(rust::Vec<rust::String> elements)
     std::back_inserter(*stdv),
     [](rust::String elem) { return std::string(elem); });
 
+  // NOLINTNEXTLINE(build/deprecated)
   assert(elements.size() == stdv->size());
   return *stdv;
 }

@@ -6,7 +6,7 @@
 pub mod cprover_api {
 
     unsafe extern "C++" {
-        include!("cprover/api.h");
+        include!("api.h");
         include!("include/c_api.h");
 
         /// Central organisational handle of the API. This directly corresponds to the
