@@ -1,4 +1,4 @@
-#![doc = include_str!("../tutorial.md")]
+#![doc = include_str!("../readme.md")]
 #![warn(missing_docs)]
 
 /// The main API module for interfacing with CProver tools (`cbmc`, `goto-analyzer`, etc).
