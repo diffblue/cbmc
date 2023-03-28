@@ -4,7 +4,7 @@ var classlinker__script__merget =
     [ "linker_script_merget", "classlinker__script__merget.html#a093960227bf06e2de49163b4e5c6854c", null ],
     [ "add_linker_script_definitions", "classlinker__script__merget.html#a318563243dd03e92ba0c570780bea54d", null ],
     [ "get_linker_script_data", "classlinker__script__merget.html#a3fe67b74ab4d7c8f9c4abe259683f090", null ],
-    [ "goto_and_object_mismatch", "classlinker__script__merget.html#ad515d34438a08f63ec5622458a25b5bd", null ],
+    [ "goto_and_object_mismatch", "classlinker__script__merget.html#a5a095b7333075b7c8a007eeed6e47ecb", null ],
     [ "linker_data_is_malformed", "classlinker__script__merget.html#aea6ef4957e8b86496b42029527d42cbc", null ],
     [ "ls_data2instructions", "classlinker__script__merget.html#a6a4ed98845c2fb10fd7db3d9e21e9cb5", null ],
     [ "pointerize_linker_defined_symbols", "classlinker__script__merget.html#a0a1f82c5727a4e1b1e856f6d13006726", null ],
