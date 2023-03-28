@@ -1525,11 +1525,8 @@ TEST_CASE(
       const address_of_exprt address_of_foo{foo};
       track_expression_objects(address_of_foo, ns, test.object_map);
       test.object_map.at(foo).unique_id = 256;
-      REQUIRE_THROWS_MATCHES(
-        test.convert(address_of_exprt{foo}),
-        invariant_failedt,
-        invariant_failure_containing("There should be sufficient bits to "
-                                     "encode unique object identifier."));
+      REQUIRE_THROWS_AS(
+        test.convert(address_of_exprt{foo}), analysis_exceptiont);
     }
     SECTION("Pointer should be wide enough to encode offset")
     {
@@ -1537,11 +1534,8 @@ TEST_CASE(
       const address_of_exprt address_of_foo{foo};
       track_expression_objects(address_of_foo, ns, test.object_map);
       test.object_map.at(foo).unique_id = 256;
-      REQUIRE_THROWS_MATCHES(
-        test.convert(address_of_exprt{foo}),
-        invariant_failedt,
-        invariant_failure_containing("Pointer should be wider than object_bits "
-                                     "in order to allow for offset encoding."));
+      REQUIRE_THROWS_AS(
+        test.convert(address_of_exprt{foo}), analysis_exceptiont);
     }
   }
   SECTION("Comparison of address of operations.")
