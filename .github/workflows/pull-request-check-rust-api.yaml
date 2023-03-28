@@ -7,6 +7,7 @@ on:
 env:
   default_build_dir: "build/"
   default_solver: "minisat2"
+  default_include_dir: "src/libcprover-cpp/"
 
 # For now, we support two jobs: A Linux and a MacOS based one.
 # Both of the jobs use CMake, as we only support building the Rust
@@ -64,7 +65,7 @@ jobs:
           VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
           cd src/libcprover-rust;\
           cargo clean;\
-          CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
+          CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
 
 
   check-macos-12-cmake-clang-rust:
@@ -104,4 +105,4 @@ jobs:
           VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
           cd src/libcprover-rust;\
           cargo clean;\
-          CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
+          CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
