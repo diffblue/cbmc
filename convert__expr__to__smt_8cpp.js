@@ -93,6 +93,5 @@ var convert__expr__to__smt_8cpp =
     [ "make_not_zero", "convert__expr__to__smt_8cpp.html#a902f906c119ae4b143c23bc8a3251dd9", null ],
     [ "most_significant_bit_is_set", "convert__expr__to__smt_8cpp.html#a68055c6868f80c64612c7d765aa04f36", null ],
     [ "operands_are_of_type", "convert__expr__to__smt_8cpp.html#adf1348cd9f8868b468b9a13dfebeeb2d", null ],
-    [ "power2", "convert__expr__to__smt_8cpp.html#aeae461609a14cd37b20393c75b2438e1", null ],
     [ "try_relational_conversion", "convert__expr__to__smt_8cpp.html#a76064b8e5595b6c431702fc6d25c5ba1", null ]
 ];
