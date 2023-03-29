@@ -23,7 +23,6 @@ Date: June 2006
 static void read_bin_symbol_table_object(
   std::istream &in,
   symbol_table_baset &symbol_table,
-  goto_functionst &functions,
   irep_serializationt &irepconverter)
 {
   const std::size_t count = irepconverter.read_gb_word(in); // # of symbols
@@ -66,14 +65,33 @@ static void read_bin_symbol_table_object(
     sym.is_extern = (flags &(1 << 1))!=0;
     sym.is_volatile = (flags &1)!=0;
 
-    if(!sym.is_type && sym.type.id()==ID_code)
-    {
-      // makes sure there is an empty function for every function symbol
-      auto entry = functions.function_map.emplace(sym.name, goto_functiont());
-      entry.first->second.set_parameter_identifiers(to_code_type(sym.type));
-    }
-
     symbol_table.add(sym);
+  }
+}
+
+/// The serialised form of the goto-model currently includes the parameter
+/// identifiers in the symbol table attached to the types of function symbols.
+/// However it is not included in the goto functions. Therefore this function is
+/// needed to copy the parameter identifiers from the symbol table to the
+/// functions.
+static void copy_parameter_identifiers(
+  const symbol_table_baset &symbol_table,
+  goto_functionst &functions)
+{
+  for(const auto &name_symbol : symbol_table)
+  {
+    const auto &symbol = name_symbol.second;
+    if(symbol.is_type)
+      continue;
+
+    const auto code_type = type_try_dynamic_cast<code_typet>(symbol.type);
+    if(!code_type)
+      continue;
+
+    // Makes sure there is an empty function for every function symbol.
+    auto emplaced =
+      functions.function_map.emplace(symbol.name, goto_functiont());
+    emplaced.first->second.set_parameter_identifiers(*code_type);
   }
 }
 
@@ -180,7 +198,8 @@ static bool read_bin_goto_object(
   goto_functionst &functions,
   irep_serializationt &irepconverter)
 {
-  read_bin_symbol_table_object(in, symbol_table, functions, irepconverter);
+  read_bin_symbol_table_object(in, symbol_table, irepconverter);
+  copy_parameter_identifiers(symbol_table, functions);
   read_bin_functions_object(in, functions, irepconverter);
   return false;
 }
