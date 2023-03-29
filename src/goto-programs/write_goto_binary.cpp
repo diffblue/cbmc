@@ -69,6 +69,37 @@ static void write_symbol_table_binary(
   }
 }
 
+static void write_instructions_binary(
+  std::ostream &out,
+  irep_serializationt &irepconverter,
+  const std::pair<const irep_idt, goto_functiont> &fct)
+{
+  write_gb_word(out, fct.second.body.instructions.size());
+
+  for(const auto &instruction : fct.second.body.instructions)
+  {
+    irepconverter.reference_convert(instruction.code(), out);
+    irepconverter.reference_convert(instruction.source_location(), out);
+    write_gb_word(out, (long)instruction.type());
+
+    const auto condition =
+      instruction.has_condition() ? instruction.condition() : true_exprt();
+    irepconverter.reference_convert(condition, out);
+
+    write_gb_word(out, instruction.target_number);
+
+    write_gb_word(out, instruction.targets.size());
+
+    for(const auto &t_it : instruction.targets)
+      write_gb_word(out, t_it->target_number);
+
+    write_gb_word(out, instruction.labels.size());
+
+    for(const auto &l_it : instruction.labels)
+      irepconverter.write_string_ref(out, l_it);
+  }
+}
+
 /// Writes the functions to file, but only those with non-empty body.
 static void write_goto_functions_binary(
   std::ostream &out,
@@ -92,31 +123,8 @@ static void write_goto_functions_binary(
     // Since version 2, goto functions are not converted to ireps,
     // instead they are saved in a custom binary format
 
-    write_gb_string(out, id2string(fct.first));              // name
-    write_gb_word(out, fct.second.body.instructions.size()); // # instructions
-
-    for(const auto &instruction : fct.second.body.instructions)
-    {
-      irepconverter.reference_convert(instruction.code(), out);
-      irepconverter.reference_convert(instruction.source_location(), out);
-      write_gb_word(out, (long)instruction.type());
-
-      const auto condition =
-        instruction.has_condition() ? instruction.condition() : true_exprt();
-      irepconverter.reference_convert(condition, out);
-
-      write_gb_word(out, instruction.target_number);
-
-      write_gb_word(out, instruction.targets.size());
-
-      for(const auto &t_it : instruction.targets)
-        write_gb_word(out, t_it->target_number);
-
-      write_gb_word(out, instruction.labels.size());
-
-      for(const auto &l_it : instruction.labels)
-        irepconverter.write_string_ref(out, l_it);
-    }
+    write_gb_string(out, id2string(fct.first)); // name
+    write_instructions_binary(out, irepconverter, fct);
   }
 }
 
