@@ -19,15 +19,12 @@ Author: CM Wintersteiger
 
 #include <goto-programs/goto_model.h>
 
-/// Writes a goto program to disc, using goto binary format
-bool write_goto_binary(
+/// Writes the symbol table to file.
+static void write_symbol_table_binary(
   std::ostream &out,
   const symbol_table_baset &symbol_table,
-  const goto_functionst &goto_functions,
   irep_serializationt &irepconverter)
 {
-  // first write symbol table
-
   write_gb_word(out, symbol_table.symbols.size());
 
   for(const auto &symbol_pair : symbol_table.symbols)
@@ -70,9 +67,14 @@ bool write_goto_binary(
 
     write_gb_word(out, flags);
   }
+}
 
-  // now write functions, but only those with body
-
+/// Writes the functions to file, but only those with non-empty body.
+static void write_goto_functions_binary(
+  std::ostream &out,
+  const goto_functionst &goto_functions,
+  irep_serializationt &irepconverter)
+{
   unsigned cnt=0;
   for(const auto &gf_entry : goto_functions.function_map)
   {
@@ -116,6 +118,17 @@ bool write_goto_binary(
       }
     }
   }
+}
+
+/// Writes a goto program to disc, using goto binary format
+bool write_goto_binary(
+  std::ostream &out,
+  const symbol_table_baset &symbol_table,
+  const goto_functionst &goto_functions,
+  irep_serializationt &irepconverter)
+{
+  write_symbol_table_binary(out, symbol_table, irepconverter);
+  write_goto_functions_binary(out, goto_functions, irepconverter);
 
   // irepconverter.output_map(f);
   // irepconverter.output_string_map(f);
