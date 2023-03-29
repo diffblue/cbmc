@@ -191,8 +191,7 @@ static void read_bin_functions_object(
 
 /// read goto binary format
 /// \par parameters: input stream, symbol_table, functions
-/// \return true on error, false otherwise
-static bool read_bin_goto_object(
+static void read_bin_goto_object(
   std::istream &in,
   symbol_table_baset &symbol_table,
   goto_functionst &functions,
@@ -201,7 +200,6 @@ static bool read_bin_goto_object(
   read_bin_symbol_table_object(in, symbol_table, irepconverter);
   copy_parameter_identifiers(symbol_table, functions);
   read_bin_functions_object(in, functions, irepconverter);
-  return false;
 }
 
 /// reads a goto binary file back into a symbol and a function table
@@ -269,7 +267,8 @@ bool read_bin_goto_object(
     }
     else if(version == GOTO_BINARY_VERSION)
     {
-      return read_bin_goto_object(in, symbol_table, functions, irepconverter);
+      read_bin_goto_object(in, symbol_table, functions, irepconverter);
+      return false;
     }
     else
     {
