@@ -279,5 +279,5 @@ bool read_bin_goto_object(
     }
   }
 
-  return false;
+  UNREACHABLE;
 }
