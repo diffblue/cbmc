@@ -1,7 +1,6 @@
 use std::env;
 use std::env::VarError;
 use std::io::{Error, ErrorKind};
-use std::path::Path;
 use std::path::PathBuf;
 
 fn get_current_working_dir() -> std::io::Result<PathBuf> {
@@ -37,12 +36,40 @@ fn get_library_build_dir() -> std::io::Result<PathBuf> {
     ))
 }
 
+// This is needed so that cargo can find the include folder for the C++
+// API headers at compile time.
+fn get_include_directory_envvar() -> Result<String, VarError> {
+    env::var("CBMC_INCLUDE_DIR")
+}
+
+fn get_include_directory() -> std::io::Result<PathBuf> {
+    let env_var_fetch_result = get_include_directory_envvar();
+    if let Ok(build_dir) = env_var_fetch_result {
+        let mut path = PathBuf::new();
+        path.push(build_dir);
+        return Ok(path);
+    }
+    Err(Error::new(
+        ErrorKind::Other,
+        "Environment variable `CBMC_INCLUDE_DIR' not set",
+    ))
+}
+
 fn main() {
-    let cbmc_source_path = Path::new("..");
-    let cpp_api_path = Path::new("../libcprover-cpp/");
+    let cpp_api_include_path = match get_include_directory() {
+        Ok(path) => path,
+        Err(err) => {
+            let error_message = &format!(
+                "Error: {}.\n Advice: {}.",
+                err,
+                "Please set the environment variable `CBMC_INCLUDE_DIR' with the path that contains cprover/api.h on your system"
+            );
+            panic!("{}", error_message);
+        }
+    };
+
     let _build = cxx_build::bridge("src/lib.rs")
-        .include(cbmc_source_path)
-        .include(cpp_api_path)
+        .include(cpp_api_include_path)
         .include(get_current_working_dir().unwrap())
         .file("src/c_api.cc")
         .flag_if_supported("-std=c++11")

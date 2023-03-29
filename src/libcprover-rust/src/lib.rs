@@ -1,4 +1,4 @@
-#![doc = include_str!("../tutorial.md")]
+#![doc = include_str!("../readme.md")]
 #![warn(missing_docs)]
 
 /// The main API module for interfacing with CProver tools (`cbmc`, `goto-analyzer`, etc).
@@ -6,7 +6,7 @@
 pub mod cprover_api {
 
     unsafe extern "C++" {
-        include!("libcprover-cpp/api.h");
+        include!("api.h");
         include!("include/c_api.h");
 
         /// Central organisational handle of the API. This directly corresponds to the
@@ -99,6 +99,22 @@ mod tests {
 
         let vect = ffi_util::translate_rust_vector_to_cpp(vec);
         assert_eq!(vect.len(), 2);
+    }
+
+    // This test will capture a `system_exceptiont` from CBMC's end at the C++ shim that this
+    // library depends on, and it will be correctly translated into the Result type for Rust.
+    // This also validates that our type definition include of the base class for the exceptions
+    // works as we expect it to.
+    #[test]
+    fn it_translates_exceptions_to_errors() {
+        let client = cprover_api::new_api_session();
+
+        // The vector of string is supposed to contain a string denoting
+        // a filepath that is erroneous.
+        let vec: Vec<String> = vec!["/fkjsdlkjfisudifoj2309".to_owned()];
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+
+        assert!(client.load_model_from_files(vect).is_err());
     }
 
     #[test]
