@@ -111,162 +111,181 @@ $(document).ready(function(){initNavTree('write__goto__binary_8cpp_source.html',
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__model_8h.html">goto-programs/goto_model.h</a>&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">   23</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#aebcde2947f5d977df5cd601b5ed7ea49">   23</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="write__goto__binary_8cpp.html#aebcde2947f5d977df5cd601b5ed7ea49">write_symbol_table_binary</a>(</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  std::ostream &amp;out,</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="comment">// first write symbol table</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.size());</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol_pair : symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="comment">// Since version 2, symbols are not converted to ireps,</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="comment">// instead they are saved in a custom binary format</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;sym = symbol_pair.second;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>, out);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(sym.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>, out);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(sym.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a>, out);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#a5f0165e0d2582194a6e7e13730288663">module</a>);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a>);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#ab8f816e539d2c409771d2faba7aee8c0">pretty_name</a>);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, 0); <span class="comment">// old: sym.ordering</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">unsigned</span> flags=0;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#ab421b35f18450e44cf022d6b88daf28e">is_weak</a>);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a693a06be1f5a7f744c8fdac606a192f3">is_property</a>);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a41b10aefcf4640d76d4932cdef15ac16">is_macro</a>);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#ab80cbaeb01cbc3eecdb89a4f6c3b7a84">is_exported</a>);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#af4e48e515cb3cf2148177844ecebda99">is_input</a>);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#aa4c3f6d74513dfa9372ea89366e0891d">is_output</a>);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a94ccbccbee26edcc086a4a6e0b210562">is_state_var</a>);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a6d79a82179f3075bf8e8ba2db015866f">is_parameter</a>);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a289c431639ca55036b9397af13fb8a7e">is_auxiliary</a>);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(<span class="keyword">false</span>); <span class="comment">// sym.binding;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">is_lvalue</a>);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a>);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a7495d7224a73c59013e7fc0db952fa8f">is_thread_local</a>);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a5a84d8bf820f7cfdd2eb18dd29bee9c4">is_file_local</a>);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a>);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a33fa638e9bedc16bd0912c6aa4afd40d">is_volatile</a>);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, flags);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// now write functions, but only those with body</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordtype">unsigned</span> cnt=0;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">if</span>(gf_entry.second.body_available())</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      cnt++;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, cnt);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.size());</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol_pair : symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">// Since version 2, symbols are not converted to ireps,</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="comment">// instead they are saved in a custom binary format</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;sym = symbol_pair.second;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>, out);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(sym.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>, out);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(sym.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a>, out);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#a5f0165e0d2582194a6e7e13730288663">module</a>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, sym.<a class="code" href="classsymbolt.html#ab8f816e539d2c409771d2faba7aee8c0">pretty_name</a>);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, 0); <span class="comment">// old: sym.ordering</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">unsigned</span> flags=0;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#ab421b35f18450e44cf022d6b88daf28e">is_weak</a>);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a693a06be1f5a7f744c8fdac606a192f3">is_property</a>);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a41b10aefcf4640d76d4932cdef15ac16">is_macro</a>);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#ab80cbaeb01cbc3eecdb89a4f6c3b7a84">is_exported</a>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#af4e48e515cb3cf2148177844ecebda99">is_input</a>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#aa4c3f6d74513dfa9372ea89366e0891d">is_output</a>);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a94ccbccbee26edcc086a4a6e0b210562">is_state_var</a>);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a6d79a82179f3075bf8e8ba2db015866f">is_parameter</a>);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a289c431639ca55036b9397af13fb8a7e">is_auxiliary</a>);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(<span class="keyword">false</span>); <span class="comment">// sym.binding;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">is_lvalue</a>);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a>);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a7495d7224a73c59013e7fc0db952fa8f">is_thread_local</a>);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a5a84d8bf820f7cfdd2eb18dd29bee9c4">is_file_local</a>);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a>);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    flags = (flags &lt;&lt; 1) | static_cast&lt;int&gt;(sym.<a class="code" href="classsymbolt.html#a33fa638e9bedc16bd0912c6aa4afd40d">is_volatile</a>);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, flags);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a21a834403af8e54d05fc3bd82ffacbad">   72</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="write__goto__binary_8cpp.html#a21a834403af8e54d05fc3bd82ffacbad">write_instructions_binary</a>(</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter,</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keyword">const</span> std::pair&lt;const irep_idt, goto_functiont&gt; &amp;fct)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;{</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, fct.second.body.instructions.size());</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : fct.second.body.instructions)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(instruction.code(), out);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(instruction.source_location(), out);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, (<span class="keywordtype">long</span>)instruction.type());</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;fct : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">if</span>(fct.second.body_available())</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="comment">// Since version 2, goto functions are not converted to ireps,</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="comment">// instead they are saved in a custom binary format</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <a class="code" href="irep__serialization_8cpp.html#a22399004f77bd36309758a61d93dcc12">write_gb_string</a>(out, <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(fct.first)); <span class="comment">// name</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, fct.second.body.instructions.size()); <span class="comment">// # instructions</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : fct.second.body.instructions)</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(instruction.code(), out);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(instruction.source_location(), out);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, (<span class="keywordtype">long</span>)instruction.type());</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> condition =</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;          instruction.has_condition() ? instruction.condition() : <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(condition, out);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, instruction.target_number);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, instruction.targets.size());</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;t_it : instruction.targets)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;          <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, t_it-&gt;target_number);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, instruction.labels.size());</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l_it : instruction.labels)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;          irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, l_it);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    }</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="comment">// irepconverter.output_map(f);</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="comment">// irepconverter.output_string_map(f);</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> condition =</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      instruction.has_condition() ? instruction.condition() : <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(condition, out);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, instruction.target_number);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, instruction.targets.size());</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;t_it : instruction.targets)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, t_it-&gt;target_number);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, instruction.labels.size());</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;l_it : instruction.labels)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      irepconverter.<a class="code" href="classirep__serializationt.html#a2bb86f775c5edf4021fa3a5403331002">write_string_ref</a>(out, l_it);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  }</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a7f5c55ec9e59b49fa9d721e3a3983f4e">  104</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="write__goto__binary_8cpp.html#a7f5c55ec9e59b49fa9d721e3a3983f4e">write_goto_functions_binary</a>(</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;{</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordtype">unsigned</span> cnt=0;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">if</span>(gf_entry.second.body_available())</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      cnt++;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, cnt);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;fct : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">if</span>(!fct.second.body_available())</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="comment">// Since version 2, goto functions are not converted to ireps,</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="comment">// instead they are saved in a custom binary format</span></div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#af72358aa2a4d2bc8ff4c5babc7afb2dd">  127</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  std::ostream &amp;out,</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="keywordtype">int</span> version)</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;{</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    out,</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>,</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    version);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;}</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a692fafb27f4e9bb346373469df6dd03e">  140</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  std::ostream &amp;out,</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordtype">int</span> version)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;{</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="comment">// header</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  out &lt;&lt; char(0x7f) &lt;&lt; <span class="stringliteral">&quot;GBF&quot;</span>;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, version);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <a class="code" href="classirep__serializationt_1_1ireps__containert.html">irep_serializationt::ireps_containert</a> irepc;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> irepconverter(irepc);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="keywordflow">if</span>(version &lt; <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>(</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="stringliteral">&quot;version &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(version) + <span class="stringliteral">&quot; no longer supported&quot;</span>,</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="stringliteral">&quot;supported version = &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>));</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(version &gt; <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>(</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <span class="stringliteral">&quot;unknown goto binary version &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(version),</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      <span class="stringliteral">&quot;supported version = &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>));</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(out, symbol_table, goto_functions, irepconverter);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;}</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a48f960da3b435a88faa31bece73792c8">  166</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;{</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  std::ofstream out(filename, <a class="code" href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">std::ios::binary</a>);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keywordflow">if</span>(!out)</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  {</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Failed to open &#39;&quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  }</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a>(out, goto_model);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;}</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> function_name = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(fct.first);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <a class="code" href="irep__serialization_8cpp.html#a22399004f77bd36309758a61d93dcc12">write_gb_string</a>(out, function_name);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="write__goto__binary_8cpp.html#a21a834403af8e54d05fc3bd82ffacbad">write_instructions_binary</a>(out, irepconverter, fct);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  }</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;}</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">  133</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;{</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <a class="code" href="write__goto__binary_8cpp.html#aebcde2947f5d977df5cd601b5ed7ea49">write_symbol_table_binary</a>(out, symbol_table, irepconverter);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  <a class="code" href="write__goto__binary_8cpp.html#a7f5c55ec9e59b49fa9d721e3a3983f4e">write_goto_functions_binary</a>(out, goto_functions, irepconverter);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00144"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#af72358aa2a4d2bc8ff4c5babc7afb2dd">  144</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keywordtype">int</span> version)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;{</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    out,</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>,</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    version);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a692fafb27f4e9bb346373469df6dd03e">  157</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions,</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordtype">int</span> version)</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;{</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="comment">// header</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  out &lt;&lt; char(0x7f) &lt;&lt; <span class="stringliteral">&quot;GBF&quot;</span>;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <a class="code" href="irep__serialization_8cpp.html#adb8fc926d108a04f70a4532e9c4381e0">write_gb_word</a>(out, version);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <a class="code" href="classirep__serializationt_1_1ireps__containert.html">irep_serializationt::ireps_containert</a> irepc;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> irepconverter(irepc);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keywordflow">if</span>(version &lt; <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>(</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <span class="stringliteral">&quot;version &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(version) + <span class="stringliteral">&quot; no longer supported&quot;</span>,</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="stringliteral">&quot;supported version = &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>));</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  }</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keywordflow">if</span>(version &gt; <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  {</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>(</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="stringliteral">&quot;unknown goto binary version &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(version),</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="stringliteral">&quot;supported version = &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>));</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  }</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(out, symbol_table, goto_functions, irepconverter);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;}</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="write__goto__binary_8cpp.html#a48f960da3b435a88faa31bece73792c8">  187</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;{</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  std::ofstream out(filename, <a class="code" href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">std::ios::binary</a>);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <span class="keywordflow">if</span>(!out)</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Failed to open &#39;&quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span>;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  }</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a>(out, goto_model);</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;}</div>
 <div class="ttc" id="aclassgoto__functionst_html"><div class="ttname"><a href="classgoto__functionst.html">goto_functionst</a></div><div class="ttdoc">A collection of goto functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00024">goto_functions.h:25</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
@@ -317,7 +336,10 @@ $(document).ready(function(){initNavTree('write__goto__binary_8cpp_source.html',
 <div class="ttc" id="ajson__expr_8cpp_html_a8ac246d85d634a72a481f40e23ccdd79"><div class="ttname"><a href="json__expr_8cpp.html#a8ac246d85d634a72a481f40e23ccdd79">binary</a></div><div class="ttdeci">static std::string binary(const constant_exprt &amp;src)</div><div class="ttdef"><b>Definition:</b> <a href="json__expr_8cpp_source.html#l00187">json_expr.cpp:187</a></div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
-<div class="ttc" id="awrite__goto__binary_8cpp_html_aa6bd3c7f1d7f42d9f27fc290dc9f1633"><div class="ttname"><a href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a></div><div class="ttdeci">bool write_goto_binary(std::ostream &amp;out, const symbol_table_baset &amp;symbol_table, const goto_functionst &amp;goto_functions, irep_serializationt &amp;irepconverter)</div><div class="ttdoc">Writes a goto program to disc, using goto binary format.</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8cpp_source.html#l00023">write_goto_binary.cpp:23</a></div></div>
+<div class="ttc" id="awrite__goto__binary_8cpp_html_a21a834403af8e54d05fc3bd82ffacbad"><div class="ttname"><a href="write__goto__binary_8cpp.html#a21a834403af8e54d05fc3bd82ffacbad">write_instructions_binary</a></div><div class="ttdeci">static void write_instructions_binary(std::ostream &amp;out, irep_serializationt &amp;irepconverter, const std::pair&lt; const irep_idt, goto_functiont &gt; &amp;fct)</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8cpp_source.html#l00072">write_goto_binary.cpp:72</a></div></div>
+<div class="ttc" id="awrite__goto__binary_8cpp_html_a7f5c55ec9e59b49fa9d721e3a3983f4e"><div class="ttname"><a href="write__goto__binary_8cpp.html#a7f5c55ec9e59b49fa9d721e3a3983f4e">write_goto_functions_binary</a></div><div class="ttdeci">static void write_goto_functions_binary(std::ostream &amp;out, const goto_functionst &amp;goto_functions, irep_serializationt &amp;irepconverter)</div><div class="ttdoc">Writes the functions to file, but only those with non-empty body.</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8cpp_source.html#l00104">write_goto_binary.cpp:104</a></div></div>
+<div class="ttc" id="awrite__goto__binary_8cpp_html_a8f439e34b0e426460a7c0e3540f3dfe7"><div class="ttname"><a href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a></div><div class="ttdeci">static void write_goto_binary(std::ostream &amp;out, const symbol_table_baset &amp;symbol_table, const goto_functionst &amp;goto_functions, irep_serializationt &amp;irepconverter)</div><div class="ttdoc">Writes a goto program to disc, using goto binary format.</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8cpp_source.html#l00133">write_goto_binary.cpp:133</a></div></div>
+<div class="ttc" id="awrite__goto__binary_8cpp_html_aebcde2947f5d977df5cd601b5ed7ea49"><div class="ttname"><a href="write__goto__binary_8cpp.html#aebcde2947f5d977df5cd601b5ed7ea49">write_symbol_table_binary</a></div><div class="ttdeci">static void write_symbol_table_binary(std::ostream &amp;out, const symbol_table_baset &amp;symbol_table, irep_serializationt &amp;irepconverter)</div><div class="ttdoc">Writes the symbol table to file.</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8cpp_source.html#l00023">write_goto_binary.cpp:23</a></div></div>
 <div class="ttc" id="awrite__goto__binary_8h_html"><div class="ttname"><a href="write__goto__binary_8h.html">write_goto_binary.h</a></div><div class="ttdoc">Write GOTO binaries.</div></div>
 <div class="ttc" id="awrite__goto__binary_8h_html_ac30ce3546ebdf1da09ccb655b5f6d6c4"><div class="ttname"><a href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a></div><div class="ttdeci">#define GOTO_BINARY_VERSION</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8h_source.html#l00015">write_goto_binary.h:15</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

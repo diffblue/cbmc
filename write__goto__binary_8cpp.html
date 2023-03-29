@@ -116,9 +116,17 @@ $(document).ready(function(){initNavTree('write__goto__binary_8cpp.html',''); in
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa6bd3c7f1d7f42d9f27fc290dc9f1633"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">write_goto_binary</a> (std::ostream &amp;out, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, <a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</td></tr>
-<tr class="memdesc:aa6bd3c7f1d7f42d9f27fc290dc9f1633"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a goto program to disc, using goto binary format.  <a href="write__goto__binary_8cpp.html#aa6bd3c7f1d7f42d9f27fc290dc9f1633">More...</a><br /></td></tr>
-<tr class="separator:aa6bd3c7f1d7f42d9f27fc290dc9f1633"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebcde2947f5d977df5cd601b5ed7ea49"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="write__goto__binary_8cpp.html#aebcde2947f5d977df5cd601b5ed7ea49">write_symbol_table_binary</a> (std::ostream &amp;out, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</td></tr>
+<tr class="memdesc:aebcde2947f5d977df5cd601b5ed7ea49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the symbol table to file.  <a href="write__goto__binary_8cpp.html#aebcde2947f5d977df5cd601b5ed7ea49">More...</a><br /></td></tr>
+<tr class="separator:aebcde2947f5d977df5cd601b5ed7ea49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21a834403af8e54d05fc3bd82ffacbad"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="write__goto__binary_8cpp.html#a21a834403af8e54d05fc3bd82ffacbad">write_instructions_binary</a> (std::ostream &amp;out, <a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter, const std::pair&lt; const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &gt; &amp;fct)</td></tr>
+<tr class="separator:a21a834403af8e54d05fc3bd82ffacbad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5c55ec9e59b49fa9d721e3a3983f4e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="write__goto__binary_8cpp.html#a7f5c55ec9e59b49fa9d721e3a3983f4e">write_goto_functions_binary</a> (std::ostream &amp;out, const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, <a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</td></tr>
+<tr class="memdesc:a7f5c55ec9e59b49fa9d721e3a3983f4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the functions to file, but only those with non-empty body.  <a href="write__goto__binary_8cpp.html#a7f5c55ec9e59b49fa9d721e3a3983f4e">More...</a><br /></td></tr>
+<tr class="separator:a7f5c55ec9e59b49fa9d721e3a3983f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f439e34b0e426460a7c0e3540f3dfe7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">write_goto_binary</a> (std::ostream &amp;out, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, <a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</td></tr>
+<tr class="memdesc:a8f439e34b0e426460a7c0e3540f3dfe7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a goto program to disc, using goto binary format.  <a href="write__goto__binary_8cpp.html#a8f439e34b0e426460a7c0e3540f3dfe7">More...</a><br /></td></tr>
+<tr class="separator:a8f439e34b0e426460a7c0e3540f3dfe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af72358aa2a4d2bc8ff4c5babc7afb2dd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="write__goto__binary_8cpp.html#af72358aa2a4d2bc8ff4c5babc7afb2dd">write_goto_binary</a> (std::ostream &amp;out, const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, int version)</td></tr>
 <tr class="memdesc:af72358aa2a4d2bc8ff4c5babc7afb2dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a goto program to disc.  <a href="write__goto__binary_8cpp.html#af72358aa2a4d2bc8ff4c5babc7afb2dd">More...</a><br /></td></tr>
 <tr class="separator:af72358aa2a4d2bc8ff4c5babc7afb2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,7 +176,7 @@ Functions</h2></td></tr>
 
 <p>Writes a goto program to disc. </p>
 
-<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00166">166</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00187">187</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
 
 </div>
 </div>
@@ -206,7 +214,7 @@ Functions</h2></td></tr>
 
 <p>Writes a goto program to disc. </p>
 
-<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00127">127</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00144">144</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
 
 </div>
 </div>
@@ -250,18 +258,21 @@ Functions</h2></td></tr>
 
 <p>Writes a goto program to disc. </p>
 
-<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00140">140</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00157">157</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aa6bd3c7f1d7f42d9f27fc290dc9f1633"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6bd3c7f1d7f42d9f27fc290dc9f1633">&#9670;&nbsp;</a></span>write_goto_binary() <span class="overload">[4/4]</span></h2>
+<a id="a8f439e34b0e426460a7c0e3540f3dfe7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f439e34b0e426460a7c0e3540f3dfe7">&#9670;&nbsp;</a></span>write_goto_binary() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool write_goto_binary </td>
+          <td class="memname">static void write_goto_binary </td>
           <td>(</td>
           <td class="paramtype">std::ostream &amp;&#160;</td>
           <td class="paramname"><em>out</em>, </td>
@@ -290,9 +301,150 @@ Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Writes a goto program to disc, using goto binary format. </p>
+
+<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00133">133</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a7f5c55ec9e59b49fa9d721e3a3983f4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f5c55ec9e59b49fa9d721e3a3983f4e">&#9670;&nbsp;</a></span>write_goto_functions_binary()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void write_goto_functions_binary </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>irepconverter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes the functions to file, but only those with non-empty body. </p>
+
+<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00104">104</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a21a834403af8e54d05fc3bd82ffacbad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21a834403af8e54d05fc3bd82ffacbad">&#9670;&nbsp;</a></span>write_instructions_binary()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void write_instructions_binary </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>irepconverter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::pair&lt; const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>fct</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00072">72</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aebcde2947f5d977df5cd601b5ed7ea49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebcde2947f5d977df5cd601b5ed7ea49">&#9670;&nbsp;</a></span>write_symbol_table_binary()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void write_symbol_table_binary </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
+          <td class="paramname"><em>symbol_table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classirep__serializationt.html">irep_serializationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>irepconverter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes the symbol table to file. </p>
 
 <p class="definition">Definition at line <a class="el" href="write__goto__binary_8cpp_source.html#l00023">23</a> of file <a class="el" href="write__goto__binary_8cpp_source.html">write_goto_binary.cpp</a>.</p>
 
