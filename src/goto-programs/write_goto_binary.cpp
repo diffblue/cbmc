@@ -86,36 +86,36 @@ static void write_goto_functions_binary(
 
   for(const auto &fct : goto_functions.function_map)
   {
-    if(fct.second.body_available())
+    if(!fct.second.body_available())
+      continue;
+
+    // Since version 2, goto functions are not converted to ireps,
+    // instead they are saved in a custom binary format
+
+    write_gb_string(out, id2string(fct.first));              // name
+    write_gb_word(out, fct.second.body.instructions.size()); // # instructions
+
+    for(const auto &instruction : fct.second.body.instructions)
     {
-      // Since version 2, goto functions are not converted to ireps,
-      // instead they are saved in a custom binary format
+      irepconverter.reference_convert(instruction.code(), out);
+      irepconverter.reference_convert(instruction.source_location(), out);
+      write_gb_word(out, (long)instruction.type());
 
-      write_gb_string(out, id2string(fct.first)); // name
-      write_gb_word(out, fct.second.body.instructions.size()); // # instructions
+      const auto condition =
+        instruction.has_condition() ? instruction.condition() : true_exprt();
+      irepconverter.reference_convert(condition, out);
 
-      for(const auto &instruction : fct.second.body.instructions)
-      {
-        irepconverter.reference_convert(instruction.code(), out);
-        irepconverter.reference_convert(instruction.source_location(), out);
-        write_gb_word(out, (long)instruction.type());
+      write_gb_word(out, instruction.target_number);
 
-        const auto condition =
-          instruction.has_condition() ? instruction.condition() : true_exprt();
-        irepconverter.reference_convert(condition, out);
+      write_gb_word(out, instruction.targets.size());
 
-        write_gb_word(out, instruction.target_number);
+      for(const auto &t_it : instruction.targets)
+        write_gb_word(out, t_it->target_number);
 
-        write_gb_word(out, instruction.targets.size());
+      write_gb_word(out, instruction.labels.size());
 
-        for(const auto &t_it : instruction.targets)
-          write_gb_word(out, t_it->target_number);
-
-        write_gb_word(out, instruction.labels.size());
-
-        for(const auto &l_it : instruction.labels)
-          irepconverter.write_string_ref(out, l_it);
-      }
+      for(const auto &l_it : instruction.labels)
+        irepconverter.write_string_ref(out, l_it);
     }
   }
 }
