@@ -100,6 +100,18 @@ static void write_instructions_binary(
   }
 }
 
+static void write_transform_history_binary(
+  std::ostream &out,
+  const goto_transform_historyt &history)
+{
+  const auto &transforms = history.transforms();
+  write_gb_word(out, transforms.size());
+  for(const auto &transform : history.transforms())
+  {
+    write_gb_word(out, static_cast<std::size_t>(transform));
+  }
+}
+
 /// Writes the functions to file, but only those with non-empty body.
 static void write_goto_functions_binary(
   std::ostream &out,
@@ -126,6 +138,7 @@ static void write_goto_functions_binary(
     const auto function_name = id2string(fct.first);
     write_gb_string(out, function_name);
     write_instructions_binary(out, irepconverter, fct);
+    write_transform_history_binary(out, fct.second.history);
   }
 }
 
