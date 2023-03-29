@@ -20,16 +20,13 @@ Date: June 2006
 #include "goto_functions.h"
 #include "write_goto_binary.h"
 
-/// read goto binary format
-/// \par parameters: input stream, symbol_table, functions
-/// \return true on error, false otherwise
-static bool read_bin_goto_object(
+static void read_bin_symbol_table_object(
   std::istream &in,
   symbol_table_baset &symbol_table,
   goto_functionst &functions,
   irep_serializationt &irepconverter)
 {
-  std::size_t count = irepconverter.read_gb_word(in); // # of symbols
+  const std::size_t count = irepconverter.read_gb_word(in); // # of symbols
 
   for(std::size_t i=0; i<count; i++)
   {
@@ -78,8 +75,14 @@ static bool read_bin_goto_object(
 
     symbol_table.add(sym);
   }
+}
 
-  count=irepconverter.read_gb_word(in); // # of functions
+static void read_bin_functions_object(
+  std::istream &in,
+  goto_functionst &functions,
+  irep_serializationt &irepconverter)
+{
+  const std::size_t count = irepconverter.read_gb_word(in); // # of functions
 
   for(std::size_t fct_index = 0; fct_index < count; ++fct_index)
   {
@@ -166,7 +169,19 @@ static bool read_bin_goto_object(
   }
 
   functions.compute_location_numbers();
+}
 
+/// read goto binary format
+/// \par parameters: input stream, symbol_table, functions
+/// \return true on error, false otherwise
+static bool read_bin_goto_object(
+  std::istream &in,
+  symbol_table_baset &symbol_table,
+  goto_functionst &functions,
+  irep_serializationt &irepconverter)
+{
+  read_bin_symbol_table_object(in, symbol_table, functions, irepconverter);
+  read_bin_functions_object(in, functions, irepconverter);
   return false;
 }
 
