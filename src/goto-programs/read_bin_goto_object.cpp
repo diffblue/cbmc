@@ -256,7 +256,7 @@ bool read_bin_goto_object(
   // symbol_serializationt symbolconverter(ic);
 
   {
-    std::size_t version=irepconverter.read_gb_word(in);
+    const std::size_t version = irepconverter.read_gb_word(in);
 
     if(version < GOTO_BINARY_VERSION)
     {
