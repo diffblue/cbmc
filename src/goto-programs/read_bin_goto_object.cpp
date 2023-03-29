@@ -112,7 +112,8 @@ read_bin_transform_history_object(std::istream &in)
 static void read_bin_functions_object(
   std::istream &in,
   goto_functionst &functions,
-  irep_serializationt &irepconverter)
+  irep_serializationt &irepconverter,
+  const bool read_transform_history)
 {
   const std::size_t count = irepconverter.read_gb_word(in); // # of functions
 
@@ -199,7 +200,8 @@ static void read_bin_functions_object(
     if(hidden)
       f.make_hidden();
 
-    f.history = read_bin_transform_history_object(in);
+    if(read_transform_history)
+      f.history = read_bin_transform_history_object(in);
   }
 
   functions.compute_location_numbers();
@@ -211,11 +213,13 @@ static void read_bin_goto_object(
   std::istream &in,
   symbol_table_baset &symbol_table,
   goto_functionst &functions,
-  irep_serializationt &irepconverter)
+  irep_serializationt &irepconverter,
+  const bool read_transform_history)
 {
   read_bin_symbol_table_object(in, symbol_table, irepconverter);
   copy_parameter_identifiers(symbol_table, functions);
-  read_bin_functions_object(in, functions, irepconverter);
+  read_bin_functions_object(
+    in, functions, irepconverter, read_transform_history);
 }
 
 /// reads a goto binary file back into a symbol and a function table
@@ -268,19 +272,33 @@ bool read_bin_goto_object(
   irep_serializationt::ireps_containert ic;
   irep_serializationt irepconverter(ic);
 
-  const std::size_t version = irepconverter.read_gb_word(in);
+  const auto deprecated_binary_version = 5;
+  static_assert(
+    deprecated_binary_version == GOTO_BINARY_VERSION - 1,
+    "The deprecated goto binary version is the one preceding current version");
 
-  if(version < GOTO_BINARY_VERSION)
+  const std::size_t version = irepconverter.read_gb_word(in);
+  bool is_deprecated_version = version == deprecated_binary_version;
+  if(is_deprecated_version)
+  {
+    message.warning()
+      << "The input was compiled with an old version of goto-cc; "
+         "which is deprecated and will be removed in cbmc version 6. "
+         "Please recompile."
+      << messaget::eom;
+  }
+  if(version == GOTO_BINARY_VERSION || is_deprecated_version)
+  {
+    read_bin_goto_object(
+      in, symbol_table, functions, irepconverter, !is_deprecated_version);
+    return false;
+  }
+  else if(version < GOTO_BINARY_VERSION)
   {
     message.error() << "The input was compiled with an old version of "
                        "goto-cc; please recompile"
                     << messaget::eom;
     return true;
-  }
-  else if(version == GOTO_BINARY_VERSION)
-  {
-    read_bin_goto_object(in, symbol_table, functions, irepconverter);
-    return false;
   }
   else
   {
