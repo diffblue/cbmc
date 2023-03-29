@@ -121,7 +121,7 @@ static void write_goto_functions_binary(
 }
 
 /// Writes a goto program to disc, using goto binary format
-bool write_goto_binary(
+static void write_goto_binary(
   std::ostream &out,
   const symbol_table_baset &symbol_table,
   const goto_functionst &goto_functions,
@@ -129,7 +129,6 @@ bool write_goto_binary(
 {
   write_symbol_table_binary(out, symbol_table, irepconverter);
   write_goto_functions_binary(out, goto_functions, irepconverter);
-  return false;
 }
 
 /// Writes a goto program to disc
@@ -160,15 +159,19 @@ bool write_goto_binary(
   irep_serializationt irepconverter(irepc);
 
   if(version < GOTO_BINARY_VERSION)
+  {
     throw invalid_command_line_argument_exceptiont(
       "version " + std::to_string(version) + " no longer supported",
       "supported version = " + std::to_string(GOTO_BINARY_VERSION));
-  else if(version > GOTO_BINARY_VERSION)
+  }
+  if(version > GOTO_BINARY_VERSION)
+  {
     throw invalid_command_line_argument_exceptiont(
       "unknown goto binary version " + std::to_string(version),
       "supported version = " + std::to_string(GOTO_BINARY_VERSION));
-  else
-    return write_goto_binary(out, symbol_table, goto_functions, irepconverter);
+  }
+  write_goto_binary(out, symbol_table, goto_functions, irepconverter);
+  return false;
 }
 
 /// Writes a goto program to disc
