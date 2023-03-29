@@ -66,4 +66,8 @@ enum class goto_transform_kindt
   label_properties = 16
 };
 
+/// Returns true if \param transform is one of the values in the definition of
+/// the enumeration above.
+bool is_valid_transform_kind(goto_transform_kindt transform);
+
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRANSFORM_HISTORY_H

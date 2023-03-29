@@ -15,6 +15,7 @@ Date: June 2006
 
 #include <util/irep_serialization.h>
 #include <util/message.h>
+#include <util/nodiscard.h>
 #include <util/symbol_table_base.h>
 
 #include "goto_functions.h"
@@ -93,6 +94,19 @@ static void copy_parameter_identifiers(
       functions.function_map.emplace(symbol.name, goto_functiont());
     emplaced.first->second.set_parameter_identifiers(*code_type);
   }
+}
+
+NODISCARD static goto_transform_historyt
+read_bin_transform_history_object(std::istream &in)
+{
+  goto_transform_historyt read;
+  auto transform_count = irep_serializationt::read_gb_word(in);
+  while(transform_count--)
+  {
+    const auto transform = irep_serializationt::read_gb_word(in);
+    read.add(static_cast<goto_transform_kindt>(transform));
+  }
+  return read;
 }
 
 static void read_bin_functions_object(
@@ -184,6 +198,8 @@ static void read_bin_functions_object(
 
     if(hidden)
       f.make_hidden();
+
+    f.history = read_bin_transform_history_object(in);
   }
 
   functions.compute_location_numbers();
