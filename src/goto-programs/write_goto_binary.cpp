@@ -123,7 +123,8 @@ static void write_goto_functions_binary(
     // Since version 2, goto functions are not converted to ireps,
     // instead they are saved in a custom binary format
 
-    write_gb_string(out, id2string(fct.first)); // name
+    const auto function_name = id2string(fct.first);
+    write_gb_string(out, function_name);
     write_instructions_binary(out, irepconverter, fct);
   }
 }
