@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
   try
   {
     std::cout << "Hello from API stub" << std::endl;
+    std::cout << "Working from C++ API version ";
 
     // Convert argv to vector of strings for initialize_goto_model
     std::vector<std::string> arguments(argv + 1, argv + argc);
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 
     // Initialise API dependencies and global configuration in one step.
     api_sessiont api(api_options);
+    std::cout << *api.get_api_version() << std::endl;
 
     // Demonstrate the loading of a goto-model from the command line arguments
     api.set_message_callback(print_messages_to_stdout, nullptr);

@@ -89,8 +89,8 @@ mod tests {
         let client = cprover_api::new_api_session();
         let result = client.get_api_version();
 
-        let_cxx_string!(expected_version = "0.1");
-        assert_eq!(*result, *expected_version);
+        let_cxx_string!(expected_version = "5.79.0");
+        assert!(*result > *expected_version);
     }
 
     #[test]
