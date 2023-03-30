@@ -1,7 +1,7 @@
 \page release-process Release Process
 
 **Date**: 2020-10-08
-**Updated**: 2022-06-23
+**Updated**: 2023-03-29
 **Author**: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 **Domain**: Release & Packaging
 
@@ -10,7 +10,11 @@
 The current process we follow through to make a new release is the following:
 
 1. At the point in time we want to make the release, we make a change to
-   `src/config.inc`, and update the configuration variable `CBMC_VERSION`.
+   two files: `src/config.inc`, wherein we update the configuration variable
+   `CBMC_VERSION`, and `src/libcprover-rust/Cargo.toml`, wherein we update
+   the `version` variable to be the same as `CBMC_VERSION` (e.g. set both
+   to `5.80.0`).
+
    This is important as it informs the various tools of the current version
    of CBMC.
 
@@ -21,6 +25,19 @@ The current process we follow through to make a new release is the following:
    number of the form of `x.y.z`, with `x` denoting the major version, `y`
    denoting the minor version, and `z` identifying the patch version (useful
    for a hotfix or patch.)
+
+3. Pushing the Rust crate, which is documented [here](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
+   but effectively entails logging in with an API token generated from
+   https://crates.io with `cargo login`, and then issuing `cargo publish`.
+
+   The usual environment variables are required (part of the `publish`
+   step is that the crate can be built) - these are documented in the
+   `readme.md` file at the root of the `src/libcprover-rust/` directory,
+   and online at [libcprover_rust](https://crates.io/crates/libcprover_rust).
+
+   For the crate to be pushed successfully, the user performing the `cargo
+   publish` step needs to be a member of the [diffblue/diffblue-opensource](https://github.com/orgs/diffblue/teams/diffblue-opensource)
+   team.
 
 At this point, the rest of the process is automated, so we don't need to do
 anything more, but the process is described below for reference:
@@ -62,6 +79,24 @@ a downstream users scripts would lead to a weak signal, as basically any
 detectable change including bugfixes can do that. Instead, major version
 increments should signal that we expect many users will have to review their
 workflows for potential breakages, not just any.
+
+### Rust API versioning
+
+Following discussions during the development of `libcprover_rust`, it was decided
+that it would be easiest if the Rust API version was following the same scheme
+that CBMC does, so that it's clear which version of the Rust API corresponds to
+which version of CBMC.
+
+This means that the Rust API has two "versions" it can report.
+
+1. The library version, as reported in `Cargo.toml`, and
+2. The (C++) API version, which is coming from CBMC and aligns with the version
+   number in `config.inc` (reported via the `get_api_version()` API call).
+
+Most of the time, these two numbers will be the same - but there can be scenarios
+where they can diverge: if the user for example uses a later version of the
+Rust API (say, `5.80.0`) to link against a static library representing an older
+version of CBMC (say `5.79.0`).
 
 ## Constraints
 
