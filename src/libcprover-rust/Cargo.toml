@@ -1,6 +1,6 @@
 [package]
 name = "libcprover_rust"
-version = "0.1.0"
+version = "5.80.0"
 edition = "2021"
 description = "Rust API for CBMC and assorted CProver tools"
 repository = "https://github.com/diffblue/cbmc"
