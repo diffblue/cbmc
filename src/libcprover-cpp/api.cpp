@@ -8,6 +8,7 @@
 #include <util/message.h>
 #include <util/options.h>
 #include <util/ui_message.h>
+#include <util/version.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -34,7 +35,7 @@ extern configt config;
 
 std::unique_ptr<std::string> api_sessiont::get_api_version() const
 {
-  return util_make_unique<std::string>(std::string{"0.1"});
+  return util_make_unique<std::string>(std::string{CBMC_VERSION});
 }
 
 struct api_session_implementationt

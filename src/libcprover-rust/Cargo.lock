@@ -64,7 +64,7 @@ dependencies = [
 
 [[package]]
 name = "libcprover_rust"
-version = "0.1.0"
+version = "5.80.0"
 dependencies = [
  "cxx",
  "cxx-build",
