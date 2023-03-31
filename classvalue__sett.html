@@ -137,7 +137,7 @@ Public Types</h2></td></tr>
 <tr class="memitem:abb2dc066654abb235711fa84799fc148"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> = <a class="el" href="classreference__counting.html">reference_counting</a>&lt; <a class="el" href="classvalue__sett.html#af92a5fe9e1495ee3c3396b02e9b2ace6">object_map_dt</a>, <a class="el" href="classvalue__sett.html#ae4012ca58327a3ec4f2a1e06c1b56390">empty_object_map</a> &gt;</td></tr>
 <tr class="memdesc:abb2dc066654abb235711fa84799fc148"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference-counts instances of <code>object_map_dt</code>, such that multiple instructions' <code><a class="el" href="classvalue__sett.html" title="State type in value_set_domaint, used in value-set analysis and goto-symex.">value_sett</a></code> instances can share them.  <a href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">More...</a><br /></td></tr>
 <tr class="separator:abb2dc066654abb235711fa84799fc148"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0edf7b833a50b85f5edb037200ae5c8d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classsharing__mapt.html">sharing_mapt</a>&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d">valuest</a></td></tr>
+<tr class="memitem:a0edf7b833a50b85f5edb037200ae5c8d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classsharing__mapt.html">sharing_mapt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d">valuest</a></td></tr>
 <tr class="memdesc:a0edf7b833a50b85f5edb037200ae5c8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map representing the entire value set, mapping from string LHS IDs to RHS expression sets.  <a href="classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d">More...</a><br /></td></tr>
 <tr class="separator:a0edf7b833a50b85f5edb037200ae5c8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -155,7 +155,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a530754f88f23f8a8e4647a15ec821f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a209536b19d2b974977ee9d57239bb605"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvalue__sett.html">value_sett</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a209536b19d2b974977ee9d57239bb605">operator=</a> (<a class="el" href="classvalue__sett.html">value_sett</a> &amp;&amp;other)</td></tr>
 <tr class="separator:a209536b19d2b974977ee9d57239bb605"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc951a819a4742483eb93f5e4eb51f3b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#acc951a819a4742483eb93f5e4eb51f3b">field_sensitive</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
+<tr class="memitem:acc951a819a4742483eb93f5e4eb51f3b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#acc951a819a4742483eb93f5e4eb51f3b">field_sensitive</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="memdesc:acc951a819a4742483eb93f5e4eb51f3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether an identifier of a given type should have its fields distinguished.  <a href="classvalue__sett.html#acc951a819a4742483eb93f5e4eb51f3b">More...</a><br /></td></tr>
 <tr class="separator:acc951a819a4742483eb93f5e4eb51f3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab70716871ae95e6d940604c52aea687"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#aab70716871ae95e6d940604c52aea687">to_expr</a> (const object_map_dt::value_type &amp;it) const</td></tr>
@@ -187,7 +187,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a305f1ea3c08bd285ffc1b3aea4d837f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b39a691ddd7935143b63d2997e51f01"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a7b39a691ddd7935143b63d2997e51f01">clear</a> ()</td></tr>
 <tr class="separator:a7b39a691ddd7935143b63d2997e51f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a120b3bf85a7c3fe706c7fcc49c5222"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a2a120b3bf85a7c3fe706c7fcc49c5222">find_entry</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
+<tr class="memitem:a2a120b3bf85a7c3fe706c7fcc49c5222"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a2a120b3bf85a7c3fe706c7fcc49c5222">find_entry</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
 <tr class="memdesc:a2a120b3bf85a7c3fe706c7fcc49c5222"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an entry in this value-set.  <a href="classvalue__sett.html#a2a120b3bf85a7c3fe706c7fcc49c5222">More...</a><br /></td></tr>
 <tr class="separator:a2a120b3bf85a7c3fe706c7fcc49c5222"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab09f67bc259d304d8bbbb62cf260e9a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#ab09f67bc259d304d8bbbb62cf260e9a1">update_entry</a> (const <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a> &amp;e, const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;new_values, bool add_to_sets)</td></tr>
@@ -217,7 +217,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab5c3e258bddbba1171d1243119ae4d8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#ab5c3e258bddbba1171d1243119ae4d8e">assign</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, bool is_simplified, bool add_to_sets)</td></tr>
 <tr class="memdesc:ab5c3e258bddbba1171d1243119ae4d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms this value-set by executing executing the assignment <code>lhs := rhs</code> against it.  <a href="classvalue__sett.html#ab5c3e258bddbba1171d1243119ae4d8e">More...</a><br /></td></tr>
 <tr class="separator:ab5c3e258bddbba1171d1243119ae4d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec26c47424113b672975f037259d8ecc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#aec26c47424113b672975f037259d8ecc">do_function_call</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memitem:aec26c47424113b672975f037259d8ecc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#aec26c47424113b672975f037259d8ecc">do_function_call</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:aec26c47424113b672975f037259d8ecc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms this value-set by executing the actual -&gt; formal parameter assignments for a particular callee.  <a href="classvalue__sett.html#aec26c47424113b672975f037259d8ecc">More...</a><br /></td></tr>
 <tr class="separator:aec26c47424113b672975f037259d8ecc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfa3af934a3cf6752953bf5b7e386c53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#adfa3af934a3cf6752953bf5b7e386c53">do_end_function</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
@@ -229,10 +229,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a29ea32746c4a0bb96e387a7df50605f6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a29ea32746c4a0bb96e387a7df50605f6">eval_pointer_offset</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="memdesc:a29ea32746c4a0bb96e387a7df50605f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to resolve any <code><a class="el" href="classpointer__offset__exprt.html" title="The offset (in bytes) of a pointer relative to the object.">pointer_offset_exprt</a></code> expressions in <code>expr</code> to constant integers using this value-set's information.  <a href="classvalue__sett.html#a29ea32746c4a0bb96e387a7df50605f6">More...</a><br /></td></tr>
 <tr class="separator:a29ea32746c4a0bb96e387a7df50605f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21987b736c3a7f70c18a658c04360108"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a21987b736c3a7f70c18a658c04360108">get_index_of_symbol</a> (<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> identifier, const <a class="el" href="classtypet.html">typet</a> &amp;type, const std::string &amp;suffix, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
+<tr class="memitem:a21987b736c3a7f70c18a658c04360108"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a21987b736c3a7f70c18a658c04360108">get_index_of_symbol</a> (<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> identifier, const <a class="el" href="classtypet.html">typet</a> &amp;type, const std::string &amp;suffix, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="memdesc:a21987b736c3a7f70c18a658c04360108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index of the symbol and suffix.  <a href="classvalue__sett.html#a21987b736c3a7f70c18a658c04360108">More...</a><br /></td></tr>
 <tr class="separator:a21987b736c3a7f70c18a658c04360108"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaec368dd5d34bd9d2251dcb0448c61b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#aaec368dd5d34bd9d2251dcb0448c61b4">erase_values_from_entry</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;index, const std::unordered_set&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;values_to_erase)</td></tr>
+<tr class="memitem:aaec368dd5d34bd9d2251dcb0448c61b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#aaec368dd5d34bd9d2251dcb0448c61b4">erase_values_from_entry</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;index, const std::unordered_set&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;values_to_erase)</td></tr>
 <tr class="memdesc:aaec368dd5d34bd9d2251dcb0448c61b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the entry stored at <code>index</code> by erasing any values listed in <code>values_to_erase</code>.  <a href="classvalue__sett.html#aaec368dd5d34bd9d2251dcb0448c61b4">More...</a><br /></td></tr>
 <tr class="separator:aaec368dd5d34bd9d2251dcb0448c61b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68070a9468cc39d626ef009c73843810"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a68070a9468cc39d626ef009c73843810">erase_symbol</a> (const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol_expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
@@ -369,7 +369,7 @@ y = new B;
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classsharing__mapt.html">sharing_mapt</a>&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a>&gt; <a class="el" href="classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d">value_sett::valuest</a></td>
+          <td class="memname">typedef <a class="el" href="classsharing__mapt.html">sharing_mapt</a>&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="structvalue__sett_1_1entryt.html">entryt</a>&gt; <a class="el" href="classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d">value_sett::valuest</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -941,7 +941,7 @@ y = new B;
         <tr>
           <td class="memname">void value_sett::do_function_call </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function</em>, </td>
         </tr>
         <tr>
@@ -1105,7 +1105,7 @@ y = new B;
         <tr>
           <td class="memname">void value_sett::erase_values_from_entry </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>index</em>, </td>
         </tr>
         <tr>
@@ -1187,7 +1187,7 @@ y = new B;
         <tr>
           <td class="memname">bool value_sett::field_sensitive </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em>, </td>
         </tr>
         <tr>
@@ -1225,7 +1225,7 @@ y = new B;
         <tr>
           <td class="memname">const <a class="el" href="structvalue__sett_1_1entryt.html">value_sett::entryt</a> * value_sett::find_entry </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -1252,9 +1252,9 @@ y = new B;
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; value_sett::get_index_of_symbol </td>
+          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; value_sett::get_index_of_symbol </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
           <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>

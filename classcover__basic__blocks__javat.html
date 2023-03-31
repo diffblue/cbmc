@@ -133,7 +133,7 @@ Public Member Functions</h2></td></tr>
 <tr class="inherit_header pub_methods_classcover__blocks__baset"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classcover__blocks__baset')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classcover__blocks__baset.html">cover_blocks_baset</a></td></tr>
 <tr class="memitem:a5869f2722db00ee0a1a51fdd3a3a64f9 inherit pub_methods_classcover__blocks__baset"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#a5869f2722db00ee0a1a51fdd3a3a64f9">~cover_blocks_baset</a> ()=default</td></tr>
 <tr class="separator:a5869f2722db00ee0a1a51fdd3a3a64f9 inherit pub_methods_classcover__blocks__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e1fb5d5cc2a57c1245d4324d26795a6 inherit pub_methods_classcover__blocks__baset"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#a0e1fb5d5cc2a57c1245d4324d26795a6">report_block_anomalies</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memitem:a0e1fb5d5cc2a57c1245d4324d26795a6 inherit pub_methods_classcover__blocks__baset"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#a0e1fb5d5cc2a57c1245d4324d26795a6">report_block_anomalies</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a0e1fb5d5cc2a57c1245d4324d26795a6 inherit pub_methods_classcover__blocks__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output warnings about ignored blocks.  <a href="classcover__blocks__baset.html#a0e1fb5d5cc2a57c1245d4324d26795a6">More...</a><br /></td></tr>
 <tr class="separator:a0e1fb5d5cc2a57c1245d4324d26795a6 inherit pub_methods_classcover__blocks__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -143,7 +143,7 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a2031de885f72c85853bf66ae3012f8fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31c726e9ba4417d4fd1bea4db5ad1081"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classsource__locationt.html">source_locationt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blocks__javat.html#a31c726e9ba4417d4fd1bea4db5ad1081">block_locations</a></td></tr>
 <tr class="separator:a31c726e9ba4417d4fd1bea4db5ad1081"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6fc8458efc828329f2bc105cbbd19e9"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blocks__javat.html#ae6fc8458efc828329f2bc105cbbd19e9">index_to_block</a></td></tr>
+<tr class="memitem:ae6fc8458efc828329f2bc105cbbd19e9"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blocks__javat.html#ae6fc8458efc828329f2bc105cbbd19e9">index_to_block</a></td></tr>
 <tr class="separator:ae6fc8458efc828329f2bc105cbbd19e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a835b5ecd34d7e3445c4c00bdcc1fc257"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classsource__linest.html">source_linest</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blocks__javat.html#a835b5ecd34d7e3445c4c00bdcc1fc257">block_source_lines</a></td></tr>
 <tr class="separator:a835b5ecd34d7e3445c4c00bdcc1fc257"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -444,7 +444,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::unordered_map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::size_t&gt; cover_basic_blocks_javat::index_to_block</td>
+          <td class="memname">std::unordered_map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::size_t&gt; cover_basic_blocks_javat::index_to_block</td>
         </tr>
       </table>
   </td>

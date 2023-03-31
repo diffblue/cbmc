@@ -110,16 +110,16 @@ $(document).ready(function(){initNavTree('classstub__global__initializer__factor
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0bb96732942b7912790eca4f1a5ddbd7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstub__global__initializer__factoryt.html#a0bb96732942b7912790eca4f1a5ddbd7">create_stub_global_initializer_symbols</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const std::unordered_set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;stub_globals_set, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
+<tr class="memitem:a0bb96732942b7912790eca4f1a5ddbd7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstub__global__initializer__factoryt.html#a0bb96732942b7912790eca4f1a5ddbd7">create_stub_global_initializer_symbols</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;stub_globals_set, <a class="el" href="synthetic__methods__map_8h.html#a5e7a794295ffe9854edb39abeaa0f8c6">synthetic_methods_mapt</a> &amp;synthetic_methods)</td></tr>
 <tr class="memdesc:a0bb96732942b7912790eca4f1a5ddbd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create static initializer symbols for each distinct class that has stub globals.  <a href="classstub__global__initializer__factoryt.html#a0bb96732942b7912790eca4f1a5ddbd7">More...</a><br /></td></tr>
 <tr class="separator:a0bb96732942b7912790eca4f1a5ddbd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27855fca5865956716632595e37a1eed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__blockt.html">code_blockt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstub__global__initializer__factoryt.html#a27855fca5865956716632595e37a1eed">get_stub_initializer_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memitem:a27855fca5865956716632595e37a1eed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcode__blockt.html">code_blockt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstub__global__initializer__factoryt.html#a27855fca5865956716632595e37a1eed">get_stub_initializer_body</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="structjava__object__factory__parameterst.html">java_object_factory_parameterst</a> &amp;object_factory_parameters, const <a class="el" href="classselect__pointer__typet.html">select_pointer_typet</a> &amp;pointer_type_selector, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a27855fca5865956716632595e37a1eed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create the body of a synthetic static initializer (clinit method), which initialise stub globals in the same manner as java_static_lifetime_init, only delayed until first reference by virtue of being given in a static initializer rather than directly in __CPROVER_initialize.  <a href="classstub__global__initializer__factoryt.html#a27855fca5865956716632595e37a1eed">More...</a><br /></td></tr>
 <tr class="separator:a27855fca5865956716632595e37a1eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
-<tr class="memitem:a2df574b289a97dff4c71d490457c7870"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_multimap&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstub__global__initializer__factoryt.html#a2df574b289a97dff4c71d490457c7870">stub_globals_by_classt</a></td></tr>
+<tr class="memitem:a2df574b289a97dff4c71d490457c7870"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_multimap&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstub__global__initializer__factoryt.html#a2df574b289a97dff4c71d490457c7870">stub_globals_by_classt</a></td></tr>
 <tr class="memdesc:a2df574b289a97dff4c71d490457c7870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps class symbols onto the stub globals that belong to them.  <a href="classstub__global__initializer__factoryt.html#a2df574b289a97dff4c71d490457c7870">More...</a><br /></td></tr>
 <tr class="separator:a2df574b289a97dff4c71d490457c7870"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -142,7 +142,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::unordered_multimap&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; <a class="el" href="classstub__global__initializer__factoryt.html#a2df574b289a97dff4c71d490457c7870">stub_global_initializer_factoryt::stub_globals_by_classt</a></td>
+          <td class="memname">typedef std::unordered_multimap&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; <a class="el" href="classstub__global__initializer__factoryt.html#a2df574b289a97dff4c71d490457c7870">stub_global_initializer_factoryt::stub_globals_by_classt</a></td>
         </tr>
       </table>
   </td>
@@ -174,7 +174,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::unordered_set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>stub_globals_set</em>, </td>
         </tr>
         <tr>
@@ -214,7 +214,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classcode__blockt.html">code_blockt</a> stub_global_initializer_factoryt::get_stub_initializer_body </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>

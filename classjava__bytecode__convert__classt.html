@@ -141,7 +141,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:acc9c24195d22f4f1ef8ba98719370003"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__classt.html#acc9c24195d22f4f1ef8ba98719370003">convert</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;class_symbol, const <a class="el" href="classjava__bytecode__convert__classt.html#a51e3a343ad85fc1065c8714179d55764">fieldt</a> &amp;f)</td></tr>
 <tr class="memdesc:acc9c24195d22f4f1ef8ba98719370003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a field, adding a symbol to teh symbol table for it.  <a href="classjava__bytecode__convert__classt.html#acc9c24195d22f4f1ef8ba98719370003">More...</a><br /></td></tr>
 <tr class="separator:acc9c24195d22f4f1ef8ba98719370003"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af081231ae120df134d7129cf89f7261a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__classt.html#af081231ae120df134d7129cf89f7261a">check_field_exists</a> (const <a class="el" href="classjava__bytecode__convert__classt.html#a51e3a343ad85fc1065c8714179d55764">fieldt</a> &amp;field, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;qualified_fieldname, const <a class="el" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_union_typet::componentst</a> &amp;fields) const</td></tr>
+<tr class="memitem:af081231ae120df134d7129cf89f7261a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__classt.html#af081231ae120df134d7129cf89f7261a">check_field_exists</a> (const <a class="el" href="classjava__bytecode__convert__classt.html#a51e3a343ad85fc1065c8714179d55764">fieldt</a> &amp;field, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;qualified_fieldname, const <a class="el" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_union_typet::componentst</a> &amp;fields) const</td></tr>
 <tr class="separator:af081231ae120df134d7129cf89f7261a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
@@ -149,7 +149,7 @@ Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a1630861abe0a6027731de8e7b435ef74"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__classt.html#a1630861abe0a6027731de8e7b435ef74">is_overlay_method</a> (const <a class="el" href="classjava__bytecode__convert__classt.html#a3d952349702ecd8dd87d076803531843">methodt</a> &amp;method)</td></tr>
 <tr class="memdesc:a1630861abe0a6027731de8e7b435ef74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a method is an overlay method by searching for <code>ID_overlay_method</code> in its list of annotations.  <a href="classjava__bytecode__convert__classt.html#a1630861abe0a6027731de8e7b435ef74">More...</a><br /></td></tr>
 <tr class="separator:a1630861abe0a6027731de8e7b435ef74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa86873a194fe53fb5d3f29a9e4bd1b3"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__classt.html#afa86873a194fe53fb5d3f29a9e4bd1b3">is_ignored_method</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, const <a class="el" href="classjava__bytecode__convert__classt.html#a3d952349702ecd8dd87d076803531843">methodt</a> &amp;method)</td></tr>
+<tr class="memitem:afa86873a194fe53fb5d3f29a9e4bd1b3"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__classt.html#afa86873a194fe53fb5d3f29a9e4bd1b3">is_ignored_method</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, const <a class="el" href="classjava__bytecode__convert__classt.html#a3d952349702ecd8dd87d076803531843">methodt</a> &amp;method)</td></tr>
 <tr class="memdesc:afa86873a194fe53fb5d3f29a9e4bd1b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a method is an ignored method, by one of two mechanisms:  <a href="classjava__bytecode__convert__classt.html#afa86873a194fe53fb5d3f29a9e4bd1b3">More...</a><br /></td></tr>
 <tr class="separator:afa86873a194fe53fb5d3f29a9e4bd1b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -342,7 +342,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>qualified_fieldname</em>, </td>
         </tr>
         <tr>
@@ -476,7 +476,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">static bool java_bytecode_convert_classt::is_ignored_method </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>class_name</em>, </td>
         </tr>
         <tr>

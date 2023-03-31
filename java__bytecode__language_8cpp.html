@@ -151,7 +151,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a804fde4ecb2f7a094a782b7fb42cf714"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a804fde4ecb2f7a094a782b7fb42cf714">infer_opaque_type_fields</a> (const <a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="memdesc:a804fde4ecb2f7a094a782b7fb42cf714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Infer fields that must exist on opaque types from field accesses against them.  <a href="java__bytecode__language_8cpp.html#a804fde4ecb2f7a094a782b7fb42cf714">More...</a><br /></td></tr>
 <tr class="separator:a804fde4ecb2f7a094a782b7fb42cf714"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a7b9e981f92a8edf5f3895b78fd8cfa82">get_or_create_class_literal_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memitem:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a7b9e981f92a8edf5f3895b78fd8cfa82">get_or_create_class_literal_symbol</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="memdesc:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create if necessary, then return the constant global java.lang.Class symbol for a given class id.  <a href="java__bytecode__language_8cpp.html#a7b9e981f92a8edf5f3895b78fd8cfa82">More...</a><br /></td></tr>
 <tr class="separator:a7b9e981f92a8edf5f3895b78fd8cfa82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c7b9e03dd1d40715e91cf62be86ad2d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a3c7b9e03dd1d40715e91cf62be86ad2d">get_ldc_result</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;ldc_arg0, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool string_refinement_enabled)</td></tr>
@@ -160,10 +160,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a2264c5b9cf2bd8b9cb5895e63faf0632"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a2264c5b9cf2bd8b9cb5895e63faf0632">generate_constant_global_variables</a> (<a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool string_refinement_enabled)</td></tr>
 <tr class="memdesc:a2264c5b9cf2bd8b9cb5895e63faf0632"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates global variables for constants mentioned in a given method.  <a href="java__bytecode__language_8cpp.html#a2264c5b9cf2bd8b9cb5895e63faf0632">More...</a><br /></td></tr>
 <tr class="separator:a2264c5b9cf2bd8b9cb5895e63faf0632"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cd501ec4d632a75872aef49e2b731d6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a8cd501ec4d632a75872aef49e2b731d6">create_stub_global_symbol</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;symbol_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;symbol_basename, const <a class="el" href="classtypet.html">typet</a> &amp;symbol_type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, bool force_nondet_init)</td></tr>
+<tr class="memitem:a8cd501ec4d632a75872aef49e2b731d6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a8cd501ec4d632a75872aef49e2b731d6">create_stub_global_symbol</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;symbol_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;symbol_basename, const <a class="el" href="classtypet.html">typet</a> &amp;symbol_type, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_id, bool force_nondet_init)</td></tr>
 <tr class="memdesc:a8cd501ec4d632a75872aef49e2b731d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a stub global symbol to the symbol table, initialising pointer-typed symbols with null and primitive-typed ones with an arbitrary (nondet) value.  <a href="java__bytecode__language_8cpp.html#a8cd501ec4d632a75872aef49e2b731d6">More...</a><br /></td></tr>
 <tr class="separator:a8cd501ec4d632a75872aef49e2b731d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea06f54044638c3202e80f73de0e89df"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#aea06f54044638c3202e80f73de0e89df">get_any_incomplete_ancestor_for_stub_static_field</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;start_class_id, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy)</td></tr>
+<tr class="memitem:aea06f54044638c3202e80f73de0e89df"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#aea06f54044638c3202e80f73de0e89df">get_any_incomplete_ancestor_for_stub_static_field</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;start_class_id, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy)</td></tr>
 <tr class="memdesc:aea06f54044638c3202e80f73de0e89df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find any incomplete ancestor of a given class that can have a stub static field attached to it.  <a href="java__bytecode__language_8cpp.html#aea06f54044638c3202e80f73de0e89df">More...</a><br /></td></tr>
 <tr class="separator:aea06f54044638c3202e80f73de0e89df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8b0155f36e0b852fc4216300e05c1e6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#ad8b0155f36e0b852fc4216300e05c1e6">create_stub_global_symbols</a> (const <a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy, <a class="el" href="classmessaget.html">messaget</a> &amp;log)</td></tr>
@@ -194,13 +194,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol_basename</em>, </td>
         </tr>
         <tr>
@@ -212,7 +212,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>class_id</em>, </td>
         </tr>
         <tr>
@@ -376,9 +376,9 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> get_any_incomplete_ancestor_for_stub_static_field </td>
+          <td class="memname">static <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> get_any_incomplete_ancestor_for_stub_static_field </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>start_class_id</em>, </td>
         </tr>
         <tr>
@@ -508,7 +508,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> get_or_create_class_literal_symbol </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>class_id</em>, </td>
         </tr>
         <tr>

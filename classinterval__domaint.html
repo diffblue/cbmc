@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('classinterval__domaint.html',''); init
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a5fbc9826b35d56d52e184d8b2c30b4ed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a5fbc9826b35d56d52e184d8b2c30b4ed">interval_domaint</a> ()</td></tr>
 <tr class="separator:a5fbc9826b35d56d52e184d8b2c30b4ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a616752f5d34e16218fe1da09487c1982"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a616752f5d34e16218fe1da09487c1982">transform</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_from, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_to, <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) final override</td></tr>
+<tr class="memitem:a616752f5d34e16218fe1da09487c1982"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a616752f5d34e16218fe1da09487c1982">transform</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_from, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_to, <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) final override</td></tr>
 <tr class="memdesc:a616752f5d34e16218fe1da09487c1982"><td class="mdescLeft">&#160;</td><td class="mdescRight">how function calls are treated: a) there is an edge from each call site to the function head b) there is an edge from the last instruction (END_FUNCTION) of the function to the instruction <em>following</em> the call site (this also needs to set the LHS, if applicable)  <a href="classinterval__domaint.html#a616752f5d34e16218fe1da09487c1982">More...</a><br /></td></tr>
 <tr class="separator:a616752f5d34e16218fe1da09487c1982"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1031b0cddaa44952f4bb6c775ef270b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a1031b0cddaa44952f4bb6c775ef270b9">output</a> (std::ostream &amp;out, const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const override</td></tr>
@@ -172,9 +172,9 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
 Protected Types</h2></td></tr>
-<tr class="memitem:ab73a48667fdf28c1c28318b27262a3f0"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="integer__interval_8h.html#a35c92211cace2a7df8a36381a8762884">integer_intervalt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#ab73a48667fdf28c1c28318b27262a3f0">int_mapt</a></td></tr>
+<tr class="memitem:ab73a48667fdf28c1c28318b27262a3f0"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="integer__interval_8h.html#a35c92211cace2a7df8a36381a8762884">integer_intervalt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#ab73a48667fdf28c1c28318b27262a3f0">int_mapt</a></td></tr>
 <tr class="separator:ab73a48667fdf28c1c28318b27262a3f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e1aaf671b88d373b30d7e1561690c62"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="interval__domain_8h.html#a802b6eb6a09b0c6112bbe9f961ae54aa">ieee_float_intervalt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a8e1aaf671b88d373b30d7e1561690c62">float_mapt</a></td></tr>
+<tr class="memitem:a8e1aaf671b88d373b30d7e1561690c62"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="interval__domain_8h.html#a802b6eb6a09b0c6112bbe9f961ae54aa">ieee_float_intervalt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a8e1aaf671b88d373b30d7e1561690c62">float_mapt</a></td></tr>
 <tr class="separator:a8e1aaf671b88d373b30d7e1561690c62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -186,7 +186,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:abcc9ef2ce1cc077c0fb8376ce3412494"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a373240e644ab7e1aee4f9836437b59d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a373240e644ab7e1aee4f9836437b59d0">assume_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, bool negation=false)</td></tr>
 <tr class="separator:a373240e644ab7e1aee4f9836437b59d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8407a4dda51bfda682b59c53b70476f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a8407a4dda51bfda682b59c53b70476f5">assume_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> id, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs)</td></tr>
+<tr class="memitem:a8407a4dda51bfda682b59c53b70476f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a8407a4dda51bfda682b59c53b70476f5">assume_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> id, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs)</td></tr>
 <tr class="separator:a8407a4dda51bfda682b59c53b70476f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01c78132a493a3a1d639b25c200f35e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a01c78132a493a3a1d639b25c200f35e2">assign</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs)</td></tr>
 <tr class="separator:a01c78132a493a3a1d639b25c200f35e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,7 +233,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="interval__domain_8h.html#a802b6eb6a09b0c6112bbe9f961ae54aa">ieee_float_intervalt</a>&gt; <a class="el" href="classinterval__domaint.html#a8e1aaf671b88d373b30d7e1561690c62">interval_domaint::float_mapt</a></td>
+          <td class="memname">typedef std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="interval__domain_8h.html#a802b6eb6a09b0c6112bbe9f961ae54aa">ieee_float_intervalt</a>&gt; <a class="el" href="classinterval__domaint.html#a8e1aaf671b88d373b30d7e1561690c62">interval_domaint::float_mapt</a></td>
         </tr>
       </table>
   </td>
@@ -257,7 +257,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="integer__interval_8h.html#a35c92211cace2a7df8a36381a8762884">integer_intervalt</a>&gt; <a class="el" href="classinterval__domaint.html#ab73a48667fdf28c1c28318b27262a3f0">interval_domaint::int_mapt</a></td>
+          <td class="memname">typedef std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="integer__interval_8h.html#a35c92211cace2a7df8a36381a8762884">integer_intervalt</a>&gt; <a class="el" href="classinterval__domaint.html#ab73a48667fdf28c1c28318b27262a3f0">interval_domaint::int_mapt</a></td>
         </tr>
       </table>
   </td>
@@ -468,7 +468,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
           <td class="paramname"><em>id</em>, </td>
         </tr>
         <tr>
@@ -938,7 +938,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void interval_domaint::transform </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_from</em>, </td>
         </tr>
         <tr>
@@ -950,7 +950,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_to</em>, </td>
         </tr>
         <tr>

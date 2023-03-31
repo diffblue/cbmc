@@ -1353,6 +1353,7 @@ var annotated_dup =
     [ "variable_sensitivity_object_factoryt", "classvariable__sensitivity__object__factoryt.html", "classvariable__sensitivity__object__factoryt" ],
     [ "vector_exprt", "classvector__exprt.html", "classvector__exprt" ],
     [ "vector_typet", "classvector__typet.html", "classvector__typet" ],
+    [ "verification_resultt", "structverification__resultt.html", "structverification__resultt" ],
     [ "visited_nodet", "classvisited__nodet.html", "classvisited__nodet" ],
     [ "vs_dep_edget", "classvs__dep__edget.html", "classvs__dep__edget" ],
     [ "vs_dep_nodet", "structvs__dep__nodet.html", "structvs__dep__nodet" ],

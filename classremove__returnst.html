@@ -119,19 +119,19 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:aae1ddb43cd6db6b0dd8cd76d2814f223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#aae1ddb43cd6db6b0dd8cd76d2814f223">replace_returns</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;function)</td></tr>
+<tr class="memitem:aae1ddb43cd6db6b0dd8cd76d2814f223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#aae1ddb43cd6db6b0dd8cd76d2814f223">replace_returns</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;function)</td></tr>
 <tr class="memdesc:aae1ddb43cd6db6b0dd8cd76d2814f223"><td class="mdescLeft">&#160;</td><td class="mdescRight">turns 'return x' into an assignment to fkt::return_value  <a href="classremove__returnst.html#aae1ddb43cd6db6b0dd8cd76d2814f223">More...</a><br /></td></tr>
 <tr class="separator:aae1ddb43cd6db6b0dd8cd76d2814f223"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfd9a689526eb90cb5b84ad3ee51a991"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#acfd9a689526eb90cb5b84ad3ee51a991">do_function_calls</a> (<a class="el" href="remove__returns_8h.html#a837c6560b2fcc018caf037b0c5768c71">function_is_stubt</a> function_is_stub, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:acfd9a689526eb90cb5b84ad3ee51a991"><td class="mdescLeft">&#160;</td><td class="mdescRight">turns x=f(...) into f(...); lhs=f::return_value;  <a href="classremove__returnst.html#acfd9a689526eb90cb5b84ad3ee51a991">More...</a><br /></td></tr>
 <tr class="separator:acfd9a689526eb90cb5b84ad3ee51a991"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a067bd0b0ad0b4bc12849d8f8422661c8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#a067bd0b0ad0b4bc12849d8f8422661c8">restore_returns</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
+<tr class="memitem:a067bd0b0ad0b4bc12849d8f8422661c8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#a067bd0b0ad0b4bc12849d8f8422661c8">restore_returns</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:a067bd0b0ad0b4bc12849d8f8422661c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">turns an assignment to fkt::return_value back into 'return x'  <a href="classremove__returnst.html#a067bd0b0ad0b4bc12849d8f8422661c8">More...</a><br /></td></tr>
 <tr class="separator:a067bd0b0ad0b4bc12849d8f8422661c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94ccf76f0ef9f2f8e8b3d5c3ad68b5ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#a94ccf76f0ef9f2f8e8b3d5c3ad68b5ab">undo_function_calls</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:a94ccf76f0ef9f2f8e8b3d5c3ad68b5ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">turns f(...); lhs=f::return_value; into lhs=f(...)  <a href="classremove__returnst.html#a94ccf76f0ef9f2f8e8b3d5c3ad68b5ab">More...</a><br /></td></tr>
 <tr class="separator:a94ccf76f0ef9f2f8e8b3d5c3ad68b5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61718746c63f987de687396d2c94114c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#a61718746c63f987de687396d2c94114c">get_or_create_return_value_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
+<tr class="memitem:a61718746c63f987de687396d2c94114c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__returnst.html#a61718746c63f987de687396d2c94114c">get_or_create_return_value_symbol</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
 <tr class="separator:a61718746c63f987de687396d2c94114c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
@@ -232,7 +232,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; remove_returnst::get_or_create_return_value_symbol </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em></td><td>)</td>
           <td></td>
         </tr>
@@ -310,7 +310,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void remove_returnst::replace_returns </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
@@ -377,7 +377,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool remove_returnst::restore_returns </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>

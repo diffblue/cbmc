@@ -152,16 +152,16 @@ Functions</h2></td></tr>
 <tr class="separator:af7257419ef83a22f3ae229baae37a67e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e7a495b9a73d0fb4c37d941dcec5be9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a5e7a495b9a73d0fb4c37d941dcec5be9">mp_max</a> (<a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;a, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;b)</td></tr>
 <tr class="separator:a5e7a495b9a73d0fb4c37d941dcec5be9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94aad2c2b250c696a03398149d4d78a1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a94aad2c2b250c696a03398149d4d78a1">get_bvrep_bit</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;src, std::size_t width, std::size_t bit_index)</td></tr>
+<tr class="memitem:a94aad2c2b250c696a03398149d4d78a1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a94aad2c2b250c696a03398149d4d78a1">get_bvrep_bit</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;src, std::size_t width, std::size_t bit_index)</td></tr>
 <tr class="memdesc:a94aad2c2b250c696a03398149d4d78a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a bit with given index from bit-vector representation.  <a href="arith__tools_8h.html#a94aad2c2b250c696a03398149d4d78a1">More...</a><br /></td></tr>
 <tr class="separator:a94aad2c2b250c696a03398149d4d78a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18174caf9f9c9856324582e7936b6318"><td class="memItemLeft" align="right" valign="top"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a> (const std::size_t width, const std::function&lt; bool(std::size_t)&gt; f)</td></tr>
+<tr class="memitem:a18174caf9f9c9856324582e7936b6318"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a> (const std::size_t width, const std::function&lt; bool(std::size_t)&gt; f)</td></tr>
 <tr class="memdesc:a18174caf9f9c9856324582e7936b6318"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct a bit-vector representation from a functor  <a href="arith__tools_8h.html#a18174caf9f9c9856324582e7936b6318">More...</a><br /></td></tr>
 <tr class="separator:a18174caf9f9c9856324582e7936b6318"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d06cc8c81db0245efe3a17fd8fcd02e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a4d06cc8c81db0245efe3a17fd8fcd02e">integer2bvrep</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;, std::size_t width)</td></tr>
+<tr class="memitem:a4d06cc8c81db0245efe3a17fd8fcd02e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a4d06cc8c81db0245efe3a17fd8fcd02e">integer2bvrep</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;, std::size_t width)</td></tr>
 <tr class="memdesc:a4d06cc8c81db0245efe3a17fd8fcd02e"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert an integer to bit-vector representation with given width This uses two's complement for negative numbers.  <a href="arith__tools_8h.html#a4d06cc8c81db0245efe3a17fd8fcd02e">More...</a><br /></td></tr>
 <tr class="separator:a4d06cc8c81db0245efe3a17fd8fcd02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae092137df14934bb20a34b294f2c9eeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#ae092137df14934bb20a34b294f2c9eeb">bvrep2integer</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;, std::size_t width, bool <a class="el" href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">is_signed</a>)</td></tr>
+<tr class="memitem:ae092137df14934bb20a34b294f2c9eeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#ae092137df14934bb20a34b294f2c9eeb">bvrep2integer</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;, std::size_t width, bool <a class="el" href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">is_signed</a>)</td></tr>
 <tr class="memdesc:ae092137df14934bb20a34b294f2c9eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert a bit-vector representation (possibly signed) to integer  <a href="arith__tools_8h.html#ae092137df14934bb20a34b294f2c9eeb">More...</a><br /></td></tr>
 <tr class="separator:ae092137df14934bb20a34b294f2c9eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -197,7 +197,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> bvrep2integer </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -265,7 +265,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">bool get_bvrep_bit </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -309,7 +309,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> integer2bvrep </td>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> integer2bvrep </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
@@ -342,7 +342,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> make_bvrep </td>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> make_bvrep </td>
           <td>(</td>
           <td class="paramtype">const std::size_t&#160;</td>
           <td class="paramname"><em>width</em>, </td>

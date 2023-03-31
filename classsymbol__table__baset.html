@@ -127,7 +127,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a748e3870d1594d9d5be4e95115316296"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a748e3870d1594d9d5be4e95115316296">symbolst</a></td></tr>
+<tr class="memitem:a748e3870d1594d9d5be4e95115316296"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a748e3870d1594d9d5be4e95115316296">symbolst</a></td></tr>
 <tr class="separator:a748e3870d1594d9d5be4e95115316296"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bd1e0131908dc95baee87414289e581"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a6bd1e0131908dc95baee87414289e581">const_iteratort</a> = symbolst::const_iterator</td></tr>
 <tr class="separator:a6bd1e0131908dc95baee87414289e581"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,22 +153,22 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac7e1e0c46fc3d566cf5e146732d99f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f20bf16787d148701f6c4e9c4316a91"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a9f20bf16787d148701f6c4e9c4316a91">get_symbol_table</a> () const =0</td></tr>
 <tr class="separator:a9f20bf16787d148701f6c4e9c4316a91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8982a03617781cd0b38cc32c49110f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ac8982a03617781cd0b38cc32c49110f5">has_symbol</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name) const</td></tr>
+<tr class="memitem:ac8982a03617781cd0b38cc32c49110f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ac8982a03617781cd0b38cc32c49110f5">has_symbol</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name) const</td></tr>
 <tr class="memdesc:ac8982a03617781cd0b38cc32c49110f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a symbol exists in the symbol table.  <a href="classsymbol__table__baset.html#ac8982a03617781cd0b38cc32c49110f5">More...</a><br /></td></tr>
 <tr class="separator:ac8982a03617781cd0b38cc32c49110f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a730ad9cb8648402cf3a93b917ecb39c4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a730ad9cb8648402cf3a93b917ecb39c4">lookup</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name) const</td></tr>
+<tr class="memitem:a730ad9cb8648402cf3a93b917ecb39c4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a730ad9cb8648402cf3a93b917ecb39c4">lookup</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name) const</td></tr>
 <tr class="memdesc:a730ad9cb8648402cf3a93b917ecb39c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a symbol in the symbol table for read-only access.  <a href="classsymbol__table__baset.html#a730ad9cb8648402cf3a93b917ecb39c4">More...</a><br /></td></tr>
 <tr class="separator:a730ad9cb8648402cf3a93b917ecb39c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa73f5af5f8d596334f12b5efd828057c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#aa73f5af5f8d596334f12b5efd828057c">lookup_ref</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name) const</td></tr>
+<tr class="memitem:aa73f5af5f8d596334f12b5efd828057c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#aa73f5af5f8d596334f12b5efd828057c">lookup_ref</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name) const</td></tr>
 <tr class="memdesc:aa73f5af5f8d596334f12b5efd828057c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a symbol in the symbol table for read-only access.  <a href="classsymbol__table__baset.html#aa73f5af5f8d596334f12b5efd828057c">More...</a><br /></td></tr>
 <tr class="separator:aa73f5af5f8d596334f12b5efd828057c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab725988cc4d2300a554efc5b9ff8db34"><td class="memItemLeft" align="right" valign="top">std::list&lt; symbolst::const_iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ab725988cc4d2300a554efc5b9ff8db34">match_name_or_base_name</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
+<tr class="memitem:ab725988cc4d2300a554efc5b9ff8db34"><td class="memItemLeft" align="right" valign="top">std::list&lt; symbolst::const_iterator &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ab725988cc4d2300a554efc5b9ff8db34">match_name_or_base_name</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
 <tr class="memdesc:ab725988cc4d2300a554efc5b9ff8db34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect all symbols the name of which matches <code>id</code> or the base name of which matches <code>id</code>.  <a href="classsymbol__table__baset.html#ab725988cc4d2300a554efc5b9ff8db34">More...</a><br /></td></tr>
 <tr class="separator:ab725988cc4d2300a554efc5b9ff8db34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad481469df4c82139719336fc5e3e63cd"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classsymbolt.html">symbolt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ad481469df4c82139719336fc5e3e63cd">get_writeable</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name)=0</td></tr>
+<tr class="memitem:ad481469df4c82139719336fc5e3e63cd"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classsymbolt.html">symbolt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ad481469df4c82139719336fc5e3e63cd">get_writeable</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name)=0</td></tr>
 <tr class="memdesc:ad481469df4c82139719336fc5e3e63cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a symbol in the symbol table for read-write access.  <a href="classsymbol__table__baset.html#ad481469df4c82139719336fc5e3e63cd">More...</a><br /></td></tr>
 <tr class="separator:ad481469df4c82139719336fc5e3e63cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a572a1bb31cb918715b9dc8593f7bf189"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">get_writeable_ref</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name)</td></tr>
+<tr class="memitem:a572a1bb31cb918715b9dc8593f7bf189"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">get_writeable_ref</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name)</td></tr>
 <tr class="memdesc:a572a1bb31cb918715b9dc8593f7bf189"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a symbol in the symbol table for read-write access.  <a href="classsymbol__table__baset.html#a572a1bb31cb918715b9dc8593f7bf189">More...</a><br /></td></tr>
 <tr class="separator:a572a1bb31cb918715b9dc8593f7bf189"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace726bfe2960bd1ad332c5ac52768e10"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">add</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol)</td></tr>
@@ -179,7 +179,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae1b8eff24b5b55eda54ae3ea9e98fb2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e50e3cab03dcafa022a94c180033bda"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a3e50e3cab03dcafa022a94c180033bda">move</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, <a class="el" href="classsymbolt.html">symbolt</a> *&amp;new_symbol)=0</td></tr>
 <tr class="separator:a3e50e3cab03dcafa022a94c180033bda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cf84522dd1857c9bd5866dca1df23d6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a2cf84522dd1857c9bd5866dca1df23d6">remove</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name)</td></tr>
+<tr class="memitem:a2cf84522dd1857c9bd5866dca1df23d6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a2cf84522dd1857c9bd5866dca1df23d6">remove</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name)</td></tr>
 <tr class="memdesc:a2cf84522dd1857c9bd5866dca1df23d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a symbol from the symbol table.  <a href="classsymbol__table__baset.html#a2cf84522dd1857c9bd5866dca1df23d6">More...</a><br /></td></tr>
 <tr class="separator:a2cf84522dd1857c9bd5866dca1df23d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59e0b21c149755e97e8c803586c0ca82"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a59e0b21c149755e97e8c803586c0ca82">erase</a> (const symbolst::const_iterator &amp;entry)=0</td></tr>
@@ -190,7 +190,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7e6a78eb73e0b11e4cdbec40d1e003b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a7e6a78eb73e0b11e4cdbec40d1e003b5">show</a> (std::ostream &amp;out) const</td></tr>
 <tr class="memdesc:a7e6a78eb73e0b11e4cdbec40d1e003b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the contents of the symbol table.  <a href="classsymbol__table__baset.html#a7e6a78eb73e0b11e4cdbec40d1e003b5">More...</a><br /></td></tr>
 <tr class="separator:a7e6a78eb73e0b11e4cdbec40d1e003b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08da11e014c1ef9cc2d5bf59c635da22"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a08da11e014c1ef9cc2d5bf59c635da22">sorted_symbol_names</a> () const</td></tr>
+<tr class="memitem:a08da11e014c1ef9cc2d5bf59c635da22"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a08da11e014c1ef9cc2d5bf59c635da22">sorted_symbol_names</a> () const</td></tr>
 <tr class="memdesc:a08da11e014c1ef9cc2d5bf59c635da22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build and return a lexicographically sorted vector of symbol names from all symbols stored in this symbol table.  <a href="classsymbol__table__baset.html#a08da11e014c1ef9cc2d5bf59c635da22">More...</a><br /></td></tr>
 <tr class="separator:a08da11e014c1ef9cc2d5bf59c635da22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61057e2d62342aed3295986dcf77149e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classsymbol__table__baset_1_1iteratort.html">iteratort</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__table__baset.html#a61057e2d62342aed3295986dcf77149e">begin</a> ()=0</td></tr>
@@ -244,7 +244,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::unordered_map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a>&gt; <a class="el" href="classsymbol__table__baset.html#a748e3870d1594d9d5be4e95115316296">symbol_table_baset::symbolst</a></td>
+          <td class="memname">typedef std::unordered_map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsymbolt.html">symbolt</a>&gt; <a class="el" href="classsymbol__table__baset.html#a748e3870d1594d9d5be4e95115316296">symbol_table_baset::symbolst</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -594,7 +594,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual <a class="el" href="classsymbolt.html">symbolt</a>* symbol_table_baset::get_writeable </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -631,7 +631,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classsymbolt.html">symbolt</a>&amp; symbol_table_baset::get_writeable_ref </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -674,7 +674,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool symbol_table_baset::has_symbol </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -749,7 +749,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">const <a class="el" href="classsymbolt.html">symbolt</a>* symbol_table_baset::lookup </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -786,7 +786,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">const <a class="el" href="classsymbolt.html">symbolt</a>&amp; symbol_table_baset::lookup_ref </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -823,7 +823,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">std::list&lt;symbolst::const_iterator&gt; symbol_table_baset::match_name_or_base_name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -1021,7 +1021,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool symbol_table_baset::remove </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1076,7 +1076,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; symbol_table_baset::sorted_symbol_names </td>
+          <td class="memname">std::vector&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; symbol_table_baset::sorted_symbol_names </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>

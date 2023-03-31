@@ -142,16 +142,16 @@ Functions</h2></td></tr>
 <tr class="memitem:a1680be1d39f1eba0f2f6efcfb9ee0d77"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structjava__primitive__type__infot.html">java_primitive_type_infot</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a1680be1d39f1eba0f2f6efcfb9ee0d77">get_java_primitive_type_info</a> (const <a class="el" href="classtypet.html">typet</a> &amp;maybe_primitive_type)</td></tr>
 <tr class="memdesc:a1680be1d39f1eba0f2f6efcfb9ee0d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <code>primitive_type</code> is a Java primitive type, return information about it, otherwise return null.  <a href="java__utils_8h.html#a1680be1d39f1eba0f2f6efcfb9ee0d77">More...</a><br /></td></tr>
 <tr class="separator:a1680be1d39f1eba0f2f6efcfb9ee0d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1880b5369568361210b15af9229e1f6f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structjava__boxed__type__infot.html">java_boxed_type_infot</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a1880b5369568361210b15af9229e1f6f">get_boxed_type_info_by_name</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;type_name)</td></tr>
+<tr class="memitem:a1880b5369568361210b15af9229e1f6f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structjava__boxed__type__infot.html">java_boxed_type_infot</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a1880b5369568361210b15af9229e1f6f">get_boxed_type_info_by_name</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;type_name)</td></tr>
 <tr class="memdesc:a1880b5369568361210b15af9229e1f6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <code>type_name</code> is a Java boxed type tag, return information about it, otherwise return null.  <a href="java__utils_8h.html#a1880b5369568361210b15af9229e1f6f">More...</a><br /></td></tr>
 <tr class="separator:a1880b5369568361210b15af9229e1f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c8c34e8e1d06be2619bc3f8a4b34146"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a6c8c34e8e1d06be2619bc3f8a4b34146">is_primitive_wrapper_type_id</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
+<tr class="memitem:a6c8c34e8e1d06be2619bc3f8a4b34146"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a6c8c34e8e1d06be2619bc3f8a4b34146">is_primitive_wrapper_type_id</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
 <tr class="memdesc:a6c8c34e8e1d06be2619bc3f8a4b34146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the argument is the symbol-table identifier of a Java primitive wrapper type (for example, java::java.lang.Byte)  <a href="java__utils_8h.html#a6c8c34e8e1d06be2619bc3f8a4b34146">More...</a><br /></td></tr>
 <tr class="separator:a6c8c34e8e1d06be2619bc3f8a4b34146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07b95e4bf1b1b4120e062de16ae1d599"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a07b95e4bf1b1b4120e062de16ae1d599">is_primitive_wrapper_type_name</a> (const std::string &amp;type_name)</td></tr>
 <tr class="memdesc:a07b95e4bf1b1b4120e062de16ae1d599"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the argument is the fully qualified name of a Java primitive wrapper type (for example, java.lang.Byte)  <a href="java__utils_8h.html#a07b95e4bf1b1b4120e062de16ae1d599">More...</a><br /></td></tr>
 <tr class="separator:a07b95e4bf1b1b4120e062de16ae1d599"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f10462c30b86c07802295b9b5c8ed20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a7f10462c30b86c07802295b9b5c8ed20">generate_class_stub</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_union_typet::componentst</a> &amp;componentst)</td></tr>
+<tr class="memitem:a7f10462c30b86c07802295b9b5c8ed20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a7f10462c30b86c07802295b9b5c8ed20">generate_class_stub</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;class_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_union_typet::componentst</a> &amp;componentst)</td></tr>
 <tr class="separator:a7f10462c30b86c07802295b9b5c8ed20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6eb3a45fbd2c90f908ad151a93fa660"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#ab6eb3a45fbd2c90f908ad151a93fa660">java_local_variable_slots</a> (const <a class="el" href="classtypet.html">typet</a> &amp;t)</td></tr>
 <tr class="memdesc:ab6eb3a45fbd2c90f908ad151a93fa660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of JVM local variables (slots) taken by a local variable that, when translated to goto, has type <code>t</code>.  <a href="java__utils_8h.html#ab6eb3a45fbd2c90f908ad151a93fa660">More...</a><br /></td></tr>
@@ -164,9 +164,9 @@ Functions</h2></td></tr>
 <tr class="memitem:adafac10974cfdab7157d4a9b7b6e3388"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#adafac10974cfdab7157d4a9b7b6e3388">merge_source_location_rec</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
 <tr class="memdesc:adafac10974cfdab7157d4a9b7b6e3388"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches a source location to an expression and all of its subexpressions.  <a href="java__utils_8h.html#adafac10974cfdab7157d4a9b7b6e3388">More...</a><br /></td></tr>
 <tr class="separator:adafac10974cfdab7157d4a9b7b6e3388"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08d6cb5375ab2c0670f299549a637fed"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a08d6cb5375ab2c0670f299549a637fed">is_java_string_literal_id</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
+<tr class="memitem:a08d6cb5375ab2c0670f299549a637fed"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a08d6cb5375ab2c0670f299549a637fed">is_java_string_literal_id</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
 <tr class="separator:a08d6cb5375ab2c0670f299549a637fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b4b859a9a6609cbb8edc0cb72c7373e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a4b4b859a9a6609cbb8edc0cb72c7373e">resolve_friendly_method_name</a> (const std::string &amp;friendly_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, std::string &amp;error)</td></tr>
+<tr class="memitem:a4b4b859a9a6609cbb8edc0cb72c7373e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a4b4b859a9a6609cbb8edc0cb72c7373e">resolve_friendly_method_name</a> (const std::string &amp;friendly_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, std::string &amp;error)</td></tr>
 <tr class="memdesc:a4b4b859a9a6609cbb8edc0cb72c7373e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resolves a user-friendly method name (like packagename.Class.method) into an internal name (like java::packagename.Class.method:()V) The input may also have a type descriptor suffix to resolve ambiguity.  <a href="java__utils_8h.html#a4b4b859a9a6609cbb8edc0cb72c7373e">More...</a><br /></td></tr>
 <tr class="separator:a4b4b859a9a6609cbb8edc0cb72c7373e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab55fd6bc240537e436f01cde6b7ff7c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classpointer__typet.html">pointer_typet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#ab55fd6bc240537e436f01cde6b7ff7c4">pointer_to_replacement_type</a> (const <a class="el" href="classpointer__typet.html">pointer_typet</a> &amp;given_pointer_type, const <a class="el" href="classjava__class__typet.html">java_class_typet</a> &amp;replacement_class_type)</td></tr>
@@ -181,27 +181,27 @@ Functions</h2></td></tr>
 <tr class="memitem:a1203178ec3650359e216ce5a12491873"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a1203178ec3650359e216ce5a12491873">find_closing_delimiter</a> (const std::string &amp;src, size_t position, char open_char, char close_char)</td></tr>
 <tr class="memdesc:a1203178ec3650359e216ce5a12491873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the corresponding closing delimiter to the given opening delimiter.  <a href="java__utils_8h.html#a1203178ec3650359e216ce5a12491873">More...</a><br /></td></tr>
 <tr class="separator:a1203178ec3650359e216ce5a12491873"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf642795e96f7e4ff765efe1653f64ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aaf642795e96f7e4ff765efe1653f64ee">make_function_application</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, const <a class="el" href="classtypet.html">typet</a> &amp;range, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memitem:aaf642795e96f7e4ff765efe1653f64ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aaf642795e96f7e4ff765efe1653f64ee">make_function_application</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments, const <a class="el" href="classtypet.html">typet</a> &amp;range, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="memdesc:aaf642795e96f7e4ff765efe1653f64ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a (mathematical) function application expression.  <a href="java__utils_8h.html#aaf642795e96f7e4ff765efe1653f64ee">More...</a><br /></td></tr>
 <tr class="separator:aaf642795e96f7e4ff765efe1653f64ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7774fc8c1491a4a91680c468b4f981b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aa7774fc8c1491a4a91680c468b4f981b">strip_java_namespace_prefix</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;to_strip)</td></tr>
+<tr class="memitem:aa7774fc8c1491a4a91680c468b4f981b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aa7774fc8c1491a4a91680c468b4f981b">strip_java_namespace_prefix</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;to_strip)</td></tr>
 <tr class="memdesc:aa7774fc8c1491a4a91680c468b4f981b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strip java:: prefix from given identifier.  <a href="java__utils_8h.html#aa7774fc8c1491a4a91680c468b4f981b">More...</a><br /></td></tr>
 <tr class="separator:aa7774fc8c1491a4a91680c468b4f981b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb63f314609cf12c7884e4ba407f032f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#afb63f314609cf12c7884e4ba407f032f">pretty_print_java_type</a> (const std::string &amp;fqn_java_type)</td></tr>
 <tr class="memdesc:afb63f314609cf12c7884e4ba407f032f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strip the package name from a java type, for the type to be pretty printed (java::java.lang.Integer -&gt; Integer).  <a href="java__utils_8h.html#afb63f314609cf12c7884e4ba407f032f">More...</a><br /></td></tr>
 <tr class="separator:afb63f314609cf12c7884e4ba407f032f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8bcdd9e42842c100435d61466ec707f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#af8bcdd9e42842c100435d61466ec707f">get_inherited_component</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_class_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool include_interfaces)</td></tr>
+<tr class="memitem:af8bcdd9e42842c100435d61466ec707f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#af8bcdd9e42842c100435d61466ec707f">get_inherited_component</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_class_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool include_interfaces)</td></tr>
 <tr class="memdesc:af8bcdd9e42842c100435d61466ec707f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an inherited component (method or field), taking component visibility into account.  <a href="java__utils_8h.html#af8bcdd9e42842c100435d61466ec707f">More...</a><br /></td></tr>
 <tr class="separator:af8bcdd9e42842c100435d61466ec707f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa7219675bbfa3781a7c40ff5f138709"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aaa7219675bbfa3781a7c40ff5f138709">is_non_null_library_global</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)</td></tr>
+<tr class="memitem:aaa7219675bbfa3781a7c40ff5f138709"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aaa7219675bbfa3781a7c40ff5f138709">is_non_null_library_global</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)</td></tr>
 <tr class="memdesc:aaa7219675bbfa3781a7c40ff5f138709"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a symbol is a well-known non-null global.  <a href="java__utils_8h.html#aaa7219675bbfa3781a7c40ff5f138709">More...</a><br /></td></tr>
 <tr class="separator:aaa7219675bbfa3781a7c40ff5f138709"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49fc9008a1330e6329658847b547673b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a49fc9008a1330e6329658847b547673b">fresh_java_symbol</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const std::string &amp;basename_prefix, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="memitem:a49fc9008a1330e6329658847b547673b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a49fc9008a1330e6329658847b547673b">fresh_java_symbol</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const std::string &amp;basename_prefix, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="separator:a49fc9008a1330e6329658847b547673b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ebae8caea79ca846955c4237d7f0915"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">declaring_class</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol)</td></tr>
+<tr class="memitem:a4ebae8caea79ca846955c4237d7f0915"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">declaring_class</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol)</td></tr>
 <tr class="memdesc:a4ebae8caea79ca846955c4237d7f0915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the identifier of the class which declared a given <code>symbol</code>.  <a href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">More...</a><br /></td></tr>
 <tr class="separator:a4ebae8caea79ca846955c4237d7f0915"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">set_declaring_class</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">declaring_class</a>)</td></tr>
+<tr class="memitem:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">set_declaring_class</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">declaring_class</a>)</td></tr>
 <tr class="memdesc:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the identifier of the class which declared a given <code>symbol</code> to <code>declaring_class</code>.  <a href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">More...</a><br /></td></tr>
 <tr class="separator:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e09e1fbfb5d08c9df24a0b6acce3c03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a2e09e1fbfb5d08c9df24a0b6acce3c03">class_name_from_method_name</a> (const std::string &amp;method_name)</td></tr>
@@ -290,7 +290,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; declaring_class </td>
+          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; declaring_class </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol</em></td><td>)</td>
@@ -389,7 +389,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_name</em>, </td>
         </tr>
         <tr>
@@ -430,7 +430,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void generate_class_stub </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>class_name</em>, </td>
         </tr>
         <tr>
@@ -472,7 +472,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">const <a class="el" href="structjava__boxed__type__infot.html">java_boxed_type_infot</a>* get_boxed_type_info_by_name </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>type_name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -494,13 +494,13 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a>&gt; get_inherited_component </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>component_class_id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>component_name</em>, </td>
         </tr>
         <tr>
@@ -570,7 +570,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">bool is_java_string_literal_id </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
         </tr>
@@ -620,7 +620,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">bool is_non_null_library_global </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>symbolid</em></td><td>)</td>
           <td></td>
         </tr>
@@ -649,7 +649,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">bool is_primitive_wrapper_type_id </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
         </tr>
@@ -796,7 +796,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classexprt.html">exprt</a> make_function_application </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_name</em>, </td>
         </tr>
         <tr>
@@ -942,7 +942,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> resolve_friendly_method_name </td>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> resolve_friendly_method_name </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>friendly_name</em>, </td>
@@ -968,7 +968,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Resolves a user-friendly method name (like packagename.Class.method) into an internal name (like java::packagename.Class.method:()V) The input may also have a type descriptor suffix to resolve ambiguity. </p>
-<p>On error, returns <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> and sets error. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>On error, returns <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> and sets error. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">friendly_name</td><td>user-friendly method name </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">symbol_table</td><td>global symbol table </td></tr>
@@ -996,7 +996,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>declaring_class</em>&#160;</td>
         </tr>
         <tr>
@@ -1020,9 +1020,9 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> strip_java_namespace_prefix </td>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> strip_java_namespace_prefix </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>to_strip</em></td><td>)</td>
           <td></td>
         </tr>

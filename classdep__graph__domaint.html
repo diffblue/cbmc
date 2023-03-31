@@ -135,7 +135,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:acd8f5f2bdc79a883c226c8c6d9fabf1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e5a8567da680fc7f79f348c4b1517af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#a4e5a8567da680fc7f79f348c4b1517af">merge</a> (const <a class="el" href="classdep__graph__domaint.html">dep_graph_domaint</a> &amp;src, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> to)</td></tr>
 <tr class="separator:a4e5a8567da680fc7f79f348c4b1517af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa36632aa38b134a9d19b558b39dc5b51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#aa36632aa38b134a9d19b558b39dc5b51">transform</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_from, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_to, <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) final override</td></tr>
+<tr class="memitem:aa36632aa38b134a9d19b558b39dc5b51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#aa36632aa38b134a9d19b558b39dc5b51">transform</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_from, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_to, <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) final override</td></tr>
 <tr class="memdesc:aa36632aa38b134a9d19b558b39dc5b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">how function calls are treated: a) there is an edge from each call site to the function head b) there is an edge from the last instruction (END_FUNCTION) of the function to the instruction <em>following</em> the call site (this also needs to set the LHS, if applicable)  <a href="classdep__graph__domaint.html#aa36632aa38b134a9d19b558b39dc5b51">More...</a><br /></td></tr>
 <tr class="separator:aa36632aa38b134a9d19b558b39dc5b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada259b546f92bb75c736ee9fec5e6ae3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#ada259b546f92bb75c736ee9fec5e6ae3">output</a> (std::ostream &amp;out, const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const final override</td></tr>
@@ -182,9 +182,9 @@ Private Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a2b10aa5456a0917f070d1221adb3edc4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#a2b10aa5456a0917f070d1221adb3edc4">control_dependencies</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> from, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> to, <a class="el" href="classdependence__grapht.html">dependence_grapht</a> &amp;dep_graph)</td></tr>
+<tr class="memitem:a2b10aa5456a0917f070d1221adb3edc4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#a2b10aa5456a0917f070d1221adb3edc4">control_dependencies</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> from, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> to, <a class="el" href="classdependence__grapht.html">dependence_grapht</a> &amp;dep_graph)</td></tr>
 <tr class="separator:a2b10aa5456a0917f070d1221adb3edc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad01ebb9e1cf1156d52e2828b94222244"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#ad01ebb9e1cf1156d52e2828b94222244">data_dependencies</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> from, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> to, <a class="el" href="classdependence__grapht.html">dependence_grapht</a> &amp;dep_graph, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memitem:ad01ebb9e1cf1156d52e2828b94222244"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#ad01ebb9e1cf1156d52e2828b94222244">data_dependencies</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> from, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> to, <a class="el" href="classdependence__grapht.html">dependence_grapht</a> &amp;dep_graph, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="separator:ad01ebb9e1cf1156d52e2828b94222244"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -305,7 +305,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void dep_graph_domaint::control_dependencies </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
@@ -361,7 +361,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_to</em>, </td>
         </tr>
         <tr>
@@ -745,7 +745,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void dep_graph_domaint::transform </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_from</em>, </td>
         </tr>
         <tr>
@@ -757,7 +757,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_to</em>, </td>
         </tr>
         <tr>

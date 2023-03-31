@@ -137,13 +137,13 @@ Functions</h2></td></tr>
 <tr class="memitem:aca6b71a541c76387dbcc2c635f94c959"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#aca6b71a541c76387dbcc2c635f94c959">has_subexpr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const std::function&lt; bool(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;pred)</td></tr>
 <tr class="memdesc:aca6b71a541c76387dbcc2c635f94c959"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if the expression has a subexpression that satisfies pred  <a href="expr__util_8cpp.html#aca6b71a541c76387dbcc2c635f94c959">More...</a><br /></td></tr>
 <tr class="separator:aca6b71a541c76387dbcc2c635f94c959"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bfffa96127eac66589d2db975e66328"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#a9bfffa96127eac66589d2db975e66328">has_subexpr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
+<tr class="memitem:a9bfffa96127eac66589d2db975e66328"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#a9bfffa96127eac66589d2db975e66328">has_subexpr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
 <tr class="memdesc:a9bfffa96127eac66589d2db975e66328"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if the expression has a subexpression with given ID  <a href="expr__util_8cpp.html#a9bfffa96127eac66589d2db975e66328">More...</a><br /></td></tr>
 <tr class="separator:a9bfffa96127eac66589d2db975e66328"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa6f127382aa2dcdc1e1bf553ce0e41d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#afa6f127382aa2dcdc1e1bf553ce0e41d">has_subtype</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const std::function&lt; bool(const <a class="el" href="classtypet.html">typet</a> &amp;)&gt; &amp;pred, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:afa6f127382aa2dcdc1e1bf553ce0e41d"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if any of the contained types satisfies pred  <a href="expr__util_8cpp.html#afa6f127382aa2dcdc1e1bf553ce0e41d">More...</a><br /></td></tr>
 <tr class="separator:afa6f127382aa2dcdc1e1bf553ce0e41d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac83c62f930a5cd24bd0f186c0303eeb1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#ac83c62f930a5cd24bd0f186c0303eeb1">has_subtype</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memitem:ac83c62f930a5cd24bd0f186c0303eeb1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#ac83c62f930a5cd24bd0f186c0303eeb1">has_subtype</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:ac83c62f930a5cd24bd0f186c0303eeb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if any of the contained types is id  <a href="expr__util_8cpp.html#ac83c62f930a5cd24bd0f186c0303eeb1">More...</a><br /></td></tr>
 <tr class="separator:ac83c62f930a5cd24bd0f186c0303eeb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc0e1c63deb5df653204af547e32afe8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classif__exprt.html">if_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#acc0e1c63deb5df653204af547e32afe8">lift_if</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;src, std::size_t operand_number)</td></tr>
@@ -232,7 +232,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em>&#160;</td>
         </tr>
         <tr>
@@ -264,7 +264,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em>, </td>
         </tr>
         <tr>

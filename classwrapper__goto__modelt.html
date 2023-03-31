@@ -128,10 +128,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae22450e97b09f623b1b5e56e092d2bf7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwrapper__goto__modelt.html#ae22450e97b09f623b1b5e56e092d2bf7">get_symbol_table</a> () const override</td></tr>
 <tr class="memdesc:ae22450e97b09f623b1b5e56e092d2bf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accessor to get the symbol table.  <a href="classwrapper__goto__modelt.html#ae22450e97b09f623b1b5e56e092d2bf7">More...</a><br /></td></tr>
 <tr class="separator:ae22450e97b09f623b1b5e56e092d2bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fa97e6a61090797916f3a5d0872f4fb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwrapper__goto__modelt.html#a9fa97e6a61090797916f3a5d0872f4fb">get_goto_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) override</td></tr>
+<tr class="memitem:a9fa97e6a61090797916f3a5d0872f4fb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwrapper__goto__modelt.html#a9fa97e6a61090797916f3a5d0872f4fb">get_goto_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) override</td></tr>
 <tr class="memdesc:a9fa97e6a61090797916f3a5d0872f4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a GOTO function by name, or throw if no such function exists.  <a href="classwrapper__goto__modelt.html#a9fa97e6a61090797916f3a5d0872f4fb">More...</a><br /></td></tr>
 <tr class="separator:a9fa97e6a61090797916f3a5d0872f4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cebd51ec5cd85493b4146607ad2f90e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwrapper__goto__modelt.html#a9cebd51ec5cd85493b4146607ad2f90e">can_produce_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const override</td></tr>
+<tr class="memitem:a9cebd51ec5cd85493b4146607ad2f90e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwrapper__goto__modelt.html#a9cebd51ec5cd85493b4146607ad2f90e">can_produce_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const override</td></tr>
 <tr class="memdesc:a9cebd51ec5cd85493b4146607ad2f90e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if this model can produce a body for the given function.  <a href="classwrapper__goto__modelt.html#a9cebd51ec5cd85493b4146607ad2f90e">More...</a><br /></td></tr>
 <tr class="separator:a9cebd51ec5cd85493b4146607ad2f90e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7c4fcd1cffcf4897a7ca4d0df277a09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classwrapper__goto__modelt.html#ab7c4fcd1cffcf4897a7ca4d0df277a09">validate</a> (const <a class="el" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9">validation_modet</a> vm, const <a class="el" href="classgoto__model__validation__optionst.html">goto_model_validation_optionst</a> &amp;goto_model_validation_options) const override</td></tr>
@@ -204,7 +204,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool wrapper_goto_modelt::can_produce_function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -243,7 +243,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a>&amp; wrapper_goto_modelt::get_goto_function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
         </tr>

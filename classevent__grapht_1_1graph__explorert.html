@@ -126,7 +126,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a813f1f2f99cda65002fe467f6ac52074"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classevent__grapht_1_1critical__cyclet.html">critical_cyclet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a813f1f2f99cda65002fe467f6ac52074">extract_cycle</a> (<a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> vertex, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> source, unsigned number_of_cycles)</td></tr>
 <tr class="memdesc:a813f1f2f99cda65002fe467f6ac52074"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts a (whole, unreduced) cycle from the stack.  <a href="classevent__grapht_1_1graph__explorert.html#a813f1f2f99cda65002fe467f6ac52074">More...</a><br /></td></tr>
 <tr class="separator:a813f1f2f99cda65002fe467f6ac52074"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab44358f0ceacdef726cb6d8f421658f9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#ab44358f0ceacdef726cb6d8f421658f9">backtrack</a> (std::set&lt; <a class="el" href="classevent__grapht_1_1critical__cyclet.html">critical_cyclet</a> &gt; &amp;set_of_cycles, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> source, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> vertex, bool unsafe_met, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> po_trans, bool same_var_pair, bool lwsync_met, bool has_to_be_unsafe, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> var_to_avoid, <a class="el" href="wmm_8h.html#a658c2a0a6277ef45f721102f5a5293d9">memory_modelt</a> model)</td></tr>
+<tr class="memitem:ab44358f0ceacdef726cb6d8f421658f9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#ab44358f0ceacdef726cb6d8f421658f9">backtrack</a> (std::set&lt; <a class="el" href="classevent__grapht_1_1critical__cyclet.html">critical_cyclet</a> &gt; &amp;set_of_cycles, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> source, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> vertex, bool unsafe_met, <a class="el" href="event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21">event_idt</a> po_trans, bool same_var_pair, bool lwsync_met, bool has_to_be_unsafe, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> var_to_avoid, <a class="el" href="wmm_8h.html#a658c2a0a6277ef45f721102f5a5293d9">memory_modelt</a> model)</td></tr>
 <tr class="memdesc:ab44358f0ceacdef726cb6d8f421658f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">see <a class="el" href="classevent__grapht.html#abd5dbadfa0c2177f77e4d8c137f11197">event_grapht::collect_cycles</a>  <a href="classevent__grapht_1_1graph__explorert.html#ab44358f0ceacdef726cb6d8f421658f9">More...</a><br /></td></tr>
 <tr class="separator:ab44358f0ceacdef726cb6d8f421658f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaf6ba4193e83b6c23673ee10c4f63a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#aaaf6ba4193e83b6c23673ee10c4f63a5">collect_cycles</a> (std::set&lt; <a class="el" href="classevent__grapht_1_1critical__cyclet.html">critical_cyclet</a> &gt; &amp;set_of_cycles, <a class="el" href="wmm_8h.html#a658c2a0a6277ef45f721102f5a5293d9">memory_modelt</a> model)</td></tr>
@@ -162,9 +162,9 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:ab86bd181919f26b6f1862cda283b9769"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71fbf3b1e379d9e5be4782b06f363cc1"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a71fbf3b1e379d9e5be4782b06f363cc1">max_po_trans</a></td></tr>
 <tr class="separator:a71fbf3b1e379d9e5be4782b06f363cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a586d28b0586167fad6c17ef2af079638"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a586d28b0586167fad6c17ef2af079638">writes_per_variable</a></td></tr>
+<tr class="memitem:a586d28b0586167fad6c17ef2af079638"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a586d28b0586167fad6c17ef2af079638">writes_per_variable</a></td></tr>
 <tr class="separator:a586d28b0586167fad6c17ef2af079638"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cede5d3be5eeb782d61dd233bbd06d0"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a0cede5d3be5eeb782d61dd233bbd06d0">reads_per_variable</a></td></tr>
+<tr class="memitem:a0cede5d3be5eeb782d61dd233bbd06d0"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a0cede5d3be5eeb782d61dd233bbd06d0">reads_per_variable</a></td></tr>
 <tr class="separator:a0cede5d3be5eeb782d61dd233bbd06d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a56c4f252c568be042edc344f8cb715"><td class="memItemLeft" align="right" valign="top">std::map&lt; unsigned, unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classevent__grapht_1_1graph__explorert.html#a9a56c4f252c568be042edc344f8cb715">events_per_thread</a></td></tr>
 <tr class="separator:a9a56c4f252c568be042edc344f8cb715"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -306,7 +306,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td>
           <td class="paramname"><em>var_to_avoid</em>, </td>
         </tr>
         <tr>
@@ -665,7 +665,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char&gt; event_grapht::graph_explorert::reads_per_variable</td>
+          <td class="memname">std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char&gt; event_grapht::graph_explorert::reads_per_variable</td>
         </tr>
       </table>
   </td>
@@ -729,7 +729,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char&gt; event_grapht::graph_explorert::writes_per_variable</td>
+          <td class="memname">std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, unsigned char&gt; event_grapht::graph_explorert::writes_per_variable</td>
         </tr>
       </table>
   </td>

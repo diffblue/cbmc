@@ -115,22 +115,22 @@ $(document).ready(function(){initNavTree('classdfcc__spec__functionst.html','');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a046b311ef577665ffd0b0172c1401a57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a046b311ef577665ffd0b0172c1401a57">dfcc_spec_functionst</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a7189a0794691a9eaaeae4211cf94fe50">message_handler</a>, <a class="el" href="classdfcc__utilst.html">dfcc_utilst</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a8ca1458e414b2324b7f18618481ba88b">utils</a>, <a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>, <a class="el" href="classdfcc__instrumentt.html">dfcc_instrumentt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#aec46648e85d9762f15e98b12386bfb5a">instrument</a>)</td></tr>
 <tr class="separator:a046b311ef577665ffd0b0172c1401a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">generate_havoc_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;havoc_function_id, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memitem:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">generate_havoc_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;havoc_function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a4aa878468b43f3e46395eeccfd1a24ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">From a function:  <a href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">More...</a><br /></td></tr>
 <tr class="separator:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3791050c87eb30ea71eae38706bb16b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#ac3791050c87eb30ea71eae38706bb16b">generate_havoc_instructions</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;module, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;original_program, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_havoc, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;havoc_program, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memitem:ac3791050c87eb30ea71eae38706bb16b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#ac3791050c87eb30ea71eae38706bb16b">generate_havoc_instructions</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;module, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;original_program, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_havoc, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;havoc_program, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:ac3791050c87eb30ea71eae38706bb16b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translates <code>original_program</code> that specifies assignable targets into a program that havocs the targets.  <a href="classdfcc__spec__functionst.html#ac3791050c87eb30ea71eae38706bb16b">More...</a><br /></td></tr>
 <tr class="separator:ac3791050c87eb30ea71eae38706bb16b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a150d81017334f45e3152527c64a6213d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">to_spec_assigns_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memitem:a150d81017334f45e3152527c64a6213d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">to_spec_assigns_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a150d81017334f45e3152527c64a6213d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms (in place) a function.  <a href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">More...</a><br /></td></tr>
 <tr class="separator:a150d81017334f45e3152527c64a6213d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82522c6484e8f0e3fd58625ddaf72228"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">to_spec_assigns_instructions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_fill, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;language_mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memitem:a82522c6484e8f0e3fd58625ddaf72228"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">to_spec_assigns_instructions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_fill, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;language_mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a82522c6484e8f0e3fd58625ddaf72228"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites in place <code>program</code> expressed in terms of built-ins specifying assignable targets declaratively using <code>__CPROVER_assignable</code>, <code>__CPROVER_object_whole</code>, <code>__CPROVER_object_from</code>, <code>__CPROVER_object_upto</code> into a program populating <code>write_set_to_fill</code>.  <a href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">More...</a><br /></td></tr>
 <tr class="separator:a82522c6484e8f0e3fd58625ddaf72228"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee89c7ad74728f279407a672d8393ec7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">to_spec_frees_function</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memitem:aee89c7ad74728f279407a672d8393ec7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">to_spec_frees_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:aee89c7ad74728f279407a672d8393ec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms (in place) a function.  <a href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">More...</a><br /></td></tr>
 <tr class="separator:aee89c7ad74728f279407a672d8393ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30c9a683159e9ac5863c075641f73fcc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">to_spec_frees_instructions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_fill, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;language_mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, std::size_t &amp;nof_targets)</td></tr>
+<tr class="memitem:a30c9a683159e9ac5863c075641f73fcc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">to_spec_frees_instructions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;write_set_to_fill, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;language_mode, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;program, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a30c9a683159e9ac5863c075641f73fcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewrites in place <code>program</code> expressed in terms of built-ins specifying freeable targets declaratively using <code>__CPROVER_freeable</code> into a program populating <code>write_set_to_fill</code>.  <a href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">More...</a><br /></td></tr>
 <tr class="separator:a30c9a683159e9ac5863c075641f73fcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -227,13 +227,13 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void dfcc_spec_functionst::generate_havoc_function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>havoc_function_id</em>, </td>
         </tr>
         <tr>
@@ -277,19 +277,19 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void dfcc_spec_functionst::generate_havoc_instructions </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>mode</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>module</em>, </td>
         </tr>
         <tr>
@@ -383,7 +383,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void dfcc_spec_functionst::to_spec_assigns_function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
@@ -439,7 +439,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>language_mode</em>, </td>
         </tr>
         <tr>
@@ -488,7 +488,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void dfcc_spec_functionst::to_spec_frees_function </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
@@ -545,7 +545,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>language_mode</em>, </td>
         </tr>
         <tr>

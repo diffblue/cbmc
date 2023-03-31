@@ -130,7 +130,7 @@ Public Types</h2></td></tr>
 <tr class="memitem:a1d189209ec943c28c807fdbd902c48a2"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a></td></tr>
 <tr class="memdesc:a1d189209ec943c28c807fdbd902c48a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type abbreviation for <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a>.  <a href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">More...</a><br /></td></tr>
 <tr class="separator:a1d189209ec943c28c807fdbd902c48a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac46ec57c74296b5034ee93a1d96190c9"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;(const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">get_goto_functiont</a></td></tr>
+<tr class="memitem:ac46ec57c74296b5034ee93a1d96190c9"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">get_goto_functiont</a></td></tr>
 <tr class="memdesc:ac46ec57c74296b5034ee93a1d96190c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of delegate functions that retrieve a <a class="el" href="classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden...">goto_functiont</a> for a particular function identifier.  <a href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">More...</a><br /></td></tr>
 <tr class="separator:ac46ec57c74296b5034ee93a1d96190c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -154,7 +154,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a03e6d9d3d164722a4c82d46c6cb5f4b0"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classsymbol__tablet.html">symbol_tablet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a03e6d9d3d164722a4c82d46c6cb5f4b0">symex_with_state</a> (<a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">get_goto_functiont</a> &amp;get_goto_functions)</td></tr>
 <tr class="memdesc:a03e6d9d3d164722a4c82d46c6cb5f4b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolically execute the entire program starting from entry point.  <a href="classgoto__symext.html#a03e6d9d3d164722a4c82d46c6cb5f4b0">More...</a><br /></td></tr>
 <tr class="separator:a03e6d9d3d164722a4c82d46c6cb5f4b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a167a7482b0fe05a23765c208b9bb0449"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a167a7482b0fe05a23765c208b9bb0449">check_break</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;loop_id, unsigned unwind)</td></tr>
+<tr class="memitem:a167a7482b0fe05a23765c208b9bb0449"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a167a7482b0fe05a23765c208b9bb0449">check_break</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;loop_id, unsigned unwind)</td></tr>
 <tr class="memdesc:a167a7482b0fe05a23765c208b9bb0449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines condition for interrupting symbolic execution for a specific loop.  <a href="classgoto__symext.html#a167a7482b0fe05a23765c208b9bb0449">More...</a><br /></td></tr>
 <tr class="separator:a167a7482b0fe05a23765c208b9bb0449"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e6577b7ef4f0dc1aa9513366f4b11ac"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a6e6577b7ef4f0dc1aa9513366f4b11ac">get_total_vccs</a> () const</td></tr>
@@ -178,8 +178,8 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a2e575b321b4c4f6b0d02a5f4a378bc9f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a2e575b321b4c4f6b0d02a5f4a378bc9f">ignore_assertions</a> = false</td></tr>
 <tr class="memdesc:a2e575b321b4c4f6b0d02a5f4a378bc9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this flag is set to true then assertions will be temporarily ignored by the symbolic executions.  <a href="classgoto__symext.html#a2e575b321b4c4f6b0d02a5f4a378bc9f">More...</a><br /></td></tr>
 <tr class="separator:a2e575b321b4c4f6b0d02a5f4a378bc9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memItemLeft" align="right" valign="top"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a1f909a66c6f56fcd2ca9f2cc2f074113">language_mode</a></td></tr>
-<tr class="memdesc:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="mdescLeft">&#160;</td><td class="mdescRight">language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise.  <a href="classgoto__symext.html#a1f909a66c6f56fcd2ca9f2cc2f074113">More...</a><br /></td></tr>
+<tr class="memitem:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a1f909a66c6f56fcd2ca9f2cc2f074113">language_mode</a></td></tr>
+<tr class="memdesc:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="mdescLeft">&#160;</td><td class="mdescRight">language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise.  <a href="classgoto__symext.html#a1f909a66c6f56fcd2ca9f2cc2f074113">More...</a><br /></td></tr>
 <tr class="separator:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8662b904beca440f2da5610fbcbbdda1"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a8662b904beca440f2da5610fbcbbdda1">path_segment_vccs</a></td></tr>
 <tr class="memdesc:a8662b904beca440f2da5610fbcbbdda1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of VCCs generated during the run of this <a class="el" href="classgoto__symext.html" title="The main class for the forward symbolic simulator.">goto_symext</a> object.  <a href="classgoto__symext.html#a8662b904beca440f2da5610fbcbbdda1">More...</a><br /></td></tr>
@@ -276,7 +276,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a035b1803811f17455b0081bd4624ca68"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a035b1803811f17455b0081bd4624ca68">try_filter_value_sets</a> (<a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classexprt.html">exprt</a> condition, const <a class="el" href="classvalue__sett.html">value_sett</a> &amp;original_value_set, <a class="el" href="classvalue__sett.html">value_sett</a> *jump_taken_value_set, <a class="el" href="classvalue__sett.html">value_sett</a> *jump_not_taken_value_set, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;<a class="el" href="classgoto__symext.html#a930625b05387d69db989ef3b3556bc88">ns</a>)</td></tr>
 <tr class="memdesc:a035b1803811f17455b0081bd4624ca68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to filter value sets based on whether possible values of a pointer-typed symbol make the condition true or false.  <a href="classgoto__symext.html#a035b1803811f17455b0081bd4624ca68">More...</a><br /></td></tr>
 <tr class="separator:a035b1803811f17455b0081bd4624ca68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a967c56b7edc0d3dd401f07d17d2aa457"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a967c56b7edc0d3dd401f07d17d2aa457">vcc</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;cond, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;property_id, const std::string &amp;msg, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state)</td></tr>
+<tr class="memitem:a967c56b7edc0d3dd401f07d17d2aa457"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a967c56b7edc0d3dd401f07d17d2aa457">vcc</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;cond, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;property_id, const std::string &amp;msg, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state)</td></tr>
 <tr class="memdesc:a967c56b7edc0d3dd401f07d17d2aa457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolically execute a verification condition (assertion).  <a href="classgoto__symext.html#a967c56b7edc0d3dd401f07d17d2aa457">More...</a><br /></td></tr>
 <tr class="separator:a967c56b7edc0d3dd401f07d17d2aa457"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0fd7b52f28c01f2d7d5a920521b727b4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a0fd7b52f28c01f2d7d5a920521b727b4">symex_assume</a> (<a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classexprt.html">exprt</a> &amp;cond)</td></tr>
@@ -298,13 +298,13 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a00d2d179e80b199884451dccfc7da170"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7622181904c577b24a97b4f591373e6e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a7622181904c577b24a97b4f591373e6e">loop_bound_exceeded</a> (<a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classexprt.html">exprt</a> &amp;<a class="el" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>)</td></tr>
 <tr class="separator:a7622181904c577b24a97b4f591373e6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a231663084d1f03e5ea2639d06f40dd97"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a231663084d1f03e5ea2639d06f40dd97">no_body</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier)</td></tr>
+<tr class="memitem:a231663084d1f03e5ea2639d06f40dd97"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a231663084d1f03e5ea2639d06f40dd97">no_body</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier)</td></tr>
 <tr class="memdesc:a231663084d1f03e5ea2639d06f40dd97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log a warning that a function has no body.  <a href="classgoto__symext.html#a231663084d1f03e5ea2639d06f40dd97">More...</a><br /></td></tr>
 <tr class="separator:a231663084d1f03e5ea2639d06f40dd97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0d7efca4168117c665fb82182d52ee5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#af0d7efca4168117c665fb82182d52ee5">symex_function_call</a> (const <a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">get_goto_functiont</a> &amp;<a class="el" href="classgoto__symext.html#a2ea8c5e3c13c108ade1d799523a89f9e">get_goto_function</a>, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;instruction)</td></tr>
 <tr class="memdesc:af0d7efca4168117c665fb82182d52ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolically execute a FUNCTION_CALL instruction.  <a href="classgoto__symext.html#af0d7efca4168117c665fb82182d52ee5">More...</a><br /></td></tr>
 <tr class="separator:af0d7efca4168117c665fb82182d52ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc715333e61f75202bb996ea814a7eec"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#adc715333e61f75202bb996ea814a7eec">locality</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_identifier, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">goto_symext::statet</a> &amp;state, const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function)</td></tr>
+<tr class="memitem:adc715333e61f75202bb996ea814a7eec"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#adc715333e61f75202bb996ea814a7eec">locality</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_identifier, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">goto_symext::statet</a> &amp;state, const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function)</td></tr>
 <tr class="memdesc:adc715333e61f75202bb996ea814a7eec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Preserves locality of parameters of a given function by applying L1 renaming to them.  <a href="classgoto__symext.html#adc715333e61f75202bb996ea814a7eec">More...</a><br /></td></tr>
 <tr class="separator:adc715333e61f75202bb996ea814a7eec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cede3d21c5a79496b170c9775edb0c8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a9cede3d21c5a79496b170c9775edb0c8">symex_end_of_function</a> (<a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;)</td></tr>
@@ -316,9 +316,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ac4fd8cef373cc10a42d011bed1a1c47f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#ac4fd8cef373cc10a42d011bed1a1c47f">symex_function_call_post_clean</a> (const <a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">get_goto_functiont</a> &amp;<a class="el" href="classgoto__symext.html#a2ea8c5e3c13c108ade1d799523a89f9e">get_goto_function</a>, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classexprt.html">exprt</a> &amp;cleaned_lhs, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;function, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;cleaned_arguments)</td></tr>
 <tr class="memdesc:ac4fd8cef373cc10a42d011bed1a1c47f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolic execution of a function call by inlining.  <a href="classgoto__symext.html#ac4fd8cef373cc10a42d011bed1a1c47f">More...</a><br /></td></tr>
 <tr class="separator:ac4fd8cef373cc10a42d011bed1a1c47f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a477bff538b4375cd8f6b6486256da2"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a5a477bff538b4375cd8f6b6486256da2">get_unwind_recursion</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, unsigned thread_nr, unsigned unwind)</td></tr>
+<tr class="memitem:a5a477bff538b4375cd8f6b6486256da2"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a5a477bff538b4375cd8f6b6486256da2">get_unwind_recursion</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, unsigned thread_nr, unsigned unwind)</td></tr>
 <tr class="separator:a5a477bff538b4375cd8f6b6486256da2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90d470833e11a0e3a7dd8fc7968f7176"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a90d470833e11a0e3a7dd8fc7968f7176">parameter_assignments</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_identifier, const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments)</td></tr>
+<tr class="memitem:a90d470833e11a0e3a7dd8fc7968f7176"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a90d470833e11a0e3a7dd8fc7968f7176">parameter_assignments</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_identifier, const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function, <a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state, const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;arguments)</td></tr>
 <tr class="memdesc:a90d470833e11a0e3a7dd8fc7968f7176"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over <code>arguments</code> and assigns them to the parameters, which are symbols whose name and type are deduced from the type of <code>goto_function</code>.  <a href="classgoto__symext.html#a90d470833e11a0e3a7dd8fc7968f7176">More...</a><br /></td></tr>
 <tr class="separator:a90d470833e11a0e3a7dd8fc7968f7176"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7ea7571b4c1f75d5382c4b1aff7fa50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#ab7ea7571b4c1f75d5382c4b1aff7fa50">symex_throw</a> (<a class="el" href="classgoto__symext.html#a1d189209ec943c28c807fdbd902c48a2">statet</a> &amp;state)</td></tr>
@@ -503,7 +503,7 @@ Friends</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::function&lt;const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;(const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; <a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">goto_symext::get_goto_functiont</a></td>
+          <td class="memname">typedef std::function&lt;const <a class="el" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; <a class="el" href="classgoto__symext.html#ac46ec57c74296b5034ee93a1d96190c9">goto_symext::get_goto_functiont</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -955,7 +955,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">bool goto_symext::check_break </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>loop_id</em>, </td>
         </tr>
         <tr>
@@ -2049,7 +2049,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">bool goto_symext::get_unwind_recursion </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
@@ -2380,7 +2380,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">void goto_symext::locality </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_identifier</em>, </td>
         </tr>
         <tr>
@@ -2602,7 +2602,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">virtual void goto_symext::no_body </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>identifier</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2640,7 +2640,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">void goto_symext::parameter_assignments </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_identifier</em>, </td>
         </tr>
         <tr>
@@ -4664,7 +4664,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>property_id</em>, </td>
         </tr>
         <tr>
@@ -4910,12 +4910,12 @@ Friends</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> goto_symext::language_mode</td>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> goto_symext::language_mode</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise. </p>
+<p>language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise. </p>
 
 <p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00244">244</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 

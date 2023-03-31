@@ -130,7 +130,7 @@ Classes</h2></td></tr>
 Public Types</h2></td></tr>
 <tr class="memitem:a10ce24987f1be31178a6489b41f0e9a7"><td class="memItemLeft" align="right" valign="top">typedef unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a10ce24987f1be31178a6489b41f0e9a7">bit_vectort</a></td></tr>
 <tr class="separator:a10ce24987f1be31178a6489b41f0e9a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3508eeeeea8b69937f4bf400183bd7f4"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classcustom__bitvector__domaint.html#a10ce24987f1be31178a6489b41f0e9a7">bit_vectort</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a3508eeeeea8b69937f4bf400183bd7f4">bitst</a></td></tr>
+<tr class="memitem:a3508eeeeea8b69937f4bf400183bd7f4"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classcustom__bitvector__domaint.html#a10ce24987f1be31178a6489b41f0e9a7">bit_vectort</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a3508eeeeea8b69937f4bf400183bd7f4">bitst</a></td></tr>
 <tr class="separator:a3508eeeeea8b69937f4bf400183bd7f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_types_classai__domain__baset"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classai__domain__baset')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classai__domain__baset.html">ai_domain_baset</a></td></tr>
 <tr class="memitem:a69906981e631f4eab72c700ce14ce458 inherit pub_types_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a></td></tr>
@@ -140,7 +140,7 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8892350e1c35d3b5e6a65638593ba05f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a8892350e1c35d3b5e6a65638593ba05f">transform</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_from, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_to, <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) final override</td></tr>
+<tr class="memitem:a8892350e1c35d3b5e6a65638593ba05f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a8892350e1c35d3b5e6a65638593ba05f">transform</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_from, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_to, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> trace_to, <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) final override</td></tr>
 <tr class="memdesc:a8892350e1c35d3b5e6a65638593ba05f"><td class="mdescLeft">&#160;</td><td class="mdescRight">how function calls are treated: a) there is an edge from each call site to the function head b) there is an edge from the last instruction (END_FUNCTION) of the function to the instruction <em>following</em> the call site (this also needs to set the LHS, if applicable)  <a href="classcustom__bitvector__domaint.html#a8892350e1c35d3b5e6a65638593ba05f">More...</a><br /></td></tr>
 <tr class="separator:a8892350e1c35d3b5e6a65638593ba05f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f7775e0e78502f10a94082f0574ab57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a9f7775e0e78502f10a94082f0574ab57">output</a> (std::ostream &amp;out, const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const final override</td></tr>
@@ -164,11 +164,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6137b967117b3b3e3e487844c638b83a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4ec9097c7dc5313af89529d528c4352"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#aa4ec9097c7dc5313af89529d528c4352">assign_lhs</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, const <a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">vectorst</a> &amp;)</td></tr>
 <tr class="separator:aa4ec9097c7dc5313af89529d528c4352"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af649f24d73e6a71852d18fae11c89f56"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#af649f24d73e6a71852d18fae11c89f56">assign_lhs</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;, const <a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">vectorst</a> &amp;)</td></tr>
+<tr class="memitem:af649f24d73e6a71852d18fae11c89f56"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#af649f24d73e6a71852d18fae11c89f56">assign_lhs</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;, const <a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">vectorst</a> &amp;)</td></tr>
 <tr class="separator:af649f24d73e6a71852d18fae11c89f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6aacbc0b27c16b3504dc5045940985ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">vectorst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a6aacbc0b27c16b3504dc5045940985ae">get_rhs</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;) const</td></tr>
 <tr class="separator:a6aacbc0b27c16b3504dc5045940985ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec7f6722499a57f6b03a4cb8e1c7007b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">vectorst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#aec7f6722499a57f6b03a4cb8e1c7007b">get_rhs</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;) const</td></tr>
+<tr class="memitem:aec7f6722499a57f6b03a4cb8e1c7007b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">vectorst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#aec7f6722499a57f6b03a4cb8e1c7007b">get_rhs</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;) const</td></tr>
 <tr class="separator:aec7f6722499a57f6b03a4cb8e1c7007b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3ea1b056f4268e41f7c59c830db1d31"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#ae3ea1b056f4268e41f7c59c830db1d31">custom_bitvector_domaint</a> ()</td></tr>
 <tr class="separator:ae3ea1b056f4268e41f7c59c830db1d31"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,7 +220,7 @@ Private Types</h2></td></tr>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:a0e975d9b56b9093b6d6a05e5b7084d57"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a0e975d9b56b9093b6d6a05e5b7084d57">set_bit</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, unsigned bit_nr, <a class="el" href="classcustom__bitvector__domaint.html#a9956e190f6a662d42d2cd412df40502f">modet</a>)</td></tr>
 <tr class="separator:a0e975d9b56b9093b6d6a05e5b7084d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec02c084e49be2592ca2b1186d83ab5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#aec02c084e49be2592ca2b1186d83ab5c">set_bit</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;, unsigned bit_nr, <a class="el" href="classcustom__bitvector__domaint.html#a9956e190f6a662d42d2cd412df40502f">modet</a>)</td></tr>
+<tr class="memitem:aec02c084e49be2592ca2b1186d83ab5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#aec02c084e49be2592ca2b1186d83ab5c">set_bit</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;, unsigned bit_nr, <a class="el" href="classcustom__bitvector__domaint.html#a9956e190f6a662d42d2cd412df40502f">modet</a>)</td></tr>
 <tr class="separator:aec02c084e49be2592ca2b1186d83ab5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaebe3bf03e64e447da8056043061b4fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#aaebe3bf03e64e447da8056043061b4fa">erase_blank_vectors</a> (<a class="el" href="classcustom__bitvector__domaint.html#a3508eeeeea8b69937f4bf400183bd7f4">bitst</a> &amp;)</td></tr>
 <tr class="memdesc:aaebe3bf03e64e447da8056043061b4fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">erase blank bitvectors  <a href="classcustom__bitvector__domaint.html#aaebe3bf03e64e447da8056043061b4fa">More...</a><br /></td></tr>
@@ -234,7 +234,7 @@ Static Private Member Functions</h2></td></tr>
 <tr class="separator:a84a721279e65fb9181174d046826431a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac685a1a97d2f6a1e2dc2c61aacf11063"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#ac685a1a97d2f6a1e2dc2c61aacf11063">get_bit</a> (const <a class="el" href="classcustom__bitvector__domaint.html#a10ce24987f1be31178a6489b41f0e9a7">bit_vectort</a> src, unsigned bit_nr)</td></tr>
 <tr class="separator:ac685a1a97d2f6a1e2dc2c61aacf11063"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a33f62b9f565b12429d8997dfedfcae"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a5a33f62b9f565b12429d8997dfedfcae">object2id</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memitem:a5a33f62b9f565b12429d8997dfedfcae"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a5a33f62b9f565b12429d8997dfedfcae">object2id</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
 <tr class="separator:a5a33f62b9f565b12429d8997dfedfcae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
@@ -274,7 +274,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classcustom__bitvector__domaint.html#a10ce24987f1be31178a6489b41f0e9a7">bit_vectort</a>&gt; <a class="el" href="classcustom__bitvector__domaint.html#a3508eeeeea8b69937f4bf400183bd7f4">custom_bitvector_domaint::bitst</a></td>
+          <td class="memname">typedef std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classcustom__bitvector__domaint.html#a10ce24987f1be31178a6489b41f0e9a7">bit_vectort</a>&gt; <a class="el" href="classcustom__bitvector__domaint.html#a3508eeeeea8b69937f4bf400183bd7f4">custom_bitvector_domaint::bitst</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -382,7 +382,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void custom_bitvector_domaint::assign_lhs </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
@@ -616,7 +616,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structcustom__bitvector__domaint_1_1vectorst.html">custom_bitvector_domaint::vectorst</a> custom_bitvector_domaint::get_rhs </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>identifier</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -890,7 +890,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> custom_bitvector_domaint::object2id </td>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> custom_bitvector_domaint::object2id </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em></td><td>)</td>
@@ -1048,7 +1048,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void custom_bitvector_domaint::set_bit </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
@@ -1092,7 +1092,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void custom_bitvector_domaint::transform </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_from</em>, </td>
         </tr>
         <tr>
@@ -1104,7 +1104,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_to</em>, </td>
         </tr>
         <tr>

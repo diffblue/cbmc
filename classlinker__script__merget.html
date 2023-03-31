@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('classlinker__script__merget.html','');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a42e4bcec3bf682ca0378bda22e6a9428"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::pair&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a></td></tr>
+<tr class="memitem:a42e4bcec3bf682ca0378bda22e6a9428"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::pair&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a></td></tr>
 <tr class="separator:a42e4bcec3bf682ca0378bda22e6a9428"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -127,7 +127,7 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a3fe67b74ab4d7c8f9c4abe259683f090"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a3fe67b74ab4d7c8f9c4abe259683f090">get_linker_script_data</a> (std::list&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;linker_defined_symbols, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::string &amp;out_file, const std::string &amp;def_out_file)</td></tr>
+<tr class="memitem:a3fe67b74ab4d7c8f9c4abe259683f090"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a3fe67b74ab4d7c8f9c4abe259683f090">get_linker_script_data</a> (std::list&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;linker_defined_symbols, const <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::string &amp;out_file, const std::string &amp;def_out_file)</td></tr>
 <tr class="memdesc:a3fe67b74ab4d7c8f9c4abe259683f090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write linker script definitions to <code>linker_data</code>.  <a href="classlinker__script__merget.html#a3fe67b74ab4d7c8f9c4abe259683f090">More...</a><br /></td></tr>
 <tr class="separator:a3fe67b74ab4d7c8f9c4abe259683f090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a4ed98845c2fb10fd7db3d9e21e9cb5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a6a4ed98845c2fb10fd7db3d9e21e9cb5">ls_data2instructions</a> (<a class="el" href="classjsont.html">jsont</a> &amp;data, const std::string &amp;linker_script, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values)</td></tr>
@@ -138,13 +138,13 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a0a1f82c5727a4e1b1e856f6d13006726"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a816b1ec2769d2ebc5fbbe9988acbfb4a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a816b1ec2769d2ebc5fbbe9988acbfb4a">pointerize_subexprs_of</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, std::list&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;to_pointerize, const <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values)</td></tr>
 <tr class="separator:a816b1ec2769d2ebc5fbbe9988acbfb4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf9b112b0375067c8ff1e79200cb0ddd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#acf9b112b0375067c8ff1e79200cb0ddd">replace_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;old_expr, const <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;old_symbol, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;ident, const std::string &amp;shape)</td></tr>
+<tr class="memitem:acf9b112b0375067c8ff1e79200cb0ddd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#acf9b112b0375067c8ff1e79200cb0ddd">replace_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;old_expr, const <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;old_symbol, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;ident, const std::string &amp;shape)</td></tr>
 <tr class="memdesc:acf9b112b0375067c8ff1e79200cb0ddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">do the actual replacement of an expr with a new pointer expr  <a href="classlinker__script__merget.html#acf9b112b0375067c8ff1e79200cb0ddd">More...</a><br /></td></tr>
 <tr class="separator:acf9b112b0375067c8ff1e79200cb0ddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1633c8274cc189f46ade75213a8613a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a1633c8274cc189f46ade75213a8613a8">symbols_to_pointerize</a> (const <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, std::list&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;to_pointerize) const</td></tr>
 <tr class="memdesc:a1633c8274cc189f46ade75213a8613a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">fill <code>to_pointerize</code> with names of linker symbols appearing in expr  <a href="classlinker__script__merget.html#a1633c8274cc189f46ade75213a8613a8">More...</a><br /></td></tr>
 <tr class="separator:a1633c8274cc189f46ade75213a8613a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a095b7333075b7c8a007eeed6e47ecb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a5a095b7333075b7c8a007eeed6e47ecb">goto_and_object_mismatch</a> (const std::list&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;linker_defined_symbols, <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values)</td></tr>
+<tr class="memitem:a5a095b7333075b7c8a007eeed6e47ecb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#a5a095b7333075b7c8a007eeed6e47ecb">goto_and_object_mismatch</a> (const std::list&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;linker_defined_symbols, <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_valuest</a> &amp;linker_values)</td></tr>
 <tr class="memdesc:a5a095b7333075b7c8a007eeed6e47ecb"><td class="mdescLeft">&#160;</td><td class="mdescRight">one-to-one correspondence between extern &amp; linker symbols  <a href="classlinker__script__merget.html#a5a095b7333075b7c8a007eeed6e47ecb">More...</a><br /></td></tr>
 <tr class="separator:a5a095b7333075b7c8a007eeed6e47ecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea6ef4957e8b86496b42029527d42cbc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlinker__script__merget.html#aea6ef4957e8b86496b42029527d42cbc">linker_data_is_malformed</a> (const <a class="el" href="classjsont.html">jsont</a> &amp;data) const</td></tr>
@@ -177,7 +177,7 @@ Protected Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::pair&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="classexprt.html">exprt</a>&gt; &gt; <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_script_merget::linker_valuest</a></td>
+          <td class="memname">typedef std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, std::pair&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>, <a class="el" href="classexprt.html">exprt</a>&gt; &gt; <a class="el" href="classlinker__script__merget.html#a42e4bcec3bf682ca0378bda22e6a9428">linker_script_merget::linker_valuest</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -269,7 +269,7 @@ The <code>__CPROVER_initialize</code> function contains one <code>__CPROVER_allo
         <tr>
           <td class="memname">int linker_script_merget::get_linker_script_data </td>
           <td>(</td>
-          <td class="paramtype">std::list&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">std::list&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>linker_defined_symbols</em>, </td>
         </tr>
         <tr>
@@ -321,7 +321,7 @@ The <code>__CPROVER_initialize</code> function contains one <code>__CPROVER_allo
         <tr>
           <td class="memname">int linker_script_merget::goto_and_object_mismatch </td>
           <td>(</td>
-          <td class="paramtype">const std::list&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::list&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>linker_defined_symbols</em>, </td>
         </tr>
         <tr>
@@ -573,7 +573,7 @@ Expressions of the shape <code>&amp;foo[0]</code>, <code>&amp;foo</code>, and <c
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>ident</em>, </td>
         </tr>
         <tr>

@@ -111,12 +111,12 @@ $(document).ready(function(){initNavTree('classsymbol__factoryt.html',''); initR
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a5f0d5e7d7e5471f637c974c4333fea28"><td class="memItemLeft" align="right" valign="top">typedef std::set&lt; <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__factoryt.html#a5f0d5e7d7e5471f637c974c4333fea28">recursion_sett</a></td></tr>
+<tr class="memitem:a5f0d5e7d7e5471f637c974c4333fea28"><td class="memItemLeft" align="right" valign="top">typedef std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__factoryt.html#a5f0d5e7d7e5471f637c974c4333fea28">recursion_sett</a></td></tr>
 <tr class="separator:a5f0d5e7d7e5471f637c974c4333fea28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adc2eeb49aeebb7fff882eef4ecb8d26a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__factoryt.html#adc2eeb49aeebb7fff882eef4ecb8d26a">symbol_factoryt</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;_symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;<a class="el" href="classsymbol__factoryt.html#ac733a1fd5d03b0786c6d7bfb6fb27bc4">loc</a>, const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name_prefix, const <a class="el" href="structc__object__factory__parameterst.html">c_object_factory_parameterst</a> &amp;<a class="el" href="classsymbol__factoryt.html#a96808c5efd06ca781ff5fee12b0dd61b">object_factory_params</a>, const <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> <a class="el" href="classsymbol__factoryt.html#adc7bcf70c79a2add283251bd3d8c2101">lifetime</a>)</td></tr>
+<tr class="memitem:adc2eeb49aeebb7fff882eef4ecb8d26a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__factoryt.html#adc2eeb49aeebb7fff882eef4ecb8d26a">symbol_factoryt</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;_symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;<a class="el" href="classsymbol__factoryt.html#ac733a1fd5d03b0786c6d7bfb6fb27bc4">loc</a>, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name_prefix, const <a class="el" href="structc__object__factory__parameterst.html">c_object_factory_parameterst</a> &amp;<a class="el" href="classsymbol__factoryt.html#a96808c5efd06ca781ff5fee12b0dd61b">object_factory_params</a>, const <a class="el" href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964">lifetimet</a> <a class="el" href="classsymbol__factoryt.html#adc7bcf70c79a2add283251bd3d8c2101">lifetime</a>)</td></tr>
 <tr class="separator:adc2eeb49aeebb7fff882eef4ecb8d26a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21ddad2edceaca411cecb9f033a1adf0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymbol__factoryt.html#a21ddad2edceaca411cecb9f033a1adf0">gen_nondet_init</a> (<a class="el" href="classcode__blockt.html">code_blockt</a> &amp;assignments, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const std::size_t depth=0, <a class="el" href="classsymbol__factoryt.html#a5f0d5e7d7e5471f637c974c4333fea28">recursion_sett</a> recursion_set=<a class="el" href="classsymbol__factoryt.html#a5f0d5e7d7e5471f637c974c4333fea28">recursion_sett</a>(), const bool assign_const=true)</td></tr>
 <tr class="memdesc:a21ddad2edceaca411cecb9f033a1adf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a nondet for expr, including calling itself recursively to make appropriate symbols to point to if expr is a pointer.  <a href="classsymbol__factoryt.html#a21ddad2edceaca411cecb9f033a1adf0">More...</a><br /></td></tr>
@@ -160,7 +160,7 @@ Private Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::set&lt;<a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; <a class="el" href="classsymbol__factoryt.html#a5f0d5e7d7e5471f637c974c4333fea28">symbol_factoryt::recursion_sett</a></td>
+          <td class="memname">typedef std::set&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; <a class="el" href="classsymbol__factoryt.html#a5f0d5e7d7e5471f637c974c4333fea28">symbol_factoryt::recursion_sett</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -194,7 +194,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>name_prefix</em>, </td>
         </tr>
         <tr>
