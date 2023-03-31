@@ -20,16 +20,12 @@ Date: June 2006
 #include "goto_functions.h"
 #include "write_goto_binary.h"
 
-/// read goto binary format
-/// \par parameters: input stream, symbol_table, functions
-/// \return true on error, false otherwise
-static bool read_bin_goto_object(
+static void read_bin_symbol_table_object(
   std::istream &in,
   symbol_table_baset &symbol_table,
-  goto_functionst &functions,
   irep_serializationt &irepconverter)
 {
-  std::size_t count = irepconverter.read_gb_word(in); // # of symbols
+  const std::size_t count = irepconverter.read_gb_word(in); // # of symbols
 
   for(std::size_t i=0; i<count; i++)
   {
@@ -69,17 +65,42 @@ static bool read_bin_goto_object(
     sym.is_extern = (flags &(1 << 1))!=0;
     sym.is_volatile = (flags &1)!=0;
 
-    if(!sym.is_type && sym.type.id()==ID_code)
-    {
-      // makes sure there is an empty function for every function symbol
-      auto entry = functions.function_map.emplace(sym.name, goto_functiont());
-      entry.first->second.set_parameter_identifiers(to_code_type(sym.type));
-    }
-
     symbol_table.add(sym);
   }
+}
 
-  count=irepconverter.read_gb_word(in); // # of functions
+/// The serialised form of the goto-model currently includes the parameter
+/// identifiers in the symbol table attached to the types of function symbols.
+/// However it is not included in the goto functions. Therefore this function is
+/// needed to copy the parameter identifiers from the symbol table to the
+/// functions.
+static void copy_parameter_identifiers(
+  const symbol_table_baset &symbol_table,
+  goto_functionst &functions)
+{
+  for(const auto &name_symbol : symbol_table)
+  {
+    const auto &symbol = name_symbol.second;
+    if(symbol.is_type)
+      continue;
+
+    const auto code_type = type_try_dynamic_cast<code_typet>(symbol.type);
+    if(!code_type)
+      continue;
+
+    // Makes sure there is an empty function for every function symbol.
+    auto emplaced =
+      functions.function_map.emplace(symbol.name, goto_functiont());
+    emplaced.first->second.set_parameter_identifiers(*code_type);
+  }
+}
+
+static void read_bin_functions_object(
+  std::istream &in,
+  goto_functionst &functions,
+  irep_serializationt &irepconverter)
+{
+  const std::size_t count = irepconverter.read_gb_word(in); // # of functions
 
   for(std::size_t fct_index = 0; fct_index < count; ++fct_index)
   {
@@ -166,8 +187,19 @@ static bool read_bin_goto_object(
   }
 
   functions.compute_location_numbers();
+}
 
-  return false;
+/// read goto binary format
+/// \par parameters: input stream, symbol_table, functions
+static void read_bin_goto_object(
+  std::istream &in,
+  symbol_table_baset &symbol_table,
+  goto_functionst &functions,
+  irep_serializationt &irepconverter)
+{
+  read_bin_symbol_table_object(in, symbol_table, irepconverter);
+  copy_parameter_identifiers(symbol_table, functions);
+  read_bin_functions_object(in, functions, irepconverter);
 }
 
 /// reads a goto binary file back into a symbol and a function table
@@ -224,7 +256,7 @@ bool read_bin_goto_object(
   // symbol_serializationt symbolconverter(ic);
 
   {
-    std::size_t version=irepconverter.read_gb_word(in);
+    const std::size_t version = irepconverter.read_gb_word(in);
 
     if(version < GOTO_BINARY_VERSION)
     {
@@ -235,7 +267,8 @@ bool read_bin_goto_object(
     }
     else if(version == GOTO_BINARY_VERSION)
     {
-      return read_bin_goto_object(in, symbol_table, functions, irepconverter);
+      read_bin_goto_object(in, symbol_table, functions, irepconverter);
+      return false;
     }
     else
     {
@@ -246,5 +279,5 @@ bool read_bin_goto_object(
     }
   }
 
-  return false;
+  UNREACHABLE;
 }
