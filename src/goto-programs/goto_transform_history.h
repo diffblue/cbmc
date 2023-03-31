@@ -5,6 +5,9 @@
 
 #include <vector>
 
+class goto_functiont;
+class goto_functionst;
+
 enum class goto_transform_kindt;
 
 /// An ordered collection of transformations which have been applied. This
@@ -69,5 +72,13 @@ enum class goto_transform_kindt
 /// Returns true if \param transform is one of the values in the definition of
 /// the enumeration above.
 bool is_valid_transform_kind(goto_transform_kindt transform);
+
+void add_history_transform(
+  goto_transform_kindt transform_kind,
+  goto_functiont &function);
+
+void add_history_transform(
+  goto_transform_kindt transform_kind,
+  goto_functionst &functions);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRANSFORM_HISTORY_H

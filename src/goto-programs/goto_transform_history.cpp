@@ -4,6 +4,9 @@
 
 #include <util/invariant.h>
 
+#include "goto_function.h"
+#include "goto_functions.h"
+
 void goto_transform_historyt::add(goto_transform_kindt transform)
 {
   INVARIANT(
@@ -44,4 +47,21 @@ bool is_valid_transform_kind(const goto_transform_kindt transform)
     // updating the validation.
   }
   return false;
+}
+
+void add_history_transform(
+  goto_transform_kindt transform_kind,
+  goto_functiont &function)
+{
+  function.history.add(transform_kind);
+}
+
+void add_history_transform(
+  goto_transform_kindt transform_kind,
+  goto_functionst &functions)
+{
+  for(auto &function_pair : functions.function_map)
+  {
+    add_history_transform(transform_kind, function_pair.second);
+  }
 }
