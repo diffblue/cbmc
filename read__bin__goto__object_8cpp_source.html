@@ -112,228 +112,257 @@ $(document).ready(function(){initNavTree('read__bin__goto__object_8cpp_source.ht
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__functions_8h.html">goto_functions.h</a>&quot;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="write__goto__binary_8h.html">write_goto_binary.h</a>&quot;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#a2eabc121b55e0d9f722f19e020e2fc69">   26</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="read__bin__goto__object_8cpp.html#a2eabc121b55e0d9f722f19e020e2fc69">read_bin_goto_object</a>(</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  std::istream &amp;in,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;functions,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;{</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  std::size_t count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of symbols</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#afe380fa6840da493c86a8efef86b44a7">   23</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="read__bin__goto__object_8cpp.html#afe380fa6840da493c86a8efef86b44a7">read_bin_symbol_table_object</a>(</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">const</span> std::size_t count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of symbols</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;count; i++)</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> sym;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;count; i++)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="classsymbolt.html">symbolt</a> sym;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classtypet.html">typet</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    sym.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    sym.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classsource__locationt.html">source_locationt</a> &amp;<span class="keyword">&gt;</span>(</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    sym.<a class="code" href="classsymbolt.html#a5f0165e0d2582194a6e7e13730288663">module</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    sym.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    sym.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab8f816e539d2c409771d2faba7aee8c0">pretty_name</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">// obsolete: symordering</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    std::size_t flags=irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab421b35f18450e44cf022d6b88daf28e">is_weak</a> = (flags &amp;(1 &lt;&lt; 16))!=0;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    sym.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a> = (flags &amp;(1 &lt;&lt; 15))!=0;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    sym.<a class="code" href="classsymbolt.html#a693a06be1f5a7f744c8fdac606a192f3">is_property</a> = (flags &amp;(1 &lt;&lt; 14))!=0;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    sym.<a class="code" href="classsymbolt.html#a41b10aefcf4640d76d4932cdef15ac16">is_macro</a> = (flags &amp;(1 &lt;&lt; 13))!=0;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab80cbaeb01cbc3eecdb89a4f6c3b7a84">is_exported</a> = (flags &amp;(1 &lt;&lt; 12))!=0;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    sym.<a class="code" href="classsymbolt.html#af4e48e515cb3cf2148177844ecebda99">is_input</a> = (flags &amp;(1 &lt;&lt; 11))!=0;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    sym.<a class="code" href="classsymbolt.html#aa4c3f6d74513dfa9372ea89366e0891d">is_output</a> = (flags &amp;(1 &lt;&lt; 10))!=0;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    sym.<a class="code" href="classsymbolt.html#a94ccbccbee26edcc086a4a6e0b210562">is_state_var</a> = (flags &amp;(1 &lt;&lt; 9))!=0;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    sym.<a class="code" href="classsymbolt.html#a6d79a82179f3075bf8e8ba2db015866f">is_parameter</a> = (flags &amp;(1 &lt;&lt; 8))!=0;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    sym.<a class="code" href="classsymbolt.html#a289c431639ca55036b9397af13fb8a7e">is_auxiliary</a> = (flags &amp;(1 &lt;&lt; 7))!=0;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">// sym.binding = (flags &amp;(1 &lt;&lt; 6))!=0;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    sym.<a class="code" href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">is_lvalue</a> = (flags &amp;(1 &lt;&lt; 5))!=0;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    sym.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a> = (flags &amp;(1 &lt;&lt; 4))!=0;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    sym.<a class="code" href="classsymbolt.html#a7495d7224a73c59013e7fc0db952fa8f">is_thread_local</a> = (flags &amp;(1 &lt;&lt; 3))!=0;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    sym.<a class="code" href="classsymbolt.html#a5a84d8bf820f7cfdd2eb18dd29bee9c4">is_file_local</a> = (flags &amp;(1 &lt;&lt; 2))!=0;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    sym.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a> = (flags &amp;(1 &lt;&lt; 1))!=0;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    sym.<a class="code" href="classsymbolt.html#a33fa638e9bedc16bd0912c6aa4afd40d">is_volatile</a> = (flags &amp;1)!=0;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classtypet.html">typet</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    sym.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    sym.<a class="code" href="classsymbolt.html#a8a5e457ca222a34e8930b9f09c805124">location</a> = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classsource__locationt.html">source_locationt</a> &amp;<span class="keyword">&gt;</span>(</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    sym.<a class="code" href="classsymbolt.html#a5f0165e0d2582194a6e7e13730288663">module</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    sym.<a class="code" href="classsymbolt.html#a070b47061b10021d1407737d61924699">base_name</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    sym.<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab8f816e539d2c409771d2faba7aee8c0">pretty_name</a> = irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="comment">// obsolete: symordering</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    std::size_t flags=irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab421b35f18450e44cf022d6b88daf28e">is_weak</a> = (flags &amp;(1 &lt;&lt; 16))!=0;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    sym.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a> = (flags &amp;(1 &lt;&lt; 15))!=0;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    sym.<a class="code" href="classsymbolt.html#a693a06be1f5a7f744c8fdac606a192f3">is_property</a> = (flags &amp;(1 &lt;&lt; 14))!=0;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    sym.<a class="code" href="classsymbolt.html#a41b10aefcf4640d76d4932cdef15ac16">is_macro</a> = (flags &amp;(1 &lt;&lt; 13))!=0;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    sym.<a class="code" href="classsymbolt.html#ab80cbaeb01cbc3eecdb89a4f6c3b7a84">is_exported</a> = (flags &amp;(1 &lt;&lt; 12))!=0;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    sym.<a class="code" href="classsymbolt.html#af4e48e515cb3cf2148177844ecebda99">is_input</a> = (flags &amp;(1 &lt;&lt; 11))!=0;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    sym.<a class="code" href="classsymbolt.html#aa4c3f6d74513dfa9372ea89366e0891d">is_output</a> = (flags &amp;(1 &lt;&lt; 10))!=0;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    sym.<a class="code" href="classsymbolt.html#a94ccbccbee26edcc086a4a6e0b210562">is_state_var</a> = (flags &amp;(1 &lt;&lt; 9))!=0;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    sym.<a class="code" href="classsymbolt.html#a6d79a82179f3075bf8e8ba2db015866f">is_parameter</a> = (flags &amp;(1 &lt;&lt; 8))!=0;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    sym.<a class="code" href="classsymbolt.html#a289c431639ca55036b9397af13fb8a7e">is_auxiliary</a> = (flags &amp;(1 &lt;&lt; 7))!=0;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">// sym.binding = (flags &amp;(1 &lt;&lt; 6))!=0;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    sym.<a class="code" href="classsymbolt.html#ae33b970aa239c4b661443181d131e117">is_lvalue</a> = (flags &amp;(1 &lt;&lt; 5))!=0;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    sym.<a class="code" href="classsymbolt.html#a6317578dd5e0ea50e815d1ee89b4f3f8">is_static_lifetime</a> = (flags &amp;(1 &lt;&lt; 4))!=0;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    sym.<a class="code" href="classsymbolt.html#a7495d7224a73c59013e7fc0db952fa8f">is_thread_local</a> = (flags &amp;(1 &lt;&lt; 3))!=0;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    sym.<a class="code" href="classsymbolt.html#a5a84d8bf820f7cfdd2eb18dd29bee9c4">is_file_local</a> = (flags &amp;(1 &lt;&lt; 2))!=0;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    sym.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a> = (flags &amp;(1 &lt;&lt; 1))!=0;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    sym.<a class="code" href="classsymbolt.html#a33fa638e9bedc16bd0912c6aa4afd40d">is_volatile</a> = (flags &amp;1)!=0;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    symbol_table.<a class="code" href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">add</a>(sym);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">if</span>(!sym.<a class="code" href="classsymbolt.html#a751b0221d1807cae2f0dd144fe5a320f">is_type</a> &amp;&amp; sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_code)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      <span class="comment">// makes sure there is an empty function for every function symbol</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <span class="keyword">auto</span> entry = functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.emplace(sym.<a class="code" href="classsymbolt.html#ab4fe07eaa16795818379d87e5e510686">name</a>, <a class="code" href="classgoto__functiont.html">goto_functiont</a>());</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      entry.first-&gt;second.set_parameter_identifiers(<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>));</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    symbol_table.<a class="code" href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">add</a>(sym);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  }</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  count=irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of functions</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordflow">for</span>(std::size_t fct_index = 0; fct_index &lt; count; ++fct_index)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> fname=irepconverter.<a class="code" href="classirep__serializationt.html#af9b930b4738f3377d0f2e8046bec7546">read_gb_string</a>(in);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;f = functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>[fname];</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">typedef</span> std::map&lt;goto_programt::targett, std::list&lt;unsigned&gt; &gt; target_mapt;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    target_mapt target_map;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keyword">typedef</span> std::map&lt;unsigned, goto_programt::targett&gt; rev_target_mapt;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    rev_target_mapt rev_target_map;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordtype">bool</span> hidden=<span class="keyword">false</span>;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    std::size_t ins_count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of instructions</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">for</span>(std::size_t ins_index = 0; ins_index &lt; ins_count; ++ins_index)</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    {</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> itarget = f.body.add_instruction();</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="comment">// take copies as references into irepconverter are not stable</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <a class="code" href="classcodet.html">codet</a> code =</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcodet.html">codet</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classsource__locationt.html">source_locationt</a> &amp;<span class="keyword">&gt;</span>(</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb">goto_program_instruction_typet</a> instruction_type =</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        (<a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb">goto_program_instruction_typet</a>)irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      <a class="code" href="classexprt.html">exprt</a> <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a> =</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> instruction{</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        code, source_location, instruction_type, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, {}};</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      instruction.target_number = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      <span class="keywordflow">if</span>(instruction.is_target() &amp;&amp;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;         rev_target_map.insert(</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;           rev_target_map.end(),</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;           std::make_pair(instruction.target_number, itarget))-&gt;second!=itarget)</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      std::size_t t_count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of targets</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;t_count; i++)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="comment">// just save the target numbers</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        target_map[itarget].push_back(irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in));</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      std::size_t l_count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of labels</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;l_count; i++)</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <a class="code" href="classdstringt.html">irep_idt</a> label=irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        instruction.labels.push_back(label);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">if</span>(label == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;HIDE&quot;</span>)</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;          hidden=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="comment">// The above info is also held in the goto_functiont object, and could</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="comment">// be stored in the binary.</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      itarget-&gt;<a class="code" href="classdstringt.html#a1969094925dd74c39194226419055dfd">swap</a>(instruction);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="comment">// Resolve targets</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">for</span>(target_mapt::iterator tit = target_map.begin();</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        tit!=target_map.end();</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        tit++)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> ins = tit-&gt;first;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      <span class="keywordflow">for</span>(std::list&lt;unsigned&gt;::iterator nit = tit-&gt;second.begin();</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;          nit!=tit-&gt;second.end();</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;          nit++)</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      {</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordtype">unsigned</span> n=*nit;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        rev_target_mapt::const_iterator entry=rev_target_map.find(n);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          entry != rev_target_map.end(),</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;          <span class="stringliteral">&quot;something from the target map should also be in the reverse target &quot;</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;          <span class="stringliteral">&quot;map&quot;</span>);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        ins-&gt;targets.push_back(entry-&gt;second);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      }</div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#a6d670939fb4b3e39b4d4d65bede9f997">   77</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="read__bin__goto__object_8cpp.html#a6d670939fb4b3e39b4d4d65bede9f997">copy_parameter_identifiers</a>(</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;functions)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;name_symbol : symbol_table)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol = name_symbol.second;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">if</span>(symbol.is_type)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> code_type = type_try_dynamic_cast&lt;code_typet&gt;(symbol.type);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">if</span>(!code_type)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="comment">// Makes sure there is an empty function for every function symbol.</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">auto</span> emplaced =</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.emplace(symbol.name, <a class="code" href="classgoto__functiont.html">goto_functiont</a>());</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    emplaced.first-&gt;second.set_parameter_identifiers(*code_type);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  }</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#ac24c317fb5216527f7555e99f90b5225">   98</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="read__bin__goto__object_8cpp.html#ac24c317fb5216527f7555e99f90b5225">read_bin_functions_object</a>(</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;functions,</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keyword">const</span> std::size_t count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of functions</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">for</span>(std::size_t fct_index = 0; fct_index &lt; count; ++fct_index)</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> fname=irepconverter.<a class="code" href="classirep__serializationt.html#af9b930b4738f3377d0f2e8046bec7546">read_gb_string</a>(in);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;f = functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>[fname];</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keyword">typedef</span> std::map&lt;goto_programt::targett, std::list&lt;unsigned&gt; &gt; target_mapt;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    target_mapt target_map;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">typedef</span> std::map&lt;unsigned, goto_programt::targett&gt; rev_target_mapt;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    rev_target_mapt rev_target_map;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">bool</span> hidden=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    std::size_t ins_count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of instructions</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordflow">for</span>(std::size_t ins_index = 0; ins_index &lt; ins_count; ++ins_index)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> itarget = f.body.add_instruction();</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      <span class="comment">// take copies as references into irepconverter are not stable</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <a class="code" href="classcodet.html">codet</a> code =</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcodet.html">codet</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <a class="code" href="classsource__locationt.html">source_locationt</a> source_location = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classsource__locationt.html">source_locationt</a> &amp;<span class="keyword">&gt;</span>(</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb">goto_program_instruction_typet</a> instruction_type =</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        (<a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb">goto_program_instruction_typet</a>)irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <a class="code" href="classexprt.html">exprt</a> <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a> =</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(irepconverter.<a class="code" href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">reference_convert</a>(in));</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> instruction{</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        code, source_location, instruction_type, <a class="code" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>, {}};</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      instruction.target_number = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="keywordflow">if</span>(instruction.is_target() &amp;&amp;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;         rev_target_map.insert(</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;           rev_target_map.end(),</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;           std::make_pair(instruction.target_number, itarget))-&gt;second!=itarget)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      std::size_t t_count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of targets</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;t_count; i++)</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="comment">// just save the target numbers</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        target_map[itarget].push_back(irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in));</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;      std::size_t l_count = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in); <span class="comment">// # of labels</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;l_count; i++)</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <a class="code" href="classdstringt.html">irep_idt</a> label=irepconverter.<a class="code" href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">read_string_ref</a>(in);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        instruction.labels.push_back(label);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keywordflow">if</span>(label == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;HIDE&quot;</span>)</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;          hidden=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="comment">// The above info is also held in the goto_functiont object, and could</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="comment">// be stored in the binary.</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      }</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      itarget-&gt;<a class="code" href="classdstringt.html#a1969094925dd74c39194226419055dfd">swap</a>(instruction);</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    }</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    f.body.update();</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">if</span>(hidden)</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      f.make_hidden();</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  }</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  functions.<a class="code" href="classgoto__functionst.html#a77f3da619abcd3129a27b2626c472a74">compute_location_numbers</a>();</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;}</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#a4ec06a3d28ae7110e8e44a10eb16ff94">  176</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="read__bin__goto__object_8cpp.html#a2eabc121b55e0d9f722f19e020e2fc69">read_bin_goto_object</a>(</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  std::istream &amp;in,</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;functions,</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;{</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="comment">// Resolve targets</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">for</span>(target_mapt::iterator tit = target_map.begin();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        tit!=target_map.end();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        tit++)</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> ins = tit-&gt;first;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="keywordflow">for</span>(std::list&lt;unsigned&gt;::iterator nit = tit-&gt;second.begin();</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;          nit!=tit-&gt;second.end();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          nit++)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      {</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordtype">unsigned</span> n=*nit;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        rev_target_mapt::const_iterator entry=rev_target_map.find(n);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;          entry != rev_target_map.end(),</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;          <span class="stringliteral">&quot;something from the target map should also be in the reverse target &quot;</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;          <span class="stringliteral">&quot;map&quot;</span>);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        ins-&gt;targets.push_back(entry-&gt;second);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      }</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    f.body.update();</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  {</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordtype">char</span> hdr[4];</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    hdr[0]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    hdr[1]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    hdr[2]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">if</span>(hdr[0]==<span class="charliteral">&#39;G&#39;</span> &amp;&amp; hdr[1]==<span class="charliteral">&#39;B&#39;</span> &amp;&amp; hdr[2]==<span class="charliteral">&#39;F&#39;</span>)</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    {</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      <span class="comment">// OK!</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      hdr[3]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      <span class="keywordflow">if</span>(hdr[0]==0x7f &amp;&amp; hdr[1]==<span class="charliteral">&#39;G&#39;</span> &amp;&amp; hdr[2]==<span class="charliteral">&#39;B&#39;</span> &amp;&amp; hdr[3]==<span class="charliteral">&#39;F&#39;</span>)</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <span class="comment">// OK!</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(hdr[0]==0x7f &amp;&amp; hdr[1]==<span class="charliteral">&#39;E&#39;</span> &amp;&amp; hdr[2]==<span class="charliteral">&#39;L&#39;</span> &amp;&amp; hdr[3]==<span class="charliteral">&#39;F&#39;</span>)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordflow">if</span>(!filename.empty())</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Sorry, but I can&#39;t read ELF binary &#39;&quot;</span> &lt;&lt; filename</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                          &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Sorry, but I can&#39;t read ELF binaries&quot;</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                          &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      {</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;&#39; is not a goto-binary&quot;</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;                        &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <a class="code" href="classirep__serializationt_1_1ireps__containert.html">irep_serializationt::ireps_containert</a> ic;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> irepconverter(ic);</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="comment">// symbol_serializationt symbolconverter(ic);</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  {</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    std::size_t version=irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordflow">if</span>(version &lt; <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;          <span class="stringliteral">&quot;The input was compiled with an old version of &quot;</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;          <span class="stringliteral">&quot;goto-cc; please recompile&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    }</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(version == <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    {</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="read__bin__goto__object_8cpp.html#a2eabc121b55e0d9f722f19e020e2fc69">read_bin_goto_object</a>(in, symbol_table, functions, irepconverter);</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    }</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    {</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;          <span class="stringliteral">&quot;The input was compiled with an unsupported version of &quot;</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;          <span class="stringliteral">&quot;goto-cc; please recompile&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  }</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;}</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">if</span>(hidden)</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      f.make_hidden();</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  functions.<a class="code" href="classgoto__functionst.html#a77f3da619abcd3129a27b2626c472a74">compute_location_numbers</a>();</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;}</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#a7e9c0461ab82359bd2f1aaf8ec223a53">  194</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="read__bin__goto__object_8cpp.html#a7e9c0461ab82359bd2f1aaf8ec223a53">read_bin_goto_object</a>(</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;functions,</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> &amp;irepconverter)</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;{</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <a class="code" href="read__bin__goto__object_8cpp.html#afe380fa6840da493c86a8efef86b44a7">read_bin_symbol_table_object</a>(in, symbol_table, irepconverter);</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <a class="code" href="read__bin__goto__object_8cpp.html#a6d670939fb4b3e39b4d4d65bede9f997">copy_parameter_identifiers</a>(symbol_table, functions);</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <a class="code" href="read__bin__goto__object_8cpp.html#ac24c317fb5216527f7555e99f90b5225">read_bin_functions_object</a>(in, functions, irepconverter);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;}</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
+<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="read__bin__goto__object_8cpp.html#a4ec06a3d28ae7110e8e44a10eb16ff94">  208</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="read__bin__goto__object_8cpp.html#a7e9c0461ab82359bd2f1aaf8ec223a53">read_bin_goto_object</a>(</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table,</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;functions,</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;{</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordtype">char</span> hdr[4];</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    hdr[0]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    hdr[1]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    hdr[2]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordflow">if</span>(hdr[0]==<span class="charliteral">&#39;G&#39;</span> &amp;&amp; hdr[1]==<span class="charliteral">&#39;B&#39;</span> &amp;&amp; hdr[2]==<span class="charliteral">&#39;F&#39;</span>)</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <span class="comment">// OK!</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    {</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      hdr[3]=<span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(in.get());</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="keywordflow">if</span>(hdr[0]==0x7f &amp;&amp; hdr[1]==<span class="charliteral">&#39;G&#39;</span> &amp;&amp; hdr[2]==<span class="charliteral">&#39;B&#39;</span> &amp;&amp; hdr[3]==<span class="charliteral">&#39;F&#39;</span>)</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="comment">// OK!</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      }</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(hdr[0]==0x7f &amp;&amp; hdr[1]==<span class="charliteral">&#39;E&#39;</span> &amp;&amp; hdr[2]==<span class="charliteral">&#39;L&#39;</span> &amp;&amp; hdr[3]==<span class="charliteral">&#39;F&#39;</span>)</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordflow">if</span>(!filename.empty())</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Sorry, but I can&#39;t read ELF binary &#39;&quot;</span> &lt;&lt; filename</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                          &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;          message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Sorry, but I can&#39;t read ELF binaries&quot;</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;                          &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      }</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; filename &lt;&lt; <span class="stringliteral">&quot;&#39; is not a goto-binary&quot;</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                        &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      }</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    }</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <a class="code" href="classirep__serializationt_1_1ireps__containert.html">irep_serializationt::ireps_containert</a> ic;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <a class="code" href="classirep__serializationt.html">irep_serializationt</a> irepconverter(ic);</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="comment">// symbol_serializationt symbolconverter(ic);</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  {</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keyword">const</span> std::size_t version = irepconverter.<a class="code" href="classirep__serializationt.html#a6fbf5b6e870d6c21a11e83e80b6f7f27">read_gb_word</a>(in);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keywordflow">if</span>(version &lt; <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    {</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;          <span class="stringliteral">&quot;The input was compiled with an old version of &quot;</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;          <span class="stringliteral">&quot;goto-cc; please recompile&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(version == <a class="code" href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a>)</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <a class="code" href="read__bin__goto__object_8cpp.html#a7e9c0461ab82359bd2f1aaf8ec223a53">read_bin_goto_object</a>(in, symbol_table, functions, irepconverter);</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    }</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    {</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      message.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;          <span class="stringliteral">&quot;The input was compiled with an unsupported version of &quot;</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;          <span class="stringliteral">&quot;goto-cc; please recompile&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  }</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;}</div>
 <div class="ttc" id="ac__safety__checks_8cpp_html_a1675f729dc854238dd23840d004c7c0a"><div class="ttname"><a href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a></div><div class="ttdeci">static exprt guard(const exprt::operandst &amp;guards, exprt cond)</div><div class="ttdef"><b>Definition:</b> <a href="c__safety__checks_8cpp_source.html#l00069">c_safety_checks.cpp:69</a></div></div>
 <div class="ttc" id="aclasscodet_html"><div class="ttname"><a href="classcodet.html">codet</a></div><div class="ttdoc">Data structure for representing an arbitrary statement in a program.</div><div class="ttdef"><b>Definition:</b> <a href="std__code__base_8h_source.html#l00028">std_code_base.h:29</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
@@ -352,7 +381,6 @@ $(document).ready(function(){initNavTree('read__bin__goto__object_8cpp_source.ht
 <div class="ttc" id="aclassirep__serializationt_html_ab0001be4c8b6dc1364d5d2cb749d36a1"><div class="ttname"><a href="classirep__serializationt.html#ab0001be4c8b6dc1364d5d2cb749d36a1">irep_serializationt::reference_convert</a></div><div class="ttdeci">const irept &amp; reference_convert(std::istream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="irep__serialization_8cpp_source.html#l00043">irep_serialization.cpp:43</a></div></div>
 <div class="ttc" id="aclassirep__serializationt_html_ada62103b0ff0d166cb49251c81bd12cb"><div class="ttname"><a href="classirep__serializationt.html#ada62103b0ff0d166cb49251c81bd12cb">irep_serializationt::read_string_ref</a></div><div class="ttdeci">irep_idt read_string_ref(std::istream &amp;)</div><div class="ttdoc">Read a string reference from the stream.</div><div class="ttdef"><b>Definition:</b> <a href="irep__serialization_8cpp_source.html#l00231">irep_serialization.cpp:231</a></div></div>
 <div class="ttc" id="aclassirep__serializationt_html_af9b930b4738f3377d0f2e8046bec7546"><div class="ttname"><a href="classirep__serializationt.html#af9b930b4738f3377d0f2e8046bec7546">irep_serializationt::read_gb_string</a></div><div class="ttdeci">irep_idt read_gb_string(std::istream &amp;)</div><div class="ttdoc">reads a string from the stream</div><div class="ttdef"><b>Definition:</b> <a href="irep__serialization_8cpp_source.html#l00186">irep_serialization.cpp:186</a></div></div>
-<div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassmessaget_html"><div class="ttname"><a href="classmessaget.html">messaget</a></div><div class="ttdoc">Class that provides messages with a built-in verbosity 'level'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00154">message.h:155</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a108043e0a9925dcebbb8a793611428b6"><div class="ttname"><a href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">messaget::error</a></div><div class="ttdeci">mstreamt &amp; error() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00399">message.h:399</a></div></div>
@@ -390,12 +418,14 @@ $(document).ready(function(){initNavTree('read__bin__goto__object_8cpp_source.ht
 <div class="ttc" id="agoto__functions_8h_html"><div class="ttname"><a href="goto__functions_8h.html">goto_functions.h</a></div><div class="ttdoc">Goto Programs with Functions.</div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beb"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb">goto_program_instruction_typet</a></div><div class="ttdeci">goto_program_instruction_typet</div><div class="ttdoc">The type of an instruction in a GOTO program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00030">goto_program.h:31</a></div></div>
 <div class="ttc" id="airep__serialization_8h_html"><div class="ttname"><a href="irep__serialization_8h.html">irep_serialization.h</a></div><div class="ttdoc">binary irep conversions with hashing</div></div>
-<div class="ttc" id="aread__bin__goto__object_8cpp_html_a2eabc121b55e0d9f722f19e020e2fc69"><div class="ttname"><a href="read__bin__goto__object_8cpp.html#a2eabc121b55e0d9f722f19e020e2fc69">read_bin_goto_object</a></div><div class="ttdeci">static bool read_bin_goto_object(std::istream &amp;in, symbol_table_baset &amp;symbol_table, goto_functionst &amp;functions, irep_serializationt &amp;irepconverter)</div><div class="ttdoc">read goto binary format</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00026">read_bin_goto_object.cpp:26</a></div></div>
+<div class="ttc" id="aread__bin__goto__object_8cpp_html_a6d670939fb4b3e39b4d4d65bede9f997"><div class="ttname"><a href="read__bin__goto__object_8cpp.html#a6d670939fb4b3e39b4d4d65bede9f997">copy_parameter_identifiers</a></div><div class="ttdeci">static void copy_parameter_identifiers(const symbol_table_baset &amp;symbol_table, goto_functionst &amp;functions)</div><div class="ttdoc">The serialised form of the goto-model currently includes the parameter identifiers in the symbol tabl...</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00077">read_bin_goto_object.cpp:77</a></div></div>
+<div class="ttc" id="aread__bin__goto__object_8cpp_html_a7e9c0461ab82359bd2f1aaf8ec223a53"><div class="ttname"><a href="read__bin__goto__object_8cpp.html#a7e9c0461ab82359bd2f1aaf8ec223a53">read_bin_goto_object</a></div><div class="ttdeci">static void read_bin_goto_object(std::istream &amp;in, symbol_table_baset &amp;symbol_table, goto_functionst &amp;functions, irep_serializationt &amp;irepconverter)</div><div class="ttdoc">read goto binary format</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00194">read_bin_goto_object.cpp:194</a></div></div>
+<div class="ttc" id="aread__bin__goto__object_8cpp_html_ac24c317fb5216527f7555e99f90b5225"><div class="ttname"><a href="read__bin__goto__object_8cpp.html#ac24c317fb5216527f7555e99f90b5225">read_bin_functions_object</a></div><div class="ttdeci">static void read_bin_functions_object(std::istream &amp;in, goto_functionst &amp;functions, irep_serializationt &amp;irepconverter)</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00098">read_bin_goto_object.cpp:98</a></div></div>
+<div class="ttc" id="aread__bin__goto__object_8cpp_html_afe380fa6840da493c86a8efef86b44a7"><div class="ttname"><a href="read__bin__goto__object_8cpp.html#afe380fa6840da493c86a8efef86b44a7">read_bin_symbol_table_object</a></div><div class="ttdeci">static void read_bin_symbol_table_object(std::istream &amp;in, symbol_table_baset &amp;symbol_table, irep_serializationt &amp;irepconverter)</div><div class="ttdef"><b>Definition:</b> <a href="read__bin__goto__object_8cpp_source.html#l00023">read_bin_goto_object.cpp:23</a></div></div>
 <div class="ttc" id="aread__bin__goto__object_8h_html"><div class="ttname"><a href="read__bin__goto__object_8h.html">read_bin_goto_object.h</a></div><div class="ttdoc">Read goto object files.</div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00503">invariant.h:503</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>
-<div class="ttc" id="astd__types_8h_html_a528308f263b96302993893c926e7d666"><div class="ttname"><a href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a></div><div class="ttdeci">const code_typet &amp; to_code_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a code_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00744">std_types.h:744</a></div></div>
 <div class="ttc" id="asymbol__table__base_8h_html"><div class="ttname"><a href="symbol__table__base_8h.html">symbol_table_base.h</a></div><div class="ttdoc">Author: Diffblue Ltd.</div></div>
 <div class="ttc" id="awrite__goto__binary_8h_html"><div class="ttname"><a href="write__goto__binary_8h.html">write_goto_binary.h</a></div><div class="ttdoc">Write GOTO binaries.</div></div>
 <div class="ttc" id="awrite__goto__binary_8h_html_ac30ce3546ebdf1da09ccb655b5f6d6c4"><div class="ttname"><a href="write__goto__binary_8h.html#ac30ce3546ebdf1da09ccb655b5f6d6c4">GOTO_BINARY_VERSION</a></div><div class="ttdeci">#define GOTO_BINARY_VERSION</div><div class="ttdef"><b>Definition:</b> <a href="write__goto__binary_8h_source.html#l00015">write_goto_binary.h:15</a></div></div>
