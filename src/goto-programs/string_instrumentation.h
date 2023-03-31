@@ -15,10 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class exprt;
 class goto_functionst;
 class goto_modelt;
-class goto_programt;
 class symbol_table_baset;
-
-void string_instrumentation(symbol_table_baset &, goto_programt &);
 
 void string_instrumentation(symbol_table_baset &, goto_functionst &);
 
