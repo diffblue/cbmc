@@ -764,7 +764,8 @@ var hierarchy =
       [ "abstract_eventt", "classabstract__eventt.html", null ],
       [ "cfg_base_nodet< T, I >", "structcfg__base__nodet.html", null ],
       [ "class_hierarchy_graph_nodet", "classclass__hierarchy__graph__nodet.html", null ],
-      [ "destructor_treet::destructor_nodet", "classdestructor__treet_1_1destructor__nodet.html", null ]
+      [ "destructor_treet::destructor_nodet", "classdestructor__treet_1_1destructor__nodet.html", null ],
+      [ "dfcc_loop_nesting_graph_nodet", "structdfcc__loop__nesting__graph__nodet.html", null ]
     ] ],
     [ "graph_nodet< vs_dep_edget >", "classgraph__nodet.html", [
       [ "vs_dep_nodet", "structvs__dep__nodet.html", null ]

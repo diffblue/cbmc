@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/graph.h" name="/home/runner/work/cbmc/cbmc/src/util/graph.h">
-<area shape="rect" id="node1" title="A Template Class for Graphs." alt="" coords="3325,5,3509,47"/>
-<area shape="rect" id="node2" href="$call__graph_8h.html" title="Function Call Graphs." alt="" coords="1597,102,1781,158"/>
-<area shape="rect" id="node11" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="715,325,944,381"/>
-<area shape="rect" id="node21" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="1011,317,1237,388"/>
-<area shape="rect" id="node23" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3321,102,3514,158"/>
-<area shape="rect" id="node24" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="3538,95,3779,165"/>
-<area shape="rect" id="node25" href="$utils_8cpp.html" title=" " alt="" coords="2761,213,2954,269"/>
-<area shape="rect" id="node26" href="$abstract__event_8h.html" title="abstract events" alt="" coords="3923,102,4117,158"/>
-<area shape="rect" id="node29" href="$event__graph_8h.html" title="graph of abstract events" alt="" coords="4309,213,4502,269"/>
-<area shape="rect" id="node38" href="$cfg_8h.html" title="Control Flow Graph." alt="" coords="2266,109,2486,151"/>
-<area shape="rect" id="node44" href="$class__hierarchy_8h.html" title="Class Hierarchy." alt="" coords="3191,213,3375,269"/>
-<area shape="rect" id="node54" href="$destructor__tree_8h.html" title=" " alt="" coords="4437,102,4621,158"/>
-<area shape="rect" id="node57" href="$string__dependencies_8cpp.html" title=" " alt="" coords="4645,102,4832,158"/>
-<area shape="rect" id="node58" href="$graphml_8h.html" title="Read/write graphs as GraphML." alt="" coords="4951,109,5161,151"/>
-<area shape="rect" id="node3" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="909,213,1093,269"/>
-<area shape="rect" id="node4" href="$call__graph__helpers_8h.html" title="Function Call Graph Helpers." alt="" coords="1533,213,1717,269"/>
-<area shape="rect" id="node7" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="1793,213,1986,269"/>
-<area shape="rect" id="node9" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2045,443,2304,499"/>
-<area shape="rect" id="node10" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="1117,213,1301,269"/>
-<area shape="rect" id="node5" href="$call__graph__helpers_8cpp.html" title="Function Call Graph Helpers." alt="" coords="1533,325,1717,381"/>
-<area shape="rect" id="node6" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="1793,325,1986,381"/>
-<area shape="rect" id="node8" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="2061,325,2304,381"/>
-<area shape="rect" id="node12" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="240,443,469,499"/>
-<area shape="rect" id="node13" href="$build__analyzer_8cpp.html" title=" " alt="" coords="933,443,1117,499"/>
-<area shape="rect" id="node14" href="$static__show__domain_8cpp.html" title=" " alt="" coords="1141,443,1328,499"/>
-<area shape="rect" id="node15" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="493,443,688,499"/>
-<area shape="rect" id="node16" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="1353,443,1546,499"/>
-<area shape="rect" id="node19" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="712,443,909,499"/>
-<area shape="rect" id="node20" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,443,216,499"/>
-<area shape="rect" id="node17" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="1353,555,1546,611"/>
-<area shape="rect" id="node18" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="1954,555,2147,611"/>
-<area shape="rect" id="node22" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="1571,436,1797,507"/>
-<area shape="rect" id="node27" href="$abstract__event_8cpp.html" title="abstract events" alt="" coords="4031,213,4225,269"/>
-<area shape="rect" id="node28" href="$data__dp_8cpp.html" title="data dependencies" alt="" coords="3814,213,4007,269"/>
-<area shape="rect" id="node30" href="$cycle__collection_8cpp.html" title="collection of cycles in graph of abstract events" alt="" coords="4803,325,5002,381"/>
-<area shape="rect" id="node31" href="$event__graph_8cpp.html" title="graph of abstract events" alt="" coords="5026,325,5219,381"/>
-<area shape="rect" id="node32" href="$goto2graph_8h.html" title="Instrumenter." alt="" coords="4369,325,4562,381"/>
-<area shape="rect" id="node34" href="$instrumenter__pensieve_8h.html" title="Instrumenter." alt="" coords="5001,443,5231,499"/>
-<area shape="rect" id="node37" href="$pair__collection_8cpp.html" title="collection of pairs (for Pensieve&#39;s static delay&#45;set analysis) in graph of abstract events" alt="" coords="4586,325,4779,381"/>
-<area shape="rect" id="node33" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="4369,443,4562,499"/>
-<area shape="rect" id="node35" href="$instrumenter__strategies_8cpp.html" title="Strategies for picking the abstract events to instrument." alt="" coords="4587,443,4837,499"/>
-<area shape="rect" id="node36" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="4151,443,4345,499"/>
-<area shape="rect" id="node39" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="1325,213,1509,269"/>
-<area shape="rect" id="node42" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="2062,213,2255,269"/>
-<area shape="rect" id="node43" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="2279,213,2473,269"/>
-<area shape="rect" id="node40" href="$natural__loops_8h.html" title="Compute natural loops in a goto_function." alt="" coords="1313,325,1509,381"/>
-<area shape="rect" id="node41" href="$sese__regions_8cpp.html" title="Single&#45;entry, single&#45;exit region analysis." alt="" coords="1821,443,2005,499"/>
-<area shape="rect" id="node45" href="$uncaught__exceptions__analysis_8h.html" title="Over&#45;approximative uncaught exceptions analysis." alt="" coords="2939,325,3149,381"/>
-<area shape="rect" id="node46" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="3416,325,3600,381"/>
-<area shape="rect" id="node47" href="$class__hierarchy_8cpp.html" title="Class Hierarchy." alt="" coords="3624,325,3808,381"/>
-<area shape="rect" id="node48" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="3832,325,4051,381"/>
-<area shape="rect" id="node49" href="$ci__lazy__methods_8h.html" title="Collect methods needed to be loaded using the lazy method." alt="" coords="3173,325,3392,381"/>
-<area shape="rect" id="node50" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="3541,443,3760,499"/>
-<area shape="rect" id="node51" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="4125,325,4344,381"/>
-<area shape="rect" id="node52" href="$remove__instanceof_8cpp.html" title="Remove Instance&#45;of Operators." alt="" coords="2480,325,2699,381"/>
-<area shape="rect" id="node53" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2723,325,2915,381"/>
-<area shape="rect" id="node55" href="$destructor__tree_8cpp.html" title=" " alt="" coords="4735,213,4919,269"/>
-<area shape="rect" id="node56" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="4527,213,4711,269"/>
-<area shape="rect" id="node59" href="$graphml__witness_8h.html" title="Witnesses for Traces and Proofs." alt="" coords="5193,213,5377,269"/>
-<area shape="rect" id="node60" href="$graphml_8cpp.html" title="Read/write graphs as GraphML." alt="" coords="4943,221,5169,262"/>
+<area shape="rect" id="node1" title="A Template Class for Graphs." alt="" coords="3087,5,3271,47"/>
+<area shape="rect" id="node2" href="$call__graph_8h.html" title="Function Call Graphs." alt="" coords="1267,102,1451,158"/>
+<area shape="rect" id="node11" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="685,339,915,395"/>
+<area shape="rect" id="node21" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="1365,332,1592,403"/>
+<area shape="rect" id="node23" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2962,102,3155,158"/>
+<area shape="rect" id="node24" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="3179,95,3421,165"/>
+<area shape="rect" id="node25" href="$dfcc__loop__nesting__graph_8h.html" title="Builds a graph describing how loops are nested in a GOTO program." alt="" coords="3445,95,3643,165"/>
+<area shape="rect" id="node27" href="$utils_8cpp.html" title=" " alt="" coords="2522,221,2715,277"/>
+<area shape="rect" id="node28" href="$abstract__event_8h.html" title="abstract events" alt="" coords="3671,102,3865,158"/>
+<area shape="rect" id="node31" href="$event__graph_8h.html" title="graph of abstract events" alt="" coords="4086,221,4279,277"/>
+<area shape="rect" id="node40" href="$cfg_8h.html" title="Control Flow Graph." alt="" coords="2154,109,2374,151"/>
+<area shape="rect" id="node44" href="$class__hierarchy_8h.html" title="Class Hierarchy." alt="" coords="2853,221,3037,277"/>
+<area shape="rect" id="node54" href="$destructor__tree_8h.html" title=" " alt="" coords="4180,102,4364,158"/>
+<area shape="rect" id="node57" href="$string__dependencies_8cpp.html" title=" " alt="" coords="4388,102,4575,158"/>
+<area shape="rect" id="node58" href="$graphml_8h.html" title="Read/write graphs as GraphML." alt="" coords="4707,109,4917,151"/>
+<area shape="rect" id="node3" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="747,221,931,277"/>
+<area shape="rect" id="node4" href="$call__graph__helpers_8h.html" title="Function Call Graph Helpers." alt="" coords="955,221,1139,277"/>
+<area shape="rect" id="node7" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="1681,221,1874,277"/>
+<area shape="rect" id="node9" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1821,458,2080,514"/>
+<area shape="rect" id="node10" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="1163,221,1347,277"/>
+<area shape="rect" id="node5" href="$call__graph__helpers_8cpp.html" title="Function Call Graph Helpers." alt="" coords="939,339,1123,395"/>
+<area shape="rect" id="node6" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="1147,339,1341,395"/>
+<area shape="rect" id="node8" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1829,339,2072,395"/>
+<area shape="rect" id="node12" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="461,458,691,514"/>
+<area shape="rect" id="node13" href="$build__analyzer_8cpp.html" title=" " alt="" coords="1144,458,1328,514"/>
+<area shape="rect" id="node14" href="$static__show__domain_8cpp.html" title=" " alt="" coords="933,458,1120,514"/>
+<area shape="rect" id="node15" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="715,458,909,514"/>
+<area shape="rect" id="node16" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="1603,458,1797,514"/>
+<area shape="rect" id="node19" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="5,458,203,514"/>
+<area shape="rect" id="node20" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="227,458,437,514"/>
+<area shape="rect" id="node17" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="1603,569,1797,625"/>
+<area shape="rect" id="node18" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="1942,569,2135,625"/>
+<area shape="rect" id="node22" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="1352,451,1579,521"/>
+<area shape="rect" id="node26" href="$dfcc__loop__nesting__graph_8cpp.html" title=" " alt="" coords="3413,213,3627,284"/>
+<area shape="rect" id="node29" href="$abstract__event_8cpp.html" title="abstract events" alt="" coords="3651,221,3845,277"/>
+<area shape="rect" id="node30" href="$data__dp_8cpp.html" title="data dependencies" alt="" coords="3869,221,4062,277"/>
+<area shape="rect" id="node32" href="$cycle__collection_8cpp.html" title="collection of cycles in graph of abstract events" alt="" coords="4521,339,4719,395"/>
+<area shape="rect" id="node33" href="$event__graph_8cpp.html" title="graph of abstract events" alt="" coords="4743,339,4937,395"/>
+<area shape="rect" id="node34" href="$goto2graph_8h.html" title="Instrumenter." alt="" coords="4086,339,4279,395"/>
+<area shape="rect" id="node36" href="$instrumenter__pensieve_8h.html" title="Instrumenter." alt="" coords="4719,458,4948,514"/>
+<area shape="rect" id="node39" href="$pair__collection_8cpp.html" title="collection of pairs (for Pensieve&#39;s static delay&#45;set analysis) in graph of abstract events" alt="" coords="4303,339,4497,395"/>
+<area shape="rect" id="node35" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="4086,458,4279,514"/>
+<area shape="rect" id="node37" href="$instrumenter__strategies_8cpp.html" title="Strategies for picking the abstract events to instrument." alt="" coords="4304,458,4555,514"/>
+<area shape="rect" id="node38" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="3869,458,4062,514"/>
+<area shape="rect" id="node41" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="1371,221,1555,277"/>
+<area shape="rect" id="node42" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="1950,221,2143,277"/>
+<area shape="rect" id="node43" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="2167,221,2361,277"/>
+<area shape="rect" id="node45" href="$uncaught__exceptions__analysis_8h.html" title="Over&#45;approximative uncaught exceptions analysis." alt="" coords="2656,339,2867,395"/>
+<area shape="rect" id="node46" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="2891,339,3075,395"/>
+<area shape="rect" id="node47" href="$class__hierarchy_8cpp.html" title="Class Hierarchy." alt="" coords="3099,339,3283,395"/>
+<area shape="rect" id="node48" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="3549,339,3768,395"/>
+<area shape="rect" id="node49" href="$ci__lazy__methods_8h.html" title="Collect methods needed to be loaded using the lazy method." alt="" coords="3307,339,3525,395"/>
+<area shape="rect" id="node50" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="3465,458,3684,514"/>
+<area shape="rect" id="node51" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="3843,339,4061,395"/>
+<area shape="rect" id="node52" href="$remove__instanceof_8cpp.html" title="Remove Instance&#45;of Operators." alt="" coords="2197,339,2416,395"/>
+<area shape="rect" id="node53" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2440,339,2632,395"/>
+<area shape="rect" id="node55" href="$destructor__tree_8cpp.html" title=" " alt="" coords="4304,221,4488,277"/>
+<area shape="rect" id="node56" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="4512,221,4696,277"/>
+<area shape="rect" id="node59" href="$graphml__witness_8h.html" title="Witnesses for Traces and Proofs." alt="" coords="4720,221,4904,277"/>
+<area shape="rect" id="node60" href="$graphml_8cpp.html" title="Read/write graphs as GraphML." alt="" coords="4928,228,5155,269"/>
 </map>

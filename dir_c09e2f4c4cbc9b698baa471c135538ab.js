@@ -35,6 +35,8 @@ var dir_c09e2f4c4cbc9b698baa471c135538ab =
     [ "dfcc_lift_memory_predicates.h", "dfcc__lift__memory__predicates_8h.html", [
       [ "dfcc_lift_memory_predicatest", "classdfcc__lift__memory__predicatest.html", "classdfcc__lift__memory__predicatest" ]
     ] ],
+    [ "dfcc_loop_nesting_graph.cpp", "dfcc__loop__nesting__graph_8cpp.html", "dfcc__loop__nesting__graph_8cpp" ],
+    [ "dfcc_loop_nesting_graph.h", "dfcc__loop__nesting__graph_8h.html", "dfcc__loop__nesting__graph_8h" ],
     [ "dfcc_obeys_contract.cpp", "dfcc__obeys__contract_8cpp.html", null ],
     [ "dfcc_obeys_contract.h", "dfcc__obeys__contract_8h.html", [
       [ "dfcc_obeys_contractt", "classdfcc__obeys__contractt.html", "classdfcc__obeys__contractt" ]
