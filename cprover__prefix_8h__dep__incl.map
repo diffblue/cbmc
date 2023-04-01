@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/cprover_prefix.h" name="/home/runner/work/cbmc/cbmc/src/util/cprover_prefix.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4953,5,5137,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5121,5,5305,61"/>
 <area shape="rect" id="node2" href="$constant__propagator_8cpp.html" title="Constant Propagation." alt="" coords="5,117,212,173"/>
 <area shape="rect" id="node3" href="$escape__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive escape analysis." alt="" coords="236,117,432,173"/>
 <area shape="rect" id="node4" href="$variable__sensitivity__domain_8cpp.html" title=" " alt="" coords="457,109,683,180"/>
@@ -17,46 +17,46 @@
 <area shape="rect" id="node16" href="$c__wrangler_8cpp.html" title="C Wrangler." alt="" coords="3286,124,3529,165"/>
 <area shape="rect" id="node17" href="$recursive__initialization_8h.html" title=" " alt="" coords="3553,117,3739,173"/>
 <area shape="rect" id="node21" href="$branch_8cpp.html" title="Branch Instrumentation." alt="" coords="3764,117,3957,173"/>
-<area shape="rect" id="node22" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="3982,109,4179,180"/>
-<area shape="rect" id="node23" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="4203,109,4401,180"/>
-<area shape="rect" id="node24" href="$dfcc__library_8cpp.html" title=" " alt="" coords="3939,228,4137,299"/>
-<area shape="rect" id="node25" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="5263,109,5504,180"/>
-<area shape="rect" id="node26" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="5529,109,5726,180"/>
-<area shape="rect" id="node27" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="5750,109,5947,180"/>
-<area shape="rect" id="node28" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="5972,117,6179,173"/>
-<area shape="rect" id="node29" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="6203,117,6396,173"/>
-<area shape="rect" id="node30" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="6420,117,6613,173"/>
-<area shape="rect" id="node31" href="$shared__buffers_8h.html" title=" " alt="" coords="4476,117,4669,173"/>
-<area shape="rect" id="node34" href="$adjust__float__expressions_8cpp.html" title="Symbolic Execution." alt="" coords="6637,117,6852,173"/>
-<area shape="rect" id="node35" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="6877,117,7061,173"/>
-<area shape="rect" id="node36" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="7085,117,7269,173"/>
-<area shape="rect" id="node37" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="4953,117,5137,173"/>
-<area shape="rect" id="node45" href="$show__goto__functions__json_8cpp.html" title="Goto Program." alt="" coords="6298,235,6522,291"/>
-<area shape="rect" id="node46" href="$show__goto__functions__xml_8cpp.html" title="Goto Program." alt="" coords="6545,235,6768,291"/>
-<area shape="rect" id="node47" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="4597,235,4781,291"/>
-<area shape="rect" id="node48" href="$goto__inline__class_8cpp.html" title="Function Inlining." alt="" coords="7293,117,7477,173"/>
-<area shape="rect" id="node49" href="$goto__instruction__code_8cpp.html" title="Data structures representing instructions in a GOTO program." alt="" coords="7501,117,7697,173"/>
-<area shape="rect" id="node50" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="7722,117,7906,173"/>
-<area shape="rect" id="node51" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="7931,117,8143,173"/>
-<area shape="rect" id="node52" href="$static__lifetime__init_8h.html" title=" " alt="" coords="4694,117,4878,173"/>
-<area shape="rect" id="node53" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="8167,117,8368,173"/>
-<area shape="rect" id="node54" href="$boolbv__index_8cpp.html" title=" " alt="" coords="8392,117,8593,173"/>
-<area shape="rect" id="node55" href="$statement__list__typecheck_8cpp.html" title="Statement List Language Type Checking." alt="" coords="8618,117,8839,173"/>
-<area shape="rect" id="node56" href="$config_8cpp.html" title=" " alt="" coords="8863,124,9047,165"/>
-<area shape="rect" id="node57" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="9071,117,9255,173"/>
-<area shape="rect" id="node58" href="$refined__string__type_8h.html" title="Type for string expressions used by the string solver." alt="" coords="9279,117,9463,173"/>
-<area shape="rect" id="node59" href="$java__bytecode__concurrency__instrumentation_8cpp.html" title=" " alt="" coords="9487,109,9706,180"/>
-<area shape="rect" id="node60" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="9730,117,9949,173"/>
-<area shape="rect" id="node18" href="$function__call__harness__generator_8cpp.html" title=" " alt="" coords="3275,228,3459,299"/>
-<area shape="rect" id="node19" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3483,228,3689,299"/>
-<area shape="rect" id="node20" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="3713,235,3915,291"/>
-<area shape="rect" id="node32" href="$shared__buffers_8cpp.html" title=" " alt="" coords="4379,235,4572,291"/>
-<area shape="rect" id="node33" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="4161,235,4355,291"/>
-<area shape="rect" id="node38" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="5458,235,5642,291"/>
-<area shape="rect" id="node39" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="5667,243,5857,284"/>
-<area shape="rect" id="node40" href="$flow__insensitive__analysis_8h.html" title="Flow Insensitive Static Analysis." alt="" coords="5882,235,6066,291"/>
-<area shape="rect" id="node41" href="$goto__rw_8cpp.html" title=" " alt="" coords="6090,235,6274,291"/>
-<area shape="rect" id="node42" href="$static__analysis_8h.html" title="Static Analysis." alt="" coords="5013,235,5199,291"/>
-<area shape="rect" id="node43" href="$uncaught__exceptions__analysis_8cpp.html" title="Over&#45;approximating uncaught exceptions analysis." alt="" coords="5223,235,5434,291"/>
-<area shape="rect" id="node44" href="$ansi__c__entry__point_8cpp.html" title=" " alt="" coords="4805,235,4989,291"/>
+<area shape="rect" id="node22" href="$dfcc__is__cprover__symbol_8cpp.html" title=" " alt="" coords="3981,109,4191,180"/>
+<area shape="rect" id="node23" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="4215,109,4413,180"/>
+<area shape="rect" id="node24" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="4437,109,4634,180"/>
+<area shape="rect" id="node25" href="$dfcc__library_8cpp.html" title=" " alt="" coords="4111,228,4309,299"/>
+<area shape="rect" id="node26" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="5496,109,5737,180"/>
+<area shape="rect" id="node27" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="5762,109,5959,180"/>
+<area shape="rect" id="node28" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="5983,109,6181,180"/>
+<area shape="rect" id="node29" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="6205,117,6412,173"/>
+<area shape="rect" id="node30" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="6436,117,6629,173"/>
+<area shape="rect" id="node31" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="6653,117,6847,173"/>
+<area shape="rect" id="node32" href="$shared__buffers_8h.html" title=" " alt="" coords="4917,117,5111,173"/>
+<area shape="rect" id="node35" href="$adjust__float__expressions_8cpp.html" title="Symbolic Execution." alt="" coords="6871,117,7085,173"/>
+<area shape="rect" id="node36" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="7110,117,7294,173"/>
+<area shape="rect" id="node37" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="7318,117,7502,173"/>
+<area shape="rect" id="node38" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="5186,117,5370,173"/>
+<area shape="rect" id="node45" href="$show__goto__functions__json_8cpp.html" title="Goto Program." alt="" coords="6262,235,6486,291"/>
+<area shape="rect" id="node46" href="$show__goto__functions__xml_8cpp.html" title="Goto Program." alt="" coords="6509,235,6732,291"/>
+<area shape="rect" id="node47" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="4769,235,4953,291"/>
+<area shape="rect" id="node48" href="$goto__inline__class_8cpp.html" title="Function Inlining." alt="" coords="7526,117,7710,173"/>
+<area shape="rect" id="node49" href="$goto__instruction__code_8cpp.html" title="Data structures representing instructions in a GOTO program." alt="" coords="7735,117,7931,173"/>
+<area shape="rect" id="node50" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="7955,117,8139,173"/>
+<area shape="rect" id="node51" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="8164,117,8376,173"/>
+<area shape="rect" id="node52" href="$static__lifetime__init_8h.html" title=" " alt="" coords="4709,117,4893,173"/>
+<area shape="rect" id="node53" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="8400,117,8601,173"/>
+<area shape="rect" id="node54" href="$boolbv__index_8cpp.html" title=" " alt="" coords="8625,117,8827,173"/>
+<area shape="rect" id="node55" href="$statement__list__typecheck_8cpp.html" title="Statement List Language Type Checking." alt="" coords="8851,117,9073,173"/>
+<area shape="rect" id="node56" href="$config_8cpp.html" title=" " alt="" coords="9097,124,9281,165"/>
+<area shape="rect" id="node57" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="9305,117,9489,173"/>
+<area shape="rect" id="node58" href="$refined__string__type_8h.html" title="Type for string expressions used by the string solver." alt="" coords="9513,117,9697,173"/>
+<area shape="rect" id="node59" href="$java__bytecode__concurrency__instrumentation_8cpp.html" title=" " alt="" coords="9721,109,9939,180"/>
+<area shape="rect" id="node60" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="9963,117,10182,173"/>
+<area shape="rect" id="node18" href="$function__call__harness__generator_8cpp.html" title=" " alt="" coords="3335,228,3519,299"/>
+<area shape="rect" id="node19" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3543,228,3749,299"/>
+<area shape="rect" id="node20" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="3773,235,3975,291"/>
+<area shape="rect" id="node33" href="$shared__buffers_8cpp.html" title=" " alt="" coords="4551,235,4744,291"/>
+<area shape="rect" id="node34" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="4333,235,4527,291"/>
+<area shape="rect" id="node39" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="5630,235,5814,291"/>
+<area shape="rect" id="node40" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="5839,243,6029,284"/>
+<area shape="rect" id="node41" href="$flow__insensitive__analysis_8h.html" title="Flow Insensitive Static Analysis." alt="" coords="6054,235,6238,291"/>
+<area shape="rect" id="node42" href="$goto__rw_8cpp.html" title=" " alt="" coords="4977,235,5161,291"/>
+<area shape="rect" id="node43" href="$static__analysis_8h.html" title="Static Analysis." alt="" coords="5185,235,5371,291"/>
+<area shape="rect" id="node44" href="$uncaught__exceptions__analysis_8cpp.html" title="Over&#45;approximating uncaught exceptions analysis." alt="" coords="5395,235,5606,291"/>
 </map>

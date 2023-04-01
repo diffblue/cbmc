@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/magic.h" name="/home/runner/work/cbmc/cbmc/src/util/magic.h">
-<area shape="rect" id="node1" title="Magic numbers used throughout the codebase." alt="" coords="2888,5,3072,47"/>
-<area shape="rect" id="node2" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2139,95,2323,151"/>
-<area shape="rect" id="node3" href="$boolbv_8cpp.html" title=" " alt="" coords="2347,95,2549,151"/>
-<area shape="rect" id="node4" href="$dimacs__cnf_8cpp.html" title=" " alt="" coords="2573,95,2757,151"/>
-<area shape="rect" id="node5" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="2781,95,2965,151"/>
-<area shape="rect" id="node6" href="$string__refinement__util_8cpp.html" title=" " alt="" coords="2990,95,3186,151"/>
-<area shape="rect" id="node7" href="$dstring_8h.html" title="Container for C&#45;Strings." alt="" coords="3211,102,3395,143"/>
-<area shape="rect" id="node41" href="$object__factory__parameters_8h.html" title=" " alt="" coords="4073,385,4257,441"/>
-<area shape="rect" id="node60" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="3470,102,3706,143"/>
-<area shape="rect" id="node8" href="$dstring_8cpp.html" title="Container for C&#45;Strings." alt="" coords="3210,199,3395,240"/>
+<area shape="rect" id="node1" title="Magic numbers used throughout the codebase." alt="" coords="2932,5,3116,47"/>
+<area shape="rect" id="node2" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2183,95,2367,151"/>
+<area shape="rect" id="node3" href="$boolbv_8cpp.html" title=" " alt="" coords="2391,95,2593,151"/>
+<area shape="rect" id="node4" href="$dimacs__cnf_8cpp.html" title=" " alt="" coords="2617,95,2801,151"/>
+<area shape="rect" id="node5" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="2825,95,3009,151"/>
+<area shape="rect" id="node6" href="$string__refinement__util_8cpp.html" title=" " alt="" coords="3034,95,3230,151"/>
+<area shape="rect" id="node7" href="$dstring_8h.html" title="Container for C&#45;Strings." alt="" coords="3255,102,3439,143"/>
+<area shape="rect" id="node41" href="$object__factory__parameters_8h.html" title=" " alt="" coords="4107,385,4291,441"/>
+<area shape="rect" id="node60" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="3514,102,3750,143"/>
+<area shape="rect" id="node8" href="$dstring_8cpp.html" title="Container for C&#45;Strings." alt="" coords="3254,199,3439,240"/>
 <area shape="rect" id="node9" href="$irep__ids_8h.html" title="util" alt="" coords="2201,199,2385,240"/>
 <area shape="rect" id="node10" href="$irep_8h.html" title=" " alt="" coords="2201,288,2385,329"/>
 <area shape="rect" id="node59" href="$irep__ids_8cpp.html" title="Internal Representation." alt="" coords="1986,288,2177,329"/>
-<area shape="rect" id="node11" href="$locals_8h.html" title="Local variables whose address is taken." alt="" coords="3433,392,3633,433"/>
-<area shape="rect" id="node12" href="$ansi__c__scope_8h.html" title=" " alt="" coords="3657,385,3841,441"/>
-<area shape="rect" id="node13" href="$builtin__factory_8h.html" title=" " alt="" coords="3865,385,4049,441"/>
+<area shape="rect" id="node11" href="$locals_8h.html" title="Local variables whose address is taken." alt="" coords="3436,392,3636,433"/>
+<area shape="rect" id="node12" href="$ansi__c__scope_8h.html" title=" " alt="" coords="3660,385,3844,441"/>
+<area shape="rect" id="node13" href="$builtin__factory_8h.html" title=" " alt="" coords="3868,385,4052,441"/>
 <area shape="rect" id="node14" href="$c__storage__spec_8h.html" title=" " alt="" coords="5,385,200,441"/>
-<area shape="rect" id="node15" href="$ansi-c_2cprover__library_8h.html" title=" " alt="" coords="1889,496,2073,552"/>
+<area shape="rect" id="node15" href="$ansi-c_2cprover__library_8h.html" title=" " alt="" coords="2029,496,2213,552"/>
 <area shape="rect" id="node19" href="$cpp__exception__id_8h.html" title="C++ Language Type Checking." alt="" coords="275,392,515,433"/>
 <area shape="rect" id="node20" href="$cpp__member__spec_8h.html" title=" " alt="" coords="539,385,739,441"/>
-<area shape="rect" id="node21" href="$cpp_2cprover__library_8h.html" title=" " alt="" coords="501,496,685,552"/>
+<area shape="rect" id="node21" href="$cpp_2cprover__library_8h.html" title=" " alt="" coords="517,496,701,552"/>
 <area shape="rect" id="node22" href="$instrument__contracts_8h.html" title="Instrument Given Invariants." alt="" coords="813,385,1025,441"/>
 <area shape="rect" id="node23" href="$state__encoding_8h.html" title="State Encoding." alt="" coords="1049,385,1233,441"/>
 <area shape="rect" id="node24" href="$taint__parser_8h.html" title="Taint Parser." alt="" coords="1257,385,1441,441"/>
 <area shape="rect" id="node25" href="$goto__trace__provider_8h.html" title="Interface for returning Goto Traces from Goto Checkers." alt="" coords="1465,385,1649,441"/>
 <area shape="rect" id="node26" href="$goto__harness__generator_8h.html" title=" " alt="" coords="1673,385,1868,441"/>
-<area shape="rect" id="node27" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="1663,496,1865,552"/>
+<area shape="rect" id="node27" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="1737,496,1938,552"/>
 <area shape="rect" id="node28" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="1943,385,2137,441"/>
-<area shape="rect" id="node29" href="$branch_8h.html" title="Branch Instrumentation." alt="" coords="873,496,1066,552"/>
-<area shape="rect" id="node30" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="2097,496,2337,552"/>
-<area shape="rect" id="node31" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="2263,377,2460,448"/>
-<area shape="rect" id="node33" href="$inlining__decorator_8h.html" title=" " alt="" coords="2484,385,2703,441"/>
-<area shape="rect" id="node34" href="$function_8h.html" title="Function Entering and Exiting." alt="" coords="2694,496,2887,552"/>
-<area shape="rect" id="node35" href="$generate__function__bodies_8h.html" title=" " alt="" coords="2463,496,2670,552"/>
-<area shape="rect" id="node36" href="$insert__final__assert__false_8cpp.html" title="Insert final assert false into a function." alt="" coords="2828,385,3039,441"/>
-<area shape="rect" id="node37" href="$interrupt_8h.html" title="Interrupt Instrumentation for Goto Programs." alt="" coords="2911,496,3105,552"/>
-<area shape="rect" id="node38" href="$race__check_8h.html" title="Race Detection for Threaded Goto Programs." alt="" coords="3129,496,3322,552"/>
-<area shape="rect" id="node39" href="$remove__function_8h.html" title="Remove function definition." alt="" coords="3346,496,3539,552"/>
-<area shape="rect" id="node40" href="$replace__calls_8h.html" title="Replace calls to given functions with calls to other given functions." alt="" coords="3215,385,3409,441"/>
-<area shape="rect" id="node16" href="$dfcc_8cpp.html" title=" " alt="" coords="2084,600,2281,671"/>
-<area shape="rect" id="node17" href="$dfcc__library_8cpp.html" title=" " alt="" coords="2305,600,2503,671"/>
-<area shape="rect" id="node18" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2715,719,2973,775"/>
-<area shape="rect" id="node32" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2527,600,2724,671"/>
-<area shape="rect" id="node42" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="3563,496,3749,552"/>
-<area shape="rect" id="node49" href="$statement__list__language_8h.html" title="Statement List Language Interface." alt="" coords="4065,496,4263,552"/>
-<area shape="rect" id="node51" href="$object__factory__parameters_8cpp.html" title=" " alt="" coords="4288,496,4472,552"/>
-<area shape="rect" id="node52" href="$java__object__factory__parameters_8h.html" title=" " alt="" coords="4912,496,5160,552"/>
-<area shape="rect" id="node43" href="$ansi__c__language_8h.html" title=" " alt="" coords="3033,607,3217,663"/>
-<area shape="rect" id="node45" href="$c__nondet__symbol__factory_8cpp.html" title="C Nondet Symbol Factory." alt="" coords="3242,607,3433,663"/>
-<area shape="rect" id="node46" href="$c__object__factory__parameters_8cpp.html" title=" " alt="" coords="3457,607,3642,663"/>
-<area shape="rect" id="node47" href="$cpp__language_8h.html" title="C++ Language Module." alt="" coords="3666,615,3883,656"/>
-<area shape="rect" id="node48" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="3908,615,4127,656"/>
-<area shape="rect" id="node44" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="3643,726,3906,767"/>
-<area shape="rect" id="node50" href="$statement__list__language_8cpp.html" title="Statement List Language Interface." alt="" coords="4202,607,4417,663"/>
-<area shape="rect" id="node53" href="$convert__java__nondet_8cpp.html" title="Convert side_effect_expr_nondett expressions." alt="" coords="4441,607,4660,663"/>
-<area shape="rect" id="node54" href="$java__bytecode__language_8h.html" title=" " alt="" coords="4684,607,4903,663"/>
-<area shape="rect" id="node55" href="$java__object__factory_8cpp.html" title=" " alt="" coords="4927,607,5145,663"/>
-<area shape="rect" id="node56" href="$java__object__factory__parameters_8cpp.html" title=" " alt="" coords="5170,607,5433,663"/>
-<area shape="rect" id="node57" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="5457,607,5676,663"/>
-<area shape="rect" id="node58" href="$simple__method__stubbing_8cpp.html" title="Java simple opaque stub generation." alt="" coords="5700,607,5919,663"/>
+<area shape="rect" id="node29" href="$branch_8h.html" title="Branch Instrumentation." alt="" coords="889,496,1082,552"/>
+<area shape="rect" id="node30" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="2237,496,2477,552"/>
+<area shape="rect" id="node31" href="$dfcc__is__cprover__symbol_8h.html" title=" " alt="" coords="2263,377,2460,448"/>
+<area shape="rect" id="node32" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="2484,377,2681,448"/>
+<area shape="rect" id="node34" href="$inlining__decorator_8h.html" title=" " alt="" coords="2705,385,2924,441"/>
+<area shape="rect" id="node35" href="$function_8h.html" title="Function Entering and Exiting." alt="" coords="2834,496,3027,552"/>
+<area shape="rect" id="node36" href="$generate__function__bodies_8h.html" title=" " alt="" coords="2603,496,2810,552"/>
+<area shape="rect" id="node37" href="$insert__final__assert__false_8cpp.html" title="Insert final assert false into a function." alt="" coords="3049,385,3260,441"/>
+<area shape="rect" id="node38" href="$interrupt_8h.html" title="Interrupt Instrumentation for Goto Programs." alt="" coords="3051,496,3245,552"/>
+<area shape="rect" id="node39" href="$race__check_8h.html" title="Race Detection for Threaded Goto Programs." alt="" coords="3269,496,3462,552"/>
+<area shape="rect" id="node40" href="$remove__function_8h.html" title="Remove function definition." alt="" coords="3486,496,3679,552"/>
+<area shape="rect" id="node16" href="$dfcc_8cpp.html" title=" " alt="" coords="2209,600,2407,671"/>
+<area shape="rect" id="node17" href="$dfcc__library_8cpp.html" title=" " alt="" coords="2431,600,2628,671"/>
+<area shape="rect" id="node18" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2837,719,3096,775"/>
+<area shape="rect" id="node33" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2652,600,2849,671"/>
+<area shape="rect" id="node42" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="3703,496,3889,552"/>
+<area shape="rect" id="node49" href="$statement__list__language_8h.html" title="Statement List Language Interface." alt="" coords="4129,496,4327,552"/>
+<area shape="rect" id="node51" href="$object__factory__parameters_8cpp.html" title=" " alt="" coords="4352,496,4536,552"/>
+<area shape="rect" id="node52" href="$java__object__factory__parameters_8h.html" title=" " alt="" coords="5035,496,5283,552"/>
+<area shape="rect" id="node43" href="$ansi__c__language_8h.html" title=" " alt="" coords="3156,607,3340,663"/>
+<area shape="rect" id="node45" href="$c__nondet__symbol__factory_8cpp.html" title="C Nondet Symbol Factory." alt="" coords="3365,607,3555,663"/>
+<area shape="rect" id="node46" href="$c__object__factory__parameters_8cpp.html" title=" " alt="" coords="3579,607,3765,663"/>
+<area shape="rect" id="node47" href="$cpp__language_8h.html" title="C++ Language Module." alt="" coords="3789,615,4006,656"/>
+<area shape="rect" id="node48" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="4031,615,4249,656"/>
+<area shape="rect" id="node44" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="3766,726,4029,767"/>
+<area shape="rect" id="node50" href="$statement__list__language_8cpp.html" title="Statement List Language Interface." alt="" coords="4325,607,4539,663"/>
+<area shape="rect" id="node53" href="$convert__java__nondet_8cpp.html" title="Convert side_effect_expr_nondett expressions." alt="" coords="4564,607,4783,663"/>
+<area shape="rect" id="node54" href="$java__bytecode__language_8h.html" title=" " alt="" coords="4807,607,5025,663"/>
+<area shape="rect" id="node55" href="$java__object__factory_8cpp.html" title=" " alt="" coords="5049,607,5268,663"/>
+<area shape="rect" id="node56" href="$java__object__factory__parameters_8cpp.html" title=" " alt="" coords="5293,607,5555,663"/>
+<area shape="rect" id="node57" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="5580,607,5799,663"/>
+<area shape="rect" id="node58" href="$simple__method__stubbing_8cpp.html" title="Java simple opaque stub generation." alt="" coords="5823,607,6041,663"/>
 </map>
