@@ -11,13 +11,12 @@ Author: CM Wintersteiger
 
 #include "write_goto_binary.h"
 
-#include <fstream>
-
-#include <util/exception_utils.h>
 #include <util/irep_serialization.h>
 #include <util/message.h>
 
 #include <goto-programs/goto_model.h>
+
+#include <fstream>
 
 /// Writes the symbol table to file.
 static void write_symbol_table_binary(
@@ -144,12 +143,14 @@ static void write_goto_binary(
 bool write_goto_binary(
   std::ostream &out,
   const goto_modelt &goto_model,
+  message_handlert &message_handler,
   int version)
 {
   return write_goto_binary(
     out,
     goto_model.symbol_table,
     goto_model.goto_functions,
+    message_handler,
     version);
 }
 
@@ -158,19 +159,24 @@ bool write_goto_binary(
   std::ostream &out,
   const symbol_table_baset &symbol_table,
   const goto_functionst &goto_functions,
+  message_handlert &message_handler,
   int version)
 {
+  messaget message{message_handler};
+
   if(version < GOTO_BINARY_VERSION)
   {
-    throw invalid_command_line_argument_exceptiont(
-      "version " + std::to_string(version) + " no longer supported",
-      "supported version = " + std::to_string(GOTO_BINARY_VERSION));
+    message.error() << "version " << version << " no longer supported; "
+                    << "supported version = " << GOTO_BINARY_VERSION
+                    << messaget::eom;
+    return true;
   }
   if(version > GOTO_BINARY_VERSION)
   {
-    throw invalid_command_line_argument_exceptiont(
-      "unknown goto binary version " + std::to_string(version),
-      "supported version = " + std::to_string(GOTO_BINARY_VERSION));
+    message.error() << "unknown goto binary version " << version << "; "
+                    << "supported version = " << GOTO_BINARY_VERSION
+                    << messaget::eom;
+    return true;
   }
 
   // header
@@ -195,9 +201,9 @@ bool write_goto_binary(
   if(!out)
   {
     messaget message(message_handler);
-    message.error() << "Failed to open '" << filename << "'";
+    message.error() << "Failed to open '" << filename << "'" << messaget::eom;
     return true;
   }
 
-  return write_goto_binary(out, goto_model);
+  return write_goto_binary(out, goto_model, message_handler);
 }
