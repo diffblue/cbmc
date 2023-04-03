@@ -214,70 +214,63 @@ bool read_bin_goto_object(
 {
   messaget message(message_handler);
 
-  {
-    char hdr[4];
-    hdr[0]=static_cast<char>(in.get());
-    hdr[1]=static_cast<char>(in.get());
-    hdr[2]=static_cast<char>(in.get());
+  char hdr[4];
+  hdr[0] = static_cast<char>(in.get());
+  hdr[1] = static_cast<char>(in.get());
+  hdr[2] = static_cast<char>(in.get());
 
-    if(hdr[0]=='G' && hdr[1]=='B' && hdr[2]=='F')
+  if(hdr[0] == 'G' && hdr[1] == 'B' && hdr[2] == 'F')
+  {
+    // OK!
+  }
+  else
+  {
+    hdr[3] = static_cast<char>(in.get());
+    if(hdr[0] == 0x7f && hdr[1] == 'G' && hdr[2] == 'B' && hdr[3] == 'F')
     {
       // OK!
     }
+    else if(hdr[0] == 0x7f && hdr[1] == 'E' && hdr[2] == 'L' && hdr[3] == 'F')
+    {
+      if(!filename.empty())
+        message.error() << "Sorry, but I can't read ELF binary '" << filename
+                        << "'" << messaget::eom;
+      else
+        message.error() << "Sorry, but I can't read ELF binaries"
+                        << messaget::eom;
+
+      return true;
+    }
     else
     {
-      hdr[3]=static_cast<char>(in.get());
-      if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
-      {
-        // OK!
-      }
-      else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
-      {
-        if(!filename.empty())
-          message.error() << "Sorry, but I can't read ELF binary '" << filename
-                          << "'" << messaget::eom;
-        else
-          message.error() << "Sorry, but I can't read ELF binaries"
-                          << messaget::eom;
-
-        return true;
-      }
-      else
-      {
-        message.error() << "'" << filename << "' is not a goto-binary"
-                        << messaget::eom;
-        return true;
-      }
+      message.error() << "'" << filename << "' is not a goto-binary"
+                      << messaget::eom;
+      return true;
     }
   }
 
   irep_serializationt::ireps_containert ic;
   irep_serializationt irepconverter(ic);
-  // symbol_serializationt symbolconverter(ic);
 
+  const std::size_t version = irepconverter.read_gb_word(in);
+
+  if(version < GOTO_BINARY_VERSION)
   {
-    const std::size_t version = irepconverter.read_gb_word(in);
-
-    if(version < GOTO_BINARY_VERSION)
-    {
-      message.error() <<
-          "The input was compiled with an old version of "
-          "goto-cc; please recompile" << messaget::eom;
-      return true;
-    }
-    else if(version == GOTO_BINARY_VERSION)
-    {
-      read_bin_goto_object(in, symbol_table, functions, irepconverter);
-      return false;
-    }
-    else
-    {
-      message.error() <<
-          "The input was compiled with an unsupported version of "
-          "goto-cc; please recompile" << messaget::eom;
-      return true;
-    }
+    message.error() << "The input was compiled with an old version of "
+                       "goto-cc; please recompile"
+                    << messaget::eom;
+    return true;
   }
-
-  UNREACHABLE;
+  else if(version == GOTO_BINARY_VERSION)
+  {
+    read_bin_goto_object(in, symbol_table, functions, irepconverter);
+    return false;
+  }
+  else
+  {
+    message.error() << "The input was compiled with an unsupported version of "
+                       "goto-cc; please recompile"
+                    << messaget::eom;
+    return true;
+  }
 }
