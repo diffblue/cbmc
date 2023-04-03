@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_READ_GOTO_BINARY_H
 #define CPROVER_GOTO_PROGRAMS_READ_GOTO_BINARY_H
 
+#include <util/nodiscard.h>
+#include <util/optional.h>
+
 #include <list>
 #include <string>
-
-#include <util/optional.h>
 
 class goto_modelt;
 class message_handlert;
@@ -30,6 +31,7 @@ bool is_goto_binary(const std::string &filename, message_handlert &);
 /// \param [out] dest: GOTO model to update.
 /// \param message_handler: for diagnostics
 /// \return True on error, false otherwise
+NODISCARD
 bool read_objects_and_link(
   const std::list<std::string> &file_names,
   goto_modelt &dest,

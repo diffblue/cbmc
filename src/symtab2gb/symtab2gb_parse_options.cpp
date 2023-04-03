@@ -106,7 +106,7 @@ static void run_symtab2gb(
   linked_goto_model.symbol_table.swap(linked_symbol_table);
   goto_convert(linked_goto_model, message_handler);
 
-  if(failed(write_goto_binary(out_file, linked_goto_model)))
+  if(failed(write_goto_binary(out_file, linked_goto_model, message_handler)))
   {
     throw system_exceptiont{"failed to write goto binary to " + gb_filename};
   }
