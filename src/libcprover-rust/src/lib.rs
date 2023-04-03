@@ -12,23 +12,42 @@ pub mod cprover_api {
     // the definitions on the C++ side (i.e. it will treat C++ as the
     // source of truth rather than Rust).
 
+    /// This type reflects the success of the whole verification run.
+    /// E.g. If all of the assertions have been passing, then the result is
+    /// going to be `PASS` - if there's just one failing, the verification
+    /// result will be `FAIL`. You can get `UNKNOWN` only in the case where
+    /// you request verification results before running the verification
+    /// engine (not possible through the Rust interface) and `ERROR` if there
+    /// is something that causes the SAT solver to fail.
     #[derive(Debug)]
     #[repr(i32)]
     enum verifier_resultt {
+        /// The verification engine run hasn't been run yet.
         UNKNOWN,
+        /// No properties were violated.
         PASS,
+        /// Some properties were violated.
         FAIL,
+        /// An error occured during the running of the solver.
         ERROR,
     }
 
+    /// This type is similar to [verifier_resultt] above, but reflects the
+    /// status of a single property checked.
     #[derive(Debug)]
     #[repr(i32)]
     enum prop_statust {
+        /// The property was not checked.
         NOT_CHECKED,
+        /// The checker was unable to determine the status of the property.
         UNKNOWN,
+        /// The property was proven to be unreachable.
         NOT_REACHABLE,
+        /// The property was not violated.
         PASS,
+        /// The property was violated.
         FAIL,
+        /// An error occured in the solver during checking the property's status.
         ERROR,
     }
 
@@ -44,6 +63,14 @@ pub mod cprover_api {
 
         type verifier_resultt;
         type prop_statust;
+
+        /// This type acts as an opaque handle to the verification results object.
+        /// This will be given back to us through a UniquePtr, which we pass into
+        /// the functions that will give us back the results in a more granular level:
+        /// * [get_verification_result] will give the full verification engine run result,
+        /// * [get_property_ids] will give the list of property identifiers of the model,
+        /// * [get_property_description] will give a string description for a property identifier
+        /// * [get_property_status] will give the status of a property for a given identifier.
         type verification_resultt;
 
         /// Provide a unique pointer to the API handle. This will be required to interact
@@ -69,16 +96,31 @@ pub mod cprover_api {
         /// the CProver CLI option `--drop-unused-functions`
         fn drop_unused_functions(self: &api_sessiont) -> Result<()>;
 
+        /// Gets a pointer to the opaque type describing the aggregate verification results and
+        /// returns an enum value of type [verifier_resultt] representing the whole of the verification
+        /// engine run.
         fn get_verification_result(result: &UniquePtr<verification_resultt>) -> verifier_resultt;
+        /// Gets a pointer to the opaque type describing the aggregate verification results
+        /// and returns a C++ Vector of C++ Strings containing the identifiers of the
+        /// properties present in the model.
         fn get_property_ids(result: &UniquePtr<verification_resultt>) -> &CxxVector<CxxString>;
+        /// Given a pointer to the opaque type representing the aggregate verification results
+        /// and a property identifier using a C++ string (you can use `cxx:let_cxx_string` to
+        /// declare), returns a C++ string that contains the property description.
+        /// If a bad identifier is given, this returns an `Result::Err`.
         fn get_property_description<'a>(
             result: &'a UniquePtr<verification_resultt>,
             property_id: &CxxString,
-        ) -> &'a CxxString;
+        ) -> Result<&'a CxxString>;
+        /// Given a pointer to the opaque type representing the aggregate verification results
+        /// and a property identifier using a C++ string (you can use `cxx:let_cxx_string` to
+        /// declare), returns a value of type [prop_statust] that contains the individual
+        /// property's status.
+        /// If a bad identifier is given, this returns an `Result::Err`.
         fn get_property_status(
             result: &UniquePtr<verification_resultt>,
             property_id: &CxxString,
-        ) -> prop_statust;
+        ) -> Result<prop_statust>;
 
         // WARNING: Please don't use this function - use its public interface in [ffi_util::translate_rust_vector_to_cpp].
         // The reason this is here is that it's implemented on the C++ shim, and to link this function against
@@ -364,10 +406,53 @@ mod tests {
         let results = client.verify_model();
         if let Ok(el) = results {
             let_cxx_string!(existing_property_id = "main.assertion.1");
-            let description =
-                cprover_api::get_property_description(&el, &existing_property_id).to_string();
-            assert_eq!(description, "expected failure: arr[3] == 3");
-            Ok(())
+            let description = cprover_api::get_property_description(&el, &existing_property_id);
+            if let Ok(description_text) = description {
+                assert_eq!(description_text, "expected failure: arr[3] == 3");
+                Ok(())
+            } else {
+                let error_msg = format!(
+                    "Unable to get description for property {:?}",
+                    &existing_property_id
+                );
+                Err(error_msg)
+            }
+        } else {
+            Err("Unable to produce results from the verification engine".to_string())
+        }
+    }
+
+    #[test]
+    fn it_raises_an_exception_when_getting_the_property_description_for_nonexisting_property(
+    ) -> Result<(), String> {
+        let binding = cprover_api::new_api_session();
+        let client = match binding.as_ref() {
+            Some(api_ref) => api_ref,
+            None => panic!("Failed to acquire API session handle"),
+        };
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
+
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+        assert_eq!(vect.len(), 1);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect).to_string();
+            return Err(error_msg);
+        }
+
+        let results = client.verify_model();
+        if let Ok(el) = results {
+            let_cxx_string!(non_existing_property = "main.the.jabberwocky");
+            if let Err(_) = cprover_api::get_property_description(&el, &non_existing_property) {
+                Ok(())
+            } else {
+                let error_msg = format!(
+                    "Got a description for non-existent property {:?}",
+                    &non_existing_property
+                );
+                Err(error_msg)
+            }
         } else {
             Err("Unable to produce results from the verification engine".to_string())
         }
@@ -387,7 +472,7 @@ mod tests {
         assert_eq!(vect.len(), 1);
 
         if let Err(_) = client.load_model_from_files(vect) {
-            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect).to_string();
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect);
             return Err(error_msg);
         }
 
@@ -396,7 +481,7 @@ mod tests {
             let_cxx_string!(existing_property_id = "main.assertion.1");
             let prop_status = cprover_api::get_property_status(&el, &existing_property_id);
             match prop_status {
-                prop_statust::FAIL => Ok(()),
+                Ok(prop_statust::FAIL) => Ok(()),
                 _ => {
                     let error_msg = format!(
                         "Property status for property {:?} was {:?} - expected FAIL",
@@ -404,6 +489,42 @@ mod tests {
                     );
                     Err(error_msg)
                 }
+            }
+        } else {
+            Err("Unable to produce results from the verification engine".to_string())
+        }
+    }
+
+    #[test]
+    fn it_raises_an_exception_when_getting_status_of_non_existing_property() -> Result<(), String> {
+        let binding = cprover_api::new_api_session();
+        let client = match binding.as_ref() {
+            Some(api_ref) => api_ref,
+            None => panic!("Failed to acquire API session handle"),
+        };
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
+
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+        assert_eq!(vect.len(), 1);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect);
+            return Err(error_msg);
+        }
+
+        let results = client.verify_model();
+        if let Ok(el) = results {
+            let_cxx_string!(non_existing_property = "main.the.jabberwocky");
+            let prop_status = cprover_api::get_property_status(&el, &non_existing_property);
+            if let Err(status) = prop_status {
+                Ok(())
+            } else {
+                let error_msg = format!(
+                    "Produced verification status for non-existing property: {:?}",
+                    non_existing_property
+                );
+                Err(error_msg)
             }
         } else {
             Err("Unable to produce results from the verification engine".to_string())

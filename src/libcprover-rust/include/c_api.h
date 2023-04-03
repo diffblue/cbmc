@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 // NOLINTNEXTLINE(build/include)
@@ -55,6 +56,16 @@ static void trycatch(Try &&func, Fail &&fail) noexcept
   catch(const invariant_failedt &i)
   {
     fail(i.what());
+  }
+  catch(const std::out_of_range &our)
+  {
+    fail(our.what());
+  }
+  catch(const std::exception &exc)
+  {
+    // collective catch-all for all exceptions that derive
+    // from standard exception class.
+    fail(exc.what());
   }
 }
 
