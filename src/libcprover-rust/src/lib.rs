@@ -5,13 +5,46 @@
 #[cxx::bridge]
 pub mod cprover_api {
 
+    // The following two definitions for enums are *shared types* - in
+    // contrast to the opaque types. These are supposed to match the
+    // definitions on the C++ side, and `cxx.rs` will generate static
+    // assertions to make sure that these are extern enums that match
+    // the definitions on the C++ side (i.e. it will treat C++ as the
+    // source of truth rather than Rust).
+
+    #[derive(Debug)]
+    #[repr(i32)]
+    enum verifier_resultt {
+        UNKNOWN,
+        PASS,
+        FAIL,
+        ERROR,
+    }
+
+    #[derive(Debug)]
+    #[repr(i32)]
+    enum prop_statust {
+        NOT_CHECKED,
+        UNKNOWN,
+        NOT_REACHABLE,
+        PASS,
+        FAIL,
+        ERROR,
+    }
+
     unsafe extern "C++" {
         include!("api.h");
+        include!("verification_result.h");
+
         include!("include/c_api.h");
 
         /// Central organisational handle of the API. This directly corresponds to the
         /// C++-API type `api_sessiont`. To initiate a session interaction, call [new_api_session].
         type api_sessiont;
+
+        type verifier_resultt;
+        type prop_statust;
+        type verification_resultt;
 
         /// Provide a unique pointer to the API handle. This will be required to interact
         /// with the API calls, and thus, is expected to be the first call before any other
@@ -21,20 +54,31 @@ pub mod cprover_api {
         /// Return the API version - note that this is coming from the C++ API, which
         /// returns the API version of CBMC (which should map to the version of `libcprover.a`)
         /// the Rust API has mapped against.
-        fn get_api_version(&self) -> UniquePtr<CxxString>;
+        fn get_api_version(self: &api_sessiont) -> UniquePtr<CxxString>;
         /// Provided a C++ Vector of Strings (use [translate_vector_of_string] to translate
         /// a Rust `Vec<String` into a `CxxVector<CxxString>` before passing it to the function),
         /// load the models from the files in the vector and link them together.
-        fn load_model_from_files(&self, files: &CxxVector<CxxString>) -> Result<()>;
+        fn load_model_from_files(self: &api_sessiont, files: &CxxVector<CxxString>) -> Result<()>;
         /// Execute a verification engine run against the loaded model.
         /// *ATTENTION*: A model must be loaded before this function is run.
-        fn verify_model(&self) -> Result<()>;
+        fn verify_model(self: &api_sessiont) -> Result<UniquePtr<verification_resultt>>;
         /// Run a validation check on the goto-model that has been loaded.
         /// Corresponds to the CProver CLI option `--validate-goto-model`.
-        fn validate_goto_model(&self) -> Result<()>;
+        fn validate_goto_model(self: &api_sessiont) -> Result<()>;
         /// Drop functions that aren't used from the model. Corresponds to
         /// the CProver CLI option `--drop-unused-functions`
-        fn drop_unused_functions(&self) -> Result<()>;
+        fn drop_unused_functions(self: &api_sessiont) -> Result<()>;
+
+        fn get_verification_result(result: &UniquePtr<verification_resultt>) -> verifier_resultt;
+        fn get_property_ids(result: &UniquePtr<verification_resultt>) -> &CxxVector<CxxString>;
+        fn get_property_description<'a>(
+            result: &'a UniquePtr<verification_resultt>,
+            property_id: &CxxString,
+        ) -> &'a CxxString;
+        fn get_property_status(
+            result: &UniquePtr<verification_resultt>,
+            property_id: &CxxString,
+        ) -> prop_statust;
 
         // WARNING: Please don't use this function - use its public interface in [ffi_util::translate_rust_vector_to_cpp].
         // The reason this is here is that it's implemented on the C++ shim, and to link this function against
@@ -80,6 +124,9 @@ pub mod ffi_util {
 // To test run "CBMC_LIB_DIR=<path_to_build/libs> CBMC_VERSION=<version> cargo test -- --test-threads=1 --nocapture"
 #[cfg(test)]
 mod tests {
+    use cprover_api::prop_statust;
+    use cprover_api::verifier_resultt;
+
     use super::*;
     use cxx::let_cxx_string;
     use std::process;
@@ -220,5 +267,146 @@ mod tests {
 
         assert!(msgs_assert.contains(&String::from(instrumentation_msg)));
         assert!(msgs_assert.contains(&String::from(instrumentation_msg2)));
+    }
+
+    #[test]
+    fn it_can_produce_verification_results_for_file() -> Result<(), String> {
+        let binding = cprover_api::new_api_session();
+        let client = match binding.as_ref() {
+            Some(api_ref) => api_ref,
+            None => panic!("Failed to acquire API session handle"),
+        };
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
+
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+        assert_eq!(vect.len(), 1);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect).to_string();
+            return Err(error_msg);
+        }
+
+        // Perform a drop of any unused functions.
+        if let Err(err) = client.drop_unused_functions() {
+            let error_msg = format!("Error during API call: {:?}", err).to_string();
+            return Err(error_msg);
+        }
+
+        let results = client.verify_model();
+        if let Ok(el) = results {
+            let verifier_results = cprover_api::get_verification_result(&el);
+            match verifier_results {
+                verifier_resultt::FAIL => Ok(()),
+                _ => Err("Unexpected result from verification engine run".to_string()),
+            }
+        } else {
+            Err("Unable to produce results from the verification engine".to_string())
+        }
+    }
+
+    #[test]
+    fn it_can_query_property_identifiers_from_result() -> Result<(), String> {
+        let binding = cprover_api::new_api_session();
+        let client = match binding.as_ref() {
+            Some(api_ref) => api_ref,
+            None => panic!("Failed to acquire API session handle"),
+        };
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
+
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+        assert_eq!(vect.len(), 1);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect).to_string();
+            return Err(error_msg);
+        }
+
+        let results = client.verify_model();
+        if let Ok(el) = results {
+            let property_ids_cxx = cprover_api::get_property_ids(&el);
+            let property_ids_rust = ffi_util::translate_cpp_vector_to_rust(property_ids_cxx);
+            let expected_property_id = "main.assertion.1";
+            if property_ids_rust.contains(&expected_property_id.to_owned()) {
+                Ok(())
+            } else {
+                let error_msg = format!(
+                    "Unable to find expected assertion id in model: {}",
+                    expected_property_id
+                )
+                .to_string();
+                Err(error_msg)
+            }
+        } else {
+            Err("Unable to produce results from the verification engine".to_string())
+        }
+    }
+
+    #[test]
+    fn it_can_get_the_property_description_for_existing_property() -> Result<(), String> {
+        let binding = cprover_api::new_api_session();
+        let client = match binding.as_ref() {
+            Some(api_ref) => api_ref,
+            None => panic!("Failed to acquire API session handle"),
+        };
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
+
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+        assert_eq!(vect.len(), 1);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect).to_string();
+            return Err(error_msg);
+        }
+
+        let results = client.verify_model();
+        if let Ok(el) = results {
+            let_cxx_string!(existing_property_id = "main.assertion.1");
+            let description =
+                cprover_api::get_property_description(&el, &existing_property_id).to_string();
+            assert_eq!(description, "expected failure: arr[3] == 3");
+            Ok(())
+        } else {
+            Err("Unable to produce results from the verification engine".to_string())
+        }
+    }
+
+    #[test]
+    fn it_can_get_the_property_status_for_existing_property() -> Result<(), String> {
+        let binding = cprover_api::new_api_session();
+        let client = match binding.as_ref() {
+            Some(api_ref) => api_ref,
+            None => panic!("Failed to acquire API session handle"),
+        };
+
+        let vec: Vec<String> = vec!["other/example.c".to_owned()];
+
+        let vect = ffi_util::translate_rust_vector_to_cpp(vec);
+        assert_eq!(vect.len(), 1);
+
+        if let Err(_) = client.load_model_from_files(vect) {
+            let error_msg = format!("Failed to load GOTO model from files: {:?}", vect).to_string();
+            return Err(error_msg);
+        }
+
+        let results = client.verify_model();
+        if let Ok(el) = results {
+            let_cxx_string!(existing_property_id = "main.assertion.1");
+            let prop_status = cprover_api::get_property_status(&el, &existing_property_id);
+            match prop_status {
+                prop_statust::FAIL => Ok(()),
+                _ => {
+                    let error_msg = format!(
+                        "Property status for property {:?} was {:?} - expected FAIL",
+                        existing_property_id, prop_status
+                    );
+                    Err(error_msg)
+                }
+            }
+        } else {
+            Err("Unable to produce results from the verification engine".to_string())
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string>
+
 // The following type is cloning two types from the `util/exception_utils.h` and
 // `util/invariant.h` files.
 //
