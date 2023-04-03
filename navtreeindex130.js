@@ -1,5 +1,6 @@
 var NAVTREEINDEX130 =
 {
+"structcover__goalst_1_1goalt.html#a85c15f9f90e11f44d6038e13adf1b8a5":[8,0,292,0,3],
 "structcover__goalst_1_1goalt.html#aca306e56ef0e231dd4348a98b2636b69":[8,0,292,0,2],
 "structcpp__typecheck__resolvet_1_1matcht.html":[8,0,327,0],
 "structcpp__typecheck__resolvet_1_1matcht.html#a148e3940e388728ee78648ac27d7b8d8":[8,0,327,0,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX130 =
 "structgdb__apit_1_1pointer__valuet.html#a22d263c7ea54a329f10beac27185f92e":[8,0,518,1,2],
 "structgdb__apit_1_1pointer__valuet.html#a9b8e0295796fd3320b826d9d9b71d188":[8,0,518,1,1],
 "structgdb__apit_1_1pointer__valuet.html#aabd4146d8301cbb1782e2a1951583d46":[8,0,518,1,3],
-"structgdb__apit_1_1pointer__valuet.html#ad4eddd7d69994804dc2bf56ae3d4ceaa":[8,0,518,1,4],
-"structgdb__apit_1_1pointer__valuet.html#aef4f70381ec5852f9dce6daea5d8fc8f":[8,0,518,1,5]
+"structgdb__apit_1_1pointer__valuet.html#ad4eddd7d69994804dc2bf56ae3d4ceaa":[8,0,518,1,4]
 };
