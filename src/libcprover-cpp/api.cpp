@@ -133,57 +133,7 @@ void api_sessiont::load_model_from_files(
     files, *implementation->message_handler, *implementation->options));
 }
 
-void api_sessiont::verify_model() const
-{
-  PRECONDITION(implementation->model);
-
-  // Remove inline assembler; this needs to happen before adding the library.
-  remove_asm(*implementation->model);
-
-  // add the library
-  messaget log{*implementation->message_handler};
-  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
-               << messaget::eom;
-  link_to_library(
-    *implementation->model,
-    *implementation->message_handler,
-    cprover_c_library_factory);
-
-  // Common removal of types and complex constructs
-  if(::process_goto_program(
-       *implementation->model, *implementation->options, log))
-  {
-    return;
-  }
-
-  // add failed symbols
-  // needs to be done before pointer analysis
-  add_failed_symbols(implementation->model->symbol_table);
-
-  // label the assertions
-  // This must be done after adding assertions and
-  // before using the argument of the "property" option.
-  // Do not re-label after using the property slicer because
-  // this would cause the property identifiers to change.
-  label_properties(*implementation->model);
-
-  remove_skip(*implementation->model);
-
-  ui_message_handlert ui_message_handler(*implementation->message_handler);
-  all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>
-    verifier(
-      *implementation->options, ui_message_handler, *implementation->model);
-  (void)verifier();
-  verifier.report();
-}
-
-// TODO: This is a temporary function - it's basically `verify_model`, tweaked
-// to return the results in a structured format. It's temporary in the sense
-// that this will get folded into the `verify_model` function, but I want to do
-// this slightly later because modifying the interface of `verify_model` from
-// the C++ end breaks the Rust API for now, and I want to take steps one at
-// a time.
-verification_resultt api_sessiont::produce_results()
+std::unique_ptr<verification_resultt> api_sessiont::verify_model() const
 {
   PRECONDITION(implementation->model);
 
@@ -225,10 +175,13 @@ verification_resultt api_sessiont::produce_results()
       *implementation->options, ui_message_handler, *implementation->model);
   verification_resultt result;
   auto results = verifier();
+  // Print messages collected to callback buffer.
+  verifier.report();
+  // Set results object before returning.
   result.set_result(results);
   auto properties = verifier.get_properties();
   result.set_properties(properties);
-  return result;
+  return util_make_unique<verification_resultt>(result);
 }
 
 void api_sessiont::drop_unused_functions() const

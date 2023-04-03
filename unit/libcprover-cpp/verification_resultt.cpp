@@ -8,6 +8,7 @@
 #include <libcprover-cpp/verification_result.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -25,18 +26,18 @@ SCENARIO(
 
     WHEN("We run that model past the verification engine")
     {
-      const verification_resultt &results = api.produce_results();
+      const std::unique_ptr<verification_resultt> results = api.verify_model();
 
       THEN("The verification result should be success")
       {
-        REQUIRE(results.final_result() == verifier_resultt::PASS);
+        REQUIRE(results->final_result() == verifier_resultt::PASS);
       }
 
       THEN(
         "We should have access to the property and the property status should "
         "be PASS")
       {
-        auto properties = results.get_property_ids();
+        auto properties = results->get_property_ids();
         REQUIRE(properties.size() == 1);
         REQUIRE(properties.at(0) == "main.assertion.1");
 
@@ -47,14 +48,14 @@ SCENARIO(
           const std::string assertion_description{
             "expected success: arr[3] to be 3"};
           const std::string results_description =
-            results.get_property_description(properties.at(0));
+            results->get_property_description(properties.at(0));
           REQUIRE(assertion_description == results_description);
         }
 
         THEN("The property status should be PASS")
         {
           const auto property_status =
-            results.get_property_status(properties.at(0));
+            results->get_property_status(properties.at(0));
           REQUIRE(property_status == prop_statust::PASS);
         }
       }
@@ -68,11 +69,11 @@ SCENARIO(
 
     WHEN("We run that model past the verification engine")
     {
-      const auto &results = api.produce_results();
+      const auto results = api.verify_model();
 
       THEN("The verification result should be failure")
       {
-        REQUIRE(results.final_result() == verifier_resultt::FAIL);
+        REQUIRE(results->final_result() == verifier_resultt::FAIL);
       }
     }
   }

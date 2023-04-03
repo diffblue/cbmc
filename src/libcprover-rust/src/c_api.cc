@@ -59,3 +59,33 @@ std::vector<std::string> const &get_messages()
 {
   return output;
 }
+
+verifier_resultt get_verification_result(
+  const std::unique_ptr<verification_resultt> &verifier_result)
+{
+  return verifier_result->final_result();
+}
+
+std::vector<std::string> const &
+get_property_ids(const std::unique_ptr<verification_resultt> &verifier_result)
+{
+  std::vector<std::string> *property_ids = new std::vector<std::string>();
+  *property_ids = verifier_result->get_property_ids();
+  return *property_ids;
+}
+
+std::string const &get_property_description(
+  const std::unique_ptr<verification_resultt> &verifier_result,
+  const std::string &property_id)
+{
+  std::string *description = new std::string();
+  *description = verifier_result->get_property_description(property_id);
+  return *description;
+}
+
+prop_statust get_property_status(
+  const std::unique_ptr<verification_resultt> &verifier_result,
+  const std::string &property_id)
+{
+  return verifier_result->get_property_status(property_id);
+}

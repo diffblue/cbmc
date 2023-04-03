@@ -69,8 +69,9 @@ struct api_sessiont
   /// \param files: A vector<string> containing the filenames to be loaded
   void load_model_from_files(const std::vector<std::string> &files) const;
 
-  /// Verify previously loaded model.
-  void verify_model() const;
+  // Run the verification engine against previously loaded model and return
+  // results object pointer.
+  std::unique_ptr<verification_resultt> verify_model() const;
 
   /// Drop unused functions from the loaded goto_model simplifying it
   void drop_unused_functions() const;
@@ -80,9 +81,6 @@ struct api_sessiont
 
   // A simple API version information function.
   std::unique_ptr<std::string> get_api_version() const;
-
-  /// Run the verification engine and return results.
-  verification_resultt produce_results();
 
 private:
   std::unique_ptr<api_session_implementationt> implementation;
