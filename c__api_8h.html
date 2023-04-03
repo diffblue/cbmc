@@ -96,6 +96,7 @@ $(document).ready(function(){initNavTree('c__api_8h.html',''); initResizable(); 
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;stdexcept&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &quot;rust/cxx.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="c__errors_8h_source.html">include/c_errors.h</a>&quot;</code><br />
@@ -104,7 +105,7 @@ $(document).ready(function(){initNavTree('c__api_8h.html',''); initResizable(); 
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="c__api_8h__incl.svg" width="444" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="c__api_8h__incl.svg" width="524" height="216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -125,6 +126,14 @@ Functions</h2></td></tr>
 <tr class="separator:a38df5c9067730560413887bbd987e848"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa6f17e0c0db689461b4e3acf7ae10dc"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt; const  &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__api_8h.html#afa6f17e0c0db689461b4e3acf7ae10dc">get_messages</a> ()</td></tr>
 <tr class="separator:afa6f17e0c0db689461b4e3acf7ae10dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e196608e5045363bd73649bfe8c39ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a968c86fa056ac6fd9150ef96f64fcd37">verifier_resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__api_8h.html#a9e196608e5045363bd73649bfe8c39ff">get_verification_result</a> (const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;v)</td></tr>
+<tr class="separator:a9e196608e5045363bd73649bfe8c39ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09a382538ddcc46499484edfad5061a0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt; const  &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__api_8h.html#a09a382538ddcc46499484edfad5061a0">get_property_ids</a> (const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;)</td></tr>
+<tr class="separator:a09a382538ddcc46499484edfad5061a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0841595b4301cae692bee460a4d985ba"><td class="memItemLeft" align="right" valign="top">std::string const  &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__api_8h.html#a0841595b4301cae692bee460a4d985ba">get_property_description</a> (const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;, const std::string &amp;)</td></tr>
+<tr class="separator:a0841595b4301cae692bee460a4d985ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95967161d96bf80081f9a8cfa2237e4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#aad5ef57ee262e5fca2f042a94bc3d7ae">prop_statust</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__api_8h.html#a95967161d96bf80081f9a8cfa2237e4b">get_property_status</a> (const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;, const std::string &amp;)</td></tr>
+<tr class="separator:a95967161d96bf80081f9a8cfa2237e4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21ff5bf9e7f38edc407311580a62acfa"><td class="memTemplParams" colspan="2">template&lt;typename Try , typename Fail &gt; </td></tr>
 <tr class="memitem:a21ff5bf9e7f38edc407311580a62acfa"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerust_1_1behavior.html#a21ff5bf9e7f38edc407311580a62acfa">rust::behavior::trycatch</a> (Try &amp;&amp;func, Fail &amp;&amp;fail) noexcept</td></tr>
 <tr class="separator:a21ff5bf9e7f38edc407311580a62acfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,6 +167,98 @@ Functions</h2></td></tr>
           <td class="memname">std::vector&lt;std::string&gt; const&amp; get_messages </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0841595b4301cae692bee460a4d985ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0841595b4301cae692bee460a4d985ba">&#9670;&nbsp;</a></span>get_property_description()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string const&amp; get_property_description </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a09a382538ddcc46499484edfad5061a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09a382538ddcc46499484edfad5061a0">&#9670;&nbsp;</a></span>get_property_ids()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; const&amp; get_property_ids </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a95967161d96bf80081f9a8cfa2237e4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95967161d96bf80081f9a8cfa2237e4b">&#9670;&nbsp;</a></span>get_property_status()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="verification__result_8h.html#aad5ef57ee262e5fca2f042a94bc3d7ae">prop_statust</a> get_property_status </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9e196608e5045363bd73649bfe8c39ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e196608e5045363bd73649bfe8c39ff">&#9670;&nbsp;</a></span>get_verification_result()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="verification__result_8h.html#a968c86fa056ac6fd9150ef96f64fcd37">verifier_resultt</a> get_verification_result </td>
+          <td>(</td>
+          <td class="paramtype">const std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
