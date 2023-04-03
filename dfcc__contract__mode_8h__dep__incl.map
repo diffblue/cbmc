@@ -1,9 +1,10 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_mode.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_mode.h">
-<area shape="rect" id="node1" title="Enum type representing the contract checking and replacement modes." alt="" coords="457,5,655,76"/>
+<area shape="rect" id="node1" title="Enum type representing the contract checking and replacement modes." alt="" coords="525,5,723,76"/>
 <area shape="rect" id="node2" href="$dfcc__contract__clauses__codegen_8h.html" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="69,243,312,313"/>
 <area shape="rect" id="node11" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="389,124,587,195"/>
 <area shape="rect" id="node17" href="$dfcc__wrapper__program_8h.html" title="Generates the body of a wrapper function from a contract for contract checking or contract replacemen..." alt="" coords="525,243,723,313"/>
-<area shape="rect" id="node18" href="$dfcc__instrument_8h.html" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="1123,124,1320,195"/>
+<area shape="rect" id="node18" href="$dfcc__contract__mode_8cpp.html" title=" " alt="" coords="661,124,859,195"/>
+<area shape="rect" id="node19" href="$dfcc__instrument_8h.html" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="1123,124,1320,195"/>
 <area shape="rect" id="node3" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1107,487,1347,543"/>
 <area shape="rect" id="node9" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="264,361,523,432"/>
 <area shape="rect" id="node10" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="33,361,239,432"/>
@@ -17,8 +18,8 @@
 <area shape="rect" id="node13" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="1045,361,1243,432"/>
 <area shape="rect" id="node14" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="1317,361,1515,432"/>
 <area shape="rect" id="node15" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1371,480,1568,551"/>
-<area shape="rect" id="node19" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="1659,243,1856,313"/>
-<area shape="rect" id="node20" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="1291,243,1533,313"/>
-<area shape="rect" id="node21" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="797,243,995,313"/>
-<area shape="rect" id="node22" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="824,361,1021,432"/>
+<area shape="rect" id="node20" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="1659,243,1856,313"/>
+<area shape="rect" id="node21" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="1291,243,1533,313"/>
+<area shape="rect" id="node22" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="797,243,995,313"/>
+<area shape="rect" id="node23" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="824,361,1021,432"/>
 </map>
