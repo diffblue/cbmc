@@ -3,7 +3,7 @@
 
 int main()
 {
-  int *x = calloc(sizeof(int), 1);
+  int *x = calloc(sizeof(int), 2);
   assert(*x == 0);
   return 0;
 }

@@ -2645,6 +2645,19 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
     if(!expr.op0().is_constant() || !expr.op1().is_constant())
       return unchanged(expr);
 
+    // preserve the sizeof type annotation
+    optionalt<typet> c_sizeof_type;
+    for(const auto &op : expr.operands())
+    {
+      const typet &sizeof_type =
+        static_cast<const typet &>(op.find(ID_C_c_sizeof_type));
+      if(sizeof_type.is_not_nil())
+      {
+        c_sizeof_type = sizeof_type;
+        break;
+      }
+    }
+
     const auto op0_value = numeric_cast<mp_integer>(expr.op0());
     const auto op1_value = numeric_cast<mp_integer>(expr.op1());
     if(!op0_value.has_value() || !op1_value.has_value())
@@ -2662,6 +2675,11 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
     else
       UNREACHABLE;
 
+    exprt no_overflow_result_expr =
+      from_integer(no_overflow_result, expr.op0().type());
+    if(c_sizeof_type.has_value())
+      no_overflow_result_expr.set(ID_C_c_sizeof_type, *c_sizeof_type);
+
     const std::size_t width = to_bitvector_type(expr.op0().type()).get_width();
     const integer_bitvector_typet bv_type{op_type_id, width};
     if(
@@ -2669,14 +2687,12 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
       no_overflow_result > bv_type.largest())
     {
       return struct_exprt{
-        {from_integer(no_overflow_result, expr.op0().type()), true_exprt{}},
-        expr.type()};
+        {std::move(no_overflow_result_expr), true_exprt{}}, expr.type()};
     }
     else
     {
       return struct_exprt{
-        {from_integer(no_overflow_result, expr.op0().type()), false_exprt{}},
-        expr.type()};
+        {std::move(no_overflow_result_expr), false_exprt{}}, expr.type()};
     }
   }
 }
