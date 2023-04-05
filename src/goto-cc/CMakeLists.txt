@@ -39,6 +39,11 @@ else()
   add_custom_command(TARGET goto-cc
     POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E create_symlink
+      goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-clang
+    BYPRODUCTS ${CMAKE_BINARY_DIR}/bin/goto-clang)
+  add_custom_command(TARGET goto-cc
+    POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E create_symlink
       goto-cc $<TARGET_FILE_DIR:goto-cc>/goto-ld
     BYPRODUCTS ${CMAKE_BINARY_DIR}/bin/goto-ld)
   add_custom_command(TARGET goto-cc
@@ -52,6 +57,7 @@ else()
     FILES
       ${CMAKE_BINARY_DIR}/bin/goto-ld
       ${CMAKE_BINARY_DIR}/bin/goto-gcc
+      ${CMAKE_BINARY_DIR}/bin/goto-clang
       ${CMAKE_BINARY_DIR}/bin/ls_parse.py
     DESTINATION
       ${CMAKE_INSTALL_BINDIR})
@@ -60,5 +66,5 @@ else()
   install(
     DIRECTORY ${CMAKE_SOURCE_DIR}/doc/man/
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
-    FILES_MATCHING REGEX "goto-(cc|gcc|ld).*")
+    FILES_MATCHING REGEX "goto-(cc|gcc|clang|ld).*")
 endif()

@@ -59,7 +59,11 @@ static std::string compiler_name(
      base_name=="goto-gcc" ||
      base_name=="goto-ld")
   {
-    #ifdef __FreeBSD__
+// XXX this should probably be removed to avoid usage confusion since goto-clang has a link created like goto-gcc.
+// it would be strange to launch goto-gcc and have clang being called.
+// when removing that part, do we need to find a way to NOT hardcode calls to goto-gcc
+// such as in regression/goto-gcc/CMakeLists.txt ?
+    #if defined(__FreeBSD__) || defined(__OpenBSD__)
     return "clang";
     #else
     return "gcc";

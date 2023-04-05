@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 _cbmc_autocomplete()
 {
   #list of all switches cbmc has. IMPORTANT: in the template file, this variable must be defined on line 5.
