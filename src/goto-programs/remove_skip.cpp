@@ -201,6 +201,7 @@ void remove_skip(goto_functionst &goto_functions)
       gf_entry.second.body,
       gf_entry.second.body.instructions.begin(),
       gf_entry.second.body.instructions.end());
+    add_history_transform(goto_transform_kindt::remove_skip, gf_entry.second);
   }
 
   // we may remove targets

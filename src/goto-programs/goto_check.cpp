@@ -74,6 +74,8 @@ void transform_assertions_assumptions(
       enable_assertions,
       enable_built_in_assertions,
       enable_assumptions);
+    add_history_transform(
+      goto_transform_kindt::transform_assertions_assumptions, entry.second);
   }
 }
 
@@ -96,4 +98,6 @@ void transform_assertions_assumptions(
     enable_assertions,
     enable_built_in_assertions,
     enable_assumptions);
+  add_history_transform(
+    goto_transform_kindt::transform_assertions_assumptions, goto_function);
 }

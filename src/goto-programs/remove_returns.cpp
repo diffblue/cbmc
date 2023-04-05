@@ -231,6 +231,8 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
     replace_returns(gf_entry.first, gf_entry.second);
     if(do_function_calls(function_is_stub, gf_entry.second.body))
       goto_functions.compute_location_numbers(gf_entry.second.body);
+    add_history_transform(
+      goto_transform_kindt::remove_returns, gf_entry.second);
   }
 }
 

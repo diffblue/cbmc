@@ -175,4 +175,7 @@ void link_to_library(
 
   if(!object_type_updates.empty())
     finalize_linking(goto_model, object_type_updates);
+
+  add_history_transform(
+    goto_transform_kindt::link_to_library, goto_model.goto_functions);
 }

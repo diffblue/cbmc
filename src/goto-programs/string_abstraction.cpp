@@ -178,6 +178,7 @@ void string_abstractiont::apply()
     main.swap(initialization);
     initialization.clear();
   }
+  add_history_transform(goto_transform_kindt::string_abstraction, dest);
 }
 
 void string_abstractiont::apply(goto_programt &dest)

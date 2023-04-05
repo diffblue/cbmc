@@ -134,7 +134,10 @@ void mm_io(symbol_tablet &symbol_table, goto_functionst &goto_functions)
     mm_io_w = mm_io_w_symbol->symbol_expr();
 
   for(auto & f : goto_functions.function_map)
+  {
     mm_io(mm_io_r, mm_io_r_value, mm_io_w, f.second, ns);
+    add_history_transform(goto_transform_kindt::mm_io, f.second);
+  }
 }
 
 void mm_io(goto_modelt &model)

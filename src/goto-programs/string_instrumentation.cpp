@@ -172,6 +172,7 @@ void string_instrumentation(
 {
   string_instrumentationt string_instrumentation{symbol_table};
   string_instrumentation(dest);
+  add_history_transform(goto_transform_kindt::string_instrumentation, dest);
 }
 
 void string_instrumentation(goto_modelt &goto_model)

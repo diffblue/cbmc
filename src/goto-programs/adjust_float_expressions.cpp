@@ -216,6 +216,8 @@ void adjust_float_expressions(
       else
         return {};
     });
+  add_history_transform(
+    goto_transform_kindt::adjust_float_expressions, goto_function);
 }
 
 void adjust_float_expressions(

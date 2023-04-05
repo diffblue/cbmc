@@ -52,6 +52,8 @@ void remove_unused_functions(
 
   for(const auto &f : unused_functions)
     functions.function_map.erase(f);
+  add_history_transform(
+    goto_transform_kindt::remove_unused_functions, functions);
 }
 
 void find_used_functions(

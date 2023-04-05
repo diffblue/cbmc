@@ -486,6 +486,8 @@ void goto_inlinet::goto_inline(
     goto_function,
     inline_map,
     force_full);
+  add_history_transform(
+    goto_transform_kindt::goto_partial_inline, goto_function);
 }
 
 void goto_inlinet::goto_inline(

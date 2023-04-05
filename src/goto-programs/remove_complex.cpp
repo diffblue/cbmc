@@ -311,6 +311,7 @@ void remove_complex(
 {
   remove_complex(symbol_table);
   remove_complex(goto_functions);
+  add_history_transform(goto_transform_kindt::remove_complex, goto_functions);
 }
 
 /// removes complex data type

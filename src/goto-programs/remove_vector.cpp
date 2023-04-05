@@ -379,6 +379,7 @@ void remove_vector(
 {
   remove_vector(symbol_table);
   remove_vector(goto_functions);
+  add_history_transform(goto_transform_kindt::remove_vector, goto_functions);
 }
 
 /// removes vector data type

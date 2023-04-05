@@ -533,4 +533,6 @@ void remove_function_pointers(
     goto_model.goto_functions);
 
   rfp(goto_model.goto_functions);
+  add_history_transform(
+    goto_transform_kindt::remove_function_pointers, goto_model.goto_functions);
 }

@@ -103,6 +103,7 @@ void label_properties(goto_model_functiont &function)
   auto &goto_function = function.get_goto_function();
   label_properties(
     function.get_function_id(), goto_function.body, property_counters);
+  add_history_transform(goto_transform_kindt::label_properties, goto_function);
 }
 
 void set_properties(
@@ -137,5 +138,8 @@ void label_properties(goto_functionst &goto_functions)
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
+  {
     label_properties(it->first, it->second.body, property_counters);
+    add_history_transform(goto_transform_kindt::label_properties, it->second);
+  }
 }

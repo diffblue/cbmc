@@ -107,6 +107,7 @@ void rewrite_union(goto_functionst::goto_functiont &goto_function)
     if(instruction.has_condition())
       rewrite_union(instruction.condition_nonconst());
   }
+  add_history_transform(goto_transform_kindt::rewrite_union, goto_function);
 }
 
 void rewrite_union(goto_functionst &goto_functions)

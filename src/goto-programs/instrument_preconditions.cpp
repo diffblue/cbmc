@@ -157,6 +157,8 @@ void instrument_preconditions(goto_modelt &goto_model)
   // Note that only the first loop is the one known to leave locations
   // uninitialized.
   goto_model.goto_functions.update();
+  add_history_transform(
+    goto_transform_kindt::instrument_preconditions, goto_model.goto_functions);
 }
 
 void remove_preconditions(goto_functiont &goto_function)
