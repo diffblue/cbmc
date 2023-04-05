@@ -97,10 +97,12 @@ void label_properties(
   }
 }
 
-void label_properties(irep_idt function_identifier, goto_programt &goto_program)
+void label_properties(goto_model_functiont &function)
 {
   std::map<irep_idt, std::size_t> property_counters;
-  label_properties(function_identifier, goto_program, property_counters);
+  auto &goto_function = function.get_goto_function();
+  label_properties(
+    function.get_function_id(), goto_function.body, property_counters);
 }
 
 void set_properties(
