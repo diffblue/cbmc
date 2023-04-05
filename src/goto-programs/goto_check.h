@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
 
+class goto_model_functiont;
 class goto_modelt;
-class goto_programt;
 class optionst;
 
 /// Handle the options "assertions", "built-in-assertions", "assumptions" to
@@ -24,10 +24,10 @@ void transform_assertions_assumptions(
   goto_modelt &goto_model);
 
 /// Handle the options "assertions", "built-in-assertions", "assumptions" to
-/// remove assertions and assumptions in \p goto_program when these are set to
+/// remove assertions and assumptions in \p function when these are set to
 /// false in \p options.
 void transform_assertions_assumptions(
   const optionst &options,
-  goto_programt &goto_program);
+  goto_model_functiont &function);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H

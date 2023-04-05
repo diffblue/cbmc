@@ -694,7 +694,7 @@ void janalyzer_parse_optionst::process_goto_function(
 
   remove_returns(function, function_is_stub);
 
-  transform_assertions_assumptions(options, function.get_goto_function().body);
+  transform_assertions_assumptions(options, function);
 }
 
 bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)

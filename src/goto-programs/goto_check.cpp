@@ -79,7 +79,7 @@ void transform_assertions_assumptions(
 
 void transform_assertions_assumptions(
   const optionst &options,
-  goto_programt &goto_program)
+  goto_model_functiont &function)
 {
   const bool enable_assertions = options.get_bool_option("assertions");
   const bool enable_built_in_assertions =
@@ -90,8 +90,9 @@ void transform_assertions_assumptions(
   if(enable_assertions && enable_built_in_assertions && enable_assumptions)
     return;
 
+  auto &goto_function = function.get_goto_function();
   transform_assertions_assumptions(
-    goto_program,
+    goto_function.body,
     enable_assertions,
     enable_built_in_assertions,
     enable_assumptions);

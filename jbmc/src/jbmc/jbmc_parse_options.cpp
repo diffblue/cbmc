@@ -718,7 +718,7 @@ void jbmc_parse_optionst::process_goto_function(
       ui_message_handler);
   }
 
-  transform_assertions_assumptions(options, function.get_goto_function().body);
+  transform_assertions_assumptions(options, function);
 
   // Replace Java new side effects
   remove_java_new(
