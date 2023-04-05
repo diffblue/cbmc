@@ -58,15 +58,15 @@ endif()
 
 # bash completion
 if(NOT WIN32)
-  add_custom_command(OUTPUT "${CMAKE_SOURCE_DIR}/scripts/bash-autocomplete/cbmc.sh"
-    COMMAND "${CMAKE_SOURCE_DIR}/scripts/bash-autocomplete/extract_switches.sh"
+  add_custom_command(OUTPUT "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh"
+    COMMAND "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/extract_switches.sh"
     DEPENDS $<TARGET_FILE:cbmc>
   )
   add_custom_target(cbmc.sh ALL
-    DEPENDS "${CMAKE_SOURCE_DIR}/scripts/bash-autocomplete/cbmc.sh"
+    DEPENDS "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh"
   )
   install(
-    FILES ${CMAKE_SOURCE_DIR}/scripts/bash-autocomplete/cbmc.sh
+    FILES ${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh
     DESTINATION etc/bash_completion.d
     RENAME cbmc
   )
