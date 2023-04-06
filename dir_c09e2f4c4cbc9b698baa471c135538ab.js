@@ -40,6 +40,8 @@ var dir_c09e2f4c4cbc9b698baa471c135538ab =
     [ "dfcc_loop_contract_mode.h", "dfcc__loop__contract__mode_8h.html", "dfcc__loop__contract__mode_8h" ],
     [ "dfcc_loop_nesting_graph.cpp", "dfcc__loop__nesting__graph_8cpp.html", "dfcc__loop__nesting__graph_8cpp" ],
     [ "dfcc_loop_nesting_graph.h", "dfcc__loop__nesting__graph_8h.html", "dfcc__loop__nesting__graph_8h" ],
+    [ "dfcc_loop_tags.cpp", "dfcc__loop__tags_8cpp.html", "dfcc__loop__tags_8cpp" ],
+    [ "dfcc_loop_tags.h", "dfcc__loop__tags_8h.html", "dfcc__loop__tags_8h" ],
     [ "dfcc_obeys_contract.cpp", "dfcc__obeys__contract_8cpp.html", null ],
     [ "dfcc_obeys_contract.h", "dfcc__obeys__contract_8h.html", [
       [ "dfcc_obeys_contractt", "classdfcc__obeys__contractt.html", "classdfcc__obeys__contractt" ]
