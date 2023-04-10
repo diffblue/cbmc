@@ -2,6 +2,8 @@ var dir_c09e2f4c4cbc9b698baa471c135538ab =
 [
     [ "dfcc.cpp", "dfcc_8cpp.html", "dfcc_8cpp" ],
     [ "dfcc.h", "dfcc_8h.html", "dfcc_8h" ],
+    [ "dfcc_check_loop_normal_form.cpp", "dfcc__check__loop__normal__form_8cpp.html", "dfcc__check__loop__normal__form_8cpp" ],
+    [ "dfcc_check_loop_normal_form.h", "dfcc__check__loop__normal__form_8h.html", "dfcc__check__loop__normal__form_8h" ],
     [ "dfcc_contract_clauses_codegen.cpp", "dfcc__contract__clauses__codegen_8cpp.html", null ],
     [ "dfcc_contract_clauses_codegen.h", "dfcc__contract__clauses__codegen_8h.html", [
       [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html", "classdfcc__contract__clauses__codegent" ]

@@ -1,5 +1,11 @@
 var NAVTREEINDEX120 =
 {
+"report__traces_8h_source.html":[9,0,2,6,42],
+"report__util_8cpp.html":[9,0,2,10,28],
+"report__util_8cpp.html#a0eb1857f18f2df0cba9291abcd75e9ce":[9,0,2,10,28,12],
+"report__util_8cpp.html#a1dea05c52675db06fc4d5d7142e1e69f":[9,0,2,10,28,13],
+"report__util_8cpp.html#a20f251dcf3900853074f8a94bd8b8056":[9,0,2,10,28,0],
+"report__util_8cpp.html#a2786ac9317d5051b01e91ddebc232b97":[9,0,2,10,28,4],
 "report__util_8cpp.html#a3d3e68f019d855c41eafa919b8ed3789":[9,0,2,10,28,14],
 "report__util_8cpp.html#a526fa0ca024d638411b35d502e227488":[9,0,2,10,28,16],
 "report__util_8cpp.html#a54745b61adc00bc479bfbf4390c28ab4":[9,0,2,10,28,3],
@@ -243,11 +249,5 @@ var NAVTREEINDEX120 =
 "satcheck__lingeling_8cpp_source.html":[9,0,2,27,7,22],
 "satcheck__lingeling_8h.html":[9,0,2,27,7,23],
 "satcheck__lingeling_8h_source.html":[9,0,2,27,7,23],
-"satcheck__minisat2_8cpp.html":[9,0,2,27,7,26],
-"satcheck__minisat2_8cpp.html#a075f860aa9ba72c736fbebd1390c3ec7":[9,0,2,27,7,26,2],
-"satcheck__minisat2_8cpp.html#a22a0bc2658cb8d521ef0d536650ac832":[9,0,2,27,7,26,1],
-"satcheck__minisat2_8cpp.html#a6a4cbf4ac896acd692c200b4b9c9f127":[9,0,2,27,7,26,0],
-"satcheck__minisat2_8cpp_source.html":[9,0,2,27,7,26],
-"satcheck__minisat2_8h.html":[9,0,2,27,7,27],
-"satcheck__minisat2_8h_source.html":[9,0,2,27,7,27]
+"satcheck__minisat2_8cpp.html":[9,0,2,27,7,26]
 };
