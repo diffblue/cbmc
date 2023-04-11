@@ -38,7 +38,6 @@ do that for:
 
 * a `docker` image
 * an `ubuntu-20.04` package
-* an `ubuntu-18.04` package
 * a `windows-msi` installer package
 
 Last but not least, we are also performing a coverage statistics collection

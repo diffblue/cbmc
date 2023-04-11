@@ -56,11 +56,9 @@ jobs:
 
             ## Ubuntu
 
-            On Ubuntu, install CBMC by downloading the *.deb package below for your version of Ubuntu and install with one of
+            On Ubuntu, install CBMC by downloading the *.deb package below for your version of Ubuntu and install with
 
             ```sh
-            # Ubuntu 18:
-            $ dpkg -i ubuntu-18.04-cbmc-${{ env.CBMC_VERSION }}-Linux.deb
             # Ubuntu 20:
             $ dpkg -i ubuntu-20.04-cbmc-${{ env.CBMC_VERSION }}-Linux.deb
             ```
