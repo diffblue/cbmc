@@ -500,9 +500,26 @@ CBMC_NORETURN void report_invariant_failure(
   EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))
 
 /// This should be used to mark dead code
-#define UNREACHABLE INVARIANT(false, "Unreachable")
-#define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                  \
-  EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))
+#ifdef __GNUC__
+// GCC 12 with -O0 fails reporting missing return when using UNREACHABLE.
+// Using __builtin_unreachable fixes this without breaking the invariant.
+#  define UNREACHABLE                                                          \
+    do                                                                         \
+    {                                                                          \
+      INVARIANT(false, "Unreachable");                                         \
+      __builtin_unreachable();                                                 \
+    } while(false)
+#  define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                \
+    do                                                                         \
+    {                                                                          \
+      EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__));        \
+      __builtin_unreachable();                                                 \
+    } while(false)
+#else
+#  define UNREACHABLE INVARIANT(false, "Unreachable")
+#  define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                \
+    EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))
+#endif
 
 /// This condition should be used to document that assumptions that are
 /// made on goto_functions, goto_programs, exprts, etc. being well formed.
