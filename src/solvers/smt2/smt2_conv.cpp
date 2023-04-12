@@ -516,10 +516,9 @@ constant_exprt smt2_convt::parse_literal(
     return from_integer(value, type);
   }
   else
-    INVARIANT(
-      false,
+    UNREACHABLE_BECAUSE(
       "smt2_convt::parse_literal should not be of unsupported type " +
-        type.id_string());
+      type.id_string());
 }
 
 exprt smt2_convt::parse_array(
