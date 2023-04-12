@@ -17,12 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 
 static void transform_assertions_assumptions(
-  goto_programt &goto_program,
+  goto_functiont &goto_function,
   bool enable_assertions,
   bool enable_built_in_assertions,
   bool enable_assumptions)
 {
   bool did_something = false;
+  auto &goto_program = goto_function.body;
 
   for(auto &instruction : goto_program.instructions)
   {
@@ -52,6 +53,9 @@ static void transform_assertions_assumptions(
 
   if(did_something)
     remove_skip(goto_program);
+
+  add_history_transform(
+    goto_transform_kindt::transform_assertions_assumptions, goto_function);
 }
 
 void transform_assertions_assumptions(
@@ -70,12 +74,10 @@ void transform_assertions_assumptions(
   for(auto &entry : goto_model.goto_functions.function_map)
   {
     transform_assertions_assumptions(
-      entry.second.body,
+      entry.second,
       enable_assertions,
       enable_built_in_assertions,
       enable_assumptions);
-    add_history_transform(
-      goto_transform_kindt::transform_assertions_assumptions, entry.second);
   }
 }
 
@@ -94,10 +96,8 @@ void transform_assertions_assumptions(
 
   auto &goto_function = function.get_goto_function();
   transform_assertions_assumptions(
-    goto_function.body,
+    goto_function,
     enable_assertions,
     enable_built_in_assertions,
     enable_assumptions);
-  add_history_transform(
-    goto_transform_kindt::transform_assertions_assumptions, goto_function);
 }
