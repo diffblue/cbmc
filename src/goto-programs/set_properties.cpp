@@ -47,7 +47,7 @@ void label_properties(goto_modelt &goto_model)
   label_properties(goto_model.goto_functions);
 }
 
-void label_properties(
+static void label_properties(
   const irep_idt function_identifier,
   goto_programt &goto_program,
   std::map<irep_idt, std::size_t> &property_counters)
