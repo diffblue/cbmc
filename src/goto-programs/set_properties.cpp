@@ -49,9 +49,10 @@ void label_properties(goto_modelt &goto_model)
 
 static void label_properties(
   const irep_idt function_identifier,
-  goto_programt &goto_program,
+  goto_functiont &goto_function,
   std::map<irep_idt, std::size_t> &property_counters)
 {
+  goto_programt &goto_program = goto_function.body;
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
       it!=goto_program.instructions.end();
@@ -95,6 +96,7 @@ static void label_properties(
 
     it->source_location_nonconst().set_property_id(property_id);
   }
+  add_history_transform(goto_transform_kindt::label_properties, goto_function);
 }
 
 void label_properties(goto_model_functiont &function)
@@ -102,8 +104,7 @@ void label_properties(goto_model_functiont &function)
   std::map<irep_idt, std::size_t> property_counters;
   auto &goto_function = function.get_goto_function();
   label_properties(
-    function.get_function_id(), goto_function.body, property_counters);
-  add_history_transform(goto_transform_kindt::label_properties, goto_function);
+    function.get_function_id(), goto_function, property_counters);
 }
 
 void set_properties(
@@ -139,7 +140,6 @@ void label_properties(goto_functionst &goto_functions)
       it!=goto_functions.function_map.end();
       it++)
   {
-    label_properties(it->first, it->second.body, property_counters);
-    add_history_transform(goto_transform_kindt::label_properties, it->second);
+    label_properties(it->first, it->second, property_counters);
   }
 }
