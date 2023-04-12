@@ -1,5 +1,6 @@
 var NAVTREEINDEX120 =
 {
+"report__traces_8h.html#a244546ebe8eaeb100dd07c1f3b223f6c":[9,0,2,6,42,0],
 "report__traces_8h_source.html":[9,0,2,6,42],
 "report__util_8cpp.html":[9,0,2,10,28],
 "report__util_8cpp.html#a0eb1857f18f2df0cba9291abcd75e9ce":[9,0,2,10,28,12],
@@ -248,6 +249,5 @@ var NAVTREEINDEX120 =
 "satcheck__lingeling_8cpp.html":[9,0,2,27,7,22],
 "satcheck__lingeling_8cpp_source.html":[9,0,2,27,7,22],
 "satcheck__lingeling_8h.html":[9,0,2,27,7,23],
-"satcheck__lingeling_8h_source.html":[9,0,2,27,7,23],
-"satcheck__minisat2_8cpp.html":[9,0,2,27,7,26]
+"satcheck__lingeling_8h_source.html":[9,0,2,27,7,23]
 };
