@@ -112,6 +112,8 @@ int main(int argc, char** argv)
     UNREACHABLE_STRUCTURED(structured_error_testt, 1, "Structured error"); // NOLINT
   else if(arg=="unreachable-string")
     UNREACHABLE;
+  else if(arg == "unreachable-because")
+    UNREACHABLE_BECAUSE("Unreachable with explanation text");
   else if(arg=="data-invariant-structured")
     DATA_INVARIANT_STRUCTURED(false, structured_error_testt, 1, "Structured error"); // NOLINT
   else if(arg=="data-invariant-string")
