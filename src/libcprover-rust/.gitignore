@@ -1,2 +1,5 @@
 # Ignore build artefacts folder
 target/
+
+# Ignore Cargo.lock as recommended by Rust docs
+Cargo.lock
