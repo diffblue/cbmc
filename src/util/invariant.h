@@ -509,6 +509,12 @@ CBMC_NORETURN void report_invariant_failure(
       INVARIANT(false, "Unreachable");                                         \
       __builtin_unreachable();                                                 \
     } while(false)
+#  define UNREACHABLE_BECAUSE(REASON)                                          \
+    do                                                                         \
+    {                                                                          \
+      INVARIANT(false, REASON);                                                \
+      __builtin_unreachable();                                                 \
+    } while(false)
 #  define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                \
     do                                                                         \
     {                                                                          \
@@ -517,6 +523,7 @@ CBMC_NORETURN void report_invariant_failure(
     } while(false)
 #else
 #  define UNREACHABLE INVARIANT(false, "Unreachable")
+#  define UNREACHABLE_BECAUSE(REASON) INVARIANT(false, REASON)
 #  define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                \
     EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))
 #endif
