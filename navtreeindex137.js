@@ -1,6 +1,5 @@
 var NAVTREEINDEX137 =
 {
-"structtinfl__huff__table.html#a31f719d4829db3d6646139d5249094cb":[8,0,1259,0],
 "structtinfl__huff__table.html#a51b707504c86547f166bc557d7ce4f84":[8,0,1259,1],
 "structto__be__merged__irep__hash.html":[8,0,1260],
 "structto__be__merged__irep__hash.html#a1bf41d3c6ceb55ca581675ff2234faf0":[8,0,1260,0],
@@ -249,5 +248,6 @@ var NAVTREEINDEX137 =
 "symex__other_8cpp_source.html":[9,0,2,15,70],
 "symex__set__return__value_8cpp.html":[9,0,2,15,71],
 "symex__set__return__value_8cpp_source.html":[9,0,2,15,71],
-"symex__slice__class_8h.html":[9,0,2,15,72]
+"symex__slice__class_8h.html":[9,0,2,15,72],
+"symex__slice__class_8h_source.html":[9,0,2,15,72]
 };
