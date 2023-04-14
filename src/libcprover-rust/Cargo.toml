@@ -7,6 +7,7 @@ repository = "https://github.com/diffblue/cbmc"
 documentation = "https://diffblue.github.io/cbmc/"
 license = "BSD-4-Clause"
 exclude = ["module_dependencies.txt", "Cargo.lock"]
+readme = "readme.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
