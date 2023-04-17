@@ -3280,9 +3280,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
   }
   else
   {
-    if(components.size()==1)
-    {
-      const exprt &op = expr.op0();
+    auto convert_operand = [this](const exprt &op) {
       // may need to flatten array-theory arrays in there
       if(op.type().id() == ID_array && use_array_theory(op))
         flatten_array(op);
@@ -3290,39 +3288,29 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         flatten2bv(op);
       else
         convert_expr(op);
-    }
-    else
+    };
+
+    // SMT-LIB 2 concat is binary only
+    std::size_t n_concat = 0;
+    for(std::size_t i = components.size(); i > 1; i--)
     {
-      // SMT-LIB 2 concat is binary only
-      std::size_t n_concat = 0;
-      for(std::size_t i=components.size(); i>1; i--)
+      if(is_zero_width(components[i - 1].type(), ns))
+        continue;
+      else if(i > 2 || !is_zero_width(components[0].type(), ns))
       {
-        if(is_zero_width(components[i - 1].type(), ns))
-          continue;
-        else if(i > 2 || !is_zero_width(components[0].type(), ns))
-        {
-          ++n_concat;
-          out << "(concat ";
-        }
-
-        exprt op=expr.operands()[i-1];
-
-        // may need to flatten array-theory arrays in there
-        if(op.type().id() == ID_array && use_array_theory(op))
-          flatten_array(op);
-        else if(op.type().id() == ID_bool)
-          flatten2bv(op);
-        else
-          convert_expr(op);
-
-        out << " ";
+        ++n_concat;
+        out << "(concat ";
       }
 
-      if(!is_zero_width(components[0].type(), ns))
-        convert_expr(expr.op0());
+      convert_operand(expr.operands()[i - 1]);
 
-      out << std::string(n_concat, ')');
+      out << " ";
     }
+
+    if(!is_zero_width(components[0].type(), ns))
+      convert_operand(expr.op0());
+
+    out << std::string(n_concat, ')');
   }
 }
 

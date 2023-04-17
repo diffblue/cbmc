@@ -1207,7 +1207,7 @@ void smt2_parsert::setup_expressions()
 
     // add the widths
     auto op_width = make_range(op).map(
-      [](const exprt &o) { return to_unsignedbv_type(o.type()).get_width(); });
+      [](const exprt &o) { return to_bitvector_type(o.type()).get_width(); });
 
     const std::size_t total_width =
       std::accumulate(op_width.begin(), op_width.end(), 0);
