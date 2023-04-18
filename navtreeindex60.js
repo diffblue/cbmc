@@ -1,5 +1,12 @@
 var NAVTREEINDEX60 =
 {
+"classsmt2__incremental__decision__proceduret.html#aaf55f9e2e824609152ad2dfc5835df61":[8,0,1072,26],
+"classsmt2__incremental__decision__proceduret.html#aaf66dddd4bdb0cd0030e3c492ffa0971":[8,0,1072,32],
+"classsmt2__incremental__decision__proceduret.html#ac6c4c5fd91258822e90ec70890c84055":[8,0,1072,22],
+"classsmt2__incremental__decision__proceduret.html#ac84baf3fcc2b7d0800f8b676d4b56640":[8,0,1072,33],
+"classsmt2__incremental__decision__proceduret.html#acbbc9c7ccec8c2c0e3f3615a37bf1e23":[8,0,1072,27],
+"classsmt2__incremental__decision__proceduret.html#acde08cb3d8518d527db4667019452710":[8,0,1072,8],
+"classsmt2__incremental__decision__proceduret.html#acfad41046b599b1e47a9515e37ec426f":[8,0,1072,2],
 "classsmt2__incremental__decision__proceduret.html#ad3825ed42511b1ac9b81dd1d71ac8232":[8,0,1072,30],
 "classsmt2__incremental__decision__proceduret.html#ad4706a4c52fc2594831c91b0850af8ad":[8,0,1072,10],
 "classsmt2__incremental__decision__proceduret.html#ad4c88502d7c8dc813d3502e93be35668":[8,0,1072,35],
@@ -242,12 +249,5 @@ var NAVTREEINDEX60 =
 "classsmt__declare__function__commandt.html#a428f49a3761c2ae4baaf79f9f211bfc7":[8,0,1098,3],
 "classsmt__declare__function__commandt.html#a8dd2b4a878ef861f5a0a8ef095b24d39":[8,0,1098,0],
 "classsmt__declare__function__commandt.html#a9c8288f16e5a7f40004c82cc7dbeca03":[8,0,1098,2],
-"classsmt__declare__function__commandt.html#abff84f6f43bc850e0599a02a05de92df":[8,0,1098,5],
-"classsmt__declare__function__commandt.html#accf62b5c3cff3652cfad595614e41341":[8,0,1098,4],
-"classsmt__declare__function__commandt.html#ae9cac564e8797fdfefc71c0eb3065dd2":[8,0,1098,1],
-"classsmt__define__function__commandt.html":[8,0,1099],
-"classsmt__define__function__commandt.html#a2d08b6aa4981d4cf770dc3f8fdebbf9b":[8,0,1099,1],
-"classsmt__define__function__commandt.html#a4b243df0de933c88c361668a444f3858":[8,0,1099,2],
-"classsmt__define__function__commandt.html#a4dfc700dae57137fe46e4403a9355a58":[8,0,1099,0],
-"classsmt__define__function__commandt.html#a618e74838d5f310e1acf51ced36d0661":[8,0,1099,3]
+"classsmt__declare__function__commandt.html#abff84f6f43bc850e0599a02a05de92df":[8,0,1098,5]
 };

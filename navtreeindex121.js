@@ -1,5 +1,6 @@
 var NAVTREEINDEX121 =
 {
+"satcheck__cadical_8h_source.html":[9,0,2,27,7,16],
 "satcheck__core_8h.html":[9,0,2,27,7,17],
 "satcheck__core_8h_source.html":[9,0,2,27,7,17],
 "satcheck__glucose_8cpp.html":[9,0,2,27,7,18],
@@ -248,6 +249,5 @@ var NAVTREEINDEX121 =
 "show__value__sets_8h.html#ac356fc75d4aa678e165ef880eefb92c2":[9,0,2,26,7,0],
 "show__value__sets_8h_source.html":[9,0,2,26,7],
 "show__vcc_8cpp.html":[9,0,2,15,46],
-"show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0":[9,0,2,15,46,2],
-"show__vcc_8cpp.html#a627ae66eed07b2a56db6c5d2ddca896b":[9,0,2,15,46,1]
+"show__vcc_8cpp.html#a5592351617311aa29302c5dda7c129b0":[9,0,2,15,46,2]
 };

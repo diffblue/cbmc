@@ -1,5 +1,12 @@
 var NAVTREEINDEX65 =
 {
+"classstring__format__builtin__functiont.html#a1ee618d83cbc3842fc0224d83b3ea6ae":[8,0,1193,6],
+"classstring__format__builtin__functiont.html#a540c0aa792a3bd3cd2ad46fa92586907":[8,0,1193,1],
+"classstring__format__builtin__functiont.html#a5fe5b7a6a1399d405bd8d49c7c2a5897":[8,0,1193,4],
+"classstring__format__builtin__functiont.html#a70febf36ce0da42e9edc1a34630d28f7":[8,0,1193,8],
+"classstring__format__builtin__functiont.html#a83254aaedc4d040428b348c8a8885a0c":[8,0,1193,7],
+"classstring__format__builtin__functiont.html#aa7a2f58cbd652868e6af385c0d14fe37":[8,0,1193,10],
+"classstring__format__builtin__functiont.html#aad7e7852c8597ae83ae15862428383ce":[8,0,1193,0],
 "classstring__format__builtin__functiont.html#ad067e7a462ec5044146ef64bff60ed15":[8,0,1193,9],
 "classstring__format__builtin__functiont.html#ae3d67035b24c292b45ef7c6c38cd6e39":[8,0,1193,2],
 "classstring__insertion__builtin__functiont.html":[8,0,1195],
@@ -110,10 +117,6 @@ var NAVTREEINDEX65 =
 "classstruct__exprt.html#a0bdda390d68df93ab83b8e0115d75d74":[8,0,1209,2],
 "classstruct__exprt.html#a31bbeb32ef0ebec348684214818fabe0":[8,0,1209,1],
 "classstruct__exprt.html#a7f51be064f2b634280bd45d9c274a793":[8,0,1209,0],
-"background-concepts.html#Glossary_section":[0,4,8,2],
-"classinstrumentert.html#a8b4a80015186ade8f48cea132ff4f12d":[8,0,620,39],
-"classcpp__tokent.html#aa26a06e8fe870d8831aa596112cb9173":[8,0,324,4],
-"classinstrumentert.html#aa82ecd2d9446aeb3a06a987becf22221":[8,0,620,38],
 "classstruct__tag__typet.html":[8,0,1210],
 "classstruct__tag__typet.html#a9661b45de02ca9decb365cb52cae8443":[8,0,1210,0],
 "classstruct__typet.html":[8,0,1211],
@@ -246,8 +249,5 @@ var NAVTREEINDEX65 =
 "classsymbol__table__baset_1_1iteratort.html#a4ec95f3200a2468eb89fa7b7e9575a0a":[8,0,1221,0,11],
 "classsymbol__table__baset_1_1iteratort.html#a6b5c64ff6f18ca24263f932cf913f389":[8,0,1221,0,8],
 "classsymbol__table__baset_1_1iteratort.html#a71d63cc1e360bc4f25015777969f1967":[8,0,1221,0,1],
-"classsymbol__table__baset_1_1iteratort.html#a766aced53222edab05df6c3f2b0f454b":[8,0,1221,0,10],
-"classsymbol__table__baset_1_1iteratort.html#a7be0bf0cd90c6ede14ff43252dffc076":[8,0,1221,0,3],
-"classsymbol__table__baset_1_1iteratort.html#a90e465ea304891d8c2df336461158795":[8,0,1221,0,4],
-"classsymbol__table__baset_1_1iteratort.html#a94ed3f43b9122cf1ec6d1d48cf2f91d9":[8,0,1221,0,2]
+"classsymbol__table__baset_1_1iteratort.html#a766aced53222edab05df6c3f2b0f454b":[8,0,1221,0,10]
 };

@@ -1264,217 +1264,238 @@ $(document).ready(function(){initNavTree('bv__utils_8cpp_source.html',''); initR
 <div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;    <span class="keywordtype">size_t</span> start;</div>
 <div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;    <span class="keywordtype">size_t</span> i;</div>
 <div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160; </div>
-<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;    compareBelow = <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ab1dda85468d1f7f4070376bba890b707">new_variables</a>(bv0.size());</div>
-<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;    result = <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#acd417a4b281966755360a57a77a78b48">new_variable</a>();</div>
-<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160; </div>
-<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;    <span class="keywordflow">if</span>(rep == <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">representationt::SIGNED</a>)</div>
-<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;    {</div>
-<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;        bv0.size() &gt;= 2, <span class="stringliteral">&quot;signed bitvectors should have at least two bits&quot;</span>);</div>
-<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;      start = compareBelow.size() - 2;</div>
-<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160; </div>
-<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160;      <a class="code" href="classliteralt.html">literalt</a> firstComp=compareBelow[start];</div>
-<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160; </div>
-<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160;      <span class="comment">// When comparing signs we are comparing the top bit</span></div>
-<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;<span class="preprocessor">#ifdef INCLUDE_REDUNDANT_CLAUSES</span></div>
-<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a1419580e2fd4421a62daae94c3eac561">l_set_to_true</a>(compareBelow[start + 1])</div>
-<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160; </div>
-<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;      <span class="comment">// Four cases...</span></div>
-<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(top0, top1, firstComp);  <span class="comment">// + + compare needed</span></div>
-<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(top0, !top1, !result); <span class="comment">// + - result false and no compare needed</span></div>
-<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!top0, top1, result); <span class="comment">// - + result true and no compare needed</span></div>
-<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!top0, !top1, firstComp);  <span class="comment">// - - negated compare needed</span></div>
+<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;    <span class="keywordflow">if</span>(rep == <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">representationt::SIGNED</a>)</div>
+<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;    {</div>
+<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;      <span class="keywordflow">if</span>(top0.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>() &amp;&amp; top1.is_true())</div>
+<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(top0.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>() &amp;&amp; top1.is_false())</div>
+<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160; </div>
+<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;        bv0.size() &gt;= 2, <span class="stringliteral">&quot;signed bitvectors should have at least two bits&quot;</span>);</div>
+<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160;      compareBelow = <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ab1dda85468d1f7f4070376bba890b707">new_variables</a>(bv0.size() - 1);</div>
+<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160;      start = compareBelow.size() - 1;</div>
+<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160; </div>
+<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;      <a class="code" href="classliteralt.html">literalt</a> &amp;firstComp = compareBelow[start];</div>
+<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;      <span class="keywordflow">if</span>(top0.<a class="code" href="classliteralt.html#acba32efda3807ebcc865b945dcce352e">is_false</a>())</div>
+<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;        firstComp = !top1;</div>
+<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(top0.<a class="code" href="classliteralt.html#a0a901bd96c00af27c04d0aa63581f71b">is_true</a>())</div>
+<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;        firstComp = top1;</div>
+<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(top1.is_false())</div>
+<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;        firstComp = !top0;</div>
+<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(top1.is_true())</div>
+<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;        firstComp = top0;</div>
 <div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160; </div>
-<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;<span class="preprocessor">#ifdef INCLUDE_REDUNDANT_CLAUSES</span></div>
-<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(top0, !top1, !firstComp);</div>
-<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!top0,  top1, !firstComp);</div>
-<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;    }</div>
-<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;    {</div>
-<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;      <span class="comment">// Unsigned is much easier</span></div>
-<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;      start = compareBelow.size() - 1;</div>
-<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a1419580e2fd4421a62daae94c3eac561">l_set_to_true</a>(compareBelow[start]);</div>
-<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;    }</div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160; </div>
-<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;    <span class="comment">// Determine the output</span></div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;    <span class="comment">//  \forall i .  cb[i] &amp; -a[i] &amp;  b[i] =&gt;  result</span></div>
-<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;    <span class="comment">//  \forall i .  cb[i] &amp;  a[i] &amp; -b[i] =&gt; -result</span></div>
-<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;    i = start;</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;    <span class="keywordflow">do</span></div>
-<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;    {</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i],  bv0[i], !bv1[i],  result);</div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i], !bv0[i],  bv1[i], !result);</div>
-<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;    }</div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;    <span class="keywordflow">while</span>(i-- != 0);</div>
+<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;      result = <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#acd417a4b281966755360a57a77a78b48">new_variable</a>();</div>
+<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160; </div>
+<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;      <span class="comment">// When comparing signs we are comparing the top bit</span></div>
+<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;      <span class="comment">// Four cases...</span></div>
+<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(top0, top1, firstComp);  <span class="comment">// + + compare needed</span></div>
+<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(top0, !top1, !result); <span class="comment">// + - result false and no compare needed</span></div>
+<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!top0, top1, result); <span class="comment">// - + result true and no compare needed</span></div>
+<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!top0, !top1, firstComp);  <span class="comment">// - - negated compare needed</span></div>
+<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160; </div>
+<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;<span class="preprocessor">#ifdef INCLUDE_REDUNDANT_CLAUSES</span></div>
+<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(top0, !top1, !firstComp);</div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!top0,  top1, !firstComp);</div>
+<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;    }</div>
+<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;    {</div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;      <span class="comment">// Unsigned is much easier</span></div>
+<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;      compareBelow = <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ab1dda85468d1f7f4070376bba890b707">new_variables</a>(bv0.size() - 1);</div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;      compareBelow.push_back(<a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>));</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;      start = compareBelow.size() - 1;</div>
+<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;      result = <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#acd417a4b281966755360a57a77a78b48">new_variable</a>();</div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;    }</div>
 <div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160; </div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;    <span class="comment">// Chain the comparison bit</span></div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;    <span class="comment">//  \forall i != 0 . cb[i] &amp;  a[i] &amp;  b[i] =&gt; cb[i-1]</span></div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    <span class="comment">//  \forall i != 0 . cb[i] &amp; -a[i] &amp; -b[i] =&gt; cb[i-1]</span></div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    <span class="keywordflow">for</span>(i = start; i &gt; 0; i--)</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;    {</div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i], !bv0[i], !bv1[i], compareBelow[i-1]);</div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i],  bv0[i],  bv1[i], compareBelow[i-1]);</div>
-<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;    }</div>
-<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160; </div>
-<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160; </div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;<span class="preprocessor">#ifdef INCLUDE_REDUNDANT_CLAUSES</span></div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;    <span class="comment">// Optional zeroing of the comparison bit when not needed</span></div>
-<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;    <span class="comment">//  \forall i != 0 . -c[i] =&gt; -c[i-1]</span></div>
-<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;    <span class="comment">//  \forall i != 0 .  c[i] &amp; -a[i] &amp;  b[i] =&gt; -c[i-1]</span></div>
-<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;    <span class="comment">//  \forall i != 0 .  c[i] &amp;  a[i] &amp; -b[i] =&gt; -c[i-1]</span></div>
-<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;    <span class="keywordflow">for</span>(i = start; i &gt; 0; i--)</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;    {</div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(compareBelow[i],                   !compareBelow[i-1]);</div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i],  bv0[i], !bv1[i], !compareBelow[i-1]);</div>
-<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i], !bv0[i],  bv1[i], !compareBelow[i-1]);</div>
-<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;    }</div>
-<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160; </div>
-<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;    <span class="comment">// The &#39;base case&#39; of the induction is the case when they are equal</span></div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;    <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[0], !bv0[0], !bv1[0], (or_equal)?result:!result);</div>
-<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;    <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[0],  bv0[0],  bv1[0], (or_equal)?result:!result);</div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160; </div>
-<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;  }</div>
-<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;  {</div>
-<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">carry</a>=</div>
-<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;      <a class="code" href="classbv__utilst.html#ac824545109fa1a790773bf46079e7386">carry_out</a>(bv0, <a class="code" href="classbv__utilst.html#a0419160b94042cd0c0ea228806b1d9b6">inverted</a>(bv1), <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>));</div>
-<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160; </div>
-<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> result;</div>
-<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160; </div>
-<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;    <span class="keywordflow">if</span>(rep==<a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">representationt::SIGNED</a>)</div>
-<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;      result=<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a6f3227138ae60389265a611a1801dbac">lxor</a>(<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ad6f9e961d7ca9860f8e9e341d5c895f7">lequal</a>(top0, top1), <a class="code" href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">carry</a>);</div>
-<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;    {</div>
-<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;        rep == <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">representationt::UNSIGNED</a>,</div>
-<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;        <span class="stringliteral">&quot;representation has either value signed or unsigned&quot;</span>);</div>
-<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;      result = !<a class="code" href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">carry</a>;</div>
-<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;    }</div>
-<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160; </div>
-<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;    <span class="keywordflow">if</span>(or_equal)</div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;      result=<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ada2ce7569ca9c2c2fea13bf83a1b347d">lor</a>(result, <a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(bv0, bv1));</div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160; </div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;  }</div>
-<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;}</div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160; </div>
-<div class="line"><a name="l01303"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a8f6f6fa9c5e47a3cce35dd45db4e92e4"> 1303</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#a8f6f6fa9c5e47a3cce35dd45db4e92e4">bv_utilst::unsigned_less_than</a>(</div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op0,</div>
-<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op1)</div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;{</div>
-<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;<span class="preprocessor">#ifdef COMPACT_LT_OR_LE</span></div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, op0, op1, <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">representationt::UNSIGNED</a>);</div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;  <span class="comment">// A &lt;= B  iff  there is an overflow on A-B</span></div>
-<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classbv__utilst.html#ac824545109fa1a790773bf46079e7386">carry_out</a>(op0, <a class="code" href="classbv__utilst.html#a0419160b94042cd0c0ea228806b1d9b6">inverted</a>(op1), <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>));</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;}</div>
-<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160; </div>
-<div class="line"><a name="l01315"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a04210bf02f6a8361b9f9f267a94f6c47"> 1315</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#a04210bf02f6a8361b9f9f267a94f6c47">bv_utilst::signed_less_than</a>(</div>
-<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv0,</div>
-<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv1)</div>
-<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;{</div>
-<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, bv0, bv1, <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">representationt::SIGNED</a>);</div>
-<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;}</div>
-<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160; </div>
-<div class="line"><a name="l01322"></a><span class="lineno"><a class="line" href="classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8"> 1322</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8">bv_utilst::rel</a>(</div>
-<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv0,</div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">id</span>,</div>
-<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv1,</div>
-<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;  <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775">representationt</a> rep)</div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;    <span class="comment">// Determine the output</span></div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;    <span class="comment">//  \forall i .  cb[i] &amp; -a[i] &amp;  b[i] =&gt;  result</span></div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    <span class="comment">//  \forall i .  cb[i] &amp;  a[i] &amp; -b[i] =&gt; -result</span></div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    i = start;</div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;    <span class="keywordflow">do</span></div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;    {</div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;      <span class="keywordflow">if</span>(compareBelow[i].<a class="code" href="literal_8h.html#a2ff88b9bc21389f737fd9fdba0b0e032">is_false</a>())</div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(compareBelow[i].<a class="code" href="literal_8h.html#a6d80a6cf9298ead271f523ba294e4395">is_true</a>())</div>
+<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;      {</div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;        <span class="keywordflow">if</span>(bv0[i].<a class="code" href="literal_8h.html#a2ff88b9bc21389f737fd9fdba0b0e032">is_false</a>() &amp;&amp; bv1[i].<a class="code" href="literal_8h.html#a6d80a6cf9298ead271f523ba294e4395">is_true</a>())</div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(bv0[i].<a class="code" href="literal_8h.html#a6d80a6cf9298ead271f523ba294e4395">is_true</a>() &amp;&amp; bv1[i].<a class="code" href="literal_8h.html#a2ff88b9bc21389f737fd9fdba0b0e032">is_false</a>())</div>
+<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;      }</div>
+<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160; </div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i],  bv0[i], !bv1[i],  result);</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i], !bv0[i],  bv1[i], !result);</div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;    }</div>
+<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;    <span class="keywordflow">while</span>(i-- != 0);</div>
+<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160; </div>
+<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;    <span class="comment">// Chain the comparison bit</span></div>
+<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;    <span class="comment">//  \forall i != 0 . cb[i] &amp;  a[i] &amp;  b[i] =&gt; cb[i-1]</span></div>
+<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;    <span class="comment">//  \forall i != 0 . cb[i] &amp; -a[i] &amp; -b[i] =&gt; cb[i-1]</span></div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;    <span class="keywordflow">for</span>(i = start; i &gt; 0; i--)</div>
+<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;    {</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i], !bv0[i], !bv1[i], compareBelow[i-1]);</div>
+<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i],  bv0[i],  bv1[i], compareBelow[i-1]);</div>
+<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;    }</div>
+<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160; </div>
+<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160; </div>
+<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;<span class="preprocessor">#ifdef INCLUDE_REDUNDANT_CLAUSES</span></div>
+<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;    <span class="comment">// Optional zeroing of the comparison bit when not needed</span></div>
+<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;    <span class="comment">//  \forall i != 0 . -c[i] =&gt; -c[i-1]</span></div>
+<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;    <span class="comment">//  \forall i != 0 .  c[i] &amp; -a[i] &amp;  b[i] =&gt; -c[i-1]</span></div>
+<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;    <span class="comment">//  \forall i != 0 .  c[i] &amp;  a[i] &amp; -b[i] =&gt; -c[i-1]</span></div>
+<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;    <span class="keywordflow">for</span>(i = start; i &gt; 0; i--)</div>
+<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;    {</div>
+<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(compareBelow[i],                   !compareBelow[i-1]);</div>
+<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i],  bv0[i], !bv1[i], !compareBelow[i-1]);</div>
+<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[i], !bv0[i],  bv1[i], !compareBelow[i-1]);</div>
+<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;    }</div>
+<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160; </div>
+<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;    <span class="comment">// The &#39;base case&#39; of the induction is the case when they are equal</span></div>
+<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;    <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[0], !bv0[0], !bv1[0], (or_equal)?result:!result);</div>
+<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;    <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!compareBelow[0],  bv0[0],  bv1[0], (or_equal)?result:!result);</div>
+<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160; </div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;  }</div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;  {</div>
+<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">carry</a>=</div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;      <a class="code" href="classbv__utilst.html#ac824545109fa1a790773bf46079e7386">carry_out</a>(bv0, <a class="code" href="classbv__utilst.html#a0419160b94042cd0c0ea228806b1d9b6">inverted</a>(bv1), <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>));</div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160; </div>
+<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;    <a class="code" href="classliteralt.html">literalt</a> result;</div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160; </div>
+<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;    <span class="keywordflow">if</span>(rep==<a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">representationt::SIGNED</a>)</div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;      result=<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a6f3227138ae60389265a611a1801dbac">lxor</a>(<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ad6f9e961d7ca9860f8e9e341d5c895f7">lequal</a>(top0, top1), <a class="code" href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">carry</a>);</div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;    {</div>
+<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;        rep == <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">representationt::UNSIGNED</a>,</div>
+<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;        <span class="stringliteral">&quot;representation has either value signed or unsigned&quot;</span>);</div>
+<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;      result = !<a class="code" href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">carry</a>;</div>
+<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;    }</div>
+<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160; </div>
+<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;    <span class="keywordflow">if</span>(or_equal)</div>
+<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;      result=<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ada2ce7569ca9c2c2fea13bf83a1b347d">lor</a>(result, <a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(bv0, bv1));</div>
+<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160; </div>
+<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;  }</div>
+<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;}</div>
+<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160; </div>
+<div class="line"><a name="l01324"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a8f6f6fa9c5e47a3cce35dd45db4e92e4"> 1324</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#a8f6f6fa9c5e47a3cce35dd45db4e92e4">bv_utilst::unsigned_less_than</a>(</div>
+<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op0,</div>
+<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op1)</div>
 <div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;{</div>
-<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;  <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_equal)</div>
-<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(bv0, bv1);</div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_notequal)</div>
-<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;    <span class="keywordflow">return</span> !<a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(bv0, bv1);</div>
-<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_le)</div>
-<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">true</span>, bv0, bv1, rep);</div>
-<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_lt)</div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, bv0, bv1, rep);</div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_ge)</div>
-<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">true</span>, bv1, bv0, rep); <span class="comment">// swapped</span></div>
-<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_gt)</div>
-<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, bv1, bv0, rep); <span class="comment">// swapped</span></div>
-<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;}</div>
-<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160; </div>
-<div class="line"><a name="l01344"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a09f9c1a298cd94e373c2df16190a62df"> 1344</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classbv__utilst.html#a09f9c1a298cd94e373c2df16190a62df">bv_utilst::is_constant</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
-<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;{</div>
-<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;literal : bv)</div>
-<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;  {</div>
-<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;    <span class="keywordflow">if</span>(!literal.is_constant())</div>
-<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;  }</div>
-<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160; </div>
-<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;}</div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160; </div>
-<div class="line"><a name="l01355"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b"> 1355</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b">bv_utilst::cond_implies_equal</a>(</div>
-<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> cond,</div>
-<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;a,</div>
-<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;b)</div>
-<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;{</div>
-<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(a.size() == b.size());</div>
-<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160; </div>
-<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a5c9141f5f830de823eb0bacb642112e4">cnf_handled_well</a>())</div>
-<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;  {</div>
-<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;    <span class="keywordflow">for</span>(std::size_t i=0; i&lt;a.size(); i++)</div>
-<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;    {</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!cond,  a[i], !b[i]);</div>
-<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!cond, !a[i],  b[i]);</div>
-<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;    }</div>
-<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;  }</div>
-<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;  {</div>
-<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;    <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a4546ae0726b542a948b997c67876b12c">limplies</a>(cond, <a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(a, b));</div>
-<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;  }</div>
-<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160; </div>
-<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;  <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;}</div>
-<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160; </div>
-<div class="line"><a name="l01378"></a><span class="lineno"><a class="line" href="classbv__utilst.html#acafee38a096ea699587999c43c0b12ae"> 1378</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#acafee38a096ea699587999c43c0b12ae">bv_utilst::verilog_bv_has_x_or_z</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;src)</div>
-<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;{</div>
-<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> odd_bits;</div>
-<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;  odd_bits.reserve(src.size()/2);</div>
+<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;<span class="preprocessor">#ifdef COMPACT_LT_OR_LE</span></div>
+<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, op0, op1, <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">representationt::UNSIGNED</a>);</div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;  <span class="comment">// A &lt;= B  iff  there is an overflow on A-B</span></div>
+<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="classbv__utilst.html#ac824545109fa1a790773bf46079e7386">carry_out</a>(op0, <a class="code" href="classbv__utilst.html#a0419160b94042cd0c0ea228806b1d9b6">inverted</a>(op1), <a class="code" href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a>(<span class="keyword">true</span>));</div>
+<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;}</div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160; </div>
+<div class="line"><a name="l01336"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a04210bf02f6a8361b9f9f267a94f6c47"> 1336</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#a04210bf02f6a8361b9f9f267a94f6c47">bv_utilst::signed_less_than</a>(</div>
+<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv0,</div>
+<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv1)</div>
+<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;{</div>
+<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, bv0, bv1, <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">representationt::SIGNED</a>);</div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;}</div>
+<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160; </div>
+<div class="line"><a name="l01343"></a><span class="lineno"><a class="line" href="classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8"> 1343</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8">bv_utilst::rel</a>(</div>
+<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv0,</div>
+<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">id</span>,</div>
+<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv1,</div>
+<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;  <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775">representationt</a> rep)</div>
+<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;{</div>
+<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;  <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_equal)</div>
+<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(bv0, bv1);</div>
+<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_notequal)</div>
+<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;    <span class="keywordflow">return</span> !<a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(bv0, bv1);</div>
+<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_le)</div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">true</span>, bv0, bv1, rep);</div>
+<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_lt)</div>
+<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, bv0, bv1, rep);</div>
+<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_ge)</div>
+<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">true</span>, bv1, bv0, rep); <span class="comment">// swapped</span></div>
+<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<span class="keywordtype">id</span>==ID_gt)</div>
+<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#a9c98ec661aa6499761a2ad19b2bf9822">lt_or_le</a>(<span class="keyword">false</span>, bv1, bv0, rep); <span class="comment">// swapped</span></div>
+<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;}</div>
+<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160; </div>
+<div class="line"><a name="l01365"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a09f9c1a298cd94e373c2df16190a62df"> 1365</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classbv__utilst.html#a09f9c1a298cd94e373c2df16190a62df">bv_utilst::is_constant</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;bv)</div>
+<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;{</div>
+<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;literal : bv)</div>
+<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;  {</div>
+<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;    <span class="keywordflow">if</span>(!literal.is_constant())</div>
+<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;  }</div>
+<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160; </div>
+<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;}</div>
+<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160; </div>
+<div class="line"><a name="l01376"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b"> 1376</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b">bv_utilst::cond_implies_equal</a>(</div>
+<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;  <a class="code" href="classliteralt.html">literalt</a> cond,</div>
+<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;a,</div>
+<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;b)</div>
+<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;{</div>
+<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(a.size() == b.size());</div>
 <div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160; </div>
-<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  <span class="comment">// check every odd bit</span></div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;src.size(); i++)</div>
-<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;  {</div>
-<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;    <span class="keywordflow">if</span>(i%2!=0)</div>
-<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;      odd_bits.push_back(src[i]);</div>
-<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  }</div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160; </div>
-<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ada2ce7569ca9c2c2fea13bf83a1b347d">lor</a>(odd_bits);</div>
-<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;}</div>
-<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160; </div>
-<div class="line"><a name="l01393"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef"> 1393</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef">bv_utilst::verilog_bv_normal_bits</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;src)</div>
-<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;{</div>
-<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> even_bits;</div>
-<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;  even_bits.reserve(src.size()/2);</div>
-<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160; </div>
-<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;  <span class="comment">// get every even bit</span></div>
-<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;src.size(); i++)</div>
-<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;  {</div>
-<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;    <span class="keywordflow">if</span>(i%2==0)</div>
-<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;      even_bits.push_back(src[i]);</div>
-<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;  }</div>
-<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160; </div>
-<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;  <span class="keywordflow">return</span> even_bits;</div>
-<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;}</div>
+<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a5c9141f5f830de823eb0bacb642112e4">cnf_handled_well</a>())</div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  {</div>
+<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;    <span class="keywordflow">for</span>(std::size_t i=0; i&lt;a.size(); i++)</div>
+<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;    {</div>
+<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!cond,  a[i], !b[i]);</div>
+<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;      <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#aa88ae6f4f3a364cdb1178c53d9da0564">lcnf</a>(!cond, !a[i],  b[i]);</div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;    }</div>
+<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;  }</div>
+<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;  {</div>
+<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;    <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#a4546ae0726b542a948b997c67876b12c">limplies</a>(cond, <a class="code" href="classbv__utilst.html#a770b550f3704656e076961f976723f49">equal</a>(a, b));</div>
+<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;  }</div>
+<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160; </div>
+<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;  <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;}</div>
+<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160; </div>
+<div class="line"><a name="l01399"></a><span class="lineno"><a class="line" href="classbv__utilst.html#acafee38a096ea699587999c43c0b12ae"> 1399</a></span>&#160;<a class="code" href="classliteralt.html">literalt</a> <a class="code" href="classbv__utilst.html#acafee38a096ea699587999c43c0b12ae">bv_utilst::verilog_bv_has_x_or_z</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;src)</div>
+<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;{</div>
+<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> odd_bits;</div>
+<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;  odd_bits.reserve(src.size()/2);</div>
+<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160; </div>
+<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;  <span class="comment">// check every odd bit</span></div>
+<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;src.size(); i++)</div>
+<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;  {</div>
+<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;    <span class="keywordflow">if</span>(i%2!=0)</div>
+<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;      odd_bits.push_back(src[i]);</div>
+<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;  }</div>
+<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160; </div>
+<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">prop</a>.<a class="code" href="classpropt.html#ada2ce7569ca9c2c2fea13bf83a1b347d">lor</a>(odd_bits);</div>
+<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;}</div>
+<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160; </div>
+<div class="line"><a name="l01414"></a><span class="lineno"><a class="line" href="classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef"> 1414</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef">bv_utilst::verilog_bv_normal_bits</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;src)</div>
+<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;{</div>
+<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> even_bits;</div>
+<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;  even_bits.reserve(src.size()/2);</div>
+<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160; </div>
+<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;  <span class="comment">// get every even bit</span></div>
+<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;  <span class="keywordflow">for</span>(std::size_t i=0; i&lt;src.size(); i++)</div>
+<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;  {</div>
+<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;    <span class="keywordflow">if</span>(i%2==0)</div>
+<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;      even_bits.push_back(src[i]);</div>
+<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;  }</div>
+<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160; </div>
+<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;  <span class="keywordflow">return</span> even_bits;</div>
+<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;}</div>
 <div class="ttc" id="abv__utils_8h_html"><div class="ttname"><a href="bv__utils_8h.html">bv_utils.h</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a0419160b94042cd0c0ea228806b1d9b6"><div class="ttname"><a href="classbv__utilst.html#a0419160b94042cd0c0ea228806b1d9b6">bv_utilst::inverted</a></div><div class="ttdeci">static bvt inverted(const bvt &amp;op)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00634">bv_utils.cpp:634</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_a04210bf02f6a8361b9f9f267a94f6c47"><div class="ttname"><a href="classbv__utilst.html#a04210bf02f6a8361b9f9f267a94f6c47">bv_utilst::signed_less_than</a></div><div class="ttdeci">literalt signed_less_than(const bvt &amp;bv0, const bvt &amp;bv1)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01315">bv_utils.cpp:1315</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_a09f9c1a298cd94e373c2df16190a62df"><div class="ttname"><a href="classbv__utilst.html#a09f9c1a298cd94e373c2df16190a62df">bv_utilst::is_constant</a></div><div class="ttdeci">static bool is_constant(const bvt &amp;bv)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01344">bv_utils.cpp:1344</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_a04210bf02f6a8361b9f9f267a94f6c47"><div class="ttname"><a href="classbv__utilst.html#a04210bf02f6a8361b9f9f267a94f6c47">bv_utilst::signed_less_than</a></div><div class="ttdeci">literalt signed_less_than(const bvt &amp;bv0, const bvt &amp;bv1)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01336">bv_utils.cpp:1336</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_a09f9c1a298cd94e373c2df16190a62df"><div class="ttname"><a href="classbv__utilst.html#a09f9c1a298cd94e373c2df16190a62df">bv_utilst::is_constant</a></div><div class="ttdeci">static bool is_constant(const bvt &amp;bv)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01365">bv_utils.cpp:1365</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a1ea6dd526f2402862ff5f27d86809ec2"><div class="ttname"><a href="classbv__utilst.html#a1ea6dd526f2402862ff5f27d86809ec2">bv_utilst::adder</a></div><div class="ttdeci">std::pair&lt; bvt, literalt &gt; adder(const bvt &amp;op0, const bvt &amp;op1, literalt carry_in)</div><div class="ttdoc">Return the sum and carry-out when adding op0 and op1 under initial carry carry_in.</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00294">bv_utils.cpp:294</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a41116a3032159fa84dfaaa9e382611f0"><div class="ttname"><a href="classbv__utilst.html#a41116a3032159fa84dfaaa9e382611f0">bv_utilst::wallace_tree</a></div><div class="ttdeci">bvt wallace_tree(const std::vector&lt; bvt &gt; &amp;pps)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00642">bv_utils.cpp:642</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a497a012c25e4ad503a7440bfcac16cc5"><div class="ttname"><a href="classbv__utilst.html#a497a012c25e4ad503a7440bfcac16cc5">bv_utilst::is_not_zero</a></div><div class="ttdeci">literalt is_not_zero(const bvt &amp;op)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8h_source.html#l00147">bv_utils.h:147</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_a4bebcc118758252242c0e85cdec8e2ef"><div class="ttname"><a href="classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef">bv_utilst::verilog_bv_normal_bits</a></div><div class="ttdeci">static bvt verilog_bv_normal_bits(const bvt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01393">bv_utils.cpp:1393</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_a4bebcc118758252242c0e85cdec8e2ef"><div class="ttname"><a href="classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef">bv_utilst::verilog_bv_normal_bits</a></div><div class="ttdeci">static bvt verilog_bv_normal_bits(const bvt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01414">bv_utils.cpp:1414</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a523d9681b564b19c36efac0ed81db56c"><div class="ttname"><a href="classbv__utilst.html#a523d9681b564b19c36efac0ed81db56c">bv_utilst::is_int_min</a></div><div class="ttdeci">literalt is_int_min(const bvt &amp;op)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8h_source.html#l00150">bv_utils.h:150</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a5959de18f70e78a14d5ecd8df7fe7816"><div class="ttname"><a href="classbv__utilst.html#a5959de18f70e78a14d5ecd8df7fe7816">bv_utilst::extract_msb</a></div><div class="ttdeci">static bvt extract_msb(const bvt &amp;a, std::size_t n)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00054">bv_utils.cpp:54</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a5c272b6108723f636c107d6ed9c83557"><div class="ttname"><a href="classbv__utilst.html#a5c272b6108723f636c107d6ed9c83557">bv_utilst::set_equal</a></div><div class="ttdeci">void set_equal(const bvt &amp;a, const bvt &amp;b)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00031">bv_utils.cpp:31</a></div></div>
@@ -1493,8 +1514,8 @@ $(document).ready(function(){initNavTree('bv__utils_8cpp_source.html',''); initR
 <div class="ttc" id="aclassbv__utilst_html_a7ee8c09c51ae6f1a464436140e6bde87"><div class="ttname"><a href="classbv__utilst.html#a7ee8c09c51ae6f1a464436140e6bde87">bv_utilst::is_one</a></div><div class="ttdeci">literalt is_one(const bvt &amp;op)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00022">bv_utils.cpp:22</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a80cb53e8cfb49711c70c2a5610c470ea"><div class="ttname"><a href="classbv__utilst.html#a80cb53e8cfb49711c70c2a5610c470ea">bv_utilst::cond_negate_no_overflow</a></div><div class="ttdeci">bvt cond_negate_no_overflow(const bvt &amp;bv, const literalt cond)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00826">bv_utils.cpp:826</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a8b7a5f27b675b7dcda7dd303bbaed617"><div class="ttname"><a href="classbv__utilst.html#a8b7a5f27b675b7dcda7dd303bbaed617">bv_utilst::overflow_sub</a></div><div class="ttdeci">literalt overflow_sub(const bvt &amp;op0, const bvt &amp;op1, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00448">bv_utils.cpp:448</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_a8ca59a4e51039fe73545276fca05bf5b"><div class="ttname"><a href="classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b">bv_utilst::cond_implies_equal</a></div><div class="ttdeci">void cond_implies_equal(literalt cond, const bvt &amp;a, const bvt &amp;b)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01355">bv_utils.cpp:1355</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_a8f6f6fa9c5e47a3cce35dd45db4e92e4"><div class="ttname"><a href="classbv__utilst.html#a8f6f6fa9c5e47a3cce35dd45db4e92e4">bv_utilst::unsigned_less_than</a></div><div class="ttdeci">literalt unsigned_less_than(const bvt &amp;bv0, const bvt &amp;bv1)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01303">bv_utils.cpp:1303</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_a8ca59a4e51039fe73545276fca05bf5b"><div class="ttname"><a href="classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b">bv_utilst::cond_implies_equal</a></div><div class="ttdeci">void cond_implies_equal(literalt cond, const bvt &amp;a, const bvt &amp;b)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01376">bv_utils.cpp:1376</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_a8f6f6fa9c5e47a3cce35dd45db4e92e4"><div class="ttname"><a href="classbv__utilst.html#a8f6f6fa9c5e47a3cce35dd45db4e92e4">bv_utilst::unsigned_less_than</a></div><div class="ttdeci">literalt unsigned_less_than(const bvt &amp;bv0, const bvt &amp;bv1)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01324">bv_utils.cpp:1324</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a92e9f0675589b99663cae55f6e3467af"><div class="ttname"><a href="classbv__utilst.html#a92e9f0675589b99663cae55f6e3467af">bv_utilst::signed_multiplier_no_overflow</a></div><div class="ttdeci">bvt signed_multiplier_no_overflow(const bvt &amp;op0, const bvt &amp;op1)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00833">bv_utils.cpp:833</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a949847d755fdbd8c10b1d1f9b5804fde"><div class="ttname"><a href="classbv__utilst.html#a949847d755fdbd8c10b1d1f9b5804fde">bv_utilst::incrementer</a></div><div class="ttdeci">bvt incrementer(const bvt &amp;op, literalt carry_in)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00626">bv_utils.cpp:626</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a96020e66743dba235e41e1fa6d9518d5"><div class="ttname"><a href="classbv__utilst.html#a96020e66743dba235e41e1fa6d9518d5">bv_utilst::add_sub</a></div><div class="ttdeci">bvt add_sub(const bvt &amp;op0, const bvt &amp;op1, bool subtract)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00334">bv_utils.cpp:334</a></div></div>
@@ -1523,11 +1544,11 @@ $(document).ready(function(){initNavTree('bv__utils_8cpp_source.html',''); initR
 <div class="ttc" id="aclassbv__utilst_html_ac846987c896b9a3e95554908fdf520c4"><div class="ttname"><a href="classbv__utilst.html#ac846987c896b9a3e95554908fdf520c4">bv_utilst::negate</a></div><div class="ttdeci">bvt negate(const bvt &amp;op)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00586">bv_utils.cpp:586</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_ac9579e316ddd24d4162efde44d8affc2"><div class="ttname"><a href="classbv__utilst.html#ac9579e316ddd24d4162efde44d8affc2">bv_utilst::extension</a></div><div class="ttdeci">static bvt extension(const bvt &amp;bv, std::size_t new_size, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00105">bv_utils.cpp:105</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_aca583ddeaca8b2b4e6a56078649b27b4"><div class="ttname"><a href="classbv__utilst.html#aca583ddeaca8b2b4e6a56078649b27b4">bv_utilst::extract_lsb</a></div><div class="ttdeci">static bvt extract_lsb(const bvt &amp;a, std::size_t n)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00066">bv_utils.cpp:66</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_acafee38a096ea699587999c43c0b12ae"><div class="ttname"><a href="classbv__utilst.html#acafee38a096ea699587999c43c0b12ae">bv_utilst::verilog_bv_has_x_or_z</a></div><div class="ttdeci">literalt verilog_bv_has_x_or_z(const bvt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01378">bv_utils.cpp:1378</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_acafee38a096ea699587999c43c0b12ae"><div class="ttname"><a href="classbv__utilst.html#acafee38a096ea699587999c43c0b12ae">bv_utilst::verilog_bv_has_x_or_z</a></div><div class="ttdeci">literalt verilog_bv_has_x_or_z(const bvt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01399">bv_utils.cpp:1399</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_acc38b234c0620d165f7a17874a0fd595"><div class="ttname"><a href="classbv__utilst.html#acc38b234c0620d165f7a17874a0fd595">bv_utilst::carry</a></div><div class="ttdeci">literalt carry(literalt a, literalt b, literalt c)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00227">bv_utils.cpp:227</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_ace5ecfec28d1557d6ac502611a794489"><div class="ttname"><a href="classbv__utilst.html#ace5ecfec28d1557d6ac502611a794489">bv_utilst::unsigned_multiplier_no_overflow</a></div><div class="ttdeci">bvt unsigned_multiplier_no_overflow(const bvt &amp;op0, const bvt &amp;op1)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00750">bv_utils.cpp:750</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_ae986aefedce9f329365ce0fc2c66096e"><div class="ttname"><a href="classbv__utilst.html#ae986aefedce9f329365ce0fc2c66096e">bv_utilst::zeros</a></div><div class="ttdeci">static bvt zeros(std::size_t new_size)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8h_source.html#l00193">bv_utils.h:193</a></div></div>
-<div class="ttc" id="aclassbv__utilst_html_aeb4322a29bfa63ac8c8cebfb9f157bb8"><div class="ttname"><a href="classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8">bv_utilst::rel</a></div><div class="ttdeci">literalt rel(const bvt &amp;bv0, irep_idt id, const bvt &amp;bv1, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01322">bv_utils.cpp:1322</a></div></div>
+<div class="ttc" id="aclassbv__utilst_html_aeb4322a29bfa63ac8c8cebfb9f157bb8"><div class="ttname"><a href="classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8">bv_utilst::rel</a></div><div class="ttdeci">literalt rel(const bvt &amp;bv0, irep_idt id, const bvt &amp;bv1, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l01343">bv_utils.cpp:1343</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_aef0f752b25a57504702825fb537e0fa9"><div class="ttname"><a href="classbv__utilst.html#aef0f752b25a57504702825fb537e0fa9">bv_utilst::prop</a></div><div class="ttdeci">propt &amp; prop</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8h_source.html#l00223">bv_utils.h:223</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_af1f142f1ecb4b2fe831f23b06071dcbc"><div class="ttname"><a href="classbv__utilst.html#af1f142f1ecb4b2fe831f23b06071dcbc">bv_utilst::adder_no_overflow</a></div><div class="ttdeci">bvt adder_no_overflow(const bvt &amp;op0, const bvt &amp;op1, bool subtract, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00473">bv_utils.cpp:473</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_afaa28ab00c8650a5e58337ee387ef7ab"><div class="ttname"><a href="classbv__utilst.html#afaa28ab00c8650a5e58337ee387ef7ab">bv_utilst::saturating_add_sub</a></div><div class="ttdeci">bvt saturating_add_sub(const bvt &amp;op0, const bvt &amp;op1, bool subtract, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00355">bv_utils.cpp:355</a></div></div>
@@ -1551,6 +1572,8 @@ $(document).ready(function(){initNavTree('bv__utils_8cpp_source.html',''); initR
 <div class="ttc" id="aclasspropt_html_ada2ce7569ca9c2c2fea13bf83a1b347d"><div class="ttname"><a href="classpropt.html#ada2ce7569ca9c2c2fea13bf83a1b347d">propt::lor</a></div><div class="ttdeci">virtual literalt lor(literalt a, literalt b)=0</div></div>
 <div class="ttc" id="aclasspropt_html_ade381c21e35ac44d8e37fcec86e7bc14"><div class="ttname"><a href="classpropt.html#ade381c21e35ac44d8e37fcec86e7bc14">propt::l_set_to_false</a></div><div class="ttdeci">void l_set_to_false(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00054">prop.h:54</a></div></div>
 <div class="ttc" id="aclasspropt_html_ae353a5b55cad71394ce2c7c43b585547"><div class="ttname"><a href="classpropt.html#ae353a5b55cad71394ce2c7c43b585547">propt::has_set_to</a></div><div class="ttdeci">virtual bool has_set_to() const</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00081">prop.h:81</a></div></div>
+<div class="ttc" id="aliteral_8h_html_a2ff88b9bc21389f737fd9fdba0b0e032"><div class="ttname"><a href="literal_8h.html#a2ff88b9bc21389f737fd9fdba0b0e032">is_false</a></div><div class="ttdeci">bool is_false(const literalt &amp;l)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00197">literal.h:197</a></div></div>
+<div class="ttc" id="aliteral_8h_html_a6d80a6cf9298ead271f523ba294e4395"><div class="ttname"><a href="literal_8h.html#a6d80a6cf9298ead271f523ba294e4395">is_true</a></div><div class="ttdeci">bool is_true(const literalt &amp;l)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00198">literal.h:198</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="aliteral_8h_html_ad2dfd63c2c74c4a666f97dd385f57230"><div class="ttname"><a href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a></div><div class="ttdeci">literalt const_literal(bool value)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00188">literal.h:188</a></div></div>
 <div class="ttc" id="amp__arith_8cpp_html_aba9945ee796bc4bd7cac452fa0d69748"><div class="ttname"><a href="mp__arith_8cpp.html#aba9945ee796bc4bd7cac452fa0d69748">integer2binary</a></div><div class="ttdeci">const std::string integer2binary(const mp_integer &amp;n, std::size_t width)</div><div class="ttdef"><b>Definition:</b> <a href="mp__arith_8cpp_source.html#l00064">mp_arith.cpp:64</a></div></div>
