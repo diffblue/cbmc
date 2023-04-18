@@ -232,7 +232,8 @@ add_axioms_for_format_specifier(
   }
   }
 
-  INVARIANT(false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
+  UNREACHABLE_BECAUSE(
+    "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
 }
 
 /// Deserialize an argument for format from \p string.
