@@ -2711,6 +2711,17 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
     }
   }
 
+  if(as_const(expr).type().id() == ID_array)
+  {
+    const array_typet &array_type = to_array_type(as_const(expr).type());
+    resultt<> simp_size = simplify_rec(array_type.size());
+    if(simp_size.has_changed())
+    {
+      to_array_type(expr.type()).size() = simp_size.expr;
+      result = false;
+    }
+  }
+
   return result;
 }
 
@@ -3035,7 +3046,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
   else // change, new expression is 'tmp'
   {
     POSTCONDITION_WITH_DIAGNOSTICS(
-      as_const(tmp).type() == expr.type(), tmp.pretty(), expr.pretty());
+      (as_const(tmp).type().id() == ID_array && expr.type().id() == ID_array) ||
+        as_const(tmp).type() == expr.type(),
+      tmp.pretty(),
+      expr.pretty());
 
 #ifdef USE_CACHE
     // save in cache
