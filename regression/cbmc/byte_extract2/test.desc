@@ -1,0 +1,11 @@
+CORE broken-cprover-smt-backend
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The CPROVER SMT2 back-end does not support quantifiers, which are brought into
+this example via an array comprehension.

@@ -522,9 +522,10 @@ static exprt unpack_array_vector_no_known_bounds(
 
 /// Rewrite an array or vector into its individual bytes.
 /// \param src: array/vector to unpack
-/// \param src_size: array/vector size; if not a constant and thus not set,
-///   \p max_bytes must be a known constant value to build an array expression,
-///   otherwise we fall back to building and array comprehension
+/// \param src_size: number of elements in \p src, if the array/vector size is
+///   constant; if the array/vector size is not constant (and this argument thus
+///   not set), \p max_bytes needs to be a known constant value to build an
+///   array expression, else we fall back to building an array comprehension
 /// \param element_bits: bit width of array/vector elements
 /// \param little_endian: true, iff assumed endianness is little-endian
 /// \param offset_bytes: if set, bytes prior to this offset will be filled
@@ -576,7 +577,9 @@ static exprt unpack_array_vector(
       first_element = *offset_bytes / el_bytes;
       // insert offset_bytes-many nil bytes into the output array
       byte_operands.resize(
-        numeric_cast_v<std::size_t>(*offset_bytes - (*offset_bytes % el_bytes)),
+        numeric_cast_v<std::size_t>(std::min(
+          *offset_bytes - (*offset_bytes % el_bytes),
+          *num_elements * el_bytes)),
         from_integer(0, bv_typet{bits_per_byte}));
     }
   }
@@ -777,24 +780,39 @@ static array_exprt unpack_struct(
       !bit_fields.has_value(),
       "all preceding members should have been processed");
 
-    exprt sub = unpack_rec(
-      member,
-      little_endian,
-      offset_in_member,
-      max_bytes_left,
-      bits_per_byte,
-      ns,
-      true);
+    if(
+      component_bits.has_value() && offset_in_member.has_value() &&
+      *offset_in_member * bits_per_byte >= *component_bits)
+    {
+      // we won't actually need this component, fill in zeros instead of
+      // computing an unpacking
+      byte_operands.resize(
+        byte_operands.size() +
+          numeric_cast_v<std::size_t>(*component_bits / bits_per_byte),
+        from_integer(0, bv_typet{bits_per_byte}));
+    }
+    else
+    {
+      exprt sub = unpack_rec(
+        member,
+        little_endian,
+        offset_in_member,
+        max_bytes_left,
+        bits_per_byte,
+        ns,
+        true);
 
-    byte_operands.insert(
-      byte_operands.end(),
-      std::make_move_iterator(sub.operands().begin()),
-      std::make_move_iterator(sub.operands().end()));
+      byte_operands.insert(
+        byte_operands.end(),
+        std::make_move_iterator(sub.operands().begin()),
+        std::make_move_iterator(sub.operands().end()));
+    }
 
     if(component_bits.has_value())
       member_offset_bits += *component_bits;
   }
 
+  // any remaining bit fields?
   if(bit_fields.has_value())
   {
     process_bit_fields(
