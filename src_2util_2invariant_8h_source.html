@@ -533,29 +533,62 @@ $(document).ready(function(){initNavTree('src_2util_2invariant_8h_source.html','
 <div class="line"><a name="l00499"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a27df75588c56fcdab5a05bb1c7d17d71">  499</a></span>&#160;<span class="preprocessor">#define CHECK_RETURN_STRUCTURED(CONDITION, TYPENAME, ...)                      \</span></div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;<span class="preprocessor">  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))</span></div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160; </div>
-<div class="line"><a name="l00503"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">  503</a></span>&#160;<span class="preprocessor">#define UNREACHABLE INVARIANT(false, &quot;Unreachable&quot;</span>)</div>
-<div class="line"><a name="l00504"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#ac7411ae3cc9abf4b4c71641902a535e7">  504</a></span>&#160;<span class="preprocessor">#define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                  \</span></div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;<span class="preprocessor">  EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))</span></div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160; </div>
-<div class="line"><a name="l00510"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">  510</a></span>&#160;<span class="preprocessor">#define DATA_INVARIANT(CONDITION, REASON) INVARIANT(CONDITION, REASON)</span></div>
-<div class="line"><a name="l00511"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">  511</a></span>&#160;<span class="preprocessor">#define DATA_INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                \</span></div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="preprocessor">  INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, __VA_ARGS__)</span></div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160; </div>
-<div class="line"><a name="l00514"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a4b02fb3797e1647f30591ebd4e0e498f">  514</a></span>&#160;<span class="preprocessor">#define DATA_INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                    \</span></div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;<span class="preprocessor">  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))</span></div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160; </div>
-<div class="line"><a name="l00517"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">  517</a></span>&#160;<span class="preprocessor">#define UNIMPLEMENTED_FEATURE(FEATURE)                                         \</span></div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;<span class="preprocessor">  INVARIANT(false, std::string{&quot;Reached unimplemented &quot;</span>} + (FEATURE))</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="comment">// Legacy annotations</span></div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160; </div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;<span class="comment">// The following should not be used in new code and are only intended</span></div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;<span class="comment">// to migrate documentation and &quot;error handling&quot; in older code.</span></div>
-<div class="line"><a name="l00524"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#ac610b33ec571920dfe1c0f5d93f60516">  524</a></span>&#160;<span class="preprocessor">#define TODO INVARIANT(false, &quot;Todo&quot;</span>)</div>
-<div class="line"><a name="l00525"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a8608fe736d309b01e7bf6c4d414e3bf4">  525</a></span>&#160;<span class="preprocessor">#define UNIMPLEMENTED INVARIANT(false, &quot;Unimplemented&quot;</span>)</div>
-<div class="line"><a name="l00526"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#acf66747571c51ea60ec08d649437c3d9">  526</a></span>&#160;<span class="preprocessor">#define UNHANDLED_CASE INVARIANT(false, &quot;Unhandled case&quot;</span>)</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160; </div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_UTIL_INVARIANT_H</span></div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;<span class="comment">// GCC 12 with -O0 fails reporting missing return when using UNREACHABLE.</span></div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;<span class="comment">// Using __builtin_unreachable fixes this without breaking the invariant.</span></div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;<span class="preprocessor">#  define UNREACHABLE                                                          \</span></div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;<span class="preprocessor">    do                                                                         \</span></div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;<span class="preprocessor">      INVARIANT(false, &quot;Unreachable&quot;</span>);                                         \</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;      __builtin_unreachable();                                                 \</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    } while(false)</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="preprocessor">#  define UNREACHABLE_BECAUSE(REASON)                                          \</span></div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;<span class="preprocessor">    do                                                                         \</span></div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;<span class="preprocessor">      INVARIANT(false, REASON);                                                \</span></div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;<span class="preprocessor">      __builtin_unreachable();                                                 \</span></div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;<span class="preprocessor">    } while(false)</span></div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;<span class="preprocessor">#  define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                \</span></div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="preprocessor">    do                                                                         \</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="preprocessor">      EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__));        \</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;<span class="preprocessor">      __builtin_unreachable();                                                 \</span></div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;<span class="preprocessor">    } while(false)</span></div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00525"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">  525</a></span>&#160;<span class="preprocessor">#  define UNREACHABLE INVARIANT(false, &quot;Unreachable&quot;</span>)</div>
+<div class="line"><a name="l00526"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#af74d5ce38d0812bbe162fc4edbde7134">  526</a></span>&#160;<span class="preprocessor">#  define UNREACHABLE_BECAUSE(REASON) INVARIANT(false, REASON)</span></div>
+<div class="line"><a name="l00527"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#ac7411ae3cc9abf4b4c71641902a535e7">  527</a></span>&#160;<span class="preprocessor">#  define UNREACHABLE_STRUCTURED(TYPENAME, ...)                                \</span></div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;<span class="preprocessor">    EXPAND_MACRO(INVARIANT_STRUCTURED(false, TYPENAME, __VA_ARGS__))</span></div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160; </div>
+<div class="line"><a name="l00534"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">  534</a></span>&#160;<span class="preprocessor">#define DATA_INVARIANT(CONDITION, REASON) INVARIANT(CONDITION, REASON)</span></div>
+<div class="line"><a name="l00535"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">  535</a></span>&#160;<span class="preprocessor">#define DATA_INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, ...)                \</span></div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;<span class="preprocessor">  INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON, __VA_ARGS__)</span></div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160; </div>
+<div class="line"><a name="l00538"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a4b02fb3797e1647f30591ebd4e0e498f">  538</a></span>&#160;<span class="preprocessor">#define DATA_INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...)                    \</span></div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;<span class="preprocessor">  EXPAND_MACRO(INVARIANT_STRUCTURED(CONDITION, TYPENAME, __VA_ARGS__))</span></div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160; </div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;<span class="preprocessor">#if __GNUC__</span></div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;<span class="preprocessor">#  define UNIMPLEMENTED_FEATURE(FEATURE)                                       \</span></div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;<span class="preprocessor">    do                                                                         \</span></div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;<span class="preprocessor">    {                                                                          \</span></div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;<span class="preprocessor">      INVARIANT(false, std::string{&quot;Reached unimplemented &quot;</span>} + (FEATURE));     \</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;      __builtin_unreachable();                                                 \</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;    } while(false)</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00549"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">  549</a></span>&#160;<span class="preprocessor">#  define UNIMPLEMENTED_FEATURE(FEATURE)                                       \</span></div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;<span class="preprocessor">    INVARIANT(false, std::string{&quot;Reached unimplemented &quot;</span>} + (FEATURE))</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160; </div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;<span class="comment">// Legacy annotations</span></div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160; </div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;<span class="comment">// The following should not be used in new code and are only intended</span></div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;<span class="comment">// to migrate documentation and &quot;error handling&quot; in older code.</span></div>
+<div class="line"><a name="l00557"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#ac610b33ec571920dfe1c0f5d93f60516">  557</a></span>&#160;<span class="preprocessor">#define TODO INVARIANT(false, &quot;Todo&quot;</span>)</div>
+<div class="line"><a name="l00558"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#a8608fe736d309b01e7bf6c4d414e3bf4">  558</a></span>&#160;<span class="preprocessor">#define UNIMPLEMENTED INVARIANT(false, &quot;Unimplemented&quot;</span>)</div>
+<div class="line"><a name="l00559"></a><span class="lineno"><a class="line" href="src_2util_2invariant_8h.html#acf66747571c51ea60ec08d649437c3d9">  559</a></span>&#160;<span class="preprocessor">#define UNHANDLED_CASE INVARIANT(false, &quot;Unhandled case&quot;</span>)</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160; </div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_UTIL_INVARIANT_H</span></div>
 <div class="ttc" id="aclassinvariant__failedt_html"><div class="ttname"><a href="classinvariant__failedt.html">invariant_failedt</a></div><div class="ttdoc">A logic error, augmented with a distinguished field to hold a backtrace.</div><div class="ttdef"><b>Definition:</b> <a href="c__errors_8h_source.html#l00027">c_errors.h:28</a></div></div>
 <div class="ttc" id="aclassinvariant__failedt_html_a1b48263ce42e8a61982e539b7465cea0"><div class="ttname"><a href="classinvariant__failedt.html#a1b48263ce42e8a61982e539b7465cea0">invariant_failedt::line</a></div><div class="ttdeci">const int line</div><div class="ttdef"><b>Definition:</b> <a href="c__errors_8h_source.html#l00032">c_errors.h:32</a></div></div>
 <div class="ttc" id="aclassinvariant__failedt_html_a2f11e262368a732ddc11196e7c1a1194"><div class="ttname"><a href="classinvariant__failedt.html#a2f11e262368a732ddc11196e7c1a1194">invariant_failedt::backtrace</a></div><div class="ttdeci">const std::string backtrace</div><div class="ttdef"><b>Definition:</b> <a href="c__errors_8h_source.html#l00033">c_errors.h:33</a></div></div>

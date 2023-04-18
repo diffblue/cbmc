@@ -31,6 +31,7 @@ var src_2util_2invariant_8h =
     [ "UNIMPLEMENTED", "src_2util_2invariant_8h.html#a8608fe736d309b01e7bf6c4d414e3bf4", null ],
     [ "UNIMPLEMENTED_FEATURE", "src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df", null ],
     [ "UNREACHABLE", "src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f", null ],
+    [ "UNREACHABLE_BECAUSE", "src_2util_2invariant_8h.html#af74d5ce38d0812bbe162fc4edbde7134", null ],
     [ "UNREACHABLE_STRUCTURED", "src_2util_2invariant_8h.html#ac7411ae3cc9abf4b4c71641902a535e7", null ],
     [ "assemble_diagnostics", "src_2util_2invariant_8h.html#ac4537263398ba0bc3c76121a4c9aa405", null ],
     [ "assemble_diagnostics", "src_2util_2invariant_8h.html#a1e78b96b30ab3780ae8ded64d5058ce4", null ],

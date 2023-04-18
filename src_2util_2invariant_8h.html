@@ -178,7 +178,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a3af99897b60119951af8961dbd52dd3f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>&#160;&#160;&#160;INVARIANT(false, &quot;Unreachable&quot;)</td></tr>
 <tr class="memdesc:a3af99897b60119951af8961dbd52dd3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">This should be used to mark dead code.  <a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">More...</a><br /></td></tr>
 <tr class="separator:a3af99897b60119951af8961dbd52dd3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7411ae3cc9abf4b4c71641902a535e7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#ac7411ae3cc9abf4b4c71641902a535e7">UNREACHABLE_STRUCTURED</a>(TYPENAME, ...)&#160;&#160;&#160;  <a class="el" href="src_2util_2invariant_8h.html#af59555164cdf505d9eed864dcf4bc920">EXPAND_MACRO</a>(<a class="el" href="src_2util_2invariant_8h.html#a19756947ba9bc0a9e72987004581da53">INVARIANT_STRUCTURED</a>(false, TYPENAME, __VA_ARGS__))</td></tr>
+<tr class="memitem:af74d5ce38d0812bbe162fc4edbde7134"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#af74d5ce38d0812bbe162fc4edbde7134">UNREACHABLE_BECAUSE</a>(REASON)&#160;&#160;&#160;INVARIANT(false, REASON)</td></tr>
+<tr class="separator:af74d5ce38d0812bbe162fc4edbde7134"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7411ae3cc9abf4b4c71641902a535e7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#ac7411ae3cc9abf4b4c71641902a535e7">UNREACHABLE_STRUCTURED</a>(TYPENAME, ...)&#160;&#160;&#160;    <a class="el" href="src_2util_2invariant_8h.html#af59555164cdf505d9eed864dcf4bc920">EXPAND_MACRO</a>(<a class="el" href="src_2util_2invariant_8h.html#a19756947ba9bc0a9e72987004581da53">INVARIANT_STRUCTURED</a>(false, TYPENAME, __VA_ARGS__))</td></tr>
 <tr class="separator:ac7411ae3cc9abf4b4c71641902a535e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3bbb0ca244ed91263aa51797d6b7ad9e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(CONDITION,  REASON)&#160;&#160;&#160;INVARIANT(CONDITION, REASON)</td></tr>
 <tr class="memdesc:a3bbb0ca244ed91263aa51797d6b7ad9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This condition should be used to document that assumptions that are made on goto_functions, goto_programs, exprts, etc.  <a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">More...</a><br /></td></tr>
@@ -187,7 +189,7 @@ Macros</h2></td></tr>
 <tr class="separator:ad2f8f636b117b529e2660a3e0c05293c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b02fb3797e1647f30591ebd4e0e498f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#a4b02fb3797e1647f30591ebd4e0e498f">DATA_INVARIANT_STRUCTURED</a>(CONDITION,  TYPENAME, ...)&#160;&#160;&#160;  <a class="el" href="src_2util_2invariant_8h.html#af59555164cdf505d9eed864dcf4bc920">EXPAND_MACRO</a>(<a class="el" href="src_2util_2invariant_8h.html#a19756947ba9bc0a9e72987004581da53">INVARIANT_STRUCTURED</a>(CONDITION, TYPENAME, __VA_ARGS__))</td></tr>
 <tr class="separator:a4b02fb3797e1647f30591ebd4e0e498f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a163e7c1c82cc098987e5478ee28535df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">UNIMPLEMENTED_FEATURE</a>(FEATURE)&#160;&#160;&#160;  INVARIANT(false, std::string{&quot;Reached unimplemented &quot;} + (FEATURE))</td></tr>
+<tr class="memitem:a163e7c1c82cc098987e5478ee28535df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">UNIMPLEMENTED_FEATURE</a>(FEATURE)&#160;&#160;&#160;    INVARIANT(false, std::string{&quot;Reached unimplemented &quot;} + (FEATURE))</td></tr>
 <tr class="separator:a163e7c1c82cc098987e5478ee28535df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac610b33ec571920dfe1c0f5d93f60516"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="src_2util_2invariant_8h.html#ac610b33ec571920dfe1c0f5d93f60516">TODO</a>&#160;&#160;&#160;INVARIANT(false, &quot;Todo&quot;)</td></tr>
 <tr class="separator:ac610b33ec571920dfe1c0f5d93f60516"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -386,7 +388,7 @@ Variables</h2></td></tr>
 <p>This condition should be used to document that assumptions that are made on goto_functions, goto_programs, exprts, etc. </p>
 <p>being well formed. "The data structure is not corrupt or malformed" </p>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00510">510</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00534">534</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -422,7 +424,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00514">514</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00538">538</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -458,7 +460,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00511">511</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00535">535</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -804,7 +806,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00524">524</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00557">557</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -820,7 +822,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00526">526</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00559">559</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -836,7 +838,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00525">525</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00558">558</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -851,12 +853,12 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">FEATURE</td><td>)</td>
-          <td>&#160;&#160;&#160;  INVARIANT(false, std::string{&quot;Reached unimplemented &quot;} + (FEATURE))</td>
+          <td>&#160;&#160;&#160;    INVARIANT(false, std::string{&quot;Reached unimplemented &quot;} + (FEATURE))</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00517">517</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00549">549</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -874,7 +876,27 @@ Variables</h2></td></tr>
 
 <p>This should be used to mark dead code. </p>
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00503">503</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00525">525</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+
+</div>
+</div>
+<a id="af74d5ce38d0812bbe162fc4edbde7134"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af74d5ce38d0812bbe162fc4edbde7134">&#9670;&nbsp;</a></span>UNREACHABLE_BECAUSE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define UNREACHABLE_BECAUSE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">REASON</td><td>)</td>
+          <td>&#160;&#160;&#160;INVARIANT(false, REASON)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00526">526</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
@@ -899,12 +921,12 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;  <a class="el" href="src_2util_2invariant_8h.html#af59555164cdf505d9eed864dcf4bc920">EXPAND_MACRO</a>(<a class="el" href="src_2util_2invariant_8h.html#a19756947ba9bc0a9e72987004581da53">INVARIANT_STRUCTURED</a>(false, TYPENAME, __VA_ARGS__))</td>
+          <td></td><td>&#160;&#160;&#160;    <a class="el" href="src_2util_2invariant_8h.html#af59555164cdf505d9eed864dcf4bc920">EXPAND_MACRO</a>(<a class="el" href="src_2util_2invariant_8h.html#a19756947ba9bc0a9e72987004581da53">INVARIANT_STRUCTURED</a>(false, TYPENAME, __VA_ARGS__))</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00504">504</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="src_2util_2invariant_8h_source.html#l00527">527</a> of file <a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>.</p>
 
 </div>
 </div>
