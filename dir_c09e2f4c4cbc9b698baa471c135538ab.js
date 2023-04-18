@@ -52,6 +52,8 @@ var dir_c09e2f4c4cbc9b698baa471c135538ab =
     [ "dfcc_pointer_in_range.h", "dfcc__pointer__in__range_8h.html", [
       [ "dfcc_pointer_in_ranget", "classdfcc__pointer__in__ranget.html", "classdfcc__pointer__in__ranget" ]
     ] ],
+    [ "dfcc_root_object.cpp", "dfcc__root__object_8cpp.html", "dfcc__root__object_8cpp" ],
+    [ "dfcc_root_object.h", "dfcc__root__object_8h.html", "dfcc__root__object_8h" ],
     [ "dfcc_spec_functions.cpp", "dfcc__spec__functions_8cpp.html", null ],
     [ "dfcc_spec_functions.h", "dfcc__spec__functions_8h.html", [
       [ "dfcc_spec_functionst", "classdfcc__spec__functionst.html", "classdfcc__spec__functionst" ]
