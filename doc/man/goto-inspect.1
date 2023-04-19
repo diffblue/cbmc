@@ -1,0 +1,33 @@
+.TH GOTO-INSPECT "2" "May 2023" "goto-inspect-5.81.0" "User Commands"
+.SH NAME
+goto\-inspect \- Inspect goto-binaries.
+.SH SYNOPSIS
+.TP
+.B goto\-inspect [\-?] [\-h] [\-\-help]
+show help
+.TP
+.B goto\-inspect \-\-version
+show version and exit
+.TP
+.B goto\-inspect [options] \fIin\fR
+Inspect (show properties, goto-functions, etc of) given goto-binary.  
+.SH DESCRIPTION
+\fBgoto-inspect\fR reads a GOTO binary, and shows goto-functions, properties,
+and other attributes associated with the goto-program.
+.SH OPTIONS
+.SS "User-interface options:"
+.TP
+\fB\-\-show\-goto\-functions\fR
+print the goto-program instructions for the functions contained by the binary.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating temporary
+files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto-cc (1)
+.BR goto-instrument (1)
+.SH COPYRIGHT
+2023, Diffblue Ltd.

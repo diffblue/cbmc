@@ -10,6 +10,7 @@ DIRS = analyses \
        goto-cc \
        goto-checker \
        goto-diff \
+       goto-inspect \
        goto-instrument \
        goto-harness \
        goto-programs \
@@ -36,6 +37,7 @@ all: cbmc.dir \
      goto-cc.dir \
      goto-diff.dir \
      goto-instrument.dir \
+     goto-inspect.dir \
      goto-harness.dir \
      goto-synthesizer.dir \
      symtab2gb.dir \
@@ -81,6 +83,8 @@ goto-harness.dir: util.dir goto-programs.dir langapi.dir linking.dir \
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir
+
+goto-inspect.dir: util.dir goto-programs.dir languages linking.dir
 
 goto-checker.dir: solvers.dir goto-symex.dir goto-programs.dir
 
@@ -190,8 +194,8 @@ doc :
 install: all
 	for b in \
 		cbmc crangler \
-		goto-analyzer goto-cc goto-diff goto-instrument goto-harness goto-synthesizer \
-		symtab2gb ; do \
+		goto-analyzer goto-cc goto-diff goto-instrument goto-inspect goto-harness \
+    goto-synthesizer symtab2gb ; do \
 		  cp $$b/$$b $(PREFIX)/bin/ ; \
 			cp ../doc/man/$$b.1 $(PREFIX)/doc/man/man1/ ; \
 	done

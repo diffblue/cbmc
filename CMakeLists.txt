@@ -158,6 +158,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
               "$<TARGET_FILE:goto-cc>"
               "$<TARGET_FILE:goto-diff>"
               "$<TARGET_FILE:goto-instrument>"
+              "$<TARGET_FILE:goto-inspect>"
               "$<TARGET_FILE:goto-synthesizer>"
               "$<TARGET_FILE:janalyzer>"
               "$<TARGET_FILE:jbmc>"
@@ -230,6 +231,7 @@ cprover_default_properties(
     goto-checker
     goto-diff
     goto-diff-lib
+    goto-inspect
     goto-harness
     goto-instrument
     goto-instrument-lib
