@@ -16,7 +16,7 @@ While quantified expressions with arbitrary Boolean expressions are supported wi
 Concretely, with the SAT backend, the following syntax must be used for quantifiers:
 
 ```
-__CPROVER_forall { *id* *type*; *range* => *boolean expression* }
+__CPROVER_forall { *id* *type*; *range* ==> *boolean expression* }
 __CPROVER_exists { *id* *type*; *range* && *boolean expression* }
 ```
 

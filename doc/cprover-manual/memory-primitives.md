@@ -16,7 +16,7 @@ pointers as having 64 bits. This can be changed by various options (see section
 
 Memory is represented in CBMC as a set of objects. Each object represents a
 contiguous sequence of bytes and is identified via a numeric object ID. For
-example, assuming integers of width 4 and chars of with 1, a global integer
+example, assuming integers of width 4 and chars of width 1, a global integer
 variable would correspond to an object of size 4, and memory allocated via
 `malloc(10)` would correspond to an object of size 10.
 
@@ -273,4 +273,3 @@ programs.
 
 <sup>1</sup> Pointers with negative offsets never point to memory objects.
 Negative values are used internally to detect pointer underflows.
-
