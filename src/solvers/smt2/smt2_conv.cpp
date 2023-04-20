@@ -119,7 +119,6 @@ smt2_convt::smt2_convt(
     use_array_of_bool = true;
     use_as_const = true;
     use_check_sat_assuming = true;
-    use_lambda_for_array = true;
     use_datatypes = true;
     break;
 
