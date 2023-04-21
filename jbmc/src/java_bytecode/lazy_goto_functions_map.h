@@ -126,9 +126,12 @@ public:
            driver_program_can_generate_function_body(name);
   }
 
-  void unload(const key_type &name) const
+  /// Remove the function named \p name from the function map, if it exists.
+  /// \return Returns 0 when \p name was not present, and 1 when \p name was
+  ///   removed.
+  std::size_t unload(const key_type &name) const
   {
-    goto_functions.erase(name);
+    return goto_functions.erase(name);
   }
 
   void ensure_function_loaded(const key_type &name) const
