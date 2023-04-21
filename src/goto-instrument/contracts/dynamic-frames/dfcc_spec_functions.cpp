@@ -136,7 +136,7 @@ void dfcc_spec_functionst::generate_havoc_function(
     not_enough_arguments.empty(),
     "not enough arguments when inlining " + id2string(havoc_function_id));
 
-  utils.set_hide(havoc_function_id, true);
+  goto_model.goto_functions.function_map.at(havoc_function_id).make_hidden();
 
   goto_model.goto_functions.update();
 }
@@ -278,7 +278,7 @@ void dfcc_spec_functionst::to_spec_assigns_function(
   INVARIANT(
     function_pointer_contracts.empty(),
     "discovered function pointer contracts unexpectedly");
-  utils.set_hide(function_id, true);
+  goto_model.goto_functions.function_map.at(function_id).make_hidden();
 }
 
 void dfcc_spec_functionst::to_spec_assigns_instructions(
@@ -367,8 +367,7 @@ void dfcc_spec_functionst::to_spec_frees_function(
   INVARIANT(
     function_pointer_contracts.empty(),
     "discovered function pointer contracts unexpectedly");
-
-  utils.set_hide(function_id, true);
+  goto_model.goto_functions.function_map.at(function_id).make_hidden();
 }
 
 void dfcc_spec_functionst::to_spec_frees_instructions(

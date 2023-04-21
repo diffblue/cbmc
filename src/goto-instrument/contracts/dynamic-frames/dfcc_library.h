@@ -250,9 +250,6 @@ public:
   /// implementation.
   void inhibit_front_end_builtins();
 
-  /// Sets the given hide flag on all instructions of all library functions
-  void set_hide(bool hide);
-
   /// Adds "checked" pragmas to instructions of all library functions
   /// instructions. By default checks are not disabled.
   void disable_checks();

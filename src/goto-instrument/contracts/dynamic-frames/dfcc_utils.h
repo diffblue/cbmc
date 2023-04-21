@@ -230,10 +230,6 @@ public:
   /// \returns True iff \p goto_program is loop free.
   bool has_no_loops(const goto_programt &goto_program);
 
-  /// \brief Sets the given hide flag on all instructions of the function if it
-  /// exists.
-  void set_hide(const irep_idt &function_id, bool hide);
-
   /// \brief Traverses the call tree from the given entry point to identify
   /// functions symbols that are effectively called in the model,
   /// Then goes over all functions of the model and turns the bodies of all
