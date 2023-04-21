@@ -564,18 +564,6 @@ bool dfcc_utilst::has_no_loops(const irep_idt &function_id)
     goto_model.goto_functions.function_map.at(function_id).body);
 }
 
-void dfcc_utilst::set_hide(const irep_idt &function_id, bool hide)
-{
-  auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
-  if(goto_function.body_available())
-  {
-    Forall_goto_program_instructions(inst, goto_function.body)
-    {
-      inst->source_location_nonconst().set(ID_hide, hide);
-    }
-  }
-}
-
 void dfcc_utilst::inhibit_unused_functions(const irep_idt &start)
 {
   PRECONDITION_WITH_DIAGNOSTICS(false, "not yet implemented");

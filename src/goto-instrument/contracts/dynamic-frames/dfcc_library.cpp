@@ -360,7 +360,8 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
   inline_functions();
 
   // hide all instructions in counter example traces
-  set_hide(true);
+  for(auto it : dfcc_fun_symbol)
+    goto_model.goto_functions.function_map.at(it.second.name).make_hidden();
 }
 
 optionalt<dfcc_funt> dfcc_libraryt::get_dfcc_fun(const irep_idt &id) const
@@ -510,14 +511,6 @@ void dfcc_libraryt::inhibit_front_end_builtins()
         goto_function, goto_model.symbol_table, function_id);
     }
   }
-}
-
-/// Sets the given hide flag on all instructions of all library functions
-void dfcc_libraryt::set_hide(bool hide)
-{
-  PRECONDITION(dfcc_libraryt::loaded);
-  for(auto it : dfcc_fun_symbol)
-    utils.set_hide(it.second.name, hide);
 }
 
 const symbolt &dfcc_libraryt::get_instrumented_functions_map_symbol()
