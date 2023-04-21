@@ -28,7 +28,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_spec_functions.h"
-#include "dfcc_utils.h"
 
 #include <map>
 #include <set>
@@ -45,7 +44,6 @@ public:
   dfcc_swap_and_wrapt(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_instrumentt &instrument,
     dfcc_spec_functionst &spec_functions,
@@ -88,7 +86,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
   dfcc_spec_functionst &spec_functions;

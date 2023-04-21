@@ -38,7 +38,6 @@ Author: Remi Delmas, delmarsd@amazon.com
 dfcc_swap_and_wrapt::dfcc_swap_and_wrapt(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_instrumentt &instrument,
   dfcc_spec_functionst &spec_functions,
@@ -46,7 +45,6 @@ dfcc_swap_and_wrapt::dfcc_swap_and_wrapt(
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
-    utils(utils),
     library(library),
     instrument(instrument),
     spec_functions(spec_functions),
@@ -165,33 +163,34 @@ void dfcc_swap_and_wrapt::check_contract(
   const irep_idt &wrapper_id = function_id;
   const irep_idt wrapped_id =
     id2string(wrapper_id) + "_wrapped_for_contract_checking";
-  utils.wrap_function(wrapper_id, wrapped_id);
+  dfcc_utilst::wrap_function(goto_model, wrapper_id, wrapped_id);
 
   // wrapper body
   goto_programt body;
 
-  const auto &wrapper_symbol = utils.get_function_symbol(wrapper_id);
+  const auto &wrapper_symbol =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, wrapper_id);
 
-  auto check_started = utils
-                         .create_static_symbol(
+  auto check_started = dfcc_utilst::create_static_symbol(
+                         goto_model.symbol_table,
+                         bool_typet(),
+                         id2string(function_id),
+                         "__contract_check_in_progress",
+                         wrapper_symbol.location,
+                         wrapper_symbol.mode,
+                         wrapper_symbol.module,
+                         false_exprt())
+                         .symbol_expr();
+
+  auto check_completed = dfcc_utilst::create_static_symbol(
+                           goto_model.symbol_table,
                            bool_typet(),
                            id2string(function_id),
-                           "__contract_check_in_progress",
+                           "__contract_checked_once",
                            wrapper_symbol.location,
                            wrapper_symbol.mode,
                            wrapper_symbol.module,
                            false_exprt())
-                         .symbol_expr();
-
-  auto check_completed = utils
-                           .create_static_symbol(
-                             bool_typet(),
-                             id2string(function_id),
-                             "__contract_checked_once",
-                             wrapper_symbol.location,
-                             wrapper_symbol.mode,
-                             wrapper_symbol.module,
-                             false_exprt())
                            .symbol_expr();
 
   auto check_started_goto = body.add(goto_programt::make_incomplete_goto(
@@ -213,7 +212,8 @@ void dfcc_swap_and_wrapt::check_contract(
   body.add(goto_programt::make_assignment(
     check_started, true_exprt(), wrapper_symbol.location));
 
-  const auto write_set_symbol = utils.create_new_parameter_symbol(
+  const auto write_set_symbol = dfcc_utilst::create_new_parameter_symbol(
+    goto_model.symbol_table,
     function_id,
     "__write_set_to_check",
     library.dfcc_type[dfcc_typet::CAR_SET_PTR]);
@@ -273,7 +273,7 @@ void dfcc_swap_and_wrapt::check_contract(
   goto_model.goto_functions.function_map.at(function_id).body.swap(body);
 
   // extend the signature of the wrapper function with the write set parameter
-  utils.add_parameter(write_set_symbol, function_id);
+  dfcc_utilst::add_parameter(goto_model, write_set_symbol, function_id);
 
   goto_model.goto_functions.function_map.at(wrapper_id).make_hidden();
 
@@ -292,9 +292,10 @@ void dfcc_swap_and_wrapt::replace_with_contract(
   const irep_idt &wrapper_id = function_id;
   const irep_idt wrapped_id =
     id2string(function_id) + "_wrapped_for_replacement_with_contract";
-  utils.wrap_function(function_id, wrapped_id);
+  dfcc_utilst::wrap_function(goto_model, function_id, wrapped_id);
 
-  const auto write_set_symbol = utils.create_new_parameter_symbol(
+  const auto write_set_symbol = dfcc_utilst::create_new_parameter_symbol(
+    goto_model.symbol_table,
     function_id,
     "__write_set_to_check",
     library.dfcc_type[dfcc_typet::CAR_SET_PTR]);
@@ -311,7 +312,8 @@ void dfcc_swap_and_wrapt::replace_with_contract(
     function_pointer_contracts);
 
   body.add(goto_programt::make_end_function(
-    utils.get_function_symbol(wrapper_id).location));
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, wrapper_id)
+      .location));
 
   goto_model.goto_functions.function_map.at(wrapper_id).make_hidden();
 
@@ -319,5 +321,5 @@ void dfcc_swap_and_wrapt::replace_with_contract(
   goto_model.goto_functions.function_map.at(function_id).body.swap(body);
 
   // extend the signature with the new write set parameter
-  utils.add_parameter(write_set_symbol, function_id);
+  dfcc_utilst::add_parameter(goto_model, write_set_symbol, function_id);
 }

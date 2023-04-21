@@ -173,10 +173,8 @@ const std::set<irep_idt> create_assignable_builtin_names()
 /// Class constructor
 dfcc_libraryt::dfcc_libraryt(
   goto_modelt &goto_model,
-  dfcc_utilst &utils,
   message_handlert &message_handler)
   : goto_model(goto_model),
-    utils(utils),
     message_handler(message_handler),
     log(message_handler),
     dfcc_type_to_name(create_dfcc_type_to_name()),
@@ -411,7 +409,8 @@ void dfcc_libraryt::inline_functions()
   inlined = true;
   for(const auto &function_id : to_inline)
   {
-    utils.inline_function(dfcc_fun_to_name.at(function_id));
+    dfcc_utilst::inline_function(
+      goto_model, dfcc_fun_to_name.at(function_id), message_handler);
   }
 }
 
@@ -523,7 +522,8 @@ const symbolt &dfcc_libraryt::get_instrumented_functions_map_symbol()
   auto map_type =
     array_typet(unsigned_char_type(), infinity_exprt(size_type()));
 
-  return utils.create_static_symbol(
+  return dfcc_utilst::create_static_symbol(
+    goto_model.symbol_table,
     map_type,
     "",
     "__dfcc_instrumented_functions",
@@ -544,8 +544,9 @@ void dfcc_libraryt::add_instrumented_functions_map_init_instructions(
 
   for(auto &function_id : instrumented_functions)
   {
-    auto object_id = pointer_object(
-      address_of_exprt(utils.get_function_symbol(function_id).symbol_expr()));
+    auto object_id = pointer_object(address_of_exprt(
+      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
+        .symbol_expr()));
     auto index_expr = index_exprt(instrumented_functions_map, object_id);
     dest.add(goto_programt::make_assignment(
       index_expr, from_integer(1, unsigned_char_type()), source_location));

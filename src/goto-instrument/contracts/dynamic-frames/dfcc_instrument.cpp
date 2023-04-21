@@ -48,21 +48,18 @@ std::set<irep_idt> dfcc_instrumentt::function_cache;
 dfcc_instrumentt::dfcc_instrumentt(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_spec_functionst &spec_functions,
   dfcc_contract_clauses_codegent &contract_clauses_codegen)
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
-    utils(utils),
     library(library),
     spec_functions(spec_functions),
     contract_clauses_codegen(contract_clauses_codegen),
     instrument_loop(
       goto_model,
       message_handler,
-      utils,
       library,
       spec_functions,
       contract_clauses_codegen),
@@ -257,16 +254,17 @@ void dfcc_instrumentt::instrument_harness_function(
     to_pointer_type(library.dfcc_type[dfcc_typet::WRITE_SET_PTR]));
 
   // create a local write set symbol
-  const auto &function_symbol = utils.get_function_symbol(function_id);
-  const auto &write_set = utils
-                            .create_symbol(
-                              library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
-                              function_id,
-                              "__write_set_to_check",
-                              function_symbol.location,
-                              function_symbol.mode,
-                              function_symbol.module,
-                              false)
+  const auto &function_symbol =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
+  const auto &write_set = dfcc_utilst::create_symbol(
+                            goto_model.symbol_table,
+                            library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+                            function_id,
+                            "__write_set_to_check",
+                            function_symbol.location,
+                            function_symbol.mode,
+                            function_symbol.module,
+                            false)
                             .symbol_expr();
 
   std::set<symbol_exprt> local_statics = get_local_statics(function_id);
@@ -335,11 +333,11 @@ void dfcc_instrumentt::instrument_function(
     found != goto_model.goto_functions.function_map.end(),
     "Function '" + id2string(function_id) + "' must exist in the model.");
 
-  const auto &write_set = utils
-                            .add_parameter(
-                              function_id,
-                              "__write_set_to_check",
-                              library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
+  const auto &write_set = dfcc_utilst::add_parameter(
+                            goto_model,
+                            function_id,
+                            "__write_set_to_check",
+                            library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
                             .symbol_expr();
 
   std::set<symbol_exprt> local_statics = get_local_statics(function_id);
@@ -373,11 +371,11 @@ void dfcc_instrumentt::instrument_wrapped_function(
     "Function '" + id2string(wrapped_function_id) +
       "' must exist in the model.");
 
-  const auto &write_set = utils
-                            .add_parameter(
-                              wrapped_function_id,
-                              "__write_set_to_check",
-                              library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
+  const auto &write_set = dfcc_utilst::add_parameter(
+                            goto_model,
+                            wrapped_function_id,
+                            "__write_set_to_check",
+                            library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
                             .symbol_expr();
 
   std::set<symbol_exprt> local_statics = get_local_statics(initial_function_id);
@@ -411,7 +409,6 @@ void dfcc_instrumentt::instrument_goto_program(
     dfcc_loop_contract_modet::NONE,
     goto_model.symbol_table,
     message_handler,
-    utils,
     library);
 
   // instrument instructions
@@ -461,7 +458,6 @@ void dfcc_instrumentt::instrument_goto_function(
     loop_contract_mode,
     goto_model.symbol_table,
     message_handler,
-    utils,
     library);
 
   // instrument instructions
@@ -577,7 +573,7 @@ void dfcc_instrumentt::insert_add_decl_call(
   goto_programt payload;
   const auto &target_location = target->source_location();
   auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-    utils.make_null_check_expr(write_set), target_location));
+    dfcc_utilst::make_null_check_expr(write_set), target_location));
 
   payload.add(goto_programt::make_function_call(
     library.write_set_add_decl_call(
@@ -624,7 +620,7 @@ void dfcc_instrumentt::insert_record_dead_call(
   goto_programt payload;
   const auto &target_location = target->source_location();
   auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-    utils.make_null_check_expr(write_set), target_location));
+    dfcc_utilst::make_null_check_expr(write_set), target_location));
 
   payload.add(goto_programt::make_function_call(
     library.write_set_record_dead_call(
@@ -667,14 +663,15 @@ void dfcc_instrumentt::instrument_lhs(
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
 {
-  const auto &mode = utils.get_function_symbol(function_id).mode;
+  const auto &mode =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
 
   goto_programt payload;
 
   const auto &lhs_source_location = target->source_location();
   auto &write_set = cfg_info.get_write_set(target);
   auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-    utils.make_null_check_expr(write_set), lhs_source_location));
+    dfcc_utilst::make_null_check_expr(write_set), lhs_source_location));
 
   source_locationt check_source_location(target->source_location());
   check_source_location.set_property_class("assigns");
@@ -694,13 +691,15 @@ void dfcc_instrumentt::instrument_lhs(
     // ASSIGN lhs := rhs;
     // ```
 
-    auto &check_sym = utils.create_symbol(
+    auto &check_sym = dfcc_utilst::create_symbol(
+      goto_model.symbol_table,
       bool_typet(),
       id2string(function_id),
       "__check_lhs_assignment",
       lhs_source_location,
       mode,
-      utils.get_function_symbol(function_id).module,
+      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
+        .module,
       false);
 
     const auto &check_var = check_sym.symbol_expr();
@@ -713,7 +712,7 @@ void dfcc_instrumentt::instrument_lhs(
         write_set,
         typecast_exprt::conditional_cast(
           address_of_exprt(lhs), pointer_type(empty_typet{})),
-        utils.make_sizeof_expr(lhs),
+        dfcc_utilst::make_sizeof_expr(lhs, ns),
         lhs_source_location),
       lhs_source_location));
 
@@ -798,7 +797,7 @@ void dfcc_instrumentt::instrument_assign(
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-      utils.make_null_check_expr(write_set), target_location));
+      dfcc_utilst::make_null_check_expr(write_set), target_location));
 
     payload.add(goto_programt::make_function_call(
       library.write_set_record_dead_call(
@@ -831,7 +830,7 @@ void dfcc_instrumentt::instrument_assign(
 
     goto_programt payload;
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-      utils.make_null_check_expr(write_set), target_location));
+      dfcc_utilst::make_null_check_expr(write_set), target_location));
 
     payload.add(goto_programt::make_function_call(
       library.write_set_add_allocated_call(write_set, lhs, target_location),
@@ -951,11 +950,12 @@ void dfcc_instrumentt::instrument_deallocate_call(
   // ----
   // CALL __CPROVER_deallocate(ptr);
   // ```
-  const auto &mode = utils.get_function_symbol(function_id).mode;
+  const auto &mode =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
   goto_programt payload;
 
   auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-    utils.make_null_check_expr(write_set), target_location));
+    dfcc_utilst::make_null_check_expr(write_set), target_location));
 
   auto &check_sym = get_fresh_aux_symbol(
     bool_typet(),
@@ -1054,11 +1054,13 @@ void dfcc_instrumentt::instrument_other(
     // ----
     // OTHER {statement = array_set, args = {dest, value}};
     // ```
-    const auto &mode = utils.get_function_symbol(function_id).mode;
+    const auto &mode =
+      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
+        .mode;
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-      utils.make_null_check_expr(write_set), target_location));
+      dfcc_utilst::make_null_check_expr(write_set), target_location));
 
     auto &check_sym = get_fresh_aux_symbol(
       bool_typet(),
@@ -1113,11 +1115,13 @@ void dfcc_instrumentt::instrument_other(
     // ----
     // OTHER {statement = array_replace, args = {dest, src}};
     // ```
-    const auto &mode = utils.get_function_symbol(function_id).mode;
+    const auto &mode =
+      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
+        .mode;
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-      utils.make_null_check_expr(write_set), target_location));
+      dfcc_utilst::make_null_check_expr(write_set), target_location));
 
     auto &check_sym = get_fresh_aux_symbol(
       bool_typet(),
@@ -1166,11 +1170,13 @@ void dfcc_instrumentt::instrument_other(
     // ASSERT(check_havoc_object);
     // DEAD check_havoc_object;
     // ```
-    const auto &mode = utils.get_function_symbol(function_id).mode;
+    const auto &mode =
+      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
+        .mode;
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
-      utils.make_null_check_expr(write_set), target_location));
+      dfcc_utilst::make_null_check_expr(write_set), target_location));
 
     auto &check_sym = get_fresh_aux_symbol(
       bool_typet(),

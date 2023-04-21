@@ -30,7 +30,6 @@ Date: August 2022
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_spec_functions.h"
-#include "dfcc_utils.h"
 #include "dfcc_wrapper_program.h"
 
 std::map<irep_idt, dfcc_contract_functionst>
@@ -39,7 +38,6 @@ std::map<irep_idt, dfcc_contract_functionst>
 dfcc_contract_handlert::dfcc_contract_handlert(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_instrumentt &instrument,
   dfcc_lift_memory_predicatest &memory_predicates,
@@ -48,7 +46,6 @@ dfcc_contract_handlert::dfcc_contract_handlert(
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
-    utils(utils),
     library(library),
     instrument(instrument),
     memory_predicates(memory_predicates),
@@ -75,7 +72,6 @@ dfcc_contract_handlert::get_contract_functions(const irep_idt &contract_id)
          get_pure_contract_symbol(contract_id),
          goto_model,
          message_handler,
-         utils,
          library,
          spec_functions,
          contract_clauses_codegen,
@@ -100,13 +96,12 @@ void dfcc_contract_handlert::add_contract_instructions(
 {
   dfcc_wrapper_programt(
     contract_mode,
-    utils.get_function_symbol(wrapper_id),
-    utils.get_function_symbol(wrapped_id),
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, wrapper_id),
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, wrapped_id),
     get_contract_functions(contract_id),
     wrapper_write_set_symbol,
     goto_model,
     message_handler,
-    utils,
     library,
     instrument,
     memory_predicates)
@@ -124,7 +119,8 @@ const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
     if(function_id_opt.has_value())
     {
       auto function_id = function_id_opt.value();
-      const auto &function_symbol = utils.get_function_symbol(function_id);
+      const auto &function_symbol =
+        dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
       check_signature_compat(
         function_id,
         to_code_type(function_symbol.type),
@@ -145,7 +141,8 @@ const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
         "to derive a default contract");
 
     auto function_id = function_id_opt.value();
-    const auto &function_symbol = utils.get_function_symbol(function_id);
+    const auto &function_symbol =
+      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
 
     log.warning() << "Contract '" << contract_id
                   << "' not found, deriving empty pure contract '"

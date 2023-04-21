@@ -18,17 +18,14 @@ Author: Remi Delmas, delmarsd@amazon.com
 
 #include "dfcc_library.h"
 #include "dfcc_loop_contract_mode.h"
-#include "dfcc_utils.h"
 
 dfcc_spec_functionst::dfcc_spec_functionst(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library)
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
-    utils(utils),
     library(library),
     ns(goto_model.symbol_table)
 {
@@ -54,10 +51,12 @@ void dfcc_spec_functionst::generate_havoc_function(
     "DFCC: havoc function id '" + id2string(havoc_function_id) +
       "' already exists");
 
-  const auto &function_symbol = utils.get_function_symbol(function_id);
+  const auto &function_symbol =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
 
   // create the write_set symbol used as input by the havoc function
-  const auto &write_set_symbol = utils.create_symbol(
+  const auto &write_set_symbol = dfcc_utilst::create_symbol(
+    goto_model.symbol_table,
     library.dfcc_type[dfcc_typet::CAR_SET_PTR],
     id2string(havoc_function_id),
     "__write_set_to_havoc",
@@ -118,12 +117,14 @@ void dfcc_spec_functionst::generate_havoc_function(
   std::set<irep_idt> missing_function;
   std::set<irep_idt> recursive_call;
   std::set<irep_idt> not_enough_arguments;
-  utils.inline_function(
+  dfcc_utilst::inline_function(
+    goto_model,
     havoc_function_id,
     no_body,
     recursive_call,
     missing_function,
-    not_enough_arguments);
+    not_enough_arguments,
+    message_handler);
   INVARIANT(
     no_body.empty(),
     "no body warnings when inlining " + id2string(havoc_function_id));
@@ -201,7 +202,8 @@ void dfcc_spec_functionst::generate_havoc_instructions(
         // declare a local var to store targets havoced via nondet assignment
         auto &target_type = get_target_type(ins_it->call_arguments().at(0));
 
-        const auto &target_symbol = utils.create_symbol(
+        const auto &target_symbol = dfcc_utilst::create_symbol(
+          goto_model.symbol_table,
           pointer_type(target_type),
           id2string(function_id),
           "__havoc_target",
@@ -218,7 +220,7 @@ void dfcc_spec_functionst::generate_havoc_instructions(
 
         auto goto_instruction =
           havoc_program.add(goto_programt::make_incomplete_goto(
-            utils.make_null_check_expr(target_expr), location));
+            dfcc_utilst::make_null_check_expr(target_expr), location));
 
         // create nondet assignment to the target
         side_effect_expr_nondett nondet(target_type, location);
@@ -257,16 +259,16 @@ void dfcc_spec_functionst::to_spec_assigns_function(
 
   // add write_set parameter
   const exprt write_set_to_fill =
-    utils
-      .add_parameter(
-        function_id,
-        "__write_set_to_fill",
-        library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
+    dfcc_utilst::add_parameter(
+      goto_model,
+      function_id,
+      "__write_set_to_fill",
+      library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
       .symbol_expr();
 
   to_spec_assigns_instructions(
     write_set_to_fill,
-    utils.get_function_symbol(function_id).mode,
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode,
     goto_function.body,
     nof_targets);
 
@@ -340,16 +342,16 @@ void dfcc_spec_functionst::to_spec_frees_function(
 
   // add __dfcc_set parameter
   const exprt &write_set_to_fill =
-    utils
-      .add_parameter(
-        function_id,
-        "__write_set_to_fill",
-        library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
+    dfcc_utilst::add_parameter(
+      goto_model,
+      function_id,
+      "__write_set_to_fill",
+      library.dfcc_type[dfcc_typet::WRITE_SET_PTR])
       .symbol_expr();
 
   to_spec_frees_instructions(
     write_set_to_fill,
-    utils.get_function_symbol(function_id).mode,
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode,
     goto_function.body,
     nof_targets);
 

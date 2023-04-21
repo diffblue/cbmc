@@ -27,7 +27,6 @@ Date: August 2022
 class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
-class dfcc_utilst;
 class dfcc_instrumentt;
 class dfcc_lift_memory_predicatest;
 class dfcc_spec_functionst;
@@ -69,7 +68,6 @@ public:
   dfcc_contract_handlert(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_instrumentt &instrument,
     dfcc_lift_memory_predicatest &memory_predicates,
@@ -119,7 +117,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
   dfcc_lift_memory_predicatest &memory_predicates;

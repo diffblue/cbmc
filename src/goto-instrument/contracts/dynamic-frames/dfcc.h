@@ -41,7 +41,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_loop_contract_mode.h"
 #include "dfcc_spec_functions.h"
 #include "dfcc_swap_and_wrap.h"
-#include "dfcc_utils.h"
 
 #include <map>
 #include <set>
@@ -217,7 +216,6 @@ protected:
 
   // Singletons that hold the global state of the program transformation
   // (caches etc.)
-  dfcc_utilst utils;
   dfcc_libraryt library;
   namespacet ns;
   dfcc_spec_functionst spec_functions;

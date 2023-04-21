@@ -148,7 +148,6 @@ class message_handlert;
 class symbolt;
 class symbol_exprt;
 class typet;
-class dfcc_utilst;
 
 /// Class interface to library types and functions defined in
 /// `cprover_contracts.c`.
@@ -157,7 +156,6 @@ class dfcc_libraryt
 public:
   dfcc_libraryt(
     goto_modelt &goto_model,
-    dfcc_utilst &utils,
     message_handlert &lmessage_handler);
 
 protected:
@@ -175,7 +173,6 @@ protected:
   static bool malloc_free_fixed;
 
   goto_modelt &goto_model;
-  dfcc_utilst &utils;
   message_handlert &message_handler;
   messaget log;
 

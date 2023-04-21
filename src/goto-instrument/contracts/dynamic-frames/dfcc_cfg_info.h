@@ -29,7 +29,6 @@ Date: March 2023
 #include <set>
 #include <unordered_set>
 
-class dfcc_utilst;
 class dfcc_libraryt;
 class goto_functiont;
 class message_handlert;
@@ -240,9 +239,8 @@ public:
     goto_functiont &goto_function,
     const exprt &top_level_write_set,
     const dfcc_loop_contract_modet loop_contract_mode,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library);
 
   void output(std::ostream &out) const;

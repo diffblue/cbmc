@@ -188,23 +188,20 @@ dfcct::dfcct(
     to_exclude_from_nondet_static(to_exclude_from_nondet_static),
     message_handler(message_handler),
     log(message_handler),
-    utils(goto_model, message_handler),
-    library(goto_model, utils, message_handler),
+    library(goto_model, message_handler),
     ns(goto_model.symbol_table),
-    spec_functions(goto_model, message_handler, utils, library),
-    contract_clauses_codegen(goto_model, message_handler, utils, library),
+    spec_functions(goto_model, message_handler, library),
+    contract_clauses_codegen(goto_model, message_handler, library),
     instrument(
       goto_model,
       message_handler,
-      utils,
       library,
       spec_functions,
       contract_clauses_codegen),
-    memory_predicates(goto_model, utils, library, instrument, message_handler),
+    memory_predicates(goto_model, library, instrument, message_handler),
     contract_handler(
       goto_model,
       message_handler,
-      utils,
       library,
       instrument,
       memory_predicates,
@@ -213,7 +210,6 @@ dfcct::dfcct(
     swap_and_wrap(
       goto_model,
       message_handler,
-      utils,
       library,
       instrument,
       spec_functions,
@@ -227,7 +223,7 @@ void dfcct::check_transform_goto_model_preconditions()
 {
   // check that harness function exists
   PRECONDITION_WITH_DIAGNOSTICS(
-    utils.function_symbol_with_body_exists(harness_id),
+    dfcc_utilst::function_symbol_with_body_exists(goto_model, harness_id),
     "Harness function '" + id2string(harness_id) +
       "' either not found or has no body");
 
@@ -235,7 +231,7 @@ void dfcct::check_transform_goto_model_preconditions()
   {
     auto pair = to_check.value();
     PRECONDITION_WITH_DIAGNOSTICS(
-      utils.function_symbol_with_body_exists(pair.first),
+      dfcc_utilst::function_symbol_with_body_exists(goto_model, pair.first),
       "Function to check '" + id2string(pair.first) +
         "' either not found or has no body");
 
@@ -268,7 +264,7 @@ void dfcct::check_transform_goto_model_preconditions()
     // for functions to replace with contracts we don't require the replaced
     // function to have a body because only the contract is actually used
     PRECONDITION_WITH_DIAGNOSTICS(
-      utils.function_symbol_exists(pair.first),
+      dfcc_utilst::function_symbol_exists(goto_model, pair.first),
       "Function to replace '" + id2string(pair.first) + "' not found");
 
     // triggers signature compatibility checking
@@ -454,7 +450,7 @@ void dfcct::wrap_discovered_function_pointer_contracts()
       {
         // we need to swap it with itself
         PRECONDITION_WITH_DIAGNOSTICS(
-          utils.function_symbol_exists(str),
+          dfcc_utilst::function_symbol_exists(goto_model, str),
           "Function pointer contract '" + str + "' not found.");
 
         // triggers signature compatibility checking
@@ -581,7 +577,7 @@ void dfcct::reinitialize_model()
     goto_model.symbol_table.symbols.find(goto_functionst::entry_point()));
   // regenerate the CPROVER start function
   generate_ansi_c_start_function(
-    utils.get_function_symbol(harness_id),
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, harness_id),
     goto_model.symbol_table,
     message_handler,
     c_object_factory_parameterst(options));
