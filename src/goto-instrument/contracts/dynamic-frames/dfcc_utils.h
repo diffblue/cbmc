@@ -211,9 +211,6 @@ public:
     std::set<irep_idt> &missing_function,
     std::set<irep_idt> &not_enough_arguments);
 
-  /// \returns True iff \p function_id is loop free.
-  bool has_no_loops(const irep_idt &function_id);
-
   /// \brief Inlines the given program, aborts on recursive calls during
   /// inlining.
   void inline_program(goto_programt &program);
@@ -226,9 +223,6 @@ public:
     std::set<irep_idt> &recursive_call,
     std::set<irep_idt> &missing_function,
     std::set<irep_idt> &not_enough_arguments);
-
-  /// \returns True iff \p goto_program is loop free.
-  bool has_no_loops(const goto_programt &goto_program);
 
   /// \brief Traverses the call tree from the given entry point to identify
   /// functions symbols that are effectively called in the model,

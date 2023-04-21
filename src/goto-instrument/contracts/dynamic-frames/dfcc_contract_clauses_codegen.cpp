@@ -64,7 +64,7 @@ void dfcc_contract_clauses_codegent::gen_spec_assigns_instructions(
   // inline resulting program and check for loops
   inline_and_check_warnings(dest);
   PRECONDITION_WITH_DIAGNOSTICS(
-    utils.has_no_loops(dest),
+    is_loop_free(dest, ns, log),
     "loops in assigns clause specification functions must be unwound before "
     "contracts instrumentation");
 }
@@ -91,7 +91,7 @@ void dfcc_contract_clauses_codegent::gen_spec_frees_instructions(
   // inline resulting program and check for loops
   inline_and_check_warnings(dest);
   PRECONDITION_WITH_DIAGNOSTICS(
-    utils.has_no_loops(dest),
+    is_loop_free(dest, ns, log),
     "loops in assigns clause specification functions must be unwound before "
     "contracts instrumentation");
 }
