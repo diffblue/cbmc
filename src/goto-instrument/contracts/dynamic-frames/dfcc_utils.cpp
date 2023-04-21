@@ -552,8 +552,3 @@ void dfcc_utilst::inline_program(
     decorated.get_not_enough_arguments_set().end());
   goto_model.goto_functions.update();
 }
-
-void dfcc_utilst::inhibit_unused_functions(const irep_idt &start)
-{
-  PRECONDITION_WITH_DIAGNOSTICS(false, "not yet implemented");
-}
