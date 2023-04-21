@@ -182,9 +182,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae4fd7fd1b2330bab861ef7b1852def4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab346cd35c77b7d3ef83d76d1ae2c57aa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__utilst.html#ab346cd35c77b7d3ef83d76d1ae2c57aa">has_no_loops</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="separator:ab346cd35c77b7d3ef83d76d1ae2c57aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7621dce76bedf27a4cfc56f6df0aad30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__utilst.html#a7621dce76bedf27a4cfc56f6df0aad30">set_hide</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, bool hide)</td></tr>
-<tr class="memdesc:a7621dce76bedf27a4cfc56f6df0aad30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the given hide flag on all instructions of the function if it exists.  <a href="classdfcc__utilst.html#a7621dce76bedf27a4cfc56f6df0aad30">More...</a><br /></td></tr>
-<tr class="separator:a7621dce76bedf27a4cfc56f6df0aad30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fe1087061690b87ccc77a8f181cdc07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__utilst.html#a7fe1087061690b87ccc77a8f181cdc07">inhibit_unused_functions</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;start)</td></tr>
 <tr class="memdesc:a7fe1087061690b87ccc77a8f181cdc07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traverses the call tree from the given entry point to identify functions symbols that are effectively called in the model, Then goes over all functions of the model and turns the bodies of all functions that are not in the used function set into:  <a href="classdfcc__utilst.html#a7fe1087061690b87ccc77a8f181cdc07">More...</a><br /></td></tr>
 <tr class="separator:a7fe1087061690b87ccc77a8f181cdc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -845,7 +842,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00579">579</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00567">567</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1056,38 +1053,6 @@ Protected Attributes</h2></td></tr>
 <p>Returns the expression <code>sizeof(expr)</code>. </p>
 
 <p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00446">446</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a7621dce76bedf27a4cfc56f6df0aad30"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7621dce76bedf27a4cfc56f6df0aad30">&#9670;&nbsp;</a></span>set_hide()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dfcc_utilst::set_hide </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>function_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>hide</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets the given hide flag on all instructions of the function if it exists. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00567">567</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>

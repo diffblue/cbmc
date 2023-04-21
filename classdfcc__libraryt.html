@@ -137,9 +137,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9f703fb3912c7a8f2e10c3ddcf3c85a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a9f703fb3912c7a8f2e10c3ddcf3c85a7">inhibit_front_end_builtins</a> ()</td></tr>
 <tr class="memdesc:a9f703fb3912c7a8f2e10c3ddcf3c85a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an ASSERT(false) body to all front-end functions __CPROVER_object_whole __CPROVER_object_upto __CPROVER_object_from __CPROVER_assignable __CPROVER_freeable An error will be triggered in case calls to these functions occur outside of a contrat clause and were hence not mapped to their library implementation.  <a href="classdfcc__libraryt.html#a9f703fb3912c7a8f2e10c3ddcf3c85a7">More...</a><br /></td></tr>
 <tr class="separator:a9f703fb3912c7a8f2e10c3ddcf3c85a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52b01a3df22b1804205880e9ce122c43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#a52b01a3df22b1804205880e9ce122c43">set_hide</a> (bool hide)</td></tr>
-<tr class="memdesc:a52b01a3df22b1804205880e9ce122c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the given hide flag on all instructions of all library functions.  <a href="classdfcc__libraryt.html#a52b01a3df22b1804205880e9ce122c43">More...</a><br /></td></tr>
-<tr class="separator:a52b01a3df22b1804205880e9ce122c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbd1ff30e88053a0738af9c7508349d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__libraryt.html#adbd1ff30e88053a0738af9c7508349d3">disable_checks</a> ()</td></tr>
 <tr class="memdesc:adbd1ff30e88053a0738af9c7508349d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds "checked" pragmas to instructions of all library functions instructions.  <a href="classdfcc__libraryt.html#adbd1ff30e88053a0738af9c7508349d3">More...</a><br /></td></tr>
 <tr class="separator:adbd1ff30e88053a0738af9c7508349d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,7 +370,7 @@ Private Attributes</h2></td></tr>
 
 <p>Generates instructions to initialize the instrumented function map symbol from the given set of instrumented function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00544">544</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00537">537</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -411,7 +408,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a32aea85f6c7e488872e663c0df6eca8c">__CPROVER_contracts_check_replace_ensures_was_freed_preconditions</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00836">836</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00829">829</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -463,7 +460,7 @@ Private Attributes</h2></td></tr>
 <p>Fixes function calls to malloc and free in library functions. </p>
 <p>Change calls to <code>__CPROVER_contracts_malloc</code> into calls to <code>malloc</code> Change calls to <code>__CPROVER_contracts_free</code> into calls to <code>free</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00463">463</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00464">464</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -485,7 +482,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the dfcc_funt that corresponds to the given id if any. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00366">366</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00367">367</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -507,7 +504,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the name of the given dfcc_funt. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00380">380</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00381">381</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -576,7 +573,7 @@ Private Attributes</h2></td></tr>
 <p>Returns the "__dfcc_instrumented_functions" symbol or creates it if it does not exist already. </p>
 <p>This symbol is an unbounded map of booleans indexed by function pointer ID, meant to have value true for instrumented functions and false for non-instrumented functions. Initialisation instructions for this map are generated by <a class="el" href="classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c">add_instrumented_functions_map_init_instructions</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00523">523</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00516">516</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -626,7 +623,7 @@ Private Attributes</h2></td></tr>
 
 <p>Adds an ASSERT(false) body to all front-end functions __CPROVER_object_whole __CPROVER_object_upto __CPROVER_object_from __CPROVER_assignable __CPROVER_freeable An error will be triggered in case calls to these functions occur outside of a contrat clause and were hence not mapped to their library implementation. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00494">494</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00495">495</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -655,7 +652,7 @@ Private Attributes</h2></td></tr>
 
 <p>Inlines library functions that need to be inlined before use. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00407">407</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00408">408</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -677,7 +674,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff the given id is one of the library symbols. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00375">375</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00376">376</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -738,7 +735,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#adf9fba247bc34e6fb97a9677ce9eb17c">__CPROVER_contracts_link_allocated</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00811">811</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00804">804</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -776,7 +773,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a018a0d9ca28d2b11eda9af5f9f1f3058">__CPROVER_contracts_link_deallocated</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00823">823</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00816">816</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -814,7 +811,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#acd3d4aa41c85488781b59c0663b295cd">__CPROVER_contracts_link_is_fresh</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00799">799</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00792">792</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -869,7 +866,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a3d6a581e4c717aa75b7dacc75842ed2f">__CPROVER_contracts_obj_set_create_indexed_by_object_id</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00850">850</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00843">843</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -901,29 +898,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a03f6875f9e266f7a611d03c0a1bb5a8b">__CPROVER_contracts_obj_set_release</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00862">862</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a52b01a3df22b1804205880e9ce122c43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52b01a3df22b1804205880e9ce122c43">&#9670;&nbsp;</a></span>set_hide()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dfcc_libraryt::set_hide </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>hide</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets the given hide flag on all instructions of all library functions. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00516">516</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00855">855</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -951,7 +926,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00429">429</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00430">430</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -989,7 +964,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#af9410e73f11747d2c05b4670cbf1ad59">__CPROVER_contracts_write_set_add_allocated</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00606">606</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00599">599</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1027,7 +1002,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a68e5eb536f605bd32306f80d58cd83d8">__CPROVER_contracts_write_set_add_decl</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00618">618</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00611">611</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1065,7 +1040,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#ad6b0d79ca5c998eb350b993c2fb364a6">__CPROVER_contracts_write_set_check_allocated_deallocated_is_empty</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00655">655</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00648">648</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1109,7 +1084,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a5110f848c04f97d14ab26b1976d60cf7">__CPROVER_contracts_write_set_check_array_copy</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00698">698</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00691">691</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1159,7 +1134,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a700f2f33a49198001f1d0168c5ca2f55">__CPROVER_contracts_write_set_check_array_replace</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00712">712</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00705">705</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1203,7 +1178,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#afe1a3f3922f3d20be5c3eff10135456d">__CPROVER_contracts_write_set_check_array_set</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00684">684</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00677">677</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1253,7 +1228,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#aa194dfba197e43707ff5b99ed45a542d">__CPROVER_contracts_write_set_check_assignment</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00669">669</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00662">662</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1297,7 +1272,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a9884139906c3e0ee3e8400ad6fe8ed9a">__CPROVER_contracts_write_set_check_assigns_clause_inclusion</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00756">756</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00749">749</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1341,7 +1316,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#aaa11edbaf34a651c60f3024fc9488df1">__CPROVER_contracts_write_set_check_deallocate</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00741">741</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00734">734</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1385,7 +1360,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#abac6c9f45b98a3fdf581867f033a0568">__CPROVER_contracts_write_set_check_frees_clause_inclusion</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00772">772</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00765">765</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1429,7 +1404,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a13a068c5664dbdb170faaf882dee9a04">__CPROVER_contracts_write_set_check_havoc_object</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00727">727</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00720">720</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1509,7 +1484,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00563">563</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00556">556</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1547,7 +1522,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a5a77e5845872e1f36559d4f8a1d3eb58">__CPROVER_contracts_write_set_deallocate_freeable</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00787">787</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00780">780</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1585,7 +1560,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a275983123d6a0efe37c2292ff6d94acb">__CPROVER_contracts_write_set_record_dead</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00630">630</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00623">623</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1623,7 +1598,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a0d15ef1621aaeab7b113315bace80158">__CPROVER_contracts_write_set_record_deallocated</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00642">642</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00635">635</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -1655,7 +1630,7 @@ Private Attributes</h2></td></tr>
 
 <p>Builds call to <a class="el" href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00595">595</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00588">588</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>

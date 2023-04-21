@@ -25,7 +25,6 @@ var classdfcc__utilst =
     [ "make_map_start_address", "classdfcc__utilst.html#acc509eadd32340b3aef283afd4dacfbf", null ],
     [ "make_null_check_expr", "classdfcc__utilst.html#a395032e90f53e46e039cd45eb82e6731", null ],
     [ "make_sizeof_expr", "classdfcc__utilst.html#af3b542facca4f75b733b7d16e5de3c85", null ],
-    [ "set_hide", "classdfcc__utilst.html#a7621dce76bedf27a4cfc56f6df0aad30", null ],
     [ "symbol_exists", "classdfcc__utilst.html#a6cab060235f083e41b92bca621b6d0b5", null ],
     [ "wrap_function", "classdfcc__utilst.html#aa2c98bb82b9c75558f89d3cf92df0381", null ],
     [ "goto_model", "classdfcc__utilst.html#ab89b5fce3395c4c6b0e8ba5ee3bad235", null ],

@@ -21,7 +21,6 @@ var classdfcc__libraryt =
     [ "load", "classdfcc__libraryt.html#afdd1a9fe8bc51d3eb63055a72471a527", null ],
     [ "obj_set_create_indexed_by_object_id_call", "classdfcc__libraryt.html#a1c5c016b7f0975d13353b21f3742b0ab", null ],
     [ "obj_set_release_call", "classdfcc__libraryt.html#aa2a78515fd797aaef1ae37e36ae9f0f0", null ],
-    [ "set_hide", "classdfcc__libraryt.html#a52b01a3df22b1804205880e9ce122c43", null ],
     [ "specialize", "classdfcc__libraryt.html#ae057439f126bef5eecd419ff9df56075", null ],
     [ "write_set_add_allocated_call", "classdfcc__libraryt.html#a725ab26d920ff6ee58bff0843e0f2211", null ],
     [ "write_set_add_decl_call", "classdfcc__libraryt.html#a55f8822b61366418b694ab405fee60db", null ],

@@ -1,7 +1,5 @@
 var NAVTREEINDEX134 =
 {
-"structmz__zip__internal__state__tag.html#a71f011527805e3ac48f5f12cb73d2233":[8,0,843,4],
-"structmz__zip__internal__state__tag.html#a9d483ae9e65542742b3f81522c8fd077":[8,0,843,9],
 "structmz__zip__internal__state__tag.html#aa247669a24b55b9b9e86f732ea175bce":[8,0,843,3],
 "structmz__zip__internal__state__tag.html#abd82e3ab03081af64315ee3dfb687a7c":[8,0,843,6],
 "structmz__zip__internal__state__tag.html#ac0f2149f384cffd332635b3a5323c377":[8,0,843,7],
@@ -249,5 +247,7 @@ var NAVTREEINDEX134 =
 "structsmt2__parser__test__resultt.html":[8,0,1075],
 "structsmt2__parser__test__resultt.html#a54dd16e9d5a6ee145958f3579af28104":[8,0,1075,1],
 "structsmt2__parser__test__resultt.html#aa15d21ccd251bf7843b35717c31accd7":[8,0,1075,0],
-"structsmt2__parsert_1_1idt.html":[8,0,1076,0]
+"structsmt2__parsert_1_1idt.html":[8,0,1076,0],
+"structsmt2__parsert_1_1idt.html#a362251f8cc16f5a9d9b6b72f66b45cef":[8,0,1076,0,4],
+"structsmt2__parsert_1_1idt.html#a4ef7f57eecefbe9fa3275d634f6b2f89":[8,0,1076,0,5]
 };
