@@ -210,18 +210,8 @@ void is_fresh_baset::add_declarations(const std::string &decl_string)
     }
   }
 
-  if(goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION) != 0)
-  {
-    static_lifetime_init(
-      goto_model.symbol_table,
-      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
-    goto_convert(
-      INITIALIZE_FUNCTION,
-      goto_model.symbol_table,
-      goto_model.goto_functions,
-      log.get_message_handler());
-    goto_model.goto_functions.update();
-  }
+  if(goto_model.can_produce_function(INITIALIZE_FUNCTION))
+    recreate_initialize_function(goto_model, message_handler);
 }
 
 void is_fresh_baset::update_fn_call(

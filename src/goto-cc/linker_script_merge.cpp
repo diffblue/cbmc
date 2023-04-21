@@ -84,20 +84,11 @@ int linker_script_merget::add_linker_script_definitions()
                 << messaget::eom;
     return fail;
   }
-  if(
-    original_goto_model->goto_functions.function_map.erase(
-      INITIALIZE_FUNCTION) != 0)
+
+  if(original_goto_model->can_produce_function(INITIALIZE_FUNCTION))
   {
-    static_lifetime_init(
-      original_goto_model->symbol_table,
-      original_goto_model->symbol_table.lookup_ref(INITIALIZE_FUNCTION)
-        .location);
-    goto_convert(
-      INITIALIZE_FUNCTION,
-      original_goto_model->symbol_table,
-      original_goto_model->goto_functions,
-      log.get_message_handler());
-    original_goto_model->goto_functions.update();
+    recreate_initialize_function(
+      *original_goto_model, log.get_message_handler());
   }
 
   fail=goto_and_object_mismatch(linker_defined_symbols, linker_values);

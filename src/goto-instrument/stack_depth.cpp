@@ -40,18 +40,8 @@ static symbol_exprt add_stack_depth_symbol(
   bool failed = goto_model.symbol_table.add(new_symbol);
   CHECK_RETURN(!failed);
 
-  if(goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION) != 0)
-  {
-    static_lifetime_init(
-      goto_model.symbol_table,
-      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
-    goto_convert(
-      INITIALIZE_FUNCTION,
-      goto_model.symbol_table,
-      goto_model.goto_functions,
-      message_handler);
-    goto_model.goto_functions.update();
-  }
+  if(goto_model.can_produce_function(INITIALIZE_FUNCTION))
+    recreate_initialize_function(goto_model, message_handler);
 
   return new_symbol.symbol_expr();
 }

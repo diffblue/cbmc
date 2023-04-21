@@ -159,19 +159,8 @@ void link_to_library(
       break;
   }
 
-  if(need_reinit)
-  {
-    goto_model.unload(INITIALIZE_FUNCTION);
-    static_lifetime_init(
-      goto_model.symbol_table,
-      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
-    goto_convert(
-      INITIALIZE_FUNCTION,
-      goto_model.symbol_table,
-      goto_model.goto_functions,
-      message_handler);
-    goto_model.goto_functions.update();
-  }
+  if(need_reinit && goto_model.can_produce_function(INITIALIZE_FUNCTION))
+    recreate_initialize_function(goto_model, message_handler);
 
   if(!object_type_updates.empty())
     finalize_linking(goto_model, object_type_updates);

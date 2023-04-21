@@ -82,10 +82,6 @@ public:
     const exprt &initial_value,
     const bool no_nondet_initialization = true);
 
-  /// Regenerates the CPROVER_INITIALIZE function which defines all global
-  /// statics of the goto model.
-  void create_initialize_function();
-
   /// Creates a new parameter symbol for the given function_id
   const symbolt &create_new_parameter_symbol(
     const irep_idt &function_id,

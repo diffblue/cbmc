@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_model.h>
+
 #include <set>
 
 static optionalt<codet> static_lifetime_init(
@@ -156,4 +159,22 @@ void static_lifetime_init(
         symbol.symbol_expr(), {}, code_type.return_type(), source_location}});
     }
   }
+}
+
+void recreate_initialize_function(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  auto unloaded = goto_model.unload(INITIALIZE_FUNCTION);
+  PRECONDITION(unloaded == 1);
+
+  static_lifetime_init(
+    goto_model.symbol_table,
+    goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
+  goto_convert(
+    INITIALIZE_FUNCTION,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    message_handler);
+  goto_model.goto_functions.update();
 }
