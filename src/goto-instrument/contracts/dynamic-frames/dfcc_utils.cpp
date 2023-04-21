@@ -553,17 +553,6 @@ void dfcc_utilst::inline_program(
   goto_model.goto_functions.update();
 }
 
-bool dfcc_utilst::has_no_loops(const goto_programt &goto_program)
-{
-  return is_loop_free(goto_program, ns, log);
-}
-
-bool dfcc_utilst::has_no_loops(const irep_idt &function_id)
-{
-  return has_no_loops(
-    goto_model.goto_functions.function_map.at(function_id).body);
-}
-
 void dfcc_utilst::inhibit_unused_functions(const irep_idt &start)
 {
   PRECONDITION_WITH_DIAGNOSTICS(false, "not yet implemented");
