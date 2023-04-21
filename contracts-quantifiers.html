@@ -105,7 +105,7 @@ Syntax</h1>
 <div class="line">__CPROVER_exists { *type* *identifier*; *<span class="keywordtype">boolean</span> expression* }</div>
 </div><!-- fragment --><p>While quantified expressions with arbitrary Boolean expressions are supported with an SMT backend, the SAT backend only supports bounded quantification under <em>constant</em> lower &amp; upper bounds. This is because the SAT backend currently expands a universal quantifier (<code>__CPROVER_forall</code>) to a conjunction and an existential quantifier (<code>__CPROVER_exists</code>) to a disjunction on each value within the specified bound.</p>
 <p>Concretely, with the SAT backend, the following syntax must be used for quantifiers:</p>
-<div class="fragment"><div class="line">__CPROVER_forall { *id* *type*; *range* =&gt; *boolean expression* }</div>
+<div class="fragment"><div class="line">__CPROVER_forall { *id* *type*; *range* ==&gt; *boolean expression* }</div>
 <div class="line">__CPROVER_exists { *id* *type*; *range* &amp;&amp; *boolean expression* }</div>
 </div><!-- fragment --><p>where <code>*range*</code> is an expression of the form</p>
 <div class="fragment"><div class="line">*lower bound* &lt;= *id* &amp;&amp; *id* &lt; *upper bound*</div>
