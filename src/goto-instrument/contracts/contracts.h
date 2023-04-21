@@ -126,10 +126,6 @@ public:
     exprt decreases_clause,
     const irep_idt &mode);
 
-  // for "helper" classes to update symbol table.
-  symbol_tablet &get_symbol_table();
-  goto_functionst &get_goto_functions();
-
   std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
   get_original_loop_number_map() const
   {
