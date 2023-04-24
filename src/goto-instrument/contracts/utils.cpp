@@ -453,7 +453,7 @@ void add_quantified_variable(
 static void replace_history_parameter_rec(
   symbol_table_baset &symbol_table,
   exprt &expr,
-  std::map<exprt, exprt> &parameter2history,
+  std::unordered_map<exprt, symbol_exprt, irep_hash> &parameter2history,
   const source_locationt &location,
   const irep_idt &mode,
   goto_programt &history,
@@ -492,7 +492,7 @@ static void replace_history_parameter_rec(
 
         // 2. Associate the above temporary variable to it's corresponding
         // expression
-        parameter2history[parameter] = tmp_symbol;
+        it = parameter2history.emplace(parameter, tmp_symbol).first;
 
         // 3. Add the required instructions to the instructions list
         // 3.1. Declare the newly created temporary variable
@@ -515,7 +515,7 @@ static void replace_history_parameter_rec(
         history.destructive_append(skip_program);
       }
 
-      expr = parameter2history[parameter];
+      expr = it->second;
     }
     else
     {

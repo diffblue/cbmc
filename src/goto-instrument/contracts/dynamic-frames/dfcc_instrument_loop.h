@@ -197,7 +197,7 @@ protected:
   /// \param[in] in_base_case temporary variable `in_base_case`.
   /// \param[in] symbol_mode Language mode of the function.
   /// \return `history_var_map` that maps variables to loop_entry variables.
-  std::map<exprt, exprt> add_prehead_instructions(
+  std::unordered_map<exprt, symbol_exprt, irep_hash> add_prehead_instructions(
     const std::size_t loop_id,
     goto_functionst::goto_functiont &goto_function,
     symbol_tablet &symbol_table,
@@ -348,7 +348,7 @@ protected:
     goto_programt::targett loop_head,
     const symbol_exprt &loop_write_set,
     const symbol_exprt &addr_of_loop_write_set,
-    const std::map<exprt, exprt> &history_var_map,
+    const std::unordered_map<exprt, symbol_exprt, irep_hash> &history_var_map,
     const symbol_exprt &entered_loop,
     const symbol_exprt &initial_invariant,
     const symbol_exprt &in_base_case,

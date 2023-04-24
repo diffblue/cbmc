@@ -245,7 +245,7 @@ void add_quantified_variable(
 struct replace_history_parametert
 {
   exprt expression_after_replacement;
-  std::map<exprt, exprt> parameter_to_history;
+  std::unordered_map<exprt, symbol_exprt, irep_hash> parameter_to_history;
   goto_programt history_construction;
 };
 
