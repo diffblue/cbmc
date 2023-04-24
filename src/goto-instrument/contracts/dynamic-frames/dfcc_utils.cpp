@@ -457,14 +457,6 @@ exprt dfcc_utilst::make_sizeof_expr(const exprt &expr)
   return size.value();
 }
 
-exprt dfcc_utilst::make_map_start_address(const exprt &expr)
-{
-  return typecast_exprt::conditional_cast(
-    address_of_exprt(index_exprt(
-      expr, from_integer(0, to_array_type(expr.type()).index_type()))),
-    pointer_type(bool_typet()));
-}
-
 void dfcc_utilst::inline_function(const irep_idt &function_id)
 {
   auto &goto_function = goto_model.goto_functions.function_map.at(function_id);

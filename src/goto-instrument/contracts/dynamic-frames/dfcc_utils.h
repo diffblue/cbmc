@@ -195,9 +195,6 @@ public:
   /// \brief Returns the expression `sizeof(expr)`.
   exprt make_sizeof_expr(const exprt &expr);
 
-  /// \brief Returns the expression `&expr[0]`
-  exprt make_map_start_address(const exprt &expr);
-
   /// \brief Inlines the given function, aborts on recursive calls during
   /// inlining.
   void inline_function(const irep_idt &function_id);
