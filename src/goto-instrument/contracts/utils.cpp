@@ -457,74 +457,65 @@ static void replace_history_parameter_rec(
   const source_locationt &location,
   const irep_idt &mode,
   goto_programt &history,
-  const irep_idt &id)
+  const irep_idt &history_id)
 {
   for(auto &op : expr.operands())
   {
     replace_history_parameter_rec(
-      symbol_table, op, parameter2history, location, mode, history, id);
+      symbol_table, op, parameter2history, location, mode, history, history_id);
   }
 
-  if(expr.id() == ID_old || expr.id() == ID_loop_entry)
+  if(expr.id() != ID_old && expr.id() != ID_loop_entry)
+    return;
+
+  const auto &parameter = to_history_expr(expr, history_id).expression();
+  const auto &id = parameter.id();
+  if(
+    id != ID_dereference && id != ID_member && id != ID_symbol &&
+    id != ID_ptrmember && id != ID_constant && id != ID_typecast &&
+    id != ID_index)
   {
-    const auto &parameter = to_history_expr(expr, id).expression();
-
-    const auto &id = parameter.id();
-    if(
-      id == ID_dereference || id == ID_member || id == ID_symbol ||
-      id == ID_ptrmember || id == ID_constant || id == ID_typecast ||
-      id == ID_index)
-    {
-      auto it = parameter2history.find(parameter);
-
-      if(it == parameter2history.end())
-      {
-        // 0. Create a skip target to jump to, if the parameter is invalid
-        goto_programt skip_program;
-        const auto skip_target =
-          skip_program.add(goto_programt::make_skip(location));
-
-        // 1. Create a temporary symbol expression that represents the
-        // history variable
-        symbol_exprt tmp_symbol =
-          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
-            .symbol_expr();
-
-        // 2. Associate the above temporary variable to it's corresponding
-        // expression
-        it = parameter2history.emplace(parameter, tmp_symbol).first;
-
-        // 3. Add the required instructions to the instructions list
-        // 3.1. Declare the newly created temporary variable
-        history.add(goto_programt::make_decl(tmp_symbol, location));
-
-        // 3.2. Skip storing the history if the expression is invalid
-        history.add(goto_programt::make_goto(
-          skip_target,
-          not_exprt{
-            all_dereferences_are_valid(parameter, namespacet(symbol_table))},
-          location));
-
-        // 3.3. Add an assignment such that the value pointed to by the new
-        // temporary variable is equal to the value of the corresponding
-        // parameter
-        history.add(
-          goto_programt::make_assignment(tmp_symbol, parameter, location));
-
-        // 3.4. Add a skip target
-        history.destructive_append(skip_program);
-      }
-
-      expr = it->second;
-    }
-    else
-    {
-      throw invalid_source_file_exceptiont(
-        "Tracking history of " + id2string(parameter.id()) +
-          " expressions is not supported yet.",
-        expr.source_location());
-    }
+    throw invalid_source_file_exceptiont(
+      "Tracking history of " + id2string(parameter.id()) +
+        " expressions is not supported yet.",
+      expr.source_location());
   }
+
+  // speculatively insert a dummy, which will be replaced below if the insert
+  // actually happened
+  auto entry =
+    parameter2history.insert({parameter, symbol_exprt::typeless(ID_nil)});
+
+  if(entry.second)
+  {
+    // 1. Create a temporary symbol expression that represents the
+    // history variable
+    entry.first->second =
+      new_tmp_symbol(parameter.type(), location, mode, symbol_table)
+        .symbol_expr();
+
+    // 2. Add the required instructions to the instructions list
+    // 2.1. Declare the newly created temporary variable
+    history.add(goto_programt::make_decl(entry.first->second, location));
+
+    // 2.2. Skip storing the history if the expression is invalid
+    auto goto_instruction = history.add(goto_programt::make_incomplete_goto(
+      not_exprt{
+        all_dereferences_are_valid(parameter, namespacet(symbol_table))},
+      location));
+
+    // 2.3. Add an assignment such that the value pointed to by the new
+    // temporary variable is equal to the value of the corresponding
+    // parameter
+    history.add(
+      goto_programt::make_assignment(entry.first->second, parameter, location));
+
+    // 2.4. Complete conditional jump for invalid-parameter case
+    auto label_instruction = history.add(goto_programt::make_skip(location));
+    goto_instruction->complete_goto(label_instruction);
+  }
+
+  expr = entry.first->second;
 }
 
 replace_history_parametert replace_history_old(
