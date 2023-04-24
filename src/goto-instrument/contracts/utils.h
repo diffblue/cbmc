@@ -242,16 +242,28 @@ void add_quantified_variable(
   exprt &expression,
   const irep_idt &mode);
 
-/// This function recursively identifies the "old" expressions within expr
+struct replace_history_parametert
+{
+  exprt expression_after_replacement;
+  std::map<exprt, exprt> parameter_to_history;
+  goto_programt history_construction;
+};
+
+/// This function recursively identifies the "old" expressions within \p expr
 /// and replaces them with corresponding history variables.
-void replace_history_parameter(
+replace_history_parametert replace_history_old(
   symbol_table_baset &symbol_table,
-  exprt &expr,
-  std::map<exprt, exprt> &parameter2history,
-  source_locationt location,
-  const irep_idt &mode,
-  goto_programt &history,
-  const irep_idt &id);
+  const exprt &expr,
+  const source_locationt &location,
+  const irep_idt &mode);
+
+/// This function recursively identifies the "loop_entry" expressions within
+/// \p expr and replaces them with corresponding history variables.
+replace_history_parametert replace_history_loop_entry(
+  symbol_table_baset &symbol_table,
+  const exprt &expr,
+  const source_locationt &location,
+  const irep_idt &mode);
 
 /// This function generates all the instructions required to initialize
 /// history variables.

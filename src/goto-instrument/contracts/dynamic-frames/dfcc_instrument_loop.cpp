@@ -269,22 +269,13 @@ std::map<exprt, exprt> dfcc_instrument_loopt::add_prehead_instructions(
   //   GOTO HEAD;
   // ```
 
-  goto_programt pre_loop_head_instrs;
-  std::map<exprt, exprt> history_var_map;
 
   // initialize loop_entry history vars;
-  {
-    // Process "loop_entry" history variables.
-    // We find and replace all "__CPROVER_loop_entry" in invariant.
-    replace_history_parameter(
-      symbol_table,
-      invariant,
-      history_var_map,
-      loop_head_location,
-      language_mode,
-      pre_loop_head_instrs,
-      ID_loop_entry);
-  }
+  auto replace_history_result = replace_history_loop_entry(
+    symbol_table, invariant, loop_head_location, language_mode);
+  invariant.swap(replace_history_result.expression_after_replacement);
+  goto_programt &pre_loop_head_instrs =
+    replace_history_result.history_construction;
 
   // entered_loop = false
   {
@@ -354,7 +345,7 @@ std::map<exprt, exprt> dfcc_instrument_loopt::add_prehead_instructions(
     goto_programt::make_goto(loop_head, true_exprt{}, loop_head_location));
 
   goto_function.body.destructive_insert(loop_head, pre_loop_head_instrs);
-  return history_var_map;
+  return replace_history_result.parameter_to_history;
 }
 
 goto_programt::instructiont::targett

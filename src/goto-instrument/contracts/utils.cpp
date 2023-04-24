@@ -450,18 +450,18 @@ void add_quantified_variable(
   }
 }
 
-void replace_history_parameter(
+static void replace_history_parameter_rec(
   symbol_table_baset &symbol_table,
   exprt &expr,
   std::map<exprt, exprt> &parameter2history,
-  source_locationt location,
+  const source_locationt &location,
   const irep_idt &mode,
   goto_programt &history,
   const irep_idt &id)
 {
   for(auto &op : expr.operands())
   {
-    replace_history_parameter(
+    replace_history_parameter_rec(
       symbol_table, op, parameter2history, location, mode, history, id);
   }
 
@@ -527,25 +527,56 @@ void replace_history_parameter(
   }
 }
 
+replace_history_parametert replace_history_old(
+  symbol_table_baset &symbol_table,
+  const exprt &expr,
+  const source_locationt &location,
+  const irep_idt &mode)
+{
+  replace_history_parametert result;
+  result.expression_after_replacement = expr;
+  replace_history_parameter_rec(
+    symbol_table,
+    result.expression_after_replacement,
+    result.parameter_to_history,
+    location,
+    mode,
+    result.history_construction,
+    ID_old);
+  return result;
+}
+
+replace_history_parametert replace_history_loop_entry(
+  symbol_table_baset &symbol_table,
+  const exprt &expr,
+  const source_locationt &location,
+  const irep_idt &mode)
+{
+  replace_history_parametert result;
+  result.expression_after_replacement = expr;
+  replace_history_parameter_rec(
+    symbol_table,
+    result.expression_after_replacement,
+    result.parameter_to_history,
+    location,
+    mode,
+    result.history_construction,
+    ID_loop_entry);
+  return result;
+}
+
 void generate_history_variables_initialization(
   symbol_table_baset &symbol_table,
   exprt &clause,
   const irep_idt &mode,
   goto_programt &program)
 {
-  std::map<exprt, exprt> parameter2history;
-  goto_programt history;
   // Find and replace "old" expression in the "expression" variable
-  replace_history_parameter(
-    symbol_table,
-    clause,
-    parameter2history,
-    clause.source_location(),
-    mode,
-    history,
-    ID_old);
+  auto result =
+    replace_history_old(symbol_table, clause, clause.source_location(), mode);
+  clause.swap(result.expression_after_replacement);
   // Add all the history variable initialization instructions
-  program.destructive_append(history);
+  program.destructive_append(result.history_construction);
 }
 
 bool is_transformed_loop_head(const goto_programt::const_targett &target)
