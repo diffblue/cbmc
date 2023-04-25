@@ -291,17 +291,18 @@ void dfcc_wrapper_programt::encode_requires_write_set()
   //   assume_ensures_ctx = false,
   //   assert_ensures_ctx = false,
   // )
-  const auto write_set = requires_write_set;
-  preamble.add(goto_programt::make_decl(write_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(requires_write_set, wrapper_sl));
 
-  const auto address_of_write_set = addr_of_requires_write_set;
-  preamble.add(goto_programt::make_decl(address_of_write_set, wrapper_sl));
+  preamble.add(
+    goto_programt::make_decl(addr_of_requires_write_set, wrapper_sl));
   preamble.add(goto_programt::make_assignment(
-    address_of_write_set, address_of_exprt(write_set), wrapper_sl));
+    addr_of_requires_write_set,
+    address_of_exprt(requires_write_set),
+    wrapper_sl));
 
   bool check_mode = contract_mode == dfcc_contract_modet::CHECK;
   code_function_callt call = library.write_set_create_call(
-    address_of_write_set,
+    addr_of_requires_write_set,
     from_integer(0, size_type()),
     from_integer(0, size_type()),
     make_boolean_expr(check_mode),
@@ -317,7 +318,7 @@ void dfcc_wrapper_programt::encode_requires_write_set()
   // check for absence of allocation/deallocation in requires clauses
   // ```c
   // DECL __check_no_alloc: bool;
-  // CALL __check_no_alloc = check_empty_alloc_dealloc(write_set);
+  // CALL __check_no_alloc = check_empty_alloc_dealloc(requilres_write_set);
   // ASSERT __check_no_alloc;
   // DEAD __check_no_alloc: bool;
   // ```
@@ -334,7 +335,7 @@ void dfcc_wrapper_programt::encode_requires_write_set()
 
   postamble.add(goto_programt::make_function_call(
     library.write_set_check_allocated_deallocated_is_empty_call(
-      check_var, address_of_write_set, wrapper_sl),
+      check_var, addr_of_requires_write_set, wrapper_sl),
     wrapper_sl));
 
   source_locationt check_sl(wrapper_sl);
@@ -347,9 +348,9 @@ void dfcc_wrapper_programt::encode_requires_write_set()
 
   // generate write set release and DEAD instructions
   postamble.add(goto_programt::make_function_call(
-    library.write_set_release_call(address_of_write_set, wrapper_sl),
+    library.write_set_release_call(addr_of_requires_write_set, wrapper_sl),
     wrapper_sl));
-  postamble.add(goto_programt::make_dead(write_set, wrapper_sl));
+  postamble.add(goto_programt::make_dead(requires_write_set, wrapper_sl));
 }
 
 void dfcc_wrapper_programt::encode_ensures_write_set()
@@ -363,18 +364,18 @@ void dfcc_wrapper_programt::encode_ensures_write_set()
   //   assume_ensures_ctx = contract_mode != check,
   //   assert_ensures_ctx = contract_mode == check,
   // )
-  const auto write_set = ensures_write_set;
-  preamble.add(goto_programt::make_decl(write_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(ensures_write_set, wrapper_sl));
 
-  const auto address_of_write_set = addr_of_ensures_write_set;
-  preamble.add(goto_programt::make_decl(address_of_write_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(addr_of_ensures_write_set, wrapper_sl));
   preamble.add(goto_programt::make_assignment(
-    address_of_write_set, address_of_exprt(write_set), wrapper_sl));
+    addr_of_ensures_write_set,
+    address_of_exprt(ensures_write_set),
+    wrapper_sl));
 
   bool check_mode = contract_mode == dfcc_contract_modet::CHECK;
 
   code_function_callt call = library.write_set_create_call(
-    address_of_write_set,
+    addr_of_ensures_write_set,
     from_integer(0, size_type()),
     from_integer(0, size_type()),
     false_exprt(),
@@ -392,14 +393,14 @@ void dfcc_wrapper_programt::encode_ensures_write_set()
   {
     link_allocated_caller.add(goto_programt::make_function_call(
       library.link_allocated_call(
-        address_of_write_set, caller_write_set, wrapper_sl),
+        addr_of_ensures_write_set, caller_write_set, wrapper_sl),
       wrapper_sl));
   }
 
   // check for absence of allocation/deallocation in contract clauses
   // ```c
   // DECL __check_no_alloc: bool;
-  // CALL __check_no_alloc = check_empty_alloc_dealloc(write_set);
+  // CALL __check_no_alloc = check_empty_alloc_dealloc(ensures_write_set);
   // ASSERT __check_no_alloc;
   // DEAD __check_no_alloc: bool;
   // ```
@@ -416,7 +417,7 @@ void dfcc_wrapper_programt::encode_ensures_write_set()
 
   postamble.add(goto_programt::make_function_call(
     library.write_set_check_allocated_deallocated_is_empty_call(
-      check_var, address_of_write_set, wrapper_sl),
+      check_var, addr_of_ensures_write_set, wrapper_sl),
     wrapper_sl));
 
   source_locationt check_sl(wrapper_sl);
@@ -430,32 +431,33 @@ void dfcc_wrapper_programt::encode_ensures_write_set()
 
   // generate write set release
   postamble.add(goto_programt::make_function_call(
-    library.write_set_release_call(address_of_write_set, wrapper_sl),
+    library.write_set_release_call(addr_of_ensures_write_set, wrapper_sl),
     wrapper_sl));
 
   // declare write set DEAD
-  postamble.add(goto_programt::make_dead(write_set, wrapper_sl));
+  postamble.add(goto_programt::make_dead(ensures_write_set, wrapper_sl));
 }
 
 void dfcc_wrapper_programt::encode_contract_write_set()
 {
-  const auto write_set = contract_write_set;
-  preamble.add(goto_programt::make_decl(write_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(contract_write_set, wrapper_sl));
 
-  const auto address_of_contract_write_set = addr_of_contract_write_set;
   preamble.add(
-    goto_programt::make_decl(address_of_contract_write_set, wrapper_sl));
+    goto_programt::make_decl(addr_of_contract_write_set, wrapper_sl));
   preamble.add(goto_programt::make_assignment(
-    address_of_contract_write_set, address_of_exprt(write_set), wrapper_sl));
+    addr_of_contract_write_set,
+    address_of_exprt(contract_write_set),
+    wrapper_sl));
 
   // We use the empty write set used to check ensures for side effects
   // to check for side effects in the assigns and frees functions as well
-  const auto address_of_requires_write_set = addr_of_requires_write_set;
+  // TODO: I don't know what the above comment means, why was there an empty
+  // write set here?
 
   // call write_set_create
   {
     code_function_callt call = library.write_set_create_call(
-      address_of_contract_write_set,
+      addr_of_contract_write_set,
       from_integer(contract_functions.get_nof_assigns_targets(), size_type()),
       from_integer(contract_functions.get_nof_frees_targets(), size_type()),
       false_exprt(),
@@ -489,10 +491,10 @@ void dfcc_wrapper_programt::encode_contract_write_set()
       arguments.push_back(arg);
 
     // pass write set to populate
-    arguments.emplace_back(address_of_contract_write_set);
+    arguments.emplace_back(addr_of_contract_write_set);
 
     // pass the empty write set to check side effects against
-    arguments.emplace_back(address_of_requires_write_set);
+    arguments.emplace_back(addr_of_requires_write_set);
 
     write_set_checks.add(goto_programt::make_function_call(call, wrapper_sl));
   }
@@ -508,56 +510,55 @@ void dfcc_wrapper_programt::encode_contract_write_set()
       arguments.push_back(arg);
 
     // pass write set to populate
-    arguments.emplace_back(address_of_contract_write_set);
+    arguments.emplace_back(addr_of_contract_write_set);
 
     // pass the empty write set to check side effects against
-    arguments.emplace_back(address_of_requires_write_set);
+    arguments.emplace_back(addr_of_requires_write_set);
 
     write_set_checks.add(goto_programt::make_function_call(call, wrapper_sl));
   }
 
   // generate write set release and DEAD instructions
   postamble.add(goto_programt::make_function_call(
-    library.write_set_release_call(address_of_contract_write_set, wrapper_sl),
+    library.write_set_release_call(addr_of_contract_write_set, wrapper_sl),
     wrapper_sl));
-  postamble.add(goto_programt::make_dead(write_set, wrapper_sl));
+  postamble.add(
+    goto_programt::make_dead(addr_of_contract_write_set, wrapper_sl));
 }
 
 void dfcc_wrapper_programt::encode_is_fresh_set()
 {
-  const auto object_set = is_fresh_set;
-  preamble.add(goto_programt::make_decl(object_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(is_fresh_set, wrapper_sl));
 
-  const auto address_of_object_set = addr_of_is_fresh_set;
-  preamble.add(goto_programt::make_decl(address_of_object_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(addr_of_is_fresh_set, wrapper_sl));
   preamble.add(goto_programt::make_assignment(
-    address_of_object_set, address_of_exprt(object_set), wrapper_sl));
+    addr_of_is_fresh_set, address_of_exprt(is_fresh_set), wrapper_sl));
 
   // CALL obj_set_create_indexed_by_object_id(is_fresh_set) in preamble
   preamble.add(goto_programt::make_function_call(
     library.obj_set_create_indexed_by_object_id_call(
-      address_of_object_set, wrapper_sl),
+      addr_of_is_fresh_set, wrapper_sl),
     wrapper_sl));
 
   // link to requires write set
   link_is_fresh.add(goto_programt::make_function_call(
     library.link_is_fresh_call(
-      addr_of_requires_write_set, address_of_object_set, wrapper_sl),
+      addr_of_requires_write_set, addr_of_is_fresh_set, wrapper_sl),
     wrapper_sl));
 
   // link to ensures write set
   link_is_fresh.add(goto_programt::make_function_call(
     library.link_is_fresh_call(
-      addr_of_ensures_write_set, address_of_object_set, wrapper_sl),
+      addr_of_ensures_write_set, addr_of_is_fresh_set, wrapper_sl),
     wrapper_sl));
 
   // release call in postamble
   postamble.add(goto_programt::make_function_call(
-    library.obj_set_release_call(address_of_object_set, wrapper_sl),
+    library.obj_set_release_call(addr_of_is_fresh_set, wrapper_sl),
     wrapper_sl));
 
   // DEAD instructions in postamble
-  postamble.add(goto_programt::make_dead(object_set, wrapper_sl));
+  postamble.add(goto_programt::make_dead(is_fresh_set, wrapper_sl));
 }
 
 void dfcc_wrapper_programt::encode_requires_clauses()
@@ -594,7 +595,6 @@ void dfcc_wrapper_programt::encode_requires_clauses()
     codet requires_statement(statement_type, {std::move(requires)}, sl);
     converter.goto_convert(requires_statement, requires_program, language_mode);
   }
-  const auto address_of_requires_write_set = addr_of_requires_write_set;
 
   // fix calls to user-defined memory predicates
   memory_predicates.fix_calls(requires_program);
@@ -603,7 +603,7 @@ void dfcc_wrapper_programt::encode_requires_clauses()
   instrument.instrument_goto_program(
     wrapper_id,
     requires_program,
-    address_of_requires_write_set,
+    addr_of_requires_write_set,
     function_pointer_contracts);
 
   // append resulting program to preconditions section
@@ -626,8 +626,9 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   // translate each ensures clause
   for(const auto &e : contract_code_type.ensures())
   {
-    exprt ensures = to_lambda_expr(e).application(contract_lambda_parameters);
-    ensures.add_source_location() = e.source_location();
+    exprt ensures = to_lambda_expr(e)
+                      .application(contract_lambda_parameters)
+                      .with_source_location<exprt>(e);
 
     if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
       add_quantified_variable(goto_model.symbol_table, ensures, language_mode);
@@ -652,14 +653,12 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
     converter.goto_convert(ensures_statement, ensures_program, language_mode);
   }
 
-  const auto address_of_ensures_write_set = addr_of_ensures_write_set;
-
   // When checking an ensures clause we link the contract write set to the
   // ensures write set to know what was deallocated by the function so that
   // the was_freed predicate can perform its checks
   link_deallocated_contract.add(goto_programt::make_function_call(
     library.link_deallocated_call(
-      address_of_ensures_write_set, addr_of_contract_write_set, wrapper_sl),
+      addr_of_ensures_write_set, addr_of_contract_write_set, wrapper_sl),
     wrapper_sl));
 
   // fix calls to user-defined user-defined memory predicates
@@ -669,7 +668,7 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   instrument.instrument_goto_program(
     wrapper_id,
     ensures_program,
-    address_of_ensures_write_set,
+    addr_of_ensures_write_set,
     function_pointer_contracts);
 
   // add the snapshot program in the history section
@@ -735,8 +734,6 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
     write_set_arguments.push_back(parameter_symbol.symbol_expr());
   }
 
-  auto address_of_contract_write_set = addr_of_contract_write_set;
-
   // check assigns clause inclusion
   // IF __caller_write_set==NULL GOTO skip_target;
   // DECL check: bool;
@@ -768,7 +765,7 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
 
     write_set_checks.add(goto_programt::make_function_call(
       library.write_set_check_assigns_clause_inclusion_call(
-        check_var, caller_write_set, address_of_contract_write_set, wrapper_sl),
+        check_var, caller_write_set, addr_of_contract_write_set, wrapper_sl),
       wrapper_sl));
 
     source_locationt check_sl(wrapper_sl);
@@ -796,7 +793,7 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
 
     write_set_checks.add(goto_programt::make_function_call(
       library.write_set_check_frees_clause_inclusion_call(
-        check_var, caller_write_set, address_of_contract_write_set, wrapper_sl),
+        check_var, caller_write_set, addr_of_contract_write_set, wrapper_sl),
       wrapper_sl));
 
     source_locationt check_sl(wrapper_sl);
@@ -814,7 +811,7 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
 
   code_function_callt havoc_call(
     contract_functions.get_spec_assigns_havoc_function_symbol().symbol_expr(),
-    {address_of_contract_write_set});
+    {addr_of_contract_write_set});
 
   function_call.add(goto_programt::make_function_call(havoc_call, wrapper_sl));
 
@@ -844,6 +841,6 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
   // set and the caller write set
   function_call.add(goto_programt::make_function_call(
     library.write_set_deallocate_freeable_call(
-      address_of_contract_write_set, caller_write_set, wrapper_sl),
+      addr_of_contract_write_set, caller_write_set, wrapper_sl),
     wrapper_sl));
 }
