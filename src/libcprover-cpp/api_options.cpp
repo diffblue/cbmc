@@ -2,52 +2,71 @@
 
 #include "api_options.h"
 
-#include <util/cmdline.h>
 #include <util/make_unique.h>
-#include <util/options.h>
 
-#include <ansi-c/goto_check_c.h>
-#include <goto-checker/solver_factory.h>
-
-api_optionst api_optionst::create()
+struct api_optionst::implementationt
 {
-  return api_optionst{};
+  // Options for the verification engine
+  bool simplify_enabled;
+
+  // Option for dropping unused function
+  bool drop_unused_functions_enabled;
+
+  // Option for validating the goto model
+  bool validate_goto_model_enabled;
+};
+
+api_optionst::api_optionst(
+  std::unique_ptr<const implementationt> implementation)
+  : implementation{std::move(implementation)}
+{
 }
 
-static std::unique_ptr<optionst> make_internal_default_options()
+bool api_optionst::simplify() const
 {
-  std::unique_ptr<optionst> options = util_make_unique<optionst>();
-  cmdlinet command_line;
-  PARSE_OPTIONS_GOTO_CHECK(command_line, (*options));
-  parse_solver_options(command_line, *options);
-  options->set_option("built-in-assertions", true);
-  options->set_option("arrays-uf", "auto");
-  options->set_option("depth", UINT32_MAX);
-  options->set_option("sat-preprocessor", true);
-  return options;
+  return implementation->simplify_enabled;
 }
 
-api_optionst &api_optionst::simplify(bool on)
+bool api_optionst::drop_unused_functions() const
 {
-  simplify_enabled = on;
+  return implementation->drop_unused_functions_enabled;
+}
+
+bool api_optionst::validate_goto_model() const
+{
+  return implementation->validate_goto_model_enabled;
+}
+
+api_optionst::api_optionst(api_optionst &&api_options) noexcept = default;
+api_optionst &api_optionst::operator=(api_optionst &&) noexcept = default;
+api_optionst::~api_optionst() = default;
+
+api_optionst::buildert &api_optionst::buildert::simplify(bool on)
+{
+  implementation->simplify_enabled = on;
   return *this;
 }
 
-api_optionst &api_optionst::drop_unused_functions(bool on)
+api_optionst::buildert &api_optionst::buildert::drop_unused_functions(bool on)
 {
-  drop_unused_functions_enabled = on;
+  implementation->drop_unused_functions_enabled = on;
   return *this;
 }
 
-api_optionst &api_optionst::validate_goto_model(bool on)
+api_optionst::buildert &api_optionst::buildert::validate_goto_model(bool on)
 {
-  validate_goto_model_enabled = on;
+  implementation->validate_goto_model_enabled = on;
   return *this;
 }
 
-std::unique_ptr<optionst> api_optionst::to_engine_options() const
+api_optionst api_optionst::buildert::build()
 {
-  auto engine_options = make_internal_default_options();
-  engine_options->set_option("simplify", simplify_enabled);
-  return engine_options;
+  auto impl = util_make_unique<implementationt>(*implementation);
+  api_optionst api_options{std::move(impl)};
+  return api_options;
 }
+
+api_optionst::buildert::buildert() = default;
+api_optionst::buildert::buildert(api_optionst::buildert &&builder) noexcept =
+  default;
+api_optionst::buildert::~buildert() = default;

@@ -66,7 +66,7 @@ TEST_CASE(
   "Test loading and verifying model from file.",
   "[core][libcprover-cpp]")
 {
-  api_sessiont api(api_optionst::create());
+  api_sessiont api(api_optionst::buildert{}.build());
 
   std::vector<std::string> output;
   // This lambda needs to be non-capturing in order for it to be convertible

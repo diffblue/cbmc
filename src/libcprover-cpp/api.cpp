@@ -21,6 +21,7 @@
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/gcc_version.h>
+#include <ansi-c/goto_check_c.h>
 #include <assembler/remove_asm.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>
@@ -32,6 +33,8 @@
 #include <vector>
 
 extern configt config;
+static std::unique_ptr<optionst>
+to_engine_options(const api_optionst &api_options);
 
 std::unique_ptr<std::string> api_sessiont::get_api_version() const
 {
@@ -45,7 +48,7 @@ struct api_session_implementationt
   std::unique_ptr<optionst> options;
 };
 
-api_sessiont::api_sessiont() : api_sessiont{api_optionst::create()}
+api_sessiont::api_sessiont() : api_sessiont{api_optionst::buildert{}.build()}
 {
 }
 
@@ -54,7 +57,7 @@ api_sessiont::api_sessiont(const api_optionst &options)
 {
   implementation->message_handler =
     util_make_unique<null_message_handlert>(null_message_handlert{});
-  implementation->options = options.to_engine_options();
+  implementation->options = to_engine_options(options);
   // Needed to initialise the language options correctly
   cmdlinet cmdline;
   // config is global in config.cpp
@@ -211,4 +214,25 @@ void api_sessiont::validate_goto_model() const
                << messaget::eom;
 
   implementation->model->validate();
+}
+
+static std::unique_ptr<optionst> make_internal_default_options()
+{
+  std::unique_ptr<optionst> options = util_make_unique<optionst>();
+  cmdlinet command_line;
+  PARSE_OPTIONS_GOTO_CHECK(command_line, (*options));
+  parse_solver_options(command_line, *options);
+  options->set_option("built-in-assertions", true);
+  options->set_option("arrays-uf", "auto");
+  options->set_option("depth", UINT32_MAX);
+  options->set_option("sat-preprocessor", true);
+  return options;
+}
+
+static std::unique_ptr<optionst>
+to_engine_options(const api_optionst &api_options)
+{
+  auto engine_options = make_internal_default_options();
+  engine_options->set_option("simplify", api_options.simplify());
+  return engine_options;
 }

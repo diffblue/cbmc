@@ -21,7 +21,7 @@ SCENARIO(
 {
   GIVEN("A model with a passing property from C source code")
   {
-    api_sessiont api(api_optionst::create());
+    api_sessiont api(api_optionst::buildert{}.build());
     api.load_model_from_files({"test2.c"});
 
     WHEN("We run that model past the verification engine")
@@ -64,7 +64,7 @@ SCENARIO(
 
   GIVEN("A model with a failing property from C source code")
   {
-    api_sessiont api(api_optionst::create());
+    api_sessiont api(api_optionst::buildert{}.build());
     api.load_model_from_files({"test.c"});
 
     WHEN("We run that model past the verification engine")

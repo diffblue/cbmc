@@ -4,7 +4,6 @@
 #include <util/exception_utils.h>
 
 #include <libcprover-cpp/api.h>
-#include <libcprover-cpp/api_options.h>
 
 #include "goto_model.h"
 
@@ -29,10 +28,11 @@ int main(int argc, char *argv[])
     std::vector<std::string> arguments(argv + 1, argv + argc);
 
     // Create API options object, to pass to initialiser of API object.
-    auto api_options = api_optionst::create()
+    auto api_options = api_optionst::buildert{}
                          .simplify(false)
                          .validate_goto_model(true)
-                         .drop_unused_functions(true);
+                         .drop_unused_functions(true)
+                         .build();
 
     // Initialise API dependencies and global configuration in one step.
     api_sessiont api(api_options);
