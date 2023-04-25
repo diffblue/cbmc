@@ -5,8 +5,6 @@
 
 #include <libcprover-cpp/api.h>
 
-#include "goto_model.h"
-
 #include <iostream>
 #include <vector>
 
