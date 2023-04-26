@@ -100,6 +100,7 @@ void instrument_preconditions(
   const goto_modelt &goto_model,
   goto_programt &goto_program)
 {
+  return;
   const namespacet ns(goto_model.symbol_table);
 
   for(auto it=goto_program.instructions.begin();
@@ -142,6 +143,7 @@ void instrument_preconditions(
 
 void instrument_preconditions(goto_modelt &goto_model)
 {
+  return;
   // add at call site
   for(auto &f_it : goto_model.goto_functions.function_map)
     instrument_preconditions(

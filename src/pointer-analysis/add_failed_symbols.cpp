@@ -76,6 +76,7 @@ void add_failed_symbol_if_needed(
 /// \param symbol_table: global symbol table
 void add_failed_symbols(symbol_table_baset &symbol_table)
 {
+  return;
   // the symbol table iterators are not stable, and
   // we are adding new symbols, this
   // is why we need a list of pointers

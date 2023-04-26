@@ -44,6 +44,7 @@ void set_properties(
 
 void label_properties(goto_modelt &goto_model)
 {
+  return;
   label_properties(goto_model.goto_functions);
 }
 

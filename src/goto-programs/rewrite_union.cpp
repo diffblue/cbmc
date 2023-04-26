@@ -117,6 +117,7 @@ void rewrite_union(goto_functionst &goto_functions)
 
 void rewrite_union(goto_modelt &goto_model)
 {
+  return;
   rewrite_union(goto_model.goto_functions);
 }
 

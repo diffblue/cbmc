@@ -32,7 +32,7 @@ void goto_check_c(
   const optionst &options,
   message_handlert &message_handler);
 
-void goto_check_c(
+void goto_check_c_noop(
   const optionst &options,
   goto_modelt &goto_model,
   message_handlert &message_handler);

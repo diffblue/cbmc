@@ -150,7 +150,7 @@ int cprover_parse_optionst::main()
     remove_function_pointers(
       remove_function_pointers_message_handler, goto_model, false);
 
-    adjust_float_expressions(goto_model);
+    //adjust_float_expressions(goto_model);
     instrument_given_invariants(goto_model);
 
     bool perform_inlining;

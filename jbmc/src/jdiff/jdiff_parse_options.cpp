@@ -196,7 +196,7 @@ bool jdiff_parse_optionst::process_goto_program(
   transform_assertions_assumptions(options, goto_model);
 
   // checks don't know about adjusted float expressions
-  adjust_float_expressions(goto_model);
+  //adjust_float_expressions(goto_model);
 
   // recalculate numbers, etc.
   goto_model.goto_functions.update();

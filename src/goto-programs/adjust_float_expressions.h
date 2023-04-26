@@ -54,7 +54,7 @@ void adjust_float_expressions(
 
 /// Adjust float expressions in a given goto_model.
 /// \see adjust_float_expressions(goto_functionst &, const namespacet &)
-void adjust_float_expressions(goto_modelt &goto_model);
+void adjust_float_expressions_noop(goto_modelt &goto_model);
 
 /// Return the identifier of the program symbol used to
 /// store the current rounding mode.

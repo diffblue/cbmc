@@ -103,6 +103,7 @@ void link_to_library(
     symbol_tablet &,
     message_handlert &)> &library)
 {
+  return;
   // this needs a fixedpoint, as library functions
   // may depend on other library functions
 

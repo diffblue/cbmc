@@ -209,5 +209,6 @@ void remove_skip(goto_functionst &goto_functions)
 
 void remove_skip(goto_modelt &goto_model)
 {
+  return;
   remove_skip(goto_model.goto_functions);
 }

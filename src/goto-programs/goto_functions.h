@@ -82,6 +82,7 @@ public:
 
   void update()
   {
+    return;
     compute_incoming_edges();
     compute_target_numbers();
     compute_location_numbers();

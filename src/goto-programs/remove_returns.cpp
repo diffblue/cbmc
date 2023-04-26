@@ -282,6 +282,7 @@ void remove_returns(
 /// removes returns
 void remove_returns(goto_modelt &goto_model)
 {
+  return;
   remove_returnst rr(goto_model.symbol_table);
   rr(goto_model.goto_functions);
 }

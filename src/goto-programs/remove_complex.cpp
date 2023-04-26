@@ -316,5 +316,6 @@ void remove_complex(
 /// removes complex data type
 void remove_complex(goto_modelt &goto_model)
 {
+  return;
   remove_complex(goto_model.symbol_table, goto_model.goto_functions);
 }
