@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['cadical_23690',['CaDiCaL',['../namespace_ca_di_ca_l.html',1,'']]]
+  ['cadical_23682',['CaDiCaL',['../namespace_ca_di_ca_l.html',1,'']]]
 ];

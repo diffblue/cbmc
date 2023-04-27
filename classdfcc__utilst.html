@@ -178,9 +178,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae4fd7fd1b2330bab861ef7b1852def4d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__utilst.html#ae4fd7fd1b2330bab861ef7b1852def4d">inline_program</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;no_body, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;recursive_call, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;missing_function, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;not_enough_arguments)</td></tr>
 <tr class="memdesc:ae4fd7fd1b2330bab861ef7b1852def4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inlines the given program, and returns function symbols that caused warnings.  <a href="classdfcc__utilst.html#ae4fd7fd1b2330bab861ef7b1852def4d">More...</a><br /></td></tr>
 <tr class="separator:ae4fd7fd1b2330bab861ef7b1852def4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7fe1087061690b87ccc77a8f181cdc07"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__utilst.html#a7fe1087061690b87ccc77a8f181cdc07">inhibit_unused_functions</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;start)</td></tr>
-<tr class="memdesc:a7fe1087061690b87ccc77a8f181cdc07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traverses the call tree from the given entry point to identify functions symbols that are effectively called in the model, Then goes over all functions of the model and turns the bodies of all functions that are not in the used function set into:  <a href="classdfcc__utilst.html#a7fe1087061690b87ccc77a8f181cdc07">More...</a><br /></td></tr>
-<tr class="separator:a7fe1087061690b87ccc77a8f181cdc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -767,36 +764,6 @@ Protected Attributes</h2></td></tr>
 <p>Returns the <code>symbolt</code> for <code>function_id</code>. </p>
 
 <p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00078">78</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a7fe1087061690b87ccc77a8f181cdc07"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7fe1087061690b87ccc77a8f181cdc07">&#9670;&nbsp;</a></span>inhibit_unused_functions()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dfcc_utilst::inhibit_unused_functions </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>start</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Traverses the call tree from the given entry point to identify functions symbols that are effectively called in the model, Then goes over all functions of the model and turns the bodies of all functions that are not in the used function set into: </p>
-<div class="fragment"><div class="line">assert(<span class="keyword">false</span>, <span class="stringliteral">&quot;function identified as unreachable&quot;</span>);</div>
-<div class="line">assume(<span class="keyword">false</span>);</div>
-</div><!-- fragment --><p> That way, if the analysis mistakenly pruned some functions, assertions will be violated and the analysis will fail. TODO: add a command line flag to tell the instrumentation to not prune a function. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">start</td><td>name of the entry point </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00556">556</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
 
 </div>
 </div>

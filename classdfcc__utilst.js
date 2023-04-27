@@ -15,7 +15,6 @@ var classdfcc__utilst =
     [ "function_symbol_exists", "classdfcc__utilst.html#acb386ff87cb3ee091c31b6e6fa2656c5", null ],
     [ "function_symbol_with_body_exists", "classdfcc__utilst.html#a73f55a2f27152def0f70f84447998fde", null ],
     [ "get_function_symbol", "classdfcc__utilst.html#a4d1820327e4c6c785c49a4ea53d9cc39", null ],
-    [ "inhibit_unused_functions", "classdfcc__utilst.html#a7fe1087061690b87ccc77a8f181cdc07", null ],
     [ "inline_function", "classdfcc__utilst.html#a13f5617fd25a3c766ae22aad7db1e85b", null ],
     [ "inline_function", "classdfcc__utilst.html#a455aa2b6f1dd7db3a0a3f37c82d7e5dc", null ],
     [ "inline_program", "classdfcc__utilst.html#ae4fd7fd1b2330bab861ef7b1852def4d", null ],
