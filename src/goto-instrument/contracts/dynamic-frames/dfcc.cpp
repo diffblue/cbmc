@@ -513,7 +513,21 @@ void dfcct::transform_goto_model()
   instrument_other_functions();
   library.inhibit_front_end_builtins();
 
-  // TODO implement and use utils.inhibit_unreachable_functions(harness);
+  // TODO implement a means to inhibit unreachable functions (possibly via the
+  // code that implements drop-unused-functions followed by
+  // generate-function-bodies):
+  // Traverse the call tree from the given entry point to identify
+  // functions symbols that are effectively called in the model,
+  // Then goes over all functions of the model and turns the bodies of all
+  // functions that are not in the used function set into:
+  //  ```c
+  //  assert(false, "function identified as unreachable");
+  //  assume(false);
+  //  ```
+  // That way, if the analysis mistakenly pruned some functions, assertions
+  // will be violated and the analysis will fail.
+  // TODO: add a command line flag to tell the instrumentation to not prune
+  // a function.
   goto_model.goto_functions.update();
 
   remove_skip(goto_model);

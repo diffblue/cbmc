@@ -223,21 +223,6 @@ public:
     std::set<irep_idt> &recursive_call,
     std::set<irep_idt> &missing_function,
     std::set<irep_idt> &not_enough_arguments);
-
-  /// \brief Traverses the call tree from the given entry point to identify
-  /// functions symbols that are effectively called in the model,
-  /// Then goes over all functions of the model and turns the bodies of all
-  /// functions that are not in the used function set into:
-  ///  ```c
-  ///  assert(false, "function identified as unreachable");
-  ///  assume(false);
-  ///  ```
-  /// That way, if the analysis mistakenly pruned some functions, assertions
-  /// will be violated and the analysis will fail.
-  /// TODO: add a command line flag to tell the instrumentation to not prune
-  /// a function.
-  /// \param start name of the entry point
-  void inhibit_unused_functions(const irep_idt &start);
 };
 
 #endif
