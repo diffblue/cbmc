@@ -617,9 +617,6 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   const auto &statement_type =
     (contract_mode == dfcc_contract_modet::CHECK) ? ID_assert : ID_assume;
 
-  // goto program where all history variable snapshots are added
-  goto_programt history_snapshot_program;
-
   // goto program where all requires are added
   goto_programt ensures_program;
 
@@ -635,10 +632,7 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
 
     // this also rewrites ID_old expressions to fresh variables
     generate_history_variables_initialization(
-      goto_model.symbol_table,
-      ensures,
-      language_mode,
-      history_snapshot_program);
+      goto_model.symbol_table, ensures, language_mode, history);
 
     source_locationt sl(e.source_location());
     if(statement_type == ID_assert)
@@ -670,9 +664,6 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
     ensures_program,
     addr_of_ensures_write_set,
     function_pointer_contracts);
-
-  // add the snapshot program in the history section
-  history.destructive_append(history_snapshot_program);
 
   // add the ensures program to the postconditions section
   postconditions.destructive_append(ensures_program);
