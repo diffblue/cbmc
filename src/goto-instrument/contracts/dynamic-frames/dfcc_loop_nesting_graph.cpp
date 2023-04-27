@@ -12,12 +12,12 @@ Date: March 2023
 
 #include "dfcc_loop_nesting_graph.h"
 
-#include <util/invariant.h>
+#include <analyses/natural_loops.h>
 
 dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet(
   const goto_programt::targett &head,
   const goto_programt::targett &latch,
-  const loopt &instructions)
+  const loop_templatet<goto_programt::targett> &instructions)
   : head(head), latch(latch), instructions(instructions)
 {
 }

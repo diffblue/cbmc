@@ -522,16 +522,15 @@ dfcc_cfg_infot::dfcc_cfg_infot(
   : function_id(function_id),
     goto_function(goto_function),
     top_level_write_set(top_level_write_set),
-    log(message_handler),
     ns(symbol_table)
 {
   dfcc_loop_nesting_grapht loop_nesting_graph;
   goto_programt &goto_program = goto_function.body;
-  messaget log(message_handler);
   if(loop_contract_mode != dfcc_loop_contract_modet::NONE)
   {
+    messaget log(message_handler);
     dfcc_check_loop_normal_form(goto_program, log);
-    loop_nesting_graph = build_loop_nesting_graph(goto_program, log);
+    loop_nesting_graph = build_loop_nesting_graph(goto_program);
 
     const auto head = check_inner_loops_have_contracts(loop_nesting_graph);
     if(head.has_value())
