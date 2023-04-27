@@ -47,6 +47,6 @@ typedef grapht<dfcc_loop_nesting_graph_nodet> dfcc_loop_nesting_grapht;
 /// loops in the given \p goto_program.
 /// A loop is considered nested in an outer loop if its head and its latch are
 /// both found in the instructions of the outer loop.
-dfcc_loop_nesting_grapht
-build_loop_nesting_graph(goto_programt &goto_program, messaget &log);
+dfcc_loop_nesting_grapht build_loop_nesting_graph(goto_programt &goto_program);
+
 #endif

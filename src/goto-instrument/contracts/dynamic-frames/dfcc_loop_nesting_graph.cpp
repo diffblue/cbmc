@@ -13,7 +13,6 @@ Date: March 2023
 #include "dfcc_loop_nesting_graph.h"
 
 #include <util/invariant.h>
-#include <util/message.h>
 
 dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet(
   const goto_programt::targett &head,
@@ -24,8 +23,7 @@ dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet(
 }
 
 /// \pre Loop normal form properties must hold.
-dfcc_loop_nesting_grapht
-build_loop_nesting_graph(goto_programt &goto_program, messaget &log)
+dfcc_loop_nesting_grapht build_loop_nesting_graph(goto_programt &goto_program)
 {
   natural_loops_mutablet natural_loops(goto_program);
   dfcc_loop_nesting_grapht loop_nesting_graph;
