@@ -89,6 +89,7 @@ macro(add_if_library target name)
     endif()
 endmacro(add_if_library)
 
+add_subdirectory(options)
 add_subdirectory(analyses)
 add_subdirectory(ansi-c)
 add_subdirectory(assembler)

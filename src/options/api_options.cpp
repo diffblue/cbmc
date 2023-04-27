@@ -2,7 +2,7 @@
 
 #include "api_options.h"
 
-#include <util/make_unique.h>
+#include <make_unique.h>
 
 struct api_optionst::implementationt
 {

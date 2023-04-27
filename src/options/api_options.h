@@ -1,7 +1,7 @@
 // Author: Fotis Koutoulakis for Diffblue Ltd.
 
-#ifndef CPROVER_LIBCPROVER_CPP_OPTIONS_H
-#define CPROVER_LIBCPROVER_CPP_OPTIONS_H
+#ifndef CPROVER_OPTIONS_API_OPTIONS_H
+#define CPROVER_OPTIONS_API_OPTIONS_H
 
 #include <memory>
 

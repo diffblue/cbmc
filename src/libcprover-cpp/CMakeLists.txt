@@ -53,6 +53,7 @@ list(REMOVE_DUPLICATES LIBRARY_DEPENDENCIES)
 # Add all the dependency targets as dependencies of `cprover-api-cpp`
 target_link_libraries(cprover-api-cpp
                       PRIVATE
+                      options-lib
                       ${LIBRARY_DEPENDENCIES})
 
 # To be able to invoke `ar` on the dependencies we need the paths of the libraries `.a` files.
