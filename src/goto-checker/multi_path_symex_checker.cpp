@@ -13,6 +13,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/ui_message.h>
 
+#include <goto-programs/language_features.h>
+
 #include <goto-symex/solver_hardness.h>
 
 #include "bmc_util.h"
@@ -27,6 +29,10 @@ multi_path_symex_checkert::multi_path_symex_checkert(
     equation_generated(false),
     property_decider(options, ui_message_handler, equation, ns)
 {
+  // check the language features used vs. what we support
+  PRECONDITION(!has_language_feature(goto_model, ID_asm));
+  PRECONDITION(!has_language_feature(goto_model, ID_function_pointers));
+  PRECONDITION(!has_language_feature(goto_model, ID_vector));
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::

@@ -19,6 +19,7 @@ Date:   September 2014
 #include <ansi-c/c_expr.h>
 
 #include "goto_model.h"
+#include "language_features.h"
 
 static bool have_to_remove_vector(const typet &type);
 
@@ -379,6 +380,7 @@ void remove_vector(
 {
   remove_vector(symbol_table);
   remove_vector(goto_functions);
+  clear_language_feature(symbol_table, ID_vector);
 }
 
 /// removes vector data type

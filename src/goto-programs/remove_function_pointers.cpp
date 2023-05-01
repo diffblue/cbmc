@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "compute_called_functions.h"
 #include "goto_model.h"
+#include "language_features.h"
 #include "remove_const_function_pointers.h"
 #include "remove_skip.h"
 
@@ -519,6 +520,10 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
 
   if(did_something)
     functions.compute_location_numbers();
+
+  // We always clear the 'function pointers' feature, even when none
+  // were present.
+  clear_language_feature(symbol_table, ID_function_pointers);
 }
 
 void remove_function_pointers(

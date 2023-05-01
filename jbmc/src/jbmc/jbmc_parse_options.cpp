@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_check.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/instrument_preconditions.h>
+#include <goto-programs/language_features.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
@@ -810,6 +811,12 @@ bool jbmc_parse_optionst::process_goto_functions(
 {
   log.status() << "Running GOTO functions transformation passes"
                << messaget::eom;
+
+  // Our transformations remove function pointers, and
+  // Java does not have assembler or vectors.
+  clear_language_feature(goto_model, ID_asm);
+  clear_language_feature(goto_model, ID_function_pointers);
+  clear_language_feature(goto_model, ID_vector);
 
   bool using_symex_driven_loading =
     options.get_bool_option("symex-driven-lazy-loading");
