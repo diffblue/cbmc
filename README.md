@@ -107,7 +107,7 @@ Contributing to the code base
 6. Create a Pull Request targeting the `develop` branch
 
 New contributors can look through the [mini
-projects](https://github.com/diffblue/cbmc/blob/develop/MINI-PROJECTS.md)
+projects](https://github.com/diffblue/cbmc/blob/develop/FEATURE_IDEAS.md)
 page for small, focussed feature ideas.
 
 License

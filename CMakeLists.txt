@@ -46,6 +46,8 @@ message(STATUS "Building CBMC version ${CBMC_VERSION}")
 
 project(CBMC VERSION ${CBMC_VERSION})
 
+set(CBMC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 # when config.inc changes we’ll need to reconfigure to check if the version changed
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/config.inc")
 
