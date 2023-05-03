@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --malloc-may-fail --malloc-fail-null
+^\[foo_assigns.assigns.\d+\] line \d+ Check that ptr\[\(.* int\)0\] is assignable: FAILURE$
+^\[foo_frees.assigns.\d+\] line \d+ Check that ptr\[\(.* int\)0\] is assignable: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This test checks that side effects in functions called from the assigns clause
+or the frees clause are detected and make the analysis fail.
