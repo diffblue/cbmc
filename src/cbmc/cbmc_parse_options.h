@@ -59,6 +59,7 @@ class optionst;
   "(verbosity):(no-library)" \
   "(nondet-static)" \
   "(version)" \
+  "(export-symex-ready-goto):" \
   OPT_COVER \
   "(symex-coverage-report):" \
   "(mm):" \
