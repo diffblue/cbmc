@@ -24,16 +24,16 @@ void dfcc_set_loop_id(
 }
 
 optionalt<std::size_t>
-dfcc_get_loop_id(const goto_programt::instructiont::targett &target)
+dfcc_get_loop_id(const goto_programt::instructiont::const_targett &target)
 {
-  if(target->source_location_nonconst().get(ID_loop_id).empty())
+  if(target->source_location().get(ID_loop_id).empty())
     return {};
 
-  return target->source_location_nonconst().get_size_t(ID_loop_id);
+  return target->source_location().get_size_t(ID_loop_id);
 }
 
 bool dfcc_has_loop_id(
-  const goto_programt::instructiont::targett &target,
+  const goto_programt::instructiont::const_targett &target,
   std::size_t loop_id)
 {
   auto loop_id_opt = dfcc_get_loop_id(target);
@@ -48,7 +48,7 @@ static void dfcc_set_loop_tag(
 }
 
 static bool has_loop_tag(
-  const goto_programt::instructiont::targett &target,
+  const goto_programt::instructiont::const_targett &target,
   const irep_idt &tag)
 {
   return target->source_location().get_bool(tag);
@@ -59,7 +59,7 @@ void dfcc_set_loop_head(goto_programt::instructiont::targett &target)
   dfcc_set_loop_tag(target, ID_loop_head);
 }
 
-bool dfcc_is_loop_head(const goto_programt::instructiont::targett &target)
+bool dfcc_is_loop_head(const goto_programt::instructiont::const_targett &target)
 {
   return has_loop_tag(target, ID_loop_head);
 }
@@ -69,7 +69,7 @@ void dfcc_set_loop_body(goto_programt::instructiont::targett &target)
   dfcc_set_loop_tag(target, ID_loop_body);
 }
 
-bool dfcc_is_loop_body(const goto_programt::instructiont::targett &target)
+bool dfcc_is_loop_body(const goto_programt::instructiont::const_targett &target)
 {
   return has_loop_tag(target, ID_loop_body);
 }
@@ -79,7 +79,8 @@ void dfcc_set_loop_exiting(goto_programt::instructiont::targett &target)
   dfcc_set_loop_tag(target, ID_loop_exiting);
 }
 
-bool dfcc_is_loop_exiting(const goto_programt::instructiont::targett &target)
+bool dfcc_is_loop_exiting(
+  const goto_programt::instructiont::const_targett &target)
 {
   return has_loop_tag(target, ID_loop_exiting);
 }
@@ -89,7 +90,8 @@ void dfcc_set_loop_latch(goto_programt::instructiont::targett &target)
   dfcc_set_loop_tag(target, ID_loop_latch);
 }
 
-bool dfcc_is_loop_latch(const goto_programt::instructiont::targett &target)
+bool dfcc_is_loop_latch(
+  const goto_programt::instructiont::const_targett &target)
 {
   return has_loop_tag(target, ID_loop_latch);
 }
@@ -99,7 +101,8 @@ void dfcc_set_loop_top_level(goto_programt::instructiont::targett &target)
   dfcc_set_loop_tag(target, ID_loop_top_level);
 }
 
-bool dfcc_is_loop_top_level(const goto_programt::instructiont::targett &target)
+bool dfcc_is_loop_top_level(
+  const goto_programt::instructiont::const_targett &target)
 {
   return has_loop_tag(target, ID_loop_top_level);
 }
