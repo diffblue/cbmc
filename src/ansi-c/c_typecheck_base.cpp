@@ -905,20 +905,20 @@ void c_typecheck_baset::typecheck_declaration(
             parameter_identifier, p.type());
         }
 
-        for(auto &requires : code_type.requires())
+        for(auto &c_requires : code_type.c_requires())
         {
-          typecheck_expr(requires);
-          implicit_typecast_bool(requires);
+          typecheck_expr(c_requires);
+          implicit_typecast_bool(c_requires);
           std::string clause_type = "preconditions";
-          check_history_expr_return_value(requires, clause_type);
-          check_was_freed(requires, clause_type);
-          lambda_exprt lambda{temporary_parameter_symbols, requires};
-          lambda.add_source_location() = requires.source_location();
-          requires.swap(lambda);
+          check_history_expr_return_value(c_requires, clause_type);
+          check_was_freed(c_requires, clause_type);
+          lambda_exprt lambda{temporary_parameter_symbols, c_requires};
+          lambda.add_source_location() = c_requires.source_location();
+          c_requires.swap(lambda);
         }
 
-        typecheck_spec_assigns(code_type.assigns());
-        for(auto &assigns : code_type.assigns())
+        typecheck_spec_assigns(code_type.c_assigns());
+        for(auto &assigns : code_type.c_assigns())
         {
           std::string clause_type = "assigns clauses";
           check_history_expr_return_value(assigns, clause_type);
@@ -927,15 +927,15 @@ void c_typecheck_baset::typecheck_declaration(
           assigns.swap(lambda);
         }
 
-        typecheck_spec_frees(code_type.frees());
-        for(auto &frees : code_type.frees())
+        typecheck_spec_frees(code_type.c_frees());
+        for(auto &frees : code_type.c_frees())
         {
           lambda_exprt lambda{temporary_parameter_symbols, frees};
           lambda.add_source_location() = frees.source_location();
           frees.swap(lambda);
         }
 
-        for(auto &ensures : code_type.ensures())
+        for(auto &ensures : code_type.c_ensures())
         {
           typecheck_expr(ensures);
           implicit_typecast_bool(ensures);

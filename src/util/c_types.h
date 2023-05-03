@@ -390,46 +390,46 @@ public:
 
   bool has_contract() const
   {
-    return !ensures().empty() || !requires().empty() || !assigns().empty() ||
-           !frees().empty();
+    return !c_ensures().empty() || !c_requires().empty() ||
+           !c_assigns().empty() || !c_frees().empty();
   }
 
-  const exprt::operandst &assigns() const
+  const exprt::operandst &c_assigns() const
   {
     return static_cast<const exprt &>(find(ID_C_spec_assigns)).operands();
   }
 
-  exprt::operandst &assigns()
+  exprt::operandst &c_assigns()
   {
     return static_cast<exprt &>(add(ID_C_spec_assigns)).operands();
   }
 
-  const exprt::operandst &frees() const
+  const exprt::operandst &c_frees() const
   {
     return static_cast<const exprt &>(find(ID_C_spec_frees)).operands();
   }
 
-  exprt::operandst &frees()
+  exprt::operandst &c_frees()
   {
     return static_cast<exprt &>(add(ID_C_spec_frees)).operands();
   }
 
-  const exprt::operandst &requires() const
+  const exprt::operandst &c_requires() const
   {
     return static_cast<const exprt &>(find(ID_C_spec_requires)).operands();
   }
 
-  exprt::operandst &requires()
+  exprt::operandst &c_requires()
   {
     return static_cast<exprt &>(add(ID_C_spec_requires)).operands();
   }
 
-  const exprt::operandst &ensures() const
+  const exprt::operandst &c_ensures() const
   {
     return static_cast<const exprt &>(find(ID_C_spec_ensures)).operands();
   }
 
-  exprt::operandst &ensures()
+  exprt::operandst &c_ensures()
   {
     return static_cast<exprt &>(add(ID_C_spec_ensures)).operands();
   }

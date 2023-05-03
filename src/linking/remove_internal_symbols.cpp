@@ -67,11 +67,11 @@ static void get_symbols(
         to_code_with_contract_type(code_type);
 
       find_symbols_sett new_symbols;
-      for(const exprt &a : maybe_contract.assigns())
+      for(const exprt &a : maybe_contract.c_assigns())
         find_type_and_expr_symbols(a, new_symbols);
-      for(const exprt &e : maybe_contract.ensures())
+      for(const exprt &e : maybe_contract.c_ensures())
         find_type_and_expr_symbols(e, new_symbols);
-      for(const exprt &r : maybe_contract.requires())
+      for(const exprt &r : maybe_contract.c_requires())
         find_type_and_expr_symbols(r, new_symbols);
 
       for(const auto &s : new_symbols)

@@ -629,7 +629,9 @@ void code_contractst::apply_function_contract(
       // If the function does return a value, but the return value is
       // disregarded, check if the postcondition includes the return value.
       if(std::any_of(
-           type.ensures().begin(), type.ensures().end(), [](const exprt &e) {
+           type.c_ensures().begin(),
+           type.c_ensures().end(),
+           [](const exprt &e) {
              return has_symbol_expr(
                to_lambda_expr(e).where(), CPROVER_PREFIX "return_value", true);
            }))
@@ -674,7 +676,7 @@ void code_contractst::apply_function_contract(
   is_fresh.add_memory_map_decl(new_program);
 
   // Generate: assert(requires)
-  for(const auto &clause : type.requires())
+  for(const auto &clause : type.c_requires())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
@@ -690,8 +692,8 @@ void code_contractst::apply_function_contract(
       converter,
       instantiated_clause,
       mode,
-      [&is_fresh](goto_programt &requires) {
-        is_fresh.update_requires(requires);
+      [&is_fresh](goto_programt &c_requires) {
+        is_fresh.update_requires(c_requires);
       },
       new_program,
       _location);
@@ -699,7 +701,7 @@ void code_contractst::apply_function_contract(
 
   // Generate all the instructions required to initialize history variables
   exprt::operandst instantiated_ensures_clauses;
-  for(auto clause : type.ensures())
+  for(auto clause : type.c_ensures())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
@@ -712,7 +714,7 @@ void code_contractst::apply_function_contract(
   // ASSIGNS clause should not refer to any quantified variables,
   // and only refer to the common symbols to be replaced.
   exprt::operandst targets;
-  for(auto &target : type.assigns())
+  for(auto &target : type.c_assigns())
     targets.push_back(to_lambda_expr(target).application(instantiation_values));
 
   // Create a sequence of non-deterministic assignments ...
@@ -1138,7 +1140,7 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
     instantiation_values.push_back(
       ns.lookup(param.get_identifier()).symbol_expr());
   }
-  for(auto &target : get_contract(function, ns).assigns())
+  for(auto &target : get_contract(function, ns).c_assigns())
   {
     goto_programt payload;
     instrument_spec_assigns.track_spec_target(
@@ -1299,7 +1301,7 @@ void code_contractst::add_contract_check(
   visitor.add_memory_map_decl(check);
 
   // Generate: assume(requires)
-  for(const auto &clause : code_type.requires())
+  for(const auto &clause : code_type.c_requires())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
@@ -1318,8 +1320,8 @@ void code_contractst::add_contract_check(
       converter,
       instantiated_clause,
       function_symbol.mode,
-      [&visitor](goto_programt &requires) {
-        visitor.update_requires(requires);
+      [&visitor](goto_programt &c_requires) {
+        visitor.update_requires(c_requires);
       },
       check,
       _location);
@@ -1327,7 +1329,7 @@ void code_contractst::add_contract_check(
 
   // Generate all the instructions required to initialize history variables
   exprt::operandst instantiated_ensures_clauses;
-  for(auto clause : code_type.ensures())
+  for(auto clause : code_type.c_ensures())
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
