@@ -1,6 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"as__const_8h.html":[9,0,2,30,6],
 "as__const_8h.html#a37898bc9977a702de0778a9bb660ec3e":[9,0,2,30,6,0],
 "as__const_8h.html#a3f867a238882d97da88bccd5aeb93c19":[9,0,2,30,6,1],
 "as__const_8h.html#aacfa8ae594f0e89e740896da858090d7":[9,0,2,30,6,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX2 =
 "boolbv_8h.html":[9,0,2,27,1,3],
 "boolbv_8h_source.html":[9,0,2,27,1,3],
 "boolbv__abs_8cpp.html":[9,0,2,27,1,4],
-"boolbv__abs_8cpp_source.html":[9,0,2,27,1,4]
+"boolbv__abs_8cpp_source.html":[9,0,2,27,1,4],
+"boolbv__add__sub_8cpp.html":[9,0,2,27,1,5]
 };
