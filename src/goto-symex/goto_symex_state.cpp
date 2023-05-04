@@ -84,6 +84,8 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 
   // the type might need renaming
   rename<L2>(lhs.type(), l1_identifier, ns);
+  if(rhs_is_simplified)
+    simplify(lhs, ns);
   lhs.update_type();
   if(run_validation_checks)
   {
