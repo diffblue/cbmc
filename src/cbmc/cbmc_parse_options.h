@@ -51,6 +51,9 @@ class optionst;
   OPT_SOLVER \
   OPT_STRING_REFINEMENT_CBMC \
   OPT_SHOW_GOTO_FUNCTIONS \
+  "(symex-record-coverage)" \
+  OPT_COMPLEXITY_GRAPH \
+  OPT_COMPLEXITY_GRAPH_CBMC \
   OPT_SHOW_PROPERTIES \
   "(show-symbol-table)(show-parse-tree)" \
   "(drop-unused-functions)" \

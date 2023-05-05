@@ -700,6 +700,54 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
+
+    {
+      optionst options;
+      options.set_option ("show-complexity-graph", cmdline.get_value ("show-complexity-graph"));
+      if (cmdline.isset ("complexity-graph-root")) 
+      {
+        std::stringstream stream;
+        for (const std::string &val : cmdline.get_values("complexity-graph-root")) 
+        {
+          stream << val << ",";
+        }
+        options.set_option ("complexity-graph-roots", stream.str());
+      }
+
+      if (cmdline.isset ("complexity-graph-omit-function")) 
+      {
+        std::stringstream stream;
+        for (const std::string &val : cmdline.get_values("complexity-graph-omit-function")) 
+        {
+          stream << val << ",";
+        }
+        options.set_option ("complexity-graph-omit-function", stream.str());
+      }
+
+      if (cmdline.isset ("complexity-graph-global-scores")) 
+      {
+        options.set_option ("complexity-graph-global-scores", true);
+      }
+
+      if (cmdline.isset ("complexity-graph-omit-function-pointers")) 
+      {
+        options.set_option ("complexity-graph-omit-function-pointers", true);
+      }
+
+      if (cmdline.isset ("complexity-graph-instructions")) 
+      {
+        options.set_option ("complexity-graph-instructions", true);
+      }
+
+      if (options.get_option ("show-complexity-graph") != "") 
+      {
+        const std::string path = options.get_option("show-complexity-graph");
+        show_complexity_graph(options, goto_model, path, ui_message_handler);
+        return CPROVER_EXIT_SUCCESS;
+      }
+    }
+
+
     if(cmdline.isset("list-undefined-functions"))
     {
       list_undefined_functions(goto_model, std::cout);
@@ -1856,6 +1904,7 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show loaded symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_COMPLEXITY_GRAPH
     HELP_GOTO_PROGRAM_STATS
     " --show-locations             show all source locations\n"
     " --dot                        generate CFG graph in DOT format\n"

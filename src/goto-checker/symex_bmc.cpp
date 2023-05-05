@@ -33,7 +33,7 @@ symex_bmct::symex_bmct(
       options,
       path_storage,
       guard_manager),
-    record_coverage(!options.get_option("symex-coverage-report").empty()),
+    record_coverage(options.get_bool_option("symex-record-coverage")),
     havoc_bodyless_functions(
       options.get_bool_option("havoc-undefined-functions")),
     unwindset(unwindset),
@@ -74,7 +74,14 @@ void symex_bmct::symex_step(
     log.statistics() << log.eom;
   }
 
+  std::chrono::duration<double> step_runtime(0);
+  auto const step_start = std::chrono::steady_clock::now();
+
   goto_symext::symex_step(get_goto_function, state);
+
+  auto const step_stop = std::chrono::steady_clock::now();
+  step_runtime = step_stop - step_start;
+  double duration = step_runtime.count();
 
   if(
     record_coverage &&
@@ -91,9 +98,9 @@ void symex_bmct::symex_step(
     if(
       cur_pc->is_goto() && cur_pc->get_target() != state.source.pc &&
       cur_pc->condition().is_true())
-      symex_coverage.covered(cur_pc, cur_pc->get_target());
+      symex_coverage.covered(cur_pc, cur_pc->get_target(), duration);
     else if(!state.guard.is_false())
-      symex_coverage.covered(cur_pc, state.source.pc);
+      symex_coverage.covered(cur_pc, state.source.pc, duration);
   }
 }
 
@@ -105,7 +112,14 @@ void symex_bmct::merge_goto(
   const goto_programt::const_targett prev_pc = prev_source.pc;
   const guardt prev_guard = goto_state.guard;
 
+  std::chrono::duration<double, std::nano> step_runtime(0);
+  auto const step_start = std::chrono::steady_clock::now();
+
   goto_symext::merge_goto(prev_source, std::move(goto_state), state);
+
+  auto const step_stop = std::chrono::steady_clock::now();
+  step_runtime = step_stop - step_start;
+  double duration = step_runtime.count();
 
   PRECONDITION(prev_pc->is_goto());
   if(
@@ -114,7 +128,7 @@ void symex_bmct::merge_goto(
     !prev_guard.is_false() && !state.guard.is_false() &&
     // branches only, no single-successor goto
     !prev_pc->condition().is_true())
-    symex_coverage.covered(prev_pc, state.source.pc);
+    symex_coverage.covered(prev_pc, state.source.pc, duration);
 }
 
 bool symex_bmct::should_stop_unwind(
@@ -223,4 +237,9 @@ void symex_bmct::no_body(const irep_idt &identifier)
     }
     log.warning() << log.eom;
   }
+}
+
+const symex_coveraget symex_bmct::get_coverage () const
+{
+  return symex_coverage;
 }
