@@ -298,6 +298,12 @@ public:
     const exprt &allow_deallocate,
     const source_locationt &source_location);
 
+  /// \brief Builds call to \ref __CPROVER_contracts_write_set_create
+  const code_function_callt write_set_create_call(
+    const exprt &write_set_ptr,
+    const exprt &contract_assigns_size,
+    const source_locationt &source_location);
+
   /// \brief Builds call to \ref __CPROVER_contracts_write_set_release
   const code_function_callt write_set_release_call(
     const exprt &write_set_ptr,
