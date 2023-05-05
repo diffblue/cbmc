@@ -353,7 +353,7 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_other(statet &state);
 
-  void symex_assert(const goto_programt::instructiont &, statet &);
+  virtual void symex_assert(const goto_programt::instructiont &, statet &);
 
   /// Propagate constants and points-to information implied by a GOTO condition.
   /// See \ref goto_statet::apply_condition for aspects of this which are common

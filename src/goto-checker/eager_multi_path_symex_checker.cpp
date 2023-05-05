@@ -1,17 +1,15 @@
 /*******************************************************************\
 
-Module: Goto Checker using Multi-Path Symbolic Execution
-        with Incremental Unwinding of a specified Loop
+Module: Goto Checker using Bounded Model Checking
 
-Author: Daniel Kroening, Peter Schrammel
+Author: Michael Tautschnig
 
 \*******************************************************************/
 
 /// \file
-/// Goto Checker using multi-path symbolic execution with incremental
-/// unwinding of a specified loop
+/// Goto Checker using Bounded Model Checking
 
-#include "single_loop_incremental_symex_checker.h"
+#include "eager_multi_path_symex_checker.h"
 
 #include <util/structured_data.h>
 
@@ -20,7 +18,9 @@ Author: Daniel Kroening, Peter Schrammel
 #include "bmc_util.h"
 #include "counterexample_beautification.h"
 
-single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
+#include <chrono>
+
+eager_multi_path_symex_checkert::eager_multi_path_symex_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
   abstract_goto_modelt &goto_model)
@@ -66,8 +66,8 @@ static void output_incremental_status(
   message_hander.statistics() << incremental_status;
 }
 
-incremental_goto_checkert::resultt single_loop_incremental_symex_checkert::
-operator()(propertiest &properties)
+incremental_goto_checkert::resultt
+eager_multi_path_symex_checkert::operator()(propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
@@ -115,6 +115,9 @@ operator()(propertiest &properties)
 
         // We convert the assertions in a new context.
         property_decider.get_stack_decision_procedure().push();
+        prop_conv_solvert *maybe_prop_conv = dynamic_cast<prop_conv_solvert*>(&property_decider.get_decision_procedure());
+        assert(maybe_prop_conv);
+        maybe_prop_conv->post_processing_done = false;
         equation.convert_assertions(
           property_decider.get_decision_procedure(), false);
         property_decider.convert_goals();
@@ -188,7 +191,7 @@ operator()(propertiest &properties)
   return result;
 }
 
-goto_tracet single_loop_incremental_symex_checkert::build_full_trace() const
+goto_tracet eager_multi_path_symex_checkert::build_full_trace() const
 {
   goto_tracet goto_trace;
   build_goto_trace(
@@ -201,7 +204,7 @@ goto_tracet single_loop_incremental_symex_checkert::build_full_trace() const
   return goto_trace;
 }
 
-goto_tracet single_loop_incremental_symex_checkert::build_shortest_trace() const
+goto_tracet eager_multi_path_symex_checkert::build_shortest_trace() const
 {
   if(options.get_bool_option("beautify"))
   {
@@ -218,8 +221,8 @@ goto_tracet single_loop_incremental_symex_checkert::build_shortest_trace() const
   return goto_trace;
 }
 
-goto_tracet single_loop_incremental_symex_checkert::build_trace(
-  const irep_idt &property_id) const
+goto_tracet
+eager_multi_path_symex_checkert::build_trace(const irep_idt &property_id) const
 {
   goto_tracet goto_trace;
   build_goto_trace(
@@ -232,17 +235,17 @@ goto_tracet single_loop_incremental_symex_checkert::build_trace(
   return goto_trace;
 }
 
-const namespacet &single_loop_incremental_symex_checkert::get_namespace() const
+const namespacet &eager_multi_path_symex_checkert::get_namespace() const
 {
   return ns;
 }
 
-void single_loop_incremental_symex_checkert::output_proof()
+void eager_multi_path_symex_checkert::output_proof()
 {
   output_graphml(equation, ns, options);
 }
 
-void single_loop_incremental_symex_checkert::output_error_witness(
+void eager_multi_path_symex_checkert::output_error_witness(
   const goto_tracet &error_trace)
 {
   output_graphml(error_trace, ns, options);
