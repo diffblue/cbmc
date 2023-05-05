@@ -92,7 +92,16 @@ protected:
   typedef std::list<postponedt> postponed_listt;
   postponed_listt postponed_list;
 
-  void do_postponed(const postponedt &postponed);
+  /// Create Boolean functions describing all dynamic and all not-dynamic object
+  /// encodings over \p placeholders as input Boolean variables representing
+  /// object bits.
+  std::pair<exprt, exprt> prepare_postponed_is_dynamic_object(
+    std::vector<symbol_exprt> &placeholders) const;
+
+  /// Create Boolean functions describing all objects of each known object size
+  /// over \p placeholders as input Boolean variables representing object bits.
+  std::unordered_map<exprt, exprt, irep_hash>
+  prepare_postponed_object_size(std::vector<symbol_exprt> &placeholders) const;
 
   /// Given a pointer encoded in \p bv, extract the literals identifying the
   /// object that the pointer points to.
