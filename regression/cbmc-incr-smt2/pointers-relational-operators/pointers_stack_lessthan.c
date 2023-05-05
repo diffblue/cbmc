@@ -2,8 +2,8 @@
 
 int main()
 {
-  int i = 12;
-  int *x = &i;
+  int i[2] = {12, 13};
+  int *x = &i[0] + 1;
   int *y = x + 1;
   int *z = x - 1;
 

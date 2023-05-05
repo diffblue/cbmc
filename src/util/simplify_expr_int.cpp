@@ -1587,12 +1587,24 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
   if(expr.op0().type().id() == ID_floatbv)
     return unchanged(expr);
 
-  // simplifications below require same-object, which we don't check for
-  if(
-    expr.op0().type().id() == ID_pointer && expr.id() != ID_equal &&
-    expr.id() != ID_notequal)
+  if(expr.op0().type().id() == ID_pointer)
   {
-    return unchanged(expr);
+    exprt ptr_op0 = simplify_object(expr.op0()).expr;
+    exprt ptr_op1 = simplify_object(expr.op1()).expr;
+
+    if(ptr_op0 == ptr_op1)
+    {
+      pointer_offset_exprt offset_op0{expr.op0(), size_type()};
+      pointer_offset_exprt offset_op1{expr.op1(), size_type()};
+
+      return changed(simplify_rec(binary_relation_exprt{
+        std::move(offset_op0), expr.id(), std::move(offset_op1)}));
+    }
+    // simplifications below require same-object, which we don't check for
+    else if(expr.id() != ID_equal && expr.id() != ID_notequal)
+    {
+      return unchanged(expr);
+    }
   }
 
   // eliminate strict inequalities
@@ -1650,19 +1662,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
       new_expr.lhs() = simplify_node(new_expr.lhs());
       new_expr.rhs() = simplify_node(new_expr.rhs());
       return changed(simplify_inequality(new_expr)); // recursive call
-    }
-    else if(expr.op0().type().id() == ID_pointer)
-    {
-      exprt ptr_op0 = simplify_object(expr.op0()).expr;
-      exprt ptr_op1 = simplify_object(expr.op1()).expr;
-
-      if(ptr_op0 == ptr_op1)
-      {
-        pointer_offset_exprt offset_op0{expr.op0(), size_type()};
-        pointer_offset_exprt offset_op1{expr.op1(), size_type()};
-
-        return changed(simplify_rec(equal_exprt{offset_op0, offset_op1}));
-      }
     }
   }
 

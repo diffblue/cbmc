@@ -1,0 +1,12 @@
+CORE
+main.c
+--unwind 10 --unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Unwinding loop .* iteration 6
+^warning: ignoring
+--
+Simplification and constant propagation should ensure that unwinding the loop
+stops when reaching the array bound.
