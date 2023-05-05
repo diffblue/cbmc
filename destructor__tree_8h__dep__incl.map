@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/destructor_tree.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/destructor_tree.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1642,5,1826,61"/>
-<area shape="rect" id="node2" href="$destructor__tree_8cpp.html" title=" " alt="" coords="1538,109,1722,165"/>
-<area shape="rect" id="node3" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="1746,109,1930,165"/>
-<area shape="rect" id="node4" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="1970,339,2164,395"/>
-<area shape="rect" id="node11" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="341,339,534,395"/>
-<area shape="rect" id="node20" href="$dfcc__contract__clauses__codegen_8h.html" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="1506,332,1748,403"/>
-<area shape="rect" id="node24" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="932,213,1130,284"/>
-<area shape="rect" id="node25" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="932,332,1130,403"/>
-<area shape="rect" id="node28" href="$dfcc__wrapper__program_8h.html" title="Generates the body of a wrapper function from a contract for contract checking or contract replacemen..." alt="" coords="560,332,758,403"/>
-<area shape="rect" id="node29" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="1807,213,2004,284"/>
-<area shape="rect" id="node30" href="$utils_8h.html" title=" " alt="" coords="2528,339,2721,395"/>
-<area shape="rect" id="node38" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="2028,221,2212,277"/>
-<area shape="rect" id="node39" href="$goto__asm_8cpp.html" title="Assembler &#45;&gt; Goto." alt="" coords="2236,221,2420,277"/>
-<area shape="rect" id="node40" href="$goto__clean__expr_8cpp.html" title="Program Transformation." alt="" coords="2444,221,2628,277"/>
-<area shape="rect" id="node41" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="2652,221,2836,277"/>
-<area shape="rect" id="node42" href="$goto__convert__exceptions_8cpp.html" title="Program Transformation." alt="" coords="2860,221,3076,277"/>
-<area shape="rect" id="node43" href="$goto__convert__function__call_8cpp.html" title="Program Transformation." alt="" coords="3101,221,3329,277"/>
-<area shape="rect" id="node44" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="5521,339,5712,395"/>
-<area shape="rect" id="node60" href="$goto__convert__side__effect_8cpp.html" title="Program Transformation." alt="" coords="3354,221,3570,277"/>
-<area shape="rect" id="node5" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="878,458,1072,514"/>
-<area shape="rect" id="node6" href="$dfcc_8cpp.html" title=" " alt="" coords="2763,688,2960,759"/>
-<area shape="rect" id="node7" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="1096,451,1294,521"/>
-<area shape="rect" id="node8" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1883,569,2080,640"/>
-<area shape="rect" id="node9" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="2154,451,2353,521"/>
-<area shape="rect" id="node10" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="2376,451,2587,521"/>
-<area shape="rect" id="node12" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="328,451,526,521"/>
-<area shape="rect" id="node13" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="284,695,527,751"/>
-<area shape="rect" id="node17" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="3644,458,3842,514"/>
-<area shape="rect" id="node18" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="28,577,290,633"/>
-<area shape="rect" id="node19" href="$goto__synthesizer__parse__options_8h.html" title="Command Line Parsing." alt="" coords="57,458,304,514"/>
-<area shape="rect" id="node14" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="47,807,282,863"/>
-<area shape="rect" id="node15" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="306,807,506,863"/>
-<area shape="rect" id="node16" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="530,807,788,863"/>
-<area shape="rect" id="node21" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="720,577,960,633"/>
-<area shape="rect" id="node22" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="1771,451,2030,521"/>
-<area shape="rect" id="node23" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="1540,451,1746,521"/>
-<area shape="rect" id="node27" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="550,451,752,521"/>
-<area shape="rect" id="node26" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="1318,451,1515,521"/>
-<area shape="rect" id="node31" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="3866,451,4063,521"/>
-<area shape="rect" id="node32" href="$dfcc__check__loop__normal__form_8cpp.html" title=" " alt="" coords="2662,451,2912,521"/>
-<area shape="rect" id="node33" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="4087,451,4284,521"/>
-<area shape="rect" id="node34" href="$havoc__assigns__clause__targets_8cpp.html" title="Havoc multiple and possibly dependent targets simultaneously." alt="" coords="2937,451,3130,521"/>
-<area shape="rect" id="node35" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4309,458,4556,514"/>
-<area shape="rect" id="node36" href="$utils_8cpp.html" title=" " alt="" coords="3154,458,3348,514"/>
-<area shape="rect" id="node37" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="3372,458,3570,514"/>
-<area shape="rect" id="node45" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="4630,465,4848,507"/>
-<area shape="rect" id="node46" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="4872,458,5056,514"/>
-<area shape="rect" id="node47" href="$function__call__harness__generator_8cpp.html" title=" " alt="" coords="5080,451,5264,521"/>
-<area shape="rect" id="node48" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="5288,451,5494,521"/>
-<area shape="rect" id="node49" href="$dfcc__library_8cpp.html" title=" " alt="" coords="5518,451,5715,521"/>
-<area shape="rect" id="node50" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="5739,458,5960,514"/>
-<area shape="rect" id="node51" href="$stack__depth_8cpp.html" title="Stack depth checks." alt="" coords="5985,458,6178,514"/>
-<area shape="rect" id="node52" href="$goto__convert__functions_8cpp.html" title=" " alt="" coords="6203,458,6408,514"/>
-<area shape="rect" id="node53" href="$initialize__goto__model_8cpp.html" title="Get a Goto Program." alt="" coords="6433,458,6626,514"/>
-<area shape="rect" id="node54" href="$link__to__library_8cpp.html" title="Library Linking." alt="" coords="6651,458,6835,514"/>
-<area shape="rect" id="node55" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="6859,458,7043,514"/>
-<area shape="rect" id="node56" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="7068,458,7306,514"/>
-<area shape="rect" id="node57" href="$lazy__goto__functions__map_8h.html" title="Author: Diffblue Ltd." alt="" coords="7331,458,7550,514"/>
-<area shape="rect" id="node58" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="7574,458,7766,514"/>
-<area shape="rect" id="node59" href="$get__goto__model__from__c_8cpp.html" title=" " alt="" coords="7790,458,8000,514"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2069,5,2253,61"/>
+<area shape="rect" id="node2" href="$destructor__tree_8cpp.html" title=" " alt="" coords="1965,109,2149,165"/>
+<area shape="rect" id="node3" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="2173,109,2357,165"/>
+<area shape="rect" id="node4" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="756,339,950,395"/>
+<area shape="rect" id="node11" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="471,339,664,395"/>
+<area shape="rect" id="node19" href="$dfcc__contract__clauses__codegen_8h.html" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="1912,332,2154,403"/>
+<area shape="rect" id="node23" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="2129,451,2326,521"/>
+<area shape="rect" id="node24" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="1725,213,1922,284"/>
+<area shape="rect" id="node25" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="1368,332,1565,403"/>
+<area shape="rect" id="node28" href="$dfcc__wrapper__program_8h.html" title="Generates the body of a wrapper function from a contract for contract checking or contract replacemen..." alt="" coords="1589,332,1786,403"/>
+<area shape="rect" id="node29" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="2302,213,2500,284"/>
+<area shape="rect" id="node30" href="$utils_8h.html" title=" " alt="" coords="2508,339,2702,395"/>
+<area shape="rect" id="node38" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="2524,221,2708,277"/>
+<area shape="rect" id="node39" href="$goto__asm_8cpp.html" title="Assembler &#45;&gt; Goto." alt="" coords="2732,221,2916,277"/>
+<area shape="rect" id="node40" href="$goto__clean__expr_8cpp.html" title="Program Transformation." alt="" coords="2940,221,3124,277"/>
+<area shape="rect" id="node41" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="3148,221,3332,277"/>
+<area shape="rect" id="node42" href="$goto__convert__exceptions_8cpp.html" title="Program Transformation." alt="" coords="3356,221,3572,277"/>
+<area shape="rect" id="node43" href="$goto__convert__function__call_8cpp.html" title="Program Transformation." alt="" coords="3596,221,3824,277"/>
+<area shape="rect" id="node44" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="5814,339,6004,395"/>
+<area shape="rect" id="node60" href="$goto__convert__side__effect_8cpp.html" title="Program Transformation." alt="" coords="3849,221,4065,277"/>
+<area shape="rect" id="node5" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="622,458,815,514"/>
+<area shape="rect" id="node6" href="$dfcc_8cpp.html" title=" " alt="" coords="2289,688,2486,759"/>
+<area shape="rect" id="node7" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="400,451,597,521"/>
+<area shape="rect" id="node8" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2854,569,3052,640"/>
+<area shape="rect" id="node9" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="1396,451,1595,521"/>
+<area shape="rect" id="node10" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="1162,451,1373,521"/>
+<area shape="rect" id="node12" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="941,451,1138,521"/>
+<area shape="rect" id="node13" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1210,695,1453,751"/>
+<area shape="rect" id="node16" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="2633,458,2830,514"/>
+<area shape="rect" id="node17" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="46,577,308,633"/>
+<area shape="rect" id="node18" href="$goto__synthesizer__parse__options_8h.html" title="Command Line Parsing." alt="" coords="28,458,275,514"/>
+<area shape="rect" id="node14" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1094,807,1329,863"/>
+<area shape="rect" id="node15" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1353,807,1553,863"/>
+<area shape="rect" id="node20" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1740,577,1980,633"/>
+<area shape="rect" id="node21" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="2350,451,2609,521"/>
+<area shape="rect" id="node22" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="1898,451,2104,521"/>
+<area shape="rect" id="node27" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="1620,451,1822,521"/>
+<area shape="rect" id="node26" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="2854,451,3052,521"/>
+<area shape="rect" id="node31" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="3834,451,4032,521"/>
+<area shape="rect" id="node32" href="$dfcc__check__loop__normal__form_8cpp.html" title=" " alt="" coords="4056,451,4306,521"/>
+<area shape="rect" id="node33" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="4330,451,4528,521"/>
+<area shape="rect" id="node34" href="$havoc__assigns__clause__targets_8cpp.html" title="Havoc multiple and possibly dependent targets simultaneously." alt="" coords="3127,451,3320,521"/>
+<area shape="rect" id="node35" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4552,458,4799,514"/>
+<area shape="rect" id="node36" href="$utils_8cpp.html" title=" " alt="" coords="3344,458,3538,514"/>
+<area shape="rect" id="node37" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="3562,458,3760,514"/>
+<area shape="rect" id="node45" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="6038,465,6257,507"/>
+<area shape="rect" id="node46" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="6281,458,6465,514"/>
+<area shape="rect" id="node47" href="$function__call__harness__generator_8cpp.html" title=" " alt="" coords="6489,451,6673,521"/>
+<area shape="rect" id="node48" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="6697,451,6902,521"/>
+<area shape="rect" id="node49" href="$dfcc__library_8cpp.html" title=" " alt="" coords="6926,451,7124,521"/>
+<area shape="rect" id="node50" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="7148,458,7369,514"/>
+<area shape="rect" id="node51" href="$stack__depth_8cpp.html" title="Stack depth checks." alt="" coords="7394,458,7587,514"/>
+<area shape="rect" id="node52" href="$goto__convert__functions_8cpp.html" title=" " alt="" coords="7612,458,7817,514"/>
+<area shape="rect" id="node53" href="$initialize__goto__model_8cpp.html" title="Get a Goto Program." alt="" coords="7842,458,8035,514"/>
+<area shape="rect" id="node54" href="$link__to__library_8cpp.html" title="Library Linking." alt="" coords="8060,458,8244,514"/>
+<area shape="rect" id="node55" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="4873,458,5057,514"/>
+<area shape="rect" id="node56" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="5082,458,5320,514"/>
+<area shape="rect" id="node57" href="$lazy__goto__functions__map_8h.html" title="Author: Diffblue Ltd." alt="" coords="5345,458,5564,514"/>
+<area shape="rect" id="node58" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="5588,458,5780,514"/>
+<area shape="rect" id="node59" href="$get__goto__model__from__c_8cpp.html" title=" " alt="" coords="5804,458,6014,514"/>
 </map>

@@ -391,6 +391,7 @@ var annotated_dup =
     [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html", "classdfcc__contract__clauses__codegent" ],
     [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html", "classdfcc__contract__functionst" ],
     [ "dfcc_contract_handlert", "classdfcc__contract__handlert.html", "classdfcc__contract__handlert" ],
+    [ "dfcc_instrument_loopt", "classdfcc__instrument__loopt.html", "classdfcc__instrument__loopt" ],
     [ "dfcc_instrumentt", "classdfcc__instrumentt.html", "classdfcc__instrumentt" ],
     [ "dfcc_is_freeablet", "classdfcc__is__freeablet.html", "classdfcc__is__freeablet" ],
     [ "dfcc_is_fresht", "classdfcc__is__fresht.html", "classdfcc__is__fresht" ],

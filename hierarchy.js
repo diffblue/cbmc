@@ -427,6 +427,7 @@ var hierarchy =
     [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html", null ],
     [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html", null ],
     [ "dfcc_contract_handlert", "classdfcc__contract__handlert.html", null ],
+    [ "dfcc_instrument_loopt", "classdfcc__instrument__loopt.html", null ],
     [ "dfcc_instrumentt", "classdfcc__instrumentt.html", null ],
     [ "dfcc_is_freeablet", "classdfcc__is__freeablet.html", null ],
     [ "dfcc_is_fresht", "classdfcc__is__fresht.html", null ],

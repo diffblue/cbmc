@@ -34,6 +34,7 @@ var classdfcc__libraryt =
     [ "write_set_check_frees_clause_inclusion_call", "classdfcc__libraryt.html#ad604d4ec783223dadf04042d3063a66c", null ],
     [ "write_set_check_havoc_object_call", "classdfcc__libraryt.html#ad9fe8921c2a5042ca752a536bf4fc259", null ],
     [ "write_set_create_call", "classdfcc__libraryt.html#aced76510f1eaf5bb86c4f8d9a0b0884e", null ],
+    [ "write_set_create_call", "classdfcc__libraryt.html#aeaa5632cca9aa35abccfba47f523e839", null ],
     [ "write_set_deallocate_freeable_call", "classdfcc__libraryt.html#adf614c1913728f7cc9e0f41977ec8dae", null ],
     [ "write_set_record_dead_call", "classdfcc__libraryt.html#a041b03574be0b6e0f64665ae32a7fbb3", null ],
     [ "write_set_record_deallocated_call", "classdfcc__libraryt.html#a5120019db5fa6364f70566d9e0103453", null ],
