@@ -51,7 +51,7 @@ void initialize_from_source_files(
 void set_up_custom_entry_point(
   language_filest &language_files,
   symbol_tablet &symbol_table,
-  const std::function<void(const irep_idt &)> &unload,
+  const std::function<std::size_t(const irep_idt &)> &unload,
   const optionst &options,
   bool try_mode_lookup,
   message_handlert &message_handler);

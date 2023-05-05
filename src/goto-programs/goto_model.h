@@ -66,7 +66,13 @@ public:
     return *this;
   }
 
-  void unload(const irep_idt &name) { goto_functions.unload(name); }
+  /// Remove the function named \p name from the function map, if it exists.
+  /// \return Returns 0 when \p name was not present, and 1 when \p name was
+  ///   removed.
+  std::size_t unload(const irep_idt &name)
+  {
+    return goto_functions.unload(name);
+  }
 
   // Implement the abstract goto model interface:
 

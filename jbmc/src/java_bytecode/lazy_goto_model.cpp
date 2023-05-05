@@ -170,7 +170,7 @@ void lazy_goto_modelt::initialize(
   set_up_custom_entry_point(
     language_files,
     symbol_table,
-    [this](const irep_idt &id) { goto_functions.unload(id); },
+    [this](const irep_idt &id) { return goto_functions.unload(id); },
     options,
     false,
     message_handler);

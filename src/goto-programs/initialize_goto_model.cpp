@@ -120,7 +120,7 @@ void initialize_from_source_files(
 void set_up_custom_entry_point(
   language_filest &language_files,
   symbol_tablet &symbol_table,
-  const std::function<void(const irep_idt &)> &unload,
+  const std::function<std::size_t(const irep_idt &)> &unload,
   const optionst &options,
   bool try_mode_lookup,
   message_handlert &message_handler)
@@ -213,7 +213,7 @@ goto_modelt initialize_goto_model(
   set_up_custom_entry_point(
     language_files,
     goto_model.symbol_table,
-    [&goto_model](const irep_idt &id) { goto_model.goto_functions.unload(id); },
+    [&goto_model](const irep_idt &id) { return goto_model.unload(id); },
     options,
     true,
     message_handler);
