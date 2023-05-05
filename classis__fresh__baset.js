@@ -1,6 +1,6 @@
 var classis__fresh__baset =
 [
-    [ "is_fresh_baset", "classis__fresh__baset.html#ad9ca29c63647e680b3fe8ccffbebc4a9", null ],
+    [ "is_fresh_baset", "classis__fresh__baset.html#ada0a2c0c2d8218c8c9b4cea1992c63b2", null ],
     [ "add_declarations", "classis__fresh__baset.html#acf37377a5bf5f7d46e3cb1a4a70cf442", null ],
     [ "add_memory_map_dead", "classis__fresh__baset.html#a9747f68a8d7e52d1b53cee0456d25eb6", null ],
     [ "add_memory_map_decl", "classis__fresh__baset.html#a754db5a5116c4b80ea9fd16f03e29b3c", null ],
@@ -12,10 +12,10 @@ var classis__fresh__baset =
     [ "update_fn_call", "classis__fresh__baset.html#a5ab7ca3a62fdcce4d6976f41c2138c35", null ],
     [ "update_requires", "classis__fresh__baset.html#aa4786680d08387dfbed752d69593fbe3", null ],
     [ "ensures_fn_name", "classis__fresh__baset.html#a5ae878d139b6caff7b642e1e722c4a8b", null ],
-    [ "fun_id", "classis__fresh__baset.html#a514da7bc7ab61284f2bd88c44f5c1f68", null ],
-    [ "log", "classis__fresh__baset.html#a95bef3df78d8b04686e7f519d25fefa8", null ],
+    [ "fun_id", "classis__fresh__baset.html#a3a3209f246b05a50171aaaaa61dddf22", null ],
+    [ "goto_model", "classis__fresh__baset.html#acc7f8f46ddcd4e9c41680b291d625586", null ],
     [ "memmap_name", "classis__fresh__baset.html#ad0ec66e3d4e13d855d6608979bdcfe6b", null ],
     [ "memmap_symbol", "classis__fresh__baset.html#ad4c0046d3c2adfe62198a769bcdcece0", null ],
-    [ "parent", "classis__fresh__baset.html#a870531220dae8b49de52903eac78498b", null ],
+    [ "message_handler", "classis__fresh__baset.html#a6a3908c99ad15c79db138000d1409e1c", null ],
     [ "requires_fn_name", "classis__fresh__baset.html#a6ff5c3684c0c8382a177974f786a5970", null ]
 ];

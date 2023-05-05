@@ -1,8 +1,5 @@
 var NAVTREEINDEX123 =
 {
-"smt2__conv_8h_source.html":[9,0,2,27,8,3],
-"smt2__dec_8cpp.html":[9,0,2,27,8,4],
-"smt2__dec_8cpp.html#a7a37f90dc12ffa6695a8abee6160d4d1":[9,0,2,27,8,4,0],
 "smt2__dec_8cpp_source.html":[9,0,2,27,8,4],
 "smt2__dec_8h.html":[9,0,2,27,8,5],
 "smt2__dec_8h_source.html":[9,0,2,27,8,5],
@@ -79,9 +76,9 @@ var NAVTREEINDEX123 =
 "smt__is__dynamic__object_8h.html":[9,0,2,27,9,12],
 "smt__is__dynamic__object_8h_source.html":[9,0,2,27,9,12],
 "smt__logics_8cpp.html":[9,0,2,27,9,0,4],
+"smt__logics_8cpp.html#a4565e178a5040422755e54ef6ecff265":[9,0,2,27,9,0,4,1],
 "smt__logics_8cpp.html#a4565e178a5040422755e54ef6ecff265":[9,0,2,27,9,0,4,0],
 "smt__logics_8cpp.html#a4565e178a5040422755e54ef6ecff265":[9,0,2,27,9,0,4,2],
-"smt__logics_8cpp.html#a4565e178a5040422755e54ef6ecff265":[9,0,2,27,9,0,4,1],
 "smt__logics_8cpp.html#a7fc4434287b818845ff41e9bd776269c":[9,0,2,27,9,0,4,3],
 "smt__logics_8cpp_source.html":[9,0,2,27,9,0,4],
 "smt__logics_8h.html":[9,0,2,27,9,0,5],
@@ -136,10 +133,10 @@ var NAVTREEINDEX123 =
 "smt__solver__process_8h.html":[9,0,2,27,9,18],
 "smt__solver__process_8h_source.html":[9,0,2,27,9,18],
 "smt__sorts_8cpp.html":[9,0,2,27,9,0,10],
-"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[9,0,2,27,9,0,10,0],
 "smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[9,0,2,27,9,0,10,3],
-"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[9,0,2,27,9,0,10,1],
 "smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[9,0,2,27,9,0,10,2],
+"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[9,0,2,27,9,0,10,1],
+"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[9,0,2,27,9,0,10,0],
 "smt__sorts_8cpp.html#a44d8f1fc245f3b9de7e6762b09484e1c":[9,0,2,27,9,0,10,4],
 "smt__sorts_8cpp_source.html":[9,0,2,27,9,0,10],
 "smt__sorts_8h.html":[9,0,2,27,9,0,11],
@@ -249,5 +246,8 @@ var NAVTREEINDEX123 =
 "source__location_8h.html#a94709b98377d5821a4895b9cf6ff588f":[9,0,2,30,210,2],
 "source__location_8h_source.html":[9,0,2,30,210],
 "sparse__vector_8h.html":[9,0,2,30,211],
-"sparse__vector_8h_source.html":[9,0,2,30,211]
+"sparse__vector_8h_source.html":[9,0,2,30,211],
+"splice__call_8cpp.html":[9,0,2,13,96],
+"splice__call_8cpp.html#a377daa52f2300bc9c1a24e2606893280":[9,0,2,13,96,0],
+"splice__call_8cpp.html#aed912aa1073fbfd335032467e4cb011f":[9,0,2,13,96,1]
 };

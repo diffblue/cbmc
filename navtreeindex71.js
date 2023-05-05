@@ -1,8 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classw__guardst.html#ada26c3992ab1403637bcce887dc16f79":[8,0,1345,4],
-"classw__guardst.html#ae8f8d6094802d06be7dc01d75e95cd8c":[8,0,1345,0],
-"classw__ok__exprt.html":[8,0,1346],
 "classw__ok__exprt.html#af75188b2658189bd0ae43a9fc0961406":[8,0,1346,0],
 "classwall__clock__timestampert.html":[8,0,1347],
 "classwall__clock__timestampert.html#a9cfec92a458ebc86abbcc85274de27d7":[8,0,1347,0],
@@ -249,5 +246,8 @@ var NAVTREEINDEX71 =
 "cone__of__influence_8h.html#ae5f21a09ba63d71a88e7c9c8556e9fd7":[9,0,2,13,0,8,1],
 "cone__of__influence_8h_source.html":[9,0,2,13,0,8],
 "config_8cpp.html":[9,0,2,30,21],
-"config_8cpp.html#a5dc47fca54d4edb9394c51f9536a5d48":[9,0,2,30,21,0]
+"config_8cpp.html#a5dc47fca54d4edb9394c51f9536a5d48":[9,0,2,30,21,0],
+"config_8cpp.html#a75c277b1f7ad11184b2ceacf6f979860":[9,0,2,30,21,2],
+"config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe":[9,0,2,30,21,3],
+"config_8cpp.html#ad2d049566f83776f4e37defd54fc28b4":[9,0,2,30,21,1]
 };
