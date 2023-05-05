@@ -14,22 +14,22 @@ Date: July 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_MEMORY_PREDICATES_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_MEMORY_PREDICATES_H
 
-#include <util/message.h>
 #include <util/symbol.h>
 
 #include <goto-programs/goto_program.h>
 
-class code_contractst;
 class goto_functionst;
+class goto_modelt;
+class message_handlert;
 
 class is_fresh_baset
 {
 public:
   is_fresh_baset(
-    code_contractst &_parent,
-    messaget _log,
-    const irep_idt _fun_id)
-    : parent(_parent), log(_log), fun_id(_fun_id)
+    goto_modelt &goto_model,
+    message_handlert &message_handler,
+    const irep_idt &_fun_id)
+    : goto_model(goto_model), message_handler(message_handler), fun_id(_fun_id)
   {
   }
 
@@ -51,9 +51,9 @@ protected:
   virtual void create_requires_fn_call(goto_programt::targett &target) = 0;
   virtual void create_ensures_fn_call(goto_programt::targett &target) = 0;
 
-  code_contractst &parent;
-  messaget log;
-  irep_idt fun_id;
+  goto_modelt &goto_model;
+  message_handlert &message_handler;
+  const irep_idt &fun_id;
 
   // written by the child classes.
   std::string memmap_name;
@@ -68,9 +68,9 @@ class is_fresh_enforcet : public is_fresh_baset
 {
 public:
   is_fresh_enforcet(
-    code_contractst &_parent,
-    messaget _log,
-    const irep_idt _fun_id);
+    goto_modelt &goto_model,
+    message_handlert &message_handler,
+    const irep_idt &_fun_id);
 
   virtual void create_declarations();
 
@@ -83,9 +83,9 @@ class is_fresh_replacet : public is_fresh_baset
 {
 public:
   is_fresh_replacet(
-    code_contractst &_parent,
-    messaget _log,
-    const irep_idt _fun_id);
+    goto_modelt &goto_model,
+    message_handlert &message_handler,
+    const irep_idt &_fun_id);
 
   virtual void create_declarations();
 
@@ -121,8 +121,8 @@ class functions_in_scope_visitort
 public:
   functions_in_scope_visitort(
     const goto_functionst &goto_functions,
-    messaget &log)
-    : goto_functions(goto_functions), log(log)
+    message_handlert &message_handler)
+    : goto_functions(goto_functions), message_handler(message_handler)
   {
   }
 
@@ -133,7 +133,7 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  messaget &log;
+  message_handlert &message_handler;
   std::set<irep_idt> function_set;
 };
 

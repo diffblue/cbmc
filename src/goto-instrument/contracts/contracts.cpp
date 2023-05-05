@@ -668,7 +668,8 @@ void code_contractst::apply_function_contract(
   // new program where all contract-derived instructions are added
   goto_programt new_program;
 
-  is_fresh_replacet is_fresh(*this, log, target_function);
+  is_fresh_replacet is_fresh(
+    goto_model, log.get_message_handler(), target_function);
   is_fresh.create_declarations();
   is_fresh.add_memory_map_decl(new_program);
 
@@ -1072,16 +1073,6 @@ void code_contractst::apply_loop_contract(
   }
 }
 
-symbol_tablet &code_contractst::get_symbol_table()
-{
-  return symbol_table;
-}
-
-goto_functionst &code_contractst::get_goto_functions()
-{
-  return goto_functions;
-}
-
 void code_contractst::check_frame_conditions_function(const irep_idt &function)
 {
   // Get the function object before instrumentation.
@@ -1302,7 +1293,8 @@ void code_contractst::add_contract_check(
     instantiation_values.push_back(p);
   }
 
-  is_fresh_enforcet visitor(*this, log, wrapper_function);
+  is_fresh_enforcet visitor(
+    goto_model, log.get_message_handler(), wrapper_function);
   visitor.create_declarations();
   visitor.add_memory_map_decl(check);
 
