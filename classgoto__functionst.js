@@ -18,7 +18,7 @@ var classgoto__functionst =
     [ "sorted", "classgoto__functionst.html#a6b0127363fb88887559748dfdb3129bf", null ],
     [ "sorted", "classgoto__functionst.html#ad48e92daa212d5093e47cb2708b14822", null ],
     [ "swap", "classgoto__functionst.html#a20a2e5d0cc3d814171ab5ac2956e91fd", null ],
-    [ "unload", "classgoto__functionst.html#a64de471ad0bb555393f91b08c41ac10f", null ],
+    [ "unload", "classgoto__functionst.html#a517716ed1ad4b7dc981bb5133caf163d", null ],
     [ "update", "classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e", null ],
     [ "validate", "classgoto__functionst.html#a8a0ae0ea67d46063134e153f900699ff", null ],
     [ "function_map", "classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9", null ],

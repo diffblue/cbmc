@@ -143,7 +143,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Interface providing access to a single function in a GOTO model, plus its associated symbol table. </p>
 <p>Its purpose is to permit GOTO program renumbering (a non-const operation on <a class="el" href="classgoto__functionst.html" title="A collection of goto functions.">goto_functionst</a>) without providing a non-const reference to the entire function map. For example, incremental function loading uses this, as in that situation functions other than the one currently being loaded should not be altered. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00183">183</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00189">189</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a478f9948081e65e6f711c12f1e1a5c96"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a478f9948081e65e6f711c12f1e1a5c96">&#9670;&nbsp;</a></span>goto_model_functiont()</h2>
@@ -202,7 +202,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00195">195</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00201">201</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -233,7 +233,7 @@ Private Attributes</h2></td></tr>
 <p>Re-number our goto_function. </p>
 <p>After this method returns all instructions' location numbers may have changed, but will be globally unique and in program order within the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00210">210</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00216">216</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -263,7 +263,7 @@ Private Attributes</h2></td></tr>
 <p>Get function id. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>goto_function</code>'s name (its key in <code>goto_functions</code>) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00233">233</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00239">239</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -293,7 +293,7 @@ Private Attributes</h2></td></tr>
 <p>Get GOTO function. </p>
 <dl class="section return"><dt>Returns</dt><dd>the wrapped GOTO function </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00226">226</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00232">232</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -323,7 +323,7 @@ Private Attributes</h2></td></tr>
 <p>Get symbol table. </p>
 <dl class="section return"><dt>Returns</dt><dd>journalling symbol table that (a) wraps the global symbol table, and (b) has recorded all symbol mutations (insertions, updates and deletions) that resulted from creating <code>goto_function</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00219">219</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00225">225</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -348,7 +348,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00241">241</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00247">247</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -372,7 +372,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00242">242</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00248">248</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -396,7 +396,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00240">240</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00246">246</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>
@@ -420,7 +420,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00239">239</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__model_8h_source.html#l00245">245</a> of file <a class="el" href="goto__model_8h_source.html">goto_model.h</a>.</p>
 
 </div>
 </div>

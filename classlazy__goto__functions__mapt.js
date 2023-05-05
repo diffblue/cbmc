@@ -20,7 +20,7 @@ var classlazy__goto__functions__mapt =
     [ "ensure_entry_converted", "classlazy__goto__functions__mapt.html#a1b6b654f9444deac74b9b5c2d76871e7", null ],
     [ "ensure_function_loaded", "classlazy__goto__functions__mapt.html#a2ebe7bb51a8f72f5a29b6947de7caeb2", null ],
     [ "ensure_function_loaded_internal", "classlazy__goto__functions__mapt.html#afb6fe9ee34de15d84eceaa42b68cbe4f", null ],
-    [ "unload", "classlazy__goto__functions__mapt.html#a844a44057f28acf41ca9e4fac3862d32", null ],
+    [ "unload", "classlazy__goto__functions__mapt.html#a13b85e05bae7aed7fe00a5cc8c3a9953", null ],
     [ "driver_program_can_generate_function_body", "classlazy__goto__functions__mapt.html#aac3a6b71ca4ff6c20b0d408a9dfd146f", null ],
     [ "driver_program_generate_function_body", "classlazy__goto__functions__mapt.html#aefca4806668ff8e2c34efe2bf94706de", null ],
     [ "goto_functions", "classlazy__goto__functions__mapt.html#a604fc65737b761db0f2e0d6efd48d7fc", null ],

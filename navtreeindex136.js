@@ -1,5 +1,6 @@
 var NAVTREEINDEX136 =
 {
+"structsmt__core__theoryt_1_1impliest.html#a4b7a46746815ffdc0824790dc0d0380e":[8,0,1100,4,1],
 "structsmt__core__theoryt_1_1impliest.html#a8a5c952ce6c85bb7ea1e1787172bbc5a":[8,0,1100,4,0],
 "structsmt__core__theoryt_1_1impliest.html#a9e7c43d48d040b087d9e72f4989a59eb":[8,0,1100,4,2],
 "structsmt__core__theoryt_1_1nott.html":[8,0,1100,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX136 =
 "structtdefl__compressor.html#a161b24984ce5e86f7c36378b9145a8a5":[8,0,1249,37],
 "structtdefl__compressor.html#a181e0aa6797e436af3625de2482ab563":[8,0,1249,38],
 "structtdefl__compressor.html#a2629e9f8046f0d2d8898303ed6e50fbf":[8,0,1249,30],
-"structtdefl__compressor.html#a2dffbb84dd4d9bf24bc3b1476cbd636c":[8,0,1249,10],
-"structtdefl__compressor.html#a2fe623583532f09b395e99e3d25c123e":[8,0,1249,36]
+"structtdefl__compressor.html#a2dffbb84dd4d9bf24bc3b1476cbd636c":[8,0,1249,10]
 };
