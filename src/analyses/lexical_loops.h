@@ -96,7 +96,8 @@ public:
 
 protected:
   void compute(P &program);
-  bool compute_lexical_loop(T, T);
+  bool
+  compute_lexical_loop(const std::map<T, std::vector<T>> &incoming_edges, T, T);
 
   bool all_in_lexical_loop_form = false;
 };
@@ -116,6 +117,16 @@ void lexical_loops_templatet<P, T>::compute(P &program)
 {
   all_in_lexical_loop_form = true;
 
+  // compute the incoming edges for all instructions
+  std::map<T, std::vector<T>> incoming_edges;
+
+  for(auto it = program.instructions.begin(); it != program.instructions.end();
+      ++it)
+  {
+    for(const auto &succ : program.get_successors(it))
+      incoming_edges[succ].push_back(it);
+  }
+
   // find back-edges m->n
   for(auto it = program.instructions.begin(); it != program.instructions.end();
       ++it)
@@ -131,7 +142,7 @@ void lexical_loops_templatet<P, T>::compute(P &program)
                   << target->location_number << "\n";
 #endif
 
-        if(!compute_lexical_loop(it, target))
+        if(!compute_lexical_loop(incoming_edges, it, target))
           all_in_lexical_loop_form = false;
       }
     }
@@ -144,6 +155,7 @@ void lexical_loops_templatet<P, T>::compute(P &program)
 /// instructions that can reach the backedge as falling within the loop.
 template <class P, class T>
 bool lexical_loops_templatet<P, T>::compute_lexical_loop(
+  const std::map<T, std::vector<T>> &incoming_edges,
   T loop_tail,
   T loop_head)
 {
@@ -165,17 +177,22 @@ bool lexical_loops_templatet<P, T>::compute_lexical_loop(
     T loop_instruction = stack.top();
     stack.pop();
 
-    for(auto predecessor : loop_instruction->incoming_edges)
+    auto incoming_edges_it = incoming_edges.find(loop_instruction);
+
+    if(incoming_edges_it != incoming_edges.end())
     {
-      if(
-        predecessor->location_number > loop_tail->location_number ||
-        predecessor->location_number < loop_head->location_number)
+      for(auto predecessor : incoming_edges_it->second)
       {
-        // Not a lexical loop: has an incoming edge from outside.
-        return false;
+        if(
+          predecessor->location_number > loop_tail->location_number ||
+          predecessor->location_number < loop_head->location_number)
+        {
+          // Not a lexical loop: has an incoming edge from outside.
+          return false;
+        }
+        if(loop_instructions.insert(predecessor).second)
+          stack.push(predecessor);
       }
-      if(loop_instructions.insert(predecessor).second)
-        stack.push(predecessor);
     }
   }
 

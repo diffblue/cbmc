@@ -173,15 +173,18 @@ void loop_analysist<T>::output(std::ostream &out) const
   {
     unsigned n = loop.first->location_number;
 
-    std::unordered_set<std::size_t> backedge_location_numbers;
-    for(const auto &backedge : loop.first->incoming_edges)
-      backedge_location_numbers.insert(backedge->location_number);
-
     out << n << " is head of { ";
 
     std::vector<std::size_t> loop_location_numbers;
+    std::unordered_set<std::size_t> backedge_location_numbers;
+
     for(const auto &loop_instruction_it : loop.second)
+    {
       loop_location_numbers.push_back(loop_instruction_it->location_number);
+      if(loop_instruction_it->is_backwards_goto())
+        backedge_location_numbers.insert(loop_instruction_it->location_number);
+    }
+
     std::sort(loop_location_numbers.begin(), loop_location_numbers.end());
 
     for(const auto location_number : loop_location_numbers)
