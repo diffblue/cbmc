@@ -126,6 +126,8 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     UNREACHABLE;
   }
 
+  argv.insert(argv.end(), solver_args.begin(), solver_args.end());
+
   int res =
     run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
 
