@@ -1,4 +1,4 @@
-CORE dfcc-only
+CORE
 main.c
 --dfcc main --apply-loop-contracts
 activate-multi-line-match
@@ -8,6 +8,6 @@ activate-multi-line-match
 ^SIGNAL=0$
 --
 --
-This test fails because the decreases clause is a statement (more precisely, 
+This test fails because the decreases clause is a statement (more precisely,
 an assignment) rather than an expression (more precisely, an ACSL binding
 expression).
