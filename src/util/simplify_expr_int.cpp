@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational_tools.h"
 #include "simplify_utils.h"
 #include "std_expr.h"
+#include "threeval.h"
 
 #include <algorithm>
 
@@ -1604,6 +1605,38 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
     else if(expr.id() != ID_equal && expr.id() != ID_notequal)
     {
       return unchanged(expr);
+    }
+    else if(
+      expr.id() == ID_equal && ptr_op0.id() == ID_address_of &&
+      ptr_op1.id() == ID_address_of)
+    {
+      // comparing pointers: if both are address-of-plus-some-constant such that
+      // the resulting pointer remains within object bounds then they can never
+      // be equal
+      auto in_bounds = [this](const exprt &object_ptr, const exprt &expr_op) {
+        auto object_size =
+          size_of_expr(to_address_of_expr(object_ptr).object().type(), ns);
+
+        if(object_size.has_value())
+        {
+          pointer_offset_exprt offset{expr_op, object_size->type()};
+          exprt in_object_bounds =
+            simplify_rec(binary_relation_exprt{
+                           std::move(offset), ID_lt, std::move(*object_size)})
+              .expr;
+          if(in_object_bounds.is_constant())
+            return tvt{in_object_bounds.is_true()};
+        }
+
+        return tvt::unknown();
+      };
+
+      if(
+        in_bounds(ptr_op0, expr.op0()).is_true() &&
+        in_bounds(ptr_op1, expr.op1()).is_true())
+      {
+        return false_exprt{};
+      }
     }
   }
 
