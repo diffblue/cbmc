@@ -1,0 +1,12 @@
+CORE broken-smt-backend
+main.c
+--malloc-may-fail --malloc-fail-null
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^Invariant check failed
+^warning: ignoring
+--
+Simplification of array sizes must be applied consistently and must not result
+in value-set assignment invariant failures.
