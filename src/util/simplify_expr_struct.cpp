@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "byte_operators.h"
 #include "c_types.h"
 #include "config.h"
+#include "expr_util.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -240,20 +241,6 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       }
     }
   }
-  else if(op.id()==ID_if)
-  {
-    const if_exprt &if_expr=to_if_expr(op);
-    exprt cond=if_expr.cond();
-
-    member_exprt member_false=to_member_expr(expr);
-    member_false.compound()=if_expr.false_case();
-
-    member_exprt member_true = to_member_expr(expr);
-    member_true.compound() = if_expr.true_case();
-
-    auto tmp = if_exprt(cond, member_true, member_false, expr.type());
-    return changed(simplify_rec(tmp));
-  }
   else if(op.id() == ID_let)
   {
     // Push a member operator inside a let binding, to avoid the let bisecting
@@ -267,6 +254,30 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     to_let_expr(new_expr).type() = to_let_expr(new_expr).where().type();
 
     return changed(simplify_rec(new_expr));
+  }
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_member_preorder(const member_exprt &expr)
+{
+  const exprt &compound = expr.compound();
+
+  if(compound.id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    auto r_it = simplify_rec(compound); // recursive call
+    if(r_it.has_changed())
+    {
+      auto tmp = expr;
+      tmp.compound() = r_it.expr;
+      return tmp;
+    }
   }
 
   return unchanged(expr);

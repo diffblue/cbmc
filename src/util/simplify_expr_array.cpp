@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
+#include "expr_util.h"
 #include "pointer_offset_size.h"
 #include "replace_expr.h"
 #include "std_expr.h"
@@ -196,22 +197,44 @@ simplify_exprt::simplify_index(const index_exprt &expr)
       return changed(simplify_byte_extract(result_expr));
     }
   }
-  else if(array.id()==ID_if)
-  {
-    const if_exprt &if_expr=to_if_expr(array);
-    exprt cond=if_expr.cond();
-
-    index_exprt idx_false=to_index_expr(expr);
-    idx_false.array()=if_expr.false_case();
-
-    new_expr.array() = if_expr.true_case();
-
-    exprt result = if_exprt(cond, new_expr, idx_false, expr.type());
-    return changed(simplify_rec(result));
-  }
 
   if(no_change)
     return unchanged(expr);
   else
     return std::move(new_expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_index_preorder(const index_exprt &expr)
+{
+  // lift up any ID_if on the array
+  if(expr.array().id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    optionalt<exprt::operandst> new_operands;
+
+    for(std::size_t i = 0; i < expr.operands().size(); ++i)
+    {
+      auto r_it = simplify_rec(expr.operands()[i]); // recursive call
+      if(r_it.has_changed())
+      {
+        if(!new_operands.has_value())
+          new_operands = expr.operands();
+        (*new_operands)[i] = std::move(r_it.expr);
+      }
+    }
+
+    if(new_operands.has_value())
+    {
+      exprt result = expr;
+      std::swap(result.operands(), *new_operands);
+      return result;
+    }
+  }
+
+  return unchanged(expr);
 }

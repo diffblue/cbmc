@@ -175,10 +175,16 @@ public:
   NODISCARD resultt<> simplify_with(const with_exprt &);
   NODISCARD resultt<> simplify_update(const update_exprt &);
   NODISCARD resultt<> simplify_index(const index_exprt &);
+  NODISCARD resultt<> simplify_index_preorder(const index_exprt &);
   NODISCARD resultt<> simplify_member(const member_exprt &);
+  NODISCARD resultt<> simplify_member_preorder(const member_exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
+  NODISCARD resultt<>
+  simplify_byte_extract_preorder(const byte_extract_exprt &);
   NODISCARD resultt<> simplify_pointer_object(const pointer_object_exprt &);
+  NODISCARD resultt<>
+  simplify_unary_pointer_predicate_preorder(const unary_exprt &);
   NODISCARD resultt<> simplify_object_size(const object_size_exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const unary_exprt &);
   NODISCARD resultt<> simplify_is_invalid_pointer(const unary_exprt &);
@@ -186,6 +192,7 @@ public:
   NODISCARD resultt<> simplify_unary_minus(const unary_minus_exprt &);
   NODISCARD resultt<> simplify_unary_plus(const unary_plus_exprt &);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
+  NODISCARD resultt<> simplify_dereference_preorder(const dereference_exprt &);
   NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
   NODISCARD resultt<> simplify_pointer_offset(const pointer_offset_exprt &);
   NODISCARD resultt<> simplify_bswap(const bswap_exprt &);

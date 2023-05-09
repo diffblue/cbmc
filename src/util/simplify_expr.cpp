@@ -1376,23 +1376,6 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
   if(pointer.type().id()!=ID_pointer)
     return unchanged(expr);
 
-  if(pointer.id()==ID_if && pointer.operands().size()==3)
-  {
-    const if_exprt &if_expr=to_if_expr(pointer);
-
-    auto tmp_op1 = expr;
-    tmp_op1.op() = if_expr.true_case();
-    exprt tmp_op1_result = simplify_dereference(tmp_op1);
-
-    auto tmp_op2 = expr;
-    tmp_op2.op() = if_expr.false_case();
-    exprt tmp_op2_result = simplify_dereference(tmp_op2);
-
-    if_exprt tmp{if_expr.cond(), tmp_op1_result, tmp_op2_result};
-
-    return changed(simplify_if(tmp));
-  }
-
   if(pointer.id()==ID_address_of)
   {
     exprt tmp=to_address_of_expr(pointer).object();
@@ -1420,6 +1403,30 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
           to_array_type(old.array().type()).element_type());
         return changed(simplify_rec(idx));
       }
+    }
+  }
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_dereference_preorder(const dereference_exprt &expr)
+{
+  const exprt &pointer = expr.pointer();
+
+  if(pointer.id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    auto r_it = simplify_rec(pointer); // recursive call
+    if(r_it.has_changed())
+    {
+      auto tmp = expr;
+      tmp.pointer() = r_it.expr;
+      return tmp;
     }
   }
 
@@ -1642,17 +1649,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 {
-  // lift up any ID_if on the object
-  if(expr.op().id()==ID_if)
-  {
-    if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() =
-      simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
-    if_expr.false_case() =
-      simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
-    return changed(simplify_if(if_expr));
-  }
-
   const auto el_size = pointer_offset_bits(expr.type(), ns);
   if(el_size.has_value() && *el_size < 0)
     return unchanged(expr);
@@ -2006,6 +2002,41 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
   if(can_forward_propagatet(ns)(expr))
     return changed(simplify_rec(lower_byte_extract(expr, ns)));
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_byte_extract_preorder(const byte_extract_exprt &expr)
+{
+  // lift up any ID_if on the object
+  if(expr.op().id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    optionalt<exprt::operandst> new_operands;
+
+    for(std::size_t i = 0; i < expr.operands().size(); ++i)
+    {
+      auto r_it = simplify_rec(expr.operands()[i]); // recursive call
+      if(r_it.has_changed())
+      {
+        if(!new_operands.has_value())
+          new_operands = expr.operands();
+        (*new_operands)[i] = std::move(r_it.expr);
+      }
+    }
+
+    if(new_operands.has_value())
+    {
+      exprt result = expr;
+      std::swap(result.operands(), *new_operands);
+      return result;
+    }
+  }
 
   return unchanged(expr);
 }
@@ -2738,6 +2769,31 @@ simplify_exprt::simplify_node_preorder(const exprt &expr)
   else if(expr.id() == ID_typecast)
   {
     result = simplify_typecast_preorder(to_typecast_expr(expr));
+  }
+  else if(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
+  {
+    result = simplify_byte_extract_preorder(to_byte_extract_expr(expr));
+  }
+  else if(expr.id() == ID_dereference)
+  {
+    result = simplify_dereference_preorder(to_dereference_expr(expr));
+  }
+  else if(expr.id() == ID_index)
+  {
+    result = simplify_index_preorder(to_index_expr(expr));
+  }
+  else if(expr.id() == ID_member)
+  {
+    result = simplify_member_preorder(to_member_expr(expr));
+  }
+  else if(
+    expr.id() == ID_is_dynamic_object || expr.id() == ID_is_invalid_pointer ||
+    expr.id() == ID_object_size || expr.id() == ID_pointer_object ||
+    expr.id() == ID_pointer_offset)
+  {
+    result = simplify_unary_pointer_predicate_preorder(to_unary_expr(expr));
   }
   else if(expr.has_operands())
   {
