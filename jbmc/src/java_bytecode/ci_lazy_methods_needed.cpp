@@ -124,7 +124,7 @@ void ci_lazy_methods_neededt::initialize_instantiated_classes_from_pointer(
   // explore again even if we've seen this classid before in the array case.
   if(add_needed_class(param_classid) || is_java_array_tag(param_classid))
   {
-    gather_field_types(pointer_type.base_type(), ns);
+    gather_field_types(class_type, ns);
   }
 
   if(is_java_generic_type(pointer_type))
@@ -145,33 +145,30 @@ void ci_lazy_methods_neededt::initialize_instantiated_classes_from_pointer(
 /// \param class_type: root of class tree to search
 /// \param ns: global namespaces.
 void ci_lazy_methods_neededt::gather_field_types(
-  const typet &class_type,
+  const struct_tag_typet &class_type,
   const namespacet &ns)
 {
-  const auto &underlying_type = to_struct_type(ns.follow(class_type));
+  const auto &underlying_type = ns.follow_tag(class_type);
+
   if(is_java_array_tag(underlying_type.get_tag()))
   {
-    // If class_type is not a symbol this may be a reference array,
-    // but we can't tell what type.
-    if(class_type.id() == ID_struct_tag)
+    const typet &element_type = java_array_element_type(class_type);
+    if(
+      element_type.id() == ID_pointer &&
+      to_pointer_type(element_type).base_type().id() != ID_empty)
     {
-      const typet &element_type =
-        java_array_element_type(to_struct_tag_type(class_type));
-      if(
-        element_type.id() == ID_pointer &&
-        to_pointer_type(element_type).base_type().id() != ID_empty)
-      {
-        // This is a reference array -- mark its element type available.
-        add_all_needed_classes(to_pointer_type(element_type));
-      }
+      // This is a reference array -- mark its element type available.
+      add_all_needed_classes(to_pointer_type(element_type));
     }
   }
   else
   {
     for(const auto &field : underlying_type.components())
     {
-      if(field.type().id() == ID_struct || field.type().id() == ID_struct_tag)
-        gather_field_types(field.type(), ns);
+      if(field.type().id() == ID_struct_tag)
+        gather_field_types(to_struct_tag_type(field.type()), ns);
+      else if(field.type().id() == ID_struct)
+        UNREACHABLE;
       else if(field.type().id() == ID_pointer)
       {
         if(to_pointer_type(field.type()).base_type().id() == ID_struct_tag)
