@@ -2,7 +2,7 @@
 # approval within two weeks.
 #
 # These owners will be the default owners for everything in the repo.
-*       @kroening @tautschnig @peterschrammel @chris-ryder
+*       @kroening @tautschnig @peterschrammel
 
 # Documentation can be reviewed by people with broad project responsibility
 
@@ -12,13 +12,13 @@
 # These files should rarely change
 
 /src/big-int/ @kroening
-/src/ansi-c/ @kroening @tautschnig @chris-ryder @peterschrammel @remi-delmas-3000
-/src/assembler/ @kroening @tautschnig @chris-ryder
-/src/goto-cc/ @kroening @tautschnig @chris-ryder
-/src/linking/ @kroening @tautschnig @chris-ryder
+/src/ansi-c/ @kroening @tautschnig @peterschrammel @remi-delmas-3000
+/src/assembler/ @kroening @tautschnig
+/src/goto-cc/ @kroening @tautschnig
+/src/linking/ @kroening @tautschnig
 /src/memory-models/ @kroening @tautschnig
 /src/goto-checker/ @kroening @tautschnig @peterschrammel
-/src/goto-symex/ @kroening @tautschnig @peterschrammel @romainbrenguier
+/src/goto-symex/ @kroening @tautschnig @peterschrammel
 /src/json/ @kroening @tautschnig @peterschrammel
 /src/json-symtab-language/ @martin-cs
 /src/langapi/ @kroening @tautschnig @peterschrammel
@@ -39,31 +39,31 @@
 /src/cbmc/ @kroening @tautschnig @peterschrammel @NlightNFotis @thomasspriggs
 /src/goto-programs/ @kroening @tautschnig @peterschrammel
 /src/util/ @kroening @tautschnig @peterschrammel
-/src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
-/src/solvers/strings @martin-cs @romainbrenguier @peterschrammel
-/jbmc/src/java_bytecode/ @romainbrenguier @peterschrammel
-/src/analyses/ @martin-cs @peterschrammel @chris-ryder
-/src/pointer-analysis/ @martin-cs @peterschrammel @chris-ryder
+/src/solvers/refinement @martin-cs @peterschrammel
+/src/solvers/strings @martin-cs @peterschrammel
+/jbmc/src/java_bytecode/ @peterschrammel @TGWDB
+/src/analyses/ @martin-cs @peterschrammel
+/src/pointer-analysis/ @martin-cs @peterschrammel
 /src/libcprover-cpp @NlightNFotis @thomasspriggs @esteffin @TGWDB @peterschrammel
 /src/libcprover-rust @NlightNFotis @thomasspriggs @TGWDB @peterschrammel
 
 # These files change frequently and changes are medium-risk
 
-/src/goto-analyzer/ @martin-cs @chris-ryder @peterschrammel
-/src/goto-harness/ @martin-cs @chris-ryder @peterschrammel
-/src/goto-instrument/ @martin-cs @chris-ryder @peterschrammel @tautschnig @kroening
+/src/goto-analyzer/ @martin-cs @peterschrammel
+/src/goto-harness/ @martin-cs @peterschrammel
+/src/goto-instrument/ @martin-cs @peterschrammel @tautschnig @kroening
 /src/goto-instrument/contracts/ @tautschnig @feliperodri @remi-delmas-3000
 /src/goto-synthesizer/ @qinheping @tautschnig @feliperodri @remi-delmas-3000
 /src/goto-diff/ @tautschnig @peterschrammel
 /src/jsil/ @kroening @tautschnig
-/src/memory-analyzer/ @tautschnig @chris-ryder @kroening
-/jbmc/src/jbmc/ @peterschrammel @romainbrenguier
-/jbmc/src/janalyzer/ @peterschrammel @romainbrenguier
+/src/memory-analyzer/ @tautschnig @kroening
+/jbmc/src/jbmc/ @peterschrammel @TGWDB
+/jbmc/src/janalyzer/ @peterschrammel @TGWDB
 /jbmc/src/jdiff/ @peterschrammel
 /src/cpp/ @kroening @tautschnig @peterschrammel
 /src/solvers/smt2 @kroening @martin-cs @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
-/src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB @chris-ryder
-/src/solvers/Makefile @kroening @tautschnig @peterschrammel @chris-ryder @thomasspriggs @NlightNFotis @TGWDB
+/src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
+/src/solvers/Makefile @kroening @tautschnig @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
 /src/statement-list/ @kroening @tautschnig @peterschrammel
 
 /cmake/        @diffblue/diffblue-opensource
