@@ -6,7 +6,7 @@ var classci__lazy__methods__neededt =
     [ "add_cprover_nondet_initialize_if_it_exists", "classci__lazy__methods__neededt.html#aea543a80889659ca51d14388e070beac", null ],
     [ "add_needed_class", "classci__lazy__methods__neededt.html#ae99ea5cde35618c898e61081767e0430", null ],
     [ "add_needed_method", "classci__lazy__methods__neededt.html#a4e3144ead86632cd0bff6001fa71d862", null ],
-    [ "gather_field_types", "classci__lazy__methods__neededt.html#a4b918d8c016ba733de1490d161b55570", null ],
+    [ "gather_field_types", "classci__lazy__methods__neededt.html#a1dfce903a2023e9d5bd4a2352d76d176", null ],
     [ "initialize_instantiated_classes_from_pointer", "classci__lazy__methods__neededt.html#a1940f306006e27aa671770620ce5ddb2", null ],
     [ "callable_methods", "classci__lazy__methods__neededt.html#a9c88d2b24183477dfbacd1970fdc2650", null ],
     [ "instantiated_classes", "classci__lazy__methods__neededt.html#a05367a5b64e269b95ab897af3ef2944e", null ],

@@ -1,5 +1,6 @@
 var NAVTREEINDEX133 =
 {
+"structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html":[8,0,686,1,0],
 "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#a21836e2d5e3d8c40a83d0bf2729b1c46":[8,0,686,1,0,6],
 "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#a5b32356b680ad4ec152154c25ba2c913":[8,0,686,1,0,3],
 "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#a7840d998b5f776e6485be763c154dd34":[8,0,686,1,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX133 =
 "structmemory__snapshot__harness__generatort_1_1source__location__matcht.html#aea434a1134db28bfca0246be5ed18688":[8,0,802,4,4],
 "structmemory__snapshot__harness__generatort_1_1source__location__matcht.html#afbe25a583f2160ce507b495c7b6f37c9":[8,0,802,4,2],
 "structmerged__irep__hash.html":[8,0,806],
-"structmerged__irep__hash.html#a9c91b61362ee4bf83506bf404e39dffc":[8,0,806,0],
-"structmethod__bytecodet_1_1class__method__and__bytecodet.html":[8,0,812,0]
+"structmerged__irep__hash.html#a9c91b61362ee4bf83506bf404e39dffc":[8,0,806,0]
 };

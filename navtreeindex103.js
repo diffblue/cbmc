@@ -1,5 +1,6 @@
 var NAVTREEINDEX103 =
 {
+"goto-program-transformations.html#coverage-transform":[0,4,9,2,1,6],
 "goto-program-transformations.html#failed-symbols-transform":[0,4,9,2,0,12],
 "goto-program-transformations.html#floats-transform":[0,4,9,2,0,10],
 "goto-program-transformations.html#function-pointer-transform":[0,4,9,2,0,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX103 =
 "goto__program_8cpp.html#a95534cab543705d5f0d3d2a252effbfb":[9,0,2,14,46,3],
 "goto__program_8cpp.html#abc02d8e8b383452362313b5c9e9657ec":[9,0,2,14,46,7],
 "goto__program_8cpp.html#ac0ff9cbec7448343403933aec8be98f4":[9,0,2,14,46,5],
-"goto__program_8cpp.html#ac6534098e447139c032985a45ed19433":[9,0,2,14,46,1],
-"goto__program_8cpp.html#acd4ad28be94170f7f5b06b84338d63a7":[9,0,2,14,46,4]
+"goto__program_8cpp.html#ac6534098e447139c032985a45ed19433":[9,0,2,14,46,1]
 };
