@@ -8,6 +8,8 @@ Date: February 2023
 \*******************************************************************/
 
 /// \file
+/// Translates assigns and frees clauses of a function contract or
+/// loop contract into goto programs that build write sets or havoc write sets.
 
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CONTRACT_CLAUSES_CODEGEN_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CONTRACT_CLAUSES_CODEGEN_H
