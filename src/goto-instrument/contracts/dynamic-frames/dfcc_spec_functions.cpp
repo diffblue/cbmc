@@ -17,20 +17,19 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <langapi/language_util.h>
 
 #include "dfcc_library.h"
+#include "dfcc_loop_contract_mode.h"
 #include "dfcc_utils.h"
 
 dfcc_spec_functionst::dfcc_spec_functionst(
   goto_modelt &goto_model,
   message_handlert &message_handler,
   dfcc_utilst &utils,
-  dfcc_libraryt &library,
-  dfcc_instrumentt &instrument)
+  dfcc_libraryt &library)
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
     utils(utils),
     library(library),
-    instrument(instrument),
     ns(goto_model.symbol_table)
 {
 }
@@ -110,6 +109,8 @@ void dfcc_spec_functionst::generate_havoc_function(
     write_set_symbol.symbol_expr(),
     havoc_program,
     nof_targets);
+
+  havoc_program.add(goto_programt::make_end_function());
 
   goto_model.goto_functions.update();
 
@@ -246,7 +247,6 @@ void dfcc_spec_functionst::generate_havoc_instructions(
     }
   }
   nof_targets = next_idx;
-  havoc_program.add(goto_programt::make_end_function());
 }
 
 void dfcc_spec_functionst::to_spec_assigns_function(
@@ -271,13 +271,6 @@ void dfcc_spec_functionst::to_spec_assigns_function(
     nof_targets);
 
   goto_model.goto_functions.update();
-
-  // instrument for side-effects checking
-  std::set<irep_idt> function_pointer_contracts;
-  instrument.instrument_function(function_id, function_pointer_contracts);
-  INVARIANT(
-    function_pointer_contracts.empty(),
-    "discovered function pointer contracts unexpectedly");
 
   goto_model.goto_functions.function_map.at(function_id).make_hidden();
 }
@@ -361,13 +354,6 @@ void dfcc_spec_functionst::to_spec_frees_function(
     nof_targets);
 
   goto_model.goto_functions.update();
-
-  // instrument for side-effects checking
-  std::set<irep_idt> function_pointer_contracts;
-  instrument.instrument_function(function_id, function_pointer_contracts);
-  INVARIANT(
-    function_pointer_contracts.empty(),
-    "discovered function pointer contracts unexpectedly");
 
   goto_model.goto_functions.function_map.at(function_id).make_hidden();
 }

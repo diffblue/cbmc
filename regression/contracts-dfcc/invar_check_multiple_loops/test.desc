@@ -1,0 +1,23 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.loop_assigns.\d+\] line 8 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 8 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 8 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 8 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 8 Check variant decreases after step for loop .*: SUCCESS$
+^\[main.loop_assigns.\d+\] line 17 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 17 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 17 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 17 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 17 Check variant decreases after step for loop .*: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion x == y \+ 2 \* n: SUCCESS$
+^\[main.assigns.\d+\] line 8 Check that r is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 15 Check that x is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 23 Check that y is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 24 Check that r is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+This test checks that multiple loops and `for` loops are correctly handled.

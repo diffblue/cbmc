@@ -21,6 +21,7 @@ Date: August 2022
 class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
+class dfcc_cfg_infot;
 class exprt;
 
 /// Rewrites calls to obeys_contract predicates into calls
@@ -39,7 +40,7 @@ public:
   /// given write_set expression as parameter to the library function.
   void rewrite_calls(
     goto_programt &program,
-    const exprt &write_set,
+    dfcc_cfg_infot &cfg_info,
     std::set<irep_idt> &function_pointer_contracts);
 
   /// Rewrites calls to obeys_contract predicates into calls
@@ -50,7 +51,7 @@ public:
     goto_programt &program,
     goto_programt::targett first_instruction,
     const goto_programt::targett &last_instruction,
-    const exprt &write_set,
+    dfcc_cfg_infot &cfg_info,
     std::set<irep_idt> &function_pointer_contracts);
 
 protected:

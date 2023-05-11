@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[main.loop_invariant_base.\d+\] line 8 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 8 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 8 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 8 Check variant decreases after step for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that r is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion r == 0 || r == 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+This test checks that conditionals and `break` are correctly handled.

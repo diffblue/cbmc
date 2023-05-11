@@ -1,0 +1,33 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --pointer-primitive-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main.loop_assigns.\d+] line 14 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+] line 14 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+] line 14 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+] line 14 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_assigns.\d+] line 26 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+] line 26 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+] line 26 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+] line 26 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_assigns.\d+] line 40 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+] line 40 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+] line 40 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+] line 40 Check step was unwound for loop .*: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion \*x1 == z1: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion x2 == z2: SUCCESS$
+^\[main.assigns.\d+\] .* Check that y1 is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 18 Check that \*x1 is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 19 Check that \*x1 is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that y2 is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 30 Check that x2 is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 31 Check that x2 is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that y3 is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that s0\.n is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that s2->n is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion \*\(s1\.n\) == \*\(s2->n\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that __CPROVER_loop_entry is supported.

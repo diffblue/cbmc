@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^Found loops with overlapping instruction spans$
+^EXIT=(6|10)$
+^SIGNAL=0$
+--
+--
+This test checks that our loop contract instrumentation verifies that loops
+nested in loops with contracts also have contracts.

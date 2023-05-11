@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main.loop_assigns.\d+\] line 15 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 15 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 15 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 15 Check step was unwound for loop .*: SUCCESS$
+--
+--
+This is guarding against an issue described in https://github.com/diffblue/cbmc/issues/6168.

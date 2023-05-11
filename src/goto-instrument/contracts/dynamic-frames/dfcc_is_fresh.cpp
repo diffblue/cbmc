@@ -13,6 +13,7 @@ Date: August 2022
 #include <util/pointer_expr.h>
 #include <util/symbol.h>
 
+#include "dfcc_cfg_info.h"
 #include "dfcc_library.h"
 
 dfcc_is_fresht::dfcc_is_fresht(
@@ -24,20 +25,20 @@ dfcc_is_fresht::dfcc_is_fresht(
 
 void dfcc_is_fresht::rewrite_calls(
   goto_programt &program,
-  const exprt &write_set)
+  dfcc_cfg_infot &cfg_info)
 {
   rewrite_calls(
     program,
     program.instructions.begin(),
     program.instructions.end(),
-    write_set);
+    cfg_info);
 }
 
 void dfcc_is_fresht::rewrite_calls(
   goto_programt &program,
   goto_programt::targett first_instruction,
   const goto_programt::targett &last_instruction,
-  const exprt &write_set)
+  dfcc_cfg_infot &cfg_info)
 {
   auto &target = first_instruction;
   while(target != last_instruction)
@@ -61,7 +62,7 @@ void dfcc_is_fresht::rewrite_calls(
             .set_identifier(library.dfcc_fun_symbol[dfcc_funt::IS_FRESH].name);
 
           // pass the write_set
-          target->call_arguments().push_back(write_set);
+          target->call_arguments().push_back(cfg_info.get_write_set(target));
         }
       }
     }

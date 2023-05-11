@@ -1,0 +1,18 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[foo.loop_assigns.\d+\] line 13 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_assigns.\d+\] line 13 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_invariant_base.\d+\] line 13 Check invariant before entry for loop .*: SUCCESS$
+^\[foo.loop_invariant_base.\d+\] line 13 Check invariant before entry for loop .*: SUCCESS$
+^\[foo.loop_invariant_step.\d+\] line 13 Check invariant after step for loop .*: SUCCESS$
+^\[foo.loop_step_unwinding.\d+\] line 13 Check step was unwound for loop .*: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that b\[(.*)i\] is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks assigns clauses (i, __CPROVER_object_whole(b)) is inferred,
+and widened correctly.

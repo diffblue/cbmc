@@ -38,6 +38,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_lift_memory_predicates.h"
+#include "dfcc_loop_contract_mode.h"
 #include "dfcc_spec_functions.h"
 #include "dfcc_swap_and_wrap.h"
 #include "dfcc_utils.h"
@@ -50,7 +51,6 @@ class messaget;
 class message_handlert;
 class symbolt;
 class conditional_target_group_exprt;
-class cfg_infot;
 class optionst;
 
 #define FLAG_DFCC "dfcc"
@@ -58,9 +58,9 @@ class optionst;
 
 // clang-format off
 #define HELP_DFCC                                                              \
-  " --dfcc <harness>             activate dynamic frame condition checking\n"\
-  "                              for function contracts using the given\n"\
-  "                              harness as entry point\n"
+  " --dfcc <harness>              activate dynamic frame condition checking\n" \
+  "                               for contracts using the given harness as\n"  \
+  "                               entry point\n"
 
 #define FLAG_ENFORCE_CONTRACT_REC "enforce-contract-rec"
 #define OPT_ENFORCE_CONTRACT_REC "(" FLAG_ENFORCE_CONTRACT_REC "):"
@@ -100,6 +100,8 @@ public:
 /// \param allow_recursive_calls Allow the checked function to be recursive
 /// \param to_replace set of functions to replace with their contract
 /// \param apply_loop_contracts apply loop contract transformations iff true
+/// \param unwind_transformed_loops unwind transformed loops after applying loop
+///                                 contracts.
 /// \param to_exclude_from_nondet_static set of symbols to exclude when havocing
 /// static program symbols.
 /// \param message_handler used for debug/warning/error messages
@@ -111,6 +113,7 @@ void dfcc(
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
   const bool apply_loop_contracts,
+  const bool unwind_transformed_loops,
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler);
 
@@ -129,7 +132,9 @@ void dfcc(
 /// \param to_check (function,contract) pair for contract checking
 /// \param allow_recursive_calls Allow the checked function to be recursive
 /// \param to_replace Functions-to-contract mapping for replacement
-/// \param apply_loop_contracts Spply loop contract transformations iff true
+/// \param apply_loop_contracts Apply loop contract transformations iff true
+/// \param unwind_transformed_loops unwind transformed loops after applying loop
+///                                 contracts.
 /// \param to_exclude_from_nondet_static Set of symbols to exclude when havocing
 /// static program symbols.
 /// \param message_handler used for debug/warning/error messages
@@ -141,6 +146,7 @@ void dfcc(
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
   const bool apply_loop_contracts,
+  const bool unwind_transformed_loops,
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler);
 
@@ -157,8 +163,7 @@ public:
   /// \param to_check (function,contract) pair for contract checking
   /// \param allow_recursive_calls Allow the checked function to be recursive
   /// \param to_replace functions-to-contract mapping for replacement
-  /// \param apply_loop_contracts apply loop contract transformations iff true
-  /// havocing static program symbols.
+  /// \param loop_contract_mode mode to use for loop contracts
   /// \param message_handler used for debug/warning/error messages
   /// \param to_exclude_from_nondet_static set of symbols to exclude when
   dfcct(
@@ -168,7 +173,7 @@ public:
     const optionalt<std::pair<irep_idt, irep_idt>> &to_check,
     const bool allow_recursive_calls,
     const std::map<irep_idt, irep_idt> &to_replace,
-    const bool apply_loop_contracts,
+    const dfcc_loop_contract_modet loop_contract_mode,
     message_handlert &message_handler,
     const std::set<std::string> &to_exclude_from_nondet_static);
 
@@ -194,7 +199,7 @@ public:
   ///   (replacement mode)
   /// - instrument all remaining functions GOTO model
   /// - (this includes standard library functions).
-  /// - specialise the instrumentation functions by unwiding loops they contain
+  /// - specialise the instrumentation functions by unwinding loops they contain
   /// to the maximum size of any assigns clause involved in the model.
   void transform_goto_model();
 
@@ -205,7 +210,7 @@ protected:
   const optionalt<std::pair<irep_idt, irep_idt>> &to_check;
   const bool allow_recursive_calls;
   const std::map<irep_idt, irep_idt> &to_replace;
-  const bool apply_loop_contracts;
+  const dfcc_loop_contract_modet loop_contract_mode;
   const std::set<std::string> &to_exclude_from_nondet_static;
   message_handlert &message_handler;
   messaget log;
@@ -215,10 +220,10 @@ protected:
   dfcc_utilst utils;
   dfcc_libraryt library;
   namespacet ns;
-  dfcc_instrumentt instrument;
-  dfcc_lift_memory_predicatest memory_predicates;
   dfcc_spec_functionst spec_functions;
   dfcc_contract_clauses_codegent contract_clauses_codegen;
+  dfcc_instrumentt instrument;
+  dfcc_lift_memory_predicatest memory_predicates;
   dfcc_contract_handlert contract_handler;
   dfcc_swap_and_wrapt swap_and_wrap;
 
@@ -277,7 +282,7 @@ protected:
   /// for each instrumented function
   ///
   /// A call to `nondet_static` will re-generate the initialize function with
-  /// nondet values. The intrumentation statics will not get nondet initialised
+  /// nondet values. The instrumentation statics will not get nondet initialised
   /// by virtue of being tagged with ID_C_no_nondet_initialization.
   ///
   /// However, nondet_static expects instructions to be either function calls

@@ -16,6 +16,7 @@ Date: August 2022
 
 #include <langapi/language_util.h>
 
+#include "dfcc_cfg_info.h"
 #include "dfcc_library.h"
 
 dfcc_obeys_contractt::dfcc_obeys_contractt(
@@ -27,14 +28,14 @@ dfcc_obeys_contractt::dfcc_obeys_contractt(
 
 void dfcc_obeys_contractt::rewrite_calls(
   goto_programt &program,
-  const exprt &write_set,
+  dfcc_cfg_infot &cfg_info,
   std::set<irep_idt> &function_pointer_contracts)
 {
   rewrite_calls(
     program,
     program.instructions.begin(),
     program.instructions.end(),
-    write_set,
+    cfg_info,
     function_pointer_contracts);
 }
 
@@ -62,7 +63,7 @@ void dfcc_obeys_contractt::rewrite_calls(
   goto_programt &program,
   goto_programt::targett first_instruction,
   const goto_programt::targett &last_instruction,
-  const exprt &write_set,
+  dfcc_cfg_infot &cfg_info,
   std::set<irep_idt> &function_pointer_contracts)
 {
   for(auto &target = first_instruction; target != last_instruction; target++)
@@ -87,7 +88,7 @@ void dfcc_obeys_contractt::rewrite_calls(
               library.dfcc_fun_symbol[dfcc_funt::OBEYS_CONTRACT].name);
 
           // pass the write_set
-          target->call_arguments().push_back(write_set);
+          target->call_arguments().push_back(cfg_info.get_write_set(target));
 
           // record discovered function contract
           get_contract_name(

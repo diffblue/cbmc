@@ -38,7 +38,6 @@ class messaget;
 class message_handlert;
 class symbolt;
 class conditional_target_group_exprt;
-class cfg_infot;
 
 class dfcc_swap_and_wrapt
 {
@@ -53,6 +52,7 @@ public:
     dfcc_contract_handlert &contract_handler);
 
   void swap_and_wrap_check(
+    const dfcc_loop_contract_modet loop_contract_mode,
     const irep_idt &function_id,
     const irep_idt &contract_id,
     std::set<irep_idt> &function_pointer_contracts,
@@ -60,6 +60,7 @@ public:
   {
     swap_and_wrap(
       dfcc_contract_modet::CHECK,
+      loop_contract_mode,
       function_id,
       contract_id,
       function_pointer_contracts,
@@ -73,6 +74,7 @@ public:
   {
     swap_and_wrap(
       dfcc_contract_modet::REPLACE,
+      dfcc_loop_contract_modet::NONE,
       function_id,
       contract_id,
       function_pointer_contracts,
@@ -94,10 +96,15 @@ protected:
   namespacet ns;
 
   /// remember all functions that were swapped/wrapped and in which mode
-  static std::map<irep_idt, std::pair<irep_idt, dfcc_contract_modet>> cache;
+  static std::map<
+    irep_idt,
+    std::
+      pair<irep_idt, std::pair<dfcc_contract_modet, dfcc_loop_contract_modet>>>
+    cache;
 
   void swap_and_wrap(
     const dfcc_contract_modet contract_mode,
+    const dfcc_loop_contract_modet loop_contract_mode,
     const irep_idt &function_id,
     const irep_idt &contract_id,
     std::set<irep_idt> &function_pointer_contracts,
@@ -106,6 +113,7 @@ protected:
   /// Swaps-and-wraps the given `function_id` in a wrapper function that
   /// checks the given `contract_id`.
   void check_contract(
+    const dfcc_loop_contract_modet loop_contract_mode,
     const irep_idt &function_id,
     const irep_idt &contract_id,
     std::set<irep_idt> &function_pointer_contracts,

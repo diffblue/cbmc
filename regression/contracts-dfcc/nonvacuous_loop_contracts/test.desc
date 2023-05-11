@@ -1,0 +1,28 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --signed-overflow-check --unsigned-overflow-check
+^\[main.loop_assigns.\d+\] line 14 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 14 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 14 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 14 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 14 Check variant decreases after step for loop .*: SUCCESS$
+\[main.assigns.\d+\] line \d+ Check that end is assignable: SUCCESS$
+\[main.assertion.\d+\] line \d+ assertion end == start: SUCCESS$
+\[main.assertion.\d+\] line \d+ assertion start <= end && end <= size: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test demonstrates a simplification that is now possible on loop contracts.
+
+Prior to this commit, loop contracts were unconditionally applied on loops,
+and thus had to also consider the case when the loop doesn't run even once.
+
+The contracts that were previously necessary were:
+  __CPROVER_loop_invariant(
+    (start > size && end == start) || (start <= end && end <= size)
+  )
+  __CPROVER_decreases(
+    max(start, size) - end
+  )

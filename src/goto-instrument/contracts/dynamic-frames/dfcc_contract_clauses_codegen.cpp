@@ -8,11 +8,13 @@ Date: February 2023
 \*******************************************************************/
 #include "dfcc_contract_clauses_codegen.h"
 
+#include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 
@@ -23,21 +25,18 @@ Date: February 2023
 #include <langapi/language_util.h>
 
 #include "dfcc_library.h"
-#include "dfcc_spec_functions.h"
 #include "dfcc_utils.h"
 
 dfcc_contract_clauses_codegent::dfcc_contract_clauses_codegent(
   goto_modelt &goto_model,
   message_handlert &message_handler,
   dfcc_utilst &utils,
-  dfcc_libraryt &library,
-  dfcc_spec_functionst &spec_functions)
+  dfcc_libraryt &library)
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
     utils(utils),
     library(library),
-    spec_functions(spec_functions),
     ns(goto_model.symbol_table)
 {
 }
@@ -63,6 +62,7 @@ void dfcc_contract_clauses_codegent::gen_spec_assigns_instructions(
 
   // inline resulting program and check for loops
   inline_and_check_warnings(dest);
+  dest.update();
   PRECONDITION_WITH_DIAGNOSTICS(
     is_loop_free(dest, ns, log),
     "loops in assigns clause specification functions must be unwound before "

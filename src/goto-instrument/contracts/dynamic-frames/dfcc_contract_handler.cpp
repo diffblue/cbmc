@@ -24,7 +24,6 @@ Date: August 2022
 #include <goto-programs/remove_function_pointers.h>
 
 #include <ansi-c/c_expr.h>
-#include <goto-instrument/contracts/contracts.h>
 #include <goto-instrument/contracts/utils.h>
 #include <langapi/language_util.h>
 
@@ -79,7 +78,8 @@ dfcc_contract_handlert::get_contract_functions(const irep_idt &contract_id)
          utils,
          library,
          spec_functions,
-         contract_clauses_codegen)})
+         contract_clauses_codegen,
+         instrument)})
     .first->second;
 }
 

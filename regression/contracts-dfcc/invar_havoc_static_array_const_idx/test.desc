@@ -1,0 +1,22 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.loop_assigns.\d+\] line 12 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 12 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 12 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 12 Check step was unwound for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that data\[\(signed long (long )?int\)1\] is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion data\[1\] == 0 \|\| data\[1\] == 1: FAILURE$
+^\[main\.assertion\.\d+\] .* assertion data\[4\] == 0: SUCCESS$
+^VERIFICATION FAILED$
+--
+--
+Test case related to issue #6020: it checks that arrays are correctly havoced
+when enforcing loop invariant contracts.
+The `data[1] == 0 || data[1] == 1` assertion is expected to fail since `data[1]`
+is havoced and the invariant does not reestablish the value of `data[1]`.
+However, the `data[4] == 0` assertion is expected to pass -- we should not havoc
+the entire `data` array, if only a constant index if being modified.

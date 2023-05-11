@@ -22,6 +22,8 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <goto-programs/goto_program.h>
 
 #include "dfcc_contract_mode.h"
+#include "dfcc_instrument_loop.h"
+#include "dfcc_loop_contract_mode.h"
 
 #include <map>
 #include <set>
@@ -30,12 +32,16 @@ class goto_modelt;
 class message_handlert;
 class symbolt;
 class conditional_target_group_exprt;
-class cfg_infot;
 class dfcc_libraryt;
+class dfcc_spec_functionst;
+class dfcc_contract_clauses_codegent;
 class dfcc_utilst;
+class dfcc_loop_utilst;
+class dirtyt;
+class dfcc_cfg_infot;
 
 /// This class instruments GOTO functions or instruction sequences
-/// for frame condition checking.
+/// for frame condition checking and loop contracts.
 class dfcc_instrumentt
 {
 public:
@@ -43,11 +49,9 @@ public:
     goto_modelt &goto_model,
     message_handlert &message_handler,
     dfcc_utilst &utils,
-    dfcc_libraryt &library);
-
-  /// True if id has `CPROVER_PREFIX` or `__VERIFIER` or `nondet` prefix,
-  /// or an `&object`
-  bool is_cprover_symbol(const irep_idt &function_id) const;
+    dfcc_libraryt &library,
+    dfcc_spec_functionst &spec_functions,
+    dfcc_contract_clauses_codegent &contract_clauses_codegen);
 
   /// True iff the symbol an internal symbol
   bool is_internal_symbol(const irep_idt &id) const;
@@ -56,47 +60,52 @@ public:
   /// symbol or a CPROVER symbol
   bool do_not_instrument(const irep_idt &id) const;
 
-  /// Instruments a function as a proof harness.
+  /// Instruments a GOTO function used as a proof harness. Proof harnesses
+  /// are closed functions without parameters, so we declare a local write set
+  /// pointer and initialise it to NULL, and check body instructions against
+  /// that NULL write set.
   ///
-  /// Instrumenting a harness function just consists in passing a NULL value
-  /// for the write_set parameter to all function and function pointer calls
-  /// it contains.
+  /// By using a NULL write set pointer we ensure that no checks are being
+  /// performed in the harness or in the functions called from the harness,
+  /// except in the following cases:
+  /// 1. One of the functions called directly (or indirectly) by the harness
+  /// is a verification wrapper function that checks some contract against some
+  /// function. This wrapper will ignore the NULL write set it received from the
+  /// harness and will instantiate its own write set from the contract and pass
+  /// it to the function under analysis.
+  /// 2. The harness function contains loops that have contracts.
+  /// A write set is created for each loop and loop instructions instrumented
+  /// against that write set. The write set is propagated to all functions
+  /// called from the loop.
   ///
-  /// This will result in no write_set updates or checks being performed in
-  /// the harness or in the functions called directly from the harness
-  /// (and transitively in functions they call).
-  ///
-  /// One of the functions called directly (or indirectly) by the harness
-  /// is eventually going to be a wrapper function that checks the contract
-  /// against the function of interest. This wrapper will ignore the NULL
-  /// write set it received from the harness and instantiate its own local
-  /// write set from the contract and pass it to the function under analysis.
-  /// This will trigger cascading checks in all functions called from the
-  /// checked function thanks to the propagation of the write set through
-  /// function calls and function pointer calls.
-  ///
-  /// \param function_id function to instrument
-  /// \param function_pointer_contracts contracts discovered in calls to
-  /// the obeys_contract predicate are added to this set.
+  /// \param function_id Function to instrument
+  /// \param loop_contract_mode Mode to use for loop contracts
+  /// \param function_pointer_contracts Contract names discovered in calls to
+  /// the `obeys_contract` predicate are added to this set.
   void instrument_harness_function(
     const irep_idt &function_id,
+    const dfcc_loop_contract_modet loop_contract_mode,
     std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments a GOTO function by adding an extra write set parameter
-  /// and inserting frame condition checks in its GOTO program, as well as
-  /// instructions to automatically insert and remove locally declared static
-  /// variables in the write set.
+  /// and instrumenting its body instructions against the write set. Adds ghost
+  /// instructions that automatically insert locally declared static variables
+  /// to the write set when entering the function and removing them upon exit.
   ///
-  /// \pre The function must *not* be one of the checked or replaced functions.
-  /// For checked/replaced functions \ref instrument_wrapped_function must be
-  /// used instead.
+  /// \pre The function must *not* be one of the functions checked against a
+  /// contract or replaced by a contract. The method
+  /// \ref instrument_wrapped_function must be used to instrument check/replaced
+  /// functions instead.
+  ///
   /// \param function_id The name of the function, used to retrieve the function
   /// to instrument and used as prefix when generating new symbols during
   /// instrumentation.
-  /// \param function_pointer_contracts contracts discovered in calls to
+  /// \param loop_contract_mode Mode to use for loop contracts
+  /// \param function_pointer_contracts Contracts discovered in calls to
   /// the obeys_contract predicate are added to this set.
   void instrument_function(
     const irep_idt &function_id,
+    const dfcc_loop_contract_modet loop_contract_mode,
     std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments a GOTO function by adding an extra write set parameter
@@ -105,8 +114,10 @@ public:
   /// variables in the write set.
   ///
   /// \pre The function must be a function wrapped for contract checking or
-  /// replacemend. For other functions \ref instrument_function must be used
-  /// instead.
+  /// replacement checking. For other functions \ref instrument_function must
+  /// be used instead. The difference is that checked or replaced functions have
+  /// their name mangled, so the the search for local statics uses a possibly
+  /// different function identifier as base name for static symbols.
   ///
   /// \param wrapped_function_id The name of the function, used to retrieve the
   /// function to instrument and used as prefix when generating new symbols
@@ -114,27 +125,30 @@ public:
   /// \param initial_function_id The initial name of the function,
   /// before mangling. This is the name used to identify statics symbols in the
   /// symbol table that were locally declared in the function.
+  /// \param loop_contract_mode Mode to use for loop contracts
   /// \param function_pointer_contracts contracts discovered in calls to
   /// the obeys_contract predicate are added to this set.
   void instrument_wrapped_function(
     const irep_idt &wrapped_function_id,
     const irep_idt &initial_function_id,
+    const dfcc_loop_contract_modet loop_contract_mode,
     std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments a GOTO program against a given write set variable.
   ///
-  /// \remark  Only variables declared within the instruction sequence are
-  /// considered local and automatically assignable. In particular, occurrences
-  /// of symbols with the `is_parameter` which represent parameters of the
-  /// enclosing function are not considered as local to the program.
-  /// \remark Local statics declared in the program are *not* searched for and
-  /// are *not* added automatically to the write set.
-  /// \remark This function is meant to instrument instruction sequences that
-  /// were generated from contract clauses.
+  /// \remark This function is meant to instrument instruction
+  /// sequences generated from contract clauses.
+  /// \remark Only variables declared within the instruction sequence are
+  /// considered local and implicitly assignable. In particular, occurrences
+  /// of symbols with the `is_parameter` flag set to true, which represent
+  /// parameters of the enclosing function, are not considered implicitly
+  /// assignable.
+  /// \remark Loop contracts are never applied.
+  /// \remark Local statics are *not* collected and added to the write set.
   ///
   /// \param function_id Name used as prefix when creating new symbols during
   /// instrumentation.
-  /// \param goto_program Goto program to instrument.
+  /// \param goto_program GOTO program to instrument.
   /// \param write_set Write set variable to use for instrumentation.
   /// \param function_pointer_contracts Discovered function pointer contracts
   void instrument_goto_program(
@@ -147,12 +161,19 @@ public:
   /// The names are kept track of in the \ref function_cache field.
   void get_instrumented_functions(std::set<irep_idt> &dest) const;
 
+  /// \return The maximum assigns clause size discovered when instrumenting
+  /// loop contracts
+  std::size_t get_max_assigns_clause_size() const;
+
 protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
   dfcc_utilst &utils;
   dfcc_libraryt &library;
+  dfcc_spec_functionst &spec_functions;
+  dfcc_contract_clauses_codegent &contract_clauses_codegen;
+  dfcc_instrument_loopt instrument_loop;
   namespacet ns;
 
   /// \brief Keeps track of instrumented functions, so that no function gets
@@ -210,23 +231,15 @@ protected:
     goto_programt::targett &target,
     goto_programt &goto_program);
 
-  /// Instruments a GOTO function by adding an extra write set parameter and
-  /// inserting frame condition checks in its goto program.
-  /// Uses \p function_id_for_local_static_search  to search for local statics
-  /// and automatically to add/remove to the write set.
-  void instrument_function(
-    const irep_idt &function_id,
-    const irep_idt &function_id_for_local_static_search,
-    std::set<irep_idt> &function_pointer_contracts);
-
   /// Instruments the body of a GOTO function against a given write set.
   /// Adds the given local statics to the write set in pre and removes them
   /// post.
-  void instrument_function_body(
+  void instrument_goto_function(
     const irep_idt &function_id,
+    goto_functiont &goto_function,
     const exprt &write_set,
-    cfg_infot &cfg_info,
     const std::set<symbol_exprt> &local_statics,
+    const dfcc_loop_contract_modet loop_contract_mode,
     std::set<irep_idt> &function_pointer_contracts);
 
   /// \brief Instruments the instructions found between \p first_instruction and
@@ -235,71 +248,44 @@ protected:
   ///
   /// \param function_id Name of the enclosing function used as prefix for new
   /// variables generated during instrumentation.
-  /// \param write_set Write set variable to instrument against
   /// \param goto_program Program to instrument the instructions of
   /// \param first_instruction First instruction to instrument in the program
   /// \param last_instruction Last instruction to instrument (excluded !!!)
   /// \param cfg_info Computes local and dirty variables to discard some checks
-  /// \param pred filter predicate for instructions. If \p pred is not provided,
-  /// all instructions are instrumented. If \p pred is provided, only
-  /// instructions satisfying \p pred are instrumented.
-  /// \param function_pointer_contracts contracts discovered in calls to
+  /// \param function_pointer_contracts Contracts discovered in calls to
   /// the obeys_contract predicate are added to this set.
   void instrument_instructions(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt &goto_program,
     goto_programt::targett first_instruction,
     const goto_programt::targett &last_instruction, // excluding the last
-    cfg_infot &cfg_info,
-    const std::function<bool(const goto_programt::targett &)> &pred,
+    dfcc_cfg_infot &cfg_info,
     std::set<irep_idt> &function_pointer_contracts);
-
-  /// Returns `true` if the symbol `x` in `DECL x` or `DEAD x` must be added
-  /// explicitly to the write set. Returns `false` when assignments to `x` must
-  /// be implicitly allowed.
-  bool must_track_decl_or_dead(
-    const goto_programt::targett &target,
-    const cfg_infot &cfg_info) const;
 
   /// Instruments a `DECL x` instruction.
   /// \pre \p target points to a `DECL` instruction
   void instrument_decl(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt::targett &target,
     goto_programt &goto_program,
-    cfg_infot &cfg_info);
+    dfcc_cfg_infot &cfg_info);
 
   /// Instruments a `DEAD x` instruction.
   /// \pre \p target points to a `DEAD` instruction
   void instrument_dead(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt::targett &target,
     goto_programt &goto_program,
-    cfg_infot &cfg_info);
-
-  /// Returns true iff the lhs of a `ASSIGN lhs := ...` instruction or
-  /// `CALL lhs := ...` must be checked against the write set.
-  /// Returns false if the assignment must be implicitly allowed.
-  /// Works in tandem with \ref must_track_decl_or_dead
-  bool must_check_lhs(
-    const source_locationt &lhs_source_location,
-    source_locationt &check_source_location,
-    const irep_idt &language_mode,
-    const exprt &lhs,
-    const cfg_infot &cfg_info);
+    dfcc_cfg_infot &cfg_info);
 
   /// \brief Instruments the LHS of an assignment instruction instruction by
   /// adding an inclusion check of \p lhs in \p write_set.
   void instrument_lhs(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt::targett &target,
     const exprt &lhs,
     goto_programt &goto_program,
-    cfg_infot &cfg_info);
+    dfcc_cfg_infot &cfg_info);
 
   /// Checks if \p lhs is the `dead_object`, and if \p rhs
   /// is an `if_exprt(nondet, ptr, dead_object)` expression.
@@ -309,17 +295,16 @@ protected:
 
   /// Instrument the \p lhs of an `ASSIGN lhs := rhs` instruction by
   /// adding an inclusion check of \p lhs in \p write_set.
-  /// If \ref is_dead_object_update returns a successfull match, the matched
+  /// If \ref is_dead_object_update returns a successful match, the matched
   /// pointer expression is removed from \p write_set.
   /// If \p rhs is a `side_effect_expr(ID_allocate)`, the allocated pointer gets
   /// added to the \p write_set.
   /// \pre \p target points to an `ASSIGN` instruction.
   void instrument_assign(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt::targett &target,
     goto_programt &goto_program,
-    cfg_infot &cfg_info);
+    dfcc_cfg_infot &cfg_info);
 
   /// Adds the \p write_set as extra argument to a function of function pointer
   /// call instruction.
@@ -332,7 +317,7 @@ protected:
   /// Before calling a function pointer, performs a dynamic lookup into
   /// the map of instrumented function provided by
   /// \ref dfcc_libraryt.get_instrumented_functions_map_symbol,
-  /// and passes the write_set parameter to the funciton pointer only if
+  /// and passes the write_set parameter to the function pointer only if
   /// it points to a function known to be instrumented and hence able to accept
   /// this parameter.
   /// \pre \p target points to a `CALL` instruction where the function
@@ -357,10 +342,9 @@ protected:
   /// \pre \p target points to a `CALL` instruction.
   void instrument_function_call(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt::targett &target,
     goto_programt &goto_program,
-    cfg_infot &cfg_info);
+    dfcc_cfg_infot &cfg_info);
 
   /// Instruments a `OTHER statement;` instruction.
   /// OTHER instructions can be an  array_set, array_copy, array_replace or
@@ -368,10 +352,22 @@ protected:
   /// \pre \p target points to an `OTHER` instruction.
   void instrument_other(
     const irep_idt &function_id,
-    const exprt &write_set,
     goto_programt::targett &target,
     goto_programt &goto_program,
-    cfg_infot &cfg_info);
+    dfcc_cfg_infot &cfg_info);
+
+  /// \brief Applies loop contracts transformations to the given GOTO function,
+  /// using the given cfg_info instance to drive the transformation.
+  ///
+  /// \pre Instructions of the function must already have been instrumented for
+  /// DFCC using the same cfg_info.
+  void apply_loop_contracts(
+    const irep_idt &function_id,
+    goto_functiont &goto_function,
+    dfcc_cfg_infot &cfg_info,
+    const dfcc_loop_contract_modet loop_contract_mode,
+    const std::set<symbol_exprt> &local_statics,
+    std::set<irep_idt> &function_pointer_contracts);
 };
 
 #endif

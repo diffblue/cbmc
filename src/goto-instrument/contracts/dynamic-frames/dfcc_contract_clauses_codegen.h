@@ -29,25 +29,23 @@ class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
 class dfcc_utilst;
-class dfcc_spec_functionst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
 
+/// Translates assigns and frees clauses of a function contract or
+/// loop contract into GOTO programs that build write sets or havoc write sets.
 class dfcc_contract_clauses_codegent
 {
 public:
-  /// \param goto_model goto model being transformed
-  /// \param message_handler used debug/warning/error messages
-  /// \param utils utility class for dynamic frames
-  /// \param library the contracts instrumentation library
-  /// \param spec_functions provides translation methods for assignable set
-  /// or freeable set specification functions.
+  /// \param goto_model GOTO model being transformed
+  /// \param message_handler Used debug/warning/error messages
+  /// \param utils Utility class for dynamic frames
+  /// \param library The contracts instrumentation library
   dfcc_contract_clauses_codegent(
     goto_modelt &goto_model,
     message_handlert &message_handler,
     dfcc_utilst &utils,
-    dfcc_libraryt &library,
-    dfcc_spec_functionst &spec_functions);
+    dfcc_libraryt &library);
 
   /// \brief Generates instructions encoding the \p assigns_clause targets and
   /// adds them to \p dest.
@@ -85,7 +83,6 @@ protected:
   messaget log;
   dfcc_utilst &utils;
   dfcc_libraryt &library;
-  dfcc_spec_functionst &spec_functions;
   namespacet ns;
 
   /// Generates GOTO instructions to build the representation of the given

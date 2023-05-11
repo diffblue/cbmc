@@ -797,7 +797,8 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
     write_set_checks.add(goto_programt::make_dead(check_var, wrapper_sl));
   }
 
-  auto label_instruction = write_set_checks.add(goto_programt::make_skip());
+  auto label_instruction =
+    write_set_checks.add(goto_programt::make_skip(wrapper_sl));
   goto_instruction->complete_goto(label_instruction);
 
   code_function_callt havoc_call(

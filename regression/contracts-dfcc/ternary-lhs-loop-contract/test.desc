@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+checks that when assignment lhs expressions have ternary expressions,
+loop assigns clause checking correctly infers what gets assigned and
+automatically tracks targets in the both the top level and the loop write sets.

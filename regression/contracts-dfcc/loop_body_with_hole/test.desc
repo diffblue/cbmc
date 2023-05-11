@@ -1,0 +1,24 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^\[main.assigns.\d+\] line 6 Check that sum_to_k is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 7 Check that flag is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 9 Check that i is assignable: SUCCESS$
+^\[main.loop_assigns.\d+\] line 9 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 9 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 9 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 9 Check step was unwound for loop .*: SUCCESS$
+^\[main.assigns.\d+\] line 17 Check that flag is assignable: SUCCESS$
+^\[main.assigns.\d+\] line 20 Check that sum_to_k is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that we only instrument instructions contained in natural loops
+against loop write sets.
+The variable `flag` is not listed in the assigns clause of the loop.
+The statement `flag = true;` is not part of the natural loop since it is only
+executed once when breaking out of the loop. In the goto program this assignment
+it is found between the loop head instruction and the loop latch instructions
+it should not cause an loop assigns clause violation.

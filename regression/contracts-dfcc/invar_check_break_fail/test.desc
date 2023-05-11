@@ -1,0 +1,16 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^\[main.loop_invariant_base.\d+\] line 8 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 8 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 8 Check step was unwound for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that r is assignable: SUCCESS$
+^\[main\.assertion\.\d+\] .* assertion r == 0: FAILURE$
+^VERIFICATION FAILED$
+--
+This test is expected to fail along the code path where r is an even integer
+before entering the loop.
+The program is simply incompatible with the desired property in this case --
+there is no loop invariant that can establish the required assertion.

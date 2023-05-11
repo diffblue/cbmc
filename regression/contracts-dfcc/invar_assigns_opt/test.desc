@@ -1,0 +1,28 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^\[foo.loop_assigns.\d+\] line 12 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_invariant_base.\d+\] line 12 Check invariant before entry for loop .*: SUCCESS$
+^\[foo.loop_invariant_step.\d+\] line 12 Check invariant after step for loop .*: SUCCESS$
+^\[foo.loop_step_unwinding.\d+\] line 12 Check step was unwound for loop .*: SUCCESS$
+^\[foo.loop_decreases.\d+\] line 12 Check variant decreases after step for loop .*: SUCCESS$
+^\[foo.loop_assigns.\d+\] line 22 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_assigns.\d+\] line 22 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[foo.loop_invariant_base.\d+\] line 22 Check invariant before entry for loop .*: SUCCESS$
+^\[foo.loop_invariant_base.\d+\] line 22 Check invariant before entry for loop .*: SUCCESS$
+^\[foo.loop_invariant_step.\d+\] line 22 Check invariant after step for loop .*: SUCCESS$
+^\[foo.loop_step_unwinding.\d+\] line 22 Check step was unwound for loop .*: SUCCESS$
+^\[foo.loop_decreases.\d+\] line 22 Check variant decreases after step for loop .*: SUCCESS$
+^\[foo.assertion.\d+\] .* assertion r1 == 0: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that s2 is assignable: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that r2 is assignable: SUCCESS$
+^\[foo.assertion.\d+\] .* assertion r2 == 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that adding assigns clause is optional
+and that if a proof does not require it, then adding an
+appropriate assigns clause does not lead to any 
+unexpected behavior. 

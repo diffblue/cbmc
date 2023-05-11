@@ -1,0 +1,18 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+activate-multi-line-match
+^No invariant provided for loop main.0 at file main.c line 4 function main.
+^\[main.loop_assigns.\d+\] line 4 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.loop_invariant_base.\d+\] line 4 Check invariant before entry for loop .*: SUCCESS$
+^\[main.loop_invariant_step.\d+\] line 4 Check invariant after step for loop .*: SUCCESS$
+^\[main.loop_step_unwinding.\d+\] line 4 Check step was unwound for loop .*: SUCCESS$
+^\[main.loop_decreases.\d+\] line 4 Check variant decreases after step for loop .*: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test succeeds, but it gives a warning that the user has not provided a loop
+invariant. Hence, a default loop invariant (i.e. true) will be used. 
