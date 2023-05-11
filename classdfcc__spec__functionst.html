@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('classdfcc__spec__functionst.html','');
 </div><!--header-->
 <div class="contents">
 
-<p>This class transforms (in place) declarative assigns clause and frees clause specification functions expressed in terms of the builtins:  
+<p>This class rewrites GOTO functions that use the built-ins:  
  <a href="classdfcc__spec__functionst.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>&gt;</code></p>
@@ -107,14 +107,14 @@ $(document).ready(function(){initNavTree('classdfcc__spec__functionst.html','');
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classdfcc__spec__functionst__coll__graph.svg" width="3234" height="1600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classdfcc__spec__functionst__coll__graph.svg" width="2972" height="1434"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a046b311ef577665ffd0b0172c1401a57"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a046b311ef577665ffd0b0172c1401a57">dfcc_spec_functionst</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a7189a0794691a9eaaeae4211cf94fe50">message_handler</a>, <a class="el" href="classdfcc__utilst.html">dfcc_utilst</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a8ca1458e414b2324b7f18618481ba88b">utils</a>, <a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>, <a class="el" href="classdfcc__instrumentt.html">dfcc_instrumentt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#aec46648e85d9762f15e98b12386bfb5a">instrument</a>)</td></tr>
-<tr class="separator:a046b311ef577665ffd0b0172c1401a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0101c546774fd8d721bc428016f1e649"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a0101c546774fd8d721bc428016f1e649">dfcc_spec_functionst</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a7189a0794691a9eaaeae4211cf94fe50">message_handler</a>, <a class="el" href="classdfcc__utilst.html">dfcc_utilst</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#a8ca1458e414b2324b7f18618481ba88b">utils</a>, <a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;<a class="el" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>)</td></tr>
+<tr class="separator:a0101c546774fd8d721bc428016f1e649"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">generate_havoc_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;havoc_function_id, std::size_t &amp;nof_targets)</td></tr>
 <tr class="memdesc:a4aa878468b43f3e46395eeccfd1a24ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">From a function:  <a href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">More...</a><br /></td></tr>
 <tr class="separator:a4aa878468b43f3e46395eeccfd1a24ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,25 +152,23 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a8ca1458e414b2324b7f18618481ba88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf46fea9e65293103445baa51367ab78"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a></td></tr>
 <tr class="separator:acf46fea9e65293103445baa51367ab78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec46648e85d9762f15e98b12386bfb5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdfcc__instrumentt.html">dfcc_instrumentt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#aec46648e85d9762f15e98b12386bfb5a">instrument</a></td></tr>
-<tr class="separator:aec46648e85d9762f15e98b12386bfb5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a706fa853860be05ddeb5a70caf537d46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnamespacet.html">namespacet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__spec__functionst.html#a706fa853860be05ddeb5a70caf537d46">ns</a></td></tr>
 <tr class="separator:a706fa853860be05ddeb5a70caf537d46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class transforms (in place) declarative assigns clause and frees clause specification functions expressed in terms of the builtins: </p>
+<div class="textblock"><p>This class rewrites GOTO functions that use the built-ins: </p>
 <ul>
 <li><code>__CPROVER_assignable</code>,</li>
 <li><code>__CPROVER_object_whole</code>,</li>
 <li><code>__CRPOVER_object_from</code>,</li>
 <li><code>__CPROVER_object_upto</code>,</li>
-<li><code>__CPROVER_freeable</code> into active functions by transforming the builtin calls into calls to dfcc library functions that actually built frame descriptions. The resulting function is then itself instrumented for frame condition checking to be able to prove the absence of side effects. </li>
+<li><code>__CPROVER_freeable</code> into GOTO functions that populate a write set instance or havoc a write set by calling the library implementation of these built-ins. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00048">48</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00043">43</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a046b311ef577665ffd0b0172c1401a57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a046b311ef577665ffd0b0172c1401a57">&#9670;&nbsp;</a></span>dfcc_spec_functionst()</h2>
+<a id="a0101c546774fd8d721bc428016f1e649"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0101c546774fd8d721bc428016f1e649">&#9670;&nbsp;</a></span>dfcc_spec_functionst()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -197,13 +195,7 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;&#160;</td>
-          <td class="paramname"><em>library</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classdfcc__instrumentt.html">dfcc_instrumentt</a> &amp;&#160;</td>
-          <td class="paramname"><em>instrument</em>&#160;</td>
+          <td class="paramname"><em>library</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -213,7 +205,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00022">22</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00023">23</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +256,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00048">48</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00047">47</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -340,7 +332,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00144">144</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00145">145</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +362,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Extracts the type of an assigns clause target expression The expression must be of the form: <code>expr = cast(address_of(target), empty*)</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00038">38</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00037">37</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -406,11 +398,9 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> function_id(</div>
 <div class="line">  params,</div>
 <div class="line">  __CPROVER_assignable_set_t write_set_to_fill,</div>
-<div class="line">  __CPROVER_assignable_set_t write_set_to_check</div>
 <div class="line">)</div>
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>write_set_to_fill</code> is the write set to populate.</li>
-<li><code>write_set_to_check</code> is the write set to use for checking side effects.</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -475,7 +465,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00285">285</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00278">278</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -511,11 +501,9 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> function_id(</div>
 <div class="line">  params,</div>
 <div class="line">  __CPROVER_assignable_set_t write_set_to_fill,</div>
-<div class="line">  __CPROVER_assignable_set_t write_set_to_check</div>
 <div class="line">)</div>
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>write_set_to_fill</code> is the write set to populate.</li>
-<li><code>write_set_to_check</code> is the write set to use for checking side effects.</li>
 </ul>
 <p>The function must be fully inlined and loop free.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -526,7 +514,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00342">342</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00335">335</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -581,7 +569,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00375">375</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8cpp_source.html#l00361">361</a> of file <a class="el" href="dfcc__spec__functions_8cpp_source.html">dfcc_spec_functions.cpp</a>.</p>
 
 </div>
 </div>
@@ -606,31 +594,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00217">217</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
-
-</div>
-</div>
-<a id="aec46648e85d9762f15e98b12386bfb5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec46648e85d9762f15e98b12386bfb5a">&#9670;&nbsp;</a></span>instrument</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classdfcc__instrumentt.html">dfcc_instrumentt</a>&amp; dfcc_spec_functionst::instrument</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00222">222</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00207">207</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -654,7 +618,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00221">221</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00211">211</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -678,7 +642,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00219">219</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00209">209</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -702,7 +666,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00218">218</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00208">208</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -726,7 +690,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00223">223</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00212">212</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>
@@ -750,7 +714,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00220">220</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__spec__functions_8h_source.html#l00210">210</a> of file <a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>.</p>
 
 </div>
 </div>

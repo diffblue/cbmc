@@ -1,52 +1,53 @@
 <map id="dfcc_contract_functionst" name="dfcc_contract_functionst">
-<area shape="rect" id="node1" title="Generates GOTO functions modelling a contract assigns and frees clauses." alt="" coords="3987,705,4168,732"/>
-<area shape="rect" id="node2" href="$classmessage__handlert.html" title=" " alt="" coords="1621,525,1764,552"/>
-<area shape="rect" id="node6" href="$classdfcc__utilst.html" title=" " alt="" coords="2353,588,2443,615"/>
-<area shape="rect" id="node7" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1995,767,2081,793"/>
-<area shape="rect" id="node37" href="$classdfcc__spec__functionst.html" title="This class transforms (in place) declarative assigns clause and frees clause specification functions ..." alt="" coords="3289,627,3448,653"/>
-<area shape="rect" id="node38" href="$classdfcc__instrumentt.html" title="This class instruments GOTO functions or instruction sequences for frame condition checking." alt="" coords="2970,735,3102,761"/>
-<area shape="rect" id="node41" href="$classdfcc__libraryt.html" title="Class interface to library types and functions defined in cprover_contracts.c." alt="" coords="2682,1196,2785,1223"/>
-<area shape="rect" id="node50" href="$classdfcc__contract__clauses__codegent.html" title=" " alt="" coords="3597,698,3763,739"/>
-<area shape="rect" id="node3" title=" " alt="" coords="631,547,817,573"/>
-<area shape="rect" id="node4" title=" " alt="" coords="157,768,287,795"/>
-<area shape="rect" id="node31" title=" " alt="" coords="436,1048,607,1075"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,724,44,751"/>
-<area shape="rect" id="node22" title=" " alt="" coords="437,739,605,765"/>
-<area shape="rect" id="node24" title=" " alt="" coords="445,637,597,678"/>
-<area shape="rect" id="node33" title=" " alt="" coords="857,1352,992,1379"/>
-<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2319,888,2477,915"/>
-<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1611,884,1775,911"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1967,999,2109,1025"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1601,1138,1784,1179"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1252,1138,1397,1179"/>
-<area shape="rect" id="node13" href="$classsource__locationt.html" title=" " alt="" coords="1628,1635,1757,1661"/>
-<area shape="rect" id="node48" href="$classsymbolt.html" title="Symbol table entry." alt="" coords="2001,1673,2075,1700"/>
-<area shape="rect" id="node14" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1299,1752,1351,1779"/>
-<area shape="rect" id="node36" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1665,1736,1721,1763"/>
-<area shape="rect" id="node49" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1665,1787,1721,1813"/>
-<area shape="rect" id="node15" href="$classsharing__treet.html" title=" " alt="" coords="841,1737,1008,1793"/>
-<area shape="rect" id="node16" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1629,935,1757,961"/>
-<area shape="rect" id="node17" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1987,263,2089,289"/>
-<area shape="rect" id="node18" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1623,52,1763,79"/>
-<area shape="rect" id="node19" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1248,643,1401,669"/>
-<area shape="rect" id="node27" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="1635,985,1750,1012"/>
-<area shape="rect" id="node20" title=" " alt="" coords="848,731,1001,773"/>
-<area shape="rect" id="node21" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="186,1333,258,1360"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1251,1073,1398,1114"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1049,923,1200,949"/>
-<area shape="rect" id="node42" title=" " alt="" coords="1251,1507,1399,1549"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1245,1577,1404,1618"/>
-<area shape="rect" id="node44" title=" " alt="" coords="1251,1377,1399,1418"/>
-<area shape="rect" id="node46" title=" " alt="" coords="1241,1255,1408,1297"/>
-<area shape="rect" id="node23" title=" " alt="" coords="203,855,241,881"/>
-<area shape="rect" id="node40" title=" " alt="" coords="467,857,576,884"/>
-<area shape="rect" id="node25" href="$classgoto__modelt.html" title=" " alt="" coords="1986,1055,2090,1081"/>
-<area shape="rect" id="node26" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="1611,1036,1775,1063"/>
-<area shape="rect" id="node28" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="1631,1087,1754,1113"/>
-<area shape="rect" id="node30" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="867,1080,983,1107"/>
-<area shape="rect" id="node32" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="462,1099,581,1125"/>
-<area shape="rect" id="node45" title=" " alt="" coords="1955,1317,2121,1358"/>
-<area shape="rect" id="node47" title=" " alt="" coords="2319,1470,2477,1511"/>
-<area shape="rect" id="node34" href="$classcode__with__contract__typet.html" title=" " alt="" coords="2501,1722,2649,1763"/>
-<area shape="rect" id="node35" href="$classcode__typet.html" title="Base type of functions." alt="" coords="1991,1737,2085,1764"/>
+<area shape="rect" id="node1" title="Generates GOTO functions modelling a contract assigns and frees clauses." alt="" coords="4007,1115,4188,1141"/>
+<area shape="rect" id="node2" href="$classmessage__handlert.html" title=" " alt="" coords="1621,1591,1764,1617"/>
+<area shape="rect" id="node6" href="$classdfcc__utilst.html" title=" " alt="" coords="2353,647,2443,673"/>
+<area shape="rect" id="node7" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1995,1309,2081,1336"/>
+<area shape="rect" id="node34" href="$classdfcc__instrumentt.html" title="This class instruments GOTO functions or instruction sequences for frame condition checking and loop ..." alt="" coords="3751,920,3883,947"/>
+<area shape="rect" id="node35" href="$classdfcc__spec__functionst.html" title="This class rewrites GOTO functions that use the built&#45;ins:" alt="" coords="2965,791,3123,817"/>
+<area shape="rect" id="node36" href="$classdfcc__libraryt.html" title="Class interface to library types and functions defined in cprover_contracts.c." alt="" coords="2682,999,2785,1025"/>
+<area shape="rect" id="node49" href="$classdfcc__contract__clauses__codegent.html" title="Translates assigns and frees clauses of a function contract or loop contract into GOTO programs that ..." alt="" coords="2961,953,3127,994"/>
+<area shape="rect" id="node3" title=" " alt="" coords="631,1285,817,1312"/>
+<area shape="rect" id="node4" title=" " alt="" coords="157,1231,287,1257"/>
+<area shape="rect" id="node31" title=" " alt="" coords="436,709,607,736"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,457,44,484"/>
+<area shape="rect" id="node22" title=" " alt="" coords="437,241,605,268"/>
+<area shape="rect" id="node24" title=" " alt="" coords="445,138,597,179"/>
+<area shape="rect" id="node33" title=" " alt="" coords="857,961,992,988"/>
+<area shape="rect" id="node48" href="$classdfcc__instrument__loopt.html" title="This class applies the loop contract transformation to a loop in a goto function." alt="" coords="3355,813,3522,840"/>
+<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2319,1447,2477,1473"/>
+<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1611,1284,1775,1311"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1967,1444,2109,1471"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1601,1447,1784,1489"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1252,1447,1397,1489"/>
+<area shape="rect" id="node13" href="$classsource__locationt.html" title=" " alt="" coords="1628,1935,1757,1961"/>
+<area shape="rect" id="node46" href="$classsymbolt.html" title="Symbol table entry." alt="" coords="2001,1885,2075,1912"/>
+<area shape="rect" id="node14" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1299,1884,1351,1911"/>
+<area shape="rect" id="node41" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1665,1776,1721,1803"/>
+<area shape="rect" id="node47" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1665,1884,1721,1911"/>
+<area shape="rect" id="node15" href="$classsharing__treet.html" title=" " alt="" coords="841,1869,1008,1925"/>
+<area shape="rect" id="node16" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1629,1335,1757,1361"/>
+<area shape="rect" id="node17" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1987,204,2089,231"/>
+<area shape="rect" id="node18" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1623,201,1763,228"/>
+<area shape="rect" id="node19" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1248,145,1401,172"/>
+<area shape="rect" id="node27" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="1635,252,1750,279"/>
+<area shape="rect" id="node20" title=" " alt="" coords="848,234,1001,275"/>
+<area shape="rect" id="node21" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="186,737,258,764"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1251,538,1398,579"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1251,1119,1399,1161"/>
+<area shape="rect" id="node38" title=" " alt="" coords="1245,774,1404,815"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1251,839,1399,881"/>
+<area shape="rect" id="node42" title=" " alt="" coords="1241,1002,1408,1043"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1049,603,1200,629"/>
+<area shape="rect" id="node23" title=" " alt="" coords="203,309,241,336"/>
+<area shape="rect" id="node44" title=" " alt="" coords="467,309,576,336"/>
+<area shape="rect" id="node25" href="$classgoto__modelt.html" title=" " alt="" coords="1986,539,2090,565"/>
+<area shape="rect" id="node26" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="1611,495,1775,521"/>
+<area shape="rect" id="node28" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="1631,545,1754,572"/>
+<area shape="rect" id="node30" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="867,495,983,521"/>
+<area shape="rect" id="node32" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="462,495,581,521"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1955,1495,2121,1537"/>
+<area shape="rect" id="node45" title=" " alt="" coords="2319,1127,2477,1169"/>
+<area shape="rect" id="node51" href="$classcode__typet.html" title="Base type of functions." alt="" coords="1991,1833,2085,1860"/>
+<area shape="rect" id="node50" href="$classcode__with__contract__typet.html" title=" " alt="" coords="2501,1830,2649,1871"/>
 </map>
