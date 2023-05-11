@@ -1,0 +1,15 @@
+CORE
+test.c
+--export-core-goto exported.core.goto
+^Parsing test.c$
+^Converting$
+^Type-checking test$
+^Generating GOTO Program$
+^Removal of function pointers and virtual functions$
+^Generic Property Instrumentation$
+Exported goto-program in core-goto form at exported.core.goto
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Ensure that --export-core-goto exported.core.goto terminates successfully and logs this.

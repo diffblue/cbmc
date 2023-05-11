@@ -1,0 +1,9 @@
+CORE
+test.c
+--export-core-goto ""
+^ERROR: Please provide a filename to write the goto-binary to.$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+Ensure that --export-core-goto exported.core.goto terminates with error when incorrectly used.
