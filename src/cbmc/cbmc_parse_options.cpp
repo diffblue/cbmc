@@ -245,6 +245,19 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("trace", true);
   }
 
+  if(cmdline.isset("export-core-goto"))
+  {
+    options.set_option(
+      "export-core-goto", cmdline.get_value("export-core-goto"));
+    if(options.get_option("export-core-goto").empty())
+    {
+      log.error()
+        << "ERROR: Please provide a filename to write the goto-binary to."
+        << messaget::eom;
+      exit(CPROVER_EXIT_INTERNAL_ERROR);
+    }
+  }
+
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);
 
@@ -549,21 +562,25 @@ int cbmc_parse_optionst::doit()
   // At this point, our goto-model should be in core-goto form (all of the
   // transformations have been run and the program is ready to be given to the
   // solver).
-  if(cmdline.isset("export-core-goto"))
+  if(options.is_set("export-core-goto"))
   {
-    auto core_goto_filename = cmdline.get_value("export-core-goto");
-    auto success =
+    auto core_goto_filename = options.get_option("export-core-goto");
+
+    bool success =
       !write_goto_binary(core_goto_filename, goto_model, ui_message_handler);
 
     if(!success)
     {
-      log.error() << "Unable to export goto-program in file "
+      log.error() << "ERROR: Unable to export goto-program in file "
                   << core_goto_filename << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }
-    log.status() << "Exported goto-program in core-goto form at "
-                 << core_goto_filename << messaget::eom;
-    return CPROVER_EXIT_SUCCESS;
+    else
+    {
+      log.status() << "Exported goto-program in core-goto form at "
+                   << core_goto_filename << messaget::eom;
+      return CPROVER_EXIT_SUCCESS;
+    }
   }
 
   if(
