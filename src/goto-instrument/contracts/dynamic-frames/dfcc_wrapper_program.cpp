@@ -577,7 +577,7 @@ void dfcc_wrapper_programt::encode_requires_clauses()
   goto_programt requires_program;
 
   // translate each requires clause
-  for(const auto &r : contract_code_type.requires())
+  for(const auto &r : contract_code_type.c_requires())
   {
     exprt requires = to_lambda_expr(r).application(contract_lambda_parameters);
     requires.add_source_location() = r.source_location();
@@ -621,7 +621,7 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   goto_programt ensures_program;
 
   // translate each ensures clause
-  for(const auto &e : contract_code_type.ensures())
+  for(const auto &e : contract_code_type.c_ensures())
   {
     exprt ensures = to_lambda_expr(e)
                       .application(contract_lambda_parameters)

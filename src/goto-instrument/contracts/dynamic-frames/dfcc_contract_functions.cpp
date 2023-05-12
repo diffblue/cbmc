@@ -150,7 +150,7 @@ void dfcc_contract_functionst::gen_spec_assigns_function()
 
   exprt::operandst targets;
 
-  for(const exprt &target : code_with_contract.assigns())
+  for(const exprt &target : code_with_contract.c_assigns())
   {
     auto new_target = to_lambda_expr(target).application(lambda_parameters);
     new_target.add_source_location() = target.source_location();
@@ -201,7 +201,7 @@ void dfcc_contract_functionst::gen_spec_frees_function()
 
   exprt::operandst targets;
 
-  for(const exprt &target : code_with_contract.frees())
+  for(const exprt &target : code_with_contract.c_frees())
   {
     auto new_target = to_lambda_expr(target).application(lambda_parameters);
     new_target.add_source_location() = target.source_location();

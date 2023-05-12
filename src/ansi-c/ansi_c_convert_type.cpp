@@ -250,7 +250,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
-    requires.push_back(to_unary_expr(as_expr).op());
+    c_requires.push_back(to_unary_expr(as_expr).op());
   }
   else if(type.id() == ID_C_spec_assigns)
   {
@@ -258,7 +258,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       static_cast<const exprt &>(static_cast<const irept &>(type));
 
     for(const exprt &target : to_unary_expr(as_expr).op().operands())
-      assigns.push_back(target);
+      c_assigns.push_back(target);
   }
   else if(type.id() == ID_C_spec_frees)
   {
@@ -266,13 +266,13 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       static_cast<const exprt &>(static_cast<const irept &>(type));
 
     for(const exprt &target : to_unary_expr(as_expr).op().operands())
-      frees.push_back(target);
+      c_frees.push_back(target);
   }
   else if(type.id() == ID_C_spec_ensures)
   {
     const exprt &as_expr =
       static_cast<const exprt &>(static_cast<const irept &>(type));
-    ensures.push_back(to_unary_expr(as_expr).op());
+    c_ensures.push_back(to_unary_expr(as_expr).op());
   }
   else
     other.push_back(type);
@@ -322,17 +322,17 @@ void ansi_c_convert_typet::write(typet &type)
     type.swap(other.front());
 
     // the contract expressions are meant for function types only
-    if(!requires.empty())
-      to_code_with_contract_type(type).requires() = std::move(requires);
+    if(!c_requires.empty())
+      to_code_with_contract_type(type).c_requires() = std::move(c_requires);
 
-    if(!assigns.empty())
-      to_code_with_contract_type(type).assigns() = std::move(assigns);
+    if(!c_assigns.empty())
+      to_code_with_contract_type(type).c_assigns() = std::move(c_assigns);
 
-    if(!frees.empty())
-      to_code_with_contract_type(type).frees() = std::move(frees);
+    if(!c_frees.empty())
+      to_code_with_contract_type(type).c_frees() = std::move(c_frees);
 
-    if(!ensures.empty())
-      to_code_with_contract_type(type).ensures() = std::move(ensures);
+    if(!c_ensures.empty())
+      to_code_with_contract_type(type).c_ensures() = std::move(c_ensures);
 
     if(constructor || destructor)
     {

@@ -224,7 +224,7 @@ protected:
   /// (populated by calling functions provided in contract_functions)
   /// - Adds declaration of write set and pointer to write set to \ref preamble
   /// - Adds initialisation function call in \ref write_set_checks
-  /// - Adds contract::assigns and contract::frees function call
+  /// - Adds contract::c_assigns and contract::frees function call
   /// in \ref write_set_checks
   /// - Adds release function call in \ref postamble
   void encode_contract_write_set();

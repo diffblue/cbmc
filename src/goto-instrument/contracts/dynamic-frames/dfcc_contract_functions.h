@@ -42,7 +42,7 @@ class conditional_target_group_exprt;
 /// ```c
 /// // Populates write_set_to_fill with targets of the assigns clause
 /// // checks its own body against write_set_to_check:
-/// void contract_id::assigns(
+/// void contract_id::c_assigns(
 ///     function-params,
 ///     write_set_to_fill,
 ///     write_set_to_check);
@@ -50,8 +50,8 @@ class conditional_target_group_exprt;
 ///
 /// ```c
 /// // Havocs the targets specified in the assigns clause, assuming
-/// // write_set_to_havoc is a snapshot created using contract_id::assigns
-/// void contract_id::assigns::havoc(write_set_to_havoc);
+/// // write_set_to_havoc is a snapshot created using contract_id::c_assigns
+/// void contract_id::c_assigns::havoc(write_set_to_havoc);
 /// ```
 ///
 /// ```c
@@ -89,10 +89,10 @@ public:
   void instrument_without_loop_contracts_check_no_pointer_contracts(
     const irep_idt &spec_function_id);
 
-  /// Returns the contract::assigns function symbol
+  /// Returns the contract::c_assigns function symbol
   const symbolt &get_spec_assigns_function_symbol() const;
 
-  /// Returns the contract::assigns::havoc function symbol
+  /// Returns the contract::c_assigns::havoc function symbol
   const symbolt &get_spec_assigns_havoc_function_symbol() const;
 
   /// Returns the contract::frees function symbol
@@ -110,10 +110,10 @@ public:
   /// The code_with_contract_type carrying the contract clauses
   const code_with_contract_typet &code_with_contract;
 
-  /// Identifier of the contract::assigns function
+  /// Identifier of the contract::c_assigns function
   const irep_idt spec_assigns_function_id;
 
-  /// Identifier of the contract::assigns::havoc function
+  /// Identifier of the contract::c_assigns::havoc function
   const irep_idt spec_assigns_havoc_function_id;
 
   /// Identifier of the contract::frees function
