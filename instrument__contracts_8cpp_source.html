@@ -378,11 +378,11 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> add_at_beginning;</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="comment">// precondition?</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="keywordflow">if</span>(!contract.requires().empty())</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="keywordflow">if</span>(!contract.c_requires().empty())</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  {</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="comment">// stick these in as assumptions, preserving the ordering</span></div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <a class="code" href="classgoto__programt.html">goto_programt</a> dest;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;assumption : contract.requires())</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;assumption : contract.c_requires())</div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    {</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      <a class="code" href="classexprt.html">exprt</a> assumption_instance = <a class="code" href="instrument__contracts_8cpp.html#a81c287a7e1f7bfc182c6b8005abbaeca">instantiate_contract_lambda</a>(assumption);</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="keyword">auto</span> fixed_assumption = <a class="code" href="instrument__contracts_8cpp.html#a8b471472a1ef8a28fd3199cb2cb2b59a">add_function</a>(f.first, assumption_instance);</div>
@@ -396,19 +396,19 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> old_prefix = <span class="stringliteral">&quot;old::&quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(f.first);</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160; </div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="comment">// postcondition?</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="keywordflow">if</span>(!contract.ensures().empty())</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <span class="keywordflow">if</span>(!contract.c_ensures().empty())</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  {</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="comment">// Stick the postconditions in as assertions at the end</span></div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keyword">auto</span> last = body.instructions.end();</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">if</span>(std::prev(last)-&gt;is_end_function())</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      last = std::prev(last);</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;assertion : contract.ensures())</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;assertion : contract.c_ensures())</div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    {</div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <a class="code" href="classexprt.html">exprt</a> assertion_instance = <a class="code" href="instrument__contracts_8cpp.html#a81c287a7e1f7bfc182c6b8005abbaeca">instantiate_contract_lambda</a>(assertion);</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      std::string <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> = <span class="stringliteral">&quot;postcondition&quot;</span>;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="keywordflow">if</span>(contract.ensures().size() &gt;= 2)</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="keywordflow">if</span>(contract.c_ensures().size() &gt;= 2)</div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> += <span class="stringliteral">&quot; &quot;</span> + <a class="code" href="instrument__contracts_8cpp.html#a22ae418d9f6477b8e8fd131bdd3e2d51">expr2text</a>(assertion_instance, ns);</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160; </div>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      <span class="keyword">auto</span> location = assertion.source_location();</div>
@@ -430,8 +430,8 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  <span class="comment">// do &#39;old&#39; in the body</span></div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    !contract.assigns().empty() || !contract.requires().empty() ||</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    !contract.ensures().empty())</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    !contract.c_assigns().empty() || !contract.c_requires().empty() ||</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    !contract.c_ensures().empty())</div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  {</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;instruction : body.instructions)</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;      instruction.transform(</div>
@@ -451,8 +451,8 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="comment">// assigns?</span></div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    !contract.assigns().empty() || !contract.requires().empty() ||</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    !contract.ensures().empty())</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    !contract.c_assigns().empty() || !contract.c_requires().empty() ||</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    !contract.c_ensures().empty())</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  {</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = body.instructions.begin(); it != body.instructions.end();</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        it++)</div>
@@ -470,7 +470,7 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        <span class="comment">// maybe not ok</span></div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;        <span class="keyword">auto</span> assigns_assertion =</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;          <a class="code" href="instrument__contracts_8cpp.html#ac8099f8bee3c96a9ccc5ed3c2d1244bd">make_assigns_assertion</a>(f.first, contract.assigns(), lhs);</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;          <a class="code" href="instrument__contracts_8cpp.html#ac8099f8bee3c96a9ccc5ed3c2d1244bd">make_assigns_assertion</a>(f.first, contract.c_assigns(), lhs);</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        <span class="keyword">auto</span> location = it-&gt;source_location();</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        location.set_property_class(<span class="stringliteral">&quot;assigns&quot;</span>);</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        location.set_comment(<span class="stringliteral">&quot;assigns clause&quot;</span>);</div>
@@ -541,7 +541,7 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        <a class="code" href="classgoto__programt.html">goto_programt</a> dest;</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;        <span class="comment">// assert the preconditions</span></div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;<a class="code" href="precondition_8cpp.html#a394cc0d4162f3a2e4db562d51a65e5b0">precondition</a> : contract.requires())</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;<a class="code" href="precondition_8cpp.html#a394cc0d4162f3a2e4db562d51a65e5b0">precondition</a> : contract.c_requires())</div>
 <div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;        {</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;          <span class="keyword">auto</span> instantiated_precondition =</div>
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;            <a class="code" href="instrument__contracts_8cpp.html#a81c287a7e1f7bfc182c6b8005abbaeca">instantiate_contract_lambda</a>(<a class="code" href="precondition_8cpp.html#a394cc0d4162f3a2e4db562d51a65e5b0">precondition</a>);</div>
@@ -560,7 +560,7 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        }</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160; </div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        <span class="comment">// havoc the &#39;assigned&#39; variables</span></div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;assigns_clause_lambda : contract.assigns())</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;assigns_clause_lambda : contract.c_assigns())</div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        {</div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;          <span class="keyword">auto</span> location = it-&gt;source_location();</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160; </div>
@@ -611,7 +611,7 @@ $(document).ready(function(){initNavTree('instrument__contracts_8cpp_source.html
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;        }</div>
 <div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160; </div>
 <div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;        <span class="comment">// assume the postconditions</span></div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;<a class="code" href="postcondition_8cpp.html#a4169ca6e98486fbb29ce285bcc12bed4">postcondition</a> : contract.ensures())</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;<a class="code" href="postcondition_8cpp.html#a4169ca6e98486fbb29ce285bcc12bed4">postcondition</a> : contract.c_ensures())</div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;        {</div>
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;          <span class="keyword">auto</span> &amp;location = it-&gt;source_location();</div>
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160; </div>

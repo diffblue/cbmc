@@ -1,13 +1,13 @@
 var classcode__with__contract__typet =
 [
     [ "code_with_contract_typet", "classcode__with__contract__typet.html#adf5dfd2a2e6f3310e208ed7af831f489", null ],
-    [ "assigns", "classcode__with__contract__typet.html#a01823776bc335f911ac63b3d06313143", null ],
-    [ "assigns", "classcode__with__contract__typet.html#a28bcc0ce25114852d3069fbc2b97b693", null ],
-    [ "ensures", "classcode__with__contract__typet.html#a983f3be72fe2cc87ad773a52ff2b938a", null ],
-    [ "ensures", "classcode__with__contract__typet.html#ad90dbc8b91800076cab89163ef7aac6d", null ],
-    [ "frees", "classcode__with__contract__typet.html#a0e88fe34f9f7aa0119d4e96ad3c95009", null ],
-    [ "frees", "classcode__with__contract__typet.html#a8fd44caf5e282f63a5d3d37bb38207a9", null ],
-    [ "has_contract", "classcode__with__contract__typet.html#ade209ee7894fd4f3fe544fef718ab282", null ],
-    [ "requires", "classcode__with__contract__typet.html#a19d61443f08a0618928cce114bb3be8e", null ],
-    [ "requires", "classcode__with__contract__typet.html#a0721f7f1a077b472dbc409410dd293ba", null ]
+    [ "c_assigns", "classcode__with__contract__typet.html#a1443f66bb09b5e93d5849958acbe8772", null ],
+    [ "c_assigns", "classcode__with__contract__typet.html#a052ef2980194e279c9df77f1b1d55b52", null ],
+    [ "c_ensures", "classcode__with__contract__typet.html#a3860a965ad6f335278d50baf0e85b806", null ],
+    [ "c_ensures", "classcode__with__contract__typet.html#ada95a0bc5880cfc48116fb48af410db1", null ],
+    [ "c_frees", "classcode__with__contract__typet.html#a3c7c2a9eb98f4f6b22b8c33b72812470", null ],
+    [ "c_frees", "classcode__with__contract__typet.html#a16bbd6cb434fbba139e6cf05ccc0b7d1", null ],
+    [ "c_requires", "classcode__with__contract__typet.html#abfadd717c24aa2524e4f16b732f57962", null ],
+    [ "c_requires", "classcode__with__contract__typet.html#a0733dd8dac3f65dd3ebf07afa1c3e22d", null ],
+    [ "has_contract", "classcode__with__contract__typet.html#ade209ee7894fd4f3fe544fef718ab282", null ]
 ];
