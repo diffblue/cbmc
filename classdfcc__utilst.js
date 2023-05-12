@@ -19,7 +19,6 @@ var classdfcc__utilst =
     [ "inline_function", "classdfcc__utilst.html#a455aa2b6f1dd7db3a0a3f37c82d7e5dc", null ],
     [ "inline_program", "classdfcc__utilst.html#ae4fd7fd1b2330bab861ef7b1852def4d", null ],
     [ "inline_program", "classdfcc__utilst.html#a70c9c67ecf087a7c0086c573b91ff478", null ],
-    [ "make_map_start_address", "classdfcc__utilst.html#acc509eadd32340b3aef283afd4dacfbf", null ],
     [ "make_null_check_expr", "classdfcc__utilst.html#a395032e90f53e46e039cd45eb82e6731", null ],
     [ "make_sizeof_expr", "classdfcc__utilst.html#af3b542facca4f75b733b7d16e5de3c85", null ],
     [ "symbol_exists", "classdfcc__utilst.html#a6cab060235f083e41b92bca621b6d0b5", null ],

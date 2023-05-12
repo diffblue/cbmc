@@ -100,13 +100,13 @@ $(document).ready(function(){initNavTree('dfcc__loop__nesting__graph_8h.html',''
 <p>Builds a graph describing how loops are nested in a GOTO program.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="graph_8h_source.html">util/graph.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="loop__utils_8h_source.html">goto-instrument/loop_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="loop__analysis_8h_source.html">analyses/loop_analysis.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for dfcc_loop_nesting_graph.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__loop__nesting__graph_8h__incl.svg" width="2562" height="812"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__loop__nesting__graph_8h__incl.svg" width="1908" height="708"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -133,9 +133,9 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acdcf59ff41cacde9ae8c56c5b0f35c83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__loop__nesting__graph_8h.html#acdcf59ff41cacde9ae8c56c5b0f35c83">build_loop_nesting_graph</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classmessaget.html">messaget</a> &amp;log)</td></tr>
-<tr class="memdesc:acdcf59ff41cacde9ae8c56c5b0f35c83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a graph instance describing the nesting structure of natural loops in the given <code>goto_program</code>.  <a href="dfcc__loop__nesting__graph_8h.html#acdcf59ff41cacde9ae8c56c5b0f35c83">More...</a><br /></td></tr>
-<tr class="separator:acdcf59ff41cacde9ae8c56c5b0f35c83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a659db86426aaaa687d3431da1b7cb278"><td class="memItemLeft" align="right" valign="top"><a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__loop__nesting__graph_8h.html#a659db86426aaaa687d3431da1b7cb278">build_loop_nesting_graph</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
+<tr class="memdesc:a659db86426aaaa687d3431da1b7cb278"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a graph instance describing the nesting structure of natural loops in the given <code>goto_program</code>.  <a href="dfcc__loop__nesting__graph_8h.html#a659db86426aaaa687d3431da1b7cb278">More...</a><br /></td></tr>
+<tr class="separator:a659db86426aaaa687d3431da1b7cb278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Builds a graph describing how loops are nested in a GOTO program. </p>
@@ -159,8 +159,8 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="acdcf59ff41cacde9ae8c56c5b0f35c83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acdcf59ff41cacde9ae8c56c5b0f35c83">&#9670;&nbsp;</a></span>build_loop_nesting_graph()</h2>
+<a id="a659db86426aaaa687d3431da1b7cb278"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a659db86426aaaa687d3431da1b7cb278">&#9670;&nbsp;</a></span>build_loop_nesting_graph()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -169,18 +169,8 @@ Functions</h2></td></tr>
           <td class="memname"><a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> build_loop_nesting_graph </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_program</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>goto_program</em></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classmessaget.html">messaget</a> &amp;&#160;</td>
-          <td class="paramname"><em>log</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -189,7 +179,7 @@ Functions</h2></td></tr>
 <p>A loop is considered nested in an outer loop if its head and its latch are both found in the instructions of the outer loop.</p>
 <dl class="section pre"><dt>Precondition</dt><dd>Loop normal form properties must hold. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__loop__nesting__graph_8cpp_source.html#l00028">28</a> of file <a class="el" href="dfcc__loop__nesting__graph_8cpp_source.html">dfcc_loop_nesting_graph.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__loop__nesting__graph_8cpp_source.html#l00026">26</a> of file <a class="el" href="dfcc__loop__nesting__graph_8cpp_source.html">dfcc_loop_nesting_graph.cpp</a>.</p>
 
 </div>
 </div>

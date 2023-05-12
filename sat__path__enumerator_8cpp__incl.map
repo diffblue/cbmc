@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/accelerate/sat_path_enumerator.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/accelerate/sat_path_enumerator.cpp">
-<area shape="rect" id="node1" title="Loop Acceleration." alt="" coords="1479,5,1742,61"/>
-<area shape="rect" id="node2" href="$sat__path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1301,117,1473,143"/>
-<area shape="rect" id="node3" title=" " alt="" coords="304,623,355,650"/>
-<area shape="rect" id="node4" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1695,616,1846,657"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1904,929,1963,956"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1721,117,1801,143"/>
-<area shape="rect" id="node40" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="1525,109,1697,151"/>
-<area shape="rect" id="node41" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="2294,199,2437,225"/>
-<area shape="rect" id="node19" href="$natural__loops_8h.html" title="Compute natural loops in a goto_function." alt="" coords="848,281,1032,307"/>
-<area shape="rect" id="node32" href="$path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1411,199,1557,225"/>
-<area shape="rect" id="node33" href="$path_8h.html" title="Loop Acceleration." alt="" coords="1342,370,1405,397"/>
-<area shape="rect" id="node34" href="$cone__of__influence_8h.html" title="Loop Acceleration." alt="" coords="1563,452,1714,479"/>
-<area shape="rect" id="node36" href="$acceleration__utils_8h.html" title="Loop Acceleration." alt="" coords="1020,199,1169,225"/>
-<area shape="rect" id="node5" href="$goto__instruction__code_8h.html" title=" " alt="" coords="2410,705,2587,732"/>
-<area shape="rect" id="node7" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2533,855,2625,881"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1353,705,1417,732"/>
-<area shape="rect" id="node13" title=" " alt="" coords="313,705,356,732"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1808,705,1867,732"/>
-<area shape="rect" id="node15" href="$source__location_8h.html" title=" " alt="" coords="1992,705,2128,732"/>
-<area shape="rect" id="node6" href="$std__code__base_8h.html" title=" " alt="" coords="2444,780,2599,807"/>
-<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2827,780,2941,807"/>
-<area shape="rect" id="node8" title=" " alt="" coords="2592,929,2667,956"/>
-<area shape="rect" id="node10" title=" " alt="" coords="2427,929,2519,956"/>
-<area shape="rect" id="node16" href="$deprecate_8h.html" title=" " alt="" coords="2116,780,2215,807"/>
-<area shape="rect" id="node17" href="$irep_8h.html" title=" " alt="" coords="1871,780,1929,807"/>
-<area shape="rect" id="node18" href="$optional_8h.html" title=" " alt="" coords="2005,780,2091,807"/>
-<area shape="rect" id="node20" title=" " alt="" coords="825,370,882,397"/>
-<area shape="rect" id="node21" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="958,363,1109,404"/>
-<area shape="rect" id="node28" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="666,370,801,397"/>
-<area shape="rect" id="node30" href="$loop__analysis_8h.html" title="Data structure representing a loop in a GOTO program and an interface shared by all analyses that fin..." alt="" coords="3068,370,3191,397"/>
-<area shape="rect" id="node22" href="$namespace_8h.html" title=" " alt="" coords="1537,623,1671,650"/>
-<area shape="rect" id="node23" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="816,452,963,479"/>
-<area shape="rect" id="node25" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1037,452,1168,479"/>
-<area shape="rect" id="node24" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="499,534,659,561"/>
-<area shape="rect" id="node26" href="$goto__function_8h.html" title="Goto Function." alt="" coords="1061,534,1184,561"/>
-<area shape="rect" id="node27" href="$cprover__prefix_8h.html" title=" " alt="" coords="885,534,1037,561"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1243,452,1285,479"/>
-<area shape="rect" id="node31" title=" " alt="" coords="3164,452,3241,479"/>
-<area shape="rect" id="node35" title=" " alt="" coords="1992,534,2107,561"/>
-<area shape="rect" id="node37" href="$guard_8h.html" title="Guard Data Structure." alt="" coords="2905,452,3039,479"/>
-<area shape="rect" id="node38" href="$polynomial_8h.html" title="Loop Acceleration." alt="" coords="195,281,301,307"/>
-<area shape="rect" id="node42" href="$make__unique_8h.html" title=" " alt="" coords="3512,281,3659,307"/>
-<area shape="rect" id="node43" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="2473,281,2669,307"/>
-<area shape="rect" id="node48" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="2221,370,2409,397"/>
-<area shape="rect" id="node54" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="2866,281,3067,307"/>
-<area shape="rect" id="node58" href="$smt2__dec_8h.html" title=" " alt="" coords="3143,281,3329,307"/>
-<area shape="rect" id="node59" href="$bv__pointers_8h.html" title=" " alt="" coords="3353,273,3487,315"/>
-<area shape="rect" id="node60" href="$satcheck_8h.html" title=" " alt="" coords="2282,281,2449,307"/>
-<area shape="rect" id="node44" href="$src_2util_2message_8h.html" title=" " alt="" coords="2411,623,2530,650"/>
-<area shape="rect" id="node45" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="2562,534,2718,561"/>
-<area shape="rect" id="node46" href="$shadow__memory_8h.html" title="Symex Shadow Memory Instrumentation." alt="" coords="2743,534,2887,561"/>
-<area shape="rect" id="node47" href="$symex__config_8h.html" title="Symbolic Execution." alt="" coords="1942,370,2066,397"/>
-<area shape="rect" id="node49" title=" " alt="" coords="2200,452,2285,479"/>
-<area shape="rect" id="node50" href="$merge__irep_8h.html" title=" " alt="" coords="1941,452,2075,479"/>
-<area shape="rect" id="node51" href="$narrow_8h.html" title=" " alt="" coords="2290,780,2369,807"/>
-<area shape="rect" id="node52" href="$ssa__step_8h.html" title=" " alt="" coords="2309,452,2400,479"/>
-<area shape="rect" id="node53" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="2131,534,2255,561"/>
-<area shape="rect" id="node55" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="2690,370,2814,397"/>
-<area shape="rect" id="node56" href="$local__safe__pointers_8h.html" title="Local safe pointer analysis." alt="" coords="1310,527,1461,568"/>
-<area shape="rect" id="node57" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="2889,370,3044,397"/>
+<area shape="rect" id="node1" title="Loop Acceleration." alt="" coords="1545,5,1807,61"/>
+<area shape="rect" id="node2" href="$sat__path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1218,109,1390,136"/>
+<area shape="rect" id="node3" title=" " alt="" coords="512,698,563,725"/>
+<area shape="rect" id="node4" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1626,691,1777,732"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1749,1004,1808,1031"/>
+<area shape="rect" id="node38" title=" " alt="" coords="1713,109,1793,136"/>
+<area shape="rect" id="node39" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="1729,184,1901,225"/>
+<area shape="rect" id="node40" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="1918,273,2061,300"/>
+<area shape="rect" id="node19" href="$natural__loops_8h.html" title="Compute natural loops in a goto_function." alt="" coords="489,273,673,300"/>
+<area shape="rect" id="node31" href="$path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="1134,191,1279,218"/>
+<area shape="rect" id="node32" href="$path_8h.html" title="Loop Acceleration." alt="" coords="1261,445,1323,471"/>
+<area shape="rect" id="node33" href="$cone__of__influence_8h.html" title="Loop Acceleration." alt="" coords="1462,527,1613,553"/>
+<area shape="rect" id="node35" href="$acceleration__utils_8h.html" title="Loop Acceleration." alt="" coords="937,191,1087,218"/>
+<area shape="rect" id="node5" href="$goto__instruction__code_8h.html" title=" " alt="" coords="2041,780,2218,807"/>
+<area shape="rect" id="node7" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2366,929,2458,956"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1424,780,1488,807"/>
+<area shape="rect" id="node13" title=" " alt="" coords="111,780,153,807"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1696,780,1755,807"/>
+<area shape="rect" id="node15" href="$source__location_8h.html" title=" " alt="" coords="1880,780,2016,807"/>
+<area shape="rect" id="node6" href="$std__code__base_8h.html" title=" " alt="" coords="2019,855,2173,881"/>
+<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2197,855,2312,881"/>
+<area shape="rect" id="node8" title=" " alt="" coords="2500,1004,2575,1031"/>
+<area shape="rect" id="node10" title=" " alt="" coords="2850,1004,2942,1031"/>
+<area shape="rect" id="node16" href="$deprecate_8h.html" title=" " alt="" coords="2387,855,2485,881"/>
+<area shape="rect" id="node17" href="$irep_8h.html" title=" " alt="" coords="1708,855,1767,881"/>
+<area shape="rect" id="node18" href="$optional_8h.html" title=" " alt="" coords="1905,855,1991,881"/>
+<area shape="rect" id="node20" title=" " alt="" coords="438,355,495,382"/>
+<area shape="rect" id="node21" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="605,437,755,479"/>
+<area shape="rect" id="node28" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="347,445,482,471"/>
+<area shape="rect" id="node30" href="$loop__analysis_8h.html" title="Data structure representing a loop in a GOTO program and an interface shared by all analyses that fin..." alt="" coords="520,355,643,382"/>
+<area shape="rect" id="node22" href="$namespace_8h.html" title=" " alt="" coords="1049,698,1183,725"/>
+<area shape="rect" id="node23" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="1088,527,1235,553"/>
+<area shape="rect" id="node25" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="661,527,792,553"/>
+<area shape="rect" id="node24" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="1024,609,1184,635"/>
+<area shape="rect" id="node26" href="$goto__function_8h.html" title="Goto Function." alt="" coords="827,609,949,635"/>
+<area shape="rect" id="node27" href="$cprover__prefix_8h.html" title=" " alt="" coords="651,609,803,635"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1021,527,1064,553"/>
+<area shape="rect" id="node34" title=" " alt="" coords="2301,609,2416,635"/>
+<area shape="rect" id="node36" href="$guard_8h.html" title="Guard Data Structure." alt="" coords="1840,527,1973,553"/>
+<area shape="rect" id="node37" href="$polynomial_8h.html" title="Loop Acceleration." alt="" coords="751,273,857,300"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1997,527,2075,553"/>
+<area shape="rect" id="node42" href="$make__unique_8h.html" title=" " alt="" coords="1916,445,2063,471"/>
+<area shape="rect" id="node43" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="2509,355,2705,382"/>
+<area shape="rect" id="node48" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="2825,445,3013,471"/>
+<area shape="rect" id="node54" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="2229,355,2430,382"/>
+<area shape="rect" id="node58" href="$smt2__dec_8h.html" title=" " alt="" coords="2729,355,2914,382"/>
+<area shape="rect" id="node59" href="$bv__pointers_8h.html" title=" " alt="" coords="2938,348,3073,389"/>
+<area shape="rect" id="node60" href="$satcheck_8h.html" title=" " alt="" coords="3097,355,3263,382"/>
+<area shape="rect" id="node44" href="$src_2util_2message_8h.html" title=" " alt="" coords="2662,698,2781,725"/>
+<area shape="rect" id="node45" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="2645,445,2801,471"/>
+<area shape="rect" id="node46" href="$shadow__memory_8h.html" title="Symex Shadow Memory Instrumentation." alt="" coords="2963,609,3107,635"/>
+<area shape="rect" id="node47" href="$symex__config_8h.html" title="Symbolic Execution." alt="" coords="3139,445,3263,471"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2979,527,3064,553"/>
+<area shape="rect" id="node50" href="$merge__irep_8h.html" title=" " alt="" coords="2352,527,2485,553"/>
+<area shape="rect" id="node51" href="$narrow_8h.html" title=" " alt="" coords="2933,855,3011,881"/>
+<area shape="rect" id="node52" href="$ssa__step_8h.html" title=" " alt="" coords="2813,527,2904,553"/>
+<area shape="rect" id="node53" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="2814,609,2938,635"/>
+<area shape="rect" id="node55" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="2418,445,2542,471"/>
+<area shape="rect" id="node56" href="$local__safe__pointers_8h.html" title="Local safe pointer analysis." alt="" coords="1462,601,1613,643"/>
+<area shape="rect" id="node57" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="2087,445,2241,471"/>
 </map>

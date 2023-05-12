@@ -17,7 +17,6 @@ var classdfcc__cfg__infot =
     [ "output", "classdfcc__cfg__infot.html#a5a0467a5099cc2d051bcdeeef77479af", null ],
     [ "function_id", "classdfcc__cfg__infot.html#ae5e21d2677b966153c375f8bd4536ca4", null ],
     [ "goto_function", "classdfcc__cfg__infot.html#a7b2c770e97dde27d8d33b0fa16ec2556", null ],
-    [ "log", "classdfcc__cfg__infot.html#a15649fec26df40fb2ff93858604b0b6d", null ],
     [ "loop_info_map", "classdfcc__cfg__infot.html#aef94d5df9a8ea9ca48aa58c2fc727544", null ],
     [ "ns", "classdfcc__cfg__infot.html#a36ddb9bc1cbd404404ce7221ccd24c9a", null ],
     [ "top_level_local", "classdfcc__cfg__infot.html#a283e9ed4b758056175c123af22f32e63", null ],

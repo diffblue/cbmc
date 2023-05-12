@@ -1047,6 +1047,7 @@ var hierarchy =
     [ "loop_templatet< T >", "classloop__templatet.html", [
       [ "loop_with_parent_analysis_templatet< T >", "classloop__with__parent__analysis__templatet.html", null ]
     ] ],
+    [ "loop_templatet< goto_programt::targett >", "classloop__templatet.html", null ],
     [ "main_function_resultt", "structmain__function__resultt.html", null ],
     [ "detail::make_voidt< typest >", "structdetail_1_1make__voidt.html", null ],
     [ "boolbv_mapt::map_entryt", "classboolbv__mapt_1_1map__entryt.html", null ],
