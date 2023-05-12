@@ -1,5 +1,6 @@
 var NAVTREEINDEX48 =
 {
+"classlocation__sensitive__storaget.html#aec9b1ca559a99230ee44bf6cb84896be":[8,0,781,3],
 "classlocation__sensitive__storaget.html#afeb1b7d8d688665cf988146bb7e44e5d":[8,0,781,0],
 "classlocation__update__visitort.html":[8,0,782],
 "classlocation__update__visitort.html#a7b941759a7f2264af65a40ed3a6ddb42":[8,0,782,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX48 =
 "classmessaget.html#a8e57d8a6ce4d215665f2599cc0b145fb":[8,0,811,16],
 "classmessaget.html#a92254d8ea9fbe2e2959ce89d4026ee21":[8,0,811,14],
 "classmessaget.html#a948a1e5ddef8d250c65b41ec9b7012ee":[8,0,811,17],
-"classmessaget.html#a9b00d066828dcda2059ead6b91f55d86":[8,0,811,10],
-"classmessaget.html#a9b8e1bf66846146916ea4a06c5fc9f90":[8,0,811,13]
+"classmessaget.html#a9b00d066828dcda2059ead6b91f55d86":[8,0,811,10]
 };
