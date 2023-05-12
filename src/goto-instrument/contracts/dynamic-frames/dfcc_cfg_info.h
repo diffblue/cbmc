@@ -17,7 +17,6 @@ Date: March 2023
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CFG_INFO_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CFG_INFO_H
 
-#include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -33,6 +32,7 @@ Date: March 2023
 class dfcc_utilst;
 class dfcc_libraryt;
 class goto_functiont;
+class message_handlert;
 
 /// \brief Describes a single loop for the purpose of DFCC loop contract
 /// instrumentation.
@@ -297,7 +297,6 @@ private:
   const irep_idt &function_id;
   goto_functiont &goto_function;
   const exprt &top_level_write_set;
-  messaget log;
   const namespacet ns;
 
   /// True iff \p id is in the valid range for a loop id or is equal to

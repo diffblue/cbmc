@@ -13,7 +13,7 @@ Author: Diffblue Ltd
 #ifndef CPROVER_ANALYSES_LOOP_ANALYSIS_H
 #define CPROVER_ANALYSES_LOOP_ANALYSIS_H
 
-#include <memory>
+#include <goto-programs/goto_model.h>
 
 template <class T>
 class loop_analysist;

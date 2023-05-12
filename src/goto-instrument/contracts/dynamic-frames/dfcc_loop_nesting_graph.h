@@ -18,7 +18,7 @@ Date: March 2023
 
 #include <util/graph.h>
 
-#include <goto-instrument/loop_utils.h>
+#include <analyses/loop_analysis.h>
 
 class messaget;
 
@@ -29,7 +29,7 @@ public:
   dfcc_loop_nesting_graph_nodet(
     const goto_programt::targett &head,
     const goto_programt::targett &latch,
-    const loopt &instructions);
+    const loop_templatet<goto_programt::targett> &instructions);
 
   /// Loop head instruction
   goto_programt::targett head;
@@ -38,7 +38,7 @@ public:
   goto_programt::targett latch;
 
   /// Set of loop instructions
-  loopt instructions;
+  loop_templatet<goto_programt::targett> instructions;
 };
 
 typedef grapht<dfcc_loop_nesting_graph_nodet> dfcc_loop_nesting_grapht;
@@ -47,6 +47,6 @@ typedef grapht<dfcc_loop_nesting_graph_nodet> dfcc_loop_nesting_grapht;
 /// loops in the given \p goto_program.
 /// A loop is considered nested in an outer loop if its head and its latch are
 /// both found in the instructions of the outer loop.
-dfcc_loop_nesting_grapht
-build_loop_nesting_graph(goto_programt &goto_program, messaget &log);
+dfcc_loop_nesting_grapht build_loop_nesting_graph(goto_programt &goto_program);
+
 #endif
