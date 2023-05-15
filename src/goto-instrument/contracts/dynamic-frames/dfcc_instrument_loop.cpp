@@ -167,7 +167,7 @@ void dfcc_instrument_loopt::operator()(
   goto_programt::targett loop_latch =
     loop.find_latch(goto_function.body).value();
 
-  const auto &history_var_map = add_prehead_instructions(
+  const auto history_var_map = add_prehead_instructions(
     loop_id,
     goto_function,
     symbol_table,
@@ -234,7 +234,8 @@ void dfcc_instrument_loopt::operator()(
   goto_function.body.update();
 }
 
-std::map<exprt, exprt> dfcc_instrument_loopt::add_prehead_instructions(
+std::unordered_map<exprt, symbol_exprt, irep_hash>
+dfcc_instrument_loopt::add_prehead_instructions(
   const std::size_t loop_id,
   goto_functionst::goto_functiont &goto_function,
   symbol_tablet &symbol_table,
@@ -269,22 +270,13 @@ std::map<exprt, exprt> dfcc_instrument_loopt::add_prehead_instructions(
   //   GOTO HEAD;
   // ```
 
-  goto_programt pre_loop_head_instrs;
-  std::map<exprt, exprt> history_var_map;
 
   // initialize loop_entry history vars;
-  {
-    // Process "loop_entry" history variables.
-    // We find and replace all "__CPROVER_loop_entry" in invariant.
-    replace_history_parameter(
-      symbol_table,
-      invariant,
-      history_var_map,
-      loop_head_location,
-      language_mode,
-      pre_loop_head_instrs,
-      ID_loop_entry);
-  }
+  auto replace_history_result = replace_history_loop_entry(
+    symbol_table, invariant, loop_head_location, language_mode);
+  invariant.swap(replace_history_result.expression_after_replacement);
+  goto_programt &pre_loop_head_instrs =
+    replace_history_result.history_construction;
 
   // entered_loop = false
   {
@@ -354,7 +346,7 @@ std::map<exprt, exprt> dfcc_instrument_loopt::add_prehead_instructions(
     goto_programt::make_goto(loop_head, true_exprt{}, loop_head_location));
 
   goto_function.body.destructive_insert(loop_head, pre_loop_head_instrs);
-  return history_var_map;
+  return replace_history_result.parameter_to_history;
 }
 
 goto_programt::instructiont::targett
@@ -614,7 +606,7 @@ void dfcc_instrument_loopt::add_exit_instructions(
   goto_programt::targett loop_head,
   const symbol_exprt &loop_write_set,
   const symbol_exprt &addr_of_loop_write_set,
-  const std::map<exprt, exprt> &history_var_map,
+  const std::unordered_map<exprt, symbol_exprt, irep_hash> &history_var_map,
   const symbol_exprt &entered_loop,
   const symbol_exprt &initial_invariant,
   const symbol_exprt &in_base_case,
@@ -690,10 +682,7 @@ void dfcc_instrument_loopt::add_exit_instructions(
 
     // Mark history variables as going out of scope.
     for(const auto &v : history_var_map)
-    {
-      loop_exit_program.add(
-        goto_programt::make_dead(to_symbol_expr(v.second), exit_location));
-    }
+      loop_exit_program.add(goto_programt::make_dead(v.second, exit_location));
 
     // Mark decreases clause snapshots as gong out of scope.
     for(size_t i = 0; i < old_decreases_vars.size(); i++)

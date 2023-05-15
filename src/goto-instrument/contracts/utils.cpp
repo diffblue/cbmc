@@ -11,7 +11,6 @@ Date: September 2021
 #include "utils.h"
 
 #include <util/c_types.h>
-#include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
 #include <util/mathematical_expr.h>
@@ -450,81 +449,107 @@ void add_quantified_variable(
   }
 }
 
-void replace_history_parameter(
+static void replace_history_parameter_rec(
   symbol_table_baset &symbol_table,
   exprt &expr,
-  std::map<exprt, exprt> &parameter2history,
-  source_locationt location,
+  std::unordered_map<exprt, symbol_exprt, irep_hash> &parameter2history,
+  const source_locationt &location,
   const irep_idt &mode,
   goto_programt &history,
-  const irep_idt &id)
+  const irep_idt &history_id)
 {
   for(auto &op : expr.operands())
   {
-    replace_history_parameter(
-      symbol_table, op, parameter2history, location, mode, history, id);
+    replace_history_parameter_rec(
+      symbol_table, op, parameter2history, location, mode, history, history_id);
   }
 
-  if(expr.id() == ID_old || expr.id() == ID_loop_entry)
-  {
-    const auto &parameter = to_history_expr(expr, id).expression();
+  if(expr.id() != ID_old && expr.id() != ID_loop_entry)
+    return;
 
-    const auto &id = parameter.id();
-    if(
-      id == ID_dereference || id == ID_member || id == ID_symbol ||
+  const auto &parameter = to_history_expr(expr, history_id).expression();
+  const auto &id = parameter.id();
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    id == ID_dereference || id == ID_member || id == ID_symbol ||
       id == ID_ptrmember || id == ID_constant || id == ID_typecast ||
-      id == ID_index)
-    {
-      auto it = parameter2history.find(parameter);
+      id == ID_index,
+    "Tracking history of " + id2string(id) +
+      " expressions is not supported yet.",
+    parameter.pretty());
 
-      if(it == parameter2history.end())
-      {
-        // 0. Create a skip target to jump to, if the parameter is invalid
-        goto_programt skip_program;
-        const auto skip_target =
-          skip_program.add(goto_programt::make_skip(location));
+  // speculatively insert a dummy, which will be replaced below if the insert
+  // actually happened
+  auto entry =
+    parameter2history.insert({parameter, symbol_exprt::typeless(ID_nil)});
 
-        // 1. Create a temporary symbol expression that represents the
-        // history variable
-        symbol_exprt tmp_symbol =
-          new_tmp_symbol(parameter.type(), location, mode, symbol_table)
-            .symbol_expr();
+  if(entry.second)
+  {
+    // 1. Create a temporary symbol expression that represents the
+    // history variable
+    entry.first->second =
+      new_tmp_symbol(parameter.type(), location, mode, symbol_table)
+        .symbol_expr();
 
-        // 2. Associate the above temporary variable to it's corresponding
-        // expression
-        parameter2history[parameter] = tmp_symbol;
+    // 2. Add the required instructions to the instructions list
+    // 2.1. Declare the newly created temporary variable
+    history.add(goto_programt::make_decl(entry.first->second, location));
 
-        // 3. Add the required instructions to the instructions list
-        // 3.1. Declare the newly created temporary variable
-        history.add(goto_programt::make_decl(tmp_symbol, location));
+    // 2.2. Skip storing the history if the expression is invalid
+    auto goto_instruction = history.add(goto_programt::make_incomplete_goto(
+      not_exprt{
+        all_dereferences_are_valid(parameter, namespacet(symbol_table))},
+      location));
 
-        // 3.2. Skip storing the history if the expression is invalid
-        history.add(goto_programt::make_goto(
-          skip_target,
-          not_exprt{
-            all_dereferences_are_valid(parameter, namespacet(symbol_table))},
-          location));
+    // 2.3. Add an assignment such that the value pointed to by the new
+    // temporary variable is equal to the value of the corresponding
+    // parameter
+    history.add(
+      goto_programt::make_assignment(entry.first->second, parameter, location));
 
-        // 3.3. Add an assignment such that the value pointed to by the new
-        // temporary variable is equal to the value of the corresponding
-        // parameter
-        history.add(
-          goto_programt::make_assignment(tmp_symbol, parameter, location));
-
-        // 3.4. Add a skip target
-        history.destructive_append(skip_program);
-      }
-
-      expr = parameter2history[parameter];
-    }
-    else
-    {
-      throw invalid_source_file_exceptiont(
-        "Tracking history of " + id2string(parameter.id()) +
-          " expressions is not supported yet.",
-        expr.source_location());
-    }
+    // 2.4. Complete conditional jump for invalid-parameter case
+    auto label_instruction = history.add(goto_programt::make_skip(location));
+    goto_instruction->complete_goto(label_instruction);
   }
+
+  expr = entry.first->second;
+}
+
+replace_history_parametert replace_history_old(
+  symbol_table_baset &symbol_table,
+  const exprt &expr,
+  const source_locationt &location,
+  const irep_idt &mode)
+{
+  replace_history_parametert result;
+  result.expression_after_replacement = expr;
+  replace_history_parameter_rec(
+    symbol_table,
+    result.expression_after_replacement,
+    result.parameter_to_history,
+    location,
+    mode,
+    result.history_construction,
+    ID_old);
+  return result;
+}
+
+replace_history_parametert replace_history_loop_entry(
+  symbol_table_baset &symbol_table,
+  const exprt &expr,
+  const source_locationt &location,
+  const irep_idt &mode)
+{
+  replace_history_parametert result;
+  result.expression_after_replacement = expr;
+  replace_history_parameter_rec(
+    symbol_table,
+    result.expression_after_replacement,
+    result.parameter_to_history,
+    location,
+    mode,
+    result.history_construction,
+    ID_loop_entry);
+  return result;
 }
 
 void generate_history_variables_initialization(
@@ -533,19 +558,12 @@ void generate_history_variables_initialization(
   const irep_idt &mode,
   goto_programt &program)
 {
-  std::map<exprt, exprt> parameter2history;
-  goto_programt history;
   // Find and replace "old" expression in the "expression" variable
-  replace_history_parameter(
-    symbol_table,
-    clause,
-    parameter2history,
-    clause.source_location(),
-    mode,
-    history,
-    ID_old);
+  auto result =
+    replace_history_old(symbol_table, clause, clause.source_location(), mode);
+  clause.swap(result.expression_after_replacement);
   // Add all the history variable initialization instructions
-  program.destructive_append(history);
+  program.destructive_append(result.history_construction);
 }
 
 bool is_transformed_loop_head(const goto_programt::const_targett &target)

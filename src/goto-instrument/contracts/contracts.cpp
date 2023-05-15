@@ -125,21 +125,16 @@ void code_contractst::check_apply_loop_contracts(
   //
   // Assertions for assigns clause checking are inserted in the loop body.
 
-  // an intermediate goto_program to store generated instructions
-  // to be inserted before the loop head
-  goto_programt pre_loop_head_instrs;
-
   // Process "loop_entry" history variables.
   // We find and replace all "__CPROVER_loop_entry" subexpressions in invariant.
-  std::map<exprt, exprt> history_var_map;
-  replace_history_parameter(
-    symbol_table,
-    invariant,
-    history_var_map,
-    loop_head_location,
-    mode,
-    pre_loop_head_instrs,
-    ID_loop_entry);
+  auto replace_history_result = replace_history_loop_entry(
+    symbol_table, invariant, loop_head_location, mode);
+  invariant.swap(replace_history_result.expression_after_replacement);
+  const auto &history_var_map = replace_history_result.parameter_to_history;
+  // an intermediate goto_program to store generated instructions
+  // to be inserted before the loop head
+  goto_programt &pre_loop_head_instrs =
+    replace_history_result.history_construction;
 
   // Create a temporary to track if we entered the loop,
   // i.e., the loop guard was satisfied.
