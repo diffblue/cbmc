@@ -15,7 +15,9 @@ var utils_8cpp =
     [ "is_transformed_loop_head", "utils_8cpp.html#a523e10f9b5ded98f00cc8c5e85cf1a6a", null ],
     [ "make_assigns_clause_replacement_tracking_comment", "utils_8cpp.html#a1c73b0b817e6e049ea409d0c86e7b3e3", null ],
     [ "new_tmp_symbol", "utils_8cpp.html#a5cf09fde997eeb78602693d324d9d34b", null ],
-    [ "replace_history_parameter", "utils_8cpp.html#a3c151c3ed976293e7799df9faeb14154", null ],
+    [ "replace_history_loop_entry", "utils_8cpp.html#a44f41852b68d69b70a2b10550742f2a4", null ],
+    [ "replace_history_old", "utils_8cpp.html#a0b931288a19e60b91ac791eb53cbf9a1", null ],
+    [ "replace_history_parameter_rec", "utils_8cpp.html#ab75372a13c4ed5ecb45844a43b600244", null ],
     [ "simplify_gotos", "utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024", null ],
     [ "widen_assigns", "utils_8cpp.html#a8ec8b1b695a472d1ee3ffc455fb07995", null ],
     [ "ASSIGNS_CLAUSE_REPLACEMENT_TRACKING", "utils_8cpp.html#abe4637b56094bf90d6b488cbf4b6de92", null ]

@@ -3,6 +3,7 @@ var utils_8h =
     [ "cleanert", "classcleanert.html", "classcleanert" ],
     [ "havoc_if_validt", "classhavoc__if__validt.html", "classhavoc__if__validt" ],
     [ "havoc_assigns_targetst", "classhavoc__assigns__targetst.html", "classhavoc__assigns__targetst" ],
+    [ "replace_history_parametert", "structreplace__history__parametert.html", "structreplace__history__parametert" ],
     [ "ENTERED_LOOP", "utils_8h.html#a39033a5b5a007b6d8a90f38c0c07d5ca", null ],
     [ "IN_BASE_CASE", "utils_8h.html#ada1f40a73b6266ed4561d4e0196b742d", null ],
     [ "IN_LOOP_HAVOC_BLOCK", "utils_8h.html#af716ec54b6b85bb035b702320eea0bbf", null ],
@@ -21,7 +22,8 @@ var utils_8h =
     [ "is_transformed_loop_head", "utils_8h.html#a523e10f9b5ded98f00cc8c5e85cf1a6a", null ],
     [ "make_assigns_clause_replacement_tracking_comment", "utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3", null ],
     [ "new_tmp_symbol", "utils_8h.html#a5aa22ab7a0301e7955023b63a6868c15", null ],
-    [ "replace_history_parameter", "utils_8h.html#a3c151c3ed976293e7799df9faeb14154", null ],
+    [ "replace_history_loop_entry", "utils_8h.html#a44f41852b68d69b70a2b10550742f2a4", null ],
+    [ "replace_history_old", "utils_8h.html#a0b931288a19e60b91ac791eb53cbf9a1", null ],
     [ "simplify_gotos", "utils_8h.html#aba81cb53e8d0082cbe68db4136188024", null ],
     [ "widen_assigns", "utils_8h.html#a8ec8b1b695a472d1ee3ffc455fb07995", null ]
 ];

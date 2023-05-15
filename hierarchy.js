@@ -1374,6 +1374,7 @@ var hierarchy =
     [ "rename_symbolt", "classrename__symbolt.html", null ],
     [ "smt_bit_vector_theoryt::repeatt", "structsmt__bit__vector__theoryt_1_1repeatt.html", null ],
     [ "replace_callst", "classreplace__callst.html", null ],
+    [ "replace_history_parametert", "structreplace__history__parametert.html", null ],
     [ "replace_symbolt", "classreplace__symbolt.html", [
       [ "casting_replace_symbolt", "classcasting__replace__symbolt.html", null ],
       [ "unchecked_replace_symbolt", "classunchecked__replace__symbolt.html", [

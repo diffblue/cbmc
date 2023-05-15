@@ -1008,6 +1008,7 @@ var annotated_dup =
     [ "rename_symbolt", "classrename__symbolt.html", "classrename__symbolt" ],
     [ "renamedt", "classrenamedt.html", "classrenamedt" ],
     [ "replace_callst", "classreplace__callst.html", "classreplace__callst" ],
+    [ "replace_history_parametert", "structreplace__history__parametert.html", "structreplace__history__parametert" ],
     [ "replace_symbolt", "classreplace__symbolt.html", "classreplace__symbolt" ],
     [ "replacement_predicatet", "classreplacement__predicatet.html", "classreplacement__predicatet" ],
     [ "replication_exprt", "classreplication__exprt.html", "classreplication__exprt" ],

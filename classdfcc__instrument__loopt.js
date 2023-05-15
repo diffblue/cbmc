@@ -2,8 +2,8 @@ var classdfcc__instrument__loopt =
 [
     [ "dfcc_instrument_loopt", "classdfcc__instrument__loopt.html#a0bbc7ae8b1654542e5f7cc44236a5703", null ],
     [ "add_body_instructions", "classdfcc__instrument__loopt.html#a000afe9eb00cb4ff911ce86e74bb7415", null ],
-    [ "add_exit_instructions", "classdfcc__instrument__loopt.html#a7e7c31f003f0ec330b4f2ac7a2445f33", null ],
-    [ "add_prehead_instructions", "classdfcc__instrument__loopt.html#a10a599261de7ce9bcea2a1a37d536edf", null ],
+    [ "add_exit_instructions", "classdfcc__instrument__loopt.html#a2b1d824b00be7788cf10c9bf88297ec6", null ],
+    [ "add_prehead_instructions", "classdfcc__instrument__loopt.html#ace9301a1f6f82da82b69b524f1df0176", null ],
     [ "add_step_instructions", "classdfcc__instrument__loopt.html#a31e560cbe9d22cfb48611c383a9a8a8f", null ],
     [ "get_max_assigns_clause_size", "classdfcc__instrument__loopt.html#a9ae0dc5508b096210b994dec05e1b555", null ],
     [ "operator()", "classdfcc__instrument__loopt.html#aa0c6b59537501e86b4a634c685c10e31", null ],
