@@ -11,7 +11,6 @@ Date: September 2021
 #include "utils.h"
 
 #include <util/c_types.h>
-#include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/graph.h>
 #include <util/mathematical_expr.h>
@@ -470,16 +469,13 @@ static void replace_history_parameter_rec(
 
   const auto &parameter = to_history_expr(expr, history_id).expression();
   const auto &id = parameter.id();
-  if(
-    id != ID_dereference && id != ID_member && id != ID_symbol &&
-    id != ID_ptrmember && id != ID_constant && id != ID_typecast &&
-    id != ID_index)
-  {
-    throw invalid_source_file_exceptiont(
-      "Tracking history of " + id2string(parameter.id()) +
-        " expressions is not supported yet.",
-      expr.source_location());
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    id == ID_dereference || id == ID_member || id == ID_symbol ||
+      id == ID_ptrmember || id == ID_constant || id == ID_typecast ||
+      id == ID_index,
+    "Tracking history of " + id2string(id) +
+      " expressions is not supported yet.",
+    parameter.pretty());
 
   // speculatively insert a dummy, which will be replaced below if the insert
   // actually happened
