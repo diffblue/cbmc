@@ -228,29 +228,32 @@ const exprt &skip_typecast(const exprt &expr)
 /// "constants"
 bool is_constantt::is_constant(const exprt &expr) const
 {
-  if(expr.is_constant())
-    return true;
+  if(
+    expr.id() == ID_symbol || expr.id() == ID_nondet_symbol ||
+    expr.id() == ID_side_effect)
+  {
+    return false;
+  }
 
   if(expr.id() == ID_address_of)
   {
     return is_constant_address_of(to_address_of_expr(expr).object());
   }
-  else if(
-    expr.id() == ID_typecast || expr.id() == ID_array_of ||
-    expr.id() == ID_plus || expr.id() == ID_mult || expr.id() == ID_array ||
-    expr.id() == ID_with || expr.id() == ID_struct || expr.id() == ID_union ||
-    expr.id() == ID_empty_union || expr.id() == ID_equal ||
-    expr.id() == ID_notequal || expr.id() == ID_lt || expr.id() == ID_le ||
-    expr.id() == ID_gt || expr.id() == ID_ge || expr.id() == ID_if ||
-    expr.id() == ID_not || expr.id() == ID_and || expr.id() == ID_or ||
-    expr.id() == ID_bitnot || expr.id() == ID_bitand || expr.id() == ID_bitor ||
-    expr.id() == ID_bitxor || expr.id() == ID_byte_update_big_endian ||
-    expr.id() == ID_byte_update_little_endian)
+  else if(auto index = expr_try_dynamic_cast<index_exprt>(expr))
   {
-    return std::all_of(
-      expr.operands().begin(), expr.operands().end(), [this](const exprt &e) {
-        return is_constant(e);
-      });
+    if(!is_constant(index->array()) || !index->index().is_constant())
+      return false;
+
+    const auto &array_type = to_array_type(index->array().type());
+    if(!array_type.size().is_constant())
+      return false;
+
+    const mp_integer size =
+      numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+    const mp_integer index_int =
+      numeric_cast_v<mp_integer>(to_constant_expr(index->index()));
+
+    return index_int >= 0 && index_int < size;
   }
   else if(auto be = expr_try_dynamic_cast<byte_extract_exprt>(expr))
   {
@@ -269,7 +272,7 @@ bool is_constantt::is_constant(const exprt &expr) const
       numeric_cast_v<mp_integer>(to_constant_expr(be->offset())) *
       be->get_bits_per_byte();
 
-    return offset_bits + *extract_bits <= *op_bits;
+    return offset_bits >= 0 && offset_bits + *extract_bits <= *op_bits;
   }
   else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
   {
@@ -292,8 +295,14 @@ bool is_constantt::is_constant(const exprt &expr) const
     return lower_bound >= 0 && lower_bound <= upper_bound &&
            upper_bound < src_bits;
   }
-
-  return false;
+  else
+  {
+    // std::all_of returns true when there are no operands
+    return std::all_of(
+      expr.operands().begin(), expr.operands().end(), [this](const exprt &e) {
+        return is_constant(e);
+      });
+  }
 }
 
 /// this function determines which reference-typed expressions are constant
