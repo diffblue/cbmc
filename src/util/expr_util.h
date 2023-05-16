@@ -82,7 +82,7 @@ const exprt &skip_typecast(const exprt &expr);
 
 /// Determine whether an expression is constant.  A literal constant is
 /// constant, but so are, e.g., sums over constants or addresses of objects.
-/// An implementation derive from this class to refine what it considers
+/// An implementation may derive from this class to refine what it considers
 /// constant in a particular context by overriding is_constant and/or
 /// is_constant_address_of.
 class is_constantt
