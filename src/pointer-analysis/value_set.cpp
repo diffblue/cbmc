@@ -371,6 +371,24 @@ value_sett::object_mapt value_sett::get_value_set(
 
   object_mapt dest;
   get_value_set_rec(expr, dest, "", expr.type(), ns);
+
+  if(nondet_pointer && expr.type().id() == ID_pointer)
+  {
+    // we'll take the union of all objects we see, with unspecified offsets
+    values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
+      for(const auto &object : value.object_map.read())
+        insert(dest, object.first, offsett());
+    });
+
+    // we'll add null, in case it's not there yet
+    insert(
+      dest,
+      exprt(ID_null_object, to_pointer_type(expr.type()).base_type()),
+      offsett());
+
+    nondet_pointer = false;
+  }
+
   return dest;
 }
 
@@ -512,17 +530,7 @@ void value_sett::get_value_set_rec(
   {
     if(expr.type().id() == ID_pointer)
     {
-      // we'll take the union of all objects we see, with unspecified offsets
-      values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
-        for(const auto &object : value.object_map.read())
-          insert(dest, object.first, offsett());
-      });
-
-      // we'll add null, in case it's not there yet
-      insert(
-        dest,
-        exprt(ID_null_object, to_pointer_type(expr_type).base_type()),
-        offsett());
+      nondet_pointer = true;
     }
     else
       insert(dest, exprt(ID_unknown, original_type));

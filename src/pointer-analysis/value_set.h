@@ -494,7 +494,9 @@ protected:
     const codet &code,
     const namespacet &ns);
 
- private:
+  mutable bool nondet_pointer = false;
+
+private:
   /// Subclass customisation point to filter or otherwise alter the value-set
   /// returned from get_value_set before it is passed into assign. For example,
   /// this is used in one subclass to tag and thus differentiate values that
