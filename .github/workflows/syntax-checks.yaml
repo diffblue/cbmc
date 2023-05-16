@@ -55,10 +55,7 @@ jobs:
       - name: Checkout CBMC repository 
         uses: actions/checkout@v3
       - name: Install latest stable Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: stable
-            override: true
-            components: rustfmt, clippy
+        run: |
+          rustup toolchain install stable --profile minimal --no-self-update -c clippy -c rustfmt
       - name: Run `cargo fmt` on top of Rust API project
         run: cd src/libcprover-rust; cargo fmt --all -- --check
