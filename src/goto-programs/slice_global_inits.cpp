@@ -22,7 +22,6 @@ Date:   December 2016
 
 #include <linking/static_lifetime_init.h>
 
-#include "goto_convert_functions.h"
 #include "goto_functions.h"
 #include "goto_model.h"
 
@@ -132,18 +131,6 @@ void slice_global_inits(
     }
   }
 
-  if(
-    changed &&
-    goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION) != 0)
-  {
-    static_lifetime_init(
-      goto_model.symbol_table,
-      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
-    goto_convert(
-      INITIALIZE_FUNCTION,
-      goto_model.symbol_table,
-      goto_model.goto_functions,
-      message_handler);
-    goto_model.goto_functions.update();
-  }
+  if(changed && goto_model.can_produce_function(INITIALIZE_FUNCTION))
+    recreate_initialize_function(goto_model, message_handler);
 }

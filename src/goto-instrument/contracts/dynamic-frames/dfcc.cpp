@@ -560,8 +560,8 @@ void dfcct::reinitialize_model()
   swap_and_wrap.get_swapped_functions(instrumented_functions);
 
   log.status() << "Updating init function" << messaget::eom;
-  utils.create_initialize_function();
-  goto_model.goto_functions.update();
+  if(goto_model.can_produce_function(INITIALIZE_FUNCTION))
+    recreate_initialize_function(goto_model, message_handler);
   nondet_static(goto_model, to_exclude_from_nondet_static);
 
   // Initialize the map of instrumented functions by adding extra instructions

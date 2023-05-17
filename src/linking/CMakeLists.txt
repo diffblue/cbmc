@@ -3,4 +3,4 @@ add_library(linking ${sources})
 
 generic_includes(linking)
 
-target_link_libraries(linking util)
+target_link_libraries(linking goto-programs util)

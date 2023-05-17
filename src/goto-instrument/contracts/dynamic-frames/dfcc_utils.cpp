@@ -140,22 +140,6 @@ const symbolt &dfcc_utilst::create_static_symbol(
   return symbol;
 }
 
-void dfcc_utilst::create_initialize_function()
-{
-  if(goto_model.goto_functions.function_map.erase(INITIALIZE_FUNCTION) != 0)
-  {
-    static_lifetime_init(
-      goto_model.symbol_table,
-      goto_model.symbol_table.lookup_ref(INITIALIZE_FUNCTION).location);
-    goto_convert(
-      INITIALIZE_FUNCTION,
-      goto_model.symbol_table,
-      goto_model.goto_functions,
-      message_handler);
-    goto_model.goto_functions.update();
-  }
-}
-
 void dfcc_utilst::fix_parameters_symbols(const irep_idt &function_id)
 {
   auto &function_symbol = get_function_symbol(function_id);
