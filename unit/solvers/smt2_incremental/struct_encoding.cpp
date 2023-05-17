@@ -1,6 +1,7 @@
 // Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
@@ -71,9 +72,9 @@ TEST_CASE("struct encoding of types", "[core][smt2_incremental]")
 
 TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
 {
-  const struct_union_typet::componentst components{
+  const struct_union_typet::componentst component_types{
     {"green", signedbv_typet{32}}, {"eggs", unsignedbv_typet{16}}};
-  const struct_typet struct_type{components};
+  const struct_typet struct_type{component_types};
   const type_symbolt type_symbol{"my_structt", struct_type, ID_C};
   auto test = struct_encoding_test_environmentt::make();
   test.symbol_table.insert(type_symbol);
@@ -91,5 +92,16 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     const auto struct_equal = equal_exprt{symbol_expr, symbol_expr};
     const auto bv_equal = equal_exprt{symbol_expr_as_bv, symbol_expr_as_bv};
     REQUIRE(test.struct_encoding.encode(struct_equal) == bv_equal);
+  }
+  SECTION("expression for a struct from list of components")
+  {
+    const symbolt green_ham{"ham", signedbv_typet{32}, ID_C};
+    test.symbol_table.insert(green_ham);
+    const auto forty_two = from_integer(42, unsignedbv_typet{16});
+    const exprt::operandst components{green_ham.symbol_expr(), forty_two};
+    const struct_exprt struct_expr{components, struct_tag};
+    const concatenation_exprt expected_result{
+      {green_ham.symbol_expr(), forty_two}, bv_typet{48}};
+    REQUIRE(test.struct_encoding.encode(struct_expr) == expected_result);
   }
 }
