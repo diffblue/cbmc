@@ -93,6 +93,10 @@ protected:
   /// Sends the solver the definitions of the object sizes and dynamic memory
   /// statuses.
   void define_object_properties();
+  /// Performs a combination of transformations which reduces the set of
+  /// possible expression forms by expressing these in terms of the remaining
+  /// language features.
+  exprt lower(exprt expression);
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
   /// This includes the symbols defined outside of the decision procedure but

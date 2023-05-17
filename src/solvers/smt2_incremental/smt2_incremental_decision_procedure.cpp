@@ -268,7 +268,7 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
     return;
   }
 
-  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+  const exprt lowered_expr = lower(in_expr);
 
   define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
@@ -514,7 +514,7 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt &in_expr,
   bool value)
 {
-  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+  const exprt lowered_expr = lower(in_expr);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
@@ -585,6 +585,11 @@ void smt2_incremental_decision_proceduret::define_object_properties()
     solver_process->send(is_dynamic_object_function.make_definition(
       object.unique_id, object.is_dynamic));
   }
+}
+
+exprt smt2_incremental_decision_proceduret::lower(exprt expression)
+{
+  return lower_byte_operators(expression, ns);
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
