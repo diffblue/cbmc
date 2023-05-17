@@ -1831,41 +1831,44 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   const auto bits =
     expr2bits(expr.op(), expr.id() == ID_byte_extract_little_endian, ns);
 
-  // make sure we don't lose bits with structs containing flexible array members
-  const bool struct_has_flexible_array_member = has_subtype(
-    expr.type(),
-    [&](const typet &type) {
-      if(type.id() != ID_struct && type.id() != ID_struct_tag)
-        return false;
-
-      const struct_typet &st = to_struct_type(ns.follow(type));
-      const auto &comps = st.components();
-      if(comps.empty() || comps.back().type().id() != ID_array)
-        return false;
-
-      if(comps.back().type().get_bool(ID_C_flexible_array_member))
-        return true;
-
-      const auto size =
-        numeric_cast<mp_integer>(to_array_type(comps.back().type()).size());
-      return !size.has_value() || *size <= 1;
-    },
-    ns);
   if(
     bits.has_value() &&
-    mp_integer(bits->size()) >= *el_size + *offset * expr.get_bits_per_byte() &&
-    !struct_has_flexible_array_member)
+    mp_integer(bits->size()) >= *el_size + *offset * expr.get_bits_per_byte())
   {
-    std::string bits_cut = std::string(
-      bits.value(),
-      numeric_cast_v<std::size_t>(*offset * expr.get_bits_per_byte()),
-      numeric_cast_v<std::size_t>(*el_size));
+    // make sure we don't lose bits with structs containing flexible array
+    // members
+    const bool struct_has_flexible_array_member = has_subtype(
+      expr.type(),
+      [&](const typet &type) {
+        if(type.id() != ID_struct && type.id() != ID_struct_tag)
+          return false;
 
-    auto tmp = bits2expr(
-      bits_cut, expr.type(), expr.id() == ID_byte_extract_little_endian, ns);
+        const struct_typet &st = to_struct_type(ns.follow(type));
+        const auto &comps = st.components();
+        if(comps.empty() || comps.back().type().id() != ID_array)
+          return false;
 
-    if(tmp.has_value())
-      return std::move(*tmp);
+        if(comps.back().type().get_bool(ID_C_flexible_array_member))
+          return true;
+
+        const auto size =
+          numeric_cast<mp_integer>(to_array_type(comps.back().type()).size());
+        return !size.has_value() || *size <= 1;
+      },
+      ns);
+    if(!struct_has_flexible_array_member)
+    {
+      std::string bits_cut = std::string(
+        bits.value(),
+        numeric_cast_v<std::size_t>(*offset * expr.get_bits_per_byte()),
+        numeric_cast_v<std::size_t>(*el_size));
+
+      auto tmp = bits2expr(
+        bits_cut, expr.type(), expr.id() == ID_byte_extract_little_endian, ns);
+
+      if(tmp.has_value())
+        return std::move(*tmp);
+    }
   }
 
   // push byte extracts into struct or union expressions, just like
