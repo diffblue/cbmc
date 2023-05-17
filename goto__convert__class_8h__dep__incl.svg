@@ -944,7 +944,7 @@
 <polygon fill="midnightblue" stroke="midnightblue" points="4288.05,-371.15 4298.17,-368.03 4288.31,-364.15 4288.05,-371.15"/>
 </g>
 <!-- Node45&#45;&gt;Node13 -->
-<g id="edge84" class="edge">
+<g id="edge83" class="edge">
 <title>Node45&#45;&gt;Node13</title>
 <path fill="none" stroke="midnightblue" d="M4287.95,-370.36C3993.55,-369.43 2989.88,-362.32 2673.87,-309 2665.24,-307.55 2656.27,-305.44 2647.54,-303.06"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="4288.11,-373.86 4298.12,-370.39 4288.13,-366.86 4288.11,-373.86"/>
@@ -1142,16 +1142,16 @@
 <!-- Node56 -->
 <g id="node55" class="node">
 <title>Node56</title>
-<g id="a_node55"><a xlink:href="slice__global__inits_8cpp.html" target="_top" xlink:title="Remove initializations of unused global variables.">
+<g id="a_node55"><a xlink:href="static__lifetime__init_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="5301.87,-262 5301.87,-303 5439.87,-303 5439.87,-262 5301.87,-262"/>
 <text text-anchor="start" x="5309.87" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5309.87" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text text-anchor="middle" x="5370.87" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/slice_global_inits.cpp</text>
+<text text-anchor="start" x="5309.87" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/linking/static</text>
+<text text-anchor="middle" x="5370.87" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">_lifetime_init.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node45&#45;&gt;Node56 -->
-<g id="edge83" class="edge">
+<g id="edge84" class="edge">
 <title>Node45&#45;&gt;Node56</title>
 <path fill="none" stroke="midnightblue" d="M4451.61,-367.67C4646.25,-360.5 5132.84,-339.98 5292.87,-309 5300.7,-307.48 5308.84,-305.41 5316.77,-303.1"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="4451.31,-364.18 4441.45,-368.04 4451.57,-371.17 4451.31,-364.18"/>

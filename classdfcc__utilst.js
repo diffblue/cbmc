@@ -7,7 +7,6 @@ var classdfcc__utilst =
     [ "clone_and_rename_function", "classdfcc__utilst.html#a04999192989828e386434af8bdc5d503", null ],
     [ "clone_and_rename_function", "classdfcc__utilst.html#afaa6bd76488de90e3d179bf57cb89706", null ],
     [ "clone_parameters", "classdfcc__utilst.html#a0d21c34abc0c06e5558113ef2b2ebedb", null ],
-    [ "create_initialize_function", "classdfcc__utilst.html#ad0ba5a76a6cbab7678cf8fb10d6b3c05", null ],
     [ "create_new_parameter_symbol", "classdfcc__utilst.html#adf9500d4ebc8c663e9ec5f852da4196b", null ],
     [ "create_static_symbol", "classdfcc__utilst.html#a6d8575dfff02667d3c7edfd909d3a5f7", null ],
     [ "create_symbol", "classdfcc__utilst.html#ade03aa7cd999c3c0ede329ffa8e303e6", null ],

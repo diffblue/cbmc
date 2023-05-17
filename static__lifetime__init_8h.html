@@ -124,6 +124,9 @@ Macros</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a591d79cb5efc9fd6b07a0ce62f53d8e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="static__lifetime__init_8h.html#a591d79cb5efc9fd6b07a0ce62f53d8e6">static_lifetime_init</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location)</td></tr>
 <tr class="separator:a591d79cb5efc9fd6b07a0ce62f53d8e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bfa7aba3cf931dda55f995d3a0ea1a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="static__lifetime__init_8h.html#a2bfa7aba3cf931dda55f995d3a0ea1a5">recreate_initialize_function</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
+<tr class="memdesc:a2bfa7aba3cf931dda55f995d3a0ea1a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Regenerates the CPROVER_INITIALIZE function, which initializes all non-function symbols of the goto model that have static lifetime.  <a href="static__lifetime__init_8h.html#a2bfa7aba3cf931dda55f995d3a0ea1a5">More...</a><br /></td></tr>
+<tr class="separator:a2bfa7aba3cf931dda55f995d3a0ea1a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a2f0ae8a1c812a7205d351da820888c98"></a>
@@ -138,11 +141,44 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="static__lifetime__init_8h_source.html#l00022">22</a> of file <a class="el" href="static__lifetime__init_8h_source.html">static_lifetime_init.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="static__lifetime__init_8h_source.html#l00024">24</a> of file <a class="el" href="static__lifetime__init_8h_source.html">static_lifetime_init.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a2bfa7aba3cf931dda55f995d3a0ea1a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bfa7aba3cf931dda55f995d3a0ea1a5">&#9670;&nbsp;</a></span>recreate_initialize_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void recreate_initialize_function </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Regenerates the CPROVER_INITIALIZE function, which initializes all non-function symbols of the goto model that have static lifetime. </p>
+<p>It is an error if CPROVER_INITIALIZE was not present beforehand. </p>
+
+<p class="definition">Definition at line <a class="el" href="static__lifetime__init_8cpp_source.html#l00164">164</a> of file <a class="el" href="static__lifetime__init_8cpp_source.html">static_lifetime_init.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a591d79cb5efc9fd6b07a0ce62f53d8e6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a591d79cb5efc9fd6b07a0ce62f53d8e6">&#9670;&nbsp;</a></span>static_lifetime_init()</h2>
 
@@ -169,7 +205,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="static__lifetime__init_8cpp_source.html#l00095">95</a> of file <a class="el" href="static__lifetime__init_8cpp_source.html">static_lifetime_init.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="static__lifetime__init_8cpp_source.html#l00098">98</a> of file <a class="el" href="static__lifetime__init_8cpp_source.html">static_lifetime_init.cpp</a>.</p>
 
 </div>
 </div>

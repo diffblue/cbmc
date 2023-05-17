@@ -265,36 +265,36 @@
 <!-- Node22 -->
 <g id="node22" class="node">
 <title>Node22</title>
-<g id="a_node22"><a xlink:href="slice__global__inits_8cpp.html" target="_top" xlink:title="Remove initializations of unused global variables.">
-<polygon fill="none" stroke="black" points="2246,-262 2246,-303 2384,-303 2384,-262 2246,-262"/>
+<g id="a_node22"><a xlink:href="cegis__verifier_8cpp.html" target="_top" xlink:title="Verifier for Counterexample&#45;Guided Synthesis.">
+<polygon fill="none" stroke="black" points="2246,-262 2246,-303 2394,-303 2394,-262 2246,-262"/>
 <text text-anchor="start" x="2254" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="2254" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text text-anchor="middle" x="2315" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/slice_global_inits.cpp</text>
+<text text-anchor="start" x="2254" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;synthesizer</text>
+<text text-anchor="middle" x="2320" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/cegis_verifier.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node22 -->
 <g id="edge22" class="edge">
 <title>Node1&#45;&gt;Node22</title>
-<path fill="none" stroke="midnightblue" d="M1658,-364.12C1783.8,-361.42 2031.44,-350.72 2237,-309 2244.68,-307.44 2252.66,-305.38 2260.46,-303.09"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1657.61,-360.63 1647.68,-364.33 1657.75,-367.63 1657.61,-360.63"/>
+<path fill="none" stroke="midnightblue" d="M1657.91,-363.66C1783.59,-360.36 2031.07,-348.88 2237,-309 2245.14,-307.42 2253.61,-305.35 2261.9,-303.06"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1657.51,-360.17 1647.6,-363.92 1657.69,-367.17 1657.51,-360.17"/>
 </g>
 <!-- Node23 -->
 <g id="node23" class="node">
 <title>Node23</title>
-<g id="a_node23"><a xlink:href="cegis__verifier_8cpp.html" target="_top" xlink:title="Verifier for Counterexample&#45;Guided Synthesis.">
-<polygon fill="none" stroke="black" points="2402,-262 2402,-303 2550,-303 2550,-262 2402,-262"/>
-<text text-anchor="start" x="2410" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="2410" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;synthesizer</text>
-<text text-anchor="middle" x="2476" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/cegis_verifier.cpp</text>
+<g id="a_node23"><a xlink:href="static__lifetime__init_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="2412,-262 2412,-303 2550,-303 2550,-262 2412,-262"/>
+<text text-anchor="start" x="2420" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="2420" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/linking/static</text>
+<text text-anchor="middle" x="2481" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">_lifetime_init.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node23 -->
 <g id="edge23" class="edge">
 <title>Node1&#45;&gt;Node23</title>
-<path fill="none" stroke="midnightblue" d="M1658.09,-365.57C1806.21,-365.23 2127.48,-358.21 2393,-309 2401.3,-307.46 2409.94,-305.38 2418.38,-303.06"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1657.72,-362.07 1647.72,-365.58 1657.73,-369.07 1657.72,-362.07"/>
+<path fill="none" stroke="midnightblue" d="M1657.81,-362.04C1837.51,-355.13 2261.91,-336.4 2403,-309 2410.83,-307.48 2418.97,-305.4 2426.91,-303.09"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1657.48,-358.55 1647.62,-362.43 1657.75,-365.55 1657.48,-358.55"/>
 </g>
 <!-- Node24 -->
 <g id="node24" class="node">
