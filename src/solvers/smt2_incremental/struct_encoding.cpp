@@ -40,3 +40,18 @@ typet struct_encodingt::encode(typet type) const
   }
   return type;
 }
+
+exprt struct_encodingt::encode(exprt expr) const
+{
+  std::queue<exprt *> work_queue;
+  work_queue.push(&expr);
+  while(!work_queue.empty())
+  {
+    exprt &current = *work_queue.front();
+    work_queue.pop();
+    current.type() = encode(current.type());
+    for(auto &operand : current.operands())
+      work_queue.push(&operand);
+  }
+  return expr;
+}

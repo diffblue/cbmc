@@ -3,6 +3,7 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_STRUCT_ENCODING_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_STRUCT_ENCODING_H
 
+#include <util/expr.h> // For passing exprt by value. // IWYU pragma: keep
 #include <util/type.h> // For passing `typet` by value. // IWYU pragma: keep
 
 #include <memory>
@@ -19,6 +20,7 @@ public:
   ~struct_encodingt();
 
   typet encode(typet type) const;
+  exprt encode(exprt expr) const;
 
 private:
   std::unique_ptr<boolbv_widtht> boolbv_width;

@@ -68,3 +68,28 @@ TEST_CASE("struct encoding of types", "[core][smt2_incremental]")
       expected_encoded_array);
   }
 }
+
+TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
+{
+  const struct_union_typet::componentst components{
+    {"green", signedbv_typet{32}}, {"eggs", unsignedbv_typet{16}}};
+  const struct_typet struct_type{components};
+  const type_symbolt type_symbol{"my_structt", struct_type, ID_C};
+  auto test = struct_encoding_test_environmentt::make();
+  test.symbol_table.insert(type_symbol);
+  const struct_tag_typet struct_tag{type_symbol.name};
+  const symbolt struct_value_symbol{"my_struct", struct_tag, ID_C};
+  test.symbol_table.insert(struct_value_symbol);
+  const auto symbol_expr = struct_value_symbol.symbol_expr();
+  const auto symbol_expr_as_bv = symbol_exprt{"my_struct", bv_typet{48}};
+  SECTION("struct typed symbol expression")
+  {
+    REQUIRE(test.struct_encoding.encode(symbol_expr) == symbol_expr_as_bv);
+  }
+  SECTION("struct equality expression")
+  {
+    const auto struct_equal = equal_exprt{symbol_expr, symbol_expr};
+    const auto bv_equal = equal_exprt{symbol_expr_as_bv, symbol_expr_as_bv};
+    REQUIRE(test.struct_encoding.encode(struct_equal) == bv_equal);
+  }
+}
