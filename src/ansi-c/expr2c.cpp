@@ -1663,7 +1663,7 @@ std::string expr2ct::convert_symbol(const exprt &src)
 std::string expr2ct::convert_nondet_symbol(const nondet_symbol_exprt &src)
 {
   const irep_idt id=src.get_identifier();
-  return "nondet_symbol("+id2string(id)+")";
+  return "nondet_symbol<" + convert(src.type()) + ">(" + id2string(id) + ")";
 }
 
 std::string expr2ct::convert_predicate_symbol(const exprt &src)
