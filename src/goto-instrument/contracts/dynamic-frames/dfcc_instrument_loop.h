@@ -240,7 +240,6 @@ protected:
   /// \param[in] initial_invariant temporary variable `initial_invariant`.
   /// \param[in] in_base_case temporary variable `in_base_case`.
   /// \param[in] old_decreases_vars temporary vars of decreases clauses.
-  /// \param[in] symbol_mode Language mode of the function.
   /// \return The STEP jump target.
   goto_programt::instructiont::targett add_step_instructions(
     const std::size_t loop_id,
@@ -257,8 +256,7 @@ protected:
     const exprt &outer_write_set,
     const symbol_exprt &initial_invariant,
     const symbol_exprt &in_base_case,
-    const std::vector<symbol_exprt> &old_decreases_vars,
-    const irep_idt &symbol_mode);
+    const std::vector<symbol_exprt> &old_decreases_vars);
 
   /// \brief Adds instructions of the body block.
   ///

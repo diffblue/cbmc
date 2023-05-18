@@ -54,22 +54,11 @@ void dfcc_spec_functionst::generate_havoc_function(
   const auto &function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
 
-  // create the write_set symbol used as input by the havoc function
-  const auto &write_set_symbol = dfcc_utilst::create_symbol(
-    goto_model.symbol_table,
-    library.dfcc_type[dfcc_typet::CAR_SET_PTR],
-    id2string(havoc_function_id),
-    "__write_set_to_havoc",
-    function_symbol.location,
-    function_symbol.mode,
-    function_symbol.module,
-    true);
-
   // create the code type that goes on the function symbol
-  code_typet::parametert write_set_param(write_set_symbol.type);
-  write_set_param.set_base_name(write_set_symbol.base_name);
-  write_set_param.set_identifier(write_set_symbol.name);
-  code_typet havoc_code_type({write_set_param}, empty_typet());
+  const typet &write_set_param_type =
+    library.dfcc_type[dfcc_typet::CAR_SET_PTR];
+  code_typet::parametert write_set_param{write_set_param_type};
+  code_typet havoc_code_type({std::move(write_set_param)}, empty_typet());
 
   // create the havoc function symbol
   symbolt havoc_function_symbol;
@@ -87,9 +76,20 @@ void dfcc_spec_functionst::generate_havoc_function(
     "DFCC: could not insert havoc function '" + id2string(havoc_function_id) +
       "' in the symbol table");
 
+  // create the write_set symbol used as input by the havoc function
+  const auto &write_set_symbol = dfcc_utilst::create_new_parameter_symbol(
+    goto_model.symbol_table,
+    havoc_function_id,
+    "__write_set_to_havoc",
+    write_set_param_type);
+  to_code_type(
+    goto_model.symbol_table.get_writeable_ref(havoc_function_id).type)
+    .parameters()[0]
+    .set_identifier(write_set_symbol.name);
+
   // create new goto_function
   goto_functiont dummy_havoc_function;
-  dummy_havoc_function.set_parameter_identifiers(havoc_code_type);
+  dummy_havoc_function.parameter_identifiers = {write_set_symbol.name};
   goto_model.goto_functions.function_map[havoc_function_id].copy_from(
     dummy_havoc_function);
 
@@ -102,8 +102,6 @@ void dfcc_spec_functionst::generate_havoc_function(
 
   generate_havoc_instructions(
     havoc_function_id,
-    havoc_function_symbol.mode,
-    havoc_function_symbol.module,
     original_program,
     write_set_symbol.symbol_expr(),
     havoc_program,
@@ -145,8 +143,6 @@ void dfcc_spec_functionst::generate_havoc_function(
 
 void dfcc_spec_functionst::generate_havoc_instructions(
   const irep_idt &function_id,
-  const irep_idt &mode,
-  const irep_idt &module,
   const goto_programt &original_program,
   const exprt &write_set_to_havoc,
   goto_programt &havoc_program,
@@ -202,17 +198,13 @@ void dfcc_spec_functionst::generate_havoc_instructions(
         // declare a local var to store targets havoced via nondet assignment
         auto &target_type = get_target_type(ins_it->call_arguments().at(0));
 
-        const auto &target_symbol = dfcc_utilst::create_symbol(
+        const auto target_expr = dfcc_utilst::create_symbol(
           goto_model.symbol_table,
           pointer_type(target_type),
-          id2string(function_id),
+          function_id,
           "__havoc_target",
-          location,
-          mode,
-          module,
-          false);
+          location);
 
-        auto target_expr = target_symbol.symbol_expr();
         havoc_program.add(goto_programt::make_decl(target_expr));
 
         call.lhs() = target_expr;

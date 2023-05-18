@@ -16,6 +16,7 @@ Date: January 2022
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
+#include <util/fresh_symbol.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
@@ -441,12 +442,23 @@ void instrument_spec_assignst::track_plain_spec_target(
   create_snapshot(car, dest);
 }
 
-const symbolt instrument_spec_assignst::create_fresh_symbol(
+/// Creates a fresh symbolt with given suffix, scoped to the function of
+/// \p location.
+static symbol_exprt create_fresh_symbol(
   const std::string &suffix,
   const typet &type,
-  const source_locationt &location) const
+  const source_locationt &location,
+  const irep_idt &mode,
+  symbol_table_baset &symbol_table)
 {
-  return new_tmp_symbol(type, location, mode, st, suffix);
+  return get_fresh_aux_symbol(
+           type,
+           id2string(location.get_function()),
+           suffix,
+           location,
+           mode,
+           symbol_table)
+    .symbol_expr();
 }
 
 car_exprt instrument_spec_assignst::create_car_expr(
@@ -455,16 +467,13 @@ car_exprt instrument_spec_assignst::create_car_expr(
 {
   const source_locationt &source_location = target.source_location();
   const auto &valid_var =
-    create_fresh_symbol("__car_valid", bool_typet(), source_location)
-      .symbol_expr();
+    create_fresh_symbol("__car_valid", bool_typet(), source_location, mode, st);
 
-  const auto &lower_bound_var =
-    create_fresh_symbol("__car_lb", pointer_type(char_type()), source_location)
-      .symbol_expr();
+  const auto &lower_bound_var = create_fresh_symbol(
+    "__car_lb", pointer_type(char_type()), source_location, mode, st);
 
-  const auto &upper_bound_var =
-    create_fresh_symbol("__car_ub", pointer_type(char_type()), source_location)
-      .symbol_expr();
+  const auto &upper_bound_var = create_fresh_symbol(
+    "__car_ub", pointer_type(char_type()), source_location, mode, st);
 
   if(target.id() == ID_pointer_object)
   {

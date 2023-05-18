@@ -87,8 +87,6 @@ public:
   /// write set \p write_set_to_havoc.
   ///
   /// \param[in] function_id function id to use for prefixing fresh variables
-  /// \param[in] mode function id to use for prefixing fresh variables
-  /// \param[in] module function id to use for prefixing fresh variables
   /// \param[in] original_program program from which to derive the havoc program
   /// \param[in] write_set_to_havoc write set symbol to havoc
   /// \param[out] havoc_program destination program for havoc instructions
@@ -96,8 +94,6 @@ public:
   ///
   void generate_havoc_instructions(
     const irep_idt &function_id,
-    const irep_idt &mode,
-    const irep_idt &module,
     const goto_programt &original_program,
     const exprt &write_set_to_havoc,
     goto_programt &havoc_program,

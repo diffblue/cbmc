@@ -139,12 +139,13 @@ void code_contractst::check_apply_loop_contracts(
   // Create a temporary to track if we entered the loop,
   // i.e., the loop guard was satisfied.
   const auto entered_loop =
-    new_tmp_symbol(
+    get_fresh_aux_symbol(
       bool_typet(),
+      id2string(loop_head_location.get_function()),
+      std::string(ENTERED_LOOP) + "__" + std::to_string(loop_number),
       loop_head_location,
       mode,
-      symbol_table,
-      std::string(ENTERED_LOOP) + "__" + std::to_string(loop_number))
+      symbol_table)
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(entered_loop, loop_head_location));
@@ -154,8 +155,13 @@ void code_contractst::check_apply_loop_contracts(
   // Create a snapshot of the invariant so that we can check the base case,
   // if the loop is not vacuous and must be abstracted with contracts.
   const auto initial_invariant_val =
-    new_tmp_symbol(
-      bool_typet(), loop_head_location, mode, symbol_table, INIT_INVARIANT)
+    get_fresh_aux_symbol(
+      bool_typet(),
+      id2string(loop_head_location.get_function()),
+      INIT_INVARIANT,
+      loop_head_location,
+      mode,
+      symbol_table)
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(initial_invariant_val, loop_head_location));
@@ -173,10 +179,14 @@ void code_contractst::check_apply_loop_contracts(
 
   // Create a temporary variable to track base case vs inductive case
   // instrumentation of the loop.
-  const auto in_base_case =
-    new_tmp_symbol(
-      bool_typet(), loop_head_location, mode, symbol_table, "__in_base_case")
-      .symbol_expr();
+  const auto in_base_case = get_fresh_aux_symbol(
+                              bool_typet(),
+                              id2string(loop_head_location.get_function()),
+                              "__in_base_case",
+                              loop_head_location,
+                              mode,
+                              symbol_table)
+                              .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(in_base_case, loop_head_location));
   pre_loop_head_instrs.add(
@@ -298,12 +308,13 @@ void code_contractst::check_apply_loop_contracts(
   // havoc (assigns_set);
   // ASSIGN in_loop_havoc_block = false;
   const auto in_loop_havoc_block =
-    new_tmp_symbol(
+    get_fresh_aux_symbol(
       bool_typet(),
+      id2string(loop_head_location.get_function()),
+      std::string(IN_LOOP_HAVOC_BLOCK) + +"__" + std::to_string(loop_number),
       loop_head_location,
       mode,
-      symbol_table,
-      std::string(IN_LOOP_HAVOC_BLOCK) + +"__" + std::to_string(loop_number))
+      symbol_table)
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(in_loop_havoc_block, loop_head_location));
@@ -335,14 +346,26 @@ void code_contractst::check_apply_loop_contracts(
   for(const auto &clause : decreases_clause.operands())
   {
     const auto old_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head_location, mode, symbol_table)
+      get_fresh_aux_symbol(
+        clause.type(),
+        id2string(loop_head_location.get_function()),
+        "tmp_cc",
+        loop_head_location,
+        mode,
+        symbol_table)
         .symbol_expr();
     pre_loop_head_instrs.add(
       goto_programt::make_decl(old_decreases_var, loop_head_location));
     old_decreases_vars.push_back(old_decreases_var);
 
     const auto new_decreases_var =
-      new_tmp_symbol(clause.type(), loop_head_location, mode, symbol_table)
+      get_fresh_aux_symbol(
+        clause.type(),
+        id2string(loop_head_location.get_function()),
+        "tmp_cc",
+        loop_head_location,
+        mode,
+        symbol_table)
         .symbol_expr();
     pre_loop_head_instrs.add(
       goto_programt::make_decl(new_decreases_var, loop_head_location));
@@ -1251,8 +1274,10 @@ void code_contractst::add_contract_check(
   optionalt<code_returnt> return_stmt;
   if(code_type.return_type() != empty_typet())
   {
-    symbol_exprt r = new_tmp_symbol(
+    symbol_exprt r = get_fresh_aux_symbol(
                        code_type.return_type(),
+                       id2string(source_location.get_function()),
+                       "tmp_cc",
                        source_location,
                        function_symbol.mode,
                        symbol_table)
@@ -1275,8 +1300,10 @@ void code_contractst::add_contract_check(
   {
     PRECONDITION(!parameter.empty());
     const symbolt &parameter_symbol = ns.lookup(parameter);
-    symbol_exprt p = new_tmp_symbol(
+    symbol_exprt p = get_fresh_aux_symbol(
                        parameter_symbol.type,
+                       id2string(source_location.get_function()),
+                       "tmp_cc",
                        source_location,
                        parameter_symbol.mode,
                        symbol_table)

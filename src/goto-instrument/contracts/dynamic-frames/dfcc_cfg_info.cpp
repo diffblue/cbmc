@@ -471,30 +471,22 @@ static dfcc_loop_infot gen_dfcc_loop_info(
 
   auto &loop = loop_nesting_graph[loop_id];
   const auto cbmc_loop_number = loop.latch->loop_number;
-  const auto &language_mode =
-    dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
 
   // Generate "write set" variable
-  const auto &write_set_var =
-    get_fresh_aux_symbol(
-      library.dfcc_type[dfcc_typet::WRITE_SET],
-      id2string(function_id),
-      "__write_set_loop_" + std::to_string(cbmc_loop_number),
-      loop.head->source_location(),
-      language_mode,
-      symbol_table)
-      .symbol_expr();
+  const auto write_set_var = dfcc_utilst::create_symbol(
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET],
+    function_id,
+    "__write_set_loop_" + std::to_string(cbmc_loop_number),
+    loop.head->source_location());
 
   // Generate "address of write set" variable
-  const auto &addr_of_write_set_var =
-    get_fresh_aux_symbol(
-      library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
-      id2string(function_id),
-      "__address_of_write_set_loop_" + std::to_string(cbmc_loop_number),
-      loop.head->source_location(),
-      language_mode,
-      symbol_table)
-      .symbol_expr();
+  const auto &addr_of_write_set_var = dfcc_utilst::create_symbol(
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+    function_id,
+    "__address_of_write_set_loop_" + std::to_string(cbmc_loop_number),
+    loop.head->source_location());
 
   return {
     loop_id,

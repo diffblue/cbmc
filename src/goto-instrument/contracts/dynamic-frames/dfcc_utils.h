@@ -37,19 +37,17 @@ struct dfcc_utilst
   static symbolt &
   get_function_symbol(symbol_table_baset &, const irep_idt &function_id);
 
-  /// Adds a new symbol named `prefix::base_name` of type `type`
-  /// with given attributes in the symbol table, and returns the created symbol.
+  /// Adds a new symbol named `function_id::base_name` of type `type`
+  /// with given attributes in the symbol table, and returns a symbol expression
+  /// for the created symbol.
   /// If a symbol of the same name already exists the name will be decorated
   /// with a unique suffix.
-  static const symbolt &create_symbol(
+  static symbol_exprt create_symbol(
     symbol_table_baset &,
     const typet &type,
-    const irep_idt &prefix,
-    const irep_idt &base_name,
-    const source_locationt &source_location,
-    const irep_idt &mode,
-    const irep_idt &module,
-    bool is_parameter);
+    const irep_idt &function_id,
+    const std::string &base_name,
+    const source_locationt &source_location);
 
   /// Adds a new static symbol named `prefix::base_name` of type `type` with
   /// value `initial_value` in the symbol table, returns the created symbol.
@@ -65,8 +63,8 @@ struct dfcc_utilst
   static const symbolt &create_static_symbol(
     symbol_table_baset &,
     const typet &type,
-    const irep_idt &prefix,
-    const irep_idt &base_name,
+    const std::string &prefix,
+    const std::string &base_name,
     const source_locationt &source_location,
     const irep_idt &mode,
     const irep_idt &module,
@@ -77,7 +75,7 @@ struct dfcc_utilst
   static const symbolt &create_new_parameter_symbol(
     symbol_table_baset &,
     const irep_idt &function_id,
-    const irep_idt &base_name,
+    const std::string &base_name,
     const typet &type);
 
   /// \brief Adds the given symbol as parameter to the function symbol's
@@ -93,7 +91,7 @@ struct dfcc_utilst
   static const symbolt &add_parameter(
     goto_modelt &,
     const irep_idt &function_id,
-    const irep_idt &base_name,
+    const std::string &base_name,
     const typet &type);
 
   /// \brief Creates a new function symbol and goto_function

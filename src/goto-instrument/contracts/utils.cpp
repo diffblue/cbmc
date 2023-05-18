@@ -253,20 +253,6 @@ void insert_before_and_update_jumps(
   }
 }
 
-const symbolt &new_tmp_symbol(
-  const typet &type,
-  const source_locationt &location,
-  const irep_idt &mode,
-  symbol_table_baset &symtab,
-  std::string suffix,
-  bool is_auxiliary)
-{
-  symbolt &new_symbol = get_fresh_aux_symbol(
-    type, id2string(location.get_function()), suffix, location, mode, symtab);
-  new_symbol.is_auxiliary = is_auxiliary;
-  return new_symbol;
-}
-
 void simplify_gotos(goto_programt &goto_program, namespacet &ns)
 {
   for(auto &instruction : goto_program.instructions)
@@ -427,8 +413,10 @@ void add_quantified_variable(
     for(const auto &quantified_variable : quantifier_expression.variables())
     {
       // 1. create fresh symbol
-      symbolt new_symbol = new_tmp_symbol(
+      symbolt new_symbol = get_fresh_aux_symbol(
         quantified_variable.type(),
+        id2string(quantified_variable.source_location().get_function()),
+        "tmp_cc",
         quantified_variable.source_location(),
         mode,
         symbol_table);
@@ -486,9 +474,14 @@ static void replace_history_parameter_rec(
   {
     // 1. Create a temporary symbol expression that represents the
     // history variable
-    entry.first->second =
-      new_tmp_symbol(parameter.type(), location, mode, symbol_table)
-        .symbol_expr();
+    entry.first->second = get_fresh_aux_symbol(
+                            parameter.type(),
+                            id2string(location.get_function()),
+                            "tmp_cc",
+                            location,
+                            mode,
+                            symbol_table)
+                            .symbol_expr();
 
     // 2. Add the required instructions to the instructions list
     // 2.1. Declare the newly created temporary variable
