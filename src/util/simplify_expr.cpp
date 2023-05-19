@@ -1660,8 +1660,10 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   {
     auto tmp = expr;
 
-    tmp.offset() = simplify_plus(
-      plus_exprt(to_byte_extract_expr(expr.op()).offset(), expr.offset()));
+    tmp.offset() = simplify_rec(plus_exprt(
+      typecast_exprt::conditional_cast(
+        to_byte_extract_expr(expr.op()).offset(), expr.offset().type()),
+      expr.offset()));
     tmp.op() = to_byte_extract_expr(expr.op()).op();
 
     return changed(simplify_byte_extract(tmp)); // recursive call
