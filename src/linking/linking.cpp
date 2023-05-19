@@ -1495,14 +1495,13 @@ void linkingt::copy_symbols(
   }
 
   // Apply type updates to initializers
-  for(const auto &named_symbol : main_symbol_table.symbols)
+  for(auto it = main_symbol_table.begin(); it != main_symbol_table.end(); ++it)
   {
-    if(!named_symbol.second.is_type &&
-       !named_symbol.second.is_macro &&
-       named_symbol.second.value.is_not_nil())
+    if(
+      !it->second.is_type && !it->second.is_macro &&
+      it->second.value.is_not_nil())
     {
-      object_type_updates(
-        main_symbol_table.get_writeable_ref(named_symbol.first).value);
+      object_type_updates(it.get_writeable_symbol().value);
     }
   }
 }

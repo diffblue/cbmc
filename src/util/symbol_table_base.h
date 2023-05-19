@@ -196,6 +196,11 @@ public:
     {
     }
 
+    operator symbolst::const_iterator() const
+    {
+      return symbolst::const_iterator{it};
+    }
+
     // The following typedefs are NOLINT as they are needed by the STL
     typedef symbolst::iterator::difference_type difference_type;     // NOLINT
     typedef symbolst::const_iterator::value_type value_type;         // NOLINT

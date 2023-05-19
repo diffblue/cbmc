@@ -16,9 +16,9 @@ Date:   September 2014
 
 class goto_functionst;
 class goto_modelt;
-class symbol_tablet;
+class symbol_table_baset;
 
-void remove_complex(symbol_tablet &, goto_functionst &);
+void remove_complex(symbol_table_baset &, goto_functionst &);
 
 void remove_complex(goto_modelt &);
 
