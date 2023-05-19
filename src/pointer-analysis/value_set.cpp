@@ -370,9 +370,10 @@ value_sett::object_mapt value_sett::get_value_set(
     simplify(expr, ns);
 
   object_mapt dest;
-  get_value_set_rec(expr, dest, "", expr.type(), ns);
+  bool includes_nondet_pointer = false;
+  get_value_set_rec(expr, dest, includes_nondet_pointer, "", expr.type(), ns);
 
-  if(nondet_pointer && expr.type().id() == ID_pointer)
+  if(includes_nondet_pointer && expr.type().id() == ID_pointer)
   {
     // we'll take the union of all objects we see, with unspecified offsets
     values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
@@ -385,8 +386,6 @@ value_sett::object_mapt value_sett::get_value_set(
       dest,
       exprt(ID_null_object, to_pointer_type(expr.type()).base_type()),
       offsett());
-
-    nondet_pointer = false;
   }
 
   return dest;
@@ -473,6 +472,7 @@ optionalt<irep_idt> value_sett::get_index_of_symbol(
 void value_sett::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
+  bool &includes_nondet_pointer,
   const std::string &suffix,
   const typet &original_type,
   const namespacet &ns) const
@@ -496,7 +496,12 @@ void value_sett::get_value_set_rec(
       type.id() == ID_array, "operand 0 of index expression must be an array");
 
     get_value_set_rec(
-      to_index_expr(expr).array(), dest, "[]" + suffix, original_type, ns);
+      to_index_expr(expr).array(),
+      dest,
+      includes_nondet_pointer,
+      "[]" + suffix,
+      original_type,
+      ns);
   }
   else if(expr.id()==ID_member)
   {
@@ -512,6 +517,7 @@ void value_sett::get_value_set_rec(
     get_value_set_rec(
       to_member_expr(expr).compound(),
       dest,
+      includes_nondet_pointer,
       "." + component_name + suffix,
       original_type,
       ns);
@@ -529,18 +535,26 @@ void value_sett::get_value_set_rec(
   else if(expr.id() == ID_nondet_symbol)
   {
     if(expr.type().id() == ID_pointer)
-    {
-      nondet_pointer = true;
-    }
+      includes_nondet_pointer = true;
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
   else if(expr.id()==ID_if)
   {
     get_value_set_rec(
-      to_if_expr(expr).true_case(), dest, suffix, original_type, ns);
+      to_if_expr(expr).true_case(),
+      dest,
+      includes_nondet_pointer,
+      suffix,
+      original_type,
+      ns);
     get_value_set_rec(
-      to_if_expr(expr).false_case(), dest, suffix, original_type, ns);
+      to_if_expr(expr).false_case(),
+      dest,
+      includes_nondet_pointer,
+      suffix,
+      original_type,
+      ns);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -564,7 +578,8 @@ void value_sett::get_value_set_rec(
         /// Do not take a reference to object_numbering's storage as we may call
         /// object_numbering.number(), which may reallocate it.
         const exprt object=object_numbering[it1->first];
-        get_value_set_rec(object, dest, suffix, original_type, ns);
+        get_value_set_rec(
+          object, dest, includes_nondet_pointer, suffix, original_type, ns);
       }
     }
   }
@@ -597,7 +612,8 @@ void value_sett::get_value_set_rec(
     if(op_type.id()==ID_pointer)
     {
       // pointer-to-something -- we just ignore the type cast
-      get_value_set_rec(op, dest, suffix, original_type, ns);
+      get_value_set_rec(
+        op, dest, includes_nondet_pointer, suffix, original_type, ns);
     }
     else if(
       op_type.id() == ID_unsignedbv || op_type.id() == ID_signedbv ||
@@ -614,7 +630,8 @@ void value_sett::get_value_set_rec(
         // see if we have something for the integer
         object_mapt tmp;
 
-        get_value_set_rec(op, tmp, suffix, original_type, ns);
+        get_value_set_rec(
+          op, tmp, includes_nondet_pointer, suffix, original_type, ns);
 
         if(tmp.read().empty())
         {
@@ -716,14 +733,20 @@ void value_sett::get_value_set_rec(
     if(ptr_operand.has_value())
     {
       get_value_set_rec(
-        *ptr_operand, pointer_expr_set, "", ptr_operand->type(), ns);
+        *ptr_operand,
+        pointer_expr_set,
+        includes_nondet_pointer,
+        "",
+        ptr_operand->type(),
+        ns);
     }
     else
     {
       // we get the points-to for all operands, even integers
       for(const auto &op : expr.operands())
       {
-        get_value_set_rec(op, pointer_expr_set, "", op.type(), ns);
+        get_value_set_rec(
+          op, pointer_expr_set, includes_nondet_pointer, "", op.type(), ns);
       }
     }
 
@@ -756,7 +779,8 @@ void value_sett::get_value_set_rec(
     // we get the points-to for all operands, even integers
     for(const auto &op : expr.operands())
     {
-      get_value_set_rec(op, pointer_expr_set, "", op.type(), ns);
+      get_value_set_rec(
+        op, pointer_expr_set, includes_nondet_pointer, "", op.type(), ns);
     }
 
     for(object_map_dt::const_iterator
@@ -778,7 +802,12 @@ void value_sett::get_value_set_rec(
 
     object_mapt pointer_expr_set;
     get_value_set_rec(
-      binary_expr.op0(), pointer_expr_set, "", binary_expr.op0().type(), ns);
+      binary_expr.op0(),
+      pointer_expr_set,
+      includes_nondet_pointer,
+      "",
+      binary_expr.op0().type(),
+      ns);
 
     for(const auto &object_map_entry : pointer_expr_set.read())
     {
@@ -847,7 +876,13 @@ void value_sett::get_value_set_rec(
       {
         std::string remaining_suffix =
           strip_first_field_from_suffix(suffix, component_name);
-        get_value_set_rec(op, dest, remaining_suffix, original_type, ns);
+        get_value_set_rec(
+          op,
+          dest,
+          includes_nondet_pointer,
+          remaining_suffix,
+          original_type,
+          ns);
         found_component = true;
       }
       ++component_iter;
@@ -859,13 +894,21 @@ void value_sett::get_value_set_rec(
       // cast from an incompatible type. Conservatively assume all fields may
       // be of interest.
       for(const auto &op : expr.operands())
-        get_value_set_rec(op, dest, suffix, original_type, ns);
+      {
+        get_value_set_rec(
+          op, dest, includes_nondet_pointer, suffix, original_type, ns);
+      }
     }
   }
   else if(expr.id() == ID_union)
   {
     get_value_set_rec(
-      to_union_expr(expr).op(), dest, suffix, original_type, ns);
+      to_union_expr(expr).op(),
+      dest,
+      includes_nondet_pointer,
+      suffix,
+      original_type,
+      ns);
   }
   else if(expr.id()==ID_with)
   {
@@ -882,20 +925,43 @@ void value_sett::get_value_set_rec(
         std::string remaining_suffix =
           strip_first_field_from_suffix(suffix, id2string(component_name));
         get_value_set_rec(
-          with_expr.new_value(), dest, remaining_suffix, original_type, ns);
+          with_expr.new_value(),
+          dest,
+          includes_nondet_pointer,
+          remaining_suffix,
+          original_type,
+          ns);
       }
       else if(to_struct_type(expr_type).has_component(component_name))
       {
         // Looking for a non-overwritten member, look through this expression
-        get_value_set_rec(with_expr.old(), dest, suffix, original_type, ns);
+        get_value_set_rec(
+          with_expr.old(),
+          dest,
+          includes_nondet_pointer,
+          suffix,
+          original_type,
+          ns);
       }
       else
       {
         // Member we're looking for is not defined in this struct -- this
         // must be a reinterpret cast of some sort. Default to conservatively
         // assuming either operand might be involved.
-        get_value_set_rec(with_expr.old(), dest, suffix, original_type, ns);
-        get_value_set_rec(with_expr.new_value(), dest, "", original_type, ns);
+        get_value_set_rec(
+          with_expr.old(),
+          dest,
+          includes_nondet_pointer,
+          suffix,
+          original_type,
+          ns);
+        get_value_set_rec(
+          with_expr.new_value(),
+          dest,
+          includes_nondet_pointer,
+          "",
+          original_type,
+          ns);
       }
     }
     else if(expr_type.id() == ID_array && !suffix.empty())
@@ -907,16 +973,39 @@ void value_sett::get_value_set_rec(
       // Otherwise use a blank suffix on the assumption anything involved with
       // the new value might be interesting.
 
-      get_value_set_rec(with_expr.old(), dest, suffix, original_type, ns);
       get_value_set_rec(
-        with_expr.new_value(), dest, new_value_suffix, original_type, ns);
+        with_expr.old(),
+        dest,
+        includes_nondet_pointer,
+        suffix,
+        original_type,
+        ns);
+      get_value_set_rec(
+        with_expr.new_value(),
+        dest,
+        includes_nondet_pointer,
+        new_value_suffix,
+        original_type,
+        ns);
     }
     else
     {
       // Something else-- the suffixes used here are a rough guess at best,
       // so this is imprecise.
-      get_value_set_rec(with_expr.old(), dest, suffix, original_type, ns);
-      get_value_set_rec(with_expr.new_value(), dest, "", original_type, ns);
+      get_value_set_rec(
+        with_expr.old(),
+        dest,
+        includes_nondet_pointer,
+        suffix,
+        original_type,
+        ns);
+      get_value_set_rec(
+        with_expr.new_value(),
+        dest,
+        includes_nondet_pointer,
+        "",
+        original_type,
+        ns);
     }
   }
   else if(expr.id()==ID_array)
@@ -929,7 +1018,10 @@ void value_sett::get_value_set_rec(
     // with the current suffix for want of a better idea.
 
     for(const auto &op : expr.operands())
-      get_value_set_rec(op, dest, new_suffix, original_type, ns);
+    {
+      get_value_set_rec(
+        op, dest, includes_nondet_pointer, new_suffix, original_type, ns);
+    }
   }
   else if(expr.id()==ID_array_of)
   {
@@ -941,7 +1033,12 @@ void value_sett::get_value_set_rec(
     // with the current suffix for want of a better idea.
 
     get_value_set_rec(
-      to_array_of_expr(expr).what(), dest, new_suffix, original_type, ns);
+      to_array_of_expr(expr).what(),
+      dest,
+      includes_nondet_pointer,
+      new_suffix,
+      original_type,
+      ns);
   }
   else if(expr.id()==ID_dynamic_object)
   {
@@ -1014,7 +1111,8 @@ void value_sett::get_value_set_rec(
         found=true;
 
         member_exprt member(byte_extract_expr.op(), c);
-        get_value_set_rec(member, dest, suffix, original_type, ns);
+        get_value_set_rec(
+          member, dest, includes_nondet_pointer, suffix, original_type, ns);
       }
     }
 
@@ -1025,14 +1123,20 @@ void value_sett::get_value_set_rec(
       {
         const irep_idt &name = c.get_name();
         member_exprt member(byte_extract_expr.op(), name, c.type());
-        get_value_set_rec(member, dest, suffix, original_type, ns);
+        get_value_set_rec(
+          member, dest, includes_nondet_pointer, suffix, original_type, ns);
       }
     }
 
     if(!found)
       // we just pass through
       get_value_set_rec(
-        byte_extract_expr.op(), dest, suffix, original_type, ns);
+        byte_extract_expr.op(),
+        dest,
+        includes_nondet_pointer,
+        suffix,
+        original_type,
+        ns);
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
@@ -1040,9 +1144,20 @@ void value_sett::get_value_set_rec(
     const auto &byte_update_expr = to_byte_update_expr(expr);
 
     // we just pass through
-    get_value_set_rec(byte_update_expr.op(), dest, suffix, original_type, ns);
     get_value_set_rec(
-      byte_update_expr.value(), dest, suffix, original_type, ns);
+      byte_update_expr.op(),
+      dest,
+      includes_nondet_pointer,
+      suffix,
+      original_type,
+      ns);
+    get_value_set_rec(
+      byte_update_expr.value(),
+      dest,
+      includes_nondet_pointer,
+      suffix,
+      original_type,
+      ns);
 
     // we could have checked object size to be more precise
   }
@@ -1056,12 +1171,23 @@ void value_sett::get_value_set_rec(
       let_expr.symbol(), let_expr.value(), ns, false, false);
 
     value_set_with_local_definition.get_value_set_rec(
-      let_expr.where(), dest, suffix, original_type, ns);
+      let_expr.where(),
+      dest,
+      includes_nondet_pointer,
+      suffix,
+      original_type,
+      ns);
   }
   else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
   {
     object_mapt pointer_expr_set;
-    get_value_set_rec(eb->src(), pointer_expr_set, "", eb->src().type(), ns);
+    get_value_set_rec(
+      eb->src(),
+      pointer_expr_set,
+      includes_nondet_pointer,
+      "",
+      eb->src().type(),
+      ns);
 
     for(const auto &object_map_entry : pointer_expr_set.read())
     {
@@ -1077,7 +1203,10 @@ void value_sett::get_value_set_rec(
   {
     object_mapt pointer_expr_set;
     for(const auto &op : expr.operands())
-      get_value_set_rec(op, pointer_expr_set, "", original_type, ns);
+    {
+      get_value_set_rec(
+        op, pointer_expr_set, includes_nondet_pointer, "", original_type, ns);
+    }
 
     for(const auto &object_map_entry : pointer_expr_set.read())
     {
@@ -1162,7 +1291,9 @@ void value_sett::get_reference_set_rec(
   {
     const auto &pointer = to_dereference_expr(expr).pointer();
 
-    get_value_set_rec(pointer, dest, "", pointer.type(), ns);
+    bool includes_nondet_pointer = false;
+    get_value_set_rec(
+      pointer, dest, includes_nondet_pointer, "", pointer.type(), ns);
 
 #ifdef DEBUG
     for(const auto &map_entry : dest.read())

@@ -470,13 +470,21 @@ protected:
     const std::string &erase_prefix,
     const namespacet &ns);
 
+protected:
   // Subclass customisation points:
 
-protected:
-  /// Subclass customisation point for recursion over RHS expression:
+  /// Subclass customisation point for recursion over RHS expression.
+  /// \param expr: RHS expression to get value set for.
+  /// \param [out] dest: value set for \p expr.
+  /// \param [out] includes_nondet_pointer: \p expr includes a non-deterministic
+  ///   value, and the caller may want to expand \p dest to reflect this.
+  /// \param suffix: context to enable field sensitivity.
+  /// \param original_type: type of \p expr when starting the recursion.
+  /// \param ns: namespace.
   virtual void get_value_set_rec(
     const exprt &expr,
     object_mapt &dest,
+    bool &includes_nondet_pointer,
     const std::string &suffix,
     const typet &original_type,
     const namespacet &ns) const;
@@ -493,8 +501,6 @@ protected:
   virtual void apply_code_rec(
     const codet &code,
     const namespacet &ns);
-
-  mutable bool nondet_pointer = false;
 
 private:
   /// Subclass customisation point to filter or otherwise alter the value-set
