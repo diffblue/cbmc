@@ -15,8 +15,13 @@ Date: March 2023
 
 #include <util/irep.h>
 
-/// \return True iff the id starts with CPROVER_PREFIX, `__VERIFIER`, `nondet`
-/// or ends with `$object`.
-bool dfcc_is_cprover_symbol(const irep_idt &id);
+/// Returns `true` iff id is one of the known CPROVER functions or starts with
+/// `__VERIFIER` or `nondet`.
+bool dfcc_is_cprover_function_symbol(const irep_idt &id);
+
+/// Returns `true` iff the symbol is one of the known CPROVER static
+/// instrumentation variables or ends with `$object` and represents an
+/// auto-generated object following a pointer dereference.
+bool dfcc_is_cprover_static_symbol(const irep_idt &id);
 
 #endif

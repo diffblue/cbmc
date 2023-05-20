@@ -794,7 +794,7 @@ static bool must_check_lhs_from_local_and_tracked(
       return true;
     }
     const auto &id = to_symbol_expr(expr).get_identifier();
-    if(dfcc_is_cprover_symbol(id))
+    if(dfcc_is_cprover_static_symbol(id))
     {
       // Skip the check if we have a single cprover symbol as root object
       // cprover symbols are used for generic checks instrumentation and are

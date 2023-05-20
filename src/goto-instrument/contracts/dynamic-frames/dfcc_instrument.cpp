@@ -235,7 +235,7 @@ bool dfcc_instrumentt::is_internal_symbol(const irep_idt &id) const
 bool dfcc_instrumentt::do_not_instrument(const irep_idt &id) const
 {
   return !has_prefix(id2string(id), CPROVER_PREFIX "file_local") &&
-         (dfcc_is_cprover_symbol(id) || is_internal_symbol(id));
+         (dfcc_is_cprover_function_symbol(id) || is_internal_symbol(id));
 }
 
 void dfcc_instrumentt::instrument_harness_function(
