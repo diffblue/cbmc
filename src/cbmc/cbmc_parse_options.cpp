@@ -26,16 +26,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <util/unicode.h>
 #endif
 
-#include <langapi/language.h>
+#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/loop_ids.h>
+#include <goto-programs/process_goto_program.h>
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/set_properties.h>
+#include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
+#include <goto-programs/show_symbol_table.h>
+#include <goto-programs/write_goto_binary.h>
 
 #include <ansi-c/c_preprocess.h>
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/gcc_version.h>
-
 #include <assembler/remove_asm.h>
-
 #include <cpp/cprover_library.h>
-
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
@@ -49,29 +57,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/single_path_symex_only_checker.h>
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
-
-#include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/link_to_library.h>
-#include <goto-programs/loop_ids.h>
-#include <goto-programs/process_goto_program.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_unused_functions.h>
-#include <goto-programs/set_properties.h>
-#include <goto-programs/show_goto_functions.h>
-#include <goto-programs/show_properties.h>
-#include <goto-programs/show_symbol_table.h>
-
 #include <goto-instrument/cover.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
-
 #include <goto-symex/path_storage.h>
-
-#include <pointer-analysis/add_failed_symbols.h>
-
+#include <langapi/language.h>
 #include <langapi/mode.h>
+#include <pointer-analysis/add_failed_symbols.h>
 
 #include "c_test_input_generator.h"
 
@@ -250,6 +243,19 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
      !cmdline.isset("cover")))
   {
     options.set_option("trace", true);
+  }
+
+  if(cmdline.isset("export-symex-ready-goto"))
+  {
+    options.set_option(
+      "export-symex-ready-goto", cmdline.get_value("export-symex-ready-goto"));
+    if(options.get_option("export-symex-ready-goto").empty())
+    {
+      log.error()
+        << "ERROR: Please provide a filename to write the goto-binary to."
+        << messaget::eom;
+      exit(CPROVER_EXIT_INTERNAL_ERROR);
+    }
   }
 
   if(cmdline.isset("localize-faults"))
@@ -552,6 +558,31 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties())
     return CPROVER_EXIT_SET_PROPERTIES_FAILED;
+
+  // At this point, our goto-model should be in symex-ready-goto form (all of
+  // the transformations have been run and the program is ready to be given
+  // to the solver).
+  if(options.is_set("export-symex-ready-goto"))
+  {
+    auto symex_ready_goto_filename =
+      options.get_option("export-symex-ready-goto");
+
+    bool success = !write_goto_binary(
+      symex_ready_goto_filename, goto_model, ui_message_handler);
+
+    if(!success)
+    {
+      log.error() << "ERROR: Unable to export goto-program in file "
+                  << symex_ready_goto_filename << messaget::eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+    else
+    {
+      log.status() << "Exported goto-program in symex-ready-goto form at "
+                   << symex_ready_goto_filename << messaget::eom;
+      return CPROVER_EXIT_SUCCESS;
+    }
+  }
 
   if(
     options.get_bool_option("program-only") ||
@@ -937,6 +968,7 @@ void cbmc_parse_optionst::help()
     " --show-symbol-table          show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_VALIDATE
+    " --export-symex-ready-goto f         serialise goto-program in symex-ready-goto form in f\n" // NOLINT(*)
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK

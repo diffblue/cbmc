@@ -1,0 +1,15 @@
+CORE winbug
+test.c
+--export-symex-ready-goto ""
+^ERROR: Please provide a filename to write the goto-binary to.$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+Ensure that --export-symex-ready-goto exported.symex-ready.goto terminates
+with error when incorrectly used.
+
+The reason why we use `winbug` is that it fails on certain windows system
+probably due to different interpretation of "". Not a bug, but we're using
+that label to remain consistent with other parts of the codebase, and not
+to unnecessarily introduce new ones for simple use cases.

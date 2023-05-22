@@ -5,7 +5,7 @@
 \section required-transforms Core Transformation Passes
 
 This section lists the transformation passes that must have been applied for the
-goto model to be in core goto format.
+goto model to be in symex ready goto format.
 
 Note that the passes are listed below in the order they are currently called in
 CBMC. While all dependencies on the ordering are not fully documented, the
@@ -184,11 +184,11 @@ nondet-transform if it is being used.</em>
 
 This transformation removes skip instructions. Note that this transformation is
 called in many places and may be called as part of other transformations. This
-instance here is part of the mandatory transformation to reach core goto format.
-If there is a use case where it is desirable to preserve a "no operation"
-instruction, a `LOCATION` type instruction may be used in place of a `SKIP`
-instruction. The `LOCATION` instruction has the same semantics as the `SKIP`
-instruction, but is not removed by the remove skip instructions pass.
+instance here is part of the mandatory transformation to reach symex ready goto
+format. If there is a use case where it is desirable to preserve a "no
+operation" instruction, a `LOCATION` type instruction may be used in place of a
+`SKIP` instruction. The `LOCATION` instruction has the same semantics as the
+`SKIP` instruction, but is not removed by the remove skip instructions pass.
 
 The implementation of this pass is called via \ref remove_skip(goto_modelt &)
 
@@ -215,7 +215,7 @@ coverage-transform if it is being used.</em>
 
 The sections lists the optional transformation passes that are optional and will
 modify a goto model. Note that these are documented here for consistency, but
-not required for core goto format.
+not required for symex ready goto format.
 
 Note for each optional pass there is a listed predeceesor pass. This is the pass
 currently called before the listed pass in CBMC. While the ordering may not be
