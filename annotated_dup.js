@@ -403,7 +403,7 @@ var annotated_dup =
     [ "dfcc_pointer_in_ranget", "classdfcc__pointer__in__ranget.html", "classdfcc__pointer__in__ranget" ],
     [ "dfcc_spec_functionst", "classdfcc__spec__functionst.html", "classdfcc__spec__functionst" ],
     [ "dfcc_swap_and_wrapt", "classdfcc__swap__and__wrapt.html", "classdfcc__swap__and__wrapt" ],
-    [ "dfcc_utilst", "classdfcc__utilst.html", "classdfcc__utilst" ],
+    [ "dfcc_utilst", "structdfcc__utilst.html", "structdfcc__utilst" ],
     [ "dfcc_wrapper_programt", "classdfcc__wrapper__programt.html", "classdfcc__wrapper__programt" ],
     [ "dfcct", "classdfcct.html", "classdfcct" ],
     [ "diagnostics_helpert", "structdiagnostics__helpert.html", "structdiagnostics__helpert" ],

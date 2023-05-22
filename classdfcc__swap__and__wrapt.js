@@ -1,6 +1,6 @@
 var classdfcc__swap__and__wrapt =
 [
-    [ "dfcc_swap_and_wrapt", "classdfcc__swap__and__wrapt.html#a712a0af866fdb6ad5d1b60e262a63841", null ],
+    [ "dfcc_swap_and_wrapt", "classdfcc__swap__and__wrapt.html#a6abbf973240097b4cf409c9d8e260fad", null ],
     [ "check_contract", "classdfcc__swap__and__wrapt.html#ae328a632d5d67e9bfb213b483ba2cce7", null ],
     [ "get_swapped_functions", "classdfcc__swap__and__wrapt.html#a89d2ac145f95b5ac55d41aff1ed1ea68", null ],
     [ "replace_with_contract", "classdfcc__swap__and__wrapt.html#acb36c4ab6adb2729d64cdabbb83c8600", null ],
@@ -15,6 +15,5 @@ var classdfcc__swap__and__wrapt =
     [ "log", "classdfcc__swap__and__wrapt.html#a8e0e6f1b18dc683b67a226dd8ced362f", null ],
     [ "message_handler", "classdfcc__swap__and__wrapt.html#a4486f168d527174513c4c34de3f86351", null ],
     [ "ns", "classdfcc__swap__and__wrapt.html#ae55108da9a50d82e5387332ee1b9a607", null ],
-    [ "spec_functions", "classdfcc__swap__and__wrapt.html#a44f74aaa7d2b4156ff4a4cf963973ae6", null ],
-    [ "utils", "classdfcc__swap__and__wrapt.html#a14efdb16f8450e6bd37c7dcd50bc9143", null ]
+    [ "spec_functions", "classdfcc__swap__and__wrapt.html#a44f74aaa7d2b4156ff4a4cf963973ae6", null ]
 ];

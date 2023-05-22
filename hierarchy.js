@@ -438,7 +438,7 @@ var hierarchy =
     [ "dfcc_pointer_in_ranget", "classdfcc__pointer__in__ranget.html", null ],
     [ "dfcc_spec_functionst", "classdfcc__spec__functionst.html", null ],
     [ "dfcc_swap_and_wrapt", "classdfcc__swap__and__wrapt.html", null ],
-    [ "dfcc_utilst", "classdfcc__utilst.html", null ],
+    [ "dfcc_utilst", "structdfcc__utilst.html", null ],
     [ "dfcc_wrapper_programt", "classdfcc__wrapper__programt.html", null ],
     [ "dfcct", "classdfcct.html", null ],
     [ "diagnostics_helpert< T >", "structdiagnostics__helpert.html", null ],

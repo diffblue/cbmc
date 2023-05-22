@@ -1,6 +1,6 @@
 var classdfcc__wrapper__programt =
 [
-    [ "dfcc_wrapper_programt", "classdfcc__wrapper__programt.html#a309c0ed2c953c27235601a534deab5bc", null ],
+    [ "dfcc_wrapper_programt", "classdfcc__wrapper__programt.html#acc2cf77ca8d5002c6408641f0e6698d9", null ],
     [ "add_to_dest", "classdfcc__wrapper__programt.html#ad9426bb3f42eb72aed8ddae689691b5f", null ],
     [ "add_to_dest", "classdfcc__wrapper__programt.html#aa0f4800b4d90ddf2bc6b12b6adb0005b", null ],
     [ "encode_checked_function_call", "classdfcc__wrapper__programt.html#a5d038aee988318a10316f4e0cfad0645", null ],
@@ -45,7 +45,6 @@ var classdfcc__wrapper__programt =
     [ "preconditions", "classdfcc__wrapper__programt.html#acf0528b042b611be5c10f6b817a398c7", null ],
     [ "requires_write_set", "classdfcc__wrapper__programt.html#a45b67328c06bbd488c21aede19989e3d", null ],
     [ "return_value_opt", "classdfcc__wrapper__programt.html#aeff0151610e3aae6e8bd5dafeef1c33d", null ],
-    [ "utils", "classdfcc__wrapper__programt.html#a40e994c6c3a33b0bccb92aa143f4b5af", null ],
     [ "wrapped_symbol", "classdfcc__wrapper__programt.html#aca0f6b1f0b78d69605892d6ee7668a0e", null ],
     [ "wrapper_sl", "classdfcc__wrapper__programt.html#a0279c8a89d9cc41bf3f1f95e0eab231d", null ],
     [ "wrapper_symbol", "classdfcc__wrapper__programt.html#a9a583e65042ceb6e4b164d980b32e4f4", null ],

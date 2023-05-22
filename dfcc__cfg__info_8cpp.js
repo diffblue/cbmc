@@ -4,7 +4,7 @@ var dfcc__cfg__info_8cpp =
     [ "check_has_contract_rec", "dfcc__cfg__info_8cpp.html#a21be3293f2f519520b2e153bb28a4cc4", null ],
     [ "check_inner_loops_have_contracts", "dfcc__cfg__info_8cpp.html#af7d314eeb5508a065d4ea17b6d566d7d", null ],
     [ "default_loop_contract_clauses", "dfcc__cfg__info_8cpp.html#a99f012848c7a4db34c05b81f82c3b0b2", null ],
-    [ "gen_dfcc_loop_info", "dfcc__cfg__info_8cpp.html#a2bbf1498d312300b47ad4329b74bf2d0", null ],
+    [ "gen_dfcc_loop_info", "dfcc__cfg__info_8cpp.html#acc4c87431dbc60f5c0ccbf621a5b537d", null ],
     [ "gen_loop_locals_set", "dfcc__cfg__info_8cpp.html#af945bfed67dca5baaea0c57d76cb4bc0", null ],
     [ "gen_tracked_set", "dfcc__cfg__info_8cpp.html#a8590c82b7b9bf53ddfa93a02e7b621e5", null ],
     [ "get_assigns", "dfcc__cfg__info_8cpp.html#a6e3fdf15618ceb3a7ba01823230395f8", null ],

@@ -1,6 +1,6 @@
 var classdfcc__contract__functionst =
 [
-    [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html#ab6681509a65173d741a75ecc12317cc5", null ],
+    [ "dfcc_contract_functionst", "classdfcc__contract__functionst.html#a6914408115a56f140376e4ad14edae82", null ],
     [ "gen_spec_assigns_function", "classdfcc__contract__functionst.html#ab3628a600c8e2572985a523031997218", null ],
     [ "gen_spec_frees_function", "classdfcc__contract__functionst.html#a03cf1476b1b5be9f6e89c81653081faf", null ],
     [ "get_nof_assigns_targets", "classdfcc__contract__functionst.html#a95d49490312711c43b55e8a4c451cf8c", null ],
@@ -24,6 +24,5 @@ var classdfcc__contract__functionst =
     [ "spec_assigns_function_id", "classdfcc__contract__functionst.html#a547383a0c10061338780212fb9c55a25", null ],
     [ "spec_assigns_havoc_function_id", "classdfcc__contract__functionst.html#a142e6328d36ec602236a5f31c73e91d5", null ],
     [ "spec_frees_function_id", "classdfcc__contract__functionst.html#ab3b920a23bc2d04563568a53270302dc", null ],
-    [ "spec_functions", "classdfcc__contract__functionst.html#aba7a809afef328a14c8c14eefc5ebc5a", null ],
-    [ "utils", "classdfcc__contract__functionst.html#a9c30c0f0236347019c60e881a5ab2fe5", null ]
+    [ "spec_functions", "classdfcc__contract__functionst.html#aba7a809afef328a14c8c14eefc5ebc5a", null ]
 ];

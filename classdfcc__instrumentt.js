@@ -1,6 +1,6 @@
 var classdfcc__instrumentt =
 [
-    [ "dfcc_instrumentt", "classdfcc__instrumentt.html#a3d5021882844748b034177c9e954636d", null ],
+    [ "dfcc_instrumentt", "classdfcc__instrumentt.html#a8501a212fb2a284c9841d4cb6479b361", null ],
     [ "apply_loop_contracts", "classdfcc__instrumentt.html#a1e1ed46c66c6ff4be64f05422f69ba64", null ],
     [ "do_not_instrument", "classdfcc__instrumentt.html#a9cab5285f589a99ca88184776f371a83", null ],
     [ "get_instrumented_functions", "classdfcc__instrumentt.html#a3bff56cbc0bb265762f9e128fac2d660", null ],
@@ -34,6 +34,5 @@ var classdfcc__instrumentt =
     [ "log", "classdfcc__instrumentt.html#a14427d4ab2e0a853088e7e22841cd8a5", null ],
     [ "message_handler", "classdfcc__instrumentt.html#a3eee0a764a914d65ed012f73c38ef7f5", null ],
     [ "ns", "classdfcc__instrumentt.html#a7edbaed558360cdded6c7f024396b21d", null ],
-    [ "spec_functions", "classdfcc__instrumentt.html#ae4064e4f4cf345c053b2fe49b404f8e2", null ],
-    [ "utils", "classdfcc__instrumentt.html#ad1d93f107a09fed827c9aabe73e81ef4", null ]
+    [ "spec_functions", "classdfcc__instrumentt.html#ae4064e4f4cf345c053b2fe49b404f8e2", null ]
 ];

@@ -35,8 +35,7 @@ var group__dfcc_module =
       [ "swap_and_wrap", "classdfcct.html#a5b7ad9b33c59871b6124e4ff20867f8b", null ],
       [ "to_check", "classdfcct.html#a7ecb2a11d4929247f2751191e1fb4a99", null ],
       [ "to_exclude_from_nondet_static", "classdfcct.html#a47e707c9ff690b90c4cc48c17e4a94ea", null ],
-      [ "to_replace", "classdfcct.html#adc52fa5f0c20e1ae57851937c1b065b7", null ],
-      [ "utils", "classdfcct.html#a1cc579d43031202652392f0313e0aa7a", null ]
+      [ "to_replace", "classdfcct.html#adc52fa5f0c20e1ae57851937c1b065b7", null ]
     ] ],
     [ "dfcc", "group__dfcc-module.html#ga643c9eb853f28143d9a4a975844d99c4", null ],
     [ "dfcc", "group__dfcc-module.html#ga46a51b92364a93b0f1975238bb5d0994", null ]

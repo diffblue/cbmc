@@ -1,6 +1,6 @@
 var classdfcc__libraryt =
 [
-    [ "dfcc_libraryt", "classdfcc__libraryt.html#abf2a449239d88bc96d09b89d1830019e", null ],
+    [ "dfcc_libraryt", "classdfcc__libraryt.html#a26e8e66b60d6a9242a48819d6ef423e8", null ],
     [ "add_instrumented_functions_map_init_instructions", "classdfcc__libraryt.html#a78e6b7048b19c4e405370f1b40eec91c", null ],
     [ "check_replace_ensures_was_freed_preconditions_call", "classdfcc__libraryt.html#add4c897b142d77ba60e5e31f86d5050b", null ],
     [ "disable_checks", "classdfcc__libraryt.html#adbd1ff30e88053a0738af9c7508349d3", null ],
@@ -54,6 +54,5 @@ var classdfcc__libraryt =
     [ "log", "classdfcc__libraryt.html#a8e589ae7ea0688a409970d5156f80e4c", null ],
     [ "malloc_free_fixed", "classdfcc__libraryt.html#a3ca4a065624478d4cd6d4d38ed5e4351", null ],
     [ "message_handler", "classdfcc__libraryt.html#ac48e1d14e81745c5914ad2f954e75009", null ],
-    [ "specialized", "classdfcc__libraryt.html#afe679d91ee7da0b0e3f39d499a9a9e5a", null ],
-    [ "utils", "classdfcc__libraryt.html#ac9dfbc39c66fef48e6a9bd795e38299b", null ]
+    [ "specialized", "classdfcc__libraryt.html#afe679d91ee7da0b0e3f39d499a9a9e5a", null ]
 ];

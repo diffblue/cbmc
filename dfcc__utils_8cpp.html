@@ -88,6 +88,8 @@ $(document).ready(function(){initNavTree('dfcc__utils_8cpp.html',''); initResiza
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">dfcc_utils.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -97,7 +99,6 @@ $(document).ready(function(){initNavTree('dfcc__utils_8cpp.html',''); initResiza
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="format__expr_8h_source.html">util/format_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="fresh__symbol_8h_source.html">util/fresh_symbol.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="mathematical__expr_8h_source.html">util/mathematical_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
@@ -106,10 +107,8 @@ $(document).ready(function(){initNavTree('dfcc__utils_8cpp.html',''); initResiza
 <code>#include &lt;<a class="el" href="goto__convert__functions_8h_source.html">goto-programs/goto_convert_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__inline_8h_source.html">goto-programs/goto_inline.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="c__expr_8h_source.html">ansi-c/c_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="inlining__decorator_8h_source.html">goto-instrument/contracts/inlining_decorator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="utils_8h_source.html">goto-instrument/contracts/utils.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="language__util_8h_source.html">langapi/language_util.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &lt;set&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -117,11 +116,319 @@ $(document).ready(function(){initNavTree('dfcc__utils_8cpp.html',''); initResiza
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__utils_8cpp__incl.svg" width="2552" height="1051"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__utils_8cpp__incl.svg" width="2739" height="976"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
 <p><a href="dfcc__utils_8cpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a5e5a30b5f0e6561284cb4d49193d28f9"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__utils_8cpp.html#a5e5a30b5f0e6561284cb4d49193d28f9">symbol_exists</a> (const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;name, const bool require_has_code_type, const bool require_body_available)</td></tr>
+<tr class="memdesc:a5e5a30b5f0e6561284cb4d49193d28f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the given symbol exists and satisfies requirements.  <a href="dfcc__utils_8cpp.html#a5e5a30b5f0e6561284cb4d49193d28f9">More...</a><br /></td></tr>
+<tr class="separator:a5e5a30b5f0e6561284cb4d49193d28f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a918d20b252f13554b5856881b98de8f9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__utils_8cpp.html#a918d20b252f13554b5856881b98de8f9">add_parameter</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, <a class="el" href="classcode__typet.html">code_typet</a> &amp;code_type)</td></tr>
+<tr class="memdesc:a918d20b252f13554b5856881b98de8f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the given symbol as parameter to the given <a class="el" href="classcode__typet.html" title="Base type of functions.">code_typet</a>.  <a href="dfcc__utils_8cpp.html#a918d20b252f13554b5856881b98de8f9">More...</a><br /></td></tr>
+<tr class="separator:a918d20b252f13554b5856881b98de8f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44b6719784a69313b5ea4a144acd261b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__utils_8cpp.html#a44b6719784a69313b5ea4a144acd261b">clone_parameters</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;old_params, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;module, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, std::function&lt; const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;trans_param, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;new_function_id, <a class="el" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;new_params)</td></tr>
+<tr class="memdesc:a44b6719784a69313b5ea4a144acd261b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones the old_params into the new_params list, applying the trans_param function to generate the names of the cloned params.  <a href="dfcc__utils_8cpp.html#a44b6719784a69313b5ea4a144acd261b">More...</a><br /></td></tr>
+<tr class="separator:a44b6719784a69313b5ea4a144acd261b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44c77d93e4ae21f9cf14d085c7d2f26b"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__utils_8cpp.html#a44c77d93e4ae21f9cf14d085c7d2f26b">clone_and_rename_function</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, std::function&lt; const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;trans_fun, std::function&lt; const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;trans_param, std::function&lt; const <a class="el" href="classtypet.html">typet</a>(const <a class="el" href="classtypet.html">typet</a> &amp;)&gt; &amp;trans_ret_type, std::function&lt; const <a class="el" href="classsource__locationt.html">source_locationt</a>(const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;)&gt; &amp;trans_loc)</td></tr>
+<tr class="memdesc:a44c77d93e4ae21f9cf14d085c7d2f26b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new symbol in the <code>symbol_table</code> by cloning the given <code>function_id</code> function and transforming the existing function's name, parameter names, return type and source location using the given <code>trans_fun</code>, <code>trans_param</code> and <code>trans_ret_type</code> and <code>trans_loc</code> functions.  <a href="dfcc__utils_8cpp.html#a44c77d93e4ae21f9cf14d085c7d2f26b">More...</a><br /></td></tr>
+<tr class="separator:a44c77d93e4ae21f9cf14d085c7d2f26b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a8a59151c95741b4d7f9368f8ffb91c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classinlining__decoratort.html">inlining_decoratort</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__utils_8cpp.html#a5a8a59151c95741b4d7f9368f8ffb91c">inline_function</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="separator:a5a8a59151c95741b4d7f9368f8ffb91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a918d20b252f13554b5856881b98de8f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a918d20b252f13554b5856881b98de8f9">&#9670;&nbsp;</a></span>add_parameter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void add_parameter </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcode__typet.html">code_typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>code_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds the given symbol as parameter to the given <a class="el" href="classcode__typet.html" title="Base type of functions.">code_typet</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00161">161</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a44c77d93e4ae21f9cf14d085c7d2f26b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44c77d93e4ae21f9cf14d085c7d2f26b">&#9670;&nbsp;</a></span>clone_and_rename_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const <a class="el" href="classsymbolt.html">symbolt</a>&amp; clone_and_rename_function </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>trans_fun</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>trans_param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; const <a class="el" href="classtypet.html">typet</a>(const <a class="el" href="classtypet.html">typet</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>trans_ret_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; const <a class="el" href="classsource__locationt.html">source_locationt</a>(const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>trans_loc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new symbol in the <code>symbol_table</code> by cloning the given <code>function_id</code> function and transforming the existing function's name, parameter names, return type and source location using the given <code>trans_fun</code>, <code>trans_param</code> and <code>trans_ret_type</code> and <code>trans_loc</code> functions. </p>
+<p>Also creates a new <code>goto_function</code> under the transformed name in the <code>function_map</code> with new parameters and an empty body. Returns the new symbol.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">goto_model</td><td>target goto_model holding the symbol table </td></tr>
+    <tr><td class="paramname">function_id</td><td>function to clone </td></tr>
+    <tr><td class="paramname">trans_fun</td><td>transformation function for the function name </td></tr>
+    <tr><td class="paramname">trans_param</td><td>transformation function for the parameter names </td></tr>
+    <tr><td class="paramname">trans_ret_type</td><td>transformation function for the return type </td></tr>
+    <tr><td class="paramname">trans_loc</td><td>transformation function for the source location </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the new function symbol </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00264">264</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a44b6719784a69313b5ea4a144acd261b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44b6719784a69313b5ea4a144acd261b">&#9670;&nbsp;</a></span>clone_parameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void clone_parameters </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
+          <td class="paramname"><em>symbol_table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;&#160;</td>
+          <td class="paramname"><em>old_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
+          <td class="paramname"><em>location</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;&#160;</td>
+          <td class="paramname"><em>trans_param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>new_function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a> &amp;&#160;</td>
+          <td class="paramname"><em>new_params</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clones the old_params into the new_params list, applying the trans_param function to generate the names of the cloned params. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00199">199</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5a8a59151c95741b4d7f9368f8ffb91c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a8a59151c95741b4d7f9368f8ffb91c">&#9670;&nbsp;</a></span>inline_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classinlining__decoratort.html">inlining_decoratort</a> inline_function </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00439">439</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5e5a30b5f0e6561284cb4d49193d28f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e5a30b5f0e6561284cb4d49193d28f9">&#9670;&nbsp;</a></span>symbol_exists()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool symbol_exists </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>require_has_code_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>require_body_available</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns true iff the given symbol exists and satisfies requirements. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__utils_8cpp_source.html#l00033">33</a> of file <a class="el" href="dfcc__utils_8cpp_source.html">dfcc_utils.cpp</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

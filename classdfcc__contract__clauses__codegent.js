@@ -1,6 +1,6 @@
 var classdfcc__contract__clauses__codegent =
 [
-    [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html#a6174115621dedd217b2236a95c060732", null ],
+    [ "dfcc_contract_clauses_codegent", "classdfcc__contract__clauses__codegent.html#af7124e5699ab974a768570362125c182", null ],
     [ "encode_assignable_target", "classdfcc__contract__clauses__codegent.html#a2eb3790ec22db6ce4d94031a0d5fbae0", null ],
     [ "encode_assignable_target_group", "classdfcc__contract__clauses__codegent.html#a4fbceda8951b5eaca5f1bb33689fbceb", null ],
     [ "encode_freeable_target", "classdfcc__contract__clauses__codegent.html#ac40787458e7580be04e83bd096d922f0", null ],
@@ -12,6 +12,5 @@ var classdfcc__contract__clauses__codegent =
     [ "library", "classdfcc__contract__clauses__codegent.html#ac7ffbdd29db79fd4bda3e43ff969cca5", null ],
     [ "log", "classdfcc__contract__clauses__codegent.html#a65510d8423078042a028efdd1ad96185", null ],
     [ "message_handler", "classdfcc__contract__clauses__codegent.html#acc9c7f90f638598d8ac8d3bbb3a58530", null ],
-    [ "ns", "classdfcc__contract__clauses__codegent.html#aec8a0b5b79a89eb0da0348e5468d7c99", null ],
-    [ "utils", "classdfcc__contract__clauses__codegent.html#aabdcc948d387b4afc5e98046cb9c2d15", null ]
+    [ "ns", "classdfcc__contract__clauses__codegent.html#aec8a0b5b79a89eb0da0348e5468d7c99", null ]
 ];
