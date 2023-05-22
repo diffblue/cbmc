@@ -16,6 +16,7 @@ Date: July 2021
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/fresh_symbol.h>
 #include <util/prefix.h>
 
 #include <goto-programs/goto_convert_functions.h>
@@ -255,13 +256,13 @@ is_fresh_enforcet::is_fresh_enforcet(
   this->memmap_name = ssmemmap.str();
 
   const auto &mode = goto_model.symbol_table.lookup_ref(_fun_id).mode;
-  this->memmap_symbol = new_tmp_symbol(
+  this->memmap_symbol = get_fresh_aux_symbol(
     get_memmap_type(),
+    "",
+    this->memmap_name,
     source_locationt(),
     mode,
-    goto_model.symbol_table,
-    this->memmap_name,
-    true);
+    goto_model.symbol_table);
 }
 
 void is_fresh_enforcet::create_declarations()
@@ -334,13 +335,13 @@ is_fresh_replacet::is_fresh_replacet(
   this->memmap_name = ssmemmap.str();
 
   const auto &mode = goto_model.symbol_table.lookup_ref(_fun_id).mode;
-  this->memmap_symbol = new_tmp_symbol(
+  this->memmap_symbol = get_fresh_aux_symbol(
     get_memmap_type(),
+    "",
+    this->memmap_name,
     source_locationt(),
     mode,
-    goto_model.symbol_table,
-    this->memmap_name,
-    true);
+    goto_model.symbol_table);
 }
 
 void is_fresh_replacet::create_declarations()

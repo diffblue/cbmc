@@ -11,7 +11,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
-#include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/namespace.h>
@@ -37,15 +36,11 @@ static symbol_exprt create_contract_write_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::WRITE_SET],
-           id2string(wrapper_symbol.name),
-           "__contract_write_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET],
+    wrapper_symbol.name,
+    "__contract_write_set",
+    wrapper_symbol.location);
 }
 
 /// Generate the contract write set pointer
@@ -55,15 +50,11 @@ static symbol_exprt create_addr_of_contract_write_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
-           id2string(wrapper_symbol.name),
-           "__address_of_contract_write_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+    wrapper_symbol.name,
+    "__address_of_contract_write_set",
+    wrapper_symbol.location);
 }
 
 // Generate the write set to check for side effects in requires clauses
@@ -73,15 +64,11 @@ static symbol_exprt create_requires_write_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::WRITE_SET],
-           id2string(wrapper_symbol.name),
-           "__requires_write_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET],
+    wrapper_symbol.name,
+    "__requires_write_set",
+    wrapper_symbol.location);
 }
 
 /// Generate the write set pointer to check side effects in requires clauses
@@ -91,15 +78,11 @@ static symbol_exprt create_addr_of_requires_write_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
-           id2string(wrapper_symbol.name),
-           "__address_of_requires_write_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+    wrapper_symbol.name,
+    "__address_of_requires_write_set",
+    wrapper_symbol.location);
 }
 
 /// Generate the write set to check side effects in ensures clauses
@@ -109,15 +92,11 @@ static symbol_exprt create_ensures_write_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::WRITE_SET],
-           id2string(wrapper_symbol.name),
-           "__ensures_write_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET],
+    wrapper_symbol.name,
+    "__ensures_write_set",
+    wrapper_symbol.location);
 }
 
 /// Generate the write set pointer to check side effects in ensures clauses
@@ -127,15 +106,11 @@ static symbol_exprt create_addr_of_ensures_write_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
-           id2string(wrapper_symbol.name),
-           "__address_of_ensures_write_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+    wrapper_symbol.name,
+    "__address_of_ensures_write_set",
+    wrapper_symbol.location);
 }
 
 /// Generate object set used to support is_fresh predicates
@@ -145,15 +120,11 @@ static symbol_exprt create_is_fresh_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::OBJ_SET],
-           id2string(wrapper_symbol.name),
-           "__is_fresh_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::OBJ_SET],
+    wrapper_symbol.name,
+    "__is_fresh_set",
+    wrapper_symbol.location);
 }
 
 /// Generate object set pointer used to support is_fresh predicates
@@ -163,15 +134,11 @@ static symbol_exprt create_addr_of_is_fresh_set(
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
-           symbol_table,
-           library.dfcc_type[dfcc_typet::OBJ_SET_PTR],
-           id2string(wrapper_symbol.name),
-           "__address_of_is_fresh_set",
-           wrapper_symbol.location,
-           wrapper_symbol.mode,
-           wrapper_symbol.module,
-           false)
-    .symbol_expr();
+    symbol_table,
+    library.dfcc_type[dfcc_typet::OBJ_SET_PTR],
+    wrapper_symbol.name,
+    "__address_of_is_fresh_set",
+    wrapper_symbol.location);
 }
 
 dfcc_wrapper_programt::dfcc_wrapper_programt(
@@ -238,15 +205,11 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
   if(contract_code_type.return_type().id() != ID_empty)
   {
     return_value_opt = dfcc_utilst::create_symbol(
-                         goto_model.symbol_table,
-                         contract_code_type.return_type(),
-                         id2string(wrapper_symbol.name),
-                         "__contract_return_value",
-                         wrapper_symbol.location,
-                         wrapper_symbol.mode,
-                         wrapper_symbol.module,
-                         false)
-                         .symbol_expr();
+      goto_model.symbol_table,
+      contract_code_type.return_type(),
+      wrapper_symbol.name,
+      "__contract_return_value",
+      wrapper_symbol.location);
 
     // build contract_lambda_parameters
     contract_lambda_parameters.push_back(return_value_opt.value());
@@ -336,14 +299,12 @@ void dfcc_wrapper_programt::encode_requires_write_set()
   // ASSERT __check_no_alloc;
   // DEAD __check_no_alloc: bool;
   // ```
-  auto check_var = get_fresh_aux_symbol(
-                     bool_typet(),
-                     id2string(wrapper_symbol.name),
-                     "__no_alloc_dealloc_in_requires",
-                     wrapper_sl,
-                     wrapper_symbol.mode,
-                     goto_model.symbol_table)
-                     .symbol_expr();
+  const auto check_var = dfcc_utilst::create_symbol(
+    goto_model.symbol_table,
+    bool_typet(),
+    wrapper_symbol.name,
+    "__no_alloc_dealloc_in_requires",
+    wrapper_sl);
 
   postamble.add(goto_programt::make_decl(check_var, wrapper_sl));
 
@@ -418,14 +379,12 @@ void dfcc_wrapper_programt::encode_ensures_write_set()
   // ASSERT __check_no_alloc;
   // DEAD __check_no_alloc: bool;
   // ```
-  auto check_var = get_fresh_aux_symbol(
-                     bool_typet(),
-                     id2string(wrapper_symbol.name),
-                     "__no_alloc_dealloc_in_ensures_clauses",
-                     wrapper_sl,
-                     wrapper_symbol.mode,
-                     goto_model.symbol_table)
-                     .symbol_expr();
+  const auto check_var = dfcc_utilst::create_symbol(
+    goto_model.symbol_table,
+    bool_typet(),
+    wrapper_symbol.name,
+    "__no_alloc_dealloc_in_ensures_clauses",
+    wrapper_sl);
 
   postamble.add(goto_programt::make_decl(check_var, wrapper_sl));
 
@@ -758,14 +717,12 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
 
   {
     // assigns clause inclusion
-    auto check_var = get_fresh_aux_symbol(
-                       bool_typet(),
-                       id2string(wrapper_symbol.name),
-                       "__check_assigns_clause_incl",
-                       wrapper_sl,
-                       wrapper_symbol.mode,
-                       goto_model.symbol_table)
-                       .symbol_expr();
+    const auto check_var = dfcc_utilst::create_symbol(
+      goto_model.symbol_table,
+      bool_typet(),
+      wrapper_symbol.name,
+      "__check_assigns_clause_incl",
+      wrapper_sl);
 
     write_set_checks.add(goto_programt::make_decl(check_var, wrapper_sl));
 
@@ -786,14 +743,12 @@ void dfcc_wrapper_programt::encode_havoced_function_call()
 
   {
     // frees clause inclusion
-    auto check_var = get_fresh_aux_symbol(
-                       bool_typet(),
-                       id2string(wrapper_symbol.name),
-                       "__check_frees_clause_incl",
-                       wrapper_sl,
-                       wrapper_symbol.mode,
-                       goto_model.symbol_table)
-                       .symbol_expr();
+    const auto check_var = dfcc_utilst::create_symbol(
+      goto_model.symbol_table,
+      bool_typet(),
+      wrapper_symbol.name,
+      "__check_frees_clause_incl",
+      wrapper_sl);
 
     write_set_checks.add(goto_programt::make_decl(check_var, wrapper_sl));
 

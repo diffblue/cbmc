@@ -50,8 +50,6 @@ void dfcc_instrument_loopt::operator()(
   const dfcc_loop_infot &loop = cfg_info.get_loop_info(loop_id);
   const std::size_t cbmc_loop_id = loop.cbmc_loop_id;
   const exprt &outer_write_set = cfg_info.get_outer_write_set(loop_id);
-  const irep_idt language_mode =
-    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
   goto_programt::targett head = loop.find_head(goto_function.body).value();
   auto head_location(head->source_location());
 
@@ -60,37 +58,22 @@ void dfcc_instrument_loopt::operator()(
   // Temporary variables:
   // Create a temporary to track if we entered the loop,
   // i.e., the loop guard was satisfied.
-  const auto entered_loop =
-    get_fresh_aux_symbol(
-      bool_typet(),
-      id2string(function_id),
-      std::string(ENTERED_LOOP) + "__" + std::to_string(cbmc_loop_id),
-      head_location,
-      language_mode,
-      symbol_table)
-      .symbol_expr();
+  const auto entered_loop = dfcc_utilst::create_symbol(
+    symbol_table,
+    bool_typet(),
+    function_id,
+    std::string(ENTERED_LOOP) + "__" + std::to_string(cbmc_loop_id),
+    head_location);
 
   // Create a snapshot of the invariant so that we can check the base case,
   // if the loop is not vacuous and must be abstracted with contracts.
-  const auto initial_invariant = get_fresh_aux_symbol(
-                                   bool_typet(),
-                                   id2string(function_id),
-                                   INIT_INVARIANT,
-                                   head_location,
-                                   language_mode,
-                                   symbol_table)
-                                   .symbol_expr();
+  const auto initial_invariant = dfcc_utilst::create_symbol(
+    symbol_table, bool_typet(), function_id, INIT_INVARIANT, head_location);
 
   // Create a temporary variable to track base case vs inductive case
   // instrumentation of the loop.
-  const auto in_base_case = get_fresh_aux_symbol(
-                              bool_typet(),
-                              id2string(function_id),
-                              IN_BASE_CASE,
-                              head_location,
-                              language_mode,
-                              symbol_table)
-                              .symbol_expr();
+  const auto in_base_case = dfcc_utilst::create_symbol(
+    symbol_table, bool_typet(), function_id, IN_BASE_CASE, head_location);
 
   // Temporary variables for storing the multidimensional decreases clause
   // at the start of and end of a loop body.
@@ -99,24 +82,12 @@ void dfcc_instrument_loopt::operator()(
   for(const auto &clause : decreases_clauses)
   {
     // old
-    const auto old_decreases_var = get_fresh_aux_symbol(
-                                     clause.type(),
-                                     id2string(function_id),
-                                     "tmp_cc",
-                                     head_location,
-                                     language_mode,
-                                     symbol_table)
-                                     .symbol_expr();
+    const auto old_decreases_var = dfcc_utilst::create_symbol(
+      symbol_table, clause.type(), function_id, "tmp_cc", head_location);
     old_decreases_vars.push_back(old_decreases_var);
     // new
-    const auto new_decreases_var = get_fresh_aux_symbol(
-                                     clause.type(),
-                                     id2string(function_id),
-                                     "tmp_cc",
-                                     head_location,
-                                     language_mode,
-                                     symbol_table)
-                                     .symbol_expr();
+    const auto new_decreases_var = dfcc_utilst::create_symbol(
+      symbol_table, clause.type(), function_id, "tmp_cc", head_location);
     new_decreases_vars.push_back(new_decreases_var);
   }
 
@@ -137,6 +108,8 @@ void dfcc_instrument_loopt::operator()(
   // in the result __CPROVER_contracts_write_set_t should be the set of CAR
   // of the loop assign targets.
   goto_programt write_set_populate_instrs;
+  const irep_idt &language_mode =
+    dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
   contract_clauses_codegen.gen_spec_assigns_instructions(
     language_mode, assigns, write_set_populate_instrs);
 
@@ -146,8 +119,6 @@ void dfcc_instrument_loopt::operator()(
 
   spec_functions.generate_havoc_instructions(
     function_id,
-    language_mode,
-    symbol_table.get_writeable_ref(function_id).module,
     write_set_populate_instrs,
     loop.addr_of_write_set_var,
     havoc_instrs,
@@ -198,8 +169,7 @@ void dfcc_instrument_loopt::operator()(
     outer_write_set,
     initial_invariant,
     in_base_case,
-    old_decreases_vars,
-    language_mode);
+    old_decreases_vars);
 
   add_body_instructions(
     loop_id,
@@ -365,8 +335,7 @@ dfcc_instrument_loopt::add_step_instructions(
   const exprt &outer_write_set,
   const symbol_exprt &initial_invariant,
   const symbol_exprt &in_base_case,
-  const std::vector<symbol_exprt> &old_decreases_vars,
-  const irep_idt &language_mode)
+  const std::vector<symbol_exprt> &old_decreases_vars)
 {
   auto loop_head_location(loop_head->source_location());
   dfcc_remove_loop_tags(loop_head_location);
@@ -414,15 +383,12 @@ dfcc_instrument_loopt::add_step_instructions(
         null_pointer_exprt(to_pointer_type(outer_write_set.type()))),
       loop_head_location));
 
-    auto check_var =
-      get_fresh_aux_symbol(
-        bool_typet(),
-        id2string(function_id),
-        "__check_assigns_clause_incl_loop_" + std::to_string(cbmc_loop_id),
-        loop_head_location,
-        language_mode,
-        symbol_table)
-        .symbol_expr();
+    const auto check_var = dfcc_utilst::create_symbol(
+      symbol_table,
+      bool_typet(),
+      function_id,
+      "__check_assigns_clause_incl_loop_" + std::to_string(cbmc_loop_id),
+      loop_head_location);
 
     step_instrs.add(goto_programt::make_decl(check_var, loop_head_location));
     step_instrs.add(goto_programt::make_function_call(
@@ -446,15 +412,12 @@ dfcc_instrument_loopt::add_step_instructions(
 
   {
     // Generate havocing code for assigns targets.
-    const auto in_loop_havoc_block =
-      get_fresh_aux_symbol(
-        bool_typet(),
-        id2string(function_id),
-        std::string(IN_LOOP_HAVOC_BLOCK) + +"__" + std::to_string(cbmc_loop_id),
-        loop_head_location,
-        language_mode,
-        symbol_table)
-        .symbol_expr();
+    const auto in_loop_havoc_block = dfcc_utilst::create_symbol(
+      symbol_table,
+      bool_typet(),
+      function_id,
+      std::string(IN_LOOP_HAVOC_BLOCK) + +"__" + std::to_string(cbmc_loop_id),
+      loop_head_location);
     step_instrs.add(
       goto_programt::make_decl(in_loop_havoc_block, loop_head_location));
     step_instrs.add(
@@ -465,6 +428,8 @@ dfcc_instrument_loopt::add_step_instructions(
   }
 
   goto_convertt converter(symbol_table, log.get_message_handler());
+  const irep_idt &language_mode =
+    dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
   {
     // Assume the loop invariant after havocing the state.
     code_assumet assumption{invariant};

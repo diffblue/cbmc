@@ -187,23 +187,6 @@ void insert_before_and_update_jumps(
   goto_programt::targett &target,
   const goto_programt::instructiont &i);
 
-/// \brief Adds a fresh and uniquely named symbol to the symbol table.
-///
-/// \param type: The type of the new symbol.
-/// \param location: The source location for the new symbol.
-/// \param mode: The mode for the new symbol, e.g. ID_C, ID_java.
-/// \param symtab: The symbol table to which the new symbol is to be added.
-/// \param suffix: Suffix to use to generate the unique name
-/// \param is_auxiliary: Do not print symbol in traces if true (default = true)
-/// \return The new symbolt object.
-const symbolt &new_tmp_symbol(
-  const typet &type,
-  const source_locationt &location,
-  const irep_idt &mode,
-  symbol_table_baset &symtab,
-  std::string suffix = "tmp_cc",
-  bool is_auxiliary = true);
-
 /// Turns goto instructions `IF cond GOTO label` where the condition
 /// statically simplifies to `false` into SKIP instructions.
 void simplify_gotos(goto_programt &goto_program, namespacet &ns);

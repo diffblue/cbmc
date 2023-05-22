@@ -78,38 +78,33 @@ symbolt &dfcc_utilst::get_function_symbol(
   return function_symbol;
 }
 
-const symbolt &dfcc_utilst::create_symbol(
+symbol_exprt dfcc_utilst::create_symbol(
   symbol_table_baset &symbol_table,
   const typet &type,
-  const irep_idt &prefix,
-  const irep_idt &base_name,
-  const source_locationt &source_location,
-  const irep_idt &mode,
-  const irep_idt &module,
-  bool is_parameter)
+  const irep_idt &function_id,
+  const std::string &base_name,
+  const source_locationt &source_location)
 {
+  const symbolt &function_symbol =
+    get_function_symbol(symbol_table, function_id);
+
   symbolt &symbol = get_fresh_aux_symbol(
     type,
-    id2string(prefix),
-    id2string(base_name),
+    id2string(function_id),
+    base_name,
     source_location,
-    mode,
+    function_symbol.mode,
     symbol_table);
-  symbol.module = module;
-  symbol.is_lvalue = true;
-  symbol.is_state_var = true;
-  symbol.is_thread_local = true;
-  symbol.is_file_local = true;
-  symbol.is_auxiliary = true;
-  symbol.is_parameter = is_parameter;
-  return symbol;
+  symbol.module = function_symbol.module;
+
+  return symbol.symbol_expr();
 }
 
 const symbolt &dfcc_utilst::create_static_symbol(
   symbol_table_baset &symbol_table,
   const typet &type,
-  const irep_idt &prefix,
-  const irep_idt &base_name,
+  const std::string &prefix,
+  const std::string &base_name,
   const source_locationt &source_location,
   const irep_idt &mode,
   const irep_idt &module,
@@ -117,21 +112,11 @@ const symbolt &dfcc_utilst::create_static_symbol(
   const bool no_nondet_initialization)
 {
   symbolt &symbol = get_fresh_aux_symbol(
-    type,
-    id2string(prefix),
-    id2string(base_name),
-    source_location,
-    mode,
-    symbol_table);
+    type, prefix, base_name, source_location, mode, symbol_table);
   symbol.module = module;
   symbol.is_static_lifetime = true;
   symbol.value = initial_value;
   symbol.value.set(ID_C_no_nondet_initialization, no_nondet_initialization);
-  symbol.is_lvalue = true;
-  symbol.is_state_var = true;
-  symbol.is_thread_local = true;
-  symbol.is_file_local = true;
-  symbol.is_auxiliary = true;
   symbol.is_parameter = false;
   return symbol;
 }
@@ -139,21 +124,21 @@ const symbolt &dfcc_utilst::create_static_symbol(
 const symbolt &dfcc_utilst::create_new_parameter_symbol(
   symbol_table_baset &symbol_table,
   const irep_idt &function_id,
-  const irep_idt &base_name,
+  const std::string &base_name,
   const typet &type)
 {
-  symbolt &function_symbol = get_function_symbol(symbol_table, function_id);
+  const symbolt &function_symbol =
+    get_function_symbol(symbol_table, function_id);
 
-  // insert new parameter in the symbol table
-  const symbolt &symbol = create_symbol(
-    symbol_table,
+  symbolt &symbol = get_fresh_aux_symbol(
     type,
     id2string(function_id),
     base_name,
     function_symbol.location,
     function_symbol.mode,
-    function_symbol.module,
-    true);
+    symbol_table);
+  symbol.is_parameter = true;
+  symbol.module = function_symbol.module;
   return symbol;
 }
 
@@ -185,7 +170,7 @@ void dfcc_utilst::add_parameter(
 const symbolt &dfcc_utilst::add_parameter(
   goto_modelt &goto_model,
   const irep_idt &function_id,
-  const irep_idt &base_name,
+  const std::string &base_name,
   const typet &type)
 {
   const symbolt &symbol = create_new_parameter_symbol(

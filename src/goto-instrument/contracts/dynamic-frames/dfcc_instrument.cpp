@@ -256,16 +256,12 @@ void dfcc_instrumentt::instrument_harness_function(
   // create a local write set symbol
   const auto &function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
-  const auto &write_set = dfcc_utilst::create_symbol(
-                            goto_model.symbol_table,
-                            library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
-                            function_id,
-                            "__write_set_to_check",
-                            function_symbol.location,
-                            function_symbol.mode,
-                            function_symbol.module,
-                            false)
-                            .symbol_expr();
+  const auto write_set = dfcc_utilst::create_symbol(
+    goto_model.symbol_table,
+    library.dfcc_type[dfcc_typet::WRITE_SET_PTR],
+    function_id,
+    "__write_set_to_check",
+    function_symbol.location);
 
   std::set<symbol_exprt> local_statics = get_local_statics(function_id);
 
@@ -663,7 +659,7 @@ void dfcc_instrumentt::instrument_lhs(
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
 {
-  const auto &mode =
+  const irep_idt &mode =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
 
   goto_programt payload;
@@ -691,18 +687,12 @@ void dfcc_instrumentt::instrument_lhs(
     // ASSIGN lhs := rhs;
     // ```
 
-    auto &check_sym = dfcc_utilst::create_symbol(
+    const auto check_var = dfcc_utilst::create_symbol(
       goto_model.symbol_table,
       bool_typet(),
-      id2string(function_id),
+      function_id,
       "__check_lhs_assignment",
-      lhs_source_location,
-      mode,
-      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
-        .module,
-      false);
-
-    const auto &check_var = check_sym.symbol_expr();
+      lhs_source_location);
 
     payload.add(goto_programt::make_decl(check_var, lhs_source_location));
 
@@ -950,22 +940,17 @@ void dfcc_instrumentt::instrument_deallocate_call(
   // ----
   // CALL __CPROVER_deallocate(ptr);
   // ```
-  const auto &mode =
-    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
   goto_programt payload;
 
   auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
     dfcc_utilst::make_null_check_expr(write_set), target_location));
 
-  auto &check_sym = get_fresh_aux_symbol(
+  const auto check_var = dfcc_utilst::create_symbol(
+    goto_model.symbol_table,
     bool_typet(),
-    id2string(function_id),
+    function_id,
     "__check_deallocate",
-    target_location,
-    mode,
-    goto_model.symbol_table);
-
-  const auto &check_var = check_sym.symbol_expr();
+    target_location);
 
   payload.add(goto_programt::make_decl(check_var, target_location));
 
@@ -977,6 +962,8 @@ void dfcc_instrumentt::instrument_deallocate_call(
     target_location));
 
   // add property class on assertion source_location
+  const irep_idt &mode =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
   source_locationt check_location(target_location);
   check_location.set_property_class("frees");
   std::string comment =
@@ -1040,6 +1027,8 @@ void dfcc_instrumentt::instrument_other(
   const auto &target_location = target->source_location();
   auto &statement = target->get_other().get_statement();
   auto &write_set = cfg_info.get_write_set(target);
+  const irep_idt &mode =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
 
   if(statement == ID_array_set || statement == ID_array_copy)
   {
@@ -1054,23 +1043,17 @@ void dfcc_instrumentt::instrument_other(
     // ----
     // OTHER {statement = array_set, args = {dest, value}};
     // ```
-    const auto &mode =
-      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
-        .mode;
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
       dfcc_utilst::make_null_check_expr(write_set), target_location));
 
-    auto &check_sym = get_fresh_aux_symbol(
+    const auto check_var = dfcc_utilst::create_symbol(
+      goto_model.symbol_table,
       bool_typet(),
-      id2string(function_id),
+      function_id,
       is_array_set ? "__check_array_set" : "__check_array_copy",
-      target_location,
-      mode,
-      goto_model.symbol_table);
-
-    const auto &check_var = check_sym.symbol_expr();
+      target_location);
 
     payload.add(goto_programt::make_decl(check_var, target_location));
 
@@ -1115,23 +1098,17 @@ void dfcc_instrumentt::instrument_other(
     // ----
     // OTHER {statement = array_replace, args = {dest, src}};
     // ```
-    const auto &mode =
-      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
-        .mode;
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
       dfcc_utilst::make_null_check_expr(write_set), target_location));
 
-    auto &check_sym = get_fresh_aux_symbol(
+    const auto check_var = dfcc_utilst::create_symbol(
+      goto_model.symbol_table,
       bool_typet(),
-      id2string(function_id),
+      function_id,
       "__check_array_replace",
-      target_location,
-      mode,
-      goto_model.symbol_table);
-
-    const auto &check_var = check_sym.symbol_expr();
+      target_location);
 
     payload.add(goto_programt::make_decl(check_var, target_location));
 
@@ -1170,23 +1147,17 @@ void dfcc_instrumentt::instrument_other(
     // ASSERT(check_havoc_object);
     // DEAD check_havoc_object;
     // ```
-    const auto &mode =
-      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
-        .mode;
     goto_programt payload;
 
     auto goto_instruction = payload.add(goto_programt::make_incomplete_goto(
       dfcc_utilst::make_null_check_expr(write_set), target_location));
 
-    auto &check_sym = get_fresh_aux_symbol(
+    const auto check_var = dfcc_utilst::create_symbol(
+      goto_model.symbol_table,
       bool_typet(),
-      id2string(function_id),
+      function_id,
       "__check_havoc_object",
-      target_location,
-      mode,
-      goto_model.symbol_table);
-
-    const auto &check_var = check_sym.symbol_expr();
+      target_location);
 
     payload.add(goto_programt::make_decl(check_var, target_location));
 

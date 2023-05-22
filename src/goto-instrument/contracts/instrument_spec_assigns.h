@@ -501,13 +501,6 @@ protected:
   /// checking assertions for a conditional target group from an assigns clause
   void track_plain_spec_target(const exprt &expr, goto_programt &dest);
 
-  /// Creates a fresh symbolt with given suffix,
-  /// scoped to \ref function_id.
-  const symbolt create_fresh_symbol(
-    const std::string &suffix,
-    const typet &type,
-    const source_locationt &location) const;
-
   /// Returns snapshot instructions for a car_exprt
   void create_snapshot(const car_exprt &car, goto_programt &dest) const;
 
