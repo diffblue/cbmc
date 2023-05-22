@@ -31,7 +31,6 @@ class message_handlert;
 class dfcc_instrumentt;
 class dfcc_libraryt;
 class dfcc_lift_memory_predicatest;
-class dfcc_utilst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
 
@@ -106,7 +105,6 @@ public:
   /// to the wrapper function by its caller.
   /// \param goto_model the goto model being transformed
   /// \param message_handler used for debug/warning/error messages
-  /// \param utils utility functions for contracts transformation
   /// \param library the contracts instrumentation library
   /// \param instrument the instrumenter class for goto functions/goto programs
   /// \param memory_predicates handler for user-defed memory predicates, used to
@@ -120,7 +118,6 @@ public:
     const symbolt &caller_write_set_symbol,
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_instrumentt &instrument,
     dfcc_lift_memory_predicatest &memory_predicates);
@@ -175,7 +172,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
   dfcc_lift_memory_predicatest &memory_predicates;

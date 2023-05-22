@@ -24,7 +24,6 @@ Date: April 2023
 #include <analyses/local_may_alias.h>
 
 class dfcc_spec_functionst;
-class dfcc_utilst;
 class dfcc_libraryt;
 class dfcc_instrumentt;
 class dfcc_spec_functionst;
@@ -39,7 +38,6 @@ public:
   /// \brief Constructor for the loop contract instrumentation class.
   /// \param[inout] goto_model GOTO model being instrumented
   /// \param[inout] message_handler For status/debug output
-  /// \param[inout] utils DFCC utility methods
   /// \param[inout] library DFCC instrumentation library functions
   /// \param[inout] spec_functions Class used to translate assigns clauses
   /// to GOTO instructions.
@@ -48,7 +46,6 @@ public:
   dfcc_instrument_loopt(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_spec_functionst &spec_functions,
     dfcc_contract_clauses_codegent &contract_clauses_codegen);
@@ -151,7 +148,6 @@ protected:
   std::size_t max_assigns_clause_size = 0;
   goto_modelt &goto_model;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_spec_functionst &spec_functions;
   dfcc_contract_clauses_codegent &contract_clauses_codegen;
@@ -200,7 +196,7 @@ protected:
   std::unordered_map<exprt, symbol_exprt, irep_hash> add_prehead_instructions(
     const std::size_t loop_id,
     goto_functionst::goto_functiont &goto_function,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
     goto_programt::targett loop_latch,
     goto_programt &assigns_instrs,
@@ -251,7 +247,7 @@ protected:
     const std::size_t cbmc_loop_id,
     const irep_idt &function_id,
     goto_functionst::goto_functiont &goto_function,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
     goto_programt::targett loop_latch,
     goto_programt &havoc_instrs,
@@ -299,7 +295,7 @@ protected:
     const std::size_t loop_id,
     const std::size_t cbmc_loop_id,
     goto_functionst::goto_functiont &goto_function,
-    symbol_tablet &symbol_table,
+    symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
     goto_programt::targett loop_latch,
     const exprt &invariant,

@@ -436,9 +436,8 @@ static dfcc_loop_infot gen_dfcc_loop_info(
   dirtyt &dirty,
   local_may_aliast &local_may_alias,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   std::unordered_set<irep_idt> loop_locals =
     gen_loop_locals_set(loop_nesting_graph, loop_id);
@@ -472,7 +471,8 @@ static dfcc_loop_infot gen_dfcc_loop_info(
 
   auto &loop = loop_nesting_graph[loop_id];
   const auto cbmc_loop_number = loop.latch->loop_number;
-  const auto &language_mode = utils.get_function_symbol(function_id).mode;
+  const auto &language_mode =
+    dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
 
   // Generate "write set" variable
   const auto &write_set_var =
@@ -515,9 +515,8 @@ dfcc_cfg_infot::dfcc_cfg_infot(
   goto_functiont &goto_function,
   const exprt &top_level_write_set,
   const dfcc_loop_contract_modet loop_contract_mode,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library)
   : function_id(function_id),
     goto_function(goto_function),
@@ -581,7 +580,6 @@ dfcc_cfg_infot::dfcc_cfg_infot(
          dirty,
          local_may_alias,
          message_handler,
-         utils,
          library,
          symbol_table)});
 

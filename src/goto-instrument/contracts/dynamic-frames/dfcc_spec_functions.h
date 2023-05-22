@@ -46,7 +46,6 @@ public:
   dfcc_spec_functionst(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library);
 
   /// From a function:
@@ -207,7 +206,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   namespacet ns;
 

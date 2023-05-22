@@ -26,13 +26,11 @@ Date: August 2022
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_spec_functions.h"
-#include "dfcc_utils.h"
 
 dfcc_contract_functionst::dfcc_contract_functionst(
   const symbolt &pure_contract_symbol,
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_spec_functionst &spec_functions,
   dfcc_contract_clauses_codegent &contract_clauses_codegen,
@@ -48,7 +46,6 @@ dfcc_contract_functionst::dfcc_contract_functionst(
     goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
-    utils(utils),
     library(library),
     spec_functions(spec_functions),
     contract_clauses_codegen(contract_clauses_codegen),
@@ -122,8 +119,11 @@ const std::size_t dfcc_contract_functionst::get_nof_frees_targets() const
 
 void dfcc_contract_functionst::gen_spec_assigns_function()
 {
-  const auto &spec_function_symbol = utils.clone_and_rename_function(
-    pure_contract_symbol.name, spec_assigns_function_id, empty_typet());
+  const auto &spec_function_symbol = dfcc_utilst::clone_and_rename_function(
+    goto_model,
+    pure_contract_symbol.name,
+    spec_assigns_function_id,
+    empty_typet());
 
   const auto &spec_function_id = spec_function_symbol.name;
 
@@ -171,8 +171,11 @@ void dfcc_contract_functionst::gen_spec_frees_function()
   const auto &code_with_contract =
     to_code_with_contract_type(pure_contract_symbol.type);
 
-  auto &spec_function_symbol = utils.clone_and_rename_function(
-    pure_contract_symbol.name, spec_frees_function_id, empty_typet());
+  auto &spec_function_symbol = dfcc_utilst::clone_and_rename_function(
+    goto_model,
+    pure_contract_symbol.name,
+    spec_frees_function_id,
+    empty_typet());
 
   const auto &spec_function_id = spec_function_symbol.name;
 

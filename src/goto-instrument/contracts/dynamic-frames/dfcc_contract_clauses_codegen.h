@@ -28,7 +28,6 @@ Date: February 2023
 class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
-class dfcc_utilst;
 class code_with_contract_typet;
 class conditional_target_group_exprt;
 
@@ -39,12 +38,10 @@ class dfcc_contract_clauses_codegent
 public:
   /// \param goto_model GOTO model being transformed
   /// \param message_handler Used debug/warning/error messages
-  /// \param utils Utility class for dynamic frames
   /// \param library The contracts instrumentation library
   dfcc_contract_clauses_codegent(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library);
 
   /// \brief Generates instructions encoding the \p assigns_clause targets and
@@ -81,7 +78,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   namespacet ns;
 

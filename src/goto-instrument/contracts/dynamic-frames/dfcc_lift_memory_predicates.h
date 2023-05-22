@@ -26,7 +26,6 @@ Date: November 2022
 #include <map>
 #include <set>
 
-class dfcc_utilst;
 class dfcc_libraryt;
 class dfcc_instrumentt;
 class message_handlert;
@@ -38,13 +37,11 @@ class dfcc_lift_memory_predicatest
 {
 public:
   /// \param goto_model The goto model to process
-  /// \param utils Utility methods
   /// \param library The contracts instrumentation library
   /// \param instrument The DFCC instrumenter object
   /// \param message_handler Used for messages
   dfcc_lift_memory_predicatest(
     goto_modelt &goto_model,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_instrumentt &instrument,
     message_handlert &message_handler);
@@ -70,7 +67,6 @@ public:
 
 protected:
   goto_modelt &goto_model;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_instrumentt &instrument;
   messaget log;

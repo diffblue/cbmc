@@ -35,9 +35,6 @@ class conditional_target_group_exprt;
 class dfcc_libraryt;
 class dfcc_spec_functionst;
 class dfcc_contract_clauses_codegent;
-class dfcc_utilst;
-class dfcc_loop_utilst;
-class dirtyt;
 class dfcc_cfg_infot;
 
 /// This class instruments GOTO functions or instruction sequences
@@ -48,7 +45,6 @@ public:
   dfcc_instrumentt(
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_spec_functionst &spec_functions,
     dfcc_contract_clauses_codegent &contract_clauses_codegen);
@@ -169,7 +165,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_spec_functionst &spec_functions;
   dfcc_contract_clauses_codegent &contract_clauses_codegen;

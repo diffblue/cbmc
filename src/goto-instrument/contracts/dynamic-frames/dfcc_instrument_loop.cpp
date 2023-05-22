@@ -27,13 +27,11 @@ Date: April 2023
 dfcc_instrument_loopt::dfcc_instrument_loopt(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_spec_functionst &spec_functions,
   dfcc_contract_clauses_codegent &contract_clauses_codegen)
   : goto_model(goto_model),
     log(message_handler),
-    utils(utils),
     library(library),
     spec_functions(spec_functions),
     contract_clauses_codegen(contract_clauses_codegen),
@@ -52,7 +50,8 @@ void dfcc_instrument_loopt::operator()(
   const dfcc_loop_infot &loop = cfg_info.get_loop_info(loop_id);
   const std::size_t cbmc_loop_id = loop.cbmc_loop_id;
   const exprt &outer_write_set = cfg_info.get_outer_write_set(loop_id);
-  const irep_idt language_mode = utils.get_function_symbol(function_id).mode;
+  const irep_idt language_mode =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id).mode;
   goto_programt::targett head = loop.find_head(goto_function.body).value();
   auto head_location(head->source_location());
 
@@ -137,26 +136,27 @@ void dfcc_instrument_loopt::operator()(
   // Construct the write set from loop assigns target. That is, contract_assigns
   // in the result __CPROVER_contracts_write_set_t should be the set of CAR
   // of the loop assign targets.
-  goto_programt assigns_instrs;
   goto_programt write_set_populate_instrs;
+  contract_clauses_codegen.gen_spec_assigns_instructions(
+    language_mode, assigns, write_set_populate_instrs);
 
   //   havoc(w_loop);
   // The generated GOTO instructions havoc the write set of the loop.
   goto_programt havoc_instrs;
-  contract_clauses_codegen.gen_spec_assigns_instructions(
-    language_mode, assigns, assigns_instrs);
 
   spec_functions.generate_havoc_instructions(
     function_id,
     language_mode,
     symbol_table.get_writeable_ref(function_id).module,
-    assigns_instrs,
+    write_set_populate_instrs,
     loop.addr_of_write_set_var,
     havoc_instrs,
     nof_targets);
   spec_functions.to_spec_assigns_instructions(
-    loop.addr_of_write_set_var, language_mode, assigns_instrs, nof_targets);
-  write_set_populate_instrs.copy_from(assigns_instrs);
+    loop.addr_of_write_set_var,
+    language_mode,
+    write_set_populate_instrs,
+    nof_targets);
 
   // Replace bound variables by fresh instances in quantified formulas.
   exprt invariant = loop.invariant;
@@ -238,7 +238,7 @@ std::unordered_map<exprt, symbol_exprt, irep_hash>
 dfcc_instrument_loopt::add_prehead_instructions(
   const std::size_t loop_id,
   goto_functionst::goto_functiont &goto_function,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
   goto_programt::targett loop_latch,
   goto_programt &assigns_instrs,
@@ -355,7 +355,7 @@ dfcc_instrument_loopt::add_step_instructions(
   const std::size_t cbmc_loop_id,
   const irep_idt &function_id,
   goto_functionst::goto_functiont &goto_function,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
   goto_programt::targett loop_latch,
   goto_programt &havoc_instrs,
@@ -493,7 +493,7 @@ void dfcc_instrument_loopt::add_body_instructions(
   const std::size_t loop_id,
   const std::size_t cbmc_loop_id,
   goto_functionst::goto_functiont &goto_function,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
   goto_programt::targett loop_latch,
   const exprt &invariant,

@@ -28,7 +28,6 @@ Date: August 2022
 class goto_modelt;
 class message_handlert;
 class dfcc_libraryt;
-class dfcc_utilst;
 class dfcc_instrumentt;
 class dfcc_spec_functionst;
 class dfcc_contract_clauses_codegent;
@@ -68,7 +67,6 @@ public:
   /// \param pure_contract_symbol the contract to generate code from
   /// \param goto_model goto model being transformed
   /// \param message_handler used debug/warning/error messages
-  /// \param utils utility class for dynamic frames
   /// \param library the contracts instrumentation library
   /// \param spec_functions provides translation methods for assignable set
   /// \param contract_clauses_codegen provides GOTO code generation methods
@@ -78,7 +76,6 @@ public:
     const symbolt &pure_contract_symbol,
     goto_modelt &goto_model,
     message_handlert &message_handler,
-    dfcc_utilst &utils,
     dfcc_libraryt &library,
     dfcc_spec_functionst &spec_functions,
     dfcc_contract_clauses_codegent &contract_clauses_codegen,
@@ -126,7 +123,6 @@ protected:
   goto_modelt &goto_model;
   message_handlert &message_handler;
   messaget log;
-  dfcc_utilst &utils;
   dfcc_libraryt &library;
   dfcc_spec_functionst &spec_functions;
   dfcc_contract_clauses_codegent &contract_clauses_codegen;

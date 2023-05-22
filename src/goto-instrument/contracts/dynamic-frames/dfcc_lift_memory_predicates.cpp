@@ -24,12 +24,10 @@ Date: August 2022
 
 dfcc_lift_memory_predicatest::dfcc_lift_memory_predicatest(
   goto_modelt &goto_model,
-  dfcc_utilst &utils,
   dfcc_libraryt &library,
   dfcc_instrumentt &instrument,
   message_handlert &message_handler)
   : goto_model(goto_model),
-    utils(utils),
     library(library),
     instrument(instrument),
     log(message_handler)
@@ -214,7 +212,8 @@ static optionalt<std::size_t> is_param_expr(
 void dfcc_lift_memory_predicatest::collect_parameters_to_lift(
   const irep_idt &function_id)
 {
-  const symbolt &function_symbol = utils.get_function_symbol(function_id);
+  const symbolt &function_symbol =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   // map of parameter name to its rank in the signature
   std::map<irep_idt, std::size_t> parameter_rank;
   const auto &parameters = to_code_type(function_symbol.type).parameters();
@@ -279,7 +278,8 @@ void dfcc_lift_memory_predicatest::add_pointer_type(
   const std::size_t parameter_rank,
   replace_symbolt &replace_lifted_param)
 {
-  symbolt &function_symbol = utils.get_function_symbol(function_id);
+  symbolt &function_symbol =
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   code_typet &code_type = to_code_type(function_symbol.type);
   auto &parameters = code_type.parameters();
   auto &parameter_id = parameters[parameter_rank].get_identifier();

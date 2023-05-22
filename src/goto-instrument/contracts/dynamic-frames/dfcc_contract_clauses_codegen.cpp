@@ -30,12 +30,10 @@ Date: February 2023
 dfcc_contract_clauses_codegent::dfcc_contract_clauses_codegent(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  dfcc_utilst &utils,
   dfcc_libraryt &library)
   : goto_model(goto_model),
     message_handler(message_handler),
     log(message_handler),
-    utils(utils),
     library(library),
     ns(goto_model.symbol_table)
 {
@@ -233,7 +231,9 @@ void dfcc_contract_clauses_codegent::encode_freeable_target(
   {
     // A plain `target` becomes `CALL __CPROVER_freeable(target);`
     code_function_callt code_function_call(
-      utils.get_function_symbol(CPROVER_PREFIX "freeable").symbol_expr());
+      dfcc_utilst::get_function_symbol(
+        goto_model.symbol_table, CPROVER_PREFIX "freeable")
+        .symbol_expr());
     auto &arguments = code_function_call.arguments();
     arguments.emplace_back(target);
 
@@ -258,12 +258,14 @@ void dfcc_contract_clauses_codegent::inline_and_check_warnings(
   std::set<irep_idt> recursive_call;
   std::set<irep_idt> not_enough_arguments;
 
-  utils.inline_program(
+  dfcc_utilst::inline_program(
+    goto_model,
     goto_program,
     no_body,
     recursive_call,
     missing_function,
-    not_enough_arguments);
+    not_enough_arguments,
+    message_handler);
 
   // check that the only no body / missing functions are the cprover builtins
   for(const auto &id : no_body)
