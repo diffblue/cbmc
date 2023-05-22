@@ -1,5 +1,8 @@
 var NAVTREEINDEX128 =
 {
+"string__instrumentation_8cpp.html#ac7c634bbc6feadc0831277e3d3757810":[9,0,2,14,136,3],
+"string__instrumentation_8cpp.html#af8a85415b1d76b6892eea8e86f92ef95":[9,0,2,14,136,6],
+"string__instrumentation_8cpp_source.html":[9,0,2,14,136],
 "string__instrumentation_8h.html":[9,0,2,14,137],
 "string__instrumentation_8h.html#a5bb2d583972281b195f855d4d61d9734":[9,0,2,14,137,0],
 "string__instrumentation_8h.html#a5f57b8d1ae38fae26ed679ebf46f7aa6":[9,0,2,14,137,3],
@@ -246,8 +249,5 @@ var NAVTREEINDEX128 =
 "structabstract__objectt_1_1abstract__object__visitort.html#a4205d30d931cec63a5527ca7c7625c5e":[8,0,27,0,0],
 "structabstract__objectt_1_1combine__result.html":[8,0,27,1],
 "structabstract__objectt_1_1combine__result.html#a497fd14e8a70ee156d8364d715db87b7":[8,0,27,1,1],
-"structabstract__objectt_1_1combine__result.html#ae102a2c90d8a35057df5bb33ec7d3010":[8,0,27,1,0],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html":[8,0,33,0],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html#a045175cf80841296c7f1dd59adac9a67":[8,0,33,0,1],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html#ad142a41da6e8b9dfd4c00c09898ecdf0":[8,0,33,0,2]
+"structabstract__objectt_1_1combine__result.html#ae102a2c90d8a35057df5bb33ec7d3010":[8,0,27,1,0]
 };
