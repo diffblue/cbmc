@@ -136,9 +136,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a2636321c60f87bb1a79d8e8ba0d59dac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a2636321c60f87bb1a79d8e8ba0d59dac">insert_before_and_update_jumps</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;destination, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;target, const <a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;i)</td></tr>
 <tr class="memdesc:a2636321c60f87bb1a79d8e8ba0d59dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a goto instruction before a target instruction iterator and update targets of all jumps that points to the iterator to jumping to the inserted instruction.  <a href="utils_8cpp.html#a2636321c60f87bb1a79d8e8ba0d59dac">More...</a><br /></td></tr>
 <tr class="separator:a2636321c60f87bb1a79d8e8ba0d59dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cf09fde997eeb78602693d324d9d34b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a5cf09fde997eeb78602693d324d9d34b">new_tmp_symbol</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symtab, std::string suffix, bool is_auxiliary)</td></tr>
-<tr class="memdesc:a5cf09fde997eeb78602693d324d9d34b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a fresh and uniquely named symbol to the symbol table.  <a href="utils_8cpp.html#a5cf09fde997eeb78602693d324d9d34b">More...</a><br /></td></tr>
-<tr class="separator:a5cf09fde997eeb78602693d324d9d34b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba81cb53e8d0082cbe68db4136188024"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024">simplify_gotos</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:aba81cb53e8d0082cbe68db4136188024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turns goto instructions <code>IF cond GOTO label</code> where the condition statically simplifies to <code>false</code> into SKIP instructions.  <a href="utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024">More...</a><br /></td></tr>
 <tr class="separator:aba81cb53e8d0082cbe68db4136188024"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -223,7 +220,7 @@ Variables</h2></td></tr>
 <p>This function recursively searches <code>expression</code> to find nested or non-nested quantified expressions. </p>
 <p>When a quantified expression is found, a fresh quantified variable is added to the symbol table and <code>expression</code> is updated to use this fresh variable. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00380">380</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00366">366</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -366,7 +363,7 @@ Variables</h2></td></tr>
 
 <p>This function generates all the instructions required to initialize history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00555">555</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00548">548</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +436,7 @@ Variables</h2></td></tr>
 
 <p>Convert the suffix digits right after <code>prefix</code> of <code>str</code> into unsigned. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00607">607</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00600">600</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -567,7 +564,7 @@ Variables</h2></td></tr>
 
 <p>Return true if <code>target</code> is an assignment to an instrumented variable with name <code>var_name</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00585">585</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00578">578</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -589,7 +586,7 @@ Variables</h2></td></tr>
 
 <p>Returns true if the given comment matches the type of comments created by <a class="el" href="utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3">make_assigns_clause_replacement_tracking_comment</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00348">348</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00334">334</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +625,7 @@ Variables</h2></td></tr>
 <p>Returns true iff the given program is loop-free, i.e. </p>
 <p>if each SCC of its CFG contains a single element. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00281">281</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00267">267</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +647,7 @@ Variables</h2></td></tr>
 
 <p>Return true if <code>target</code> is the end of some transformed loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00577">577</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00570">570</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +669,7 @@ Variables</h2></td></tr>
 
 <p>Return true if <code>target</code> is the head of some transformed loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00569">569</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00562">562</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -710,75 +707,7 @@ Variables</h2></td></tr>
 
 <p>Returns an <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> that essentially says that <code>target</code> was assigned by the contract of <code>function_id</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00339">339</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a5cf09fde997eeb78602693d324d9d34b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5cf09fde997eeb78602693d324d9d34b">&#9670;&nbsp;</a></span>new_tmp_symbol()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classsymbolt.html">symbolt</a>&amp; new_tmp_symbol </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td>
-          <td class="paramname"><em>location</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>mode</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
-          <td class="paramname"><em>symtab</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>suffix</em> = <code>&quot;tmp_cc&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>is_auxiliary</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Adds a fresh and uniquely named symbol to the symbol table. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">type</td><td>The type of the new symbol. </td></tr>
-    <tr><td class="paramname">location</td><td>The source location for the new symbol. </td></tr>
-    <tr><td class="paramname">mode</td><td>The mode for the new symbol, e.g. ID_C, ID_java. </td></tr>
-    <tr><td class="paramname">symtab</td><td>The symbol table to which the new symbol is to be added. </td></tr>
-    <tr><td class="paramname">suffix</td><td>Suffix to use to generate the unique name </td></tr>
-    <tr><td class="paramname">is_auxiliary</td><td>Do not print symbol in traces if true (default = true) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The new symbolt object. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00256">256</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00325">325</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -822,7 +751,7 @@ Variables</h2></td></tr>
 
 <p>This function recursively identifies the "loop_entry" expressions within <code>expr</code> and replaces them with corresponding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00536">536</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00529">529</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -866,7 +795,7 @@ Variables</h2></td></tr>
 
 <p>This function recursively identifies the "old" expressions within <code>expr</code> and replaces them with corresponding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00517">517</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00510">510</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -934,7 +863,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00452">452</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00440">440</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -966,7 +895,7 @@ Variables</h2></td></tr>
 
 <p>Turns goto instructions <code>IF cond GOTO label</code> where the condition statically simplifies to <code>false</code> into SKIP instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00270">270</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00256">256</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -999,7 +928,7 @@ Variables</h2></td></tr>
 <p>Widen expressions in <code>assigns</code> with the following strategy. </p>
 <p>If an expression is an array index or object dereference expression, with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant <code>i</code>, then replace it by the entire underlying object. Otherwise, e.g. for a[i] or *(b+i) when <code>i</code> is a known constant, keep the expression in the result. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00354">354</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00340">340</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1028,7 +957,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>Prefix for comments added to track assigns clause replacement. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00336">336</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00322">322</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>

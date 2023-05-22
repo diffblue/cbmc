@@ -16,7 +16,6 @@ var classinstrument__spec__assignst =
     [ "create_car_from_spec_assigns", "classinstrument__spec__assignst.html#a4a3057e1e86f4285363568ddbd43dc77", null ],
     [ "create_car_from_stack_alloc", "classinstrument__spec__assignst.html#aa9d332291c32e4b90e73cc5d5a16e8a0", null ],
     [ "create_car_from_static_local", "classinstrument__spec__assignst.html#a355cf18f9c70dcb5bf6e5f88e0716cb6", null ],
-    [ "create_fresh_symbol", "classinstrument__spec__assignst.html#a95eeceab94ddd530bf935493b81a9d91", null ],
     [ "create_snapshot", "classinstrument__spec__assignst.html#ae08011aeeed7d9bda119fcf95a0f1e53", null ],
     [ "get_static_locals", "classinstrument__spec__assignst.html#af9506fd558eaacc9a3a50db5f1c15b35", null ],
     [ "inclusion_check_assertion", "classinstrument__spec__assignst.html#a1e7224035c559e568424e6ee3ec5270f", null ],

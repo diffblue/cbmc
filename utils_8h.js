@@ -21,7 +21,6 @@ var utils_8h =
     [ "is_transformed_loop_end", "utils_8h.html#a9d1167acb38516d35006111efc44f571", null ],
     [ "is_transformed_loop_head", "utils_8h.html#a523e10f9b5ded98f00cc8c5e85cf1a6a", null ],
     [ "make_assigns_clause_replacement_tracking_comment", "utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3", null ],
-    [ "new_tmp_symbol", "utils_8h.html#a5aa22ab7a0301e7955023b63a6868c15", null ],
     [ "replace_history_loop_entry", "utils_8h.html#a44f41852b68d69b70a2b10550742f2a4", null ],
     [ "replace_history_old", "utils_8h.html#a0b931288a19e60b91ac791eb53cbf9a1", null ],
     [ "simplify_gotos", "utils_8h.html#aba81cb53e8d0082cbe68db4136188024", null ],
