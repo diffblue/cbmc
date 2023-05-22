@@ -17,9 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-#include <util/typecheck.h>
 
 #include <unordered_set>
+
+class message_handlert;
 
 class casting_replace_symbolt : public replace_symbolt
 {
@@ -30,21 +31,22 @@ private:
   bool replace_symbol_expr(symbol_exprt &dest) const override;
 };
 
-class linkingt:public typecheckt
+class linkingt
 {
 public:
   linkingt(
     symbol_table_baset &_main_symbol_table,
-    const symbol_table_baset &_src_symbol_table,
     message_handlert &_message_handler)
-    : typecheckt(_message_handler),
-      main_symbol_table(_main_symbol_table),
-      src_symbol_table(_src_symbol_table),
-      ns(_main_symbol_table)
+    : main_symbol_table(_main_symbol_table),
+      ns(_main_symbol_table),
+      message_handler(_message_handler)
   {
   }
 
-  virtual void typecheck();
+  /// Merges the symbol table \p src_symbol_table into `main_symbol_table`,
+  /// renaming symbols from \p src_symbol_table when necessary.
+  /// \return True, iff linking failed with unresolvable conflicts.
+  bool link(const symbol_table_baset &src_symbol_table);
 
   rename_symbolt rename_symbol;
   casting_replace_symbolt object_type_updates;
@@ -68,11 +70,12 @@ protected:
       return needs_renaming_non_type(old_symbol, new_symbol);
   }
 
-  void do_type_dependencies(std::unordered_set<irep_idt> &);
-
-  std::unordered_map<irep_idt, irep_idt>
-  rename_symbols(const std::unordered_set<irep_idt> &needs_to_be_renamed);
-  void copy_symbols(const std::unordered_map<irep_idt, irep_idt> &);
+  std::unordered_map<irep_idt, irep_idt> rename_symbols(
+    const symbol_table_baset &,
+    const std::unordered_set<irep_idt> &needs_to_be_renamed);
+  void copy_symbols(
+    const symbol_table_baset &,
+    const std::unordered_map<irep_idt, irep_idt> &);
 
   void duplicate_non_type_symbol(
     symbolt &old_symbol,
@@ -178,14 +181,10 @@ protected:
     const struct_typet &new_type);
 
   symbol_table_baset &main_symbol_table;
-  const symbol_table_baset &src_symbol_table;
-
   namespacet ns;
+  message_handlert &message_handler;
 
-  // X -> Y iff Y uses X for new symbol type IDs X and Y
-  typedef std::unordered_map<irep_idt, std::unordered_set<irep_idt>> used_byt;
-
-  irep_idt rename(const irep_idt &);
+  irep_idt rename(const symbol_table_baset &, const irep_idt &);
 
   // the new IDs created by renaming
   std::unordered_set<irep_idt> renamed_ids;
