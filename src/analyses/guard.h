@@ -14,7 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef BDD_GUARDS
 
-#include "guard_bdd.h"
+#  include <solvers/prop/bdd_expr.h>
+
+#  include "guard_bdd.h"
 
 using guard_managert = bdd_exprt;
 using guardt = guard_bddt;

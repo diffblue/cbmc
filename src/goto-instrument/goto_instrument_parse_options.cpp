@@ -58,6 +58,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dependence_graph.h>
 #include <analyses/escape_analysis.h>
 #include <analyses/global_may_alias.h>
+#include <analyses/guard.h>
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
 #include <analyses/is_threaded.h>
