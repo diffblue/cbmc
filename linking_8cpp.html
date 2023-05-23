@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('linking_8cpp.html',''); initResizable(
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="find__symbols_8h_source.html">util/find_symbols.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mathematical__types_8h_source.html">util/mathematical_types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
@@ -114,7 +115,7 @@ $(document).ready(function(){initNavTree('linking_8cpp.html',''); initResizable(
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="linking_8cpp__incl.svg" width="2128" height="1187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="linking_8cpp__incl.svg" width="2376" height="1187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -124,6 +125,8 @@ $(document).ready(function(){initNavTree('linking_8cpp.html',''); initResizable(
 Functions</h2></td></tr>
 <tr class="memitem:aab7ce401e805c9068b864abc46a5ee27"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="linking_8cpp.html#aab7ce401e805c9068b864abc46a5ee27">follow_tags_symbols</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="separator:aab7ce401e805c9068b864abc46a5ee27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e671ef80efedb68d4e4cdb0409b99f3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="linking_8cpp.html#a3e671ef80efedb68d4e4cdb0409b99f3">do_type_dependencies</a> (const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;src_symbol_table, std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;needs_to_be_renamed, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="separator:a3e671ef80efedb68d4e4cdb0409b99f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af635c273acceb87a79403f598e070453"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="linking_8cpp.html#af635c273acceb87a79403f598e070453">linking</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;dest_symbol_table, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;new_symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:af635c273acceb87a79403f598e070453"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges the symbol table <code>new_symbol_table</code> into <code>dest_symbol_table</code>, renaming symbols from <code>new_symbol_table</code> when necessary.  <a href="linking_8cpp.html#af635c273acceb87a79403f598e070453">More...</a><br /></td></tr>
 <tr class="separator:af635c273acceb87a79403f598e070453"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,6 +136,50 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a3e671ef80efedb68d4e4cdb0409b99f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e671ef80efedb68d4e4cdb0409b99f3">&#9670;&nbsp;</a></span>do_type_dependencies()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void do_type_dependencies </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
+          <td class="paramname"><em>src_symbol_table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>needs_to_be_renamed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01372">1372</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aab7ce401e805c9068b864abc46a5ee27"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aab7ce401e805c9068b864abc46a5ee27">&#9670;&nbsp;</a></span>follow_tags_symbols()</h2>
 
@@ -167,7 +214,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00127">127</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l00128">128</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
@@ -206,7 +253,7 @@ Functions</h2></td></tr>
 <p>Merges the symbol table <code>new_symbol_table</code> into <code>dest_symbol_table</code>, renaming symbols from <code>new_symbol_table</code> when necessary. </p>
 <dl class="section return"><dt>Returns</dt><dd>True, iff linking failed with unresolvable conflicts. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01545">1545</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="linking_8cpp_source.html#l01565">1565</a> of file <a class="el" href="linking_8cpp_source.html">linking.cpp</a>.</p>
 
 </div>
 </div>
