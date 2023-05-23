@@ -10,15 +10,15 @@ Author: Michael Tautschnig, Daniel Kroening
 /// Link Goto Programs
 
 #include "link_goto_model.h"
-
-#include <unordered_set>
-
-#include <util/symbol.h>
-#include <util/rename_symbol.h>
-
 #include <linking/linking_class.h>
 
+#include <util/message.h>
+#include <util/rename_symbol.h>
+#include <util/symbol.h>
+
 #include "goto_model.h"
+
+#include <unordered_set>
 
 static void rename_symbols_in_function(
   goto_functionst::goto_functiont &function,
@@ -119,9 +119,9 @@ optionalt<replace_symbolt::expr_mapt> link_goto_model(
       weak_symbols.insert(symbol_pair.first);
   }
 
-  linkingt linking(dest.symbol_table, src.symbol_table, message_handler);
+  linkingt linking(dest.symbol_table, message_handler);
 
-  if(linking.typecheck_main())
+  if(linking.link(src.symbol_table))
   {
     messaget log{message_handler};
     log.error() << "typechecking main failed" << messaget::eom;

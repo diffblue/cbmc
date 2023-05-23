@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/find_symbols.h>
 #include <util/mathematical_types.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
@@ -201,7 +202,8 @@ bool linkingt::detailed_conflict_report_rec(
   bool conclusive = false;
 
 #ifdef DEBUG
-  debug() << "<BEGIN DEPTH " << depth << ">" << eom;
+  messaget log{message_handler};
+  log.debug() << "<BEGIN DEPTH " << depth << ">" << messaget::eom;
 #endif
 
   std::string msg;
@@ -455,18 +457,23 @@ bool linkingt::detailed_conflict_report_rec(
 
   if(conclusive && !msg.empty())
   {
-    error() << '\n';
-    error() << "reason for conflict at "
-            << expr_to_string(irep_idt(), conflict_path) << ": " << msg << '\n';
+#ifndef DEBUG
+    messaget log{message_handler};
+#endif
+    log.error() << '\n';
+    log.error() << "reason for conflict at "
+                << expr_to_string(irep_idt(), conflict_path) << ": " << msg
+                << '\n';
 
-    error() << '\n';
-    error() << type_to_string_verbose(old_symbol, t1) << '\n';
-    error() << type_to_string_verbose(new_symbol, t2) << '\n';
+    log.error() << '\n';
+    log.error() << type_to_string_verbose(old_symbol, t1) << '\n';
+    log.error() << type_to_string_verbose(new_symbol, t2) << '\n'
+                << messaget::eom;
   }
 
   #ifdef DEBUG
-  debug() << "<END DEPTH " << depth << ">" << eom;
-  #endif
+  log.debug() << "<END DEPTH " << depth << ">" << messaget::eom;
+#endif
 
   return conclusive;
 }
@@ -476,16 +483,17 @@ void linkingt::link_error(
     const symbolt &new_symbol,
     const std::string &msg)
 {
-  error().source_location=new_symbol.location;
+  messaget log{message_handler};
+  log.error().source_location = new_symbol.location;
 
-  error() << "error: " << msg << " '" << old_symbol.display_name() << "'"
-          << '\n';
-  error() << "old definition in module '" << old_symbol.module << "' "
-          << old_symbol.location << '\n'
-          << type_to_string_verbose(old_symbol) << '\n';
-  error() << "new definition in module '" << new_symbol.module << "' "
-          << new_symbol.location << '\n'
-          << type_to_string_verbose(new_symbol) << eom;
+  log.error() << "error: " << msg << " '" << old_symbol.display_name() << "'"
+              << '\n';
+  log.error() << "old definition in module '" << old_symbol.module << "' "
+              << old_symbol.location << '\n'
+              << type_to_string_verbose(old_symbol) << '\n';
+  log.error() << "new definition in module '" << new_symbol.module << "' "
+              << new_symbol.location << '\n'
+              << type_to_string_verbose(new_symbol) << messaget::eom;
 }
 
 void linkingt::link_warning(
@@ -493,20 +501,21 @@ void linkingt::link_warning(
     const symbolt &new_symbol,
     const std::string &msg)
 {
-  warning().source_location=new_symbol.location;
+  messaget log{message_handler};
+  log.warning().source_location = new_symbol.location;
 
-  warning() << "warning: " << msg << " \""
-            << old_symbol.display_name()
-            << "\"" << '\n';
-  warning() << "old definition in module " << old_symbol.module << " "
-            << old_symbol.location << '\n'
-            << type_to_string_verbose(old_symbol) << '\n';
-  warning() << "new definition in module " << new_symbol.module << " "
-            << new_symbol.location << '\n'
-            << type_to_string_verbose(new_symbol) << eom;
+  log.warning() << "warning: " << msg << " \"" << old_symbol.display_name()
+                << "\"" << '\n';
+  log.warning() << "old definition in module " << old_symbol.module << " "
+                << old_symbol.location << '\n'
+                << type_to_string_verbose(old_symbol) << '\n';
+  log.warning() << "new definition in module " << new_symbol.module << " "
+                << new_symbol.location << '\n'
+                << type_to_string_verbose(new_symbol) << messaget::eom;
 }
 
-irep_idt linkingt::rename(const irep_idt &id)
+irep_idt
+linkingt::rename(const symbol_table_baset &src_symbol_table, const irep_idt &id)
 {
   unsigned cnt=0;
 
@@ -738,11 +747,6 @@ void linkingt::duplicate_code_symbol(
           {
             warn_msg="pointer parameter types differ between "
                      "declaration and definition";
-            detailed_conflict_report(
-              old_symbol,
-              new_symbol,
-              conflicts.front().first,
-              conflicts.front().second);
           }
 
           replace=new_symbol.value.is_not_nil();
@@ -855,12 +859,12 @@ void linkingt::duplicate_code_symbol(
     else if(old_symbol.type == new_symbol.type)
     {
       // keep the one in old_symbol -- libraries come last!
-      debug().source_location = new_symbol.location;
-
-      debug() << "function '" << old_symbol.name << "' in module '"
-              << new_symbol.module
-              << "' is shadowed by a definition in module '"
-              << old_symbol.module << "'" << eom;
+      messaget log{message_handler};
+      log.debug().source_location = new_symbol.location;
+      log.debug() << "function '" << old_symbol.name << "' in module '"
+                  << new_symbol.module
+                  << "' is shadowed by a definition in module '"
+                  << old_symbol.module << "'" << messaget::eom;
     }
     else
       link_error(
@@ -1146,16 +1150,18 @@ void linkingt::duplicate_object_symbol(
       }
       else
       {
-        warning().source_location=new_symbol.location;
+        messaget log{message_handler};
+        log.warning().source_location = new_symbol.location;
 
-        warning() << "warning: conflicting initializers for"
-                  << " variable \"" << old_symbol.name << "\"\n";
-        warning() << "using old value in module " << old_symbol.module << " "
-                  << old_symbol.value.find_source_location() << '\n'
-                  << expr_to_string(old_symbol.name, tmp_old) << '\n';
-        warning() << "ignoring new value in module " << new_symbol.module << " "
-                  << new_symbol.value.find_source_location() << '\n'
-                  << expr_to_string(new_symbol.name, tmp_new) << eom;
+        log.warning() << "warning: conflicting initializers for"
+                      << " variable \"" << old_symbol.name << "\"\n";
+        log.warning() << "using old value in module " << old_symbol.module
+                      << " " << old_symbol.value.find_source_location() << '\n'
+                      << expr_to_string(old_symbol.name, tmp_old) << '\n';
+        log.warning() << "ignoring new value in module " << new_symbol.module
+                      << " " << new_symbol.value.find_source_location() << '\n'
+                      << expr_to_string(new_symbol.name, tmp_new)
+                      << messaget::eom;
       }
     }
   }
@@ -1363,13 +1369,16 @@ bool linkingt::needs_renaming_type(
   return true; // different
 }
 
-void linkingt::do_type_dependencies(
-  std::unordered_set<irep_idt> &needs_to_be_renamed)
+static void do_type_dependencies(
+  const symbol_table_baset &src_symbol_table,
+  std::unordered_set<irep_idt> &needs_to_be_renamed,
+  message_handlert &message_handler)
 {
   // Any type that uses a symbol that will be renamed also
   // needs to be renamed, and so on, until saturation.
 
-  used_byt used_by;
+  // X -> Y iff Y uses X for new symbol type IDs X and Y
+  std::unordered_map<irep_idt, std::unordered_set<irep_idt>> used_by;
 
   for(const auto &symbol_pair : src_symbol_table.symbols)
   {
@@ -1401,14 +1410,16 @@ void linkingt::do_type_dependencies(
       {
         queue.push_back(dep);
         #ifdef DEBUG
-        debug() << "LINKING: needs to be renamed (dependency): "
-                << dep << eom;
-        #endif
+        messaget log{message_handler};
+        log.debug() << "LINKING: needs to be renamed (dependency): " << dep
+                    << messaget::eom;
+#endif
       }
   }
 }
 
 std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
+  const symbol_table_baset &src_symbol_table,
   const std::unordered_set<irep_idt> &needs_to_be_renamed)
 {
   std::unordered_map<irep_idt, irep_idt> new_identifiers;
@@ -1423,13 +1434,14 @@ std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
     if(new_symbol.is_type)
       new_identifier=type_to_name(src_ns, id, new_symbol.type);
     else
-      new_identifier=rename(id);
+      new_identifier = rename(src_symbol_table, id);
 
     new_identifiers.emplace(id, new_identifier);
 
 #ifdef DEBUG
-    debug() << "LINKING: renaming " << id << " to "
-            << new_identifier << eom;
+    messaget log{message_handler};
+    log.debug() << "LINKING: renaming " << id << " to " << new_identifier
+                << messaget::eom;
 #endif
 
     if(new_symbol.is_type)
@@ -1442,6 +1454,7 @@ std::unordered_map<irep_idt, irep_idt> linkingt::rename_symbols(
 }
 
 void linkingt::copy_symbols(
+  const symbol_table_baset &src_symbol_table,
   const std::unordered_map<irep_idt, irep_idt> &new_identifiers)
 {
   std::map<irep_idt, symbolt> src_symbols;
@@ -1506,8 +1519,11 @@ void linkingt::copy_symbols(
   }
 }
 
-void linkingt::typecheck()
+bool linkingt::link(const symbol_table_baset &src_symbol_table)
 {
+  const unsigned errors_before =
+    message_handler.get_message_count(messaget::M_ERROR);
+
   // We do this in three phases. We first figure out which symbols need to
   // be renamed, and then build the renaming, and finally apply this
   // renaming in the second pass over the symbol table.
@@ -1527,19 +1543,23 @@ void linkingt::typecheck()
     {
       needs_to_be_renamed.insert(symbol_pair.first);
       #ifdef DEBUG
-      debug() << "LINKING: needs to be renamed: " << symbol_pair.first << eom;
-      #endif
+      messaget log{message_handler};
+      log.debug() << "LINKING: needs to be renamed: " << symbol_pair.first
+                  << messaget::eom;
+#endif
     }
   }
 
   // renaming types may trigger further renaming
-  do_type_dependencies(needs_to_be_renamed);
+  do_type_dependencies(src_symbol_table, needs_to_be_renamed, message_handler);
 
   // PHASE 2: actually rename them
-  auto new_identifiers = rename_symbols(needs_to_be_renamed);
+  auto new_identifiers = rename_symbols(src_symbol_table, needs_to_be_renamed);
 
   // PHASE 3: copy new symbols to main table
-  copy_symbols(new_identifiers);
+  copy_symbols(src_symbol_table, new_identifiers);
+
+  return message_handler.get_message_count(messaget::M_ERROR) != errors_before;
 }
 
 bool linking(
@@ -1547,8 +1567,7 @@ bool linking(
   const symbol_table_baset &new_symbol_table,
   message_handlert &message_handler)
 {
-  linkingt linking(
-    dest_symbol_table, new_symbol_table, message_handler);
+  linkingt linking(dest_symbol_table, message_handler);
 
-  return linking.typecheck_main();
+  return linking.link(new_symbol_table);
 }
