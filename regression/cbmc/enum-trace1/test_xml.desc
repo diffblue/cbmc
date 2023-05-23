@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 main.c
 --xml-ui --function test --trace
 activate-multi-line-match
