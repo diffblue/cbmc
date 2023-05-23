@@ -12,6 +12,7 @@ var group__module__hidden =
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_checker_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_diff_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_harness_README", null ],
+    [ "readme", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_inspect_readme", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_instrument_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_programs_README", null ],
     [ "README", "group__module__hidden.html#md__home_runner_work_cbmc_cbmc_src_goto_symex_README", null ],

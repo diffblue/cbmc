@@ -93,12 +93,12 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-contract-checking.h
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md31">Swapping-and-Wrapping Functions</a></li>
-<li class="level1"><a href="#autotoc_md32">Wrapping Recursive Functions</a></li>
+<ul><li class="level1"><a href="#autotoc_md32">Swapping-and-Wrapping Functions</a></li>
+<li class="level1"><a href="#autotoc_md33">Wrapping Recursive Functions</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_developer_contracts_dev_spec_contract_checking"></a> Back to top <a class="el" href="contracts-dev-spec.html">Code Contracts Transformation Specification</a></p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Swapping-and-Wrapping Functions</h1>
 <p>The first operation one can do with contracts is to check if a function satisfies a contract.</p>
 <p>Let us consider a contract <code>c</code>, a function <code>foo</code> and a proof harness <code>main</code>.</p>
@@ -207,7 +207,7 @@ Swapping-and-Wrapping Functions</h1>
 <div class="ttc" id="acprover__contracts_8c_html_a6b104b988f01f52cacd9dec8b2621c79"><div class="ttname"><a href="cprover__contracts_8c.html#a6b104b988f01f52cacd9dec8b2621c79">__CPROVER_contracts_write_set_release</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_release(__CPROVER_contracts_write_set_ptr_t set)</div><div class="ttdoc">Releases resources used by set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00441">cprover_contracts.c:441</a></div></div>
 <div class="ttc" id="acprover__contracts_8c_html_ab79449fced8abf348ef2c38bc7cce15a"><div class="ttname"><a href="cprover__contracts_8c.html#ab79449fced8abf348ef2c38bc7cce15a">__CPROVER_contracts_write_set_create</a></div><div class="ttdeci">void __CPROVER_contracts_write_set_create(__CPROVER_contracts_write_set_ptr_t set, __CPROVER_size_t contract_assigns_size, __CPROVER_size_t contract_frees_size, __CPROVER_bool assume_requires_ctx, __CPROVER_bool assert_requires_ctx, __CPROVER_bool assume_ensures_ctx, __CPROVER_bool assert_ensures_ctx, __CPROVER_bool allow_allocate, __CPROVER_bool allow_deallocate)</div><div class="ttdoc">Initialises a __CPROVER_contracts_write_set_t object.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00404">cprover_contracts.c:404</a></div></div>
 <div class="ttc" id="astruct_____c_p_r_o_v_e_r__contracts__write__set__t_html"><div class="ttname"><a href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a></div><div class="ttdoc">Runtime representation of a write set.</div><div class="ttdef"><b>Definition:</b> <a href="cprover__contracts_8c_source.html#l00068">cprover_contracts.c:69</a></div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md32"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md33"></a>
 Wrapping Recursive Functions</h1>
 <p>If the function to be checked is potentially recursive, we generate the wrapper function body such that the first call trigger the contract checking, and any subsequent call triggers the contract replacement logic as described in <a class="el" href="contracts-dev-spec-contract-replacement.html">Replacing a Function by a Contract</a> :</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> foo_check_started = <span class="keyword">false</span>;</div>

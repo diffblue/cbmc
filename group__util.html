@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('group__util.html',''); initResizable()
 <div class="title">util</div>  </div>
 </div><!--header-->
 <div class="contents">
-<h1><a class="anchor" id="autotoc_md162"></a>
+<h1><a class="anchor" id="autotoc_md163"></a>
 Folder util</h1>
 <dl class="section author"><dt>Author</dt><dd>Martin Brain, Owen Jones, Chris Smowton</dd></dl>
 <h1><a class="anchor" id="util_data_structures"></a>
@@ -213,10 +213,10 @@ CProver legacy output</h3>
 </ul>
 <h2><a class="anchor" id="Graph"></a>
 Graph</h2>
-<h3><a class="anchor" id="autotoc_md163"></a>
+<h3><a class="anchor" id="autotoc_md164"></a>
 Graph</h3>
 <p>Implemented in <code><a class="el" href="graph_8h.html" title="A Template Class for Graphs.">src/util/graph.h</a></code> as <code>grapht</code> class. The <code>grapht</code> class represents a directed graph. However, an undirected graph can be emulated by inserting for each edge (u, v) also (v, u). A multi-graph is not supported though, because parallel edges are not allowed between vertices.</p>
-<h4><a class="anchor" id="autotoc_md164"></a>
+<h4><a class="anchor" id="autotoc_md165"></a>
 Data representation</h4>
 <p>A graph is defined by a template class <code>grapht&lt;N&gt;</code>, where <code>N</code> is the type of the nodes of the graph. The class <code>grapht</code> stores the nodes in a vector. A user of the graph is supposed to access the nodes via their indices in the vector. The node type <code>N</code> must meet these requirements:</p><ul>
 <li>It must be default constructible; the common way how to insert a node to the graph is to call method <code>add_node</code> which pushes a new default-constructed instance of <code>N</code> to the end of the vector and returns its index. Then <code>operator[]</code> can be used to obtain a reference to the pushed instance and set its content as desired.</li>
@@ -227,7 +227,7 @@ Data representation</h4>
 <li>It must define a method <code>pretty</code> converting the node to a "pretty" string.</li>
 </ul>
 <p>One can use a predefined template class <code><a class="el" href="classgraph__nodet.html" title="This class represents a node in a directed graph.">graph_nodet</a>&lt;E&gt;</code> as the template parameter <code>N</code> of the graph. The template parameter <code>E</code> allows to define the type <code>edget</code>.</p>
-<h4><a class="anchor" id="autotoc_md165"></a>
+<h4><a class="anchor" id="autotoc_md166"></a>
 Graph algorithms</h4>
 <p>The graph implementation comes with several graph algorithms. We describe each of them in following paragraphs.</p>
 <p>TODO! </p>

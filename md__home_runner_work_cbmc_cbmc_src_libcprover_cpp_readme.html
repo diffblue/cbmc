@@ -93,10 +93,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_cbmc_cbmc_src_lib
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This folder includes the interface and the implementation of a new C++-based API for the CProver libraries. This allows direct linking to key CProver functionality via C++ function calls. This (will eventually) allow the use of all aspects of the CProver verification pipeline via direct function calls and deprecate the need for invoking separate tools/programs.</p>
-<h1><a class="anchor" id="autotoc_md145"></a>
+<h1><a class="anchor" id="autotoc_md146"></a>
 Implementation</h1>
 <p>The major part of the implementation of the API is in <a href="src/api.cpp"><code>api.cpp</code></a>. To use the API as it stands, you need to include the header <a href="src/api.h"><code>api.h</code></a> in your program, and link against the resultant shared-object from the CProver build process (<code>libcprover-api.a</code>).</p>
-<h1><a class="anchor" id="autotoc_md146"></a>
+<h1><a class="anchor" id="autotoc_md147"></a>
 Example</h1>
 <p>An example for driving the API in its current form is in the file <a href="regression/call_bmc.cpp"><code>call_bmc.cpp</code></a>, which we are also using as a binary driver for testing the API. </p>
 </div></div><!-- contents -->

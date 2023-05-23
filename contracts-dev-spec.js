@@ -18,8 +18,8 @@ var contracts_dev_spec =
     [ "Dynamic Frame Condition Checking", "contracts-dev-spec-dfcc.html", "contracts-dev-spec-dfcc" ],
     [ "Proof Harness Intrumentation", "contracts-dev-spec-harness.html", null ],
     [ "Checking a Contract Against a Function", "contracts-dev-spec-contract-checking.html", [
-      [ "Swapping-and-Wrapping Functions", "contracts-dev-spec-contract-checking.html#autotoc_md31", null ],
-      [ "Wrapping Recursive Functions", "contracts-dev-spec-contract-checking.html#autotoc_md32", null ]
+      [ "Swapping-and-Wrapping Functions", "contracts-dev-spec-contract-checking.html#autotoc_md32", null ],
+      [ "Wrapping Recursive Functions", "contracts-dev-spec-contract-checking.html#autotoc_md33", null ]
     ] ],
     [ "Checking a Contract Against a Recursive Function", "contracts-dev-spec-contract-checking-rec.html", null ],
     [ "Replacing a Function by a Contract", "contracts-dev-spec-contract-replacement.html", null ]

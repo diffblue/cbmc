@@ -93,23 +93,23 @@ $(document).ready(function(){initNavTree('contracts-requires-ensures.html',''); 
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md120">Syntax</a></li>
-<li class="level1"><a href="#autotoc_md121">Semantics</a><ul><li class="level2"><a href="#autotoc_md122">Enforcement</a></li>
-<li class="level2"><a href="#autotoc_md123">Replacement</a></li>
+<ul><li class="level1"><a href="#autotoc_md121">Syntax</a></li>
+<li class="level1"><a href="#autotoc_md122">Semantics</a><ul><li class="level2"><a href="#autotoc_md123">Enforcement</a></li>
+<li class="level2"><a href="#autotoc_md124">Replacement</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md124">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md125">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_user_contracts_requires_ensures"></a> Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md120"></a>
+<h1><a class="anchor" id="autotoc_md121"></a>
 Syntax</h1>
 <div class="fragment"><div class="line">__CPROVER_requires(<span class="keywordtype">bool</span> cond)</div>
 </div><!-- fragment --><p>A <em>requires</em> clause specifies a precondition for a function, i.e., a property that must hold to properly execute the function. Developers may see the <em>requires</em> clauses of a function as obligations on the caller when invoking the function. The precondition of a function is the conjunction of the <em>requires</em> clauses, or <code>true</code> if none are specified.</p>
 <div class="fragment"><div class="line">__CPROVER_ensures(<span class="keywordtype">bool</span> cond)</div>
 </div><!-- fragment --><p>An <em>ensures</em> clause specifies a postcondition for a function, i.e., a property over arguments or global variables that the function guarantees at the end of the operation. Developers may see the <em>ensures</em> clauses of a function as the obligations of that function to the caller. The postcondition of a function is the conjunction of the <em>ensures</em> clauses, or <code>true</code> if none are specified.</p>
 <p>Both <em>requires</em> clauses and <em>ensures</em> clauses take a Boolean expression over the arguments of a function and/or global variables. The expression can include calls to CBMC built-in functions, to <a class="el" href="contracts-memory-predicates.html">Memory Predicates</a> or to <a class="el" href="contracts-function-pointer-predicates.html">function pointer predicates</a>. User-defined functions can also be called inside <em>requires</em> clauses as long as they are deterministic and do not have any side-effects (the absence of side effects is checked by the tool). In addition, <em>ensures</em> clauses also accept <a class="el" href="contracts-history-variables.html">History Variables</a> and the special built-in symbol <code>__CPROVER_return_value</code> which represents the return value of the function.</p>
-<h1><a class="anchor" id="autotoc_md121"></a>
+<h1><a class="anchor" id="autotoc_md122"></a>
 Semantics</h1>
 <p>The semantics of <em>ensures</em> and <em>requires</em> clauses can be understood in two contexts: enforcement and replacement. To illustrate these two perspectives, consider the following implementation of the <code>sum</code> function.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> sum(<span class="keyword">const</span> uint32_t a, <span class="keyword">const</span> uint32_t b, uint32_t* out)</div>
@@ -126,7 +126,7 @@ Semantics</h1>
 <div class="line">  <span class="keywordflow">return</span> SUCCESS;</div>
 <div class="line">}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ad4e9673ed79a6d8ff4af6cf12d95c29f"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size)</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md122"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md123"></a>
 Enforcement</h2>
 <p>In order to determine whether <em>requires</em> and <em>ensures</em> clauses are a sound abstraction of the behavior of a function <em>f</em>, CBMC will try to check them as follows:</p>
 <ol type="1">
@@ -172,7 +172,7 @@ Enforcement</h2>
 <div class="line">}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a564e8a5a7bebea04fdd5ee1277832478"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a></div><div class="ttdeci">void __CPROVER_assert(__CPROVER_bool assertion, const char *description)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ae5af07e274b573cd0f23ffb9d332bef2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a></div><div class="ttdeci">void __CPROVER_assume(__CPROVER_bool assumption)</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md123"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md124"></a>
 Replacement</h2>
 <p>Assuming <em>requires</em> and <em>ensures</em> clauses are a sound abstraction of the behavior of the function <em>f</em>, CBMC will use the function contract in place of the function implementation as follows:</p>
 <ol type="1">
@@ -224,7 +224,7 @@ Replacement</h2>
 <div class="line">  <span class="comment">// else, use out</span></div>
 <div class="line">  utin32_t result = out + ...;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md124"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md125"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>

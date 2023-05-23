@@ -566,6 +566,7 @@ var annotated_dup =
     [ "goto_harness_generatort", "classgoto__harness__generatort.html", "classgoto__harness__generatort" ],
     [ "goto_harness_parse_optionst", "classgoto__harness__parse__optionst.html", "classgoto__harness__parse__optionst" ],
     [ "goto_inlinet", "classgoto__inlinet.html", "classgoto__inlinet" ],
+    [ "goto_inspect_parse_optionst", "structgoto__inspect__parse__optionst.html", "structgoto__inspect__parse__optionst" ],
     [ "goto_instrument_parse_optionst", "classgoto__instrument__parse__optionst.html", "classgoto__instrument__parse__optionst" ],
     [ "goto_model_functiont", "classgoto__model__functiont.html", "classgoto__model__functiont" ],
     [ "goto_model_validation_optionst", "classgoto__model__validation__optionst.html", "classgoto__model__validation__optionst" ],

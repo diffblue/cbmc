@@ -93,28 +93,28 @@ $(document).ready(function(){initNavTree('contracts-history-variables.html','');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md92">In Function Contracts</a><ul><li class="level2"><a href="#autotoc_md93">Syntax</a></li>
-<li class="level2"><a href="#autotoc_md94">Parameters</a></li>
-<li class="level2"><a href="#autotoc_md95">Semantics</a></li>
+<ul><li class="level1"><a href="#autotoc_md93">In Function Contracts</a><ul><li class="level2"><a href="#autotoc_md94">Syntax</a></li>
+<li class="level2"><a href="#autotoc_md95">Parameters</a></li>
+<li class="level2"><a href="#autotoc_md96">Semantics</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md96">In Loop Contracts</a></li>
-<li class="level1"><a href="#autotoc_md97">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md97">In Loop Contracts</a></li>
+<li class="level1"><a href="#autotoc_md98">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_user_contracts_history_variables"></a> Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md92"></a>
+<h1><a class="anchor" id="autotoc_md93"></a>
 In Function Contracts</h1>
-<h2><a class="anchor" id="autotoc_md93"></a>
+<h2><a class="anchor" id="autotoc_md94"></a>
 Syntax</h2>
 <div class="fragment"><div class="line"><a class="code" href="cprover__builtin__headers_8h.html#a10645790184f1c29e831659a4fd568bb">__CPROVER_old</a>(*identifier*)</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a10645790184f1c29e831659a4fd568bb"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a10645790184f1c29e831659a4fd568bb">__CPROVER_old</a></div><div class="ttdeci">void __CPROVER_old(const void *)</div></div>
 </div><!-- fragment --><p>Refers to the value of a given object in the pre-state of a function within the <em>ensures</em> clause.</p>
 <p><b>Important.</b> This function may be used only within the context of <code>__CPROVER_ensures</code>.</p>
-<h2><a class="anchor" id="autotoc_md94"></a>
+<h2><a class="anchor" id="autotoc_md95"></a>
 Parameters</h2>
 <p><code>__CPROVER_old</code> takes a single argument, which is the identifier corresponding to a parameter of the function. For now, only scalars, pointers, and struct members are supported.</p>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md96"></a>
 Semantics</h2>
 <p>To illustrate the behavior of <code>__CPROVER_old</code>, take a look at the example bellow. If the function returns a failure code, the value of <code>*out</code> should not have been modified.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> sum(<span class="keyword">const</span> uint32_t a, <span class="keyword">const</span> uint32_t b, uint32_t* out)</div>
@@ -125,10 +125,10 @@ Semantics</h2>
 <div class="line">{</div>
 <div class="line">  <span class="comment">/* ... */</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md96"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md97"></a>
 In Loop Contracts</h1>
 <p>TODO: Document <code>__CPROVER_loop_entry</code> and <code>__CPROVER_loop_old</code>.</p>
-<h1><a class="anchor" id="autotoc_md97"></a>
+<h1><a class="anchor" id="autotoc_md98"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>

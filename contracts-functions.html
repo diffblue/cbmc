@@ -93,12 +93,12 @@ $(document).ready(function(){initNavTree('contracts-functions.html',''); initRes
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md90">Overview</a></li>
-<li class="level1"><a href="#autotoc_md91">Additional Resources</a></li>
+<ul><li class="level1"><a href="#autotoc_md91">Overview</a></li>
+<li class="level1"><a href="#autotoc_md92">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_user_contracts_functions"></a> Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<h1><a class="anchor" id="autotoc_md90"></a>
+<h1><a class="anchor" id="autotoc_md91"></a>
 Overview</h1>
 <p>Take a look at the example below.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
@@ -177,7 +177,7 @@ Overview</h1>
 <div class="line">goto-instrument --replace-call-with-contract sum foo.goto foo-using-sum-contract.goto</div>
 <div class="line">cbmc foo-using-sum-contract.goto --function foo</div>
 </div><!-- fragment --><p>The first command just compiles the GOTO program as usual, the second command instruments the code to use the function contract in place of the function implementation wherever is invoked, and the third one runs CBMC to check the program using contracts.</p>
-<h1><a class="anchor" id="autotoc_md91"></a>
+<h1><a class="anchor" id="autotoc_md92"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>

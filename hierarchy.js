@@ -1205,6 +1205,7 @@ var hierarchy =
       [ "goto_analyzer_parse_optionst", "classgoto__analyzer__parse__optionst.html", null ],
       [ "goto_diff_parse_optionst", "classgoto__diff__parse__optionst.html", null ],
       [ "goto_harness_parse_optionst", "classgoto__harness__parse__optionst.html", null ],
+      [ "goto_inspect_parse_optionst", "structgoto__inspect__parse__optionst.html", null ],
       [ "goto_instrument_parse_optionst", "classgoto__instrument__parse__optionst.html", null ],
       [ "goto_synthesizer_parse_optionst", "classgoto__synthesizer__parse__optionst.html", null ],
       [ "janalyzer_parse_optionst", "classjanalyzer__parse__optionst.html", null ],

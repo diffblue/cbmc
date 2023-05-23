@@ -93,7 +93,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_cbmc_cbmc_src_lib
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>A Rust interface for convenient interaction with the CProver tools.</p>
-<h1><a class="anchor" id="autotoc_md148"></a>
+<h1><a class="anchor" id="autotoc_md149"></a>
 Building instructions</h1>
 <p>To build the Rust project you need the Rust language toolchain installed (you can install from <a href="https://rustup.rs">rustup.rs</a>).</p>
 <p>With that instaled, you can execute <code>cargo build</code> under this (<code>src/libcprover-rust</code>) directory.</p>
@@ -111,7 +111,7 @@ Building instructions</h1>
 <div class="fragment"><div class="line">$ cd src/libcprover-rust</div>
 <div class="line">$ cargo clean</div>
 <div class="line">$ CBMC_INCLUDE_DIR=../../build/include CBMC_LIB_DIR=../../build/lib CBMC_VERSION=5.78.0 cargo test -- --test-threads=1 --nocapture</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md149"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md150"></a>
 Basic Usage</h1>
 <p>This file will guide through a sample interaction with the API, under a basic scenario: <em>loading a file and verifying the model contained within</em>.</p>
 <p>To begin, we will assume that you have a file under <code>/tmp/api_example.c</code>, with the following contents:</p>
@@ -158,7 +158,7 @@ Basic Usage</h1>
 <div class="fragment"><div class="line">let msgs_cpp = cprover_api::get_messages();</div>
 <div class="line">let msgs_rust = ffi_util::translate_cpp_vector_to_rust(msgs_cpp);</div>
 <div class="line">ffi_util::print_response(msgs_rust);</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md152"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md153"></a>
 Notes</h1>
 <ul>
 <li>The functions supported by the Rust API are catalogued within the <code>ffi</code> module within <code>lib.rs</code>.</li>

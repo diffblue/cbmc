@@ -13,6 +13,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "goto-checker", "dir_647f57bb6fbe01dbee6443af3bb1115a.html", "dir_647f57bb6fbe01dbee6443af3bb1115a" ],
     [ "goto-diff", "dir_32ed2039a38eb9392e275002cd63eb3f.html", "dir_32ed2039a38eb9392e275002cd63eb3f" ],
     [ "goto-harness", "dir_9571ccb0afd832b53e4f5cd1bf134994.html", "dir_9571ccb0afd832b53e4f5cd1bf134994" ],
+    [ "goto-inspect", "dir_c70eec12ff4e44f3b3d7ce5f45410a66.html", "dir_c70eec12ff4e44f3b3d7ce5f45410a66" ],
     [ "goto-instrument", "dir_4cd183c173ff5cfcfce420f655b591bf.html", "dir_4cd183c173ff5cfcfce420f655b591bf" ],
     [ "goto-programs", "dir_807c5b2c83e0c14a10083f60cf67ca05.html", "dir_807c5b2c83e0c14a10083f60cf67ca05" ],
     [ "goto-symex", "dir_99e24f80c4828e49b24e2d05c93d325b.html", "dir_99e24f80c4828e49b24e2d05c93d325b" ],
