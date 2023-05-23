@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language_file.h"
 
-#include <linking/linking.h>
+#include <linking/linking_class.h>
 
 #include "language.h"
 
@@ -130,6 +130,7 @@ optionalt<symbol_tablet> language_filest::typecheck(
   }
 
   // typecheck files
+  linkingt linker{symbol_table, message_handler};
   for(auto &file : file_map)
   {
     if(file.second.modules.empty())
@@ -140,7 +141,7 @@ optionalt<symbol_tablet> language_filest::typecheck(
           file.second.language->typecheck("", keep_file_local);
         if(!file_symtab_opt.has_value())
           return {};
-        if(linking(symbol_table, *file_symtab_opt, message_handler))
+        if(linker.link(*file_symtab_opt))
           return {};
       }
       else
@@ -148,7 +149,7 @@ optionalt<symbol_tablet> language_filest::typecheck(
         auto file_symtab_opt = file.second.language->typecheck("");
         if(!file_symtab_opt.has_value())
           return {};
-        if(linking(symbol_table, *file_symtab_opt, message_handler))
+        if(linker.link(*file_symtab_opt))
           return {};
       }
       // register lazy methods.
@@ -169,7 +170,7 @@ optionalt<symbol_tablet> language_filest::typecheck(
       typecheck_module(module.second, keep_file_local, message_handler);
     if(failed)
       return {};
-    if(linking(symbol_table, module.second.symbol_table, message_handler))
+    if(linker.link(module.second.symbol_table))
       return {};
   }
 

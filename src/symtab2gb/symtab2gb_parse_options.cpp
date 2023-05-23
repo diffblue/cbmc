@@ -21,7 +21,7 @@ Author: Diffblue Ltd.
 #include <json-symtab-language/json_symtab_language.h>
 #include <langapi/mode.h>
 
-#include <linking/linking.h>
+#include <linking/linking_class.h>
 
 #include <util/config.h>
 #include <util/exception_utils.h>
@@ -73,6 +73,7 @@ static void run_symtab2gb(
   symtab_language->set_message_handler(message_handler);
 
   symbol_tablet linked_symbol_table;
+  linkingt linker{linked_symbol_table, message_handler};
 
   for(std::size_t ix = 0; ix < symtab_files.size(); ++ix)
   {
@@ -95,7 +96,7 @@ static void run_symtab2gb(
     }
     config.set_from_symbol_table(*symbol_table_opt);
 
-    if(failed(linking(linked_symbol_table, *symbol_table_opt, message_handler)))
+    if(failed(linker.link(*symbol_table_opt)))
     {
       throw invalid_input_exceptiont{
         "failed to link `" + symtab_filename + "'"};

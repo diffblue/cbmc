@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Linking
 
-#include "linking.h"
 #include "linking_class.h"
 
 #include <util/c_types.h>
@@ -1560,14 +1559,4 @@ bool linkingt::link(const symbol_table_baset &src_symbol_table)
   copy_symbols(src_symbol_table, new_identifiers);
 
   return message_handler.get_message_count(messaget::M_ERROR) != errors_before;
-}
-
-bool linking(
-  symbol_table_baset &dest_symbol_table,
-  const symbol_table_baset &new_symbol_table,
-  message_handlert &message_handler)
-{
-  linkingt linking(dest_symbol_table, message_handler);
-
-  return linking.link(new_symbol_table);
 }

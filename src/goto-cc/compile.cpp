@@ -44,7 +44,7 @@ Date: June 2006
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
 
-#include <linking/linking.h>
+#include <linking/linking_class.h>
 #include <linking/static_lifetime_init.h>
 
 #define DOTGRAPHSETTINGS  "color=black;" \
@@ -369,6 +369,7 @@ bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
 optionalt<symbol_tablet> compilet::compile()
 {
   symbol_tablet symbol_table;
+  linkingt linker{symbol_table, log.get_message_handler()};
 
   while(!source_files.empty())
   {
@@ -436,7 +437,7 @@ optionalt<symbol_tablet> compilet::compile()
     }
     else
     {
-      if(linking(symbol_table, *file_symbol_table, log.get_message_handler()))
+      if(linker.link(*file_symbol_table))
       {
         return {};
       }
