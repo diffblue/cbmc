@@ -153,15 +153,18 @@ void lazy_goto_modelt::initialize(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(symbol_table, message_handler))
+    auto symbol_table_opt = language_files.typecheck(message_handler);
+    if(!symbol_table_opt.has_value())
     {
       throw invalid_input_exceptiont("CONVERSION ERROR");
     }
+    symbol_table.swap(*symbol_table_opt);
   }
   else
   {
-    initialize_from_source_files(
-      sources, options, language_files, symbol_table, message_handler);
+    symbol_tablet initial_symtab = initialize_from_source_files(
+      sources, options, language_files, message_handler);
+    symbol_table.swap(initial_symtab);
   }
 
   if(read_objects_and_link(binaries, *goto_model, message_handler))

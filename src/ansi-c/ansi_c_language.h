@@ -50,13 +50,10 @@ public:
 
   bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
-  bool typecheck(
-    symbol_table_baset &symbol_table,
-    const std::string &module,
-    const bool keep_file_local) override;
+  optionalt<symbol_tablet>
+  typecheck(const std::string &module, const bool keep_file_local) override;
 
-  bool typecheck(
-    symbol_table_baset &symbol_table,
+  optionalt<symbol_tablet> typecheck(
     const std::string &module,
     const bool keep_file_local,
     const std::set<irep_idt> &keep);
@@ -66,10 +63,9 @@ public:
     return true;
   }
 
-  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
-    override
+  optionalt<symbol_tablet> typecheck(const std::string &module) override
   {
-    return typecheck(symbol_table, module, true);
+    return typecheck(module, true);
   }
 
   void show_parse(std::ostream &out) override;

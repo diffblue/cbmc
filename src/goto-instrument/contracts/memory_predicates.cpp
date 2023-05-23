@@ -177,8 +177,8 @@ void is_fresh_baset::add_declarations(const std::string &decl_string)
   ansi_c_language.parse(iss, "");
   config.ansi_c.preprocessor = pp;
 
-  symbol_tablet tmp_symbol_table;
-  ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
+  auto symbol_table_opt = ansi_c_language.typecheck("<built-in-library>");
+  CHECK_RETURN(symbol_table_opt.has_value());
   exprt value = nil_exprt();
 
   goto_functionst tmp_functions;
@@ -190,7 +190,7 @@ void is_fresh_baset::add_declarations(const std::string &decl_string)
   goto_model.goto_functions.function_map[requires_fn_name].copy_from(
     tmp_functions.function_map[requires_fn_name]);
 
-  for(const auto &symbol_pair : tmp_symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table_opt->symbols)
   {
     if(
       symbol_pair.first == memmap_name ||

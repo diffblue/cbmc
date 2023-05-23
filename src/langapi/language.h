@@ -12,20 +12,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LANGAPI_LANGUAGE_H
 #define CPROVER_LANGAPI_LANGUAGE_H
 
+#include <util/message.h>
+#include <util/symbol_table.h>
+
 #include <iosfwd>
 #include <memory> // unique_ptr
 #include <set>
 #include <string>
 #include <unordered_set>
 
-#include <util/invariant.h>
-#include <util/message.h>
-
-class exprt;
 class namespacet;
 class optionst;
-class symbol_table_baset;
-class typet;
 
 #define OPT_FUNCTIONS \
   "(function):"
@@ -113,10 +110,10 @@ public:
 
   virtual bool interfaces(symbol_table_baset &symbol_table);
 
-  // type check a module in the currently parsed file
-
-  virtual bool
-  typecheck(symbol_table_baset &symbol_table, const std::string &module) = 0;
+  /// Type check a module in the currently parsed file.
+  /// \return Resulting symbol table iff type checking succeeded, else
+  ///   `nullopt`.
+  virtual optionalt<symbol_tablet> typecheck(const std::string &module) = 0;
 
   /// \brief Is it possible to call three-argument typecheck() on this object?
   virtual bool can_keep_file_local()
@@ -133,14 +130,14 @@ public:
   ///
   /// This function should only be called on objects for which a call to
   /// can_keep_symbols() returns `true`.
-  virtual bool typecheck(
-    symbol_table_baset &symbol_table,
-    const std::string &module,
-    const bool keep_file_local)
+  ///
+  /// \return Resulting symbol table iff type checking succeeded, else
+  ///   `nullopt`.
+  virtual optionalt<symbol_tablet>
+  typecheck(const std::string &module, const bool keep_file_local)
   {
-    INVARIANT(
-      false,
-      "three-argument typecheck should only be called for files written"
+    UNREACHABLE_BECAUSE(
+      "two-argument typecheck should only be called for files written"
       " in a language that allows file-local symbols, like C");
   }
 

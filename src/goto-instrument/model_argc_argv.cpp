@@ -111,15 +111,15 @@ bool model_argc_argv(
   ansi_c_language.parse(iss, "");
   config.ansi_c.preprocessor=pp;
 
-  symbol_tablet tmp_symbol_table;
-  ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
+  auto symbol_table_opt = ansi_c_language.typecheck("<built-in-library>");
+  CHECK_RETURN(symbol_table_opt.has_value());
 
   goto_programt init_instructions;
   exprt value=nil_exprt();
   // locate the body of the newly built start function as well as any
   // additional declarations we might need; the body will then be
   // converted and inserted into the start function
-  for(const auto &symbol_pair : tmp_symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table_opt->symbols)
   {
     // add __CPROVER_assume if necessary (it might exist already)
     if(

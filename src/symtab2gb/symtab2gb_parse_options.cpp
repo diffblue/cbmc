@@ -85,17 +85,17 @@ static void run_symtab2gb(
       throw invalid_source_file_exceptiont{
         "failed to parse symbol table", source_location};
     }
-    symbol_tablet symtab{};
-    if(failed(symtab_language->typecheck(symtab, "<unused>")))
+    auto symbol_table_opt = symtab_language->typecheck("<unused>");
+    if(!symbol_table_opt.has_value())
     {
       source_locationt source_location;
       source_location.set_file(symtab_filename);
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table", source_location};
     }
-    config.set_from_symbol_table(symtab);
+    config.set_from_symbol_table(*symbol_table_opt);
 
-    if(failed(linking(linked_symbol_table, symtab, message_handler)))
+    if(failed(linking(linked_symbol_table, *symbol_table_opt, message_handler)))
     {
       throw invalid_input_exceptiont{
         "failed to link `" + symtab_filename + "'"};

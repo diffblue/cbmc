@@ -22,19 +22,19 @@ Author: Daniel Kroening, kroening@kroening.com
 static std::pair<optionalt<replace_symbolt::expr_mapt>, bool> add_one_function(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  const std::function<void(
+  const std::function<optionalt<symbol_tablet>(
     const std::set<irep_idt> &,
     const symbol_tablet &,
-    symbol_tablet &,
     message_handlert &)> &library,
   const irep_idt &missing_function)
 {
+  auto symbol_table_opt =
+    library({missing_function}, goto_model.symbol_table, message_handler);
+  if(!symbol_table_opt.has_value())
+    return {{}, false};
+
   goto_modelt library_model;
-  library(
-    {missing_function},
-    goto_model.symbol_table,
-    library_model.symbol_table,
-    message_handler);
+  library_model.symbol_table.swap(*symbol_table_opt);
 
   // convert to CFG
   if(
@@ -80,9 +80,15 @@ static std::pair<optionalt<replace_symbolt::expr_mapt>, bool> add_one_function(
     }
   }
 
-  return {
-    link_goto_model(goto_model, std::move(library_model), message_handler),
-    init_required};
+  auto updates_opt =
+    link_goto_model(goto_model, std::move(library_model), message_handler);
+  if(!updates_opt.has_value())
+  {
+    messaget log{message_handler};
+    log.warning() << "Linking library function '" << missing_function
+                  << "' failed" << messaget::eom;
+  }
+  return {std::move(updates_opt), init_required};
 }
 
 /// Complete missing function definitions using the \p library.
@@ -97,10 +103,9 @@ static std::pair<optionalt<replace_symbolt::expr_mapt>, bool> add_one_function(
 void link_to_library(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  const std::function<void(
+  const std::function<optionalt<symbol_tablet>(
     const std::set<irep_idt> &,
     const symbol_tablet &,
-    symbol_tablet &,
     message_handlert &)> &library)
 {
   // this needs a fixedpoint, as library functions
@@ -143,14 +148,8 @@ void link_to_library(
           add_one_function(goto_model, message_handler, library, id);
         auto updates_opt = one_result.first;
         need_reinit |= one_result.second;
-        if(!updates_opt.has_value())
-        {
-          messaget log{message_handler};
-          log.warning() << "Linking library function '" << id << "' failed"
-                        << messaget::eom;
-          continue;
-        }
-        object_type_updates.insert(updates_opt->begin(), updates_opt->end());
+        if(updates_opt.has_value())
+          object_type_updates.insert(updates_opt->begin(), updates_opt->end());
       }
     }
 

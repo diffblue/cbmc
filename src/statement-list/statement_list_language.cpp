@@ -16,7 +16,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include "statement_list_parser.h"
 #include "statement_list_typecheck.h"
 
-#include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 #include <util/get_base_name.h>
 #include <util/make_unique.h>
@@ -33,8 +32,7 @@ bool statement_list_languaget::generate_support_functions(
   return statement_list_entry_point(symbol_table, get_message_handler());
 }
 
-bool statement_list_languaget::typecheck(
-  symbol_table_baset &symbol_table,
+optionalt<symbol_tablet> statement_list_languaget::typecheck(
   const std::string &module,
   const bool keep_file_local)
 {
@@ -42,15 +40,12 @@ bool statement_list_languaget::typecheck(
 
   if(statement_list_typecheck(
        parse_tree, new_symbol_table, module, get_message_handler()))
-    return true;
+    return {};
 
   remove_internal_symbols(
     new_symbol_table, get_message_handler(), keep_file_local);
 
-  if(linking(symbol_table, new_symbol_table, get_message_handler()))
-    return true;
-
-  return false;
+  return std::move(new_symbol_table);
 }
 
 bool statement_list_languaget::parse(
@@ -81,11 +76,10 @@ bool statement_list_languaget::can_keep_file_local()
   return true;
 }
 
-bool statement_list_languaget::typecheck(
-  symbol_table_baset &symbol_table,
-  const std::string &module)
+optionalt<symbol_tablet>
+statement_list_languaget::typecheck(const std::string &module)
 {
-  return typecheck(symbol_table, module, true);
+  return typecheck(module, true);
 }
 
 bool statement_list_languaget::from_expr(

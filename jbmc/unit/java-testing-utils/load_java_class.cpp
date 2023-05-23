@@ -126,7 +126,9 @@ goto_modelt load_goto_model_from_java_class(
   language.set_message_handler(null_message_handler);
   language.set_language_options(options);
   language.parse(java_code_stream, filename);
-  language.typecheck(lazy_goto_model.symbol_table, "");
+  auto symbol_table_opt = language.typecheck("");
+  CHECK_RETURN(symbol_table_opt.has_value());
+  lazy_goto_model.symbol_table.swap(*symbol_table_opt);
   language.generate_support_functions(lazy_goto_model.symbol_table);
   language.final(lazy_goto_model.symbol_table);
 

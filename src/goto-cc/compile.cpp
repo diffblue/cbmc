@@ -625,21 +625,22 @@ optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
     return {};
 
   // we just typecheck one file here
-  symbol_tablet file_symbol_table;
-  if(language_files.typecheck(
-       file_symbol_table, keep_file_local, log.get_message_handler()))
+  auto file_symbol_table_opt =
+    language_files.typecheck(keep_file_local, log.get_message_handler());
+
+  if(!file_symbol_table_opt.has_value())
   {
     log.error() << "CONVERSION ERROR" << messaget::eom;
     return {};
   }
 
-  if(language_files.final(file_symbol_table))
+  if(language_files.final(*file_symbol_table_opt))
   {
     log.error() << "CONVERSION ERROR" << messaget::eom;
     return {};
   }
 
-  return std::move(file_symbol_table);
+  return file_symbol_table_opt;
 }
 
 /// constructor

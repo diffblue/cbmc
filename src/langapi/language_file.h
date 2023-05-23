@@ -10,14 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LANGAPI_LANGUAGE_FILE_H
 #define CPROVER_LANGAPI_LANGUAGE_FILE_H
 
+#include <util/symbol_table.h>
+
 #include <iosfwd>
 #include <map>
 #include <memory> // unique_ptr
 #include <set>
 #include <string>
 #include <unordered_set>
-
-#include <util/symbol_table_base.h>
 
 class message_handlert;
 class language_filet;
@@ -28,6 +28,7 @@ class language_modulet final
 public:
   std::string name;
   bool type_checked, in_progress;
+  symbol_tablet symbol_table;
   language_filet *file;
 
   language_modulet():
@@ -107,16 +108,11 @@ public:
 
   bool generate_support_functions(symbol_table_baset &symbol_table);
 
-  bool
-
-  typecheck(
-    symbol_table_baset &symbol_table,
-    const bool keep_file_local,
-    message_handlert &message_handler);
-  bool
-  typecheck(symbol_table_baset &symbol_table, message_handlert &message_handler)
+  optionalt<symbol_tablet>
+  typecheck(const bool keep_file_local, message_handlert &message_handler);
+  optionalt<symbol_tablet> typecheck(message_handlert &message_handler)
   {
-    return typecheck(symbol_table, false, message_handler);
+    return typecheck(false, message_handler);
   }
 
   bool final(symbol_table_baset &symbol_table);
@@ -151,13 +147,11 @@ public:
 
 protected:
   bool typecheck_module(
-    symbol_table_baset &symbol_table,
     language_modulet &module,
     const bool keep_file_local,
     message_handlert &message_handler);
 
   bool typecheck_module(
-    symbol_table_baset &symbol_table,
     const std::string &module,
     const bool keep_file_local,
     message_handlert &message_handler);

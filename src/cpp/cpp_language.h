@@ -41,8 +41,7 @@ public:
 
   bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
-  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
-    override;
+  optionalt<symbol_tablet> typecheck(const std::string &module) override;
 
   bool merge_symbol_table(
     symbol_table_baset &dest,

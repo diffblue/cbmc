@@ -8,9 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language_file.h"
 
-#include <fstream>
+#include <linking/linking.h>
 
 #include "language.h"
+
+#include <fstream>
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
@@ -82,17 +84,18 @@ bool language_filest::parse(message_handlert &message_handler)
   return false;
 }
 
-bool language_filest::typecheck(
-  symbol_table_baset &symbol_table,
+optionalt<symbol_tablet> language_filest::typecheck(
   const bool keep_file_local,
   message_handlert &message_handler)
 {
+  symbol_tablet symbol_table;
+
   // typecheck interfaces
 
   for(auto &file : file_map)
   {
     if(file.second.language->interfaces(symbol_table))
-      return true;
+      return {};
   }
 
   // build module map
@@ -127,20 +130,26 @@ bool language_filest::typecheck(
   }
 
   // typecheck files
-
   for(auto &file : file_map)
   {
     if(file.second.modules.empty())
     {
       if(file.second.language->can_keep_file_local())
       {
-        if(file.second.language->typecheck(symbol_table, "", keep_file_local))
-          return true;
+        auto file_symtab_opt =
+          file.second.language->typecheck("", keep_file_local);
+        if(!file_symtab_opt.has_value())
+          return {};
+        if(linking(symbol_table, *file_symtab_opt, message_handler))
+          return {};
       }
       else
       {
-        if(file.second.language->typecheck(symbol_table, ""))
-          return true;
+        auto file_symtab_opt = file.second.language->typecheck("");
+        if(!file_symtab_opt.has_value())
+          return {};
+        if(linking(symbol_table, *file_symtab_opt, message_handler))
+          return {};
       }
       // register lazy methods.
       // TODO: learn about modules and generalise this
@@ -156,12 +165,15 @@ bool language_filest::typecheck(
 
   for(auto &module : module_map)
   {
-    if(typecheck_module(
-         symbol_table, module.second, keep_file_local, message_handler))
-      return true;
+    bool failed =
+      typecheck_module(module.second, keep_file_local, message_handler);
+    if(failed)
+      return {};
+    if(linking(symbol_table, module.second.symbol_table, message_handler))
+      return {};
   }
 
-  return false;
+  return std::move(symbol_table);
 }
 
 bool language_filest::generate_support_functions(
@@ -205,7 +217,6 @@ bool language_filest::interfaces(symbol_table_baset &symbol_table)
 }
 
 bool language_filest::typecheck_module(
-  symbol_table_baset &symbol_table,
   const std::string &module,
   const bool keep_file_local,
   message_handlert &message_handler)
@@ -222,12 +233,10 @@ bool language_filest::typecheck_module(
     return true;
   }
 
-  return typecheck_module(
-    symbol_table, it->second, keep_file_local, message_handler);
+  return typecheck_module(it->second, keep_file_local, message_handler);
 }
 
 bool language_filest::typecheck_module(
-  symbol_table_baset &symbol_table,
   language_modulet &module,
   const bool keep_file_local,
   message_handlert &message_handler)
@@ -261,7 +270,7 @@ bool language_filest::typecheck_module(
       it++)
   {
     module.in_progress =
-      !typecheck_module(symbol_table, *it, keep_file_local, message_handler);
+      !typecheck_module(*it, keep_file_local, message_handler);
     if(module.in_progress == false)
       return true;
   }
@@ -272,17 +281,25 @@ bool language_filest::typecheck_module(
 
   if(module.file->language->can_keep_file_local())
   {
-    module.in_progress = !module.file->language->typecheck(
-      symbol_table, module.name, keep_file_local);
+    auto module_symtab_opt =
+      module.file->language->typecheck(module.name, keep_file_local);
+    if(!module_symtab_opt.has_value())
+    {
+      module.in_progress = false;
+      return true;
+    }
+    module.symbol_table = std::move(*module_symtab_opt);
   }
   else
   {
-    module.in_progress =
-      !module.file->language->typecheck(symbol_table, module.name);
+    auto module_symtab_opt = module.file->language->typecheck(module.name);
+    if(!module_symtab_opt.has_value())
+    {
+      module.in_progress = false;
+      return true;
+    }
+    module.symbol_table = std::move(*module_symtab_opt);
   }
-
-  if(!module.in_progress)
-    return true;
 
   module.type_checked=true;
   module.in_progress=false;

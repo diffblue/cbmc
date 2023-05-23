@@ -29,13 +29,12 @@ goto_modelt initialize_goto_model(
 ///   if the collection is empty.
 /// \param options: Configuration options.
 /// \param language_files: Language parsing and type checking facilities.
-/// \param [out] symbol_table: Symbol table to be populated.
 /// \param message_handler: Message handler.
-void initialize_from_source_files(
+/// \return Symbol table containing type checked symbols from \p sources.
+symbol_tablet initialize_from_source_files(
   const std::list<std::string> &sources,
   const optionst &options,
   language_filest &language_files,
-  symbol_tablet &symbol_table,
   message_handlert &message_handler);
 
 /// Process the "function" option in \p options to prepare a custom entry point

@@ -76,14 +76,14 @@ bool jsil_languaget::parse(
 }
 
 /// Converting from parse tree and type checking.
-bool jsil_languaget::typecheck(
-  symbol_table_baset &symbol_table,
-  const std::string &)
+optionalt<symbol_tablet> jsil_languaget::typecheck(const std::string &)
 {
-  if(jsil_typecheck(symbol_table, get_message_handler()))
-    return true;
+  symbol_tablet symbol_table;
 
-  return false;
+  if(jsil_typecheck(symbol_table, get_message_handler()))
+    return {};
+
+  return std::move(symbol_table);
 }
 
 bool jsil_languaget::generate_support_functions(

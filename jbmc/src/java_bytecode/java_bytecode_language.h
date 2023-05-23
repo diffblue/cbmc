@@ -295,8 +295,7 @@ public:
 
   bool generate_support_functions(symbol_table_baset &symbol_table) override;
 
-  bool
-  typecheck(symbol_table_baset &context, const std::string &module) override;
+  optionalt<symbol_tablet> typecheck(const std::string &module) override;
 
   virtual bool final(symbol_table_baset &context) override;
 

@@ -65,11 +65,12 @@ goto_modelt get_goto_model_from_c(std::istream &in)
   goto_modelt goto_model;
 
   {
-    const bool error =
-      language_files.typecheck(goto_model.symbol_table, null_message_handler);
+    auto symbol_table_opt = language_files.typecheck(null_message_handler);
 
-    if(error)
+    if(!symbol_table_opt.has_value())
       throw invalid_input_exceptiont("typechecking failed");
+
+    goto_model.symbol_table = std::move(*symbol_table_opt);
   }
 
   {

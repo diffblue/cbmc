@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/ansi_c_entry_point.h>
 #include <ansi-c/c_preprocess.h>
-#include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 
 #include "cpp_internal_additions.h"
@@ -118,22 +117,22 @@ bool cpp_languaget::parse(
   return result;
 }
 
-bool cpp_languaget::typecheck(
-  symbol_table_baset &symbol_table,
-  const std::string &module)
+optionalt<symbol_tablet> cpp_languaget::typecheck(const std::string &module)
 {
-  if(module.empty())
-    return false;
-
   symbol_tablet new_symbol_table;
+
+  if(module.empty())
+    return std::move(new_symbol_table);
 
   if(cpp_typecheck(
       cpp_parse_tree, new_symbol_table, module, get_message_handler()))
-    return true;
+  {
+    return {};
+  }
 
   remove_internal_symbols(new_symbol_table, get_message_handler(), false);
 
-  return linking(symbol_table, new_symbol_table, get_message_handler());
+  return std::move(new_symbol_table);
 }
 
 bool cpp_languaget::generate_support_functions(symbol_table_baset &symbol_table)

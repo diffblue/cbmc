@@ -13,7 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <util/json.h>
 #include <util/make_unique.h>
-#include <util/symbol_table_base.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -27,8 +27,7 @@ class json_symtab_languaget : public languaget
 public:
   bool parse(std::istream &instream, const std::string &path) override;
 
-  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
-    override;
+  optionalt<symbol_tablet> typecheck(const std::string &module) override;
 
   void show_parse(std::ostream &out) override;
 

@@ -13,7 +13,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table.h>
 
 #include <json/json_parser.h>
-#include <linking/linking.h>
 
 #include "json_symbol_table.h"
 
@@ -31,10 +30,9 @@ bool json_symtab_languaget::parse(
 /// Typecheck a goto program in json form.
 /// \param symbol_table: The symbol table containing symbols read from file.
 /// \param module: A useless parameter, there for interface consistency.
-/// \return boolean signifying success or failure of the typechecking.
-bool json_symtab_languaget::typecheck(
-  symbol_table_baset &symbol_table,
-  const std::string &module)
+/// \return Symbol table iff type checking succeeded, else `nullopt`.
+optionalt<symbol_tablet>
+json_symtab_languaget::typecheck(const std::string &module)
 {
   (void)module; // unused parameter
 
@@ -43,12 +41,12 @@ bool json_symtab_languaget::typecheck(
   try
   {
     symbol_table_from_json(parsed_json_file, new_symbol_table);
-    return linking(symbol_table, new_symbol_table, get_message_handler());
+    return std::move(new_symbol_table);
   }
   catch(const std::string &str)
   {
     error() << "typecheck: " << str << eom;
-    return true;
+    return {};
   }
 }
 

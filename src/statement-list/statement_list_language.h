@@ -45,14 +45,11 @@ public:
   /// \param module: Name of the file that has been parsed.
   /// \param keep_file_local: Set to true if local variables of this module
   ///   should be included in the table.
-  /// \return False if no errors occurred, true otherwise.
-  bool typecheck(
-    symbol_table_baset &symbol_table,
-    const std::string &module,
-    const bool keep_file_local) override;
+  /// \return Symbol table iff no errors occurred, `nullopt` otherwise.
+  optionalt<symbol_tablet>
+  typecheck(const std::string &module, const bool keep_file_local) override;
 
-  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
-    override;
+  optionalt<symbol_tablet> typecheck(const std::string &module) override;
 
   bool can_keep_file_local() override;
 

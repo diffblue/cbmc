@@ -35,17 +35,16 @@ static std::string get_cprover_library_text(
     functions, symbol_table, cprover_library, library_text.str());
 }
 
-void cprover_cpp_library_factory(
+optionalt<symbol_tablet> cprover_cpp_library_factory(
   const std::set<irep_idt> &functions,
   const symbol_table_baset &symbol_table,
-  symbol_table_baset &dest_symbol_table,
   message_handlert &message_handler)
 {
   if(config.ansi_c.lib == configt::ansi_ct::libt::LIB_NONE)
-    return;
+    return {};
 
   const std::string library_text =
     get_cprover_library_text(functions, symbol_table);
 
-  add_library(library_text, dest_symbol_table, message_handler);
+  return add_library(library_text, message_handler);
 }

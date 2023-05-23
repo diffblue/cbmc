@@ -60,15 +60,14 @@ static bool generate_entry_point_for_function(
   return entry_language->generate_support_functions(symbol_table);
 }
 
-void initialize_from_source_files(
+symbol_tablet initialize_from_source_files(
   const std::list<std::string> &sources,
   const optionst &options,
   language_filest &language_files,
-  symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
   if(sources.empty())
-    return;
+    return symbol_tablet{};
 
   messaget msg(message_handler);
 
@@ -111,10 +110,13 @@ void initialize_from_source_files(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(symbol_table, message_handler))
+    auto symbol_table_opt = language_files.typecheck(message_handler);
+    if(!symbol_table_opt.has_value())
     {
       throw invalid_input_exceptiont("CONVERSION ERROR");
     }
+
+    return std::move(*symbol_table_opt);
 }
 
 void set_up_custom_entry_point(
@@ -204,8 +206,9 @@ goto_modelt initialize_goto_model(
 
   language_filest language_files;
   goto_modelt goto_model;
-  initialize_from_source_files(
-    sources, options, language_files, goto_model.symbol_table, message_handler);
+  auto symbol_table = initialize_from_source_files(
+    sources, options, language_files, message_handler);
+  goto_model.symbol_table.swap(symbol_table);
 
   if(read_objects_and_link(binaries, goto_model, message_handler))
     throw incorrect_goto_program_exceptiont{"failed to read/link goto model"};

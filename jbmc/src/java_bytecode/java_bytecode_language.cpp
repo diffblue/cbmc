@@ -799,21 +799,11 @@ static void create_stub_global_symbols(
   }
 }
 
-bool java_bytecode_languaget::typecheck(
-  symbol_table_baset &symbol_table,
-  const std::string &)
+optionalt<symbol_tablet> java_bytecode_languaget::typecheck(const std::string &)
 {
   PRECONDITION(language_options.has_value());
-  // There are various cases in the Java front-end where pre-existing symbols
-  // from a previous load are not handled. We just rule this case out for now;
-  // a user wishing to ensure a particular class is loaded should use
-  // --java-load-class (to force class-loading) or
-  // --lazy-methods-extra-entry-point (to ensure a method body is loaded)
-  // instead of creating two instances of the front-end.
-  INVARIANT(
-    symbol_table.begin() == symbol_table.end(),
-    "the Java front-end should only be used with an empty symbol table");
 
+  symbol_tablet symbol_table;
   java_internal_additions(symbol_table);
   create_java_initialize(symbol_table);
 
@@ -836,7 +826,7 @@ bool java_bytecode_languaget::typecheck(
          string_preprocess,
          language_options->no_load_classes))
     {
-      return true;
+      return {};
     }
   }
 
@@ -856,7 +846,7 @@ bool java_bytecode_languaget::typecheck(
          string_preprocess,
          language_options->no_load_classes))
     {
-      return true;
+      return {};
     }
   }
 
@@ -987,7 +977,7 @@ bool java_bytecode_languaget::typecheck(
   case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
     // ci = context-insensitive
     if(do_ci_lazy_method_conversion(symbol_table))
-      return true;
+      return {};
     break;
   case LAZY_METHODS_MODE_EAGER:
   {
@@ -1033,10 +1023,12 @@ bool java_bytecode_languaget::typecheck(
     get_message_handler());
 
   // now typecheck all
-  bool res = java_bytecode_typecheck(
+  bool failed = java_bytecode_typecheck(
     symbol_table,
     get_message_handler(),
     language_options->string_refinement_enabled);
+  if(failed)
+    return {};
 
   // now instrument thread-blocks and synchronized methods.
   if(language_options->threading_support)
@@ -1045,7 +1037,7 @@ bool java_bytecode_languaget::typecheck(
     convert_synchronized_methods(symbol_table, get_message_handler());
   }
 
-  return res;
+  return std::move(symbol_table);
 }
 
 bool java_bytecode_languaget::generate_support_functions(

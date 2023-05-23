@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/get_base_name.h>
 #include <util/symbol_table.h>
 
-#include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 
 #include "ansi_c_entry_point.h"
@@ -101,16 +100,14 @@ bool ansi_c_languaget::parse(
   return result;
 }
 
-bool ansi_c_languaget::typecheck(
-  symbol_table_baset &symbol_table,
+optionalt<symbol_tablet> ansi_c_languaget::typecheck(
   const std::string &module,
   const bool keep_file_local)
 {
-  return typecheck(symbol_table, module, keep_file_local, {});
+  return typecheck(module, keep_file_local, {});
 }
 
-bool ansi_c_languaget::typecheck(
-  symbol_table_baset &symbol_table,
+optionalt<symbol_tablet> ansi_c_languaget::typecheck(
   const std::string &module,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
@@ -123,16 +120,13 @@ bool ansi_c_languaget::typecheck(
     module,
     get_message_handler()))
   {
-    return true;
+    return {};
   }
 
   remove_internal_symbols(
     new_symbol_table, this->get_message_handler(), keep_file_local, keep);
 
-  if(linking(symbol_table, new_symbol_table, get_message_handler()))
-    return true;
-
-  return false;
+  return std::move(new_symbol_table);
 }
 
 bool ansi_c_languaget::generate_support_functions(

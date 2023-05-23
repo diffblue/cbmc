@@ -306,15 +306,15 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
   to_load.insert("free");
   to_load.insert(CPROVER_PREFIX "deallocate");
 
-  symbol_tablet tmp_symbol_table;
-  cprover_c_library_factory_force_load(
-    to_load, tmp_symbol_table, message_handler);
+  auto symbol_table_opt = cprover_c_library_factory_force_load(
+    to_load, symbol_tablet{}, message_handler);
+  CHECK_RETURN(symbol_table_opt.has_value());
 
   // compute missing library functions before modifying the symbol table
   std::set<irep_idt> missing = get_missing_funs();
 
   // copy all loaded symbols to the main symbol table
-  for(const auto &symbol_pair : tmp_symbol_table.symbols)
+  for(const auto &symbol_pair : symbol_table_opt->symbols)
   {
     const auto &sym = symbol_pair.first;
     if(!goto_model.symbol_table.has_symbol(sym))
