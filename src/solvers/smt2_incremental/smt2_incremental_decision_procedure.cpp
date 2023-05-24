@@ -8,7 +8,6 @@
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>
-#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
@@ -266,13 +265,13 @@ static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
       auto prophecy_r_or_w_ok =
         expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
     {
-      expr = simplify_expr(prophecy_r_or_w_ok->lower(ns), ns);
+      expr = prophecy_r_or_w_ok->lower(ns);
     }
     else if(
       auto prophecy_pointer_in_range =
         expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
     {
-      expr = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
+      expr = prophecy_pointer_in_range->lower(ns);
     }
   });
   return expr;
