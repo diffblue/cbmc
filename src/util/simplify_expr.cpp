@@ -1332,6 +1332,17 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       return changed(simplify_address_of(result)); // recursive call
     }
   }
+  else if(
+    operand.id() == ID_pointer_object || operand.id() == ID_pointer_offset)
+  {
+    // pointer_object and pointer_offset do not have a prescribed type
+    if(expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv)
+    {
+      auto new_expr = operand;
+      new_expr.type() = expr_type;
+      return std::move(new_expr);
+    }
+  }
 
   return unchanged(expr);
 }
