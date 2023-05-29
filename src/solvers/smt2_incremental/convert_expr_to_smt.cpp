@@ -34,8 +34,7 @@
 ///   * avoiding the deeply nested call stacks associated with recursion.
 ///   * supporting wider scope for the conversion of specific types of `exprt`,
 ///     without inflating the parameter list / scope for all conversions.
-using sub_expression_mapt =
-  std::unordered_map<exprt, smt_termt, irep_full_hash>;
+using sub_expression_mapt = std::unordered_map<exprt, smt_termt, irep_hash>;
 
 /// \brief Converts operator expressions with 2 or more operands to terms
 ///   expressed as binary operator application.
