@@ -1,0 +1,12 @@
+CORE new-smt-backend
+main.c
+-DSIZE=1 -DITERS=1
+^Generated 33 VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Requires constant propagation of with_exprt (where all operands evaluate to
+constants) and simplification of type casts of pointer_object expressions.

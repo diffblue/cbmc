@@ -40,6 +40,8 @@ protected:
 
       return !found_non_constant;
     }
+    else if(expr.id() == ID_if && expr.type().id() == ID_pointer)
+      return true;
 
     return is_constantt::is_constant(expr);
   }
