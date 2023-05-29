@@ -153,31 +153,6 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
         bv_get_rec(member, bv, offset),
         type);
     }
-    else if(type.id()==ID_vector)
-    {
-      const std::size_t width = boolbv_width(type);
-
-      const auto &vector_type = to_vector_type(type);
-      const typet &element_type = vector_type.element_type();
-      std::size_t element_width = boolbv_width(element_type);
-      CHECK_RETURN(element_width > 0);
-
-      if(element_width != 0 && width % element_width == 0)
-      {
-        std::size_t size = width / element_width;
-        vector_exprt value({}, vector_type);
-        value.reserve_operands(size);
-
-        for(std::size_t i=0; i<size; i++)
-        {
-          const index_exprt index{expr,
-                                  from_integer(i, vector_type.index_type())};
-          value.operands().push_back(bv_get_rec(index, bv, i * element_width));
-        }
-
-        return std::move(value);
-      }
-    }
     else if(type.id()==ID_complex)
     {
       const std::size_t width = boolbv_width(type);

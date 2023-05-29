@@ -149,21 +149,6 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     else
       cache_entry = defined_entryt{numeric_cast_v<std::size_t>(total)};
   }
-  else if(type_id==ID_vector)
-  {
-    const vector_typet &vector_type=to_vector_type(type);
-    auto sub_width = get_width_opt(vector_type.element_type());
-    if(!sub_width.has_value())
-      return cache_entry;
-
-    const auto vector_size = numeric_cast_v<mp_integer>(vector_type.size());
-
-    mp_integer total = vector_size * *sub_width;
-    if(total > (1 << 30)) // realistic limit
-      throw analysis_exceptiont("vector too large for flattening");
-    else
-      cache_entry = defined_entryt{numeric_cast_v<std::size_t>(total)};
-  }
   else if(type_id==ID_complex)
   {
     auto sub_width = get_width_opt(to_complex_type(type).subtype());

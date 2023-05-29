@@ -30,8 +30,7 @@ bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
   bvtypet bvtype=get_bvtype(type);
   bvtypet op_bvtype = get_bvtype(op.type());
 
-  if(bvtype==bvtypet::IS_UNKNOWN &&
-     (type.id()==ID_vector || type.id()==ID_complex))
+  if(bvtype == bvtypet::IS_UNKNOWN && type.id() == ID_complex)
   {
     const typet &subtype = to_type_with_subtype(type).subtype();
 

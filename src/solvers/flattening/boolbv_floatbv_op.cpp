@@ -116,7 +116,7 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
     else
       UNREACHABLE;
   }
-  else if(expr.type().id() == ID_vector || expr.type().id() == ID_complex)
+  else if(expr.type().id() == ID_complex)
   {
     const typet &subtype = to_type_with_subtype(expr.type()).subtype();
 
@@ -129,8 +129,8 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
 
       DATA_INVARIANT(
         sub_width > 0 && width % sub_width == 0,
-        "width of a vector subtype must be positive and evenly divide the "
-        "width of the vector");
+        "width of a complex subtype must be positive and evenly divide the "
+        "width of the complex expression");
 
       std::size_t size=width/sub_width;
       bvt result_bv;
@@ -160,7 +160,7 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
 
         INVARIANT(
           sub_result_bv.size() == sub_width,
-          "we constructed a new vector of the right size");
+          "we constructed a new complex of the right size");
         INVARIANT(
           i * sub_width + sub_width - 1 < result_bv.size(),
           "the sub-bitvector fits into the result bitvector");
