@@ -515,12 +515,12 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt &in_expr,
   bool value)
 {
-  const exprt lowered_expr = lower(in_expr);
-  PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
-          << lowered_expr.pretty(2, 0) << messaget::eom;
+          << in_expr.pretty(2, 0) << messaget::eom;
   });
+  const exprt lowered_expr = lower(in_expr);
+  PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
@@ -590,7 +590,13 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression)
 {
-  return struct_encoding.encode(lower_byte_operators(expression, ns));
+  const exprt lowered =
+    struct_encoding.encode(lower_byte_operators(expression, ns));
+  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
+    if(lowered != expression)
+      debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
+  });
+  return lowered;
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
