@@ -127,7 +127,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a4a1246264a6dd3069e480a3610ed80e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8h.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a> (<a class="el" href="classexprt.html">exprt</a> expr)</td></tr>
 <tr class="memdesc:a4a1246264a6dd3069e480a3610ed80e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower the <code>address_of(array[idx])</code> sub expressions in <code>expr</code> to <code>idx + address_of(array)</code>, so that it can be fed to <code>convert_expr_to_smt</code>.  <a href="convert__expr__to__smt_8h.html#a4a1246264a6dd3069e480a3610ed80e1">More...</a><br /></td></tr>
 <tr class="separator:a4a1246264a6dd3069e480a3610ed80e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2eac5e11c3708eaf57361a7fbcd8f91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsmt__termt.html">smt_termt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8h.html#ac2eac5e11c3708eaf57361a7fbcd8f91">convert_expr_to_smt</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map, const <a class="el" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a> &amp;pointer_sizes, const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;<a class="el" href="pointer__predicates_8h.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>, const <a class="el" href="structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</td></tr>
+<tr class="memitem:ac2eac5e11c3708eaf57361a7fbcd8f91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsmt__termt.html">smt_termt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8h.html#ac2eac5e11c3708eaf57361a7fbcd8f91">convert_expr_to_smt</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map, const <a class="el" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes, const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;<a class="el" href="pointer__predicates_8h.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>, const <a class="el" href="structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</td></tr>
 <tr class="memdesc:ac2eac5e11c3708eaf57361a7fbcd8f91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the <code>expression</code> to an smt encoding of the same expression stored as term ast (abstract syntax tree).  <a href="convert__expr__to__smt_8h.html#ac2eac5e11c3708eaf57361a7fbcd8f91">More...</a><br /></td></tr>
 <tr class="separator:ac2eac5e11c3708eaf57361a7fbcd8f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -153,7 +153,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="type__size__mapping_8h.html#adfc99be25653a8feeac43c1192a1992e">type_size_mapt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;&#160;</td>
           <td class="paramname"><em>pointer_sizes</em>, </td>
         </tr>
         <tr>
@@ -178,7 +178,7 @@ Functions</h2></td></tr>
 
 <p>Converts the <code>expression</code> to an smt encoding of the same expression stored as term ast (abstract syntax tree). </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01849">1849</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01848">1848</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -200,7 +200,7 @@ Functions</h2></td></tr>
 
 <p>Converts the <code>type</code> to an smt encoding of the same expression stored as sort ast (abstract syntax tree). </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00100">100</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00099">99</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -222,7 +222,7 @@ Functions</h2></td></tr>
 
 <p>Lower the <code>address_of(array[idx])</code> sub expressions in <code>expr</code> to <code>idx + address_of(array)</code>, so that it can be fed to <code>convert_expr_to_smt</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01830">1830</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01829">1829</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
