@@ -15,7 +15,7 @@
 
 #include <unordered_map> // IWYU pragma: keep
 
-using type_size_mapt = std::unordered_map<typet, smt_termt, irep_full_hash>;
+using type_size_mapt = std::unordered_map<typet, smt_termt, irep_hash>;
 
 /// This function populates the (pointer) type -> size map.
 /// \param expression: the expression we're building the map for.
