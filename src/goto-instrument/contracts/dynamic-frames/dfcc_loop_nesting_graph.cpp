@@ -17,7 +17,8 @@ Date: March 2023
 dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet(
   const goto_programt::targett &head,
   const goto_programt::targett &latch,
-  const loop_templatet<goto_programt::targett> &instructions)
+  const loop_templatet<goto_programt::targett, goto_programt::target_less_than>
+    &instructions)
   : head(head), latch(latch), instructions(instructions)
 {
 }

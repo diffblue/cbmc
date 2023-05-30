@@ -49,8 +49,10 @@ public:
 
   bool has_been_modified(const abstract_object_pointert &before) const override;
 
-  std::set<goto_programt::const_targett> get_data_dependencies() const;
-  std::set<goto_programt::const_targett> get_data_dominators() const;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than>
+  get_data_dependencies() const;
+  std::set<goto_programt::const_targett, goto_programt::target_less_than>
+  get_data_dominators() const;
 
   void output(std::ostream &out, const class ai_baset &ai, const namespacet &ns)
     const override;

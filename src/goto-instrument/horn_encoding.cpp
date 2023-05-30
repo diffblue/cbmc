@@ -389,7 +389,8 @@ protected:
   loct first_loc;
   symbol_exprt entry_state = symbol_exprt(irep_idt(), typet());
   exprt return_lhs = nil_exprt();
-  using incomingt = std::map<loct, std::vector<loct>>;
+  using incomingt =
+    std::map<loct, std::vector<loct>, goto_programt::target_less_than>;
   incomingt incoming;
 };
 

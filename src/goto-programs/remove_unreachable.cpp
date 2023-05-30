@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// remove unreachable code
 void remove_unreachable(goto_programt &goto_program)
 {
-  std::set<goto_programt::targett> reachable;
+  std::set<goto_programt::targett, goto_programt::target_less_than> reachable;
   std::stack<goto_programt::targett> working;
 
   working.push(goto_program.instructions.begin());

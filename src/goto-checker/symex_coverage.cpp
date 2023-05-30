@@ -80,7 +80,11 @@ protected:
     }
 
     unsigned hits;
-    std::map<goto_programt::const_targett, coverage_conditiont> conditions;
+    std::map<
+      goto_programt::const_targett,
+      coverage_conditiont,
+      goto_programt::target_less_than>
+      conditions;
   };
 
   typedef std::map<unsigned, coverage_linet> coverage_lines_mapt;

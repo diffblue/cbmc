@@ -487,7 +487,8 @@ void code_contractst::check_apply_loop_contracts(
   loop_end->turn_into_assume();
   loop_end->condition_nonconst() = boolean_negate(loop_end->condition());
 
-  std::set<goto_programt::targett> seen_targets;
+  std::set<goto_programt::targett, goto_programt::target_less_than>
+    seen_targets;
   // Find all exit points of the loop, make temporary variables `DEAD`,
   // and check that step case was checked for non-vacuous loops.
   for(const auto &t : loop)

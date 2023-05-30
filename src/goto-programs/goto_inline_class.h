@@ -138,7 +138,9 @@ public:
     // map from segment start to inline info
     typedef std::map<
       goto_programt::const_targett,
-      goto_inline_log_infot> log_mapt;
+      goto_inline_log_infot,
+      goto_programt::target_less_than>
+      log_mapt;
 
     log_mapt log_map;
   };

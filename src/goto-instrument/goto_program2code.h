@@ -22,7 +22,10 @@ class code_blockt;
 class goto_program2codet
 {
   typedef std::list<irep_idt> id_listt;
-  typedef std::map<goto_programt::const_targett, goto_programt::const_targett>
+  typedef std::map<
+    goto_programt::const_targett,
+    goto_programt::const_targett,
+    goto_programt::target_less_than>
     loopt;
   typedef std::unordered_map<irep_idt, unsigned> dead_mapt;
   typedef std::list<std::pair<goto_programt::const_targett, bool> >

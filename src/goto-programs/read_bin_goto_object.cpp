@@ -107,7 +107,11 @@ static void read_bin_functions_object(
     irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
 
-    typedef std::map<goto_programt::targett, std::list<unsigned> > target_mapt;
+    typedef std::map<
+      goto_programt::targett,
+      std::list<unsigned>,
+      goto_programt::target_less_than>
+      target_mapt;
     target_mapt target_map;
     typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
     rev_target_mapt rev_target_map;

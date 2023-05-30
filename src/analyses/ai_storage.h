@@ -100,7 +100,8 @@ public:
 class trace_map_storaget : public ai_storage_baset
 {
 protected:
-  typedef std::map<locationt, trace_set_ptrt> trace_mapt;
+  typedef std::map<locationt, trace_set_ptrt, goto_programt::target_less_than>
+    trace_mapt;
   trace_mapt trace_map;
 
   // This retains one part of a shared_ptr to the history object

@@ -378,7 +378,11 @@ protected:
   typedef std::list<goto_programt::targett> computed_gotost;
   typedef exprt::operandst caset;
   typedef std::list<std::pair<goto_programt::targett, caset> > casest;
-  typedef std::map<goto_programt::targett, casest::iterator> cases_mapt;
+  typedef std::map<
+    goto_programt::targett,
+    casest::iterator,
+    goto_programt::target_less_than>
+    cases_mapt;
 
   struct targetst
   {

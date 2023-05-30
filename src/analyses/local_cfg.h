@@ -29,7 +29,9 @@ public:
     successorst successors;
   };
 
-  typedef std::map<goto_programt::const_targett, node_nrt> loc_mapt;
+  typedef std::
+    map<goto_programt::const_targett, node_nrt, goto_programt::target_less_than>
+      loc_mapt;
   loc_mapt loc_map;
 
   typedef std::vector<nodet> nodest;

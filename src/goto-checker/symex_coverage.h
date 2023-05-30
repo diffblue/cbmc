@@ -64,9 +64,16 @@ protected:
     goto_programt::const_targett succ;
   };
 
-  typedef std::map<goto_programt::const_targett, coverage_infot>
+  typedef std::map<
+    goto_programt::const_targett,
+    coverage_infot,
+    goto_programt::target_less_than>
     coverage_innert;
-  typedef std::map<goto_programt::const_targett, coverage_innert> coveraget;
+  typedef std::map<
+    goto_programt::const_targett,
+    coverage_innert,
+    goto_programt::target_less_than>
+    coveraget;
   coveraget coverage;
 
   bool

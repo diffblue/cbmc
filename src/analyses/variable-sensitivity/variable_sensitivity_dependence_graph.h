@@ -179,13 +179,19 @@ private:
       data_depst;
   data_depst domain_data_deps;
 
-  typedef std::map<goto_programt::const_targett, tvt> control_depst;
+  typedef std::
+    map<goto_programt::const_targett, tvt, goto_programt::target_less_than>
+      control_depst;
   control_depst control_deps;
 
-  typedef std::set<goto_programt::const_targett> control_dep_candidatest;
+  typedef std::
+    set<goto_programt::const_targett, goto_programt::target_less_than>
+      control_dep_candidatest;
   control_dep_candidatest control_dep_candidates;
 
-  typedef std::set<goto_programt::const_targett> control_dep_callst;
+  typedef std::
+    set<goto_programt::const_targett, goto_programt::target_less_than>
+      control_dep_callst;
   control_dep_callst control_dep_calls;
   control_dep_callst control_dep_call_candidates;
 

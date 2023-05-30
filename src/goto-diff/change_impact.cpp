@@ -236,8 +236,9 @@ protected:
     DEL_CTRL_DEP=1<<5
   };
 
-  typedef std::map<goto_programt::const_targett, unsigned>
-    goto_program_change_impactt;
+  typedef std::
+    map<goto_programt::const_targett, unsigned, goto_programt::target_less_than>
+      goto_program_change_impactt;
   typedef std::map<irep_idt, goto_program_change_impactt>
     goto_functions_change_impactt;
 

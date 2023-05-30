@@ -86,30 +86,24 @@ bool ensure_one_backedge_per_target(
   return true;
 }
 
-struct instruction_location_numbert : public goto_programt::targett
+struct location_number_less_thant
 {
-  // Implicit conversion from a goto_programt::targett is permitted.
-  // NOLINTNEXTLINE(runtime/explicit)
-  instruction_location_numbert(goto_programt::targett target)
-    : goto_programt::targett(target)
+  inline bool operator()(
+    const goto_programt::targett &i1,
+    const goto_programt::targett &i2) const
   {
+    return location_number_less_than(i1, i2);
   }
-
-  instruction_location_numbert() = default;
 };
-
-inline bool operator<(
-  const instruction_location_numbert &i1,
-  const instruction_location_numbert &i2)
-{
-  return i1->location_number < i2->location_number;
-}
 
 bool ensure_one_backedge_per_target(goto_programt &goto_program)
 {
-  natural_loops_templatet<goto_programt, instruction_location_numbert>
+  natural_loops_templatet<
+    goto_programt,
+    goto_programt::targett,
+    location_number_less_thant>
     natural_loops{goto_program};
-  std::set<instruction_location_numbert> modified_loops;
+  std::set<goto_programt::targett, location_number_less_thant> modified_loops;
 
   for(auto it1 = natural_loops.loop_map.begin();
       it1 != natural_loops.loop_map.end();
@@ -136,7 +130,8 @@ bool ensure_one_backedge_per_target(goto_programt &goto_program)
            it1->second.begin(),
            it1->second.end(),
            it2->second.begin(),
-           it2->second.end()))
+           it2->second.end(),
+           location_number_less_thant()))
       {
         // make sure that loops with overlapping body are properly nested by a
         // back edge; this will be a disconnected edge, which

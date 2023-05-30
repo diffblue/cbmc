@@ -114,9 +114,9 @@ inline bool operator<(
   const reaching_definitiont &a,
   const reaching_definitiont &b)
 {
-  if(a.definition_at<b.definition_at)
+  if(goto_programt::target_less_than()(a.definition_at, b.definition_at))
     return true;
-  if(b.definition_at<a.definition_at)
+  if(goto_programt::target_less_than()(b.definition_at, a.definition_at))
     return false;
 
   if(a.bit_begin.is_unknown() != b.bit_begin.is_unknown())
@@ -250,7 +250,8 @@ public:
 
   // each element x represents a range of bits [x.first, x.second)
   typedef std::multimap<range_spect, range_spect> rangest;
-  typedef std::map<locationt, rangest> ranges_at_loct;
+  typedef std::map<locationt, rangest, goto_programt::target_less_than>
+    ranges_at_loct;
 
   const ranges_at_loct &get(const irep_idt &identifier) const;
   void clear_cache(const irep_idt &identifier) const

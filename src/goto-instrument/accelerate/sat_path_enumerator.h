@@ -66,7 +66,9 @@ protected:
   natural_loops_mutablet::natural_loopt &loop;
   goto_programt::targett loop_header;
 
-  typedef std::map<goto_programt::targett, exprt> distinguish_mapt;
+  typedef std::
+    map<goto_programt::targett, exprt, goto_programt::target_less_than>
+      distinguish_mapt;
   typedef std::map<exprt, bool> distinguish_valuest;
 
   acceleration_utilst utils;

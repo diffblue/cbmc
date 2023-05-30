@@ -240,7 +240,23 @@ protected:
 
 public:
   typedef std::map<method_offsett, converted_instructiont> address_mapt;
-  typedef std::pair<const methodt &, const address_mapt &> method_with_amapt;
+  struct method_with_amapt
+  {
+    method_with_amapt(const methodt &m, const address_mapt &a)
+      : method_with_amap(m, a)
+    {
+    }
+
+    std::pair<const methodt &, const address_mapt &> method_with_amap;
+
+    struct target_less_than // NOLINT(readability/identifiers)
+    {
+      bool operator()(const method_offsett &a, const method_offsett &b) const
+      {
+        return a < b;
+      }
+    };
+  };
   typedef cfg_dominators_templatet<method_with_amapt, method_offsett, false>
     java_cfg_dominatorst;
 

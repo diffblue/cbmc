@@ -326,10 +326,13 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
   for(const auto &c_dep : other_control_deps)
   {
     // find position to insert
-    while(it != control_deps.end() && it->first < c_dep.first)
+    while(it != control_deps.end() &&
+          goto_programt::target_less_than()(it->first, c_dep.first))
       ++it;
 
-    if(it == control_deps.end() || c_dep.first < it->first)
+    if(
+      it == control_deps.end() ||
+      goto_programt::target_less_than()(c_dep.first, it->first))
     {
       // hint points at position that will follow the new element
       control_deps.insert(it, c_dep);
@@ -340,9 +343,11 @@ bool variable_sensitivity_dependence_domaint::merge_control_dependencies(
       INVARIANT(
         it != control_deps.end(), "Property of branch needed for safety");
       INVARIANT(
-        !(it->first < c_dep.first), "Property of loop needed for safety");
+        !(goto_programt::target_less_than()(it->first, c_dep.first)),
+        "Property of loop needed for safety");
       INVARIANT(
-        !(c_dep.first < it->first), "Property of loop needed for safety");
+        !(goto_programt::target_less_than()(c_dep.first, it->first)),
+        "Property of loop needed for safety");
 
       tvt &branch1 = it->second;
       const tvt &branch2 = c_dep.second;

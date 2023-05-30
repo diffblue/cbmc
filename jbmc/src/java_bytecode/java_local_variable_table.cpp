@@ -46,8 +46,8 @@ struct procedure_local_cfg_baset<
 
   void operator()(const method_with_amapt &args)
   {
-    const auto &method=args.first;
-    const auto &amap=args.second;
+    const auto &method = args.method_with_amap.first;
+    const auto &amap = args.method_with_amap.second;
     for(const auto &inst : amap)
     {
       // Map instruction PCs onto node indices:
@@ -109,18 +109,18 @@ struct procedure_local_cfg_baset<
   static java_bytecode_convert_methodt::method_offsett
   get_first_node(const method_with_amapt &args)
   {
-    return args.second.begin()->first;
+    return args.method_with_amap.second.begin()->first;
   }
 
   static java_bytecode_convert_methodt::method_offsett
   get_last_node(const method_with_amapt &args)
   {
-    return (--args.second.end())->first;
+    return (--args.method_with_amap.second.end())->first;
   }
 
   static bool nodes_empty(const method_with_amapt &args)
   {
-    return args.second.empty();
+    return args.method_with_amap.second.empty();
   }
 };
 

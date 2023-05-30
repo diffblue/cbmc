@@ -56,10 +56,11 @@ protected:
                   const goto_programt::instructiont &,
                   const std::string &);
 
-  void find_next(const goto_programt::instructionst &,
-                 const goto_programt::const_targett &,
-                 std::set<goto_programt::const_targett> &,
-                 std::set<goto_programt::const_targett> &);
+  void find_next(
+    const goto_programt::instructionst &,
+    const goto_programt::const_targett &,
+    std::set<goto_programt::const_targett, goto_programt::target_less_than> &,
+    std::set<goto_programt::const_targett, goto_programt::target_less_than> &);
 };
 
 /// Write the dot graph that corresponds to the goto program to the output
@@ -91,7 +92,8 @@ void dott::write_dot_subgraph(
   {
     const namespacet ns(goto_model.symbol_table);
 
-    std::set<goto_programt::const_targett> seen;
+    std::set<goto_programt::const_targett, goto_programt::target_less_than>
+      seen;
     goto_programt::const_targetst worklist;
     worklist.push_back(instructions.begin());
 
@@ -186,8 +188,10 @@ void dott::write_dot_subgraph(
       out << tmp.str();
       out << "\"];\n";
 
-      std::set<goto_programt::const_targett> tres;
-      std::set<goto_programt::const_targett> fres;
+      std::set<goto_programt::const_targett, goto_programt::target_less_than>
+        tres;
+      std::set<goto_programt::const_targett, goto_programt::target_less_than>
+        fres;
       find_next(instructions, it, tres, fres);
 
       std::string tlabel;
@@ -198,7 +202,9 @@ void dott::write_dot_subgraph(
         flabel = "false";
       }
 
-      typedef std::set<goto_programt::const_targett> t;
+      typedef std::
+        set<goto_programt::const_targett, goto_programt::target_less_than>
+          t;
 
       for(t::iterator trit=tres.begin();
            trit!=tres.end();
@@ -311,8 +317,8 @@ std::string &dott::escape(std::string &str)
 void dott::find_next(
   const goto_programt::instructionst &instructions,
   const goto_programt::const_targett &it,
-  std::set<goto_programt::const_targett> &tres,
-  std::set<goto_programt::const_targett> &fres)
+  std::set<goto_programt::const_targett, goto_programt::target_less_than> &tres,
+  std::set<goto_programt::const_targett, goto_programt::target_less_than> &fres)
 {
   if(it->is_goto() && !it->condition().is_false())
   {

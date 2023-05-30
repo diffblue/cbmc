@@ -140,7 +140,9 @@ protected:
   typedef std::map<irep_idt, std::unique_ptr<local_may_aliast> > fkt_mapt;
   fkt_mapt fkt_map;
 
-  typedef std::map<goto_programt::const_targett, irep_idt > target_mapt;
+  typedef std::
+    map<goto_programt::const_targett, irep_idt, goto_programt::target_less_than>
+      target_mapt;
   target_mapt target_map;
 };
 
