@@ -249,7 +249,8 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
     number_of_solver_calls{0},
     solver_process(std::move(_solver_process)),
     log{message_handler},
-    object_map{initial_smt_object_map()}
+    object_map{initial_smt_object_map()},
+    struct_encoding{_ns}
 {
   solver_process->send(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
@@ -589,7 +590,7 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression)
 {
-  return lower_byte_operators(expression, ns);
+  return struct_encoding.encode(lower_byte_operators(expression, ns));
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()

@@ -13,6 +13,7 @@
 #include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_is_dynamic_object.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
+#include <solvers/smt2_incremental/struct_encoding.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <solvers/stack_decision_procedure.h>
 
@@ -169,6 +170,7 @@ protected:
   smt_is_dynamic_objectt is_dynamic_object_function;
   /// Precalculated type sizes used for pointer arithmetic.
   type_size_mapt pointer_sizes_map;
+  struct_encodingt struct_encoding;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
