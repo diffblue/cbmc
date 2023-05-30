@@ -363,10 +363,10 @@ $(document).ready(function(){initNavTree('piped__process_8cpp_source.html',''); 
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    dup2(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[1], STDOUT_FILENO);</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    dup2(<a class="code" href="classpiped__processt.html#ac8d31909489f1e4e2b86e838433cea7d">pipe_output</a>[1], STDERR_FILENO);</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="comment">// Create a char** for the arguments (all the contents of commandvec</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="comment">// except the first element, i.e. the command itself).</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordtype">char</span> **args =</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(<a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>((commandvec.size()) * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span> *)));</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="comment">// Create a char** for the arguments plus a NULL terminator (by convention,</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="comment">// the first &quot;argument&quot; is the command itself)</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordtype">char</span> **args = <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> **<span class="keyword">&gt;</span>(</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <a class="code" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>((commandvec.size() + 1) * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span> *)));</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="comment">// Add all the arguments to the args array of char *.</span></div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> i = 0;</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordflow">while</span>(i &lt; commandvec.size())</div>
