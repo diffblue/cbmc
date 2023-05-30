@@ -277,10 +277,10 @@ piped_processt::piped_processt(
     dup2(pipe_output[1], STDOUT_FILENO);
     dup2(pipe_output[1], STDERR_FILENO);
 
-    // Create a char** for the arguments (all the contents of commandvec
-    // except the first element, i.e. the command itself).
-    char **args =
-      reinterpret_cast<char **>(malloc((commandvec.size()) * sizeof(char *)));
+    // Create a char** for the arguments plus a NULL terminator (by convention,
+    // the first "argument" is the command itself)
+    char **args = reinterpret_cast<char **>(
+      malloc((commandvec.size() + 1) * sizeof(char *)));
     // Add all the arguments to the args array of char *.
     unsigned long i = 0;
     while(i < commandvec.size())
