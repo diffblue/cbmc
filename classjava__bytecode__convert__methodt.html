@@ -123,6 +123,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjava__bytecode__convert__methodt_1_1local__variable__with__holest.html">local_variable_with_holest</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structjava__bytecode__convert__methodt_1_1method__with__amapt.html">method_with_amapt</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__methodt_1_1variablet.html">variablet</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -144,9 +146,7 @@ Public Types</h2></td></tr>
 <tr class="separator:a4bcea5ed65791f55e7f50584f8eba328"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8045abf2ea866171f820b5f57145ff0"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classjava__bytecode__convert__methodt.html#ac9b745c4aede089f1f3a527c4d381991">method_offsett</a>, <a class="el" href="structjava__bytecode__convert__methodt_1_1converted__instructiont.html">converted_instructiont</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__methodt.html#aa8045abf2ea866171f820b5f57145ff0">address_mapt</a></td></tr>
 <tr class="separator:aa8045abf2ea866171f820b5f57145ff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a510bca7df90e2931000acfcdd99d1c5d"><td class="memItemLeft" align="right" valign="top">typedef std::pair&lt; const <a class="el" href="classjava__bytecode__convert__methodt.html#a4b69666d26724928b24cd3f85c8737af">methodt</a> &amp;, const <a class="el" href="classjava__bytecode__convert__methodt.html#aa8045abf2ea866171f820b5f57145ff0">address_mapt</a> &amp; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__methodt.html#a510bca7df90e2931000acfcdd99d1c5d">method_with_amapt</a></td></tr>
-<tr class="separator:a510bca7df90e2931000acfcdd99d1c5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21750e8679e27d4b574be7917e527a8a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcfg__dominators__templatet.html">cfg_dominators_templatet</a>&lt; <a class="el" href="classjava__bytecode__convert__methodt.html#a510bca7df90e2931000acfcdd99d1c5d">method_with_amapt</a>, <a class="el" href="classjava__bytecode__convert__methodt.html#ac9b745c4aede089f1f3a527c4d381991">method_offsett</a>, false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__methodt.html#a21750e8679e27d4b574be7917e527a8a">java_cfg_dominatorst</a></td></tr>
+<tr class="memitem:a21750e8679e27d4b574be7917e527a8a"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classcfg__dominators__templatet.html">cfg_dominators_templatet</a>&lt; <a class="el" href="structjava__bytecode__convert__methodt_1_1method__with__amapt.html">method_with_amapt</a>, <a class="el" href="classjava__bytecode__convert__methodt.html#ac9b745c4aede089f1f3a527c4d381991">method_offsett</a>, false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__convert__methodt.html#a21750e8679e27d4b574be7917e527a8a">java_cfg_dominatorst</a></td></tr>
 <tr class="separator:a21750e8679e27d4b574be7917e527a8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -426,12 +426,12 @@ Friends</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classcfg__dominators__templatet.html">cfg_dominators_templatet</a>&lt;<a class="el" href="classjava__bytecode__convert__methodt.html#a510bca7df90e2931000acfcdd99d1c5d">method_with_amapt</a>, <a class="el" href="classjava__bytecode__convert__methodt.html#ac9b745c4aede089f1f3a527c4d381991">method_offsett</a>, false&gt; <a class="el" href="classjava__bytecode__convert__methodt.html#a21750e8679e27d4b574be7917e527a8a">java_bytecode_convert_methodt::java_cfg_dominatorst</a></td>
+          <td class="memname">typedef <a class="el" href="classcfg__dominators__templatet.html">cfg_dominators_templatet</a>&lt;<a class="el" href="structjava__bytecode__convert__methodt_1_1method__with__amapt.html">method_with_amapt</a>, <a class="el" href="classjava__bytecode__convert__methodt.html#ac9b745c4aede089f1f3a527c4d381991">method_offsett</a>, false&gt; <a class="el" href="classjava__bytecode__convert__methodt.html#a21750e8679e27d4b574be7917e527a8a">java_bytecode_convert_methodt::java_cfg_dominatorst</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00245">245</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00261">261</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
 
 </div>
 </div>
@@ -496,22 +496,6 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00077">77</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
-
-</div>
-</div>
-<a id="a510bca7df90e2931000acfcdd99d1c5d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a510bca7df90e2931000acfcdd99d1c5d">&#9670;&nbsp;</a></span>method_with_amapt</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef std::pair&lt;const <a class="el" href="classjava__bytecode__convert__methodt.html#a4b69666d26724928b24cd3f85c8737af">methodt</a> &amp;, const <a class="el" href="classjava__bytecode__convert__methodt.html#aa8045abf2ea866171f820b5f57145ff0">address_mapt</a> &amp;&gt; <a class="el" href="classjava__bytecode__convert__methodt.html#a510bca7df90e2931000acfcdd99d1c5d">java_bytecode_convert_methodt::method_with_amapt</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00243">243</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
 
 </div>
 </div>
@@ -606,7 +590,7 @@ Friends</h2></td></tr>
 <tr><td class="fieldname"><a id="a31b2d3437275ea85c19997afdf4bbe55a552a541802e89c9f535247f725bd1c0d"></a>FIELD&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00323">323</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00339">339</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
 
 </div>
 </div>
@@ -3460,7 +3444,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00529">529</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__convert__method__class_8h_source.html#l00545">545</a> of file <a class="el" href="java__bytecode__convert__method__class_8h_source.html">java_bytecode_convert_method_class.h</a>.</p>
 
 </div>
 </div>

@@ -115,12 +115,12 @@ $(document).ready(function(){initNavTree('container__utils_8h_source.html',''); 
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;s : source)</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">while</span>(it != target.end() &amp;&amp; *it &lt; s)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">while</span>(it != target.end() &amp;&amp; Compare()(*it, s))</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      ++it;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">if</span>(it == target.end() || s &lt; *it)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">if</span>(it == target.end() || Compare()(s, *it))</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    {</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <span class="comment">// Insertion hint should point at element that will follow the new element</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      target.insert(it, s);</div>

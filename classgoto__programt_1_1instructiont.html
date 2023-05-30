@@ -89,6 +89,7 @@ $(document).ready(function(){initNavTree('classgoto__programt_1_1instructiont.ht
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -109,10 +110,16 @@ $(document).ready(function(){initNavTree('classgoto__programt_1_1instructiont.ht
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classgoto__programt_1_1instructiont__coll__graph.svg" width="2136" height="392"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classgoto__programt_1_1instructiont__coll__graph.svg" width="2230" height="408"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">target_less_than</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A total order over <code>targett</code> and <code>const_targett</code>.  <a href="structgoto__programt_1_1instructiont_1_1target__less__than.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:ab9d5a94cb1301e75c0d32bd4d7bdf0e1"><td class="memItemLeft" align="right" valign="top">typedef std::list&lt; <a class="el" href="classgoto__programt_1_1instructiont.html">instructiont</a> &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__programt_1_1instructiont.html#ab9d5a94cb1301e75c0d32bd4d7bdf0e1">targett</a></td></tr>
@@ -307,8 +314,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a633f4e32426cd72c4f338cc8ac178b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1acc94d107972ece88b95dce0d9be150"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt_1_1instructiont.html#ae6516f1de50d16636adef9b0fbabc24e">labelst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__programt_1_1instructiont.html#a1acc94d107972ece88b95dce0d9be150">labels</a></td></tr>
 <tr class="separator:a1acc94d107972ece88b95dce0d9be150"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e243304070f653be79103b1ff360c58"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="classgoto__programt_1_1instructiont.html#ab9d5a94cb1301e75c0d32bd4d7bdf0e1">targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__programt_1_1instructiont.html#a3e243304070f653be79103b1ff360c58">incoming_edges</a></td></tr>
-<tr class="separator:a3e243304070f653be79103b1ff360c58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0d8c70776ff291fd95b2d09e20bd287"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="classgoto__programt_1_1instructiont.html#ab9d5a94cb1301e75c0d32bd4d7bdf0e1">targett</a>, <a class="el" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">target_less_than</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__programt_1_1instructiont.html#ab0d8c70776ff291fd95b2d09e20bd287">incoming_edges</a></td></tr>
+<tr class="separator:ab0d8c70776ff291fd95b2d09e20bd287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c5bdb92e07e4404d1b583e78c0457dc"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a> = 0</td></tr>
 <tr class="memdesc:a9c5bdb92e07e4404d1b583e78c0457dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A globally unique number to identify a program location.  <a href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">More...</a><br /></td></tr>
 <tr class="separator:a9c5bdb92e07e4404d1b583e78c0457dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -422,7 +429,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Goto target labels. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00418">418</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00445">445</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -484,7 +491,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00484">484</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00511">511</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -512,7 +519,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00489">489</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00516">516</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -570,7 +577,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Constructor that can set all members, passed by value. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00498">498</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00525">525</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -913,7 +920,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Clear the node. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00429">429</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00456">456</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -999,7 +1006,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00454">454</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00481">481</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1254,7 +1261,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns the first (and only) successor for the usual case of a single target. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00398">398</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00425">425</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1283,7 +1290,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns the first (and only) successor for the usual case of a single target. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00390">390</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00417">417</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1339,7 +1346,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00412">412</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00439">439</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1366,7 +1373,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00475">475</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00502">502</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1393,7 +1400,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00465">465</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00492">492</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1420,7 +1427,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00474">474</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00501">501</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1447,7 +1454,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00476">476</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00503">503</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1474,7 +1481,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00477">477</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00504">504</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1503,7 +1510,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns true if the instruction is a backwards branch. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00541">541</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00568">568</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1530,7 +1537,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00468">468</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00495">495</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1557,7 +1564,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00473">473</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00500">500</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1584,7 +1591,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00472">472</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00499">499</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1611,7 +1618,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00480">480</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00507">507</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1638,7 +1645,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00479">479</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00506">506</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1665,7 +1672,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00466">466</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00493">493</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1692,7 +1699,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00463">463</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00490">490</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1719,7 +1726,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00481">481</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00508">508</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1746,7 +1753,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00470">470</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00497">497</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1773,7 +1780,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00471">471</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00498">498</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1800,7 +1807,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00464">464</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00491">491</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1827,7 +1834,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00469">469</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00496">496</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1854,7 +1861,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00478">478</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00505">505</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1883,7 +1890,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Is this node a branch target? </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00425">425</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00452">452</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -1910,7 +1917,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00467">467</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00494">494</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2061,7 +2068,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Sets the first (and only) successor for the usual case of a single target. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00406">406</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00433">433</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2145,7 +2152,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Swap two instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00513">513</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00540">540</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2172,7 +2179,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00553">553</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00580">580</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2223,7 +2230,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Transforms either an assertion or a GOTO instruction into an assumption, with the same condition. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00446">446</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00473">473</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2252,7 +2259,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Transforms an existing instruction into a skip, retaining the source_location. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00439">439</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00466">466</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2422,19 +2429,19 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3e243304070f653be79103b1ff360c58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e243304070f653be79103b1ff360c58">&#9670;&nbsp;</a></span>incoming_edges</h2>
+<a id="ab0d8c70776ff291fd95b2d09e20bd287"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0d8c70776ff291fd95b2d09e20bd287">&#9670;&nbsp;</a></span>incoming_edges</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::set&lt;<a class="el" href="classgoto__programt_1_1instructiont.html#ab9d5a94cb1301e75c0d32bd4d7bdf0e1">targett</a>&gt; goto_programt::instructiont::incoming_edges</td>
+          <td class="memname">std::set&lt;<a class="el" href="classgoto__programt_1_1instructiont.html#ab9d5a94cb1301e75c0d32bd4d7bdf0e1">targett</a>, <a class="el" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">target_less_than</a>&gt; goto_programt::instructiont::incoming_edges</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00422">422</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00449">449</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2450,7 +2457,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00419">419</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00446">446</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2469,7 +2476,7 @@ Protected Attributes</h2></td></tr>
 <p>A globally unique number to identify a program location. </p>
 <p>It's guaranteed to be ordered in program order within one goto_program. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00531">531</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00558">558</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2487,7 +2494,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Number unique per function to identify loops. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00534">534</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00561">561</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2515,7 +2522,7 @@ Protected Attributes</h2></td></tr>
 </div><!-- fragment -->
 <p>Uniquely identify an invalid target or location. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00525">525</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00552">552</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2534,7 +2541,7 @@ Protected Attributes</h2></td></tr>
 <p>A number to identify branch targets. </p>
 <p>This is <a class="el" href="classgoto__programt_1_1instructiont.html#aa5b3e59c3470dd63b6b3b0c4bc9e527f">nil_target</a> if it's not a target. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00538">538</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00565">565</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -2552,7 +2559,7 @@ Protected Attributes</h2></td></tr>
 
 <p>The list of successor instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00386">386</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l00413">413</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>

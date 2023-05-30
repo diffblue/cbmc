@@ -1,9 +1,5 @@
 var NAVTREEINDEX119 =
 {
-"reference__counting_8h.html#a3b8d287ea0fd8ef05d4f9485dc1bacd6":[9,0,2,31,177,3],
-"reference__counting_8h.html#aa55b0a305802f46ee3284c14bbf5db5e":[9,0,2,31,177,2],
-"reference__counting_8h_source.html":[9,0,2,31,177],
-"reference_guide.html":[0,2],
 "refine__arithmetic_8cpp.html":[9,0,2,28,6,2],
 "refine__arithmetic_8cpp.html#a090a0b2bbb0e01b8ec51121970d550c1":[9,0,2,28,6,2,1],
 "refine__arithmetic_8cpp.html#a5214830f24120bc5f48db5a26b1bcffa":[9,0,2,28,6,2,0],
@@ -249,5 +245,9 @@ var NAVTREEINDEX119 =
 "renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7ad4b8947b24b9747bce934e0a0afb7bb5":[9,0,2,16,35,1,2],
 "renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7ae5bc7ee7d6dda5340a28f91834f10543":[9,0,2,16,35,1,1],
 "renamed_8h.html#a68c860fe66697dd96efc0bff2d4b0845":[9,0,2,16,35,3],
-"renamed_8h_source.html":[9,0,2,16,35]
+"renamed_8h_source.html":[9,0,2,16,35],
+"renaming__level_8cpp.html":[9,0,2,16,36],
+"renaming__level_8cpp.html#a5a9629e74e0f49f032345d5123be328b":[9,0,2,16,36,3],
+"renaming__level_8cpp.html#a5b423fc854996a0a8beb34d4cd17e2e1":[9,0,2,16,36,1],
+"renaming__level_8cpp.html#a7cc127489ddf0f4efa10c683389ccaa9":[9,0,2,16,36,0]
 };

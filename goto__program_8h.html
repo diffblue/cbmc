@@ -126,6 +126,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class represents an instruction in the GOTO intermediate representation.  <a href="classgoto__programt_1_1instructiont.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::instructiont::target_less_than</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A total order over <code>targett</code> and <code>const_targett</code>.  <a href="structgoto__programt_1_1instructiont_1_1target__less__than.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconst__target__hash.html">const_target_hash</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpointee__address__equalt.html">pointee_address_equalt</a></td></tr>
@@ -176,18 +179,12 @@ Functions</h2></td></tr>
 <tr class="memitem:aec60d66bd090f7bb028921a7e4299f6a"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#aec60d66bd090f7bb028921a7e4299f6a">operator&lt;&lt;</a> (std::ostream &amp;, <a class="el" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beb">goto_program_instruction_typet</a>)</td></tr>
 <tr class="memdesc:aec60d66bd090f7bb028921a7e4299f6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Outputs a string representation of a <code>goto_program_instruction_typet</code>  <a href="goto__program_8h.html#aec60d66bd090f7bb028921a7e4299f6a">More...</a><br /></td></tr>
 <tr class="separator:aec60d66bd090f7bb028921a7e4299f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d467ec84f8202e175e8d1ed2bec9abc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#a2d467ec84f8202e175e8d1ed2bec9abc">order_const_target</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> i1, const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> i2)</td></tr>
-<tr class="separator:a2d467ec84f8202e175e8d1ed2bec9abc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad131c513e5320eb20669eeaff55259bd"><td class="memTemplParams" colspan="2">template&lt;typename GotoFunctionT , typename PredicateT , typename HandlerT &gt; </td></tr>
 <tr class="memitem:ad131c513e5320eb20669eeaff55259bd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#ad131c513e5320eb20669eeaff55259bd">for_each_instruction_if</a> (GotoFunctionT &amp;&amp;goto_function, PredicateT predicate, HandlerT handler)</td></tr>
 <tr class="separator:ad131c513e5320eb20669eeaff55259bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a565b9891fcb43c9a645bcaa4ae363f94"><td class="memTemplParams" colspan="2">template&lt;typename GotoFunctionT , typename HandlerT &gt; </td></tr>
 <tr class="memitem:a565b9891fcb43c9a645bcaa4ae363f94"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#a565b9891fcb43c9a645bcaa4ae363f94">for_each_instruction</a> (GotoFunctionT &amp;&amp;goto_function, HandlerT handler)</td></tr>
 <tr class="separator:a565b9891fcb43c9a645bcaa4ae363f94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60522a054ddbe630017b138dfe6abf80"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#a60522a054ddbe630017b138dfe6abf80">operator&lt;</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;i1, const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;i2)</td></tr>
-<tr class="separator:a60522a054ddbe630017b138dfe6abf80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7526c3c44fc4245678dc1c2791463a9e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#a7526c3c44fc4245678dc1c2791463a9e">operator&lt;</a> (const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;i1, const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;i2)</td></tr>
-<tr class="separator:a7526c3c44fc4245678dc1c2791463a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5e73fd7751bbccdcce5b2e7e1600cfb"><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#af5e73fd7751bbccdcce5b2e7e1600cfb">objects_read</a> (const <a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;)</td></tr>
 <tr class="separator:af5e73fd7751bbccdcce5b2e7e1600cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a462c8f6a852996163b3df949a114a679"><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program_8h.html#a462c8f6a852996163b3df949a114a679">objects_written</a> (const <a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;)</td></tr>
@@ -233,7 +230,7 @@ Functions</h2></td></tr>
 <div class="line">      it=(program).instructions.begin(); \</div>
 <div class="line">      it!=(program).instructions.end(); it++)</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01208">1208</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01228">1228</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -266,7 +263,7 @@ Functions</h2></td></tr>
 <div class="line">      it=(program).instructions.begin(); \</div>
 <div class="line">      it!=(program).instructions.end(); it++)</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01213">1213</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01233">1233</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -414,7 +411,7 @@ template&lt;typename GotoFunctionT , typename HandlerT &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01201">1201</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01221">1221</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -452,7 +449,7 @@ template&lt;typename GotoFunctionT , typename PredicateT , typename HandlerT &gt
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01185">1185</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01205">1205</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>
@@ -496,82 +493,6 @@ template&lt;typename GotoFunctionT , typename PredicateT , typename HandlerT &gt
 
 </div>
 </div>
-<a id="a60522a054ddbe630017b138dfe6abf80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60522a054ddbe630017b138dfe6abf80">&#9670;&nbsp;</a></span>operator&lt;() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool operator&lt; </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>i1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>i2</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01218">1218</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
-
-</div>
-</div>
-<a id="a7526c3c44fc4245678dc1c2791463a9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7526c3c44fc4245678dc1c2791463a9e">&#9670;&nbsp;</a></span>operator&lt;() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool operator&lt; </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>i1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>i2</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01225">1225</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
-
-</div>
-</div>
 <a id="aec60d66bd090f7bb028921a7e4299f6a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aec60d66bd090f7bb028921a7e4299f6a">&#9670;&nbsp;</a></span>operator&lt;&lt;()</h2>
 
@@ -601,44 +522,6 @@ template&lt;typename GotoFunctionT , typename PredicateT , typename HandlerT &gt
 <p>Outputs a string representation of a <code>goto_program_instruction_typet</code> </p>
 
 <p class="definition">Definition at line <a class="el" href="goto__program_8cpp_source.html#l01172">1172</a> of file <a class="el" href="goto__program_8cpp_source.html">goto_program.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2d467ec84f8202e175e8d1ed2bec9abc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d467ec84f8202e175e8d1ed2bec9abc">&#9670;&nbsp;</a></span>order_const_target()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool order_const_target </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&#160;</td>
-          <td class="paramname"><em>i1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&#160;</td>
-          <td class="paramname"><em>i2</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="goto__program_8h_source.html#l01153">1153</a> of file <a class="el" href="goto__program_8h_source.html">goto_program.h</a>.</p>
 
 </div>
 </div>

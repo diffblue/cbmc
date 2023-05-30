@@ -1,6 +1,6 @@
 var classdisjunctive__polynomial__accelerationt =
 [
-    [ "distinguish_mapt", "classdisjunctive__polynomial__accelerationt.html#aeef8a9a22d41b09538fb7d565950f3fc", null ],
+    [ "distinguish_mapt", "classdisjunctive__polynomial__accelerationt.html#a7df812c6cbf566e4c503c43f7dffb4ea", null ],
     [ "distinguish_valuest", "classdisjunctive__polynomial__accelerationt.html#af9925df82ff6ba01e57222b34d143535", null ],
     [ "disjunctive_polynomial_accelerationt", "classdisjunctive__polynomial__accelerationt.html#afd77d3b44fe22fdb0720e2ef21407d7c", null ],
     [ "accelerate", "classdisjunctive__polynomial__accelerationt.html#a7035927c7d42f5eaaeea8ce81e6fa8d2", null ],

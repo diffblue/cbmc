@@ -148,304 +148,310 @@ $(document).ready(function(){initNavTree('dot_8cpp_source.html',''); initResizab
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                  <span class="keyword">const</span> <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;,</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                  <span class="keyword">const</span> std::string &amp;);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classdott.html#ab787fe32160012625ec6d6adfea7afef">find_next</a>(<span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a> &amp;,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                 <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;,</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                 std::set&lt;goto_programt::const_targett&gt; &amp;,</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                 std::set&lt;goto_programt::const_targett&gt; &amp;);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;};</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classdott.html#a6fc009951726463fc06747a6b2b12244">   70</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#a6fc009951726463fc06747a6b2b12244">dott::write_dot_subgraph</a>(</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  std::ostream &amp;out,</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.push_back(<a class="code" href="classexprt.html">exprt</a>(<span class="stringliteral">&quot;cluster&quot;</span>));</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;name&quot;</span>, function_id);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;nr&quot;</span>, <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;subgraph \&quot;cluster_&quot;</span> &lt;&lt; function_id &lt;&lt; <span class="stringliteral">&quot;\&quot; {\n&quot;</span>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;label=\&quot;&quot;</span> &lt;&lt; function_id &lt;&lt; <span class="stringliteral">&quot;\&quot;;\n&quot;</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a> &amp;instructions =</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordflow">if</span>(instructions.empty())</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_0 &quot;</span> &lt;&lt;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      <span class="stringliteral">&quot;[shape=Mrecord,fontsize=22,label=\&quot;?\&quot;];\n&quot;</span>;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  }</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(<a class="code" href="classdott.html#a843d7358a07ba3b28e1fbef649bfda1b">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    std::set&lt;goto_programt::const_targett&gt; seen;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="classgoto__programt.html#a8e45dae3e5715d3687547cd692de5d34">goto_programt::const_targetst</a> worklist;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    worklist.push_back(instructions.begin());</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">while</span>(!worklist.empty())</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> it=worklist.front();</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      worklist.pop_front();</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keywordflow">if</span>(it==instructions.end() ||</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;         seen.find(it)!=seen.end()) <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      std::stringstream tmp;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="keywordflow">if</span>(it-&gt;is_goto())</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">if</span>(it-&gt;condition().is_true())</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;          tmp.str(<span class="stringliteral">&quot;Goto&quot;</span>);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;          std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;condition());</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;          <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            t = t.substr(0, t.size()-1);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;          tmp &lt;&lt; <a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t) &lt;&lt; <span class="stringliteral">&quot;?&quot;</span>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        }</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_assume())</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      {</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;condition());</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          t = t.substr(0, t.size()-1);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        tmp &lt;&lt; <span class="stringliteral">&quot;Assume\\n(&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_assert())</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;condition());</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;          t = t.substr(0, t.size()-1);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        tmp &lt;&lt; <span class="stringliteral">&quot;Assert\\n(&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_skip())</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        tmp.str(<span class="stringliteral">&quot;Skip&quot;</span>);</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_end_function())</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        tmp.str(<span class="stringliteral">&quot;End of Function&quot;</span>);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_location())</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        tmp.str(<span class="stringliteral">&quot;Location&quot;</span>);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_dead())</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        tmp.str(<span class="stringliteral">&quot;Dead&quot;</span>);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_atomic_begin())</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        tmp.str(<span class="stringliteral">&quot;Atomic Begin&quot;</span>);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_atomic_end())</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        tmp.str(<span class="stringliteral">&quot;Atomic End&quot;</span>);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_function_call())</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      {</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keyword">const</span> <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;          it-&gt;call_lhs(), it-&gt;call_function(), it-&gt;call_arguments());</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, function_call);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;          t = t.substr(0, t.size()-1);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        tmp.str(<a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t));</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        std::stringstream ss;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        ss &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; it-&gt;location_number;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <a class="code" href="classdott.html#a0176320c11108d14f9e760e2f5be3217">function_calls</a>.push_back(</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;          std::pair&lt;std::string, exprt&gt;(ss.str(), it-&gt;call_function()));</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      }</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        it-&gt;is_assign() || it-&gt;is_decl() || it-&gt;is_set_return_value() ||</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        it-&gt;is_other())</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;code());</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;          t = t.substr(0, t.size()-1);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        tmp.str(<a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t));</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      }</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_start_thread())</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        tmp.str(<span class="stringliteral">&quot;Start of Thread&quot;</span>);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_end_thread())</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        tmp.str(<span class="stringliteral">&quot;End of Thread&quot;</span>);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_throw())</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        tmp.str(<span class="stringliteral">&quot;THROW&quot;</span>);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_catch())</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        tmp.str(<span class="stringliteral">&quot;CATCH&quot;</span>);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        tmp.str(<span class="stringliteral">&quot;UNKNOWN&quot;</span>);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; it-&gt;location_number;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot; [shape=&quot;</span>;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; !it-&gt;condition().is_constant())</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;diamond&quot;</span>;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        out &lt;&lt;<span class="stringliteral">&quot;Mrecord&quot;</span>;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;,fontsize=22,label=\&quot;&quot;</span>;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      out &lt;&lt; tmp.str();</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;\&quot;];\n&quot;</span>;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      std::set&lt;goto_programt::const_targett&gt; tres;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      std::set&lt;goto_programt::const_targett&gt; fres;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <a class="code" href="classdott.html#ab787fe32160012625ec6d6adfea7afef">find_next</a>(instructions, it, tres, fres);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      std::string tlabel;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      std::string flabel;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <span class="keywordflow">if</span>(!fres.empty() &amp;&amp; !tres.empty())</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        tlabel = <span class="stringliteral">&quot;true&quot;</span>;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        flabel = <span class="stringliteral">&quot;false&quot;</span>;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keyword">typedef</span> std::set&lt;goto_programt::const_targett&gt; t;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="keywordflow">for</span>(t::iterator trit=tres.begin();</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;           trit!=tres.end();</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;           trit++)</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        <a class="code" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">write_edge</a>(out, *it, **trit, tlabel);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <span class="keywordflow">for</span>(t::iterator frit=fres.begin();</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;          frit!=fres.end();</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;          frit++)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <a class="code" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">write_edge</a>(out, *it, **frit, flabel);</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      seen.insert(it);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> temp=goto_program.<a class="code" href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">get_successors</a>(it);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      worklist.insert(worklist.end(), temp.begin(), temp.end());</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classdott.html#a6bde72a25aaa41aa2de31daa7df6ab5a">find_next</a>(</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a> &amp;,</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;,</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt; &amp;,</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt; &amp;);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;};</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classdott.html#a6fc009951726463fc06747a6b2b12244">   71</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#a6fc009951726463fc06747a6b2b12244">dott::write_dot_subgraph</a>(</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;{</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.push_back(<a class="code" href="classexprt.html">exprt</a>(<span class="stringliteral">&quot;cluster&quot;</span>));</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;name&quot;</span>, function_id);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;nr&quot;</span>, <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;subgraph \&quot;cluster_&quot;</span> &lt;&lt; function_id &lt;&lt; <span class="stringliteral">&quot;\&quot; {\n&quot;</span>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;label=\&quot;&quot;</span> &lt;&lt; function_id &lt;&lt; <span class="stringliteral">&quot;\&quot;;\n&quot;</span>;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a> &amp;instructions =</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">if</span>(instructions.empty())</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_0 &quot;</span> &lt;&lt;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="stringliteral">&quot;[shape=Mrecord,fontsize=22,label=\&quot;?\&quot;];\n&quot;</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> ns(<a class="code" href="classdott.html#a843d7358a07ba3b28e1fbef649bfda1b">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      seen;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="classgoto__programt.html#a8e45dae3e5715d3687547cd692de5d34">goto_programt::const_targetst</a> worklist;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    worklist.push_back(instructions.begin());</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">while</span>(!worklist.empty())</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> it=worklist.front();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      worklist.pop_front();</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keywordflow">if</span>(it==instructions.end() ||</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;         seen.find(it)!=seen.end()) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      std::stringstream tmp;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <span class="keywordflow">if</span>(it-&gt;is_goto())</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="keywordflow">if</span>(it-&gt;condition().is_true())</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;          tmp.str(<span class="stringliteral">&quot;Goto&quot;</span>);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;          std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;condition());</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;          <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            t = t.substr(0, t.size()-1);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;          tmp &lt;&lt; <a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t) &lt;&lt; <span class="stringliteral">&quot;?&quot;</span>;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_assume())</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;condition());</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;          t = t.substr(0, t.size()-1);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        tmp &lt;&lt; <span class="stringliteral">&quot;Assume\\n(&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_assert())</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      {</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;condition());</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;          t = t.substr(0, t.size()-1);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        tmp &lt;&lt; <span class="stringliteral">&quot;Assert\\n(&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t) &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_skip())</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        tmp.str(<span class="stringliteral">&quot;Skip&quot;</span>);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_end_function())</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        tmp.str(<span class="stringliteral">&quot;End of Function&quot;</span>);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_location())</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        tmp.str(<span class="stringliteral">&quot;Location&quot;</span>);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_dead())</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        tmp.str(<span class="stringliteral">&quot;Dead&quot;</span>);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_atomic_begin())</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        tmp.str(<span class="stringliteral">&quot;Atomic Begin&quot;</span>);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_atomic_end())</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        tmp.str(<span class="stringliteral">&quot;Atomic End&quot;</span>);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_function_call())</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keyword">const</span> <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;          it-&gt;call_lhs(), it-&gt;call_function(), it-&gt;call_arguments());</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, function_call);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;          t = t.substr(0, t.size()-1);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        tmp.str(<a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t));</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        std::stringstream ss;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        ss &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; it-&gt;location_number;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <a class="code" href="classdott.html#a0176320c11108d14f9e760e2f5be3217">function_calls</a>.push_back(</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;          std::pair&lt;std::string, exprt&gt;(ss.str(), it-&gt;call_function()));</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      }</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        it-&gt;is_assign() || it-&gt;is_decl() || it-&gt;is_set_return_value() ||</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        it-&gt;is_other())</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      {</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        std::string t = <a class="code" href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a>(ns, function_id, it-&gt;code());</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="keywordflow">while</span>(t[ t.size()-1 ]==<span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;          t = t.substr(0, t.size()-1);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        tmp.str(<a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">escape</a>(t));</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      }</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_start_thread())</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        tmp.str(<span class="stringliteral">&quot;Start of Thread&quot;</span>);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_end_thread())</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        tmp.str(<span class="stringliteral">&quot;End of Thread&quot;</span>);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_throw())</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        tmp.str(<span class="stringliteral">&quot;THROW&quot;</span>);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(it-&gt;is_catch())</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        tmp.str(<span class="stringliteral">&quot;CATCH&quot;</span>);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        tmp.str(<span class="stringliteral">&quot;UNKNOWN&quot;</span>);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; it-&gt;location_number;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot; [shape=&quot;</span>;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; !it-&gt;condition().is_constant())</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;diamond&quot;</span>;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        out &lt;&lt;<span class="stringliteral">&quot;Mrecord&quot;</span>;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;,fontsize=22,label=\&quot;&quot;</span>;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      out &lt;&lt; tmp.str();</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;\&quot;];\n&quot;</span>;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        tres;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        fres;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <a class="code" href="classdott.html#a6bde72a25aaa41aa2de31daa7df6ab5a">find_next</a>(instructions, it, tres, fres);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      std::string tlabel;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      std::string flabel;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      <span class="keywordflow">if</span>(!fres.empty() &amp;&amp; !tres.empty())</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        tlabel = <span class="stringliteral">&quot;true&quot;</span>;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        flabel = <span class="stringliteral">&quot;false&quot;</span>;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      }</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <span class="keyword">typedef</span> std::</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;          t;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">for</span>(t::iterator trit=tres.begin();</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;           trit!=tres.end();</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;           trit++)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <a class="code" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">write_edge</a>(out, *it, **trit, tlabel);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keywordflow">for</span>(t::iterator frit=fres.begin();</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;          frit!=fres.end();</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;          frit++)</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <a class="code" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">write_edge</a>(out, *it, **frit, flabel);</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>++;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
-<div class="line"><a name="l00222"></a><span class="lineno"><a class="line" href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">  222</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">dott::do_dot_function_calls</a>(</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  std::ostream &amp;out)</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;{</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;call : <a class="code" href="classdott.html#a0176320c11108d14f9e760e2f5be3217">function_calls</a>)</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  {</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    std::list&lt;exprt&gt;::const_iterator cit=<a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.begin();</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordflow">for</span>( ; cit!=<a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.end(); cit++)</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <span class="keywordflow">if</span>(cit-&gt;get(<span class="stringliteral">&quot;name&quot;</span>) == call.second.get(ID_identifier))</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">if</span>(cit!=<a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.end())</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      out &lt;&lt; call.first</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;             <span class="stringliteral">&quot;Node_&quot;</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;          &lt;&lt; cit-&gt;get(<span class="stringliteral">&quot;nr&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;_0&quot;</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; [lhead=\&quot;cluster_&quot;</span> &lt;&lt; call.second.get(ID_identifier) &lt;&lt; <span class="stringliteral">&quot;\&quot;,&quot;</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;color=blue];\n&quot;</span>;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    }</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;subgraph \&quot;cluster_&quot;</span> &lt;&lt; call.second.get(ID_identifier)</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;\&quot; {\n&quot;</span>;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;rank=sink;\n&quot;</span>;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;label=\&quot;&quot;</span> &lt;&lt; call.second.get(ID_identifier) &lt;&lt; <span class="stringliteral">&quot;\&quot;;\n&quot;</span>;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_0 &quot;</span> &lt;&lt;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <span class="stringliteral">&quot;[shape=Mrecord,fontsize=22,label=\&quot;?\&quot;];\n&quot;</span>;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.push_back(<a class="code" href="classexprt.html">exprt</a>(<span class="stringliteral">&quot;cluster&quot;</span>));</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;name&quot;</span>, call.second.get(ID_identifier));</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;nr&quot;</span>, <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      out &lt;&lt; call.first</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;             <span class="stringliteral">&quot;Node_&quot;</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;          &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_0&quot;</span></div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; [lhead=\&quot;cluster_&quot;</span> &lt;&lt; call.second.get(<span class="stringliteral">&quot;identifier&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;\&quot;,&quot;</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;color=blue];\n&quot;</span>;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>++;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    }</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  }</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;}</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno"><a class="line" href="classdott.html#aada72a54654aba95aa4a63671a36260d">  264</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#aada72a54654aba95aa4a63671a36260d">dott::output</a>(std::ostream &amp;out)</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;{</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;digraph G {\n&quot;</span>;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  out &lt;&lt; <a class="code" href="dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b">DOTGRAPHSETTINGS</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : <a class="code" href="classdott.html#a843d7358a07ba3b28e1fbef649bfda1b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  {</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordflow">if</span>(gf_entry.second.body_available())</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <a class="code" href="classdott.html#a6fc009951726463fc06747a6b2b12244">write_dot_subgraph</a>(out, gf_entry.first, gf_entry.second.body);</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  }</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      seen.insert(it);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> temp=goto_program.<a class="code" href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">get_successors</a>(it);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      worklist.insert(worklist.end(), temp.begin(), temp.end());</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>++;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;}</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
+<div class="line"><a name="l00228"></a><span class="lineno"><a class="line" href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">  228</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">dott::do_dot_function_calls</a>(</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  std::ostream &amp;out)</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;{</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;call : <a class="code" href="classdott.html#a0176320c11108d14f9e760e2f5be3217">function_calls</a>)</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  {</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    std::list&lt;exprt&gt;::const_iterator cit=<a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.begin();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">for</span>( ; cit!=<a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.end(); cit++)</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <span class="keywordflow">if</span>(cit-&gt;get(<span class="stringliteral">&quot;name&quot;</span>) == call.second.get(ID_identifier))</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">if</span>(cit!=<a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.end())</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    {</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      out &lt;&lt; call.first</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;             <span class="stringliteral">&quot;Node_&quot;</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;          &lt;&lt; cit-&gt;get(<span class="stringliteral">&quot;nr&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;_0&quot;</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; [lhead=\&quot;cluster_&quot;</span> &lt;&lt; call.second.get(ID_identifier) &lt;&lt; <span class="stringliteral">&quot;\&quot;,&quot;</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;color=blue];\n&quot;</span>;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    {</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;subgraph \&quot;cluster_&quot;</span> &lt;&lt; call.second.get(ID_identifier)</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;\&quot; {\n&quot;</span>;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;rank=sink;\n&quot;</span>;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;label=\&quot;&quot;</span> &lt;&lt; call.second.get(ID_identifier) &lt;&lt; <span class="stringliteral">&quot;\&quot;;\n&quot;</span>;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_0 &quot;</span> &lt;&lt;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <span class="stringliteral">&quot;[shape=Mrecord,fontsize=22,label=\&quot;?\&quot;];\n&quot;</span>;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.push_back(<a class="code" href="classexprt.html">exprt</a>(<span class="stringliteral">&quot;cluster&quot;</span>));</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;name&quot;</span>, call.second.get(ID_identifier));</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <a class="code" href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">clusters</a>.back().set(<span class="stringliteral">&quot;nr&quot;</span>, <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>);</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      out &lt;&lt; call.first</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;             <span class="stringliteral">&quot;Node_&quot;</span></div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;          &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_0&quot;</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; [lhead=\&quot;cluster_&quot;</span> &lt;&lt; call.second.get(<span class="stringliteral">&quot;identifier&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;\&quot;,&quot;</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;color=blue];\n&quot;</span>;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a>++;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  }</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;}</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="classdott.html#aada72a54654aba95aa4a63671a36260d">  270</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#aada72a54654aba95aa4a63671a36260d">dott::output</a>(std::ostream &amp;out)</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;digraph G {\n&quot;</span>;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  out &lt;&lt; <a class="code" href="dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b">DOTGRAPHSETTINGS</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <a class="code" href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">do_dot_function_calls</a>(out);</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;}</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
-<div class="line"><a name="l00283"></a><span class="lineno"><a class="line" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">  283</a></span>&#160;std::string &amp;<a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">dott::escape</a>(std::string &amp;str)</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;{</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> i=0; i&lt;str.size(); i++)</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  {</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">if</span>(str[i]==<span class="charliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    {</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      str[i] = <span class="charliteral">&#39;n&#39;</span>;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      str.insert(i, <span class="stringliteral">&quot;\\&quot;</span>);</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    }</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(str[i]==<span class="charliteral">&#39;\&quot;&#39;</span> ||</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            str[i]==<span class="charliteral">&#39;|&#39;</span> ||</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            str[i]==<span class="charliteral">&#39;\\&#39;</span> ||</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;            str[i]==<span class="charliteral">&#39;&gt;&#39;</span> ||</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;            str[i]==<span class="charliteral">&#39;&lt;&#39;</span> ||</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;            str[i]==<span class="charliteral">&#39;{&#39;</span> ||</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;            str[i]==<span class="charliteral">&#39;}&#39;</span>)</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    {</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      str.insert(i, <span class="stringliteral">&quot;\\&quot;</span>);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      i++;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    }</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  }</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160; </div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <span class="keywordflow">return</span> str;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;}</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
-<div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="classdott.html#ab787fe32160012625ec6d6adfea7afef">  311</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#ab787fe32160012625ec6d6adfea7afef">dott::find_next</a>(</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a> &amp;instructions,</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;it,</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  std::set&lt;goto_programt::const_targett&gt; &amp;tres,</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  std::set&lt;goto_programt::const_targett&gt; &amp;fres)</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;{</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; !it-&gt;condition().is_false())</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  {</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : it-&gt;targets)</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      tres.insert(target);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  }</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; it-&gt;condition().is_true())</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160; </div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> next = it; next++;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="keywordflow">if</span>(next!=instructions.end())</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    fres.insert(next);</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;}</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00334"></a><span class="lineno"><a class="line" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">  334</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">dott::write_edge</a>(</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  std::ostream &amp;out,</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;from,</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;to,</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <span class="keyword">const</span> std::string &amp;label)</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;{</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; from.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a>;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span>;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; to.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keywordflow">if</span>(!label.empty())</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  {</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;[fontsize=20,label=\&quot;&quot;</span> &lt;&lt; label &lt;&lt; <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">if</span>(from.<a class="code" href="classgoto__programt_1_1instructiont.html#a9cd6229e1d915bcf1c8805f7d983c3f6">is_backwards_goto</a>() &amp;&amp; from.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a> &gt; to.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a>)</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;,color=red&quot;</span>;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  }</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;;\n&quot;</span>;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;}</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno"><a class="line" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">  353</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a>(<span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;src, std::ostream &amp;out)</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;{</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <a class="code" href="classdott.html">dott</a> <a class="code" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a>(src);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <a class="code" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a>.output(out);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : <a class="code" href="classdott.html#a843d7358a07ba3b28e1fbef649bfda1b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  {</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span>(gf_entry.second.body_available())</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      <a class="code" href="classdott.html#a6fc009951726463fc06747a6b2b12244">write_dot_subgraph</a>(out, gf_entry.first, gf_entry.second.body);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <a class="code" href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">do_dot_function_calls</a>(out);</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;}</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
+<div class="line"><a name="l00289"></a><span class="lineno"><a class="line" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">  289</a></span>&#160;std::string &amp;<a class="code" href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">dott::escape</a>(std::string &amp;str)</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;{</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  <span class="keywordflow">for</span>(<a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">std::string::size_type</a> i=0; i&lt;str.size(); i++)</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  {</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">if</span>(str[i]==<span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    {</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      str[i] = <span class="charliteral">&#39;n&#39;</span>;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      str.insert(i, <span class="stringliteral">&quot;\\&quot;</span>);</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    }</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(str[i]==<span class="charliteral">&#39;\&quot;&#39;</span> ||</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            str[i]==<span class="charliteral">&#39;|&#39;</span> ||</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            str[i]==<span class="charliteral">&#39;\\&#39;</span> ||</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            str[i]==<span class="charliteral">&#39;&gt;&#39;</span> ||</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            str[i]==<span class="charliteral">&#39;&lt;&#39;</span> ||</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            str[i]==<span class="charliteral">&#39;{&#39;</span> ||</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            str[i]==<span class="charliteral">&#39;}&#39;</span>)</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      str.insert(i, <span class="stringliteral">&quot;\\&quot;</span>);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      i++;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    }</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <span class="keywordflow">return</span> str;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;}</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
+<div class="line"><a name="l00317"></a><span class="lineno"><a class="line" href="classdott.html#a6bde72a25aaa41aa2de31daa7df6ab5a">  317</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#a6bde72a25aaa41aa2de31daa7df6ab5a">dott::find_next</a>(</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a> &amp;instructions,</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;it,</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt; &amp;tres,</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt; &amp;fres)</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;{</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; !it-&gt;condition().is_false())</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  {</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : it-&gt;targets)</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      tres.insert(target);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  }</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; it-&gt;condition().is_true())</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> next = it; next++;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  <span class="keywordflow">if</span>(next!=instructions.end())</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    fres.insert(next);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;}</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160; </div>
+<div class="line"><a name="l00340"></a><span class="lineno"><a class="line" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">  340</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">dott::write_edge</a>(</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  std::ostream &amp;out,</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;from,</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;to,</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="keyword">const</span> std::string &amp;label)</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;{</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; from.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a>;</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span>;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;Node_&quot;</span> &lt;&lt; <a class="code" href="classdott.html#a36483764d094389a2785376c30cb015e">subgraphscount</a> &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; to.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a> &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="keywordflow">if</span>(!label.empty())</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  {</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;[fontsize=20,label=\&quot;&quot;</span> &lt;&lt; label &lt;&lt; <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keywordflow">if</span>(from.<a class="code" href="classgoto__programt_1_1instructiont.html#a9cd6229e1d915bcf1c8805f7d983c3f6">is_backwards_goto</a>() &amp;&amp; from.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a> &gt; to.<a class="code" href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">location_number</a>)</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;,color=red&quot;</span>;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    out &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  }</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  out &lt;&lt; <span class="stringliteral">&quot;;\n&quot;</span>;</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;}</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
+<div class="line"><a name="l00359"></a><span class="lineno"><a class="line" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">  359</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a>(<span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;src, std::ostream &amp;out)</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;{</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  <a class="code" href="classdott.html">dott</a> <a class="code" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a>(src);</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  <a class="code" href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a>.output(out);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;}</div>
 <div class="ttc" id="aclasscode__function__callt_html"><div class="ttname"><a href="classcode__function__callt.html">code_function_callt</a></div><div class="ttdoc">goto_instruction_codet representation of a function call statement.</div><div class="ttdef"><b>Definition:</b> <a href="goto__instruction__code_8h_source.html#l00270">goto_instruction_code.h:271</a></div></div>
 <div class="ttc" id="aclassdott_html"><div class="ttname"><a href="classdott.html">dott</a></div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00027">dot.cpp:28</a></div></div>
 <div class="ttc" id="aclassdott_html_a0176320c11108d14f9e760e2f5be3217"><div class="ttname"><a href="classdott.html#a0176320c11108d14f9e760e2f5be3217">dott::function_calls</a></div><div class="ttdeci">std::list&lt; std::pair&lt; std::string, exprt &gt; &gt; function_calls</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00044">dot.cpp:44</a></div></div>
 <div class="ttc" id="aclassdott_html_a11f04ac07bb24642c8f882c06a2308d9"><div class="ttname"><a href="classdott.html#a11f04ac07bb24642c8f882c06a2308d9">dott::clusters</a></div><div class="ttdeci">std::list&lt; exprt &gt; clusters</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00045">dot.cpp:45</a></div></div>
-<div class="ttc" id="aclassdott_html_a32f9eb459fe07ab94836055f4dc499e7"><div class="ttname"><a href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">dott::escape</a></div><div class="ttdeci">std::string &amp; escape(std::string &amp;str)</div><div class="ttdoc">Escapes a string.</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00283">dot.cpp:283</a></div></div>
+<div class="ttc" id="aclassdott_html_a32f9eb459fe07ab94836055f4dc499e7"><div class="ttname"><a href="classdott.html#a32f9eb459fe07ab94836055f4dc499e7">dott::escape</a></div><div class="ttdeci">std::string &amp; escape(std::string &amp;str)</div><div class="ttdoc">Escapes a string.</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00289">dot.cpp:289</a></div></div>
 <div class="ttc" id="aclassdott_html_a36483764d094389a2785376c30cb015e"><div class="ttname"><a href="classdott.html#a36483764d094389a2785376c30cb015e">dott::subgraphscount</a></div><div class="ttdeci">unsigned subgraphscount</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00042">dot.cpp:42</a></div></div>
-<div class="ttc" id="aclassdott_html_a6a645d38ce19875776cbc439d9a7b78a"><div class="ttname"><a href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">dott::do_dot_function_calls</a></div><div class="ttdeci">void do_dot_function_calls(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00222">dot.cpp:222</a></div></div>
-<div class="ttc" id="aclassdott_html_a6fc009951726463fc06747a6b2b12244"><div class="ttname"><a href="classdott.html#a6fc009951726463fc06747a6b2b12244">dott::write_dot_subgraph</a></div><div class="ttdeci">void write_dot_subgraph(std::ostream &amp;, const irep_idt &amp;, const goto_programt &amp;)</div><div class="ttdoc">Write the dot graph that corresponds to the goto program to the output stream.</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00070">dot.cpp:70</a></div></div>
+<div class="ttc" id="aclassdott_html_a6a645d38ce19875776cbc439d9a7b78a"><div class="ttname"><a href="classdott.html#a6a645d38ce19875776cbc439d9a7b78a">dott::do_dot_function_calls</a></div><div class="ttdeci">void do_dot_function_calls(std::ostream &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00228">dot.cpp:228</a></div></div>
+<div class="ttc" id="aclassdott_html_a6bde72a25aaa41aa2de31daa7df6ab5a"><div class="ttname"><a href="classdott.html#a6bde72a25aaa41aa2de31daa7df6ab5a">dott::find_next</a></div><div class="ttdeci">void find_next(const goto_programt::instructionst &amp;, const goto_programt::const_targett &amp;, std::set&lt; goto_programt::const_targett, goto_programt::target_less_than &gt; &amp;, std::set&lt; goto_programt::const_targett, goto_programt::target_less_than &gt; &amp;)</div><div class="ttdoc">finds an instructions successors (for goto graphs)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00317">dot.cpp:317</a></div></div>
+<div class="ttc" id="aclassdott_html_a6fc009951726463fc06747a6b2b12244"><div class="ttname"><a href="classdott.html#a6fc009951726463fc06747a6b2b12244">dott::write_dot_subgraph</a></div><div class="ttdeci">void write_dot_subgraph(std::ostream &amp;, const irep_idt &amp;, const goto_programt &amp;)</div><div class="ttdoc">Write the dot graph that corresponds to the goto program to the output stream.</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00071">dot.cpp:71</a></div></div>
 <div class="ttc" id="aclassdott_html_a843d7358a07ba3b28e1fbef649bfda1b"><div class="ttname"><a href="classdott.html#a843d7358a07ba3b28e1fbef649bfda1b">dott::goto_model</a></div><div class="ttdeci">const goto_modelt &amp; goto_model</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00040">dot.cpp:40</a></div></div>
 <div class="ttc" id="aclassdott_html_a95c2545677a73115e9636f33696ef713"><div class="ttname"><a href="classdott.html#a95c2545677a73115e9636f33696ef713">dott::dott</a></div><div class="ttdeci">dott(const goto_modelt &amp;_goto_model)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00030">dot.cpp:30</a></div></div>
-<div class="ttc" id="aclassdott_html_aada72a54654aba95aa4a63671a36260d"><div class="ttname"><a href="classdott.html#aada72a54654aba95aa4a63671a36260d">dott::output</a></div><div class="ttdeci">void output(std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00264">dot.cpp:264</a></div></div>
-<div class="ttc" id="aclassdott_html_ab787fe32160012625ec6d6adfea7afef"><div class="ttname"><a href="classdott.html#ab787fe32160012625ec6d6adfea7afef">dott::find_next</a></div><div class="ttdeci">void find_next(const goto_programt::instructionst &amp;, const goto_programt::const_targett &amp;, std::set&lt; goto_programt::const_targett &gt; &amp;, std::set&lt; goto_programt::const_targett &gt; &amp;)</div><div class="ttdoc">finds an instructions successors (for goto graphs)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00311">dot.cpp:311</a></div></div>
-<div class="ttc" id="aclassdott_html_ae40ef2be3953cb51404931736dca6bb4"><div class="ttname"><a href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">dott::write_edge</a></div><div class="ttdeci">void write_edge(std::ostream &amp;, const goto_programt::instructiont &amp;, const goto_programt::instructiont &amp;, const std::string &amp;)</div><div class="ttdoc">writes an edge from the from node to the to node and with the given label to the output stream (dot f...</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00334">dot.cpp:334</a></div></div>
+<div class="ttc" id="aclassdott_html_aada72a54654aba95aa4a63671a36260d"><div class="ttname"><a href="classdott.html#aada72a54654aba95aa4a63671a36260d">dott::output</a></div><div class="ttdeci">void output(std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00270">dot.cpp:270</a></div></div>
+<div class="ttc" id="aclassdott_html_ae40ef2be3953cb51404931736dca6bb4"><div class="ttname"><a href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">dott::write_edge</a></div><div class="ttdeci">void write_edge(std::ostream &amp;, const goto_programt::instructiont &amp;, const goto_programt::instructiont &amp;, const std::string &amp;)</div><div class="ttdoc">writes an edge from the from node to the to node and with the given label to the output stream (dot f...</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00340">dot.cpp:340</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
@@ -453,17 +459,17 @@ $(document).ready(function(){initNavTree('dot_8cpp_source.html',''); initResizab
 <div class="ttc" id="aclassgoto__modelt_html_aa4063c1728aada83299deb1296363803"><div class="ttname"><a href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">goto_modelt::symbol_table</a></div><div class="ttdeci">symbol_tablet symbol_table</div><div class="ttdoc">Symbol table.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00031">goto_model.h:31</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html_ae63ccd9b824a94422f0bcead059bcaa2"><div class="ttname"><a href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_modelt::goto_functions</a></div><div class="ttdeci">goto_functionst goto_functions</div><div class="ttdoc">GOTO functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00034">goto_model.h:34</a></div></div>
 <div class="ttc" id="aclassgoto__programt_1_1instructiont_html"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a></div><div class="ttdoc">This class represents an instruction in the GOTO intermediate representation.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00179">goto_program.h:180</a></div></div>
-<div class="ttc" id="aclassgoto__programt_1_1instructiont_html_a9c5bdb92e07e4404d1b583e78c0457dc"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">goto_programt::instructiont::location_number</a></div><div class="ttdeci">unsigned location_number</div><div class="ttdoc">A globally unique number to identify a program location.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00531">goto_program.h:531</a></div></div>
-<div class="ttc" id="aclassgoto__programt_1_1instructiont_html_a9cd6229e1d915bcf1c8805f7d983c3f6"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#a9cd6229e1d915bcf1c8805f7d983c3f6">goto_programt::instructiont::is_backwards_goto</a></div><div class="ttdeci">bool is_backwards_goto() const</div><div class="ttdoc">Returns true if the instruction is a backwards branch.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00541">goto_program.h:541</a></div></div>
+<div class="ttc" id="aclassgoto__programt_1_1instructiont_html_a9c5bdb92e07e4404d1b583e78c0457dc"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#a9c5bdb92e07e4404d1b583e78c0457dc">goto_programt::instructiont::location_number</a></div><div class="ttdeci">unsigned location_number</div><div class="ttdoc">A globally unique number to identify a program location.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00558">goto_program.h:558</a></div></div>
+<div class="ttc" id="aclassgoto__programt_1_1instructiont_html_a9cd6229e1d915bcf1c8805f7d983c3f6"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html#a9cd6229e1d915bcf1c8805f7d983c3f6">goto_programt::instructiont::is_backwards_goto</a></div><div class="ttdeci">bool is_backwards_goto() const</div><div class="ttdoc">Returns true if the instruction is a backwards branch.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00568">goto_program.h:568</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00071">goto_program.h:72</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00592">goto_program.h:592</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a4fbd003af91fdc813da302d90a00513d"><div class="ttname"><a href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a></div><div class="ttdeci">instructionst::const_iterator const_targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00587">goto_program.h:587</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a7d0b43ee4ddd3c783512fd2edc084068"><div class="ttname"><a href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a></div><div class="ttdeci">std::list&lt; instructiont &gt; instructionst</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00584">goto_program.h:584</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a8e45dae3e5715d3687547cd692de5d34"><div class="ttname"><a href="classgoto__programt.html#a8e45dae3e5715d3687547cd692de5d34">goto_programt::const_targetst</a></div><div class="ttdeci">std::list&lt; const_targett &gt; const_targetst</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00589">goto_program.h:589</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_ab9c71d3111a417eb2cb13ba85d0f24a7"><div class="ttname"><a href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">goto_programt::get_successors</a></div><div class="ttdeci">std::list&lt; Target &gt; get_successors(Target target) const</div><div class="ttdoc">Get control-flow successors of a given instruction.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01096">goto_program.h:1096</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00621">goto_program.h:621</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a4fbd003af91fdc813da302d90a00513d"><div class="ttname"><a href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a></div><div class="ttdeci">instructionst::const_iterator const_targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00614">goto_program.h:614</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a7d0b43ee4ddd3c783512fd2edc084068"><div class="ttname"><a href="classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068">goto_programt::instructionst</a></div><div class="ttdeci">std::list&lt; instructiont &gt; instructionst</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00611">goto_program.h:611</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a8e45dae3e5715d3687547cd692de5d34"><div class="ttname"><a href="classgoto__programt.html#a8e45dae3e5715d3687547cd692de5d34">goto_programt::const_targetst</a></div><div class="ttdeci">std::list&lt; const_targett &gt; const_targetst</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00616">goto_program.h:616</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_ab9c71d3111a417eb2cb13ba85d0f24a7"><div class="ttname"><a href="classgoto__programt.html#ab9c71d3111a417eb2cb13ba85d0f24a7">goto_programt::get_successors</a></div><div class="ttdeci">std::list&lt; Target &gt; get_successors(Target target) const</div><div class="ttdoc">Get control-flow successors of a given instruction.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01125">goto_program.h:1125</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
 <div class="ttc" id="adot_8cpp_html_a5b1c2ca69fb2572f85dbe78bb577fc8b"><div class="ttname"><a href="dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b">DOTGRAPHSETTINGS</a></div><div class="ttdeci">#define DOTGRAPHSETTINGS</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00020">dot.cpp:20</a></div></div>
-<div class="ttc" id="adot_8cpp_html_aa7d89ec1a8200563a90f26afed25c859"><div class="ttname"><a href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a></div><div class="ttdeci">void dot(const goto_modelt &amp;src, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00353">dot.cpp:353</a></div></div>
+<div class="ttc" id="adot_8cpp_html_aa7d89ec1a8200563a90f26afed25c859"><div class="ttname"><a href="dot_8cpp.html#aa7d89ec1a8200563a90f26afed25c859">dot</a></div><div class="ttdeci">void dot(const goto_modelt &amp;src, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dot_8cpp_source.html#l00359">dot.cpp:359</a></div></div>
 <div class="ttc" id="adot_8h_html"><div class="ttname"><a href="dot_8h.html">dot.h</a></div><div class="ttdoc">Dump Goto-Program as DOT Graph.</div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
 <div class="ttc" id="alanguage__util_8cpp_html_a75d53cac2f22bbbcd9d5168860147063"><div class="ttname"><a href="language__util_8cpp.html#a75d53cac2f22bbbcd9d5168860147063">from_expr</a></div><div class="ttdeci">std::string from_expr(const namespacet &amp;ns, const irep_idt &amp;identifier, const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="language__util_8cpp_source.html#l00038">language_util.cpp:38</a></div></div>

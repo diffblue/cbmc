@@ -1,8 +1,8 @@
 var classsymex__coveraget =
 [
     [ "coverage_infot", "structsymex__coveraget_1_1coverage__infot.html", "structsymex__coveraget_1_1coverage__infot" ],
-    [ "coverage_innert", "classsymex__coveraget.html#a501f111b27838a865c33e3d040e63c9b", null ],
-    [ "coveraget", "classsymex__coveraget.html#a9fe5c6268cfba8a63003f63c2a55fdf8", null ],
+    [ "coverage_innert", "classsymex__coveraget.html#aa1974c275b9ac79a034439874522de86", null ],
+    [ "coveraget", "classsymex__coveraget.html#affcbe37b00104c6af2525b07116e9255", null ],
     [ "symex_coveraget", "classsymex__coveraget.html#a11430eda31e956e13e6df5b720af91ba", null ],
     [ "build_cobertura", "classsymex__coveraget.html#ac7211d61baf646b1c15ad4aaeb373324", null ],
     [ "compute_overall_coverage", "classsymex__coveraget.html#a464308ac230d9fe94da1ce1883a92991", null ],

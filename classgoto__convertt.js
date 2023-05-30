@@ -5,7 +5,7 @@ var classgoto__convertt =
     [ "leave_targett", "structgoto__convertt_1_1leave__targett.html", "structgoto__convertt_1_1leave__targett" ],
     [ "targetst", "structgoto__convertt_1_1targetst.html", "structgoto__convertt_1_1targetst" ],
     [ "throw_targett", "structgoto__convertt_1_1throw__targett.html", "structgoto__convertt_1_1throw__targett" ],
-    [ "cases_mapt", "classgoto__convertt.html#a7f44b0686727d7ef7880f88f165bd49d", null ],
+    [ "cases_mapt", "classgoto__convertt.html#af85585f9114f8eab469c192f969bd122", null ],
     [ "casest", "classgoto__convertt.html#afce1f417e3ee114bf5c1dc42d610e279", null ],
     [ "caset", "classgoto__convertt.html#ad11145b9ad3a4ac1fcf0cedfb27feac6", null ],
     [ "computed_gotost", "classgoto__convertt.html#af73eb2cdcfd98ac2b2ae0ef7dcfc1815", null ],

@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('classcover__basic__blockst.html',''); 
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classcover__basic__blockst__coll__graph.svg" width="2138" height="368"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classcover__basic__blockst__coll__graph.svg" width="2138" height="392"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -147,21 +147,21 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
-<tr class="memitem:a4a3b97738b2cbbc2aefd264d5eed8e9e"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#a4a3b97738b2cbbc2aefd264d5eed8e9e">block_mapt</a></td></tr>
-<tr class="separator:a4a3b97738b2cbbc2aefd264d5eed8e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab86fe9be6aa0ea0a3cafe56168d5230b"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, std::size_t, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#ab86fe9be6aa0ea0a3cafe56168d5230b">block_mapt</a></td></tr>
+<tr class="separator:ab86fe9be6aa0ea0a3cafe56168d5230b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:ad8a579f4817861ad4c2f6f893b5d0dc8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#ad8a579f4817861ad4c2f6f893b5d0dc8">add_block_lines</a> (<a class="el" href="structcover__basic__blockst_1_1block__infot.html">cover_basic_blockst::block_infot</a> &amp;block, const <a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;instruction)</td></tr>
 <tr class="memdesc:ad8a579f4817861ad4c2f6f893b5d0dc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the lines which <code>instruction</code> spans to <code>block</code>.  <a href="classcover__basic__blockst.html#ad8a579f4817861ad4c2f6f893b5d0dc8">More...</a><br /></td></tr>
 <tr class="separator:ad8a579f4817861ad4c2f6f893b5d0dc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa569d4dad987aab427cc6a72f9fafdb0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#aa569d4dad987aab427cc6a72f9fafdb0">continuation_of_block</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;instruction, <a class="el" href="classcover__basic__blockst.html#a4a3b97738b2cbbc2aefd264d5eed8e9e">block_mapt</a> &amp;<a class="el" href="classcover__basic__blockst.html#aed8f80ff4457176cc592a3cd1f1690b5">block_map</a>)</td></tr>
+<tr class="memitem:aa569d4dad987aab427cc6a72f9fafdb0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#aa569d4dad987aab427cc6a72f9fafdb0">continuation_of_block</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;instruction, <a class="el" href="classcover__basic__blockst.html#ab86fe9be6aa0ea0a3cafe56168d5230b">block_mapt</a> &amp;<a class="el" href="classcover__basic__blockst.html#aed8f80ff4457176cc592a3cd1f1690b5">block_map</a>)</td></tr>
 <tr class="memdesc:aa569d4dad987aab427cc6a72f9fafdb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this block is a continuation of a previous block through unconditional forward gotos, return this blocks number.  <a href="classcover__basic__blockst.html#aa569d4dad987aab427cc6a72f9fafdb0">More...</a><br /></td></tr>
 <tr class="separator:aa569d4dad987aab427cc6a72f9fafdb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:aed8f80ff4457176cc592a3cd1f1690b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcover__basic__blockst.html#a4a3b97738b2cbbc2aefd264d5eed8e9e">block_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#aed8f80ff4457176cc592a3cd1f1690b5">block_map</a></td></tr>
+<tr class="memitem:aed8f80ff4457176cc592a3cd1f1690b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcover__basic__blockst.html#ab86fe9be6aa0ea0a3cafe56168d5230b">block_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#aed8f80ff4457176cc592a3cd1f1690b5">block_map</a></td></tr>
 <tr class="memdesc:aed8f80ff4457176cc592a3cd1f1690b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">map program locations to block numbers  <a href="classcover__basic__blockst.html#aed8f80ff4457176cc592a3cd1f1690b5">More...</a><br /></td></tr>
 <tr class="separator:aed8f80ff4457176cc592a3cd1f1690b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac32ef8cf246048c6d2c60851633c0368"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structcover__basic__blockst_1_1block__infot.html">block_infot</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__basic__blockst.html#ac32ef8cf246048c6d2c60851633c0368">block_infos</a></td></tr>
@@ -172,8 +172,8 @@ Private Attributes</h2></td></tr>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00067">67</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a4a3b97738b2cbbc2aefd264d5eed8e9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a3b97738b2cbbc2aefd264d5eed8e9e">&#9670;&nbsp;</a></span>block_mapt</h2>
+<a id="ab86fe9be6aa0ea0a3cafe56168d5230b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab86fe9be6aa0ea0a3cafe56168d5230b">&#9670;&nbsp;</a></span>block_mapt</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -182,7 +182,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, std::size_t&gt; <a class="el" href="classcover__basic__blockst.html#a4a3b97738b2cbbc2aefd264d5eed8e9e">cover_basic_blockst::block_mapt</a></td>
+          <td class="memname">typedef std::map&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, std::size_t, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a>&gt; <a class="el" href="classcover__basic__blockst.html#ab86fe9be6aa0ea0a3cafe56168d5230b">cover_basic_blockst::block_mapt</a></td>
         </tr>
       </table>
   </td>
@@ -192,7 +192,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00106">106</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00110">110</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
 
 </div>
 </div>
@@ -321,7 +321,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classcover__basic__blockst.html#a4a3b97738b2cbbc2aefd264d5eed8e9e">cover_basic_blockst::block_mapt</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classcover__basic__blockst.html#ab86fe9be6aa0ea0a3cafe56168d5230b">cover_basic_blockst::block_mapt</a> &amp;&#160;</td>
           <td class="paramname"><em>block_map</em>&#160;</td>
         </tr>
         <tr>
@@ -565,7 +565,7 @@ Private Attributes</h2></td></tr>
 
 <p>map block numbers to block information </p>
 
-<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00125">125</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00129">129</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
 
 </div>
 </div>
@@ -579,7 +579,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcover__basic__blockst.html#a4a3b97738b2cbbc2aefd264d5eed8e9e">block_mapt</a> cover_basic_blockst::block_map</td>
+          <td class="memname"><a class="el" href="classcover__basic__blockst.html#ab86fe9be6aa0ea0a3cafe56168d5230b">block_mapt</a> cover_basic_blockst::block_map</td>
         </tr>
       </table>
   </td>
@@ -591,7 +591,7 @@ Private Attributes</h2></td></tr>
 
 <p>map program locations to block numbers </p>
 
-<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00123">123</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00127">127</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
 
 </div>
 </div>

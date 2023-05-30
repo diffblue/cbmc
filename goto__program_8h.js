@@ -2,6 +2,7 @@ var goto__program_8h =
 [
     [ "goto_programt", "classgoto__programt.html", "classgoto__programt" ],
     [ "instructiont", "classgoto__programt_1_1instructiont.html", "classgoto__programt_1_1instructiont" ],
+    [ "target_less_than", "structgoto__programt_1_1instructiont_1_1target__less__than.html", "structgoto__programt_1_1instructiont_1_1target__less__than" ],
     [ "const_target_hash", "structconst__target__hash.html", "structconst__target__hash" ],
     [ "pointee_address_equalt", "structpointee__address__equalt.html", "structpointee__address__equalt" ],
     [ "forall_goto_program_instructions", "goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728", null ],
@@ -35,8 +36,5 @@ var goto__program_8h =
     [ "for_each_instruction_if", "goto__program_8h.html#ad131c513e5320eb20669eeaff55259bd", null ],
     [ "objects_read", "goto__program_8h.html#af5e73fd7751bbccdcce5b2e7e1600cfb", null ],
     [ "objects_written", "goto__program_8h.html#a462c8f6a852996163b3df949a114a679", null ],
-    [ "operator<", "goto__program_8h.html#a60522a054ddbe630017b138dfe6abf80", null ],
-    [ "operator<", "goto__program_8h.html#a7526c3c44fc4245678dc1c2791463a9e", null ],
-    [ "operator<<", "goto__program_8h.html#aec60d66bd090f7bb028921a7e4299f6a", null ],
-    [ "order_const_target", "goto__program_8h.html#a2d467ec84f8202e175e8d1ed2bec9abc", null ]
+    [ "operator<<", "goto__program_8h.html#aec60d66bd090f7bb028921a7e4299f6a", null ]
 ];

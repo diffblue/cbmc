@@ -1,7 +1,7 @@
 var classchange__impactt =
 [
     [ "goto_functions_change_impactt", "classchange__impactt.html#a971f1d301cc3951859753a1a69d6f353", null ],
-    [ "goto_program_change_impactt", "classchange__impactt.html#a7be7b35f869fadb2455f4a7482549eb9", null ],
+    [ "goto_program_change_impactt", "classchange__impactt.html#a260e4eb7e52e6c9b0af81acf884ae4aa", null ],
     [ "mod_flagt", "classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cd", [
       [ "SAME", "classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda4591f2036aa253aa2a0d3cec48ecd7bf", null ],
       [ "NEW", "classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda29e5375ce802f6909491403be27d07e4", null ],

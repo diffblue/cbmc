@@ -175,117 +175,120 @@ $(document).ready(function(){initNavTree('remove__skip_8cpp_source.html',''); in
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    old_size=goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.size();</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">// maps deleted instructions to their replacement</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">typedef</span> std::map&lt;goto_programt::targett, goto_programt::targett&gt;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      new_targetst;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    new_targetst new_targets;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="comment">// remove skip statements</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">for</span>(goto_programt::instructionst::iterator it = begin; it != end;)</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> old_target=it;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <span class="comment">// for collecting labels</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      std::list&lt;irep_idt&gt; labels;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">typedef</span> std::map&lt;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>,</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <a class="code" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::target_less_than</a>&gt;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      new_targetst;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    new_targetst new_targets;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">// remove skip statements</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">for</span>(goto_programt::instructionst::iterator it = begin; it != end;)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> old_target=it;</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      <span class="keywordflow">while</span>(<a class="code" href="remove__skip_8cpp.html#af68b2fdd91825dd92234edec1b8b7f91">is_skip</a>(goto_program, it, <span class="keyword">true</span>))</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="comment">// don&#39;t remove the last skip statement,</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="comment">// it could be a target</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;          it == std::prev(end) ||</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;          (std::next(it)-&gt;is_end_function() &amp;&amp;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;           (!labels.empty() || !it-&gt;labels.empty())))</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        }</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="comment">// save labels</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        labels.splice(labels.end(), it-&gt;labels);</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        it++;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> new_target=it;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="comment">// save labels</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      it-&gt;labels.splice(it-&gt;labels.begin(), labels);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      <span class="comment">// for collecting labels</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      std::list&lt;irep_idt&gt; labels;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <span class="keywordflow">while</span>(<a class="code" href="remove__skip_8cpp.html#af68b2fdd91825dd92234edec1b8b7f91">is_skip</a>(goto_program, it, <span class="keyword">true</span>))</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="comment">// don&#39;t remove the last skip statement,</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="comment">// it could be a target</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;          it == std::prev(end) ||</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          (std::next(it)-&gt;is_end_function() &amp;&amp;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;           (!labels.empty() || !it-&gt;labels.empty())))</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;          <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="comment">// save labels</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        labels.splice(labels.end(), it-&gt;labels);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        it++;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> new_target=it;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="keywordflow">if</span>(new_target!=old_target)</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      {</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <span class="keywordflow">for</span>(; old_target!=new_target; ++old_target)</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;          new_targets[old_target]=new_target; <span class="comment">// remember the old targets</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      }</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        it++;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="comment">// adjust gotos across the full goto program body</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;ins : goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      <span class="keywordflow">if</span>(ins.is_goto() || ins.is_start_thread() || ins.is_catch())</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      {</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;target : ins.targets)</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        {</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;          new_targetst::const_iterator result = new_targets.find(target);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;          <span class="keywordflow">if</span>(result!=new_targets.end())</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;            target = result-&gt;second;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        }</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordflow">while</span>(new_targets.find(begin) != new_targets.end())</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      ++begin;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="comment">// save labels</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      it-&gt;labels.splice(it-&gt;labels.begin(), labels);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keywordflow">if</span>(new_target!=old_target)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <span class="keywordflow">for</span>(; old_target!=new_target; ++old_target)</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;          new_targets[old_target]=new_target; <span class="comment">// remember the old targets</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      }</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        it++;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">// adjust gotos across the full goto program body</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;ins : goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      <span class="keywordflow">if</span>(ins.is_goto() || ins.is_start_thread() || ins.is_catch())</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      {</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;target : ins.targets)</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        {</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          new_targetst::const_iterator result = new_targets.find(target);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;          <span class="keywordflow">if</span>(result!=new_targets.end())</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;            target = result-&gt;second;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        }</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      }</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    }</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="comment">// now delete the skips -- we do so after adjusting the</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">// gotos to avoid dangling targets</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;new_target : new_targets)</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.erase(new_target.first);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">// remove the last skip statement unless it&#39;s a target</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#ae251bc09f4fc9269e35fafb5e3746b5f">compute_target_numbers</a>();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">while</span>(new_targets.find(begin) != new_targets.end())</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      ++begin;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="comment">// now delete the skips -- we do so after adjusting the</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">// gotos to avoid dangling targets</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;new_target : new_targets)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.erase(new_target.first);</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">if</span>(begin != end)</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> last = std::prev(end);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keywordflow">if</span>(begin == last)</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        ++begin;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="remove__skip_8cpp.html#af68b2fdd91825dd92234edec1b8b7f91">is_skip</a>(goto_program, last) &amp;&amp; !last-&gt;is_target())</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.erase(last);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  }</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="keywordflow">while</span>(goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.size()&lt;old_size);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;}</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno"><a class="line" href="remove__skip_8cpp.html#a5ba8947525c6003c12b54a0ab59246ac">  185</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;{</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    goto_program,</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end());</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  goto_program.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;}</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">// remove the last skip statement unless it&#39;s a target</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#ae251bc09f4fc9269e35fafb5e3746b5f">compute_target_numbers</a>();</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">if</span>(begin != end)</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> last = std::prev(end);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">if</span>(begin == last)</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        ++begin;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="remove__skip_8cpp.html#af68b2fdd91825dd92234edec1b8b7f91">is_skip</a>(goto_program, last) &amp;&amp; !last-&gt;is_target())</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.erase(last);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <span class="keywordflow">while</span>(goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.size()&lt;old_size);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;}</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="remove__skip_8cpp.html#a5ba8947525c6003c12b54a0ab59246ac">  188</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;{</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    goto_program,</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end());</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno"><a class="line" href="remove__skip_8cpp.html#a0edaa325844f4c0cd4cc197f2ed5c1cf">  196</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;{</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      gf_entry.second.body,</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      gf_entry.second.body.instructions.begin(),</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      gf_entry.second.body.instructions.end());</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  }</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="comment">// we may remove targets</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  goto_functions.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;}</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno"><a class="line" href="remove__skip_8cpp.html#abd3129f23ae4b15bd0892d51ae5e52bc">  210</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;{</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;}</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  goto_program.<a class="code" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;}</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="remove__skip_8cpp.html#a0edaa325844f4c0cd4cc197f2ed5c1cf">  199</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;{</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      gf_entry.second.body,</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      gf_entry.second.body.instructions.begin(),</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;      gf_entry.second.body.instructions.end());</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="comment">// we may remove targets</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  goto_functions.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;}</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno"><a class="line" href="remove__skip_8cpp.html#abd3129f23ae4b15bd0892d51ae5e52bc">  213</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;{</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <a class="code" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;}</div>
 <div class="ttc" id="aclasscode__expressiont_html"><div class="ttname"><a href="classcode__expressiont.html">code_expressiont</a></div><div class="ttdoc">codet representation of an expression statement.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01393">std_code.h:1394</a></div></div>
 <div class="ttc" id="aclasscode__expressiont_html_a66e447b67833475b097c54c7dd2bed54"><div class="ttname"><a href="classcode__expressiont.html#a66e447b67833475b097c54c7dd2bed54">code_expressiont::expression</a></div><div class="ttdeci">const exprt &amp; expression() const</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01401">std_code.h:1401</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
@@ -297,10 +300,10 @@ $(document).ready(function(){initNavTree('remove__skip_8cpp_source.html',''); in
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html_ae63ccd9b824a94422f0bcead059bcaa2"><div class="ttname"><a href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_modelt::goto_functions</a></div><div class="ttdeci">goto_functionst goto_functions</div><div class="ttdoc">GOTO functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00034">goto_model.h:34</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00071">goto_program.h:72</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00592">goto_program.h:592</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00621">goto_program.h:621</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a2d19ab1e24b01874b1371c8272da146b"><div class="ttname"><a href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">goto_programt::update</a></div><div class="ttdeci">void update()</div><div class="ttdoc">Update all indices.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00619">goto_program.cpp:619</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00586">goto_program.h:586</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a4fbd003af91fdc813da302d90a00513d"><div class="ttname"><a href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a></div><div class="ttdeci">instructionst::const_iterator const_targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00587">goto_program.h:587</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00613">goto_program.h:613</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a4fbd003af91fdc813da302d90a00513d"><div class="ttname"><a href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a></div><div class="ttdeci">instructionst::const_iterator const_targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00614">goto_program.h:614</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_ae251bc09f4fc9269e35fafb5e3746b5f"><div class="ttname"><a href="classgoto__programt.html#ae251bc09f4fc9269e35fafb5e3746b5f">goto_programt::compute_target_numbers</a></div><div class="ttdeci">void compute_target_numbers()</div><div class="ttdoc">Compute the target numbers.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8cpp_source.html#l00647">goto_program.cpp:647</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
@@ -311,6 +314,7 @@ $(document).ready(function(){initNavTree('remove__skip_8cpp_source.html',''); in
 <div class="ttc" id="astd__code_8h_html_a8ad7bf55a0aae3a8c6921749d3846dd5"><div class="ttname"><a href="std__code_8h.html#a8ad7bf55a0aae3a8c6921749d3846dd5">to_code_expression</a></div><div class="ttdeci">code_expressiont &amp; to_code_expression(codet &amp;code)</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01428">std_code.h:1428</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a5a136f5dafc188edca7e6a28d671cf07"><div class="ttname"><a href="std__expr_8h.html#a5a136f5dafc188edca7e6a28d671cf07">to_typecast_expr</a></div><div class="ttdeci">const typecast_exprt &amp; to_typecast_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a typecast_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02051">std_expr.h:2051</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a54d3d021c927d453b518f11032cccb6a"><div class="ttname"><a href="std__types_8h.html#a54d3d021c927d453b518f11032cccb6a">is_constant</a></div><div class="ttdeci">bool is_constant(const typet &amp;type)</div><div class="ttdoc">This method tests, if the given typet is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00029">std_types.h:29</a></div></div>
+<div class="ttc" id="astructgoto__programt_1_1instructiont_1_1target__less__than_html"><div class="ttname"><a href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::instructiont::target_less_than</a></div><div class="ttdoc">A total order over targett and const_targett.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00390">goto_program.h:391</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

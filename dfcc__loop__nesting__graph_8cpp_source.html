@@ -108,89 +108,90 @@ $(document).ready(function(){initNavTree('dfcc__loop__nesting__graph_8cpp_source
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="natural__loops_8h.html">analyses/natural_loops.h</a>&gt;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structdfcc__loop__nesting__graph__nodet.html#aa3668e9129078a6433e1e8a9938b76f1">   17</a></span>&#160;<a class="code" href="structdfcc__loop__nesting__graph__nodet.html#aa3668e9129078a6433e1e8a9938b76f1">dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet</a>(</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structdfcc__loop__nesting__graph__nodet.html#a7910a002926405eee0d54b560c81a5db">   17</a></span>&#160;<a class="code" href="structdfcc__loop__nesting__graph__nodet.html#a7910a002926405eee0d54b560c81a5db">dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet</a>(</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;head,</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;latch,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">const</span> <a class="code" href="classloop__templatet.html">loop_templatet&lt;goto_programt::targett&gt;</a> &amp;instructions)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  : head(head), latch(latch), instructions(instructions)</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;{</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;}</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="dfcc__loop__nesting__graph_8cpp.html#a659db86426aaaa687d3431da1b7cb278">   26</a></span>&#160;<a class="code" href="classgrapht.html">dfcc_loop_nesting_grapht</a> <a class="code" href="dfcc__loop__nesting__graph_8cpp.html#a659db86426aaaa687d3431da1b7cb278">build_loop_nesting_graph</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="classnatural__loops__templatet.html">natural_loops_mutablet</a> natural_loops(goto_program);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classgrapht.html">dfcc_loop_nesting_grapht</a> loop_nesting_graph;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// Add a node per natural loop</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;loop : natural_loops.<a class="code" href="classloop__analysist.html#a356c89ce65ce5fa00056bf59261102c5">loop_map</a>)</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">auto</span> loop_head = loop.first;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">auto</span> &amp;loop_instructions = loop.second;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">if</span>(loop_instructions.size() &lt;= 1)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="comment">// ignore single instruction loops of the form</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="comment">// LOOP: goto LOOP;</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">// Find the instruction that jumps back to `loop_head` and has the</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// highest GOTO location number, define it as the latch.</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">auto</span> loop_latch = loop_head;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;t : loop_instructions)</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        t-&gt;is_goto() &amp;&amp; t-&gt;get_target() == loop_head &amp;&amp;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        t-&gt;location_number &gt; loop_latch-&gt;location_number)</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        loop_latch = t;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(loop_latch != loop_head, <span class="stringliteral">&quot;Natural loop latch is found&quot;</span>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    loop_nesting_graph.<a class="code" href="classgrapht.html#a95af9d553c25cf09d45160fee31bc554">add_node</a>(loop_head, loop_latch, loop_instructions);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// Add edges to the graph, pointing from inner loop to outer loops.</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// An `inner` will be considered nested in `outer` iff both its head</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// and latch instructions are instructions of `outer`.</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> outer = 0; outer &lt; loop_nesting_graph.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++outer)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;outer_instructions = loop_nesting_graph[outer].instructions;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> inner = 0; inner &lt; loop_nesting_graph.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++inner)</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">if</span>(inner == outer)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="keywordflow">if</span>(outer_instructions.contains(loop_nesting_graph[inner].head))</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        loop_nesting_graph.<a class="code" href="classgrapht.html#aa33e2eaa72a0f14019f5b141252556ae">add_edge</a>(inner, outer);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  }</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keyword">auto</span> topsorted_size = loop_nesting_graph.<a class="code" href="classgrapht.html#ae99cfa74808773651ae42d7567b92903">topsort</a>().size();</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    topsorted_size == loop_nesting_graph.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(),</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="stringliteral">&quot;loop_nesting_graph must be acyclic&quot;</span>);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">return</span> loop_nesting_graph;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">const</span> <a class="code" href="classloop__templatet.html">loop_templatet&lt;goto_programt::targett, goto_programt::target_less_than&gt;</a></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    &amp;instructions)</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  : head(head), latch(latch), instructions(instructions)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="dfcc__loop__nesting__graph_8cpp.html#a659db86426aaaa687d3431da1b7cb278">   27</a></span>&#160;<a class="code" href="classgrapht.html">dfcc_loop_nesting_grapht</a> <a class="code" href="dfcc__loop__nesting__graph_8cpp.html#a659db86426aaaa687d3431da1b7cb278">build_loop_nesting_graph</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classnatural__loops__templatet.html">natural_loops_mutablet</a> natural_loops(goto_program);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="classgrapht.html">dfcc_loop_nesting_grapht</a> loop_nesting_graph;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="comment">// Add a node per natural loop</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;loop : natural_loops.<a class="code" href="classloop__analysist.html#a6c7ec66e618c8af824b1fe2fd249d516">loop_map</a>)</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">auto</span> loop_head = loop.first;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">auto</span> &amp;loop_instructions = loop.second;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">if</span>(loop_instructions.size() &lt;= 1)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="comment">// ignore single instruction loops of the form</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="comment">// LOOP: goto LOOP;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// Find the instruction that jumps back to `loop_head` and has the</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="comment">// highest GOTO location number, define it as the latch.</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">auto</span> loop_latch = loop_head;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;t : loop_instructions)</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        t-&gt;is_goto() &amp;&amp; t-&gt;get_target() == loop_head &amp;&amp;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        t-&gt;location_number &gt; loop_latch-&gt;location_number)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        loop_latch = t;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(loop_latch != loop_head, <span class="stringliteral">&quot;Natural loop latch is found&quot;</span>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    loop_nesting_graph.<a class="code" href="classgrapht.html#a95af9d553c25cf09d45160fee31bc554">add_node</a>(loop_head, loop_latch, loop_instructions);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// Add edges to the graph, pointing from inner loop to outer loops.</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// An `inner` will be considered nested in `outer` iff both its head</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="comment">// and latch instructions are instructions of `outer`.</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> outer = 0; outer &lt; loop_nesting_graph.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++outer)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;outer_instructions = loop_nesting_graph[outer].instructions;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> inner = 0; inner &lt; loop_nesting_graph.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(); ++inner)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <span class="keywordflow">if</span>(inner == outer)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <span class="keywordflow">if</span>(outer_instructions.contains(loop_nesting_graph[inner].head))</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        loop_nesting_graph.<a class="code" href="classgrapht.html#aa33e2eaa72a0f14019f5b141252556ae">add_edge</a>(inner, outer);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  }</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="keyword">auto</span> topsorted_size = loop_nesting_graph.<a class="code" href="classgrapht.html#ae99cfa74808773651ae42d7567b92903">topsort</a>().size();</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    topsorted_size == loop_nesting_graph.<a class="code" href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">size</a>(),</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="stringliteral">&quot;loop_nesting_graph must be acyclic&quot;</span>);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordflow">return</span> loop_nesting_graph;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00071">goto_program.h:72</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00586">goto_program.h:586</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00613">goto_program.h:613</a></div></div>
 <div class="ttc" id="aclassgrapht_html"><div class="ttname"><a href="classgrapht.html">grapht</a></div><div class="ttdoc">A generic directed graph with a parametric node type.</div><div class="ttdef"><b>Definition:</b> <a href="graph_8h_source.html#l00166">graph.h:167</a></div></div>
 <div class="ttc" id="aclassgrapht_html_a95af9d553c25cf09d45160fee31bc554"><div class="ttname"><a href="classgrapht.html#a95af9d553c25cf09d45160fee31bc554">grapht::add_node</a></div><div class="ttdeci">node_indext add_node(arguments &amp;&amp;... values)</div><div class="ttdef"><b>Definition:</b> <a href="graph_8h_source.html#l00180">graph.h:180</a></div></div>
 <div class="ttc" id="aclassgrapht_html_aa33e2eaa72a0f14019f5b141252556ae"><div class="ttname"><a href="classgrapht.html#aa33e2eaa72a0f14019f5b141252556ae">grapht::add_edge</a></div><div class="ttdeci">void add_edge(node_indext a, node_indext b)</div><div class="ttdef"><b>Definition:</b> <a href="graph_8h_source.html#l00232">graph.h:232</a></div></div>
 <div class="ttc" id="aclassgrapht_html_aafe49b9451aea23db197d0f848ff359e"><div class="ttname"><a href="classgrapht.html#aafe49b9451aea23db197d0f848ff359e">grapht::size</a></div><div class="ttdeci">std::size_t size() const</div><div class="ttdef"><b>Definition:</b> <a href="graph_8h_source.html#l00212">graph.h:212</a></div></div>
 <div class="ttc" id="aclassgrapht_html_ae99cfa74808773651ae42d7567b92903"><div class="ttname"><a href="classgrapht.html#ae99cfa74808773651ae42d7567b92903">grapht::topsort</a></div><div class="ttdeci">std::list&lt; node_indext &gt; topsort() const</div><div class="ttdoc">Find a topological order of the nodes if graph is DAG, return empty list for non-DAG or empty graph.</div><div class="ttdef"><b>Definition:</b> <a href="graph_8h_source.html#l00879">graph.h:879</a></div></div>
-<div class="ttc" id="aclassloop__analysist_html_a356c89ce65ce5fa00056bf59261102c5"><div class="ttname"><a href="classloop__analysist.html#a356c89ce65ce5fa00056bf59261102c5">loop_analysist::loop_map</a></div><div class="ttdeci">loop_mapt loop_map</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00088">loop_analysis.h:88</a></div></div>
-<div class="ttc" id="aclassloop__templatet_html"><div class="ttname"><a href="classloop__templatet.html">loop_templatet&lt; goto_programt::targett &gt;</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html"><div class="ttname"><a href="classnatural__loops__templatet.html">natural_loops_templatet&lt; goto_programt, goto_programt::targett &gt;</a></div></div>
-<div class="ttc" id="adfcc__loop__nesting__graph_8cpp_html_a659db86426aaaa687d3431da1b7cb278"><div class="ttname"><a href="dfcc__loop__nesting__graph_8cpp.html#a659db86426aaaa687d3431da1b7cb278">build_loop_nesting_graph</a></div><div class="ttdeci">dfcc_loop_nesting_grapht build_loop_nesting_graph(goto_programt &amp;goto_program)</div><div class="ttdoc">Builds a graph instance describing the nesting structure of natural loops in the given goto_program.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__loop__nesting__graph_8cpp_source.html#l00026">dfcc_loop_nesting_graph.cpp:26</a></div></div>
+<div class="ttc" id="aclassloop__analysist_html_a6c7ec66e618c8af824b1fe2fd249d516"><div class="ttname"><a href="classloop__analysist.html#a6c7ec66e618c8af824b1fe2fd249d516">loop_analysist::loop_map</a></div><div class="ttdeci">loop_mapt loop_map</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00088">loop_analysis.h:88</a></div></div>
+<div class="ttc" id="aclassloop__templatet_html"><div class="ttname"><a href="classloop__templatet.html">loop_templatet</a></div><div class="ttdoc">A loop, specified as a set of instructions.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00023">loop_analysis.h:24</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html"><div class="ttname"><a href="classnatural__loops__templatet.html">natural_loops_templatet&lt; goto_programt, goto_programt::targett, goto_programt::target_less_than &gt;</a></div></div>
+<div class="ttc" id="adfcc__loop__nesting__graph_8cpp_html_a659db86426aaaa687d3431da1b7cb278"><div class="ttname"><a href="dfcc__loop__nesting__graph_8cpp.html#a659db86426aaaa687d3431da1b7cb278">build_loop_nesting_graph</a></div><div class="ttdeci">dfcc_loop_nesting_grapht build_loop_nesting_graph(goto_programt &amp;goto_program)</div><div class="ttdoc">Builds a graph instance describing the nesting structure of natural loops in the given goto_program.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__loop__nesting__graph_8cpp_source.html#l00027">dfcc_loop_nesting_graph.cpp:27</a></div></div>
 <div class="ttc" id="adfcc__loop__nesting__graph_8h_html"><div class="ttname"><a href="dfcc__loop__nesting__graph_8h.html">dfcc_loop_nesting_graph.h</a></div><div class="ttdoc">Builds a graph describing how loops are nested in a GOTO program.</div></div>
 <div class="ttc" id="anatural__loops_8h_html"><div class="ttname"><a href="natural__loops_8h.html">natural_loops.h</a></div><div class="ttdoc">Compute natural loops in a goto_function.</div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00534">invariant.h:534</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
-<div class="ttc" id="astructdfcc__loop__nesting__graph__nodet_html_aa3668e9129078a6433e1e8a9938b76f1"><div class="ttname"><a href="structdfcc__loop__nesting__graph__nodet.html#aa3668e9129078a6433e1e8a9938b76f1">dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet</a></div><div class="ttdeci">dfcc_loop_nesting_graph_nodet(const goto_programt::targett &amp;head, const goto_programt::targett &amp;latch, const loop_templatet&lt; goto_programt::targett &gt; &amp;instructions)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__loop__nesting__graph_8cpp_source.html#l00017">dfcc_loop_nesting_graph.cpp:17</a></div></div>
+<div class="ttc" id="astructdfcc__loop__nesting__graph__nodet_html_a7910a002926405eee0d54b560c81a5db"><div class="ttname"><a href="structdfcc__loop__nesting__graph__nodet.html#a7910a002926405eee0d54b560c81a5db">dfcc_loop_nesting_graph_nodet::dfcc_loop_nesting_graph_nodet</a></div><div class="ttdeci">dfcc_loop_nesting_graph_nodet(const goto_programt::targett &amp;head, const goto_programt::targett &amp;latch, const loop_templatet&lt; goto_programt::targett, goto_programt::target_less_than &gt; &amp;instructions)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__loop__nesting__graph_8cpp_source.html#l00017">dfcc_loop_nesting_graph.cpp:17</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

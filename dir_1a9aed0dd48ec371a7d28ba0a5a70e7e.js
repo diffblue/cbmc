@@ -50,6 +50,8 @@ var dir_1a9aed0dd48ec371a7d28ba0a5a70e7e =
       [ "local_variable_with_holest", "structjava__bytecode__convert__methodt_1_1local__variable__with__holest.html", "structjava__bytecode__convert__methodt_1_1local__variable__with__holest" ],
       [ "variablet", "classjava__bytecode__convert__methodt_1_1variablet.html", "classjava__bytecode__convert__methodt_1_1variablet" ],
       [ "converted_instructiont", "structjava__bytecode__convert__methodt_1_1converted__instructiont.html", "structjava__bytecode__convert__methodt_1_1converted__instructiont" ],
+      [ "method_with_amapt", "structjava__bytecode__convert__methodt_1_1method__with__amapt.html", "structjava__bytecode__convert__methodt_1_1method__with__amapt" ],
+      [ "target_less_than", "structjava__bytecode__convert__methodt_1_1method__with__amapt_1_1target__less__than.html", "structjava__bytecode__convert__methodt_1_1method__with__amapt_1_1target__less__than" ],
       [ "block_tree_nodet", "structjava__bytecode__convert__methodt_1_1block__tree__nodet.html", "structjava__bytecode__convert__methodt_1_1block__tree__nodet" ]
     ] ],
     [ "java_bytecode_instrument.cpp", "java__bytecode__instrument_8cpp.html", "java__bytecode__instrument_8cpp" ],

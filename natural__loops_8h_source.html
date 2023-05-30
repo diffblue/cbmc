@@ -113,154 +113,161 @@ $(document).ready(function(){initNavTree('natural__loops_8h_source.html',''); in
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cfg__dominators_8h.html">cfg_dominators.h</a>&quot;</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="loop__analysis_8h.html">loop_analysis.h</a>&quot;</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html">   47</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet</a> : <span class="keyword">public</span> <a class="code" href="classloop__analysist.html">loop_analysist</a>&lt;T&gt;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ae03ac17f3bbda0c60e68f49f02cf2120">   49</a></span>&#160;  <span class="keyword">typedef</span> <a class="code" href="classloop__analysist.html">loop_analysist&lt;T&gt;</a> <a class="code" href="classnatural__loops__templatet.html#ae03ac17f3bbda0c60e68f49f02cf2120">parentt</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ad6f7c88711eb3f06e4d119cc1d39f0ec">   52</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="classloop__templatet.html">parentt::loopt</a> <a class="code" href="classnatural__loops__templatet.html#ad6f7c88711eb3f06e4d119cc1d39f0ec">natural_loopt</a>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a19a851c06bc4fffba1964e0607e5258c">   54</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#a19a851c06bc4fffba1964e0607e5258c">operator()</a>(P &amp;program)</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">compute</a>(program);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ab560f2f2a77887da9213ce1a8a9649b9">   59</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt;P, T, false&gt;</a> &amp;<a class="code" href="classnatural__loops__templatet.html#ab560f2f2a77887da9213ce1a8a9649b9">get_dominator_info</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">  </span>{</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classnatural__loops__templatet.html#a54c001fbc926bbd587b4905d48791fc7">cfg_dominators</a>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a3196667c6ab9566241860d64e5efcd87">   64</a></span>&#160;  <a class="code" href="classnatural__loops__templatet.html#a3196667c6ab9566241860d64e5efcd87">natural_loops_templatet</a>()</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a18c7ba9f3151058bee96f3b71320b4aa">   68</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classnatural__loops__templatet.html#a18c7ba9f3151058bee96f3b71320b4aa">natural_loops_templatet</a>(P &amp;program)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">compute</a>(program);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a54c001fbc926bbd587b4905d48791fc7">   74</a></span>&#160;  <a class="code" href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt;P, T, false&gt;</a> <a class="code" href="classnatural__loops__templatet.html#a54c001fbc926bbd587b4905d48791fc7">cfg_dominators</a>;</div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a45f9becd0efe24100a78c75a1a312424">   75</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt;P, T, false&gt;::cfgt::nodet</a> <a class="code" href="classnatural__loops__templatet.html#a45f9becd0efe24100a78c75a1a312424">nodet</a>;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">   77</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">compute</a>(P &amp;program);</div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a3f6c6f186022b9a2ceae12f92a5bf894">   78</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#a3f6c6f186022b9a2ceae12f92a5bf894">compute_natural_loop</a>(T, T);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;};</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="classnatural__loopst.html">   83</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnatural__loopst.html">natural_loopst</a>:</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">public</span> <a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet</a>&lt;const goto_programt,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                                   goto_programt::const_targett&gt;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;{</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;};</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">typedef</span> <a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet&lt;goto_programt, goto_programt::targett&gt;</a></div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="natural__loops_8h.html#a31f2d43832b10cd82219b957f13a4214">   90</a></span>&#160;    <a class="code" href="natural__loops_8h.html#a31f2d43832b10cd82219b957f13a4214">natural_loops_mutablet</a>;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="natural__loops_8h.html#ac8f4c8a242860bfde4e8e36691f0e67d">   92</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="natural__loops_8h.html#ac8f4c8a242860bfde4e8e36691f0e67d">show_natural_loops</a>(<span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, std::ostream &amp;out)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  show_loops&lt;natural_loopst&gt;(goto_model, out);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T, <span class="keyword">typename</span> C&gt;</div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html">   48</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet</a> : <span class="keyword">public</span> <a class="code" href="classloop__analysist.html">loop_analysist</a>&lt;T, C&gt;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;{</div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a72b805e98da37b00836cf16786a92512">   50</a></span>&#160;  <span class="keyword">typedef</span> <a class="code" href="classloop__analysist.html">loop_analysist&lt;T, C&gt;</a> <a class="code" href="classnatural__loops__templatet.html#a72b805e98da37b00836cf16786a92512">parentt</a>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a3baa5b312867729e8d7da756b3966854">   53</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="classloop__templatet.html">parentt::loopt</a> <a class="code" href="classnatural__loops__templatet.html#a3baa5b312867729e8d7da756b3966854">natural_loopt</a>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a32eec4aaef9f348b9e680430876c982a">   55</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#a32eec4aaef9f348b9e680430876c982a">operator()</a>(P &amp;program)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">compute</a>(program);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a6b9ab2362b342049a898dd84a2598b61">   60</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt;P, T, false&gt;</a> &amp;<a class="code" href="classnatural__loops__templatet.html#a6b9ab2362b342049a898dd84a2598b61">get_dominator_info</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">  </span>{</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classnatural__loops__templatet.html#a2ee7362451183fe939a4d06abddf8a0e">cfg_dominators</a>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a1dc4a66e415928b59646c756beb7c9af">   65</a></span>&#160;  <a class="code" href="classnatural__loops__templatet.html#a1dc4a66e415928b59646c756beb7c9af">natural_loops_templatet</a>()</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#aee194c7b06d5c73d851277f01f061330">   69</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classnatural__loops__templatet.html#aee194c7b06d5c73d851277f01f061330">natural_loops_templatet</a>(P &amp;program)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">compute</a>(program);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a2ee7362451183fe939a4d06abddf8a0e">   75</a></span>&#160;  <a class="code" href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt;P, T, false&gt;</a> <a class="code" href="classnatural__loops__templatet.html#a2ee7362451183fe939a4d06abddf8a0e">cfg_dominators</a>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a34245bba8b8704dd0221fab17c5d9ca6">   76</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt;P, T, false&gt;::cfgt::nodet</a> <a class="code" href="classnatural__loops__templatet.html#a34245bba8b8704dd0221fab17c5d9ca6">nodet</a>;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">   78</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">compute</a>(P &amp;program);</div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a5d91e7877f4b3e396cf1dea49287032c">   79</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#a5d91e7877f4b3e396cf1dea49287032c">compute_natural_loop</a>(T, T);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;};</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="classnatural__loopst.html">   84</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnatural__loopst.html">natural_loopst</a> : <span class="keyword">public</span> <a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet</a>&lt;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                         const goto_programt,</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                         goto_programt::const_targett,</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                         goto_programt::target_less_than&gt;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;};</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">typedef</span> <a class="code" href="classnatural__loops__templatet.html">natural_loops_templatet</a>&lt;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a>,</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="code" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>,</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <a class="code" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::target_less_than</a>&gt;</div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="natural__loops_8h.html#a92737915ec069b4a6c5a8b769a8ce849">   95</a></span>&#160;  <a class="code" href="natural__loops_8h.html#a92737915ec069b4a6c5a8b769a8ce849">natural_loops_mutablet</a>;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">  103</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">natural_loops_templatet&lt;P, T&gt;::compute</a>(P &amp;program)</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  cfg_dominators(program);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  cfg_dominators.output(std::cout);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="comment">// find back-edges m-&gt;n</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keywordflow">for</span>(T m_it=program.instructions.begin();</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      m_it!=program.instructions.end();</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      ++m_it)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">if</span>(m_it-&gt;is_backwards_goto())</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;target=m_it-&gt;get_target();</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <span class="keywordflow">if</span>(target-&gt;location_number&lt;=m_it-&gt;location_number)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">        #ifdef DEBUG</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;Computing loop for &quot;</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;                  &lt;&lt; m_it-&gt;location_number &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                  &lt;&lt; target-&gt;location_number &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">        #endif</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keywordflow">if</span>(cfg_dominators.dominates(target, m_it))</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;          compute_natural_loop(m_it, target);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      }</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;}</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00137"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a3f6c6f186022b9a2ceae12f92a5bf894">  137</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#a3f6c6f186022b9a2ceae12f92a5bf894">natural_loops_templatet&lt;P, T&gt;::compute_natural_loop</a>(T m, T n)</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;{</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(n-&gt;location_number &lt;= m-&gt;location_number);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  std::stack&lt;T&gt; stack;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keyword">auto</span> insert_result = parentt::loop_map.emplace(n, <a class="code" href="classloop__templatet.html">natural_loopt</a>{});</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="comment">// Note the emplace *may* access a loop that already exists: this happens when</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="comment">// a given header has more than one incoming edge, such as</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="comment">// head: if(x) goto head; else goto head;</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="comment">// In this case this compute routine is run twice, one for each backedge, with</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="comment">// each adding whatever instructions can reach this &#39;m&#39; (the program point</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="comment">// that branches to the loop header, &#39;n&#39;).</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <a class="code" href="classloop__templatet.html">natural_loopt</a> &amp;loop = insert_result.first-&gt;second;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  loop.<a class="code" href="classloop__templatet.html#aae9a5860f31ab57ee4cb8b2cc55b72ef">insert_instruction</a>(n);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  loop.<a class="code" href="classloop__templatet.html#aae9a5860f31ab57ee4cb8b2cc55b72ef">insert_instruction</a>(m);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keywordflow">if</span>(n!=m)</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    stack.push(m);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="keywordflow">while</span>(!stack.empty())</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    T p=stack.top();</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    stack.pop();</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="natural__loops_8h.html#ac8f4c8a242860bfde4e8e36691f0e67d">   97</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="natural__loops_8h.html#ac8f4c8a242860bfde4e8e36691f0e67d">show_natural_loops</a>(<span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, std::ostream &amp;out)</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;{</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  show_loops&lt;natural_loopst&gt;(goto_model, out);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T, <span class="keyword">typename</span> C&gt;</div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">  108</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">natural_loops_templatet&lt;P, T, C&gt;::compute</a>(P &amp;program)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  cfg_dominators(program);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  cfg_dominators.output(std::cout);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="comment">// find back-edges m-&gt;n</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordflow">for</span>(T m_it=program.instructions.begin();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      m_it!=program.instructions.end();</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      ++m_it)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  {</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">if</span>(m_it-&gt;is_backwards_goto())</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;target=m_it-&gt;get_target();</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keywordflow">if</span>(target-&gt;location_number&lt;=m_it-&gt;location_number)</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">        #ifdef DEBUG</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;Computing loop for &quot;</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;                  &lt;&lt; m_it-&gt;location_number &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;                  &lt;&lt; target-&gt;location_number &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">        #endif</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">if</span>(cfg_dominators.dominates(target, m_it))</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;          compute_natural_loop(m_it, target);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      }</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;}</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T, <span class="keyword">typename</span> C&gt;</div>
+<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="classnatural__loops__templatet.html#a5d91e7877f4b3e396cf1dea49287032c">  142</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classnatural__loops__templatet.html#a5d91e7877f4b3e396cf1dea49287032c">natural_loops_templatet&lt;P, T, C&gt;::compute_natural_loop</a>(T m, T n)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;{</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(n-&gt;location_number &lt;= m-&gt;location_number);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  std::stack&lt;T&gt; stack;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="keyword">auto</span> insert_result = parentt::loop_map.emplace(n, <a class="code" href="classloop__templatet.html">natural_loopt</a>{});</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="comment">// Note the emplace *may* access a loop that already exists: this happens when</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="comment">// a given header has more than one incoming edge, such as</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="comment">// head: if(x) goto head; else goto head;</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="comment">// In this case this compute routine is run twice, one for each backedge, with</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="comment">// each adding whatever instructions can reach this &#39;m&#39; (the program point</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <span class="comment">// that branches to the loop header, &#39;n&#39;).</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <a class="code" href="classloop__templatet.html">natural_loopt</a> &amp;loop = insert_result.first-&gt;second;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  loop.<a class="code" href="classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27">insert_instruction</a>(n);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  loop.<a class="code" href="classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27">insert_instruction</a>(m);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">if</span>(n!=m)</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    stack.push(m);</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnatural__loops__templatet.html#a45f9becd0efe24100a78c75a1a312424">nodet</a> &amp;node = cfg_dominators.get_node(p);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;edge : node.in)</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    {</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      T q=cfg_dominators.cfg[edge.first].PC;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">if</span>(loop.<a class="code" href="classloop__templatet.html#aae9a5860f31ab57ee4cb8b2cc55b72ef">insert_instruction</a>(q))</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        stack.push(q);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  }</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;}</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANALYSES_NATURAL_LOOPS_H</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keywordflow">while</span>(!stack.empty())</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  {</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    T p=stack.top();</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    stack.pop();</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnatural__loops__templatet.html#a34245bba8b8704dd0221fab17c5d9ca6">nodet</a> &amp;node = cfg_dominators.get_node(p);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;edge : node.in)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      T q=cfg_dominators.cfg[edge.first].PC;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <span class="keywordflow">if</span>(loop.<a class="code" href="classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27">insert_instruction</a>(q))</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        stack.push(q);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    }</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;}</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANALYSES_NATURAL_LOOPS_H</span></div>
 <div class="ttc" id="acfg__dominators_8h_html"><div class="ttname"><a href="cfg__dominators_8h.html">cfg_dominators.h</a></div><div class="ttdoc">Compute dominators for CFG of goto_function.</div></div>
 <div class="ttc" id="aclasscfg__dominators__templatet_html"><div class="ttname"><a href="classcfg__dominators__templatet.html">cfg_dominators_templatet&lt; P, T, false &gt;</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00071">goto_program.h:72</a></div></div>
+<div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00613">goto_program.h:613</a></div></div>
 <div class="ttc" id="aclassloop__analysist_html"><div class="ttname"><a href="classloop__analysist.html">loop_analysist</a></div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00081">loop_analysis.h:82</a></div></div>
 <div class="ttc" id="aclassloop__templatet_html"><div class="ttname"><a href="classloop__templatet.html">loop_templatet</a></div><div class="ttdoc">A loop, specified as a set of instructions.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00023">loop_analysis.h:24</a></div></div>
-<div class="ttc" id="aclassloop__templatet_html_aae9a5860f31ab57ee4cb8b2cc55b72ef"><div class="ttname"><a href="classloop__templatet.html#aae9a5860f31ab57ee4cb8b2cc55b72ef">loop_templatet::insert_instruction</a></div><div class="ttdeci">bool insert_instruction(const T instruction)</div><div class="ttdoc">Adds instruction to this loop.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00074">loop_analysis.h:74</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html"><div class="ttname"><a href="classnatural__loops__templatet.html">natural_loops_templatet</a></div><div class="ttdoc">Main driver for working out if a class (normally goto_programt) has any natural loops.</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00047">natural_loops.h:48</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_a18c7ba9f3151058bee96f3b71320b4aa"><div class="ttname"><a href="classnatural__loops__templatet.html#a18c7ba9f3151058bee96f3b71320b4aa">natural_loops_templatet::natural_loops_templatet</a></div><div class="ttdeci">natural_loops_templatet(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00068">natural_loops.h:68</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_a19a851c06bc4fffba1964e0607e5258c"><div class="ttname"><a href="classnatural__loops__templatet.html#a19a851c06bc4fffba1964e0607e5258c">natural_loops_templatet::operator()</a></div><div class="ttdeci">void operator()(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00054">natural_loops.h:54</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_a3196667c6ab9566241860d64e5efcd87"><div class="ttname"><a href="classnatural__loops__templatet.html#a3196667c6ab9566241860d64e5efcd87">natural_loops_templatet::natural_loops_templatet</a></div><div class="ttdeci">natural_loops_templatet()</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00064">natural_loops.h:64</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_a3f6c6f186022b9a2ceae12f92a5bf894"><div class="ttname"><a href="classnatural__loops__templatet.html#a3f6c6f186022b9a2ceae12f92a5bf894">natural_loops_templatet::compute_natural_loop</a></div><div class="ttdeci">void compute_natural_loop(T, T)</div><div class="ttdoc">Computes the natural loop for a given back-edge (see Muchnick section 7.4)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00137">natural_loops.h:137</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_a45f9becd0efe24100a78c75a1a312424"><div class="ttname"><a href="classnatural__loops__templatet.html#a45f9becd0efe24100a78c75a1a312424">natural_loops_templatet::nodet</a></div><div class="ttdeci">cfg_dominators_templatet&lt; P, T, false &gt;::cfgt::nodet nodet</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00075">natural_loops.h:75</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_a54c001fbc926bbd587b4905d48791fc7"><div class="ttname"><a href="classnatural__loops__templatet.html#a54c001fbc926bbd587b4905d48791fc7">natural_loops_templatet::cfg_dominators</a></div><div class="ttdeci">cfg_dominators_templatet&lt; P, T, false &gt; cfg_dominators</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00074">natural_loops.h:74</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_ab560f2f2a77887da9213ce1a8a9649b9"><div class="ttname"><a href="classnatural__loops__templatet.html#ab560f2f2a77887da9213ce1a8a9649b9">natural_loops_templatet::get_dominator_info</a></div><div class="ttdeci">const cfg_dominators_templatet&lt; P, T, false &gt; &amp; get_dominator_info() const</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00059">natural_loops.h:59</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_ac04b52882496e43899854d5d9aad74e7"><div class="ttname"><a href="classnatural__loops__templatet.html#ac04b52882496e43899854d5d9aad74e7">natural_loops_templatet::compute</a></div><div class="ttdeci">void compute(P &amp;program)</div><div class="ttdoc">Finds all back-edges and computes the natural loops.</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00103">natural_loops.h:103</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_ad6f7c88711eb3f06e4d119cc1d39f0ec"><div class="ttname"><a href="classnatural__loops__templatet.html#ad6f7c88711eb3f06e4d119cc1d39f0ec">natural_loops_templatet::natural_loopt</a></div><div class="ttdeci">parentt::loopt natural_loopt</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00052">natural_loops.h:52</a></div></div>
-<div class="ttc" id="aclassnatural__loops__templatet_html_ae03ac17f3bbda0c60e68f49f02cf2120"><div class="ttname"><a href="classnatural__loops__templatet.html#ae03ac17f3bbda0c60e68f49f02cf2120">natural_loops_templatet::parentt</a></div><div class="ttdeci">loop_analysist&lt; T &gt; parentt</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00049">natural_loops.h:49</a></div></div>
-<div class="ttc" id="aclassnatural__loopst_html"><div class="ttname"><a href="classnatural__loopst.html">natural_loopst</a></div><div class="ttdoc">A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00083">natural_loops.h:86</a></div></div>
+<div class="ttc" id="aclassloop__templatet_html_a36ab9c3983ba32dd5e13b5eac69bbc27"><div class="ttname"><a href="classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27">loop_templatet::insert_instruction</a></div><div class="ttdeci">bool insert_instruction(const T instruction)</div><div class="ttdoc">Adds instruction to this loop.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00074">loop_analysis.h:74</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html"><div class="ttname"><a href="classnatural__loops__templatet.html">natural_loops_templatet</a></div><div class="ttdoc">Main driver for working out if a class (normally goto_programt) has any natural loops.</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00048">natural_loops.h:49</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a1dc4a66e415928b59646c756beb7c9af"><div class="ttname"><a href="classnatural__loops__templatet.html#a1dc4a66e415928b59646c756beb7c9af">natural_loops_templatet::natural_loops_templatet</a></div><div class="ttdeci">natural_loops_templatet()</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00065">natural_loops.h:65</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a2ee7362451183fe939a4d06abddf8a0e"><div class="ttname"><a href="classnatural__loops__templatet.html#a2ee7362451183fe939a4d06abddf8a0e">natural_loops_templatet::cfg_dominators</a></div><div class="ttdeci">cfg_dominators_templatet&lt; P, T, false &gt; cfg_dominators</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00075">natural_loops.h:75</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a32eec4aaef9f348b9e680430876c982a"><div class="ttname"><a href="classnatural__loops__templatet.html#a32eec4aaef9f348b9e680430876c982a">natural_loops_templatet::operator()</a></div><div class="ttdeci">void operator()(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00055">natural_loops.h:55</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a34245bba8b8704dd0221fab17c5d9ca6"><div class="ttname"><a href="classnatural__loops__templatet.html#a34245bba8b8704dd0221fab17c5d9ca6">natural_loops_templatet::nodet</a></div><div class="ttdeci">cfg_dominators_templatet&lt; P, T, false &gt;::cfgt::nodet nodet</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00076">natural_loops.h:76</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a3baa5b312867729e8d7da756b3966854"><div class="ttname"><a href="classnatural__loops__templatet.html#a3baa5b312867729e8d7da756b3966854">natural_loops_templatet::natural_loopt</a></div><div class="ttdeci">parentt::loopt natural_loopt</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00053">natural_loops.h:53</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a5d91e7877f4b3e396cf1dea49287032c"><div class="ttname"><a href="classnatural__loops__templatet.html#a5d91e7877f4b3e396cf1dea49287032c">natural_loops_templatet::compute_natural_loop</a></div><div class="ttdeci">void compute_natural_loop(T, T)</div><div class="ttdoc">Computes the natural loop for a given back-edge (see Muchnick section 7.4)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00142">natural_loops.h:142</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a6b9ab2362b342049a898dd84a2598b61"><div class="ttname"><a href="classnatural__loops__templatet.html#a6b9ab2362b342049a898dd84a2598b61">natural_loops_templatet::get_dominator_info</a></div><div class="ttdeci">const cfg_dominators_templatet&lt; P, T, false &gt; &amp; get_dominator_info() const</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00060">natural_loops.h:60</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_a72b805e98da37b00836cf16786a92512"><div class="ttname"><a href="classnatural__loops__templatet.html#a72b805e98da37b00836cf16786a92512">natural_loops_templatet::parentt</a></div><div class="ttdeci">loop_analysist&lt; T, C &gt; parentt</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00050">natural_loops.h:50</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_ad2735b12c3c9fb5eef633f7060839e32"><div class="ttname"><a href="classnatural__loops__templatet.html#ad2735b12c3c9fb5eef633f7060839e32">natural_loops_templatet::compute</a></div><div class="ttdeci">void compute(P &amp;program)</div><div class="ttdoc">Finds all back-edges and computes the natural loops.</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00108">natural_loops.h:108</a></div></div>
+<div class="ttc" id="aclassnatural__loops__templatet_html_aee194c7b06d5c73d851277f01f061330"><div class="ttname"><a href="classnatural__loops__templatet.html#aee194c7b06d5c73d851277f01f061330">natural_loops_templatet::natural_loops_templatet</a></div><div class="ttdeci">natural_loops_templatet(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00069">natural_loops.h:69</a></div></div>
+<div class="ttc" id="aclassnatural__loopst_html"><div class="ttname"><a href="classnatural__loopst.html">natural_loopst</a></div><div class="ttdoc">A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00084">natural_loops.h:88</a></div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
 <div class="ttc" id="aloop__analysis_8h_html"><div class="ttname"><a href="loop__analysis_8h.html">loop_analysis.h</a></div><div class="ttdoc">Data structure representing a loop in a GOTO program and an interface shared by all analyses that fin...</div></div>
-<div class="ttc" id="anatural__loops_8h_html_a31f2d43832b10cd82219b957f13a4214"><div class="ttname"><a href="natural__loops_8h.html#a31f2d43832b10cd82219b957f13a4214">natural_loops_mutablet</a></div><div class="ttdeci">natural_loops_templatet&lt; goto_programt, goto_programt::targett &gt; natural_loops_mutablet</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00090">natural_loops.h:90</a></div></div>
-<div class="ttc" id="anatural__loops_8h_html_ac8f4c8a242860bfde4e8e36691f0e67d"><div class="ttname"><a href="natural__loops_8h.html#ac8f4c8a242860bfde4e8e36691f0e67d">show_natural_loops</a></div><div class="ttdeci">void show_natural_loops(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00092">natural_loops.h:92</a></div></div>
+<div class="ttc" id="anatural__loops_8h_html_a92737915ec069b4a6c5a8b769a8ce849"><div class="ttname"><a href="natural__loops_8h.html#a92737915ec069b4a6c5a8b769a8ce849">natural_loops_mutablet</a></div><div class="ttdeci">natural_loops_templatet&lt; goto_programt, goto_programt::targett, goto_programt::target_less_than &gt; natural_loops_mutablet</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00095">natural_loops.h:95</a></div></div>
+<div class="ttc" id="anatural__loops_8h_html_ac8f4c8a242860bfde4e8e36691f0e67d"><div class="ttname"><a href="natural__loops_8h.html#ac8f4c8a242860bfde4e8e36691f0e67d">show_natural_loops</a></div><div class="ttdeci">void show_natural_loops(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="natural__loops_8h_source.html#l00097">natural_loops.h:97</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
+<div class="ttc" id="astructgoto__programt_1_1instructiont_1_1target__less__than_html"><div class="ttname"><a href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::instructiont::target_less_than</a></div><div class="ttdoc">A total order over targett and const_targett.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00390">goto_program.h:391</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

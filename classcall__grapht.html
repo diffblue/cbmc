@@ -142,10 +142,10 @@ Public Types</h2></td></tr>
 <tr class="memitem:affb52cd0a5610d5fbb8823ecb424bee4"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4">locationt</a></td></tr>
 <tr class="memdesc:affb52cd0a5610d5fbb8823ecb424bee4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of a callsite stored in member <code>callsites</code>  <a href="classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4">More...</a><br /></td></tr>
 <tr class="separator:affb52cd0a5610d5fbb8823ecb424bee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdbe73a16e9b46d55c0a1b11bbbb9a87"><td class="memItemLeft" align="right" valign="top">typedef std::set&lt; <a class="el" href="classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4">locationt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcall__grapht.html#abdbe73a16e9b46d55c0a1b11bbbb9a87">locationst</a></td></tr>
-<tr class="memdesc:abdbe73a16e9b46d55c0a1b11bbbb9a87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of a set of callsites.  <a href="classcall__grapht.html#abdbe73a16e9b46d55c0a1b11bbbb9a87">More...</a><br /></td></tr>
-<tr class="separator:abdbe73a16e9b46d55c0a1b11bbbb9a87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18212cca49dd02f04ba4ac41877a2583"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classcall__grapht.html#a27c6376a1e3bceda29636be161c69926">edget</a>, <a class="el" href="classcall__grapht.html#abdbe73a16e9b46d55c0a1b11bbbb9a87">locationst</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcall__grapht.html#a18212cca49dd02f04ba4ac41877a2583">callsitest</a></td></tr>
+<tr class="memitem:aab49f763b3edb81742b63981fb48f5ca"><td class="memItemLeft" align="right" valign="top">typedef std::set&lt; <a class="el" href="classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4">locationt</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcall__grapht.html#aab49f763b3edb81742b63981fb48f5ca">locationst</a></td></tr>
+<tr class="memdesc:aab49f763b3edb81742b63981fb48f5ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of a set of callsites.  <a href="classcall__grapht.html#aab49f763b3edb81742b63981fb48f5ca">More...</a><br /></td></tr>
+<tr class="separator:aab49f763b3edb81742b63981fb48f5ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18212cca49dd02f04ba4ac41877a2583"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classcall__grapht.html#a27c6376a1e3bceda29636be161c69926">edget</a>, <a class="el" href="classcall__grapht.html#aab49f763b3edb81742b63981fb48f5ca">locationst</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcall__grapht.html#a18212cca49dd02f04ba4ac41877a2583">callsitest</a></td></tr>
 <tr class="memdesc:a18212cca49dd02f04ba4ac41877a2583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type mapping from call-graph edges onto the set of call instructions that make that call.  <a href="classcall__grapht.html#a18212cca49dd02f04ba4ac41877a2583">More...</a><br /></td></tr>
 <tr class="separator:a18212cca49dd02f04ba4ac41877a2583"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -234,7 +234,7 @@ Private Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="classcall__grapht.html#a27c6376a1e3bceda29636be161c69926">edget</a>, <a class="el" href="classcall__grapht.html#abdbe73a16e9b46d55c0a1b11bbbb9a87">locationst</a>&gt; <a class="el" href="classcall__grapht.html#a18212cca49dd02f04ba4ac41877a2583">call_grapht::callsitest</a></td>
+          <td class="memname">typedef std::map&lt;<a class="el" href="classcall__grapht.html#a27c6376a1e3bceda29636be161c69926">edget</a>, <a class="el" href="classcall__grapht.html#aab49f763b3edb81742b63981fb48f5ca">locationst</a>&gt; <a class="el" href="classcall__grapht.html#a18212cca49dd02f04ba4ac41877a2583">call_grapht::callsitest</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -282,14 +282,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abdbe73a16e9b46d55c0a1b11bbbb9a87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdbe73a16e9b46d55c0a1b11bbbb9a87">&#9670;&nbsp;</a></span>locationst</h2>
+<a id="aab49f763b3edb81742b63981fb48f5ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab49f763b3edb81742b63981fb48f5ca">&#9670;&nbsp;</a></span>locationst</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::set&lt;<a class="el" href="classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4">locationt</a>&gt; <a class="el" href="classcall__grapht.html#abdbe73a16e9b46d55c0a1b11bbbb9a87">call_grapht::locationst</a></td>
+          <td class="memname">typedef std::set&lt;<a class="el" href="classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4">locationt</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a>&gt; <a class="el" href="classcall__grapht.html#aab49f763b3edb81742b63981fb48f5ca">call_grapht::locationst</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -5,7 +5,7 @@ var classflow__insensitive__analysis__baset =
     [ "locationt", "classflow__insensitive__analysis__baset.html#abe5515e76b0258d1f41d48d9d0bc4a43", null ],
     [ "recursion_sett", "classflow__insensitive__analysis__baset.html#a1b4394d29d1d8411066c2be672094075", null ],
     [ "statet", "classflow__insensitive__analysis__baset.html#af63b2fa41563d01c57366751f643c9a5", null ],
-    [ "working_sett", "classflow__insensitive__analysis__baset.html#ac1d9aca876b405f385eccf38483e5264", null ],
+    [ "working_sett", "classflow__insensitive__analysis__baset.html#a349bb5918c63d0807d02f4140eb9f528", null ],
     [ "flow_insensitive_analysis_baset", "classflow__insensitive__analysis__baset.html#a518c58a5ec91812ed4005da086d4830e", null ],
     [ "~flow_insensitive_analysis_baset", "classflow__insensitive__analysis__baset.html#a1b2a93eaa44ac69acda4950154858ac3", null ],
     [ "clear", "classflow__insensitive__analysis__baset.html#a070719395d9a833b19d9e0b0869cc327", null ],
@@ -33,6 +33,6 @@ var classflow__insensitive__analysis__baset =
     [ "initialized", "classflow__insensitive__analysis__baset.html#a1e7a57d96790ae37b4a8278a1b442531", null ],
     [ "ns", "classflow__insensitive__analysis__baset.html#a786b6452f104338a8764e81b0845f690", null ],
     [ "recursion_set", "classflow__insensitive__analysis__baset.html#a544eabe9413ba32fd4c28c008c07d615", null ],
-    [ "seen_locations", "classflow__insensitive__analysis__baset.html#a19897a5f9d7c1a53715ea29f2a7decd7", null ],
-    [ "statistics", "classflow__insensitive__analysis__baset.html#ac6d83ae0ee620ca9c449ce8ab8c7448a", null ]
+    [ "seen_locations", "classflow__insensitive__analysis__baset.html#a63c9a9443fc886c76d42673be2f868c9", null ],
+    [ "statistics", "classflow__insensitive__analysis__baset.html#a2458144cbdd637c15fd91c6c307e7095", null ]
 ];

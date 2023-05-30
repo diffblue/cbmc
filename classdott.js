@@ -3,7 +3,7 @@ var classdott =
     [ "dott", "classdott.html#a95c2545677a73115e9636f33696ef713", null ],
     [ "do_dot_function_calls", "classdott.html#a6a645d38ce19875776cbc439d9a7b78a", null ],
     [ "escape", "classdott.html#a32f9eb459fe07ab94836055f4dc499e7", null ],
-    [ "find_next", "classdott.html#ab787fe32160012625ec6d6adfea7afef", null ],
+    [ "find_next", "classdott.html#a6bde72a25aaa41aa2de31daa7df6ab5a", null ],
     [ "output", "classdott.html#aada72a54654aba95aa4a63671a36260d", null ],
     [ "write_dot_subgraph", "classdott.html#a6fc009951726463fc06747a6b2b12244", null ],
     [ "write_edge", "classdott.html#ae40ef2be3953cb51404931736dca6bb4", null ],

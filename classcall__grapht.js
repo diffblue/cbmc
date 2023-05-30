@@ -6,7 +6,7 @@ var classcall__grapht =
     [ "callsitest", "classcall__grapht.html#a18212cca49dd02f04ba4ac41877a2583", null ],
     [ "edgest", "classcall__grapht.html#a95a3c556d0a7928213d22eed8ccc6daa", null ],
     [ "edget", "classcall__grapht.html#a27c6376a1e3bceda29636be161c69926", null ],
-    [ "locationst", "classcall__grapht.html#abdbe73a16e9b46d55c0a1b11bbbb9a87", null ],
+    [ "locationst", "classcall__grapht.html#aab49f763b3edb81742b63981fb48f5ca", null ],
     [ "locationt", "classcall__grapht.html#affb52cd0a5610d5fbb8823ecb424bee4", null ],
     [ "nodest", "classcall__grapht.html#af9b79dad480a6a1f6e78377b9a75ef07", null ],
     [ "call_grapht", "classcall__grapht.html#aa0dd97aeae11cbfe629a6099a354a799", null ],

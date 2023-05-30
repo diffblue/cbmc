@@ -5,7 +5,7 @@ var classgoto__program2codet =
     [ "dead_mapt", "classgoto__program2codet.html#ad093990e2d61b2cc7b816edd6276cdb5", null ],
     [ "id_listt", "classgoto__program2codet.html#a121f98bdc7adc6b6c359ba29157bf72b", null ],
     [ "loop_last_stackt", "classgoto__program2codet.html#aa689331e9bb34753a56c6f858b19eb2f", null ],
-    [ "loopt", "classgoto__program2codet.html#a02ee29686e63ad2c06581c531c34bff5", null ],
+    [ "loopt", "classgoto__program2codet.html#a0bfd4a82a8924c72398f06522267bc2e", null ],
     [ "goto_program2codet", "classgoto__program2codet.html#a4648fc02ef306502b83c40521b3ebde5", null ],
     [ "add_local_types", "classgoto__program2codet.html#ab7b84ebc52735e0ee77bc6e3c8c0489b", null ],
     [ "build_dead_map", "classgoto__program2codet.html#af62115ade2eb9df841f22db902142c08", null ],

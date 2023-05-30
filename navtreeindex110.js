@@ -1,9 +1,5 @@
 var NAVTREEINDEX110 =
 {
-"jsil__types_8h.html#a6bc74797fdcaec05a72de586743c80ce":[9,0,2,18,17,4],
-"jsil__types_8h.html#a7115e3da55862b11f04400ade445a05b":[9,0,2,18,17,10],
-"jsil__types_8h.html#a7341db42e0a064ee159606bb72612881":[9,0,2,18,17,6],
-"jsil__types_8h.html#a7bc0b7619fe5b2589e01fad837a3f361":[9,0,2,18,17,18],
 "jsil__types_8h.html#a7d51e31cad8a8aa63df44adfd162b87c":[9,0,2,18,17,17],
 "jsil__types_8h.html#a8925c98e38f0c02958a87597edcfa6a2":[9,0,2,18,17,8],
 "jsil__types_8h.html#aa939cafc3ea13f0b8c34a5937f907656":[9,0,2,18,17,14],
@@ -206,8 +202,8 @@ var NAVTREEINDEX110 =
 "letify_8h.html":[9,0,2,28,8,1],
 "letify_8h_source.html":[9,0,2,28,8,1],
 "lexical__loops_8h.html":[9,0,2,0,50],
+"lexical__loops_8h.html#a85f1a3a07cfc64438de3339edc5c581d":[9,0,2,0,50,1],
 "lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a":[9,0,2,0,50,2],
-"lexical__loops_8h.html#afd32460cb325865c6603ea19aee27dd6":[9,0,2,0,50,1],
 "lexical__loops_8h_source.html":[9,0,2,0,50],
 "lift__clinit__calls_8cpp.html":[9,0,1,0,1,96],
 "lift__clinit__calls_8cpp.html#af3451a522ee32cb64d9cca2e31c17278":[9,0,1,0,1,96,0],
@@ -249,5 +245,9 @@ var NAVTREEINDEX110 =
 "lispexpr_8cpp.html":[9,0,2,31,118],
 "lispexpr_8cpp.html#a181bbc4c1165cd2f0d66838e8ce207a2":[9,0,2,31,118,0],
 "lispexpr_8cpp_source.html":[9,0,2,31,118],
-"lispexpr_8h.html":[9,0,2,31,119]
+"lispexpr_8h.html":[9,0,2,31,119],
+"lispexpr_8h.html#a181bbc4c1165cd2f0d66838e8ce207a2":[9,0,2,31,119,9],
+"lispexpr_8h.html#a2f617a4f95a8377dd48f6e20023815f1":[9,0,2,31,119,3],
+"lispexpr_8h.html#a2f8d1c09175fec9cd749bd20ce92382e":[9,0,2,31,119,2],
+"lispexpr_8h.html#a34e3cc752d6d1bd12df01b7fd99efc40":[9,0,2,31,119,7]
 };

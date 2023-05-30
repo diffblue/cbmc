@@ -2,7 +2,7 @@ var classinstrumentert_1_1cfg__visitort =
 [
     [ "id2node_pairt", "classinstrumentert_1_1cfg__visitort.html#a468d8c5b1a136e155ddd71f2bb91552c", null ],
     [ "id2nodet", "classinstrumentert_1_1cfg__visitort.html#a56fce6b658fc59f033518141b78dcb3c", null ],
-    [ "incoming_post", "classinstrumentert_1_1cfg__visitort.html#a3c4b9ea69b4c7777a7a860a49d59f5d9", null ],
+    [ "incoming_post", "classinstrumentert_1_1cfg__visitort.html#a6839248a860c3b71be9c043d284c0853", null ],
     [ "nodet", "classinstrumentert_1_1cfg__visitort.html#ae91e390fea9b35893fc63834b3b4bfc7", null ],
     [ "~cfg_visitort", "classinstrumentert_1_1cfg__visitort.html#aa2706e09f9286a4124e5bac2e20ceccf", null ],
     [ "cfg_visitort", "classinstrumentert_1_1cfg__visitort.html#af067f1781e8853e8a23d5dfdbb21e163", null ],
@@ -44,7 +44,7 @@ var classinstrumentert_1_1cfg__visitort =
     [ "thread", "classinstrumentert_1_1cfg__visitort.html#af6e38a0a2695dec8a21076fa5c016561", null ],
     [ "unknown_read_nodes", "classinstrumentert_1_1cfg__visitort.html#a175c2e3979cb53ade38fe61dc923dfac", null ],
     [ "unknown_write_nodes", "classinstrumentert_1_1cfg__visitort.html#a1fd60952b87405e62d5a0def3d4322a3", null ],
-    [ "updated", "classinstrumentert_1_1cfg__visitort.html#a687df6ae55de0d4f23c54b41837141a4", null ],
+    [ "updated", "classinstrumentert_1_1cfg__visitort.html#af5c79472a723345357a2dcec58ec8ebb", null ],
     [ "write_counter", "classinstrumentert_1_1cfg__visitort.html#ab47cfc66e8c672d14a675f2c9d50fce8", null ],
     [ "ws_counter", "classinstrumentert_1_1cfg__visitort.html#a6d578496cb15025d67fd3d0ed0b46605", null ]
 ];

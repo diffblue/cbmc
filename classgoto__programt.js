@@ -5,6 +5,7 @@ var classgoto__programt =
     [ "const_targett", "classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d", null ],
     [ "decl_identifierst", "classgoto__programt.html#a7fc67ffa70acd1daee1303f0a9560db4", null ],
     [ "instructionst", "classgoto__programt.html#a7d0b43ee4ddd3c783512fd2edc084068", null ],
+    [ "target_less_than", "classgoto__programt.html#aae1f5166a7e251a800df037937325733", null ],
     [ "targetst", "classgoto__programt.html#afe63d57726aa7d4b4af0d7267af22098", null ],
     [ "targett", "classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09", null ],
     [ "goto_programt", "classgoto__programt.html#a9b70e7ce87a43e1be7fd8da98a2006ad", null ],

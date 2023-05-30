@@ -112,158 +112,160 @@ $(document).ready(function(){initNavTree('lexical__loops_8h_source.html',''); in
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="loop__analysis_8h.html">loop_analysis.h</a>&quot;</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html">   64</a></span>&#160;<span class="keyword">class </span><a class="code" href="classlexical__loops__templatet.html">lexical_loops_templatet</a> : <span class="keyword">public</span> <a class="code" href="classloop__analysist.html">loop_analysist</a>&lt;T&gt;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;{</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a02613c41ce32074400dbf9c674be5441">   66</a></span>&#160;  <span class="keyword">typedef</span> <a class="code" href="classloop__analysist.html">loop_analysist&lt;T&gt;</a> <a class="code" href="classlexical__loops__templatet.html#a02613c41ce32074400dbf9c674be5441">parentt</a>;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#ae67bdf77978f9771ed4b3c132ae990b1">   69</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="classloop__templatet.html">parentt::loopt</a> <a class="code" href="classlexical__loops__templatet.html#ae67bdf77978f9771ed4b3c132ae990b1">lexical_loopt</a>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#ab173ccb6777b9f50d34be9a5e97342ee">   71</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#ab173ccb6777b9f50d34be9a5e97342ee">operator()</a>(P &amp;program)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="classlexical__loops__templatet.html#ad4213748bac5f9c8c73eab345d8c27bd">compute</a>(program);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#ae6cec67ec96596255cb7dbfbbdee6af3">   76</a></span>&#160;  <a class="code" href="classlexical__loops__templatet.html#ae6cec67ec96596255cb7dbfbbdee6af3">lexical_loops_templatet</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a2426e3aeb31c4124a312e583552243bf">   78</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classlexical__loops__templatet.html#a2426e3aeb31c4124a312e583552243bf">lexical_loops_templatet</a>(P &amp;program)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="classlexical__loops__templatet.html#ad4213748bac5f9c8c73eab345d8c27bd">compute</a>(program);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a55855e97f6e1042cb644126503ef09fa">   83</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a55855e97f6e1042cb644126503ef09fa">all_cycles_in_lexical_loop_form</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">  </span>{</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classlexical__loops__templatet.html#a703a98a315ae36b9cbe0c9074220f2f0">all_in_lexical_loop_form</a>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#ad9de271adbf76a86fcdb8817568cd31e">   88</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#ad9de271adbf76a86fcdb8817568cd31e">output</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">  </span>{</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classloop__analysist.html#a319830a213f4662f44d805c762405962">parentt::output</a>(out);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classlexical__loops__templatet.html#a703a98a315ae36b9cbe0c9074220f2f0">all_in_lexical_loop_form</a>)</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;Note not all loops were in lexical loop form\n&quot;</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a7983df28c27bf775790b70e68bc4770e">   95</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classlexical__loops__templatet.html#a7983df28c27bf775790b70e68bc4770e">~lexical_loops_templatet</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#ad4213748bac5f9c8c73eab345d8c27bd">compute</a>(P &amp;program);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a84c80fa702d9f026a6761708f922ec26">compute_lexical_loop</a>(T, T);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a703a98a315ae36b9cbe0c9074220f2f0">  101</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a703a98a315ae36b9cbe0c9074220f2f0">all_in_lexical_loop_form</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;};</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">typedef</span> <a class="code" href="classlexical__loops__templatet.html">lexical_loops_templatet</a>&lt;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a>,</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&gt;</div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="lexical__loops_8h.html#afd32460cb325865c6603ea19aee27dd6">  107</a></span>&#160;  <a class="code" href="lexical__loops_8h.html#afd32460cb325865c6603ea19aee27dd6">lexical_loopst</a>;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#  include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#ad4213748bac5f9c8c73eab345d8c27bd">  115</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#ad4213748bac5f9c8c73eab345d8c27bd">lexical_loops_templatet&lt;P, T&gt;::compute</a>(P &amp;program)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  all_in_lexical_loop_form = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="comment">// find back-edges m-&gt;n</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = program.instructions.begin(); it != program.instructions.end();</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      ++it)</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_backwards_goto())</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;target = it-&gt;get_target();</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <span class="keywordflow">if</span>(target-&gt;location_number &lt;= it-&gt;location_number)</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;Computing loop for &quot;</span> &lt;&lt; it-&gt;location_number &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;                  &lt;&lt; target-&gt;location_number &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordflow">if</span>(!compute_lexical_loop(it, target))</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;          all_in_lexical_loop_form = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  }</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a84c80fa702d9f026a6761708f922ec26">  146</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a84c80fa702d9f026a6761708f922ec26">lexical_loops_templatet&lt;P, T&gt;::compute_lexical_loop</a>(</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  T loop_tail,</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  T loop_head)</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;{</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    loop_head-&gt;location_number &lt;= loop_tail-&gt;location_number,</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="stringliteral">&quot;loop header should come lexically before the tail&quot;</span>);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  std::stack&lt;T&gt; stack;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  std::set&lt;T&gt; loop_instructions;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  loop_instructions.insert(loop_head);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  loop_instructions.insert(loop_tail);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">if</span>(loop_head != loop_tail)</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    stack.push(loop_tail);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keywordflow">while</span>(!stack.empty())</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    T loop_instruction = stack.top();</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    stack.pop();</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> predecessor : loop_instruction-&gt;incoming_edges)</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        predecessor-&gt;location_number &gt; loop_tail-&gt;location_number ||</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        predecessor-&gt;location_number &lt; loop_head-&gt;location_number)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      {</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="comment">// Not a lexical loop: has an incoming edge from outside.</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      }</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keywordflow">if</span>(loop_instructions.insert(predecessor).second)</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        stack.push(predecessor);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  }</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  <span class="keyword">auto</span> insert_result = parentt::loop_map.emplace(</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    loop_head, <a class="code" href="classloop__templatet.html">lexical_loopt</a>{std::move(loop_instructions)});</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  <span class="comment">// If this isn&#39;t a new loop head (i.e. return_result.second is false) then we</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  <span class="comment">// have multiple backedges targeting one loop header: this is not in simple</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="comment">// lexical loop form.</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keywordflow">return</span> insert_result.second;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;}</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
-<div class="line"><a name="l00191"></a><span class="lineno"><a class="line" href="lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a">  191</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a">show_lexical_loops</a>(<span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, std::ostream &amp;out)</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;{</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  show_loops&lt;lexical_loopst&gt;(goto_model, out);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;}</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANALYSES_LEXICAL_LOOPS_H</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T, <span class="keyword">typename</span> C&gt;</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html">   65</a></span>&#160;<span class="keyword">class </span><a class="code" href="classlexical__loops__templatet.html">lexical_loops_templatet</a> : <span class="keyword">public</span> <a class="code" href="classloop__analysist.html">loop_analysist</a>&lt;T, C&gt;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;{</div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a22ae4ad49e32d262baeed9a31d4c948d">   67</a></span>&#160;  <span class="keyword">typedef</span> <a class="code" href="classloop__analysist.html">loop_analysist&lt;T, C&gt;</a> <a class="code" href="classlexical__loops__templatet.html#a22ae4ad49e32d262baeed9a31d4c948d">parentt</a>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a7964c0aea56baff7860e1746977cc0c5">   70</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> <a class="code" href="classloop__templatet.html">parentt::loopt</a> <a class="code" href="classlexical__loops__templatet.html#a7964c0aea56baff7860e1746977cc0c5">lexical_loopt</a>;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a6f92beae1e29c6ee6b6ad664e7f54b50">   72</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#a6f92beae1e29c6ee6b6ad664e7f54b50">operator()</a>(P &amp;program)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="classlexical__loops__templatet.html#a62c01d2e03117d5cfc26f1c4fb7f701c">compute</a>(program);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a2ac83787eb8dd0a6fb0a413dfc68fa8d">   77</a></span>&#160;  <a class="code" href="classlexical__loops__templatet.html#a2ac83787eb8dd0a6fb0a413dfc68fa8d">lexical_loops_templatet</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a20f8cd85de90f59a3d3afd259521dc99">   79</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classlexical__loops__templatet.html#a20f8cd85de90f59a3d3afd259521dc99">lexical_loops_templatet</a>(P &amp;program)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="classlexical__loops__templatet.html#a62c01d2e03117d5cfc26f1c4fb7f701c">compute</a>(program);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a2afdddfe26cd0eeacb4f96dcfd12f99a">   84</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a2afdddfe26cd0eeacb4f96dcfd12f99a">all_cycles_in_lexical_loop_form</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">  </span>{</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classlexical__loops__templatet.html#a00c0f1e1109d00a0d65d4a60d0f9edf7">all_in_lexical_loop_form</a>;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  }</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a810d9f91695dac780c512a2eaf41a6a2">   89</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#a810d9f91695dac780c512a2eaf41a6a2">output</a>(std::ostream &amp;out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">  </span>{</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="classloop__analysist.html#afbec74c32ee832b6f1662c4aa0f7fcd4">parentt::output</a>(out);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classlexical__loops__templatet.html#a00c0f1e1109d00a0d65d4a60d0f9edf7">all_in_lexical_loop_form</a>)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      out &lt;&lt; <span class="stringliteral">&quot;Note not all loops were in lexical loop form\n&quot;</span>;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a6033090dcc8dcde9119051356a797ddd">   96</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classlexical__loops__templatet.html#a6033090dcc8dcde9119051356a797ddd">~lexical_loops_templatet</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#a62c01d2e03117d5cfc26f1c4fb7f701c">compute</a>(P &amp;program);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a50928fe73243dc8fc52aef292dadb6a2">compute_lexical_loop</a>(T, T);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a00c0f1e1109d00a0d65d4a60d0f9edf7">  102</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a00c0f1e1109d00a0d65d4a60d0f9edf7">all_in_lexical_loop_form</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;};</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">typedef</span> <a class="code" href="classlexical__loops__templatet.html">lexical_loops_templatet</a>&lt;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a>,</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <a class="code" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>,</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <a class="code" href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::target_less_than</a>&gt;</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="lexical__loops_8h.html#a85f1a3a07cfc64438de3339edc5c581d">  109</a></span>&#160;  <a class="code" href="lexical__loops_8h.html#a85f1a3a07cfc64438de3339edc5c581d">lexical_loopst</a>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#  include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T, <span class="keyword">typename</span> C&gt;</div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a62c01d2e03117d5cfc26f1c4fb7f701c">  117</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classlexical__loops__templatet.html#a62c01d2e03117d5cfc26f1c4fb7f701c">lexical_loops_templatet&lt;P, T, C&gt;::compute</a>(P &amp;program)</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;{</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  all_in_lexical_loop_form = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="comment">// find back-edges m-&gt;n</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = program.instructions.begin(); it != program.instructions.end();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      ++it)</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_backwards_goto())</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;target = it-&gt;get_target();</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="keywordflow">if</span>(target-&gt;location_number &lt;= it-&gt;location_number)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;Computing loop for &quot;</span> &lt;&lt; it-&gt;location_number &lt;&lt; <span class="stringliteral">&quot; -&gt; &quot;</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                  &lt;&lt; target-&gt;location_number &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keywordflow">if</span>(!compute_lexical_loop(it, target))</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;          all_in_lexical_loop_form = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      }</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  }</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> P, <span class="keyword">class</span> T, <span class="keyword">typename</span> C&gt;</div>
+<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="classlexical__loops__templatet.html#a50928fe73243dc8fc52aef292dadb6a2">  148</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classlexical__loops__templatet.html#a50928fe73243dc8fc52aef292dadb6a2">lexical_loops_templatet&lt;P, T, C&gt;::compute_lexical_loop</a>(</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  T loop_tail,</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  T loop_head)</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;{</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    loop_head-&gt;location_number &lt;= loop_tail-&gt;location_number,</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="stringliteral">&quot;loop header should come lexically before the tail&quot;</span>);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  std::stack&lt;T&gt; stack;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  std::set&lt;T, C&gt; loop_instructions;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  loop_instructions.insert(loop_head);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  loop_instructions.insert(loop_tail);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">if</span>(loop_head != loop_tail)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    stack.push(loop_tail);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordflow">while</span>(!stack.empty())</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    T loop_instruction = stack.top();</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    stack.pop();</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> predecessor : loop_instruction-&gt;incoming_edges)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        predecessor-&gt;location_number &gt; loop_tail-&gt;location_number ||</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        predecessor-&gt;location_number &lt; loop_head-&gt;location_number)</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="comment">// Not a lexical loop: has an incoming edge from outside.</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="keywordflow">if</span>(loop_instructions.insert(predecessor).second)</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        stack.push(predecessor);</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <span class="keyword">auto</span> insert_result = parentt::loop_map.emplace(</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    loop_head, <a class="code" href="classloop__templatet.html">lexical_loopt</a>{std::move(loop_instructions)});</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="comment">// If this isn&#39;t a new loop head (i.e. return_result.second is false) then we</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="comment">// have multiple backedges targeting one loop header: this is not in simple</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="comment">// lexical loop form.</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordflow">return</span> insert_result.second;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a">  193</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a">show_lexical_loops</a>(<span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, std::ostream &amp;out)</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;{</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  show_loops&lt;lexical_loopst&gt;(goto_model, out);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;}</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_ANALYSES_LEXICAL_LOOPS_H</span></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00071">goto_program.h:72</a></div></div>
-<div class="ttc" id="aclassgoto__programt_html_a4fbd003af91fdc813da302d90a00513d"><div class="ttname"><a href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a></div><div class="ttdeci">instructionst::const_iterator const_targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00587">goto_program.h:587</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html"><div class="ttname"><a href="classlexical__loops__templatet.html">lexical_loops_templatet</a></div><div class="ttdoc">Main driver for working out if a class (normally goto_programt) has any lexical loops.</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00064">lexical_loops.h:65</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_a02613c41ce32074400dbf9c674be5441"><div class="ttname"><a href="classlexical__loops__templatet.html#a02613c41ce32074400dbf9c674be5441">lexical_loops_templatet::parentt</a></div><div class="ttdeci">loop_analysist&lt; T &gt; parentt</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00066">lexical_loops.h:66</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_a2426e3aeb31c4124a312e583552243bf"><div class="ttname"><a href="classlexical__loops__templatet.html#a2426e3aeb31c4124a312e583552243bf">lexical_loops_templatet::lexical_loops_templatet</a></div><div class="ttdeci">lexical_loops_templatet(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00078">lexical_loops.h:78</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_a55855e97f6e1042cb644126503ef09fa"><div class="ttname"><a href="classlexical__loops__templatet.html#a55855e97f6e1042cb644126503ef09fa">lexical_loops_templatet::all_cycles_in_lexical_loop_form</a></div><div class="ttdeci">bool all_cycles_in_lexical_loop_form() const</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00083">lexical_loops.h:83</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_a703a98a315ae36b9cbe0c9074220f2f0"><div class="ttname"><a href="classlexical__loops__templatet.html#a703a98a315ae36b9cbe0c9074220f2f0">lexical_loops_templatet::all_in_lexical_loop_form</a></div><div class="ttdeci">bool all_in_lexical_loop_form</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00101">lexical_loops.h:101</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_a7983df28c27bf775790b70e68bc4770e"><div class="ttname"><a href="classlexical__loops__templatet.html#a7983df28c27bf775790b70e68bc4770e">lexical_loops_templatet::~lexical_loops_templatet</a></div><div class="ttdeci">virtual ~lexical_loops_templatet()=default</div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_a84c80fa702d9f026a6761708f922ec26"><div class="ttname"><a href="classlexical__loops__templatet.html#a84c80fa702d9f026a6761708f922ec26">lexical_loops_templatet::compute_lexical_loop</a></div><div class="ttdeci">bool compute_lexical_loop(T, T)</div><div class="ttdoc">Computes the lexical loop for a given back-edge by walking backwards from the tail,...</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00146">lexical_loops.h:146</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_ab173ccb6777b9f50d34be9a5e97342ee"><div class="ttname"><a href="classlexical__loops__templatet.html#ab173ccb6777b9f50d34be9a5e97342ee">lexical_loops_templatet::operator()</a></div><div class="ttdeci">void operator()(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00071">lexical_loops.h:71</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_ad4213748bac5f9c8c73eab345d8c27bd"><div class="ttname"><a href="classlexical__loops__templatet.html#ad4213748bac5f9c8c73eab345d8c27bd">lexical_loops_templatet::compute</a></div><div class="ttdeci">void compute(P &amp;program)</div><div class="ttdoc">Finds all back-edges and computes the lexical loops.</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00115">lexical_loops.h:115</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_ad9de271adbf76a86fcdb8817568cd31e"><div class="ttname"><a href="classlexical__loops__templatet.html#ad9de271adbf76a86fcdb8817568cd31e">lexical_loops_templatet::output</a></div><div class="ttdeci">void output(std::ostream &amp;out) const</div><div class="ttdoc">Print all natural loops that were found.</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00088">lexical_loops.h:88</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_ae67bdf77978f9771ed4b3c132ae990b1"><div class="ttname"><a href="classlexical__loops__templatet.html#ae67bdf77978f9771ed4b3c132ae990b1">lexical_loops_templatet::lexical_loopt</a></div><div class="ttdeci">parentt::loopt lexical_loopt</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00069">lexical_loops.h:69</a></div></div>
-<div class="ttc" id="aclasslexical__loops__templatet_html_ae6cec67ec96596255cb7dbfbbdee6af3"><div class="ttname"><a href="classlexical__loops__templatet.html#ae6cec67ec96596255cb7dbfbbdee6af3">lexical_loops_templatet::lexical_loops_templatet</a></div><div class="ttdeci">lexical_loops_templatet()=default</div></div>
+<div class="ttc" id="aclassgoto__programt_html_a4fbd003af91fdc813da302d90a00513d"><div class="ttname"><a href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a></div><div class="ttdeci">instructionst::const_iterator const_targett</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00614">goto_program.h:614</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html"><div class="ttname"><a href="classlexical__loops__templatet.html">lexical_loops_templatet</a></div><div class="ttdoc">Main driver for working out if a class (normally goto_programt) has any lexical loops.</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00065">lexical_loops.h:66</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a00c0f1e1109d00a0d65d4a60d0f9edf7"><div class="ttname"><a href="classlexical__loops__templatet.html#a00c0f1e1109d00a0d65d4a60d0f9edf7">lexical_loops_templatet::all_in_lexical_loop_form</a></div><div class="ttdeci">bool all_in_lexical_loop_form</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00102">lexical_loops.h:102</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a20f8cd85de90f59a3d3afd259521dc99"><div class="ttname"><a href="classlexical__loops__templatet.html#a20f8cd85de90f59a3d3afd259521dc99">lexical_loops_templatet::lexical_loops_templatet</a></div><div class="ttdeci">lexical_loops_templatet(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00079">lexical_loops.h:79</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a22ae4ad49e32d262baeed9a31d4c948d"><div class="ttname"><a href="classlexical__loops__templatet.html#a22ae4ad49e32d262baeed9a31d4c948d">lexical_loops_templatet::parentt</a></div><div class="ttdeci">loop_analysist&lt; T, C &gt; parentt</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00067">lexical_loops.h:67</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a2ac83787eb8dd0a6fb0a413dfc68fa8d"><div class="ttname"><a href="classlexical__loops__templatet.html#a2ac83787eb8dd0a6fb0a413dfc68fa8d">lexical_loops_templatet::lexical_loops_templatet</a></div><div class="ttdeci">lexical_loops_templatet()=default</div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a2afdddfe26cd0eeacb4f96dcfd12f99a"><div class="ttname"><a href="classlexical__loops__templatet.html#a2afdddfe26cd0eeacb4f96dcfd12f99a">lexical_loops_templatet::all_cycles_in_lexical_loop_form</a></div><div class="ttdeci">bool all_cycles_in_lexical_loop_form() const</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00084">lexical_loops.h:84</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a50928fe73243dc8fc52aef292dadb6a2"><div class="ttname"><a href="classlexical__loops__templatet.html#a50928fe73243dc8fc52aef292dadb6a2">lexical_loops_templatet::compute_lexical_loop</a></div><div class="ttdeci">bool compute_lexical_loop(T, T)</div><div class="ttdoc">Computes the lexical loop for a given back-edge by walking backwards from the tail,...</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00148">lexical_loops.h:148</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a6033090dcc8dcde9119051356a797ddd"><div class="ttname"><a href="classlexical__loops__templatet.html#a6033090dcc8dcde9119051356a797ddd">lexical_loops_templatet::~lexical_loops_templatet</a></div><div class="ttdeci">virtual ~lexical_loops_templatet()=default</div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a62c01d2e03117d5cfc26f1c4fb7f701c"><div class="ttname"><a href="classlexical__loops__templatet.html#a62c01d2e03117d5cfc26f1c4fb7f701c">lexical_loops_templatet::compute</a></div><div class="ttdeci">void compute(P &amp;program)</div><div class="ttdoc">Finds all back-edges and computes the lexical loops.</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00117">lexical_loops.h:117</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a6f92beae1e29c6ee6b6ad664e7f54b50"><div class="ttname"><a href="classlexical__loops__templatet.html#a6f92beae1e29c6ee6b6ad664e7f54b50">lexical_loops_templatet::operator()</a></div><div class="ttdeci">void operator()(P &amp;program)</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00072">lexical_loops.h:72</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a7964c0aea56baff7860e1746977cc0c5"><div class="ttname"><a href="classlexical__loops__templatet.html#a7964c0aea56baff7860e1746977cc0c5">lexical_loops_templatet::lexical_loopt</a></div><div class="ttdeci">parentt::loopt lexical_loopt</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00070">lexical_loops.h:70</a></div></div>
+<div class="ttc" id="aclasslexical__loops__templatet_html_a810d9f91695dac780c512a2eaf41a6a2"><div class="ttname"><a href="classlexical__loops__templatet.html#a810d9f91695dac780c512a2eaf41a6a2">lexical_loops_templatet::output</a></div><div class="ttdeci">void output(std::ostream &amp;out) const</div><div class="ttdoc">Print all natural loops that were found.</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00089">lexical_loops.h:89</a></div></div>
 <div class="ttc" id="aclassloop__analysist_html"><div class="ttname"><a href="classloop__analysist.html">loop_analysist</a></div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00081">loop_analysis.h:82</a></div></div>
-<div class="ttc" id="aclassloop__analysist_html_a319830a213f4662f44d805c762405962"><div class="ttname"><a href="classloop__analysist.html#a319830a213f4662f44d805c762405962">loop_analysist::output</a></div><div class="ttdeci">virtual void output(std::ostream &amp;) const</div><div class="ttdoc">Print all natural loops that were found.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00170">loop_analysis.h:170</a></div></div>
+<div class="ttc" id="aclassloop__analysist_html_afbec74c32ee832b6f1662c4aa0f7fcd4"><div class="ttname"><a href="classloop__analysist.html#afbec74c32ee832b6f1662c4aa0f7fcd4">loop_analysist::output</a></div><div class="ttdeci">virtual void output(std::ostream &amp;) const</div><div class="ttdoc">Print all natural loops that were found.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00170">loop_analysis.h:170</a></div></div>
 <div class="ttc" id="aclassloop__templatet_html"><div class="ttname"><a href="classloop__templatet.html">loop_templatet</a></div><div class="ttdoc">A loop, specified as a set of instructions.</div><div class="ttdef"><b>Definition:</b> <a href="loop__analysis_8h_source.html#l00023">loop_analysis.h:24</a></div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
-<div class="ttc" id="alexical__loops_8h_html_aadb5d35f23c54e1f0c14cd90227d4c5a"><div class="ttname"><a href="lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a">show_lexical_loops</a></div><div class="ttdeci">void show_lexical_loops(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00191">lexical_loops.h:191</a></div></div>
-<div class="ttc" id="alexical__loops_8h_html_afd32460cb325865c6603ea19aee27dd6"><div class="ttname"><a href="lexical__loops_8h.html#afd32460cb325865c6603ea19aee27dd6">lexical_loopst</a></div><div class="ttdeci">lexical_loops_templatet&lt; const goto_programt, goto_programt::const_targett &gt; lexical_loopst</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00107">lexical_loops.h:107</a></div></div>
+<div class="ttc" id="alexical__loops_8h_html_a85f1a3a07cfc64438de3339edc5c581d"><div class="ttname"><a href="lexical__loops_8h.html#a85f1a3a07cfc64438de3339edc5c581d">lexical_loopst</a></div><div class="ttdeci">lexical_loops_templatet&lt; const goto_programt, goto_programt::const_targett, goto_programt::target_less_than &gt; lexical_loopst</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00109">lexical_loops.h:109</a></div></div>
+<div class="ttc" id="alexical__loops_8h_html_aadb5d35f23c54e1f0c14cd90227d4c5a"><div class="ttname"><a href="lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a">show_lexical_loops</a></div><div class="ttdeci">void show_lexical_loops(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="lexical__loops_8h_source.html#l00193">lexical_loops.h:193</a></div></div>
 <div class="ttc" id="aloop__analysis_8h_html"><div class="ttname"><a href="loop__analysis_8h.html">loop_analysis.h</a></div><div class="ttdoc">Data structure representing a loop in a GOTO program and an interface shared by all analyses that fin...</div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
+<div class="ttc" id="astructgoto__programt_1_1instructiont_1_1target__less__than_html"><div class="ttname"><a href="structgoto__programt_1_1instructiont_1_1target__less__than.html">goto_programt::instructiont::target_less_than</a></div><div class="ttdoc">A total order over targett and const_targett.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00390">goto_program.h:391</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -1,9 +1,5 @@
 var NAVTREEINDEX128 =
 {
-"string__hash_8h.html#acfedab89a08be359588021412998f1ef":[9,0,2,31,229,2],
-"string__hash_8h_source.html":[9,0,2,31,229],
-"string__insertion__builtin__function_8cpp.html":[9,0,2,28,10,28],
-"string__insertion__builtin__function_8cpp_source.html":[9,0,2,28,10,28],
 "string__insertion__builtin__function_8h.html":[9,0,2,28,10,29],
 "string__insertion__builtin__function_8h_source.html":[9,0,2,28,10,29],
 "string__instrumentation_8cpp.html":[9,0,2,15,136],
@@ -249,5 +245,9 @@ var NAVTREEINDEX128 =
 "structabstract__hashert.html#aacc58884c3d0e6a5b864b3d05fb49f66":[8,0,24,2],
 "structabstract__object__statisticst.html":[8,0,26],
 "structabstract__object__statisticst.html#a04f1873cf5c4deec98673149dbce932d":[8,0,26,6],
-"structabstract__object__statisticst.html#a33a800cefed7460fd306e8be45b646cf":[8,0,26,2]
+"structabstract__object__statisticst.html#a33a800cefed7460fd306e8be45b646cf":[8,0,26,2],
+"structabstract__object__statisticst.html#a86fbb666da639798ab0bca177840097d":[8,0,26,4],
+"structabstract__object__statisticst.html#ac7932888b6793224d83521014d013722":[8,0,26,1],
+"structabstract__object__statisticst.html#aca8dc5aa4ab2418e9b8513869852cefc":[8,0,26,0],
+"structabstract__object__statisticst.html#ad740586f25bfe7f88fd60abbc8679c25":[8,0,26,7]
 };

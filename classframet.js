@@ -18,7 +18,7 @@ var classframet =
     [ "catch_map", "classframet.html#a0cc2285f647dad3fb57df87f98bf4a29", null ],
     [ "end_of_function", "classframet.html#ab41c7f6b2452738c514d15878324d0ec", null ],
     [ "function_identifier", "classframet.html#ae0a34a12172daf3f44930b4259b226bb", null ],
-    [ "goto_state_map", "classframet.html#af440b959cc145123b5a23b6c3ca137b4", null ],
+    [ "goto_state_map", "classframet.html#ac4cfe7809b9310a7ab582a94fb9c4d0c", null ],
     [ "guard_at_function_start", "classframet.html#a163af8f8cf6730e8b6a6ad0002e92eb4", null ],
     [ "hidden_function", "classframet.html#a86cb6ae296e8e15f29c3e7eba48283d8", null ],
     [ "implications", "classframet.html#af7da31fcfcd5cb197f8273bfbd95d5bf", null ],
