@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/value_set_dereference.h>
 
 #include "goto_symex.h"
-#include "goto_symex_is_constant.h"
+#include "goto_symex_can_forward_propagate.h"
 #include "path_storage.h"
 
 #include <algorithm>
@@ -204,7 +204,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   if(!symbol_expr_lhs)
     return {};
 
-  if(!goto_symex_is_constantt(ns)(rhs))
+  if(!goto_symex_can_forward_propagatet(ns)(rhs))
     return {};
 
   return try_evaluate_pointer_comparison(

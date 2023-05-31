@@ -416,13 +416,13 @@ bool constant_propagator_domaint::ai_simplify(
   return partial_evaluate(values, condition, ns);
 }
 
-class constant_propagator_is_constantt : public is_constantt
+class constant_propagator_can_forward_propagatet : public can_forward_propagatet
 {
 public:
-  constant_propagator_is_constantt(
+  constant_propagator_can_forward_propagatet(
     const replace_symbolt &replace_const,
     const namespacet &ns)
-    : is_constantt(ns), replace_const(replace_const)
+    : can_forward_propagatet(ns), replace_const(replace_const)
   {
   }
 
@@ -437,7 +437,7 @@ protected:
     if(expr.id() == ID_symbol)
       return is_constant(to_symbol_expr(expr).get_identifier());
 
-    return is_constantt::is_constant(expr);
+    return can_forward_propagatet::is_constant(expr);
   }
 
   const replace_symbolt &replace_const;
@@ -447,14 +447,15 @@ bool constant_propagator_domaint::valuest::is_constant(
   const exprt &expr,
   const namespacet &ns) const
 {
-  return constant_propagator_is_constantt(replace_const, ns)(expr);
+  return constant_propagator_can_forward_propagatet(replace_const, ns)(expr);
 }
 
 bool constant_propagator_domaint::valuest::is_constant(
   const irep_idt &id,
   const namespacet &ns) const
 {
-  return constant_propagator_is_constantt(replace_const, ns).is_constant(id);
+  return constant_propagator_can_forward_propagatet(replace_const, ns)
+    .is_constant(id);
 }
 
 /// Do not call this when iterating over replace_const.expr_map!

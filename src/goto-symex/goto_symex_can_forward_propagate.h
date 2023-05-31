@@ -9,16 +9,17 @@ Author: Michael Tautschig, tautschn@amazon.com
 /// \file
 /// GOTO Symex constant propagation
 
-#ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_IS_CONSTANT_H
-#define CPROVER_GOTO_SYMEX_GOTO_SYMEX_IS_CONSTANT_H
+#ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_CAN_FORWARD_PROPAGATE_H
+#define CPROVER_GOTO_SYMEX_GOTO_SYMEX_CAN_FORWARD_PROPAGATE_H
 
 #include <util/expr.h>
 #include <util/expr_util.h>
 
-class goto_symex_is_constantt : public is_constantt
+class goto_symex_can_forward_propagatet : public can_forward_propagatet
 {
 public:
-  explicit goto_symex_is_constantt(const namespacet &ns) : is_constantt(ns)
+  explicit goto_symex_can_forward_propagatet(const namespacet &ns)
+    : can_forward_propagatet(ns)
   {
   }
 
@@ -56,8 +57,8 @@ protected:
 #endif
     }
 
-    return is_constantt::is_constant(expr);
+    return can_forward_propagatet::is_constant(expr);
   }
 };
 
-#endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_IS_CONSTANT_H
+#endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_CAN_FORWARD_PROPAGATE_H

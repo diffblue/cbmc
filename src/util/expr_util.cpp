@@ -226,7 +226,7 @@ const exprt &skip_typecast(const exprt &expr)
 
 /// This function determines what expressions are to be propagated as
 /// "constants"
-bool is_constantt::is_constant(const exprt &expr) const
+bool can_forward_propagatet::is_constant(const exprt &expr) const
 {
   if(
     expr.id() == ID_symbol || expr.id() == ID_nondet_symbol ||
@@ -306,7 +306,7 @@ bool is_constantt::is_constant(const exprt &expr) const
 }
 
 /// this function determines which reference-typed expressions are constant
-bool is_constantt::is_constant_address_of(const exprt &expr) const
+bool can_forward_propagatet::is_constant_address_of(const exprt &expr) const
 {
   if(expr.id() == ID_symbol)
   {

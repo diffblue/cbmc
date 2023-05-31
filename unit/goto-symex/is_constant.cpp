@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Unit tests for goto_symex_is_constantt
+Module: Unit tests for goto_symex_can_forward_propagatet
 
 Author: Diffblue Ltd.
 
@@ -11,7 +11,7 @@ Author: Diffblue Ltd.
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-#include <goto-symex/goto_symex_is_constant.h>
+#include <goto-symex/goto_symex_can_forward_propagate.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO("goto-symex-is-constant", "[core][goto-symex][is_constant]")
@@ -24,7 +24,7 @@ SCENARIO("goto-symex-is-constant", "[core][goto-symex][is_constant]")
   sizeof_constant.set(ID_C_c_sizeof_type, int_type);
   symbol_exprt non_constant("x", int_type);
 
-  goto_symex_is_constantt is_constant(ns);
+  goto_symex_can_forward_propagatet is_constant(ns);
 
   GIVEN("Sizeof expression multiplied by a non-constant")
   {

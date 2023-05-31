@@ -160,7 +160,7 @@ void enumerative_loop_contracts_synthesizert::synthesize_assigns(
     if(new_assign.id() == ID_index || new_assign.id() == ID_dereference)
     {
       address_of_exprt address_of_new_assigns(new_assign);
-      havoc_utils_is_constantt is_constant(assigns_map[loop_id], ns);
+      havoc_utils_can_forward_propagatet is_constant(assigns_map[loop_id], ns);
       if(!is_constant(address_of_new_assigns))
       {
         new_assign = pointer_object(address_of_new_assigns);
