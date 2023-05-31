@@ -1,0 +1,17 @@
+CORE
+simple.c
+--trace
+Passing problem to incremental SMT2 solving
+line 20 assertion my_struct.b != 30 || struct_copy.a != 10: FAILURE
+nondet=3
+struct_copy.a=10
+struct_copy.b=30
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that we support struct values and traces for a trivial example. At the
+time of adding the regression test, this exercised the conversion code specific
+to struct_tag_typet and struct_exprt. Field sensitivity is expected to eliminate
+many of the struct specific expressions before they can reach the decision
+procedure with this simple example.

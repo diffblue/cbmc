@@ -13,6 +13,7 @@
 #include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_is_dynamic_object.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
+#include <solvers/smt2_incremental/struct_encoding.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <solvers/stack_decision_procedure.h>
 
@@ -93,6 +94,10 @@ protected:
   /// Sends the solver the definitions of the object sizes and dynamic memory
   /// statuses.
   void define_object_properties();
+  /// Performs a combination of transformations which reduces the set of
+  /// possible expression forms by expressing these in terms of the remaining
+  /// language features.
+  exprt lower(exprt expression);
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
   /// This includes the symbols defined outside of the decision procedure but
@@ -165,6 +170,7 @@ protected:
   smt_is_dynamic_objectt is_dynamic_object_function;
   /// Precalculated type sizes used for pointer arithmetic.
   type_size_mapt pointer_sizes_map;
+  struct_encodingt struct_encoding;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H

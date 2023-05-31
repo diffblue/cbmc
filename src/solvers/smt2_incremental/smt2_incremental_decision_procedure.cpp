@@ -249,7 +249,8 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
     number_of_solver_calls{0},
     solver_process(std::move(_solver_process)),
     log{message_handler},
-    object_map{initial_smt_object_map()}
+    object_map{initial_smt_object_map()},
+    struct_encoding{_ns}
 {
   solver_process->send(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
@@ -268,7 +269,7 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
     return;
   }
 
-  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
+  const exprt lowered_expr = lower(in_expr);
 
   define_dependent_functions(lowered_expr);
   smt_define_function_commandt function{
@@ -514,12 +515,12 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt &in_expr,
   bool value)
 {
-  const exprt lowered_expr = lower_byte_operators(in_expr, ns);
-  PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
-          << lowered_expr.pretty(2, 0) << messaget::eom;
+          << in_expr.pretty(2, 0) << messaget::eom;
   });
+  const exprt lowered_expr = lower(in_expr);
+  PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
@@ -585,6 +586,17 @@ void smt2_incremental_decision_proceduret::define_object_properties()
     solver_process->send(is_dynamic_object_function.make_definition(
       object.unique_id, object.is_dynamic));
   }
+}
+
+exprt smt2_incremental_decision_proceduret::lower(exprt expression)
+{
+  const exprt lowered =
+    struct_encoding.encode(lower_byte_operators(expression, ns));
+  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
+    if(lowered != expression)
+      debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
+  });
+  return lowered;
 }
 
 decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
