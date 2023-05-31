@@ -61,7 +61,16 @@ target_link_libraries(cprover-api-cpp
 # Here we prepare a space-separated list of cmake generators that will resolved in  absolute paths.
 set(DEPENDENCY_TARGETS "")
 foreach(dep ${LIBRARY_DEPENDENCIES})
-    list(APPEND DEPENDENCY_TARGETS "$<TARGET_FILE:${dep}>")
+    if(TARGET ${dep})
+        list(APPEND DEPENDENCY_TARGETS "$<TARGET_FILE:${dep}>")
+    else()
+        find_library(dep_path ${dep})
+        string(REGEX REPLACE "[.]so$" ".a" dep_static_path ${dep_path})
+        if (NOT EXISTS "${dep_static_path}")
+          message(FATAL_ERROR "libcprover-cpp cannot be linked as dependency ${dep_path} does not have a static correspondent file (${dep_static_path})")
+        endif()
+        list(APPEND DEPENDENCY_TARGETS ${dep_static_path})
+    endif()
 endforeach(dep LIBRARY_DEPENDENCIES)
 string(REPLACE ";" " " DEPENDENCY_TARGETS "${DEPENDENCY_TARGETS}")
 

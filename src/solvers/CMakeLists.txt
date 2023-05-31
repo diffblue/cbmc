@@ -87,6 +87,20 @@ foreach(SOLVER ${sat_impl})
         target_sources(solvers PRIVATE ${minisat2_source})
 
         target_link_libraries(solvers minisat2-condensed)
+    elseif("${SOLVER}" STREQUAL "system-minisat2")
+        include(CheckIncludeFileCXX)
+        # if/when we move to CMake 3.12 (or later) we could also check for the
+        # library via CMAKE_REQUIRED_LIBRARIES
+        find_path(minisat_header_found "minisat/simp/SimpSolver.h")
+        if(minisat_header_found)
+            message(STATUS "Building solvers with minisat2 (${minisat_header_found})")
+            target_compile_definitions(solvers PUBLIC SATCHECK_MINISAT2 HAVE_MINISAT2)
+            target_sources(solvers PRIVATE ${minisat2_source})
+            target_include_directories(solvers PRIVATE ${minisat_header_found})
+            target_link_libraries(solvers minisat)
+        else()
+            message(FATAL_ERROR "Unable to find header file for preinstalled minisat2")
+        endif()
     elseif("${SOLVER}" STREQUAL "glucose")
         message(STATUS "Building solvers with glucose")
 
