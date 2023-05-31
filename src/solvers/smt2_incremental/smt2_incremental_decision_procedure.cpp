@@ -69,10 +69,17 @@ get_problem_messages(const smt_responset &response)
 ///   returned by this`gather_dependent_expressions` function.
 /// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
 ///   dependant expressions.
-static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
+static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 {
   std::vector<exprt> dependent_expressions;
-  expr.visit_pre([&](const exprt &expr_node) {
+
+  std::stack<const exprt *> stack;
+  stack.push(&root_expr);
+
+  while(!stack.empty())
+  {
+    const exprt &expr_node = *stack.top();
+    stack.pop();
     if(
       can_cast_expr<symbol_exprt>(expr_node) ||
       can_cast_expr<array_exprt>(expr_node) ||
@@ -82,7 +89,17 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
     {
       dependent_expressions.push_back(expr_node);
     }
-  });
+    // The decision procedure does not depend on the values inside address of
+    // code typed expressions. We can build the address without knowing the
+    // value at that memory location. In this case the hypothetical compiled
+    // machine instructions at the address are not relevant to solving, only
+    // representing *which* function a pointer points to is needed.
+    const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr_node);
+    if(address_of && can_cast_type<code_typet>(address_of->object().type()))
+      continue;
+    for(auto &operand : expr_node.operands())
+      stack.push(&operand);
+  }
   return dependent_expressions;
 }
 

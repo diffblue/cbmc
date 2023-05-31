@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
+#include <stack>
 
 /// Post order visitation is used in order to construct the the smt terms bottom
 /// upwards without using recursion to traverse the input `exprt`. Therefore
@@ -1845,6 +1846,46 @@ exprt lower_address_of_array_index(exprt expr)
   return expr;
 }
 
+/// Post order traversal where the children of a node are only visited if
+/// applying the \p filter function to that node returns true. Note that this
+/// function is based on the `visit_post_template` function.
+void filtered_visit_post(
+  const exprt &_expr,
+  std::function<bool(const exprt &)> filter,
+  std::function<void(const exprt &)> visitor)
+{
+  struct stack_entryt
+  {
+    const exprt *e;
+    bool operands_pushed;
+    explicit stack_entryt(const exprt *_e) : e(_e), operands_pushed(false)
+    {
+    }
+  };
+
+  std::stack<stack_entryt> stack;
+
+  stack.emplace(&_expr);
+
+  while(!stack.empty())
+  {
+    auto &top = stack.top();
+    if(top.operands_pushed)
+    {
+      visitor(*top.e);
+      stack.pop();
+    }
+    else
+    {
+      // do modification of 'top' before pushing in case 'top' isn't stable
+      top.operands_pushed = true;
+      if(filter(*top.e))
+        for(auto &op : top.e->operands())
+          stack.emplace(&op);
+    }
+  }
+}
+
 smt_termt convert_expr_to_smt(
   const exprt &expr,
   const smt_object_mapt &object_map,
@@ -1864,18 +1905,30 @@ smt_termt convert_expr_to_smt(
 #endif
   sub_expression_mapt sub_expression_map;
   const auto lowered_expr = lower_address_of_array_index(expr);
-  lowered_expr.visit_post([&](const exprt &expr) {
-    const auto find_result = sub_expression_map.find(expr);
-    if(find_result != sub_expression_map.cend())
-      return;
-    smt_termt term = dispatch_expr_to_smt_conversion(
-      expr,
-      sub_expression_map,
-      object_map,
-      pointer_sizes,
-      object_size,
-      is_dynamic_object);
-    sub_expression_map.emplace_hint(find_result, expr, std::move(term));
-  });
+  filtered_visit_post(
+    lowered_expr,
+    [](const exprt &expr) {
+      // Code values inside "address of" expressions do not need to be converted
+      // as the "address of" conversion only depends on the object identifier.
+      // Avoiding the conversion side steps a need to convert arbitrary code to
+      // SMT terms.
+      const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr);
+      if(!address_of)
+        return true;
+      return !can_cast_type<code_typet>(address_of->object().type());
+    },
+    [&](const exprt &expr) {
+      const auto find_result = sub_expression_map.find(expr);
+      if(find_result != sub_expression_map.cend())
+        return;
+      smt_termt term = dispatch_expr_to_smt_conversion(
+        expr,
+        sub_expression_map,
+        object_map,
+        pointer_sizes,
+        object_size,
+        is_dynamic_object);
+      sub_expression_map.emplace_hint(find_result, expr, std::move(term));
+    });
   return std::move(sub_expression_map.at(lowered_expr));
 }
