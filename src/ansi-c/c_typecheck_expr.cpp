@@ -4495,23 +4495,60 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   throw 0;
 }
 
-class is_compile_time_constantt : public is_constantt
+/// Architecturally similar to \ref can_forward_propagatet, but specialized for
+/// what is a constexpr, i.e., an expression that can be fully evaluated at
+/// compile time.
+class is_compile_time_constantt
 {
 public:
-  explicit is_compile_time_constantt(const namespacet &ns) : is_constantt(ns)
+  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
   {
+  }
+
+  /// returns true iff the expression can be considered constant
+  bool operator()(const exprt &e) const
+  {
+    return is_constant(e);
   }
 
 protected:
-  bool is_constant(const exprt &e) const override
+  const namespacet &ns;
+
+  /// This function determines what expressions are to be propagated as
+  /// "constants"
+  bool is_constant(const exprt &e) const
   {
     if(e.id() == ID_infinity)
       return true;
-    else
-      return is_constantt::is_constant(e);
+
+    if(e.is_constant())
+      return true;
+
+    if(e.id() == ID_address_of)
+    {
+      return is_constant_address_of(to_address_of_expr(e).object());
+    }
+    else if(
+      e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
+      e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
+      e.id() == ID_struct || e.id() == ID_union || e.id() == ID_empty_union ||
+      e.id() == ID_equal || e.id() == ID_notequal || e.id() == ID_lt ||
+      e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
+      e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
+      e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
+      e.id() == ID_bitor || e.id() == ID_bitxor)
+    {
+      return std::all_of(
+        e.operands().begin(), e.operands().end(), [this](const exprt &op) {
+          return is_constant(op);
+        });
+    }
+
+    return false;
   }
 
-  bool is_constant_address_of(const exprt &e) const override
+  /// this function determines which reference-typed expressions are constant
+  bool is_constant_address_of(const exprt &e) const
   {
     if(e.id() == ID_symbol)
     {
@@ -4522,8 +4559,27 @@ protected:
       return true;
     else if(e.id() == ID_label)
       return true;
-    else
-      return is_constantt::is_constant_address_of(e);
+    else if(e.id() == ID_index)
+    {
+      const index_exprt &index_expr = to_index_expr(e);
+
+      return is_constant_address_of(index_expr.array()) &&
+             is_constant(index_expr.index());
+    }
+    else if(e.id() == ID_member)
+    {
+      return is_constant_address_of(to_member_expr(e).compound());
+    }
+    else if(e.id() == ID_dereference)
+    {
+      const dereference_exprt &deref = to_dereference_expr(e);
+
+      return is_constant(deref.pointer());
+    }
+    else if(e.id() == ID_string_constant)
+      return true;
+
+    return false;
   }
 };
 
