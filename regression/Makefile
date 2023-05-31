@@ -22,6 +22,7 @@ DIRS = cbmc-shadow-memory \
        goto-instrument-json \
        goto-instrument-wmm-core \
        goto-instrument-typedef \
+       goto-inspect \
        smt2_solver \
        smt2_strings \
        strings \
