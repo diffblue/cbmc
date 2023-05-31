@@ -1,0 +1,9 @@
+CORE
+main.c
+--enforce-contract update _ --program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+^\(\d+\) guard#\d+ == .*byte_extract
+--
+Confirms that field sensitivity can resolve pointer byte extracts to type casts.

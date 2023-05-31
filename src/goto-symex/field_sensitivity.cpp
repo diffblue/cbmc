@@ -123,6 +123,20 @@ exprt field_sensitivityt::apply(
           else
             return apply(ns, state, std::move(tmp), write);
         }
+        else if(
+          recursive_member.has_value() && recursive_member->id() == ID_typecast)
+        {
+          if(was_l2)
+          {
+            return apply(
+              ns,
+              state,
+              state.rename(std::move(*recursive_member), ns).get(),
+              write);
+          }
+          else
+            return apply(ns, state, std::move(*recursive_member), write);
+        }
       }
     }
   }
