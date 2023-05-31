@@ -1,54 +1,56 @@
 <map id="smt2_incremental_decision_proceduret" name="smt2_incremental_decision_proceduret">
-<area shape="rect" id="node1" title=" " alt="" coords="2579,884,2780,925"/>
-<area shape="rect" id="node2" href="$classstack__decision__proceduret.html" title=" " alt="" coords="2132,394,2327,421"/>
-<area shape="rect" id="node3" href="$classdecision__proceduret.html" title=" " alt="" coords="1700,394,1853,421"/>
-<area shape="rect" id="node4" title=" " alt="" coords="2137,987,2322,1043"/>
-<area shape="rect" id="node5" href="$classsmt__identifier__termt.html" title="Stores identifiers in unescaped and unquoted form." alt="" coords="1699,922,1854,949"/>
-<area shape="rect" id="node18" title=" " alt="" coords="2145,841,2314,897"/>
-<area shape="rect" id="node6" href="$classsmt__termt.html" title=" " alt="" coords="1262,730,1353,757"/>
-<area shape="rect" id="node49" title=" " alt="" coords="1701,765,1853,821"/>
-<area shape="rect" id="node7" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="865,645,917,671"/>
-<area shape="rect" id="node19" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1279,579,1335,606"/>
-<area shape="rect" id="node30" href="$classsource__locationt.html" title=" " alt="" coords="1471,369,1601,395"/>
-<area shape="rect" id="node34" href="$classsmt__commandt.html" title=" " alt="" coords="1245,1049,1369,1075"/>
-<area shape="rect" id="node50" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1279,645,1335,671"/>
-<area shape="rect" id="node8" href="$classsharing__treet.html" title=" " alt="" coords="431,630,597,686"/>
-<area shape="rect" id="node9" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,637,187,679"/>
-<area shape="rect" id="node10" href="$classsmt__sortt_1_1storert.html" title=" " alt="" coords="823,727,958,768"/>
-<area shape="rect" id="node11" href="$classsmt__sortt_1_1storert.html" title="Class for adding the ability to up and down cast smt_sortt to and from irept." alt="" coords="447,885,581,927"/>
-<area shape="rect" id="node35" href="$classsmt__sortt_1_1storert.html" title=" " alt="" coords="1000,1259,1177,1315"/>
-<area shape="rect" id="node12" href="$classsmt__indext_1_1storert.html" title=" " alt="" coords="1215,932,1400,973"/>
-<area shape="rect" id="node13" href="$classsmt__indext_1_1storert.html" title="Class for adding the ability to up and down cast smt_indext to and from irept." alt="" coords="817,939,964,980"/>
-<area shape="rect" id="node14" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="855,1005,927,1031"/>
-<area shape="rect" id="node44" title=" " alt="" coords="1231,1163,1384,1204"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1231,853,1383,895"/>
-<area shape="rect" id="node43" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1700,1151,1853,1178"/>
-<area shape="rect" id="node47" title=" " alt="" coords="2127,603,2332,659"/>
-<area shape="rect" id="node16" title=" " alt="" coords="495,989,533,1015"/>
-<area shape="rect" id="node45" title=" " alt="" coords="807,1106,975,1133"/>
-<area shape="rect" id="node17" title=" " alt="" coords="495,815,533,842"/>
-<area shape="rect" id="node23" title=" " alt="" coords="826,445,955,471"/>
-<area shape="rect" id="node40" title=" " alt="" coords="812,1055,969,1082"/>
-<area shape="rect" id="node48" href="$structdecision__procedure__objectt.html" title="Information the decision procedure holds about each object." alt="" coords="1703,559,1851,600"/>
-<area shape="rect" id="node20" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="2186,247,2273,274"/>
-<area shape="rect" id="node25" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2600,227,2759,254"/>
-<area shape="rect" id="node21" href="$classmessage__handlert.html" title=" " alt="" coords="1705,293,1848,319"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1214,326,1401,353"/>
-<area shape="rect" id="node51" title=" " alt="" coords="1461,445,1611,471"/>
-<area shape="rect" id="node24" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1695,191,1859,218"/>
-<area shape="rect" id="node26" title=" " alt="" coords="2159,53,2300,79"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1685,5,1868,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2588,743,2789,784"/>
+<area shape="rect" id="node2" href="$classstack__decision__proceduret.html" title=" " alt="" coords="2141,547,2336,574"/>
+<area shape="rect" id="node3" href="$classdecision__proceduret.html" title=" " alt="" coords="1709,539,1863,566"/>
+<area shape="rect" id="node4" title=" " alt="" coords="2146,735,2331,791"/>
+<area shape="rect" id="node5" href="$classsmt__identifier__termt.html" title="Stores identifiers in unescaped and unquoted form." alt="" coords="1709,1057,1863,1083"/>
+<area shape="rect" id="node18" title=" " alt="" coords="2154,985,2323,1041"/>
+<area shape="rect" id="node6" href="$classsmt__termt.html" title=" " alt="" coords="1262,1211,1353,1238"/>
+<area shape="rect" id="node49" title=" " alt="" coords="1710,1234,1862,1290"/>
+<area shape="rect" id="node7" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="865,1161,917,1187"/>
+<area shape="rect" id="node19" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1279,1107,1335,1134"/>
+<area shape="rect" id="node30" href="$classsource__locationt.html" title=" " alt="" coords="1476,530,1605,557"/>
+<area shape="rect" id="node34" href="$classsmt__commandt.html" title=" " alt="" coords="1245,1329,1369,1355"/>
+<area shape="rect" id="node50" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1279,1161,1335,1187"/>
+<area shape="rect" id="node8" href="$classsharing__treet.html" title=" " alt="" coords="431,1146,597,1202"/>
+<area shape="rect" id="node9" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1153,187,1195"/>
+<area shape="rect" id="node10" href="$classsmt__sortt_1_1storert.html" title=" " alt="" coords="823,1248,958,1289"/>
+<area shape="rect" id="node11" href="$classsmt__sortt_1_1storert.html" title="Class for adding the ability to up and down cast smt_sortt to and from irept." alt="" coords="447,1253,581,1295"/>
+<area shape="rect" id="node35" href="$classsmt__sortt_1_1storert.html" title=" " alt="" coords="1000,1355,1177,1411"/>
+<area shape="rect" id="node12" href="$classsmt__indext_1_1storert.html" title=" " alt="" coords="1215,1005,1400,1047"/>
+<area shape="rect" id="node13" href="$classsmt__indext_1_1storert.html" title="Class for adding the ability to up and down cast smt_indext to and from irept." alt="" coords="817,1005,964,1047"/>
+<area shape="rect" id="node14" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="855,587,927,614"/>
+<area shape="rect" id="node44" title=" " alt="" coords="1231,395,1384,436"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1231,795,1383,836"/>
+<area shape="rect" id="node43" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1709,387,1863,414"/>
+<area shape="rect" id="node47" title=" " alt="" coords="2136,890,2341,946"/>
+<area shape="rect" id="node16" title=" " alt="" coords="495,563,533,590"/>
+<area shape="rect" id="node45" title=" " alt="" coords="807,449,975,475"/>
+<area shape="rect" id="node17" title=" " alt="" coords="495,675,533,702"/>
+<area shape="rect" id="node23" title=" " alt="" coords="826,499,955,526"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1229,647,1386,674"/>
+<area shape="rect" id="node48" href="$structdecision__procedure__objectt.html" title="Information the decision procedure holds about each object." alt="" coords="1712,913,1860,955"/>
+<area shape="rect" id="node20" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="2195,241,2282,267"/>
+<area shape="rect" id="node25" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2609,221,2768,247"/>
+<area shape="rect" id="node21" href="$classmessage__handlert.html" title=" " alt="" coords="1715,127,1857,154"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1214,205,1401,231"/>
+<area shape="rect" id="node51" title=" " alt="" coords="1466,491,1615,518"/>
+<area shape="rect" id="node24" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1704,234,1868,261"/>
+<area shape="rect" id="node26" title=" " alt="" coords="2168,50,2309,77"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1695,5,1877,47"/>
 <area shape="rect" id="node28" title=" " alt="" coords="1235,5,1380,47"/>
 <area shape="rect" id="node29" title=" " alt="" coords="805,13,976,39"/>
-<area shape="rect" id="node31" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1713,242,1841,269"/>
-<area shape="rect" id="node32" href="$structsmt__object__sizet.html" title="Specifics of how the object size lookup is implemented in SMT terms." alt="" coords="2163,1277,2295,1303"/>
-<area shape="rect" id="node33" href="$classsmt__declare__function__commandt.html" title=" " alt="" coords="1695,1253,1858,1295"/>
-<area shape="rect" id="node46" href="$structsmt__is__dynamic__objectt.html" title="Specifics of how the dynamic object status lookup is implemented in SMT terms." alt="" coords="2139,1226,2319,1253"/>
-<area shape="rect" id="node36" href="$classsmt__termt_1_1storert.html" title="Class for adding the ability to up and down cast smt_termt to and from irept." alt="" coords="1237,1228,1378,1269"/>
-<area shape="rect" id="node37" href="$classsmt__function__application__termt_1_1factoryt.html" title=" " alt="" coords="1659,1343,1895,1399"/>
-<area shape="rect" id="node38" href="$classsmt__function__application__termt_1_1factoryt.html" title=" " alt="" coords="1201,1351,1413,1392"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1919,1084,2103,1125"/>
-<area shape="rect" id="node41" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="2178,1150,2281,1177"/>
-<area shape="rect" id="node42" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1707,1202,1847,1229"/>
-<area shape="rect" id="node52" href="$classsmt2__incremental__decision__proceduret_1_1sequencet.html" title="Generators of sequences of uniquely identifying numbers used for naming SMT functions introduced by t..." alt="" coords="2129,921,2330,963"/>
+<area shape="rect" id="node31" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1722,285,1850,311"/>
+<area shape="rect" id="node32" href="$structsmt__object__sizet.html" title="Specifics of how the object size lookup is implemented in SMT terms." alt="" coords="2173,1277,2305,1303"/>
+<area shape="rect" id="node33" href="$classsmt__declare__function__commandt.html" title=" " alt="" coords="1705,1319,1867,1360"/>
+<area shape="rect" id="node46" href="$structsmt__is__dynamic__objectt.html" title="Specifics of how the dynamic object status lookup is implemented in SMT terms." alt="" coords="2149,1327,2329,1354"/>
+<area shape="rect" id="node36" href="$classsmt__termt_1_1storert.html" title="Class for adding the ability to up and down cast smt_termt to and from irept." alt="" coords="1237,1263,1378,1304"/>
+<area shape="rect" id="node37" href="$classsmt__function__application__termt_1_1factoryt.html" title=" " alt="" coords="1668,1402,1904,1458"/>
+<area shape="rect" id="node38" href="$classsmt__function__application__termt_1_1factoryt.html" title=" " alt="" coords="1201,1431,1413,1472"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1928,591,2112,632"/>
+<area shape="rect" id="node54" title=" " alt="" coords="1697,641,1875,683"/>
+<area shape="rect" id="node41" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="2187,438,2290,465"/>
+<area shape="rect" id="node42" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1716,438,1856,465"/>
+<area shape="rect" id="node52" href="$classsmt2__incremental__decision__proceduret_1_1sequencet.html" title="Generators of sequences of uniquely identifying numbers used for naming SMT functions introduced by t..." alt="" coords="2138,817,2339,859"/>
+<area shape="rect" id="node53" href="$classstruct__encodingt.html" title="Encodes struct types/values into non&#45;struct expressions/types." alt="" coords="2173,681,2304,707"/>
 </map>

@@ -2019,6 +2019,7 @@ var hierarchy =
     [ "string_ptr_hash", "classstring__ptr__hash.html", null ],
     [ "string_ptrt", "structstring__ptrt.html", null ],
     [ "struct_aggregate_typet", "structstruct__aggregate__typet.html", null ],
+    [ "struct_encodingt", "classstruct__encodingt.html", null ],
     [ "structured_data_entryt", "structstructured__data__entryt.html", null ],
     [ "structured_datat", "classstructured__datat.html", null ],
     [ "structured_pool_entryt", "classstructured__pool__entryt.html", [

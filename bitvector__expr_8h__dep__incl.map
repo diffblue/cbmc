@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/bitvector_expr.h" name="/home/runner/work/cbmc/cbmc/src/util/bitvector_expr.h">
-<area shape="rect" id="node1" title="API to expression classes for bitvectors." alt="" coords="4112,5,4296,61"/>
+<area shape="rect" id="node1" title="API to expression classes for bitvectors." alt="" coords="4221,5,4405,61"/>
 <area shape="rect" id="node2" href="$goto__rw_8cpp.html" title=" " alt="" coords="131,117,315,173"/>
 <area shape="rect" id="node3" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="339,117,551,173"/>
 <area shape="rect" id="node4" href="$expr2c__class_8h.html" title=" " alt="" coords="576,117,760,173"/>
@@ -23,19 +23,20 @@
 <area shape="rect" id="node42" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4637,117,4821,173"/>
 <area shape="rect" id="node43" href="$smt2__parser_8cpp.html" title=" " alt="" coords="4845,117,5029,173"/>
 <area shape="rect" id="node44" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5054,109,5250,180"/>
-<area shape="rect" id="node45" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="5275,109,5480,180"/>
-<area shape="rect" id="node46" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5505,117,5754,173"/>
-<area shape="rect" id="node47" href="$bitvector__expr_8cpp.html" title=" " alt="" coords="5779,117,5963,173"/>
-<area shape="rect" id="node48" href="$expr__util_8cpp.html" title=" " alt="" coords="5987,124,6184,165"/>
-<area shape="rect" id="node49" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="6208,117,6392,173"/>
-<area shape="rect" id="node50" href="$interval_8cpp.html" title=" " alt="" coords="6417,124,6607,165"/>
-<area shape="rect" id="node51" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="6631,117,6817,173"/>
-<area shape="rect" id="node52" href="$simplify__expr_8cpp.html" title=" " alt="" coords="6841,117,7025,173"/>
-<area shape="rect" id="node53" href="$simplify__expr__int_8cpp.html" title=" " alt="" coords="7049,117,7233,173"/>
-<area shape="rect" id="node54" href="$validate__expressions_8cpp.html" title=" " alt="" coords="7257,117,7441,173"/>
-<area shape="rect" id="node55" href="$character__refine__preprocess_8cpp.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="7466,117,7702,173"/>
-<area shape="rect" id="node56" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="7725,117,7987,173"/>
-<area shape="rect" id="node57" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="8011,117,8263,173"/>
+<area shape="rect" id="node45" href="$struct__encoding_8cpp.html" title=" " alt="" coords="5274,117,5515,173"/>
+<area shape="rect" id="node46" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="5540,109,5745,180"/>
+<area shape="rect" id="node47" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5770,117,6019,173"/>
+<area shape="rect" id="node48" href="$bitvector__expr_8cpp.html" title=" " alt="" coords="6044,117,6228,173"/>
+<area shape="rect" id="node49" href="$expr__util_8cpp.html" title=" " alt="" coords="6252,124,6449,165"/>
+<area shape="rect" id="node50" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="6473,117,6657,173"/>
+<area shape="rect" id="node51" href="$interval_8cpp.html" title=" " alt="" coords="6682,124,6873,165"/>
+<area shape="rect" id="node52" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="6897,117,7082,173"/>
+<area shape="rect" id="node53" href="$simplify__expr_8cpp.html" title=" " alt="" coords="7107,117,7291,173"/>
+<area shape="rect" id="node54" href="$simplify__expr__int_8cpp.html" title=" " alt="" coords="7315,117,7499,173"/>
+<area shape="rect" id="node55" href="$validate__expressions_8cpp.html" title=" " alt="" coords="7523,117,7707,173"/>
+<area shape="rect" id="node56" href="$character__refine__preprocess_8cpp.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="7731,117,7967,173"/>
+<area shape="rect" id="node57" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="7991,117,8252,173"/>
+<area shape="rect" id="node58" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="8277,117,8529,173"/>
 <area shape="rect" id="node5" href="$expr2c_8cpp.html" title=" " alt="" coords="5,235,208,277"/>
 <area shape="rect" id="node6" href="$expr2cpp_8cpp.html" title=" " alt="" coords="232,235,435,277"/>
 <area shape="rect" id="node7" href="$expr2jsil_8cpp.html" title="Jsil Language." alt="" coords="459,235,653,277"/>

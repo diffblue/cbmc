@@ -17,6 +17,7 @@ var classsmt2__incremental__decision__proceduret =
     [ "handle", "classsmt2__incremental__decision__proceduret.html#a1d1569125e1afdee07d0b312d3b7d650", null ],
     [ "initialize_array_elements", "classsmt2__incremental__decision__proceduret.html#a5c5e32b8c28122940ff53675ddcfb647", null ],
     [ "initialize_array_elements", "classsmt2__incremental__decision__proceduret.html#a0f2e8638bbf9cce2a4d1a22963ec0b38", null ],
+    [ "lower", "classsmt2__incremental__decision__proceduret.html#a54d0887666aab42c7750a116b43c7c4f", null ],
     [ "pop", "classsmt2__incremental__decision__proceduret.html#a860c271771929a61d93a59e77792b017", null ],
     [ "print_assignment", "classsmt2__incremental__decision__proceduret.html#a632c5481e95879e402064297f1b822a9", null ],
     [ "push", "classsmt2__incremental__decision__proceduret.html#a6517780755a4e6728529e47097ff7002", null ],
@@ -36,5 +37,6 @@ var classsmt2__incremental__decision__proceduret =
     [ "object_properties_defined", "classsmt2__incremental__decision__proceduret.html#ac84baf3fcc2b7d0800f8b676d4b56640", null ],
     [ "object_size_function", "classsmt2__incremental__decision__proceduret.html#a0a7ced200b6651c50937f94ee69932c7", null ],
     [ "pointer_sizes_map", "classsmt2__incremental__decision__proceduret.html#ad4c88502d7c8dc813d3502e93be35668", null ],
-    [ "solver_process", "classsmt2__incremental__decision__proceduret.html#adf62a75468812bf3b9bcf852d7946a25", null ]
+    [ "solver_process", "classsmt2__incremental__decision__proceduret.html#adf62a75468812bf3b9bcf852d7946a25", null ],
+    [ "struct_encoding", "classsmt2__incremental__decision__proceduret.html#a24fcd617b07c36ea2598f3685c99aab8", null ]
 ];
