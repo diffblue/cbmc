@@ -44,6 +44,8 @@ typet struct_encodingt::encode(typet type) const
 
 static exprt encode(const struct_exprt &struct_expr)
 {
+  if(struct_expr.operands().size() == 1)
+    return struct_expr.operands().front();
   return concatenation_exprt{struct_expr.operands(), struct_expr.type()};
 }
 
