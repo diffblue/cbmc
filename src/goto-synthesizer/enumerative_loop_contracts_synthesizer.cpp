@@ -99,15 +99,34 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
       if(loop_head_and_content.second.size() <= 1)
         continue;
 
-      goto_programt::const_targett loop_end =
+      goto_programt::targett loop_end =
         get_loop_end_from_loop_head_and_content_mutable(
           loop_head_and_content.first, loop_head_and_content.second);
 
       loop_idt new_id(function_p.first, loop_end->loop_number);
       loop_cfg_infot cfg_info(function_p.second, loop_head_and_content.second);
 
-      log.debug() << "Initialize candidates for the loop at "
-                  << loop_end->source_location() << messaget::eom;
+      log.progress() << "Initialize candidates for the loop at "
+                     << loop_end->source_location() << messaget::eom;
+
+      // Turn do while loops of form
+      //
+      // do
+      // { loop body }
+      // while (0)
+      //
+      // into non-loop block
+      //
+      // { loop body }
+      // skip
+      //
+      if(
+        loop_end->is_goto() &&
+        simplify_expr(loop_end->condition(), ns) == false_exprt())
+      {
+        loop_end->turn_into_skip();
+        continue;
+      }
 
       // we only synthesize invariants and assigns for unannotated loops
       if(loop_end->condition().find(ID_C_spec_loop_invariant).is_nil())
