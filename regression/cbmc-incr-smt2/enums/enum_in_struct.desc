@@ -1,0 +1,12 @@
+CORE
+enum_in_struct.c
+--trace
+Passing problem to incremental SMT2 solving
+line 21 Struct field s\.a is V1, so this should fail: FAILURE
+s\.a=/\*enum\*/V1 \(00000000 00000000 00000000 00000001\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that we support enum values and traces for an struct with enums fields. At the time of adding
+the regression test, this exercised the conversion code specific to c_enum_tag_typet.

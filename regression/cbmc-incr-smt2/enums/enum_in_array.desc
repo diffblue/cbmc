@@ -1,0 +1,15 @@
+CORE
+enum_in_array.c
+--trace
+Passing problem to incremental SMT2 solving
+line 18 Array at index 0 is V0, so this should fail: FAILURE
+i=0u \(00000000 00000000 00000000 00000000\)
+e\[0l+\]=/\*enum\*/V0 \(00000000 00000000 00000000 00000000\)
+e\[1l+\]=/\*enum\*/V1 \(00000000 00000000 00000000 00000001\)
+e\[2l+\]=/\*enum\*/V2 \(00000000 00000000 00000000 00000010\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that we support enum values and traces for an array of enums. At the time of adding the
+regression test, this exercised the conversion code specific to c_enum_tag_typet.
