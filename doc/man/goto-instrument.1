@@ -346,7 +346,7 @@ void \fBtest_get_message\fP() {
 
 The harness verifies that \fIget_message\fR assigns non-decreasing time stamps
 to the returned messages. However, simply treating \fIclock\fR as
-non-deterministic would not allow to prove this property. Thus, we can supply a
+non-deterministic would not suffice to prove this property. Thus, we can supply a
 model for reads from \fIclock\fR:
 
 .EX

@@ -780,7 +780,7 @@ __CPROVER_HIDE:;
   if(set->allocated.elems[__CPROVER_POINTER_OBJECT(ptr)] != 0)
     return 1;
 
-  // don't even drive symex into the rest of the function if the set is emtpy
+  // don't even drive symex into the rest of the function if the set is empty
   if(set->contract_assigns.max_elems == 0)
     return 0;
 

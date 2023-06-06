@@ -2266,7 +2266,7 @@ def FindDoStart(clean_lines, linenum):
 
   Work our way up through the lines starting at linenum to find a do
   that hasn't been matched. This might not succeed as might just be an
-  emtpy while statement.
+  empty while statement.
 
   Args:
     clean_lines: A CleansedLines instance containing the file.

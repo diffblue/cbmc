@@ -18,7 +18,7 @@ bvt boolbvt::convert_concatenation(const concatenation_exprt &expr)
   const exprt::operandst &operands=expr.operands();
 
   DATA_INVARIANT(
-    !operands.empty(), "concatentation shall have at least one operand");
+    !operands.empty(), "concatenation shall have at least one operand");
 
   std::size_t offset=width;
   bvt bv;
@@ -30,7 +30,7 @@ bvt boolbvt::convert_concatenation(const concatenation_exprt &expr)
 
     INVARIANT(
       op.size() <= offset,
-      "concatentation operand must fit into the result bitvector");
+      "concatenation operand must fit into the result bitvector");
 
     offset-=op.size();
 
@@ -41,7 +41,7 @@ bvt boolbvt::convert_concatenation(const concatenation_exprt &expr)
   INVARIANT(
     offset == 0,
     "all bits in the result bitvector must have been filled up by the "
-    "concatentation operands");
+    "concatenation operands");
 
   return bv;
 }
