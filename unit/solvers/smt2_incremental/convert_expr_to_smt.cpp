@@ -44,6 +44,8 @@ TEST_CASE("\"typet\" to smt sort conversion", "[core][smt2_incremental]")
   }
 }
 
+// 32bit GCC defines i386 as a macro (with value 1)
+#undef i386
 enum class test_archt
 {
   i386,
