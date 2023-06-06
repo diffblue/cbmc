@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('boolbv__concatenation_8cpp_source.html
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;operands=expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>();</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    !operands.empty(), <span class="stringliteral">&quot;concatentation shall have at least one operand&quot;</span>);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    !operands.empty(), <span class="stringliteral">&quot;concatenation shall have at least one operand&quot;</span>);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  std::size_t offset=width;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv;</div>
@@ -124,7 +124,7 @@ $(document).ready(function(){initNavTree('boolbv__concatenation_8cpp_source.html
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      op.size() &lt;= offset,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="stringliteral">&quot;concatentation operand must fit into the result bitvector&quot;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="stringliteral">&quot;concatenation operand must fit into the result bitvector&quot;</span>);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    offset-=op.size();</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
@@ -135,7 +135,7 @@ $(document).ready(function(){initNavTree('boolbv__concatenation_8cpp_source.html
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    offset == 0,</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="stringliteral">&quot;all bits in the result bitvector must have been filled up by the &quot;</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="stringliteral">&quot;concatentation operands&quot;</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="stringliteral">&quot;concatenation operands&quot;</span>);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">return</span> bv;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;}</div>

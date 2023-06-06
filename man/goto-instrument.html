@@ -311,7 +311,7 @@ void test_get_message() {
   message_t msg2 = get_message();
   assert(msg1.timestamp &lt;= msg2.timestamp);
 }</code></pre>
-<p>The harness verifies that <em>get_message</em> assigns non-decreasing time stamps to the returned messages. However, simply treating <em>clock</em> as non-deterministic would not allow to prove this property. Thus, we can supply a model for reads from <em>clock</em>:</p>
+<p>The harness verifies that <em>get_message</em> assigns non-decreasing time stamps to the returned messages. However, simply treating <em>clock</em> as non-deterministic would not suffice to prove this property. Thus, we can supply a model for reads from <em>clock</em>:</p>
 <pre><code>// model for reads of the variable clock
 uint32_t clock_read_model() {
   static uint32_t clock_value = 0;
