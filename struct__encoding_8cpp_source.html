@@ -126,37 +126,45 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp_source.html','')
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    work_queue.pop();</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> struct_tag = type_try_dynamic_cast&lt;struct_tag_typet&gt;(current))</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      current = <a class="code" href="classbv__typet.html">bv_typet</a>{(*boolbv_width)(*struct_tag)};</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> array = type_try_dynamic_cast&lt;array_typet&gt;(current))</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      work_queue.push(&amp;array-&gt;element_type());</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordflow">return</span> type;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">   45</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">encode</a>(<span class="keyword">const</span> <a class="code" href="classstruct__exprt.html">struct_exprt</a> &amp;struct_expr)</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;{</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classconcatenation__exprt.html">concatenation_exprt</a>{struct_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>(), struct_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classstruct__encodingt.html#a95c06cf3804956acc32eab0a44c428e1">   50</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9">struct_encodingt::encode</a>(<a class="code" href="classexprt.html">exprt</a> expr)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  std::queue&lt;exprt *&gt; work_queue;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  work_queue.push(&amp;expr);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordflow">while</span>(!work_queue.empty())</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classexprt.html">exprt</a> &amp;current = *work_queue.front();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    work_queue.pop();</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    current.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() = <a class="code" href="classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9">encode</a>(current.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> struct_expr = expr_try_dynamic_cast&lt;struct_exprt&gt;(current))</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      current = <a class="code" href="classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9">::encode</a>(*struct_expr);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;operand : current.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      work_queue.push(&amp;operand);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  }</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">return</span> expr;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> width = (*boolbv_width)(*struct_tag);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">if</span>(width == 0)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">UNIMPLEMENTED_FEATURE</a>(<span class="stringliteral">&quot;support for zero bit width structs.&quot;</span>);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      current = <a class="code" href="classbv__typet.html">bv_typet</a>{width};</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> array = type_try_dynamic_cast&lt;array_typet&gt;(current))</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      work_queue.push(&amp;array-&gt;element_type());</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">return</span> type;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">   48</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">encode</a>(<span class="keyword">const</span> <a class="code" href="classstruct__exprt.html">struct_exprt</a> &amp;struct_expr)</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;{</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    !struct_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().empty(),</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="stringliteral">&quot;empty structs may not be encoded into SMT terms.&quot;</span>);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordflow">if</span>(struct_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size() == 1)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">return</span> struct_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().front();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classconcatenation__exprt.html">concatenation_exprt</a>{struct_expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>(), struct_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="classstruct__encodingt.html#a95c06cf3804956acc32eab0a44c428e1">   58</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9">struct_encodingt::encode</a>(<a class="code" href="classexprt.html">exprt</a> expr)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  std::queue&lt;exprt *&gt; work_queue;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  work_queue.push(&amp;expr);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">while</span>(!work_queue.empty())</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="classexprt.html">exprt</a> &amp;current = *work_queue.front();</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    work_queue.pop();</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    current.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() = <a class="code" href="classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9">encode</a>(current.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> struct_expr = expr_try_dynamic_cast&lt;struct_exprt&gt;(current))</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      current = <a class="code" href="classstruct__encodingt.html#a725e836be34675906cab5a1290f983d9">::encode</a>(*struct_expr);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;operand : current.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      work_queue.push(&amp;operand);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">return</span> expr;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;}</div>
 <div class="ttc" id="abitvector__expr_8h_html"><div class="ttname"><a href="bitvector__expr_8h.html">bitvector_expr.h</a></div><div class="ttdoc">API to expression classes for bitvectors.</div></div>
 <div class="ttc" id="abitvector__types_8h_html"><div class="ttname"><a href="bitvector__types_8h.html">bitvector_types.h</a></div><div class="ttdoc">Pre-defined bitvector types.</div></div>
 <div class="ttc" id="aboolbv__width_8h_html"><div class="ttname"><a href="boolbv__width_8h.html">boolbv_width.h</a></div></div>
@@ -175,7 +183,9 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp_source.html','')
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
 <div class="ttc" id="amake__unique_8h_html"><div class="ttname"><a href="make__unique_8h.html">make_unique.h</a></div></div>
 <div class="ttc" id="amake__unique_8h_html_a6e28b00c2e84f60af38ff811e37ea35c"><div class="ttname"><a href="make__unique_8h.html#a6e28b00c2e84f60af38ff811e37ea35c">util_make_unique</a></div><div class="ttdeci">std::unique_ptr&lt; T &gt; util_make_unique(Ts &amp;&amp;... ts)</div><div class="ttdef"><b>Definition:</b> <a href="make__unique_8h_source.html#l00019">make_unique.h:19</a></div></div>
-<div class="ttc" id="astruct__encoding_8cpp_html_a0424907d2e9dd13f9e263bc89d73e12a"><div class="ttname"><a href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">encode</a></div><div class="ttdeci">static exprt encode(const struct_exprt &amp;struct_expr)</div><div class="ttdef"><b>Definition:</b> <a href="struct__encoding_8cpp_source.html#l00045">struct_encoding.cpp:45</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a163e7c1c82cc098987e5478ee28535df"><div class="ttname"><a href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">UNIMPLEMENTED_FEATURE</a></div><div class="ttdeci">#define UNIMPLEMENTED_FEATURE(FEATURE)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00549">invariant.h:549</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
+<div class="ttc" id="astruct__encoding_8cpp_html_a0424907d2e9dd13f9e263bc89d73e12a"><div class="ttname"><a href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">encode</a></div><div class="ttdeci">static exprt encode(const struct_exprt &amp;struct_expr)</div><div class="ttdef"><b>Definition:</b> <a href="struct__encoding_8cpp_source.html#l00048">struct_encoding.cpp:48</a></div></div>
 <div class="ttc" id="astruct__encoding_8h_html"><div class="ttname"><a href="struct__encoding_8h.html">struct_encoding.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
