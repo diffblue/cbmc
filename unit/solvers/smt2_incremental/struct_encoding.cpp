@@ -105,3 +105,35 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     REQUIRE(test.struct_encoding.encode(struct_expr) == expected_result);
   }
 }
+
+TEST_CASE(
+  "encoding of single member struct expressions",
+  "[core][smt2_incremental]")
+{
+  const struct_union_typet::componentst component_types{
+    {"eggs", signedbv_typet{32}}};
+  const type_symbolt type_symbol{"foot", struct_typet{component_types}, ID_C};
+  auto test = struct_encoding_test_environmentt::make();
+  test.symbol_table.insert(type_symbol);
+  const struct_tag_typet struct_tag{type_symbol.name};
+  const symbolt struct_value_symbol{"foo", struct_tag, ID_C};
+  test.symbol_table.insert(struct_value_symbol);
+  const auto symbol_expr = struct_value_symbol.symbol_expr();
+  const auto symbol_expr_as_bv = symbol_exprt{"foo", bv_typet{32}};
+  SECTION("struct typed symbol expression")
+  {
+    REQUIRE(test.struct_encoding.encode(symbol_expr) == symbol_expr_as_bv);
+  }
+  SECTION("struct equality expression")
+  {
+    const auto struct_equal = equal_exprt{symbol_expr, symbol_expr};
+    const auto bv_equal = equal_exprt{symbol_expr_as_bv, symbol_expr_as_bv};
+    REQUIRE(test.struct_encoding.encode(struct_equal) == bv_equal);
+  }
+  SECTION("expression for a struct from (single item) list of components")
+  {
+    const auto dozen = from_integer(12, signedbv_typet{32});
+    const struct_exprt struct_expr{{dozen}, struct_tag};
+    REQUIRE(test.struct_encoding.encode(struct_expr) == dozen);
+  }
+}
