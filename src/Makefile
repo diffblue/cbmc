@@ -174,17 +174,17 @@ glucose-download:
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@$(RM) $(glucose_rev).tar.gz
 
-cadical_release = rel-1.4.1
+cadical_release = rel-1.5.3
 cadical-download:
 	@echo "Downloading CaDiCaL $(cadical_release)"
 	@$(DOWNLOADER) https://github.com/arminbiere/cadical/archive/$(cadical_release).tar.gz
 	@$(TAR) xfz $(cadical_release).tar.gz
 	@rm -Rf ../cadical
 	@mv cadical-$(cadical_release) ../cadical
-	@(cd ../cadical; patch -p1 < ../scripts/cadical-1.4.1-patch)
+	@(cd ../cadical; patch -p1 < ../scripts/cadical-1.5.3-patch)
 	@(cd ../cadical && ./configure)
-  # Need to rename VERSION so that it isn't picked up by `#include<version>` on
-  # macOS which is case insensitive
+	# Need to rename VERSION so that it isn't picked up by `#include<version>` on
+	# macOS which is case insensitive
 	@(cd ../cadical && mv VERSION VERSION.txt)
 	@$(RM) $(cadical_release).tar.gz
 
