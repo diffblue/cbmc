@@ -32,7 +32,10 @@ typet struct_encodingt::encode(typet type) const
     work_queue.pop();
     if(const auto struct_tag = type_try_dynamic_cast<struct_tag_typet>(current))
     {
-      current = bv_typet{(*boolbv_width)(*struct_tag)};
+      const auto width = (*boolbv_width)(*struct_tag);
+      if(width == 0)
+        UNIMPLEMENTED_FEATURE("support for zero bit width structs.");
+      current = bv_typet{width};
     }
     if(const auto array = type_try_dynamic_cast<array_typet>(current))
     {
@@ -44,6 +47,9 @@ typet struct_encodingt::encode(typet type) const
 
 static exprt encode(const struct_exprt &struct_expr)
 {
+  INVARIANT(
+    !struct_expr.operands().empty(),
+    "empty structs may not be encoded into SMT terms.");
   if(struct_expr.operands().size() == 1)
     return struct_expr.operands().front();
   return concatenation_exprt{struct_expr.operands(), struct_expr.type()};
