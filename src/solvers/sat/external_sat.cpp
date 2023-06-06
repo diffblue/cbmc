@@ -85,7 +85,7 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
       if(parts.size() < 2)
       {
         log.error() << "external SAT solver has provided an unexpected "
-                       "response in results.\nUnexpected reponse: "
+                       "response in results.\nUnexpected response: "
                     << line << messaget::eom;
         return resultt::P_ERROR;
       }
