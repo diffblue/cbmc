@@ -10,7 +10,7 @@ var classis__fresh__baset =
     [ "get_memmap_type", "classis__fresh__baset.html#ac2d786a36536aa330d2aaf66e32890c5", null ],
     [ "update_ensures", "classis__fresh__baset.html#afd4eff3eca05fc2e838b4ec6be739b6f", null ],
     [ "update_fn_call", "classis__fresh__baset.html#a5ab7ca3a62fdcce4d6976f41c2138c35", null ],
-    [ "update_requires", "classis__fresh__baset.html#aa4786680d08387dfbed752d69593fbe3", null ],
+    [ "update_requires", "classis__fresh__baset.html#a842afdfba2dba6d309c2296ce84501eb", null ],
     [ "ensures_fn_name", "classis__fresh__baset.html#a5ae878d139b6caff7b642e1e722c4a8b", null ],
     [ "fun_id", "classis__fresh__baset.html#a3a3209f246b05a50171aaaaa61dddf22", null ],
     [ "goto_model", "classis__fresh__baset.html#acc7f8f46ddcd4e9c41680b291d625586", null ],
