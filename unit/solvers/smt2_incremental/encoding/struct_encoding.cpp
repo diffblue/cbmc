@@ -3,6 +3,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
@@ -107,6 +108,47 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     const concatenation_exprt expected_result{
       {green_ham.symbol_expr(), forty_two, minus_one}, bv_typet{72}};
     REQUIRE(test.struct_encoding.encode(struct_expr) == expected_result);
+  }
+  SECTION("member expression selecting a data member of a struct")
+  {
+    const symbolt breakfast{"breakfast", struct_tag, ID_C};
+    test.symbol_table.insert(breakfast);
+    SECTION("First member")
+    {
+      const typet field_type = signedbv_typet{32};
+      const exprt zero = from_integer(0, field_type);
+      const exprt input = equal_exprt{
+        zero, member_exprt{breakfast.symbol_expr(), "green", field_type}};
+      const exprt expected = equal_exprt{
+        zero,
+        extractbits_exprt{
+          symbol_exprt{"breakfast", bv_typet{72}}, 71, 40, field_type}};
+      REQUIRE(test.struct_encoding.encode(input) == expected);
+    }
+    SECTION("Second member")
+    {
+      const typet field_type = unsignedbv_typet{16};
+      const exprt dozen = from_integer(12, field_type);
+      const exprt input = equal_exprt{
+        dozen, member_exprt{breakfast.symbol_expr(), "eggs", field_type}};
+      const exprt expected = equal_exprt{
+        dozen,
+        extractbits_exprt{
+          symbol_exprt{"breakfast", bv_typet{72}}, 39, 24, field_type}};
+      REQUIRE(test.struct_encoding.encode(input) == expected);
+    }
+    SECTION("Third member")
+    {
+      const typet field_type = signedbv_typet{24};
+      const exprt two = from_integer(2, field_type);
+      const exprt input = equal_exprt{
+        two, member_exprt{breakfast.symbol_expr(), "ham", field_type}};
+      const exprt expected = equal_exprt{
+        two,
+        extractbits_exprt{
+          symbol_exprt{"breakfast", bv_typet{72}}, 23, 0, field_type}};
+      REQUIRE(test.struct_encoding.encode(input) == expected);
+    }
   }
 }
 

@@ -10,6 +10,7 @@
 
 class namespacet;
 class boolbv_widtht;
+class member_exprt;
 
 /// Encodes struct types/values into non-struct expressions/types.
 class struct_encodingt final
@@ -24,6 +25,9 @@ public:
 
 private:
   std::unique_ptr<boolbv_widtht> boolbv_width;
+  std::reference_wrapper<const namespacet> ns;
+
+  exprt encode_member(const member_exprt &member_expr) const;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_STRUCT_ENCODING_H
