@@ -71,6 +71,13 @@ TEST_CASE("struct encoding of types", "[core][smt2_incremental]")
   }
 }
 
+exprt make_member_name_expression(const irep_idt component_name)
+{
+  exprt result{ID_member_name};
+  result.set(ID_component_name, component_name);
+  return result;
+}
+
 TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
 {
   const struct_union_typet::componentst component_types{
@@ -148,6 +155,168 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         extractbits_exprt{
           symbol_exprt{"breakfast", bv_typet{72}}, 23, 0, field_type}};
       REQUIRE(test.struct_encoding.encode(input) == expected);
+    }
+  }
+  SECTION("with expression producing new struct with substituted member")
+  {
+    SECTION("First member")
+    {
+      const with_exprt with{
+        symbol_expr,
+        make_member_name_expression("green"),
+        from_integer(0, signedbv_typet{32})};
+      const concatenation_exprt expected{
+        {from_integer(0, signedbv_typet{32}),
+         extractbits_exprt{symbol_expr_as_bv, 39, 24, unsignedbv_typet{16}},
+         extractbits_exprt{symbol_expr_as_bv, 23, 0, signedbv_typet{24}}},
+        bv_typet{72}};
+      REQUIRE(test.struct_encoding.encode(with) == expected);
+    }
+    SECTION("Second member")
+    {
+      const with_exprt with{
+        symbol_expr,
+        make_member_name_expression("eggs"),
+        from_integer(0, unsignedbv_typet{16})};
+      const concatenation_exprt expected{
+        {extractbits_exprt{symbol_expr_as_bv, 71, 40, signedbv_typet{32}},
+         from_integer(0, unsignedbv_typet{16}),
+         extractbits_exprt{symbol_expr_as_bv, 23, 0, signedbv_typet{24}}},
+        bv_typet{72}};
+      REQUIRE(test.struct_encoding.encode(with) == expected);
+    }
+    SECTION("Third member")
+    {
+      const with_exprt with{
+        symbol_expr,
+        make_member_name_expression("ham"),
+        from_integer(0, signedbv_typet{24})};
+      const concatenation_exprt expected{
+        {extractbits_exprt{symbol_expr_as_bv, 71, 40, signedbv_typet{32}},
+         extractbits_exprt{symbol_expr_as_bv, 39, 24, unsignedbv_typet{16}},
+         from_integer(0, signedbv_typet{24})},
+        bv_typet{72}};
+      REQUIRE(test.struct_encoding.encode(with) == expected);
+    }
+    SECTION("First and second members")
+    {
+      const concatenation_exprt expected{
+        {from_integer(0, signedbv_typet{32}),
+         from_integer(1, unsignedbv_typet{16}),
+         extractbits_exprt{symbol_expr_as_bv, 23, 0, signedbv_typet{24}}},
+        bv_typet{72}};
+      SECTION("Operands in field order")
+      {
+        with_exprt with_in_order{
+          symbol_expr,
+          make_member_name_expression("green"),
+          from_integer(0, signedbv_typet{32})};
+        with_in_order.operands().push_back(make_member_name_expression("eggs"));
+        with_in_order.operands().push_back(
+          from_integer(1, unsignedbv_typet{16}));
+        REQUIRE(test.struct_encoding.encode(with_in_order) == expected);
+      }
+      SECTION("Operands in reverse order vs fields")
+      {
+        with_exprt with_reversed{
+          symbol_expr,
+          make_member_name_expression("eggs"),
+          from_integer(1, unsignedbv_typet{16})};
+        with_reversed.operands().push_back(
+          make_member_name_expression("green"));
+        with_reversed.operands().push_back(from_integer(0, signedbv_typet{32}));
+        REQUIRE(test.struct_encoding.encode(with_reversed) == expected);
+      }
+    }
+    SECTION("First and third members")
+    {
+      const concatenation_exprt expected{
+        {from_integer(0, signedbv_typet{32}),
+         extractbits_exprt{symbol_expr_as_bv, 39, 24, unsignedbv_typet{16}},
+         from_integer(1, signedbv_typet{24})},
+        bv_typet{72}};
+      SECTION("Operands in field order")
+      {
+        with_exprt with_in_order{
+          symbol_expr,
+          make_member_name_expression("green"),
+          from_integer(0, signedbv_typet{32})};
+        with_in_order.operands().push_back(make_member_name_expression("ham"));
+        with_in_order.operands().push_back(from_integer(1, signedbv_typet{24}));
+        REQUIRE(test.struct_encoding.encode(with_in_order) == expected);
+      }
+      SECTION("Operands in reverse order vs fields")
+      {
+        with_exprt with_reversed{
+          symbol_expr,
+          make_member_name_expression("ham"),
+          from_integer(1, signedbv_typet{24})};
+        with_reversed.operands().push_back(
+          make_member_name_expression("green"));
+        with_reversed.operands().push_back(from_integer(0, signedbv_typet{32}));
+        REQUIRE(test.struct_encoding.encode(with_reversed) == expected);
+      }
+    }
+    SECTION("Second and third members")
+    {
+      const concatenation_exprt expected{
+        {extractbits_exprt{symbol_expr_as_bv, 71, 40, signedbv_typet{32}},
+         from_integer(0, unsignedbv_typet{16}),
+         from_integer(1, signedbv_typet{24})},
+        bv_typet{72}};
+      SECTION("Operands in field order")
+      {
+        with_exprt with_in_order{
+          symbol_expr,
+          make_member_name_expression("eggs"),
+          from_integer(0, unsignedbv_typet{16})};
+        with_in_order.operands().push_back(make_member_name_expression("ham"));
+        with_in_order.operands().push_back(from_integer(1, signedbv_typet{24}));
+        REQUIRE(test.struct_encoding.encode(with_in_order) == expected);
+      }
+      SECTION("Operands in reverse order vs fields")
+      {
+        with_exprt with_reversed{
+          symbol_expr,
+          make_member_name_expression("ham"),
+          from_integer(1, signedbv_typet{24})};
+        with_reversed.operands().push_back(make_member_name_expression("eggs"));
+        with_reversed.operands().push_back(
+          from_integer(0, unsignedbv_typet{16}));
+        REQUIRE(test.struct_encoding.encode(with_reversed) == expected);
+      }
+    }
+    SECTION("All members")
+    {
+      const concatenation_exprt expected{
+        {from_integer(1, signedbv_typet{32}),
+         from_integer(2, unsignedbv_typet{16}),
+         from_integer(3, signedbv_typet{24})},
+        bv_typet{72}};
+      SECTION("Operands in field order")
+      {
+        with_exprt with{
+          symbol_expr,
+          make_member_name_expression("green"),
+          from_integer(1, signedbv_typet{32})};
+        with.operands().push_back(make_member_name_expression("eggs"));
+        with.operands().push_back(from_integer(2, unsignedbv_typet{16}));
+        with.operands().push_back(make_member_name_expression("ham"));
+        with.operands().push_back(from_integer(3, signedbv_typet{24}));
+        REQUIRE(test.struct_encoding.encode(with) == expected);
+      }
+      SECTION("Operands out of order vs fields")
+      {
+        with_exprt with{
+          symbol_expr,
+          make_member_name_expression("eggs"),
+          from_integer(2, unsignedbv_typet{16})};
+        with.operands().push_back(make_member_name_expression("ham"));
+        with.operands().push_back(from_integer(3, signedbv_typet{24}));
+        with.operands().push_back(make_member_name_expression("green"));
+        with.operands().push_back(from_integer(1, signedbv_typet{32}));
+        REQUIRE(test.struct_encoding.encode(with) == expected);
+      }
     }
   }
 }
