@@ -3,8 +3,10 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
@@ -31,6 +33,8 @@ static mp_integer max_int(const std::size_t bits)
 
 TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
 {
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
   optionalt<smt_termt> input_term;
   optionalt<exprt> expected_result;
 
@@ -90,7 +94,7 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     "\" from \"" + smt_to_smt2_string(*input_term) + "\"")
   {
     REQUIRE(
-      construct_value_expr_from_smt(*input_term, expected_result->type()) ==
+      construct_value_expr_from_smt(*input_term, expected_result->type(), ns) ==
       *expected_result);
   }
 }
@@ -99,6 +103,8 @@ TEST_CASE(
   "Invariant violations in value expr construction from smt.",
   "[core][smt2_incremental]")
 {
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
   optionalt<smt_termt> input_term;
   optionalt<typet> input_type;
   std::string invariant_reason;
@@ -145,8 +151,9 @@ TEST_CASE(
   SECTION(invariant_reason)
   {
     const cbmc_invariants_should_throwt invariants_throw;
+
     REQUIRE_THROWS_MATCHES(
-      construct_value_expr_from_smt(*input_term, *input_type),
+      construct_value_expr_from_smt(*input_term, *input_type, ns),
       invariant_failedt,
       invariant_failure_containing(invariant_reason));
   }
