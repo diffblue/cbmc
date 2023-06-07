@@ -111,10 +111,10 @@ void find_is_fresh_calls_visitort::operator()(goto_programt &prog)
   }
 }
 
-void is_fresh_baset::update_requires(goto_programt &requires)
+void is_fresh_baset::update_requires(goto_programt &requires_)
 {
   find_is_fresh_calls_visitort requires_visitor;
-  requires_visitor(requires);
+  requires_visitor(requires_);
   for(auto it : requires_visitor.is_fresh_calls())
   {
     create_requires_fn_call(it);

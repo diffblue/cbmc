@@ -33,7 +33,7 @@ public:
   {
   }
 
-  void update_requires(goto_programt &requires);
+  void update_requires(goto_programt &requires_);
   void update_ensures(goto_programt &ensures);
 
   virtual void create_declarations() = 0;

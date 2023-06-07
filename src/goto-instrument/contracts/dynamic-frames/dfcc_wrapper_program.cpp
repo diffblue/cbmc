@@ -553,10 +553,14 @@ void dfcc_wrapper_programt::encode_requires_clauses()
   // translate each requires clause
   for(const auto &r : contract_code_type.c_requires())
   {
-    exprt requires = to_lambda_expr(r).application(contract_lambda_parameters);
-    requires.add_source_location() = r.source_location();
-    if(has_subexpr(requires, ID_exists) || has_subexpr(requires, ID_forall))
-      add_quantified_variable(goto_model.symbol_table, requires, language_mode);
+    exprt requires_lmbd =
+      to_lambda_expr(r).application(contract_lambda_parameters);
+    requires_lmbd.add_source_location() = r.source_location();
+    if(
+      has_subexpr(requires_lmbd, ID_exists) ||
+      has_subexpr(requires_lmbd, ID_forall))
+      add_quantified_variable(
+        goto_model.symbol_table, requires_lmbd, language_mode);
 
     source_locationt sl(r.source_location());
     if(statement_type == ID_assert)
@@ -566,7 +570,7 @@ void dfcc_wrapper_programt::encode_requires_clauses()
         "Check requires clause of contract " + id2string(contract_symbol.name) +
         " for function " + id2string(wrapper_id));
     }
-    codet requires_statement(statement_type, {std::move(requires)}, sl);
+    codet requires_statement(statement_type, {std::move(requires_lmbd)}, sl);
     converter.goto_convert(requires_statement, requires_program, language_mode);
   }
 
