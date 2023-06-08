@@ -31,10 +31,39 @@ static mp_integer max_int(const std::size_t bits)
   return power2(bits) - 1;
 }
 
+static type_symbolt make_c_enum_type_symbol(std::size_t underlying_size)
+{
+  const signedbv_typet underlying_type{underlying_size};
+  c_enum_typet enum_type{underlying_type};
+
+  auto &members = enum_type.add(ID_body).get_sub();
+
+  for(unsigned int i = 0; i < 20; ++i)
+  {
+    c_enum_typet::c_enum_membert member;
+    member.set_identifier("V" + std::to_string(i));
+    member.set_base_name("V" + std::to_string(i));
+    member.set_value(integer2bvrep(i, underlying_size));
+    members.push_back(member);
+  }
+  return type_symbolt{"my_enum", enum_type, ID_C};
+}
+
+static symbolt make_c_enum_tag_instance_symbol(const symbolt &enum_type_symbol)
+{
+  const c_enum_tag_typet enum_tag{enum_type_symbol.name};
+  return symbolt{"my_enum_value", enum_tag, ID_C};
+}
+
 TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
 {
-  const symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   const namespacet ns{symbol_table};
+  const symbolt enum_type_symbol = make_c_enum_type_symbol(42);
+  const symbolt enum_tag_value_symbol =
+    make_c_enum_tag_instance_symbol(enum_type_symbol);
+  symbol_table.insert(enum_type_symbol);
+  symbol_table.insert(enum_tag_value_symbol);
   optionalt<smt_termt> input_term;
   optionalt<exprt> expected_result;
 
@@ -66,7 +95,7 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
        from_integer(-1, signedbv_typet{(bits)})}
   // clang-format on
 
-  std::tie(input_term, expected_result) = GENERATE(
+  std::tie(input_term, expected_result) = GENERATE_REF(
     rowt{smt_bool_literal_termt{true}, true_exprt{}},
     rowt{smt_bool_literal_termt{false}, false_exprt{}},
     rowt{smt_bit_vector_constant_termt{0, 8}, from_integer(0, c_bool_typet(8))},
@@ -81,6 +110,9 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
       smt_bit_vector_constant_termt{12, 64},
       constant_exprt(
         integer2bvrep(12, 64), pointer_typet(void_type(), 64 /* bits */))},
+    rowt{
+      smt_bit_vector_constant_termt{2, 42},
+      constant_exprt{"2", c_enum_tag_typet{enum_type_symbol.name}}},
     UNSIGNED_BIT_VECTOR_TESTS(8),
     SIGNED_BIT_VECTOR_TESTS(8),
     UNSIGNED_BIT_VECTOR_TESTS(16),
@@ -103,14 +135,19 @@ TEST_CASE(
   "Invariant violations in value expr construction from smt.",
   "[core][smt2_incremental]")
 {
-  const symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   const namespacet ns{symbol_table};
+  const symbolt enum_type_symbol = make_c_enum_type_symbol(5);
+  const symbolt enum_tag_value_symbol =
+    make_c_enum_tag_instance_symbol(enum_type_symbol);
+  symbol_table.insert(enum_type_symbol);
+  symbol_table.insert(enum_tag_value_symbol);
   optionalt<smt_termt> input_term;
   optionalt<typet> input_type;
   std::string invariant_reason;
 
   using rowt = std::tuple<smt_termt, typet, std::string>;
-  std::tie(input_term, input_type, invariant_reason) = GENERATE(
+  std::tie(input_term, input_type, invariant_reason) = GENERATE_REF(
     rowt{
       smt_bool_literal_termt{true},
       unsignedbv_typet{16},
@@ -147,7 +184,17 @@ TEST_CASE(
     rowt{
       smt_bit_vector_constant_termt{0, 16},
       pointer_typet{unsigned_int_type(), 0},
-      "Width of smt bit vector term must match the width of pointer type"});
+      "Width of smt bit vector term must match the width of pointer type"},
+    rowt{
+      smt_bit_vector_constant_termt{2, 42},
+      c_enum_tag_typet{"foo"},
+      "we are assuming that a name exists in the namespace when this function "
+      "is called - identifier foo was not found"},
+    rowt{
+      smt_bit_vector_constant_termt{8796093022208ul, 64},
+      enum_tag_value_symbol.type,
+      "Width of smt bit vector term must match the width of bit vector "
+      "underlying type of the original c_enum type."});
   SECTION(invariant_reason)
   {
     const cbmc_invariants_should_throwt invariants_throw;
