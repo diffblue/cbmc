@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts --enforce-contract decr
+^\[decr.loop_assigns.\d+] line \d+ Check assigns clause inclusion for loop decr.0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that function parameters are automatically added to the function
+write set when they are assigned from the body of a loop.
