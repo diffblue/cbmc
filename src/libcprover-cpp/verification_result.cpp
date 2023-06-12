@@ -6,6 +6,7 @@
 
 #include "verification_result.h"
 
+#include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 
@@ -146,6 +147,24 @@ verification_resultt::get_property_status(const std::string &property_id) const
     return prop_statust::PASS;
   case property_statust::UNKNOWN:
     return prop_statust::UNKNOWN;
+  }
+  UNREACHABLE;
+}
+
+// FOTIS' note: Modelled after `result_to_exit_code` in
+// `src/goto-checker/properties.cpp`.
+int verifier_result_to_exit_code(verifier_resultt result)
+{
+  switch(result)
+  {
+  case verifier_resultt::PASS:
+    return CPROVER_EXIT_VERIFICATION_SAFE;
+  case verifier_resultt::FAIL:
+    return CPROVER_EXIT_VERIFICATION_UNSAFE;
+  case verifier_resultt::ERROR:
+    return CPROVER_EXIT_INTERNAL_ERROR;
+  case verifier_resultt::UNKNOWN:
+    return CPROVER_EXIT_VERIFICATION_INCONCLUSIVE;
   }
   UNREACHABLE;
 }

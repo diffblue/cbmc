@@ -7,6 +7,7 @@
 #include <util/version.h>
 
 #include <libcprover-cpp/api_options.h>
+#include <libcprover-cpp/verification_result.h>
 
 #include "api.h"
 
@@ -71,7 +72,7 @@ int goto_bmc_parse_optionst::doit()
   // ... and run analysis on it.
   auto result = api.run_verifier();
 
-  return CPROVER_EXIT_SUCCESS;
+  return verifier_result_to_exit_code(result->final_result());
 }
 
 void goto_bmc_parse_optionst::help()

@@ -80,4 +80,8 @@ private:
   std::unique_ptr<verification_result_implt> _impl;
 };
 
+// Allow translation of `verifier_resultt` into a CPROVER_EXIT_CODES (so that
+// they can be consistent across various tools using the API).
+int verifier_result_to_exit_code(verifier_resultt result);
+
 #endif // CPROVER_GOTO_CHECKER_VERIFICATION_RESULT_H
