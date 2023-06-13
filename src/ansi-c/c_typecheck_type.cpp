@@ -1270,7 +1270,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // we also track min and max to find a nice base type
   mp_integer value=0, min_value=0, max_value=0;
 
-  std::list<c_enum_typet::c_enum_membert> enum_members;
+  std::vector<c_enum_typet::c_enum_membert> enum_members;
+  enum_members.reserve(as_expr.operands().size());
 
   // We need to determine a width, and a signedness
   // to obtain an 'underlying type'.
@@ -1413,13 +1414,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   enum_tag_symbol.is_file_local=true;
   enum_tag_symbol.base_name=base_name;
 
-  // throw in the enum members as 'body'
-  irept::subt &body=enum_tag_symbol.type.add(ID_body).get_sub();
-
-  for(const auto &member : enum_members)
-    body.push_back(member);
-
   enum_tag_symbol.type.add_subtype() = underlying_type;
+
+  // throw in the enum members as 'body'
+  to_c_enum_type(enum_tag_symbol.type).members() = std::move(enum_members);
 
   // is it in the symbol table already?
   symbolt *existing_symbol = symbol_table.get_writeable(identifier);

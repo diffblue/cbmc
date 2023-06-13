@@ -36,7 +36,8 @@ static type_symbolt make_c_enum_type_symbol(std::size_t underlying_size)
   const signedbv_typet underlying_type{underlying_size};
   c_enum_typet enum_type{underlying_type};
 
-  auto &members = enum_type.add(ID_body).get_sub();
+  auto &members = enum_type.members();
+  members.reserve(20);
 
   for(unsigned int i = 0; i < 20; ++i)
   {
