@@ -337,7 +337,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Applies loop contracts transformations to the given GOTO function, using the given cfg_info instance to drive the transformation. </p>
 <dl class="section pre"><dt>Precondition</dt><dd>Instructions of the function must already have been instrumented for DFCC using the same cfg_info. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01219">1219</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01238">1238</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -512,7 +512,7 @@ Static Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00562">562</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00581">581</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -584,7 +584,7 @@ Static Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00609">609</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00628">628</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -637,7 +637,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Instrument the <code>lhs</code> of an <code>ASSIGN lhs := rhs</code> instruction by adding an inclusion check of <code>lhs</code> in <code>write_set</code>. </p>
 <p>If <a class="el" href="classdfcc__instrumentt.html#ad021542da17241ed9c9bd924d0dff581">is_dead_object_update</a> returns a successful match, the matched pointer expression is removed from <code>write_set</code>. If <code>rhs</code> is a <code>side_effect_expr(ID_allocate)</code>, the allocated pointer gets added to the <code>write_set</code>. </p><dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to an <code>ASSIGN</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00756">756</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00775">775</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -684,7 +684,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Adds the <code>write_set</code> as extra argument to a function of function pointer call instruction. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00890">890</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00909">909</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -739,10 +739,10 @@ Static Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><a class="code" href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">insert_record_dead_call</a>(...);</div>
 <div class="line">----</div>
 <div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a> x;</div>
-<div class="ttc" id="aclassdfcc__instrumentt_html_ac931dd3f011d2dd6f0fe3bed1f4dc035"><div class="ttname"><a href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">dfcc_instrumentt::insert_record_dead_call</a></div><div class="ttdeci">void insert_record_dead_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record the death of a local symbol and inserts it in the goto_program at ...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00609">dfcc_instrument.cpp:609</a></div></div>
+<div class="ttc" id="aclassdfcc__instrumentt_html_ac931dd3f011d2dd6f0fe3bed1f4dc035"><div class="ttname"><a href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">dfcc_instrumentt::insert_record_dead_call</a></div><div class="ttdeci">void insert_record_dead_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record the death of a local symbol and inserts it in the goto_program at ...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00628">dfcc_instrument.cpp:628</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba11fd9ca455f92c69c084484d5cd803c2">DEAD</a></div><div class="ttdeci">@ DEAD</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00047">goto_program.h:47</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00640">640</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00659">659</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -795,7 +795,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Inserts deallocation checks and a write set update before a call to the __CPROVER_deallocate function. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL __CPROVER_deallocate</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00918">918</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00937">937</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -850,10 +850,10 @@ Static Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a> x;</div>
 <div class="line">----</div>
 <div class="line"><a class="code" href="classdfcc__instrumentt.html#ae6235992c25224fb6ba891842b875a32">insert_add_decl_call</a>(...);</div>
-<div class="ttc" id="aclassdfcc__instrumentt_html_ae6235992c25224fb6ba891842b875a32"><div class="ttname"><a href="classdfcc__instrumentt.html#ae6235992c25224fb6ba891842b875a32">dfcc_instrumentt::insert_add_decl_call</a></div><div class="ttdeci">void insert_add_decl_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record a locally allocated symbol and inserts it in the goto_program at t...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00562">dfcc_instrument.cpp:562</a></div></div>
+<div class="ttc" id="aclassdfcc__instrumentt_html_ae6235992c25224fb6ba891842b875a32"><div class="ttname"><a href="classdfcc__instrumentt.html#ae6235992c25224fb6ba891842b875a32">dfcc_instrumentt::insert_add_decl_call</a></div><div class="ttdeci">void insert_add_decl_call(const irep_idt &amp;function_id, const exprt &amp;write_set, const symbol_exprt &amp;symbol_expr, goto_programt::targett &amp;target, goto_programt &amp;goto_program)</div><div class="ttdoc">Generates a guarded call to record a locally allocated symbol and inserts it in the goto_program at t...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__instrument_8cpp_source.html#l00581">dfcc_instrument.cpp:581</a></div></div>
 <div class="ttc" id="agoto__program_8h_html_a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8"><div class="ttname"><a href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebac511d45de1f5895f447fbfd7a0741cd8">DECL</a></div><div class="ttdeci">@ DECL</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00046">goto_program.h:46</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00592">592</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00611">611</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -900,7 +900,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Before calling a function pointer, performs a dynamic lookup into the map of instrumented function provided by <a class="el" href="classdfcc__libraryt.html#a81eff42e4e9c47cc28a08217c62e467b">dfcc_libraryt::get_instrumented_functions_map_symbol</a>, and passes the write_set parameter to the function pointer only if it points to a function known to be instrumented and hence able to accept this parameter. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL</code> instruction where the function expression is not a <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00840">840</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00859">859</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1001,7 +1001,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Instruments a <code>CALL lhs := function(params)</code> instruction by adding an inclusion check of <code>lhs</code> in <code>write_set</code>, and passing <code>write_set</code> as an extra argument to the function call. </p>
 <dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to a <code>CALL</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00987">987</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01006">1006</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1252,7 +1252,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00499">499</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00518">518</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1310,7 +1310,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 
 <p>Instruments the LHS of an assignment instruction instruction by adding an inclusion check of <code>lhs</code> in <code>write_set</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00655">655</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00674">674</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1363,7 +1363,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 <p>Instruments a <code>OTHER statement;</code> instruction. </p>
 <p>OTHER instructions can be an array_set, array_copy, array_replace or a havoc_object instruction. </p><dl class="section pre"><dt>Precondition</dt><dd><code>target</code> points to an <code>OTHER</code> instruction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01021">1021</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l01040">1040</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>
@@ -1460,7 +1460,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 <p>Returns a pointer to the <code>ptr</code> expression if the pattern was matched, returns <code>nullptr</code> otherwise.</p>
 <p>Returns <code>ptr</code> if the pattern was matched, nullptr otherwise. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00737">737</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8cpp_source.html#l00756">756</a> of file <a class="el" href="dfcc__instrument_8cpp_source.html">dfcc_instrument.cpp</a>.</p>
 
 </div>
 </div>

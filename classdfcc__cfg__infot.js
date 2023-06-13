@@ -6,6 +6,7 @@ var classdfcc__cfg__infot =
     [ "get_loops_toposorted", "classdfcc__cfg__infot.html#a1f181c03819a3b9cb3de5b39b222d021", null ],
     [ "get_outer_loop_identifier", "classdfcc__cfg__infot.html#a79ca1e4fadee086cf1df8d282f12e76b", null ],
     [ "get_outer_write_set", "classdfcc__cfg__infot.html#abc6b5481e5f664eb063a9a001b8a0df6", null ],
+    [ "get_top_level_tracked", "classdfcc__cfg__infot.html#a250c7a87b86ef219653e97c56b543ffa", null ],
     [ "get_top_level_write_set", "classdfcc__cfg__infot.html#ad724020422e40bc1487ba7408ea41beb", null ],
     [ "get_tracked_set", "classdfcc__cfg__infot.html#a879fae9bc403c0071bbb25509bf3c486", null ],
     [ "get_write_set", "classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378", null ],

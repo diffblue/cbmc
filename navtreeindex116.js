@@ -1,5 +1,6 @@
 var NAVTREEINDEX116 =
 {
+"namespacerust_1_1behavior.html":[7,0,10,0],
 "namespacerust_1_1behavior.html#a21ff5bf9e7f38edc407311580a62acfa":[7,0,10,0,0],
 "namespaces.html":[7,0],
 "narrow_8h.html":[9,0,2,31,141],
@@ -248,6 +249,5 @@ var NAVTREEINDEX116 =
 "path__storage_8h.html#a346d05bffa23acecd5db1b2950283cbc":[9,0,2,16,30,5],
 "path__storage_8h.html#a726016d06494eb33d2d1b36003b41e38":[9,0,2,16,30,7],
 "path__storage_8h.html#a975a28ab1bcc46ea0fa777c4f1a30490":[9,0,2,16,30,6],
-"path__storage_8h.html#af3c8fb592e674d7cf2707b00107e6bd9":[9,0,2,16,30,8],
-"path__storage_8h_source.html":[9,0,2,16,30]
+"path__storage_8h.html#af3c8fb592e674d7cf2707b00107e6bd9":[9,0,2,16,30,8]
 };
