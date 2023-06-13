@@ -291,6 +291,13 @@ public:
     return top_level_write_set;
   }
 
+  /// Returns the set of top level symbols that must be tracked explicitly in
+  /// the top level write set of the function.
+  const std::unordered_set<irep_idt> &get_top_level_tracked()
+  {
+    return top_level_tracked;
+  }
+
 private:
   const irep_idt &function_id;
   goto_functiont &goto_function;

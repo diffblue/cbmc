@@ -490,6 +490,25 @@ void dfcc_instrumentt::instrument_goto_function(
     insert_record_dead_call(function_id, write_set, local_static, end, body);
   }
 
+  const code_typet &code_type = to_code_type(
+    dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
+      .type);
+  const auto &top_level_tracked = cfg_info.get_top_level_tracked();
+
+  // automatically add/remove function parameters that must be tracked in the
+  // function write set (they must be explicitly tracked if they are assigned
+  // in the body of a loop)
+  for(const auto &param : code_type.parameters())
+  {
+    const irep_idt &param_id = param.get_identifier();
+    if(top_level_tracked.find(param_id) != top_level_tracked.end())
+    {
+      symbol_exprt param_symbol{param.get_identifier(), param.type()};
+      insert_add_decl_call(function_id, write_set, param_symbol, begin, body);
+      insert_record_dead_call(function_id, write_set, param_symbol, end, body);
+    }
+  }
+
   remove_skip(body);
 
   // recalculate numbers, etc.
