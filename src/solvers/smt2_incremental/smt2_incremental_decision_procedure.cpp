@@ -16,6 +16,7 @@
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/encoding/enum_encoding.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
@@ -347,12 +348,15 @@ static optionalt<smt_termt> get_identifier(
   const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     &expression_handle_identifiers,
   const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_identifiers)
+    &expression_identifiers,
+  const namespacet &ns)
 {
-  const auto handle_find_result = expression_handle_identifiers.find(expr);
+  const exprt lowered_expr = lower_enum(expr, ns);
+  const auto handle_find_result =
+    expression_handle_identifiers.find(lowered_expr);
   if(handle_find_result != expression_handle_identifiers.cend())
     return handle_find_result->second;
-  const auto expr_find_result = expression_identifiers.find(expr);
+  const auto expr_find_result = expression_identifiers.find(lowered_expr);
   if(expr_find_result != expression_identifiers.cend())
     return expr_find_result->second;
   return {};
@@ -409,7 +413,7 @@ exprt smt2_incremental_decision_proceduret::get_expr(
       response.pretty()};
   }
   return construct_value_expr_from_smt(
-    get_value_response->pairs()[0].get().value(), type);
+    get_value_response->pairs()[0].get().value(), type, ns);
 }
 
 // This is a fall back which builds resulting expression based on getting the
@@ -446,18 +450,20 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       const auto array = get_identifier(
         index_expr->array(),
         expression_handle_identifiers,
-        expression_identifiers);
+        expression_identifiers,
+        ns);
       const auto index = get_identifier(
         index_expr->index(),
         expression_handle_identifiers,
-        expression_identifiers);
+        expression_identifiers,
+        ns);
       if(!array || !index)
         return {};
       return smt_array_theoryt::select(*array, *index);
     }
     if(
       auto identifier_descriptor = get_identifier(
-        expr, expression_handle_identifiers, expression_identifiers))
+        expr, expression_handle_identifiers, expression_identifiers, ns))
     {
       return identifier_descriptor;
     }
@@ -590,8 +596,8 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression)
 {
-  const exprt lowered =
-    struct_encoding.encode(lower_byte_operators(expression, ns));
+  const exprt lowered = struct_encoding.encode(
+    lower_enum(lower_byte_operators(expression, ns), ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     if(lowered != expression)
       debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;

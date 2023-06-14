@@ -10,10 +10,10 @@
 #include <util/std_expr.h>
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
+#include <solvers/smt2_incremental/encoding/struct_encoding.h>
 #include <solvers/smt2_incremental/object_tracking.h>
 #include <solvers/smt2_incremental/smt_is_dynamic_object.h>
 #include <solvers/smt2_incremental/smt_object_size.h>
-#include <solvers/smt2_incremental/struct_encoding.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 #include <solvers/stack_decision_procedure.h>
 

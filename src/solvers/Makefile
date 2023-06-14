@@ -210,7 +210,8 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2_incremental/smt_solver_process.cpp \
       smt2_incremental/smt_to_smt2_string.cpp \
       smt2_incremental/smt2_incremental_decision_procedure.cpp \
-      smt2_incremental/struct_encoding.cpp \
+      smt2_incremental/encoding/struct_encoding.cpp \
+      smt2_incremental/encoding/enum_encoding.cpp \
       smt2_incremental/theories/smt_array_theory.cpp \
       smt2_incremental/theories/smt_bit_vector_theory.cpp \
       smt2_incremental/theories/smt_core_theory.cpp \

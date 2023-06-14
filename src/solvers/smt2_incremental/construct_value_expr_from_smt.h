@@ -18,6 +18,9 @@ class typet;
 /// \param type_to_construct
 ///   The type which the constructed expr returned is expected to have. This
 ///   type must be compatible with the sort of \p value_term.
+/// \param ns
+///   The namespace to resolve `c_enum_tag_type` to reconstruct the correct
+///   type of enum values in the trace.
 /// \note The type is required separately in order to carry out this conversion,
 /// because the smt value term does not contain all the required information.
 /// For example an 8 bit, bit vector with a value of 255 could be used to
@@ -26,6 +29,7 @@ class typet;
 /// using the type.
 exprt construct_value_expr_from_smt(
   const smt_termt &value_term,
-  const typet &type_to_construct);
+  const typet &type_to_construct,
+  const namespacet &ns);
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_CONSTRUCT_VALUE_EXPR_FROM_SMT_H

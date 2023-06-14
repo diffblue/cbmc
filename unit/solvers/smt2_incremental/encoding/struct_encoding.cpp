@@ -6,7 +6,7 @@
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
-#include <solvers/smt2_incremental/struct_encoding.h>
+#include <solvers/smt2_incremental/encoding/struct_encoding.h>
 #include <testing-utils/use_catch.h>
 
 struct struct_encoding_test_environmentt

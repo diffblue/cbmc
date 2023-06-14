@@ -1,0 +1,14 @@
+CORE
+simple.c
+--trace
+Passing problem to incremental SMT2 solving
+line 15 Variable e is V1, so this should fail: FAILURE
+e=/\*enum\*/V0 \(00000000 00000000 00000000 00000000\)
+e=/\*enum\*/V1 \(00000000 00000000 00000000 00000001\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that we support enum values and traces for a trivial example. At the
+time of adding the regression test, this exercised the conversion code specific
+to c_enum_tag_typet.
