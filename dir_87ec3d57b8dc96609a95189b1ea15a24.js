@@ -1,6 +1,7 @@
 var dir_87ec3d57b8dc96609a95189b1ea15a24 =
 [
     [ "ast", "dir_944fd70a76fefe8830c07ff136e57176.html", "dir_944fd70a76fefe8830c07ff136e57176" ],
+    [ "encoding", "dir_395f14ef3e680ed8090b4e0c95aba18d.html", "dir_395f14ef3e680ed8090b4e0c95aba18d" ],
     [ "theories", "dir_9be549c1edc716e2e65d6df6db882e7e.html", "dir_9be549c1edc716e2e65d6df6db882e7e" ],
     [ "construct_value_expr_from_smt.cpp", "construct__value__expr__from__smt_8cpp.html", "construct__value__expr__from__smt_8cpp" ],
     [ "construct_value_expr_from_smt.h", "construct__value__expr__from__smt_8h.html", "construct__value__expr__from__smt_8h" ],
@@ -34,10 +35,6 @@ var dir_87ec3d57b8dc96609a95189b1ea15a24 =
     ] ],
     [ "smt_to_smt2_string.cpp", "smt__to__smt2__string_8cpp.html", "smt__to__smt2__string_8cpp" ],
     [ "smt_to_smt2_string.h", "smt__to__smt2__string_8h.html", "smt__to__smt2__string_8h" ],
-    [ "struct_encoding.cpp", "struct__encoding_8cpp.html", "struct__encoding_8cpp" ],
-    [ "struct_encoding.h", "struct__encoding_8h.html", [
-      [ "struct_encodingt", "classstruct__encodingt.html", "classstruct__encodingt" ]
-    ] ],
     [ "type_size_mapping.cpp", "type__size__mapping_8cpp.html", "type__size__mapping_8cpp" ],
     [ "type_size_mapping.h", "type__size__mapping_8h.html", "type__size__mapping_8h" ],
     [ "type_traits.h", "type__traits_8h.html", "type__traits_8h" ]

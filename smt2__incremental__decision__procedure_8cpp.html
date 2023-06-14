@@ -108,6 +108,7 @@ $(document).ready(function(){initNavTree('smt2__incremental__decision__procedure
 <code>#include &lt;<a class="el" href="smt__terms_8h_source.html">solvers/smt2_incremental/ast/smt_terms.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="construct__value__expr__from__smt_8h_source.html">solvers/smt2_incremental/construct_value_expr_from_smt.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="convert__expr__to__smt_8h_source.html">solvers/smt2_incremental/convert_expr_to_smt.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="enum__encoding_8h_source.html">solvers/smt2_incremental/encoding/enum_encoding.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="smt__solver__process_8h_source.html">solvers/smt2_incremental/smt_solver_process.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="smt__array__theory_8h_source.html">solvers/smt2_incremental/theories/smt_array_theory.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="smt__core__theory_8h_source.html">solvers/smt2_incremental/theories/smt_core_theory.h</a>&gt;</code><br />
@@ -119,7 +120,7 @@ $(document).ready(function(){initNavTree('smt2__incremental__decision__procedure
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__incremental__decision__procedure_8cpp__incl.svg" width="3098" height="1184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__incremental__decision__procedure_8cpp__incl.svg" width="3531" height="931"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -140,8 +141,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a95d077b08231e98d293752d4ddab5f06"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#a95d077b08231e98d293752d4ddab5f06">substitute_identifiers</a> (<a class="el" href="classexprt.html">exprt</a> expr, const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;expression_identifiers)</td></tr>
 <tr class="memdesc:a95d077b08231e98d293752d4ddab5f06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the sub expressions of <code>expr</code> which have been defined as separate functions in the smt solver, using the <code>expression_identifiers</code> map.  <a href="smt2__incremental__decision__procedure_8cpp.html#a95d077b08231e98d293752d4ddab5f06">More...</a><br /></td></tr>
 <tr class="separator:a95d077b08231e98d293752d4ddab5f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac39a0adbcad4c2c02388ed215fe82ea0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classsmt__termt.html">smt_termt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#ac39a0adbcad4c2c02388ed215fe82ea0">get_identifier</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;expression_handle_identifiers, const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;expression_identifiers)</td></tr>
-<tr class="separator:ac39a0adbcad4c2c02388ed215fe82ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b23b706518cc5ee405ede02802b207b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classsmt__termt.html">smt_termt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#a7b23b706518cc5ee405ede02802b207b">get_identifier</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;expression_handle_identifiers, const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;expression_identifiers, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="separator:a7b23b706518cc5ee405ede02802b207b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab33bbc5ccfadb567d556f857c9d0593"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#aab33bbc5ccfadb567d556f857c9d0593">build_expr_based_on_getting_operands</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classstack__decision__proceduret.html">stack_decision_proceduret</a> &amp;decision_procedure)</td></tr>
 <tr class="separator:aab33bbc5ccfadb567d556f857c9d0593"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6ac0cc53181b1e03a26670d0a5e1f04"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">decision_proceduret::resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#aa6ac0cc53181b1e03a26670d0a5e1f04">lookup_decision_procedure_result</a> (const <a class="el" href="classsmt__check__sat__response__kindt.html">smt_check_sat_response_kindt</a> &amp;response_kind)</td></tr>
@@ -182,7 +183,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00423">423</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00427">427</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -215,12 +216,12 @@ Functions</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>This pass over <code>expr</code> is tightly coupled to the implementation of <code>convert_expr_to_smt</code>. This is because any sub expressions which <code>convert_expr_to_smt</code> translates into function applications, must also be returned by this<code>gather_dependent_expressions</code> function.</dd></dl>
 <p><code><a class="el" href="classsymbol__exprt.html" title="Expression to hold a symbol (variable)">symbol_exprt</a></code>, <code><a class="el" href="classarray__exprt.html" title="Array constructor from list of elements.">array_exprt</a></code> and <code><a class="el" href="classnondet__symbol__exprt.html" title="Expression to hold a nondeterministic choice.">nondet_symbol_exprt</a></code> add dependant expressions. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00069">69</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00070">70</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ac39a0adbcad4c2c02388ed215fe82ea0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac39a0adbcad4c2c02388ed215fe82ea0">&#9670;&nbsp;</a></span>get_identifier()</h2>
+<a id="a7b23b706518cc5ee405ede02802b207b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b23b706518cc5ee405ede02802b207b">&#9670;&nbsp;</a></span>get_identifier()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -244,7 +245,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::unordered_map&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>expression_identifiers</em>&#160;</td>
+          <td class="paramname"><em>expression_identifiers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -259,7 +266,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00345">345</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00346">346</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +294,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00043">43</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00044">44</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -333,7 +340,7 @@ Functions</h2></td></tr>
 
 <p>Issues a command to the solving process which is expected to optionally return a success status followed by the actual response of interest. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00029">29</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00030">30</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -361,7 +368,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00561">561</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00567">567</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -409,7 +416,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00136">136</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00137">137</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -449,7 +456,7 @@ Functions</h2></td></tr>
 
 <p>Replaces the sub expressions of <code>expr</code> which have been defined as separate functions in the smt solver, using the <code>expression_identifiers</code> map. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00229">229</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html#l00230">230</a> of file <a class="el" href="smt2__incremental__decision__procedure_8cpp_source.html">smt2_incremental_decision_procedure.cpp</a>.</p>
 
 </div>
 </div>

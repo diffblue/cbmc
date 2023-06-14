@@ -116,13 +116,13 @@ $(document).ready(function(){initNavTree('construct__value__expr__from__smt_8h.h
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5dc56523cb5a81a85508f5b459dbfb8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="construct__value__expr__from__smt_8h.html#a5dc56523cb5a81a85508f5b459dbfb8c">construct_value_expr_from_smt</a> (const <a class="el" href="classsmt__termt.html">smt_termt</a> &amp;value_term, const <a class="el" href="classtypet.html">typet</a> &amp;type_to_construct)</td></tr>
-<tr class="memdesc:a5dc56523cb5a81a85508f5b459dbfb8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a <code>value_term</code> and a <code>type_to_construct</code>, this function constructs a value exprt with a value based on <code>value_term</code> and a type of <code>type_to_construct</code>.  <a href="construct__value__expr__from__smt_8h.html#a5dc56523cb5a81a85508f5b459dbfb8c">More...</a><br /></td></tr>
-<tr class="separator:a5dc56523cb5a81a85508f5b459dbfb8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cc3d5f008598577855ab9a6fa999958"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="construct__value__expr__from__smt_8h.html#a1cc3d5f008598577855ab9a6fa999958">construct_value_expr_from_smt</a> (const <a class="el" href="classsmt__termt.html">smt_termt</a> &amp;value_term, const <a class="el" href="classtypet.html">typet</a> &amp;type_to_construct, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a1cc3d5f008598577855ab9a6fa999958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a <code>value_term</code> and a <code>type_to_construct</code>, this function constructs a value exprt with a value based on <code>value_term</code> and a type of <code>type_to_construct</code>.  <a href="construct__value__expr__from__smt_8h.html#a1cc3d5f008598577855ab9a6fa999958">More...</a><br /></td></tr>
+<tr class="separator:a1cc3d5f008598577855ab9a6fa999958"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a5dc56523cb5a81a85508f5b459dbfb8c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5dc56523cb5a81a85508f5b459dbfb8c">&#9670;&nbsp;</a></span>construct_value_expr_from_smt()</h2>
+<a id="a1cc3d5f008598577855ab9a6fa999958"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cc3d5f008598577855ab9a6fa999958">&#9670;&nbsp;</a></span>construct_value_expr_from_smt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -137,7 +137,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type_to_construct</em>&#160;</td>
+          <td class="paramname"><em>type_to_construct</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -152,12 +158,13 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">value_term</td><td>This must be a "simple" term encoding a value. It must not be a term requiring any kind of further evaluation to get a value, such as would be the case for identifiers or function applications. </td></tr>
     <tr><td class="paramname">type_to_construct</td><td>The type which the constructed expr returned is expected to have. This type must be compatible with the sort of <code>value_term</code>. </td></tr>
+    <tr><td class="paramname">ns</td><td>The namespace to resolve <code>c_enum_tag_type</code> to reconstruct the correct type of enum values in the trace. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>The type is required separately in order to carry out this conversion, because the smt value term does not contain all the required information. For example an 8 bit, bit vector with a value of 255 could be used to construct an <code>unsigned char</code> with the value 255 or alternatively a <code>signed char</code> with the value -1. So these alternatives are disambiguated using the type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="construct__value__expr__from__smt_8cpp_source.html#l00114">114</a> of file <a class="el" href="construct__value__expr__from__smt_8cpp_source.html">construct_value_expr_from_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="construct__value__expr__from__smt_8cpp_source.html#l00136">136</a> of file <a class="el" href="construct__value__expr__from__smt_8cpp_source.html">construct_value_expr_from_smt.cpp</a>.</p>
 
 </div>
 </div>
