@@ -16,6 +16,7 @@
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
+#include <solvers/smt2_incremental/encoding/enum_encoding.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
@@ -590,8 +591,8 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression)
 {
-  const exprt lowered =
-    struct_encoding.encode(lower_byte_operators(expression, ns));
+  const exprt lowered = struct_encoding.encode(
+    lower_enum(lower_byte_operators(expression, ns), ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     if(lowered != expression)
       debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
