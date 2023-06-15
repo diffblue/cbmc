@@ -1,5 +1,7 @@
 var NAVTREEINDEX129 =
 {
+"struct_elf64___shdr.html":[8,0,416],
+"struct_elf64___shdr.html#a18f4475eeec871316099323b512d999d":[8,0,416,6],
 "struct_elf64___shdr.html#a20aab677eb99c91c0e6c3c5dc8f0f3db":[8,0,416,3],
 "struct_elf64___shdr.html#a29812c42d9310eb3ad17dcd68ec25536":[8,0,416,5],
 "struct_elf64___shdr.html#a6379cd77214969499ae99e6e8a46405c":[8,0,416,9],
@@ -247,7 +249,5 @@ var NAVTREEINDEX129 =
 "structcmdlinet_1_1optiont.html#a58e49c03c895dea51b3b26a9c703fa09":[8,0,192,1,3],
 "structcmdlinet_1_1optiont.html#a947e7b6c4f77c34384b125b3e6f5962e":[8,0,192,1,5],
 "structcmdlinet_1_1optiont.html#a96aed8bfddfe741e9f2156921ce93b32":[8,0,192,1,2],
-"structcmdlinet_1_1optiont.html#aab93a04008d1b52f9459b7297c3391a9":[8,0,192,1,6],
-"structcmdlinet_1_1optiont.html#ad04e9b807a22c8c2f370a8ce6bece05f":[8,0,192,1,0],
-"structcompare__base__name__and__descriptort.html":[8,0,237]
+"structcmdlinet_1_1optiont.html#aab93a04008d1b52f9459b7297c3391a9":[8,0,192,1,6]
 };
