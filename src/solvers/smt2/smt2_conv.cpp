@@ -285,7 +285,6 @@ void smt2_convt::define_object_size(
   const object_size_exprt &expr)
 {
   const exprt &ptr = expr.pointer();
-  std::size_t size_width = boolbv_width(expr.type());
   std::size_t pointer_width = boolbv_width(ptr.type());
   std::size_t number = 0;
   std::size_t h=pointer_width-1;
@@ -295,23 +294,23 @@ void smt2_convt::define_object_size(
   {
     const typet &type = o.type();
     auto size_expr = size_of_expr(type, ns);
-    const auto object_size =
-      numeric_cast<mp_integer>(size_expr.value_or(nil_exprt()));
 
     if(
       (o.id() != ID_symbol && o.id() != ID_string_constant) ||
-      !size_expr.has_value() || !object_size.has_value())
+      !size_expr.has_value())
     {
       ++number;
       continue;
     }
 
+    find_symbols(*size_expr);
     out << "(assert (=> (= "
         << "((_ extract " << h << " " << l << ") ";
     convert_expr(ptr);
     out << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
-        << "(= " << id << " (_ bv" << *object_size << " " << size_width
-        << "))))\n";
+        << "(= " << id << " ";
+    convert_expr(*size_expr);
+    out << ")))\n";
 
     ++number;
   }
