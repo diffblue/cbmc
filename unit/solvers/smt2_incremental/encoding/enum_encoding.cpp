@@ -15,7 +15,8 @@ static c_enum_typet make_c_enum_type(
 {
   c_enum_typet enum_type{underlying_type};
 
-  auto &members = enum_type.add(ID_body).get_sub();
+  auto &members = enum_type.members();
+  members.reserve(value_count);
 
   for(unsigned int i = 0; i < value_count; ++i)
   {

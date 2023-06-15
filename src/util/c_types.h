@@ -274,6 +274,17 @@ public:
 
   typedef std::vector<c_enum_membert> memberst;
 
+  c_enum_typet(typet _subtype, memberst enum_members)
+    : c_enum_typet(std::move(_subtype))
+  {
+    members() = std::move(enum_members);
+  }
+
+  memberst &members()
+  {
+    return reinterpret_cast<memberst &>(add(ID_body).get_sub());
+  }
+
   const memberst &members() const
   {
     return (const memberst &)(find(ID_body).get_sub());
