@@ -137,10 +137,10 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
       }
       else
       {
-        // If we are here, we came across a (simplified?) expression that was
-        // not anticipated - normally this would be a bug, but if you made
-        // changes to the simplifier (as an example), you would need to add an
-        // else-if branch that handles that type above.
+        // If you need special handling for a particular expression type (say,
+        // after changes to the simplifier) you need to make sure that you add
+        // an `else if` branch above, otherwise the expression will get skipped
+        // and the constraints will not propagate correctly.
         continue;
       }
     }

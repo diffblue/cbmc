@@ -153,7 +153,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
         mp_integer higher;
       };
       boundst bounds;
-      bool structure_matched = false;
 
       // Before we do anything else, we need to "pattern match" against the
       // expression and make sure that it has the structure we're looking for.
@@ -215,24 +214,18 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
       };
 
       // We need to match both operands, at the particular sequence we expect.
-      structure_matched |= match_first_operand(new_operands[0]);
-      structure_matched &= match_second_operand(new_operands[1]);
+      bool structure_matched = match_first_operand(new_operands[0]) &&
+                               match_second_operand(new_operands[1]);
 
       if(structure_matched && bounds.lower == bounds.higher)
       {
-        // Go through the expression again and convert >= operand into ==
-        for(const auto &op : new_operands)
-        {
-          if(
-            const auto ge_expr =
-              expr_try_dynamic_cast<greater_than_or_equal_exprt>(op))
-          {
-            equal_exprt new_expr{ge_expr->lhs(), ge_expr->rhs()};
-            return changed(new_expr);
-          }
-          else
-            continue;
-        }
+        // If we are here, we have matched the structure we expected, so we can
+        // make some reasonable assumptions about where certain info we need is
+        // located at.
+        const auto ge_expr =
+          expr_dynamic_cast<greater_than_or_equal_exprt>(new_operands[0]);
+        equal_exprt new_expr{ge_expr.lhs(), ge_expr.rhs()};
+        return changed(new_expr);
       }
     }
 
