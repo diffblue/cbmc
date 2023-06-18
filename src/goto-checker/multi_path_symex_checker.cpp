@@ -13,6 +13,10 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/ui_message.h>
 
+#include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_vector.h>
+
+#include <assembler/remove_asm.h>
 #include <goto-symex/solver_hardness.h>
 
 #include "bmc_util.h"
@@ -27,6 +31,10 @@ multi_path_symex_checkert::multi_path_symex_checkert(
     equation_generated(false),
     property_decider(options, ui_message_handler, equation, ns)
 {
+  // check for certain unsupported language features
+  PRECONDITION(!has_asm(goto_model.get_goto_functions()));
+  PRECONDITION(!has_function_pointers(goto_model.get_goto_functions()));
+  PRECONDITION(!has_vector(goto_model.get_goto_functions()));
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::

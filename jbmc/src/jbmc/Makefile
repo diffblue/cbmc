@@ -4,6 +4,7 @@ SRC = jbmc_main.cpp \
 
 OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
+      ../$(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
       ../$(CPROVER_DIR)/src/linking/linking$(LIBEXT) \
       ../$(CPROVER_DIR)/src/big-int/big-int$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-checker/goto-checker$(LIBEXT) \

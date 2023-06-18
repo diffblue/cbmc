@@ -9,6 +9,7 @@ generic_includes(jbmc-lib)
 
 target_link_libraries(jbmc-lib
     ansi-c
+    assembler
     big-int
     cbmc-lib
     goto-checker

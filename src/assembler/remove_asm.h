@@ -60,4 +60,10 @@ void remove_asm(goto_functionst &, symbol_tablet &);
 
 void remove_asm(goto_modelt &);
 
+/// returns true iff the given goto functions use asm instructions
+bool has_asm(const goto_functionst &);
+
+/// returns true iff the given goto model uses asm instructions
+bool has_asm(const goto_modelt &);
+
 #endif // CPROVER_ASSEMBLER_REMOVE_ASM_H
