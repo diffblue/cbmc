@@ -319,3 +319,34 @@ ret_type _read(int fildes, void *buf, size_type nbyte)
   __CPROVER_HIDE:;
   return read(fildes, buf, nbyte);
 }
+
+/* FUNCTION: sysconf */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+long __VERIFIER_nondet_long(void);
+unsigned int __VERIFIER_nondet_unsigned_int(void);
+
+long sysconf(int name);
+
+// This overapproximation is based on the sysconf specification available at
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/sysconf.html.
+long sysconf(int name)
+{
+__CPROVER_HIDE:;
+  (void)name;
+  long retval = __VERIFIER_nondet_long();
+
+  // We should keep errno as non-determinist as possible, since this model
+  // nver takes into account the name input.
+  errno = __VERIFIER_nondet_unsigned_int();
+
+  // Spec states "some returned values may be huge; they are not suitable
+  // for allocating memory". There aren't also guarantees about return
+  // values being strickly equal or greater to -1.
+  // Thus, modelling it as non-deterministic.
+  return retval;
+}
