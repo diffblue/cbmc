@@ -82,16 +82,31 @@ bvt bv_refinementt::convert_mult(const mult_exprt &expr)
     literalt op0_zero=bv_utils.is_zero(a.op0_bv);
     literalt op1_zero=bv_utils.is_zero(a.op1_bv);
     literalt res_zero=bv_utils.is_zero(a.result_bv);
-    prop.l_set_to_true(
-      prop.limplies(prop.lor(op0_zero, op1_zero), res_zero));
+    if(prop.cnf_handled_well())
+    {
+      prop.lcnf({!op0_zero, res_zero});
+      prop.lcnf({!op1_zero, res_zero});
+    }
+    else
+    {
+      prop.l_set_to_true(prop.limplies(prop.lor(op0_zero, op1_zero), res_zero));
+    }
 
     // x*1==x and 1*x==x
     literalt op0_one=bv_utils.is_one(a.op0_bv);
     literalt op1_one=bv_utils.is_one(a.op1_bv);
     literalt res_op0=bv_utils.equal(a.op0_bv, a.result_bv);
     literalt res_op1=bv_utils.equal(a.op1_bv, a.result_bv);
-    prop.l_set_to_true(prop.limplies(op0_one, res_op1));
-    prop.l_set_to_true(prop.limplies(op1_one, res_op0));
+    if(prop.cnf_handled_well())
+    {
+      prop.lcnf({!op0_one, res_op1});
+      prop.lcnf({!op1_one, res_op0});
+    }
+    else
+    {
+      prop.l_set_to_true(prop.limplies(op0_one, res_op1));
+      prop.l_set_to_true(prop.limplies(op1_one, res_op0));
+    }
   }
 
   return bv;
@@ -238,11 +253,16 @@ void bv_refinementt::check_SAT(approximationt &a)
       literalt result_equal=
         bv_utils.equal(a.result_bv, float_utils.build_constant(result));
 
-      literalt op0_and_op1_equal=
-        prop.land(op0_equal, op1_equal);
+      if(prop.cnf_handled_well())
+      {
+        prop.lcnf({!op0_equal, !op1_equal, result_equal});
+      }
+      else
+      {
+        literalt op0_and_op1_equal = prop.land(op0_equal, op1_equal);
 
-      prop.l_set_to_true(
-        prop.limplies(op0_and_op1_equal, result_equal));
+        prop.l_set_to_true(prop.limplies(op0_and_op1_equal, result_equal));
+      }
     }
     else
     {
