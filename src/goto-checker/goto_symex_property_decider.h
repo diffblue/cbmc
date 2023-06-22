@@ -39,7 +39,8 @@ public:
 
   /// Add disjunction of negated selected properties to the equation
   void add_constraint_from_goals(
-    std::function<bool(const irep_idt &property_id)> select_property);
+    std::function<bool(const irep_idt &property_id)> select_property,
+    const propertiest &properties);
 
   /// Calls solve() on the solver instance
   decision_proceduret::resultt solve();
@@ -67,6 +68,7 @@ public:
     bool set_pass = true) const;
 protected:
   const optionst &options;
+  bool cover_goals;
   ui_message_handlert &ui_message_handler;
   symex_target_equationt &equation;
   std::unique_ptr<solver_factoryt::solvert> solver;
@@ -76,10 +78,14 @@ protected:
     /// A property holds if all instances of it are true
     std::vector<symex_target_equationt::SSA_stepst::iterator> instances;
 
-    /// The goal variable
+    /// The goal property variable
     exprt condition;
 
-    exprt as_expr() const;
+    /// The goal reachability variable
+    exprt path_condition;
+
+    exprt build_condition() const;
+    exprt build_path_condition() const;
   };
 
   /// Maintains the relation between a property ID and

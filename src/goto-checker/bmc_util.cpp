@@ -398,7 +398,8 @@ void run_property_decider(
   property_decider.add_constraint_from_goals(
     [&properties](const irep_idt &property_id) {
       return is_property_to_check(properties.at(property_id).status);
-    });
+    },
+    properties);
 
   auto const sat_solver_start = std::chrono::steady_clock::now();
 
