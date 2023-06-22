@@ -25,6 +25,7 @@
 // strings instead of `{?}` being printed. It works because catch uses the
 // appropriate overload of `operator<<` where it exists.
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 
 #include <goto-symex/path_storage.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
@@ -907,4 +908,47 @@ TEST_CASE(
       smt_assertion};
     REQUIRE(test.sent_commands == expected_commands);
   }
+}
+
+static c_enum_typet make_c_enum_type(
+  const unsignedbv_typet &underlying_type,
+  unsigned int value_count)
+{
+  c_enum_typet enum_type{underlying_type};
+
+  auto &members = enum_type.members();
+  members.reserve(value_count);
+
+  for(unsigned int i = 0; i < value_count; ++i)
+  {
+    c_enum_typet::c_enum_membert member;
+    member.set_identifier("V" + std::to_string(i));
+    member.set_base_name("V" + std::to_string(i));
+    member.set_value(integer2bvrep(i, underlying_type.get_width()));
+    members.push_back(member);
+  }
+  return enum_type;
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret getting enum values back from solver.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const unsignedbv_typet enum_underlying_type{32};
+  const c_enum_typet enum_type = make_c_enum_type(enum_underlying_type, 5);
+  const type_symbolt enum_symbol{"my_enum", enum_type, ID_C};
+  test.symbol_table.insert(enum_symbol);
+  const c_enum_tag_typet enum_tag{enum_symbol.name};
+  const symbolt enum_value_symbol{"my_enum_value", enum_tag, ID_C};
+  test.symbol_table.insert(enum_value_symbol);
+  const auto symbol_expr = enum_value_symbol.symbol_expr();
+  const auto eq_expr = equal_exprt{symbol_expr, symbol_expr};
+
+  test.procedure.handle(eq_expr);
+  test.mock_responses.push_back(
+    smt_get_value_responset{{{"B0", smt_bool_literal_termt{true}}}});
+  auto returned = test.procedure.get(eq_expr);
+
+  REQUIRE(returned == constant_exprt{"true", bool_typet{}});
 }
