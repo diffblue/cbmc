@@ -351,14 +351,24 @@ static optionalt<smt_termt> get_identifier(
     &expression_identifiers,
   const namespacet &ns)
 {
-  const exprt lowered_expr = lower_enum(expr, ns);
-  const auto handle_find_result =
-    expression_handle_identifiers.find(lowered_expr);
+  // Lookup the non-lowered form first.
+  const auto handle_find_result = expression_handle_identifiers.find(expr);
   if(handle_find_result != expression_handle_identifiers.cend())
     return handle_find_result->second;
-  const auto expr_find_result = expression_identifiers.find(lowered_expr);
+  const auto expr_find_result = expression_identifiers.find(expr);
   if(expr_find_result != expression_identifiers.cend())
     return expr_find_result->second;
+
+  // If that didn't yield any results, then try the lowered form.
+  const exprt lowered_expr = lower_enum(expr, ns);
+  const auto lowered_handle_find_result =
+    expression_handle_identifiers.find(lowered_expr);
+  if(lowered_handle_find_result != expression_handle_identifiers.cend())
+    return lowered_handle_find_result->second;
+  const auto lowered_expr_find_result =
+    expression_identifiers.find(lowered_expr);
+  if(lowered_expr_find_result != expression_identifiers.cend())
+    return lowered_expr_find_result->second;
   return {};
 }
 
