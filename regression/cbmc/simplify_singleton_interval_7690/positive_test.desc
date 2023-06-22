@@ -1,0 +1,14 @@
+CORE 
+--trace
+singleton_interval_simp.c
+^VERIFICATION FAILED$
+^\[main\.assertion\.1\] line \d+ expected failure: only paths where x == 15 explored: FAILURE$
+^\[main\.assertion\.2\] line \d+ expected failure: only paths where x == 15 explored: FAILURE$
+x=15 \(00000000 00000000 00000000 00001111\)
+y=35 \(00000000 00000000 00000000 00100011\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This tests the positive case of the simplification of the singleton interval
+(i.e when the presented interval *is* the singleton interval)

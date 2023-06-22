@@ -1,0 +1,18 @@
+CORE 
+--trace
+singleton_interval_simp_neg.c
+^VERIFICATION FAILED$
+^\[main\.assertion\.1\] line \d expected failure: paths where x is unbounded explored: FAILURE$
+^\[main\.assertion\.2\] line \d+ expected failure: paths where 0 \<= x \<= 15 explored: FAILURE$
+^\[main\.assertion\.3\] line \d+ expected success: paths where x \<= 15 explored: SUCCESS$
+y=-6 \(11111111 11111111 11111111 11111010\)
+x=14 \(00000000 00000000 00000000 00001110\)
+y=34 \(00000000 00000000 00000000 00100010\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This tests the negative case of the simplification of the singleton interval
+(i.e when the presented interval *is* the *not* the singleton interval - 
+the set of possible values that the bounded variable can take has cardinality
+> 1).
