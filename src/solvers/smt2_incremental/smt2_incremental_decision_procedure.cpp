@@ -382,16 +382,14 @@ array_exprt smt2_incremental_decision_proceduret::get_expr(
   elements.reserve(*size);
   for(std::size_t index = 0; index < size; ++index)
   {
+    const auto index_term = ::convert_expr_to_smt(
+      from_integer(index, index_type),
+      object_map,
+      pointer_sizes_map,
+      object_size_function.make_application,
+      is_dynamic_object_function.make_application);
     elements.push_back(get_expr(
-      smt_array_theoryt::select(
-        array,
-        ::convert_expr_to_smt(
-          from_integer(index, index_type),
-          object_map,
-          pointer_sizes_map,
-          object_size_function.make_application,
-          is_dynamic_object_function.make_application)),
-      type.element_type()));
+      smt_array_theoryt::select(array, index_term), type.element_type()));
   }
   return array_exprt{elements, type};
 }
