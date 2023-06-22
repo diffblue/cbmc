@@ -367,7 +367,7 @@ smt2_incremental_decision_proceduret::get_identifier(const exprt &expr) const
   return {};
 }
 
-array_exprt smt2_incremental_decision_proceduret::get_expr(
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &array,
   const array_typet &type) const
 {
@@ -388,16 +388,25 @@ array_exprt smt2_incremental_decision_proceduret::get_expr(
       pointer_sizes_map,
       object_size_function.make_application,
       is_dynamic_object_function.make_application);
-    elements.push_back(get_expr(
-      smt_array_theoryt::select(array, index_term), type.element_type()));
+    auto element = get_expr(
+      smt_array_theoryt::select(array, index_term), type.element_type());
+    if(!element)
+      return {};
+    elements.push_back(std::move(*element));
   }
   return array_exprt{elements, type};
 }
 
-exprt smt2_incremental_decision_proceduret::get_expr(
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &descriptor,
   const typet &type) const
 {
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(type))
+  {
+    if(array_type->is_incomplete())
+      return {};
+    return get_expr(descriptor, *array_type);
+  }
   const smt_get_value_commandt get_value_command{descriptor};
   const smt_responset response = get_response_to_command(
     *solver_process, get_value_command, identifier_table);
@@ -483,13 +492,9 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       irep_pretty_diagnosticst{expr});
     return build_expr_based_on_getting_operands(expr, *this);
   }
-  if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
-  {
-    if(array_type->is_incomplete())
-      return expr;
-    return get_expr(*descriptor, *array_type);
-  }
-  return get_expr(*descriptor, expr.type());
+  if(auto result = get_expr(*descriptor, expr.type()))
+    return std::move(*result);
+  return expr;
 }
 
 void smt2_incremental_decision_proceduret::print_assignment(
