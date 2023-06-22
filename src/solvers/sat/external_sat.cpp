@@ -38,6 +38,7 @@ void external_satt::set_assignment(literalt, bool)
 
 void external_satt::write_cnf_file(std::string cnf_file)
 {
+#ifndef INCCNF
   log.status() << "Writing temporary CNF" << messaget::eom;
   std::ofstream out(cnf_file);
 
@@ -55,6 +56,29 @@ void external_satt::write_cnf_file(std::string cnf_file)
     if(!literal.is_constant())
       out << literal.dimacs() << " 0\n";
   }
+#else
+  log.status() << "Writing temporary incremental CNF" << messaget::eom;
+  std::ofstream out(cnf_file);
+
+  out << "p inccnf\n";
+
+  // output the problem clauses
+  for(auto &c : clauses)
+    dimacs_cnft::write_dimacs_clause(c, out, false);
+
+  // we can discard the clauses as subsequent calls do not need to output them
+  // again
+  clauses.clear();
+
+  // output the assumption clause, which might be empty
+  out << "a ";
+  for(const auto &literal : assumptions)
+  {
+    if(!literal.is_constant())
+      out << literal.dimacs();
+  }
+  out << " 0\n";
+#endif
 
   out.close();
 }
