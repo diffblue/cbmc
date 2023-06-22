@@ -205,6 +205,63 @@ void exprt::visit_post(std::function<void(const exprt &)> visitor) const
   visit_post_template(visitor, this);
 }
 
+optionalt<exprt>
+exprt::transform_pre(std::function<optionalt<exprt>(exprt)> visitor) const
+{
+  auto visitor_result = visitor(*this);
+
+  // make a copy
+  exprt tmp = visitor_result.value_or(*this);
+
+  bool op_changed = false;
+
+  for(auto &op : tmp.operands()) // this breaks sharing of the copy
+  {
+    auto op_result = op.transform_pre(visitor);
+    if(op_result.has_value())
+    {
+      op = std::move(op_result.value());
+      op_changed = true;
+    }
+  }
+
+  if(op_changed)
+    return std::move(tmp);
+  else
+    return visitor_result;
+}
+
+optionalt<exprt>
+exprt::transform_post(std::function<optionalt<exprt>(exprt)> visitor) const
+{
+  // make a copy
+  exprt tmp = *this;
+
+  bool op_changed = false;
+
+  for(auto &op : tmp.operands()) // this breaks sharing of the copy
+  {
+    auto op_result = op.transform_post(visitor);
+    if(op_result.has_value())
+    {
+      op = std::move(op_result.value());
+      op_changed = true;
+    }
+  }
+
+  if(op_changed)
+  {
+    auto visitor_result = visitor(tmp);
+
+    if(visitor_result.has_value())
+      return std::move(visitor_result.value());
+    else
+      return std::move(tmp);
+  }
+  else
+    return visitor(*this);
+}
+
 template <typename T>
 static void visit_pre_template(std::function<void(T &)> visitor, T *_expr)
 {
