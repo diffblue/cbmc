@@ -29,7 +29,7 @@ static c_enum_typet make_c_enum_type(
   return enum_type;
 }
 
-constant_exprt create_enum_tag_typed_constant(
+static constant_exprt create_enum_tag_typed_constant(
   const mp_integer &value,
   const c_enum_typet &enum_type,
   const c_enum_tag_typet &enum_tag_type)
