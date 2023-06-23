@@ -321,6 +321,26 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
   }
 }
 
+TEST_CASE("decoding into struct expressions.", "[core][smt2_incremental]")
+{
+  const struct_union_typet::componentst component_types{
+    {"green", signedbv_typet{32}},
+    {"eggs", unsignedbv_typet{16}},
+    {"ham", signedbv_typet{24}}};
+  const struct_typet struct_type{component_types};
+  const type_symbolt type_symbol{"my_structt", struct_type, ID_C};
+  auto test = struct_encoding_test_environmentt::make();
+  test.symbol_table.insert(type_symbol);
+  const struct_tag_typet struct_tag{type_symbol.name};
+  const struct_exprt expected{
+    {from_integer(3, signedbv_typet{32}),
+     from_integer(2, unsignedbv_typet{16}),
+     from_integer(1, signedbv_typet{24})},
+    struct_tag};
+  const exprt encoded = constant_exprt{"000000030002000001", bv_typet{72}};
+  REQUIRE(test.struct_encoding.decode(encoded, struct_tag) == expected);
+}
+
 TEST_CASE(
   "encoding of single member struct expressions",
   "[core][smt2_incremental]")

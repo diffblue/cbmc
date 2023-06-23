@@ -7,6 +7,7 @@
 #include <util/make_unique.h>
 #include <util/namespace.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 
 #include <solvers/flattening/boolbv_width.h>
 
@@ -176,4 +177,32 @@ exprt struct_encodingt::encode(exprt expr) const
       work_queue.push(&operand);
   }
   return expr;
+}
+
+exprt struct_encodingt::decode(
+  const exprt &encoded,
+  const struct_tag_typet &original_type) const
+{
+  // The algorithm below works by extracting each of the separate fields from
+  // the combined encoded value using a `member_exprt` which is itself encoded
+  // into a `bit_extract_exprt`. These separated fields can then be combined
+  // using a `struct_exprt`. This is expected to duplicate the input encoded
+  // expression for each of the fields. However for the case where the input
+  // encoded expression is a `constant_exprt`, expression simplification will be
+  // able simplify away the duplicated portions of the constant and the bit
+  // extraction expressions. This yields a clean struct expression where each
+  // field is a separate constant containing the data solely relevant to that
+  // field.
+  INVARIANT(
+    can_cast_type<bv_typet>(encoded.type()),
+    "Structs are expected to be encoded into bit vectors.");
+  const struct_typet definition = ns.get().follow_tag(original_type);
+  exprt::operandst encoded_fields;
+  for(const auto &component : definition.components())
+  {
+    encoded_fields.push_back(typecast_exprt::conditional_cast(
+      encode(member_exprt{typecast_exprt{encoded, original_type}, component}),
+      component.type()));
+  }
+  return simplify_expr(struct_exprt{encoded_fields, original_type}, ns);
 }
