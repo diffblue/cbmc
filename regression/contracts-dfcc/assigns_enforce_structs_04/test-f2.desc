@@ -3,7 +3,7 @@ main.c
 --dfcc main --enforce-contract f2
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f2.assigns.\d+\] line \d+ Check that p->x is assignable: FAILURE$
+^\[f2_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that p->x is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

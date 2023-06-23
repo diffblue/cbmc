@@ -1,7 +1,7 @@
 CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
-^\[foo.assigns.\d+\].*Check that \*out is assignable: SUCCESS$
+^\[foo_wrapped_for_contract_checking.assigns.\d+\].*Check that \*out is assignable: SUCCESS$
 ^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

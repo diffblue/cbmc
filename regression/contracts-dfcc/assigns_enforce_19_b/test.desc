@@ -1,10 +1,10 @@
 CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f
-^\[f.assigns.\d+\] line \d+ Check that b is assignable: SUCCESS$
-^\[f.assigns.\d+\] line \d+ Check that \*points_to_b is assignable: SUCCESS$
-^\[f.assigns.\d+\] line \d+ Check that c is assignable: FAILURE$
-^\[f.assigns.\d+\] line \d+ Check that \*points_to_c is assignable: FAILURE$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that b is assignable: SUCCESS$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that \*points_to_b is assignable: SUCCESS$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that c is assignable: FAILURE$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that \*points_to_c is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

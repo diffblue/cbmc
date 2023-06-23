@@ -2,9 +2,9 @@ CORE
 main.c
 --enforce-contract foo
 ^main.c function foo$
-^\[foo.assigns.\d+\] line 10 Check that \*x is valid when .*: SUCCESS$
-^\[foo.assigns.\d+\] line 16 Check that \*x is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line 20 Check that \*x is assignable: FAILURE$
+^\[__CPROVER_contracts_original_foo.assigns.\d+\] line 10 Check that \*x is valid when .*: SUCCESS$
+^\[__CPROVER_contracts_original_foo.assigns.\d+\] line 16 Check that \*x is assignable: SUCCESS$
+^\[__CPROVER_contracts_original_foo.assigns.\d+\] line 20 Check that \*x is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

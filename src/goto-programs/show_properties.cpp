@@ -19,9 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
-optionalt<source_locationt> find_property(
-    const irep_idt &property,
-    const goto_functionst & goto_functions)
+optionalt<std::pair<irep_idt, source_locationt>>
+find_property(const irep_idt &property, const goto_functionst &goto_functions)
 {
   for(const auto &fct : goto_functions.function_map)
   {
@@ -33,7 +32,7 @@ optionalt<source_locationt> find_property(
       {
         if(ins.source_location().get_property_id() == property)
         {
-          return ins.source_location();
+          return std::make_pair(fct.first, ins.source_location());
         }
       }
     }

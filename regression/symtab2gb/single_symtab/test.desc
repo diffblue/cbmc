@@ -3,8 +3,8 @@ entry_point.json_symtab
 
 ^EXIT=10$
 ^SIGNAL=0$
-^\[1\] file entry_point.adb line \d+ assertion: FAILURE$
-^\[2\] file entry_point.adb line \d+ assertion: SUCCESS$
+^\[entry_point\.1\] file entry_point.adb line \d+ assertion: FAILURE$
+^\[entry_point\.2\] file entry_point.adb line \d+ assertion: SUCCESS$
 ^VERIFICATION FAILED$
 --
 error

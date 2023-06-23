@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[f1.postcondition.\d+\] line \d+ Check ensures clause: SUCCESS$
-^\[f1.assigns.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: SUCCESS$
+^\[__CPROVER_contracts_original_f1.assigns.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

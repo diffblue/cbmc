@@ -1,7 +1,7 @@
 CORE
 main.c
 --apply-loop-contracts _ --unsigned-overflow-check
-\[check.assigns\.\d+\] line \d+ Check that \*j is assignable: SUCCESS$
+\[main.assigns\.\d+\] line \d+ Check that \*j is assignable: SUCCESS$
 \[check.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in \*j \+ 1u: SUCCESS
 \[check.overflow\.\d+\] line \d+ arithmetic overflow on unsigned \+ in \*j \+ 1u: SUCCESS
 \[main\.\d+\] line \d+ Check loop invariant before entry: SUCCESS$

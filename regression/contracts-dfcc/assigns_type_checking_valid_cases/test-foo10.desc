@@ -3,8 +3,8 @@ main.c
 --dfcc main --enforce-contract foo10 _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
-^\[foo10.assigns.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
-^\[foo10.assigns.\d+\] line \d+ Check that buffer->aux\.allocated is assignable: SUCCESS$
+^\[foo10_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that buffer->len is assignable: SUCCESS$
+^\[foo10_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that buffer->aux\.allocated is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 Checks whether CBMC parses correctly all standard cases for assigns clauses.

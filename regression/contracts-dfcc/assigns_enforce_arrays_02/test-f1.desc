@@ -1,8 +1,8 @@
 CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f1
-^\[f1.assigns.\d+\] line 8 Check that a\[.*0\] is assignable: SUCCESS$
-^\[f1.assigns.\d+\] line 9 Check that a\[.*5\] is assignable: FAILURE$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line 8 Check that a\[.*0\] is assignable: SUCCESS$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line 9 Check that a\[.*5\] is assignable: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

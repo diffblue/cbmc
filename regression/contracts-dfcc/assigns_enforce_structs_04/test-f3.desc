@@ -3,7 +3,7 @@ main.c
 --dfcc main --enforce-contract f3
 ^EXIT=0$
 ^SIGNAL=0$
-^\[f3.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
+^\[f3_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

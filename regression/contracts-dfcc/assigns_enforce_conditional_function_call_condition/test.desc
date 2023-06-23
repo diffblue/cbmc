@@ -2,8 +2,8 @@ CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
 ^main.c function foo$
-^\[foo.assigns.\d+\] line 16 Check that \*x is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line 20 Check that \*x is assignable: FAILURE$
+^\[foo_wrapped_for_contract_checking.assigns.\d+\] line 16 Check that \*x is assignable: SUCCESS$
+^\[foo_wrapped_for_contract_checking.assigns.\d+\] line 20 Check that \*x is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

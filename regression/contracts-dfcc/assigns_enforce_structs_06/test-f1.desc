@@ -3,10 +3,10 @@ main.c
 --dfcc main --enforce-contract f1
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
-^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)1\] is assignable: SUCCESS$
-^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)2\] is assignable: SUCCESS$
-^\[f1.assigns.\d+\] line \d+ Check that p->size is assignable: FAILURE$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)1\] is assignable: SUCCESS$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)2\] is assignable: SUCCESS$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that p->size is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

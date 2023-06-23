@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 \[foo.postcondition.\d+\] line \d+ Check ensures clause: SUCCESS
-\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS
+\[__CPROVER_contracts_original_foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS
 \[main.assertion.\d+\] line \d+ assertion \!\(n \< 4\): SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
