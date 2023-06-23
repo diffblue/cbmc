@@ -40,21 +40,8 @@ protected:
 
       return !found_non_constant;
     }
-    else if(expr.id() == ID_with)
-    {
-      // this is bad
-#if 0
-      for(const auto &op : expr.operands())
-      {
-        if(!is_constant(op))
-          return false;
-      }
-
+    else if(expr.id() == ID_if && expr.type().id() == ID_pointer)
       return true;
-#else
-      return false;
-#endif
-    }
 
     return is_constantt::is_constant(expr);
   }
