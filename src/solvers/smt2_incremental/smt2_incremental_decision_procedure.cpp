@@ -398,6 +398,17 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
 }
 
 optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &struct_term,
+  const struct_tag_typet &type) const
+{
+  const auto encoded_result =
+    get_expr(struct_term, struct_encoding.encode(type));
+  if(!encoded_result)
+    return {};
+  return {struct_encoding.decode(*encoded_result, type)};
+}
+
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &descriptor,
   const typet &type) const
 {
@@ -406,6 +417,10 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
     if(array_type->is_incomplete())
       return {};
     return get_expr(descriptor, *array_type);
+  }
+  if(const auto struct_type = type_try_dynamic_cast<struct_tag_typet>(type))
+  {
+    return get_expr(descriptor, *struct_type);
   }
   const smt_get_value_commandt get_value_command{descriptor};
   const smt_responset response = get_response_to_command(

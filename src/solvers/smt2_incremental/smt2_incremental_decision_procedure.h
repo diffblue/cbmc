@@ -57,6 +57,8 @@ public:
   optionalt<exprt>
   get_expr(const smt_termt &descriptor, const typet &type) const;
   optionalt<exprt>
+  get_expr(const smt_termt &struct_term, const struct_tag_typet &type) const;
+  optionalt<exprt>
   get_expr(const smt_termt &array, const array_typet &type) const;
 
 protected:
