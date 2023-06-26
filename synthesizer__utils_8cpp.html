@@ -95,16 +95,12 @@ $(document).ready(function(){initNavTree('synthesizer__utils_8cpp.html',''); ini
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="synthesizer__utils_8h_source.html">synthesizer_utils.h</a>&quot;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="natural__loops_8h_source.html">analyses/natural_loops.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="utils_8h_source.html">goto-instrument/contracts/utils.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="havoc__utils_8h_source.html">goto-instrument/havoc_utils.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for synthesizer_utils.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8cpp__incl.svg" width="2787" height="947"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="synthesizer__utils_8cpp__incl.svg" width="2512" height="1395"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -112,97 +108,11 @@ $(document).ready(function(){initNavTree('synthesizer__utils_8cpp.html',''); ini
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a205c743a5e4280f055576f73a5068320"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#a205c743a5e4280f055576f73a5068320">get_loop_end_from_loop_head_and_content</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_head, const <a class="el" href="classloop__templatet.html">loop_templatet</a>&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt; &amp;loop)</td></tr>
-<tr class="separator:a205c743a5e4280f055576f73a5068320"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa236bc60b743c89f2c364d8fc61876c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aaa236bc60b743c89f2c364d8fc61876c">get_loop_end_from_loop_head_and_content_mutable</a> (const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;loop_head, const <a class="el" href="classloop__templatet.html">loop_templatet</a>&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt; &amp;loop)</td></tr>
-<tr class="memdesc:aaa236bc60b743c89f2c364d8fc61876c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the goto instruction of <code>loop</code> that jumps to <code>loop_head</code>  <a href="synthesizer__utils_8cpp.html#aaa236bc60b743c89f2c364d8fc61876c">More...</a><br /></td></tr>
-<tr class="separator:aaa236bc60b743c89f2c364d8fc61876c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7330365cdd84d9b1d8503a299c7b309c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#a7330365cdd84d9b1d8503a299c7b309c">get_loop_head_or_end</a> (const unsigned int target_loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function, bool finding_head)</td></tr>
-<tr class="memdesc:a7330365cdd84d9b1d8503a299c7b309c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return loop head if <code>finding_head</code> is true, Otherwise return loop end.  <a href="synthesizer__utils_8cpp.html#a7330365cdd84d9b1d8503a299c7b309c">More...</a><br /></td></tr>
-<tr class="separator:a7330365cdd84d9b1d8503a299c7b309c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d801a8b0f6de9270dfc985bcf476dd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#a1d801a8b0f6de9270dfc985bcf476dd3">get_loop_end</a> (const unsigned int target_loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
-<tr class="memdesc:a1d801a8b0f6de9270dfc985bcf476dd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find and return the last instruction of the natural loop with <code>loop_number</code> in <code>function</code>.  <a href="synthesizer__utils_8cpp.html#a1d801a8b0f6de9270dfc985bcf476dd3">More...</a><br /></td></tr>
-<tr class="separator:a1d801a8b0f6de9270dfc985bcf476dd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b21d66b7d3f8e1c90243bfb0e30a23c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#a4b21d66b7d3f8e1c90243bfb0e30a23c">get_loop_head</a> (const unsigned int target_loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
-<tr class="memdesc:a4b21d66b7d3f8e1c90243bfb0e30a23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>.  <a href="synthesizer__utils_8cpp.html#a4b21d66b7d3f8e1c90243bfb0e30a23c">More...</a><br /></td></tr>
-<tr class="separator:a4b21d66b7d3f8e1c90243bfb0e30a23c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab60371e081d74195d69c087bb3b9543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;invariant_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
-<tr class="memdesc:aab60371e081d74195d69c087bb3b9543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the invariants in <code>invariant_map</code> to their corresponding loops.  <a href="synthesizer__utils_8cpp.html#aab60371e081d74195d69c087bb3b9543">More...</a><br /></td></tr>
-<tr class="separator:aab60371e081d74195d69c087bb3b9543"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaeb6c0147c7354441c41b25a535e008a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a">annotate_assigns</a> (const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::set&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;assigns_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
-<tr class="memdesc:aaeb6c0147c7354441c41b25a535e008a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the assigns in <code>assigns_map</code> to their corresponding loops.  <a href="synthesizer__utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a">More...</a><br /></td></tr>
-<tr class="separator:aaeb6c0147c7354441c41b25a535e008a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec2d1ec60e566d40c16409fe34d14518"><td class="memItemLeft" align="right" valign="top"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aec2d1ec60e566d40c16409fe34d14518">combine_in_and_post_invariant_clauses</a> (const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;in_clauses, const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;post_clauses, const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;neg_guards)</td></tr>
+<tr class="memitem:aec2d1ec60e566d40c16409fe34d14518"><td class="memItemLeft" align="right" valign="top"><a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synthesizer__utils_8cpp.html#aec2d1ec60e566d40c16409fe34d14518">combine_in_and_post_invariant_clauses</a> (const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;in_clauses, const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;post_clauses, const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;neg_guards)</td></tr>
 <tr class="memdesc:aec2d1ec60e566d40c16409fe34d14518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combine invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv)  <a href="synthesizer__utils_8cpp.html#aec2d1ec60e566d40c16409fe34d14518">More...</a><br /></td></tr>
 <tr class="separator:aec2d1ec60e566d40c16409fe34d14518"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aaeb6c0147c7354441c41b25a535e008a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaeb6c0147c7354441c41b25a535e008a">&#9670;&nbsp;</a></span>annotate_assigns()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annotate_assigns </td>
-          <td>(</td>
-          <td class="paramtype">const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::set&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>assigns_map</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_model</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Annotate the assigns in <code>assigns_map</code> to their corresponding loops. </p>
-<p>Corresponding loops are specified by keys of <code>assigns_map</code> </p>
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00122">122</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="aab60371e081d74195d69c087bb3b9543"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab60371e081d74195d69c087bb3b9543">&#9670;&nbsp;</a></span>annotate_invariants()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annotate_invariants </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
-          <td class="paramname"><em>invariant_map</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_model</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Annotate the invariants in <code>invariant_map</code> to their corresponding loops. </p>
-<p>Corresponding loops are specified by keys of <code>invariant_map</code> </p>
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00102">102</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
 <a id="aec2d1ec60e566d40c16409fe34d14518"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aec2d1ec60e566d40c16409fe34d14518">&#9670;&nbsp;</a></span>combine_in_and_post_invariant_clauses()</h2>
 
@@ -210,21 +120,21 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> combine_in_and_post_invariant_clauses </td>
+          <td class="memname"><a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> combine_in_and_post_invariant_clauses </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
           <td class="paramname"><em>in_clauses</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
           <td class="paramname"><em>post_clauses</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="synthesizer__utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;&#160;</td>
           <td class="paramname"><em>neg_guards</em>&#160;</td>
         </tr>
         <tr>
@@ -237,173 +147,7 @@ Functions</h2></td></tr>
 
 <p>Combine invariant of form (in_inv || !guard) &amp;&amp; (!guard -&gt; pos_inv) </p>
 
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00144">144</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a1d801a8b0f6de9270dfc985bcf476dd3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d801a8b0f6de9270dfc985bcf476dd3">&#9670;&nbsp;</a></span>get_loop_end()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> get_loop_end </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>loop_number</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;&#160;</td>
-          <td class="paramname"><em>function</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Find and return the last instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
-<p>loop_end -&gt; loop_head </p>
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00091">91</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a205c743a5e4280f055576f73a5068320"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a205c743a5e4280f055576f73a5068320">&#9670;&nbsp;</a></span>get_loop_end_from_loop_head_and_content()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> get_loop_end_from_loop_head_and_content </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>loop_head</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classloop__templatet.html">loop_templatet</a>&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>loop</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00017">17</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="aaa236bc60b743c89f2c364d8fc61876c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa236bc60b743c89f2c364d8fc61876c">&#9670;&nbsp;</a></span>get_loop_end_from_loop_head_and_content_mutable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> get_loop_end_from_loop_head_and_content_mutable </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>loop_head</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classloop__templatet.html">loop_templatet</a>&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>, <a class="el" href="classgoto__programt.html#aae1f5166a7e251a800df037937325733">goto_programt::target_less_than</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>loop</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Find the goto instruction of <code>loop</code> that jumps to <code>loop_head</code> </p>
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00041">41</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a4b21d66b7d3f8e1c90243bfb0e30a23c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b21d66b7d3f8e1c90243bfb0e30a23c">&#9670;&nbsp;</a></span>get_loop_head()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> get_loop_head </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>loop_number</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;&#160;</td>
-          <td class="paramname"><em>function</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
-<p>loop_end -&gt; loop_head </p>
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00097">97</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a7330365cdd84d9b1d8503a299c7b309c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7330365cdd84d9b1d8503a299c7b309c">&#9670;&nbsp;</a></span>get_loop_head_or_end()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> get_loop_head_or_end </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>target_loop_number</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;&#160;</td>
-          <td class="paramname"><em>function</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>finding_head</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return loop head if <code>finding_head</code> is true, Otherwise return loop end. </p>
-
-<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00064">64</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synthesizer__utils_8cpp_source.html#l00011">11</a> of file <a class="el" href="synthesizer__utils_8cpp_source.html">synthesizer_utils.cpp</a>.</p>
 
 </div>
 </div>

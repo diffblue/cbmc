@@ -1,23 +1,40 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/loop_ids.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/loop_ids.h">
-<area shape="rect" id="node1" title="Loop IDs." alt="" coords="941,5,1125,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,109,211,165"/>
-<area shape="rect" id="node3" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="235,109,426,165"/>
-<area shape="rect" id="node4" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="451,109,635,165"/>
-<area shape="rect" id="node5" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="659,109,917,165"/>
-<area shape="rect" id="node6" href="$loop__ids_8cpp.html" title="Loop IDs." alt="" coords="941,109,1125,165"/>
-<area shape="rect" id="node7" href="$cegis__verifier_8h.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="951,213,1148,269"/>
-<area shape="rect" id="node10" href="$synthesizer__utils_8h.html" title=" " alt="" coords="1200,109,1397,165"/>
-<area shape="rect" id="node20" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1421,109,1613,165"/>
-<area shape="rect" id="node21" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1637,109,1821,165"/>
-<area shape="rect" id="node8" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="972,325,1169,381"/>
-<area shape="rect" id="node9" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="881,436,1092,507"/>
-<area shape="rect" id="node11" href="$dump__loop__contracts_8h.html" title="Dump Loop Contracts as JSON." alt="" coords="1671,213,1868,269"/>
-<area shape="rect" id="node17" href="$loop__contracts__synthesizer__base_8h.html" title="Loop Contracts Synthesizer Interface." alt="" coords="1172,213,1425,269"/>
-<area shape="rect" id="node19" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="1449,213,1647,269"/>
-<area shape="rect" id="node12" href="$dump__loop__contracts_8cpp.html" title="Dump Loop Contracts as JSON." alt="" coords="1721,325,1919,381"/>
-<area shape="rect" id="node13" href="$goto__synthesizer__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1450,325,1697,381"/>
-<area shape="rect" id="node14" href="$goto__synthesizer__languages_8cpp.html" title="Language Registration." alt="" coords="1454,443,1693,499"/>
-<area shape="rect" id="node15" href="$goto__synthesizer__main_8cpp.html" title="Main Module." alt="" coords="1717,443,1921,499"/>
-<area shape="rect" id="node16" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1167,443,1430,499"/>
-<area shape="rect" id="node18" href="$enumerative__loop__contracts__synthesizer_8h.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="1193,317,1404,388"/>
+<area shape="rect" id="node1" title="Loop IDs." alt="" coords="3344,5,3528,61"/>
+<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1916,109,2121,165"/>
+<area shape="rect" id="node3" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="2146,109,2337,165"/>
+<area shape="rect" id="node4" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2361,109,2545,165"/>
+<area shape="rect" id="node5" href="$utils_8h.html" title=" " alt="" coords="2570,109,2763,165"/>
+<area shape="rect" id="node25" href="$cegis__verifier_8h.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="3989,332,4187,388"/>
+<area shape="rect" id="node35" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3473,109,3732,165"/>
+<area shape="rect" id="node36" href="$loop__ids_8cpp.html" title="Loop IDs." alt="" coords="3756,109,3940,165"/>
+<area shape="rect" id="node37" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3964,109,4156,165"/>
+<area shape="rect" id="node38" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="4180,109,4364,165"/>
+<area shape="rect" id="node6" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3278,221,3471,277"/>
+<area shape="rect" id="node7" href="$dfcc_8cpp.html" title=" " alt="" coords="3547,213,3744,284"/>
+<area shape="rect" id="node8" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="5,213,203,284"/>
+<area shape="rect" id="node9" href="$dfcc__check__loop__normal__form_8cpp.html" title=" " alt="" coords="227,213,477,284"/>
+<area shape="rect" id="node10" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="501,213,760,284"/>
+<area shape="rect" id="node11" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="785,213,991,284"/>
+<area shape="rect" id="node12" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="1016,213,1213,284"/>
+<area shape="rect" id="node13" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="1237,213,1435,284"/>
+<area shape="rect" id="node14" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="1459,213,1656,284"/>
+<area shape="rect" id="node15" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1680,213,1877,284"/>
+<area shape="rect" id="node16" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="1901,213,2099,284"/>
+<area shape="rect" id="node17" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="2123,213,2325,284"/>
+<area shape="rect" id="node18" href="$havoc__assigns__clause__targets_8cpp.html" title="Havoc multiple and possibly dependent targets simultaneously." alt="" coords="2350,213,2543,284"/>
+<area shape="rect" id="node19" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="2567,213,2766,284"/>
+<area shape="rect" id="node20" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="2790,221,3037,277"/>
+<area shape="rect" id="node21" href="$utils_8cpp.html" title=" " alt="" coords="3061,221,3254,277"/>
+<area shape="rect" id="node22" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="4125,443,4323,499"/>
+<area shape="rect" id="node23" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="3336,555,3547,625"/>
+<area shape="rect" id="node24" href="$synthesizer__utils_8h.html" title=" " alt="" coords="3768,221,3965,277"/>
+<area shape="rect" id="node26" href="$dump__loop__contracts_8h.html" title="Dump Loop Contracts as JSON." alt="" coords="3768,332,3965,388"/>
+<area shape="rect" id="node32" href="$loop__contracts__synthesizer__base_8h.html" title="Loop Contracts Synthesizer Interface." alt="" coords="3491,332,3744,388"/>
+<area shape="rect" id="node34" href="$synthesizer__utils_8cpp.html" title=" " alt="" coords="3269,332,3467,388"/>
+<area shape="rect" id="node27" href="$dump__loop__contracts_8cpp.html" title="Dump Loop Contracts as JSON." alt="" coords="3583,443,3780,499"/>
+<area shape="rect" id="node28" href="$goto__synthesizer__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3854,443,4101,499"/>
+<area shape="rect" id="node29" href="$goto__synthesizer__languages_8cpp.html" title="Language Registration." alt="" coords="3858,562,4097,618"/>
+<area shape="rect" id="node30" href="$goto__synthesizer__main_8cpp.html" title="Main Module." alt="" coords="4121,562,4325,618"/>
+<area shape="rect" id="node31" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="3571,562,3834,618"/>
+<area shape="rect" id="node33" href="$enumerative__loop__contracts__synthesizer_8h.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="3348,436,3559,507"/>
 </map>
