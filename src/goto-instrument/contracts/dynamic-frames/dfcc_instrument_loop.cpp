@@ -129,15 +129,10 @@ void dfcc_instrument_loopt::operator()(
     write_set_populate_instrs,
     nof_targets);
 
-  // Replace bound variables by fresh instances in quantified formulas.
-  exprt invariant = loop.invariant;
-  if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
-    add_quantified_variable(symbol_table, invariant, language_mode);
-
   // ---------- Add instrumented instructions ----------
   goto_programt::targett loop_latch =
     loop.find_latch(goto_function.body).value();
-
+  exprt invariant(loop.invariant);
   const auto history_var_map = add_prehead_instructions(
     loop_id,
     goto_function,
@@ -240,7 +235,9 @@ dfcc_instrument_loopt::add_prehead_instructions(
   //   GOTO HEAD;
   // ```
 
-
+  // Replace bound variables by fresh instances in quantified formulas.
+  if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
+    add_quantified_variable(symbol_table, invariant, language_mode);
   // initialize loop_entry history vars;
   auto replace_history_result = replace_history_loop_entry(
     symbol_table, invariant, loop_head_location, language_mode);
@@ -329,7 +326,7 @@ dfcc_instrument_loopt::add_step_instructions(
   goto_programt::targett loop_head,
   goto_programt::targett loop_latch,
   goto_programt &havoc_instrs,
-  const exprt &invariant,
+  exprt &invariant,
   const exprt::operandst &decreases_clauses,
   const symbol_exprt &addr_of_loop_write_set,
   const exprt &outer_write_set,
@@ -432,6 +429,9 @@ dfcc_instrument_loopt::add_step_instructions(
     dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
   {
     // Assume the loop invariant after havocing the state.
+    // Replace bound variables by fresh instances in quantified formulas.
+    if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
+      add_quantified_variable(symbol_table, invariant, language_mode);
     code_assumet assumption{invariant};
     assumption.add_source_location() = loop_head_location;
     converter.goto_convert(assumption, step_instrs, language_mode);
@@ -461,7 +461,7 @@ void dfcc_instrument_loopt::add_body_instructions(
   symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
   goto_programt::targett loop_latch,
-  const exprt &invariant,
+  exprt &invariant,
   const exprt::operandst &decreases_clauses,
   const symbol_exprt &entered_loop,
   const symbol_exprt &in_base_case,
@@ -512,6 +512,10 @@ void dfcc_instrument_loopt::add_body_instructions(
       "Check invariant after step for loop " +
       id2string(check_location.get_function()) + "." +
       std::to_string(cbmc_loop_id));
+    // Assume the loop invariant after havocing the state.
+    // Replace bound variables by fresh instances in quantified formulas.
+    if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
+      add_quantified_variable(symbol_table, invariant, language_mode);
     code_assertt assertion{invariant};
     assertion.add_source_location() = check_location;
     converter.goto_convert(assertion, pre_loop_latch_instrs, language_mode);

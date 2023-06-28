@@ -1,0 +1,15 @@
+CORE dfcc-only smt-backend broken-cprover-smt-backend
+main.c
+--dfcc main --apply-loop-contracts --enforce-contract foo --malloc-may-fail --malloc-fail-null _ --z3 --slice-formula
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests support for quantifiers in loop contracts with the SMT backend.
+When quantified loop invariants are used, they are inserted three times
+in the transformed program (base case assertion, step case assumption,
+step case assertion), and each occurrence needs to be rewritten with fresh
+symbols for the quantified variables. The SMT solver would with an error
+whenever this renaming is not properly done.
