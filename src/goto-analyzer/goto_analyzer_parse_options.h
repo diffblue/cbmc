@@ -89,7 +89,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
 #include <util/validation_interface.h>
@@ -100,6 +99,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <ansi-c/goto_check_c.h>
+#include <cli-utils/parse_options.h>
 #include <langapi/language.h>
 
 class optionst;

@@ -12,6 +12,7 @@ target_link_libraries(cbmc-lib
     ansi-c
     assembler
     big-int
+    cli-utils
     cpp
     goto-checker
     goto-instrument-lib

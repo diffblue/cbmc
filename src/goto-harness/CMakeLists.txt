@@ -4,6 +4,7 @@ generic_includes(goto-harness)
 
 target_link_libraries(goto-harness
   util
+  cli-utils
   goto-programs
   goto-instrument-lib
   json

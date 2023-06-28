@@ -9,7 +9,6 @@
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
@@ -20,6 +19,7 @@
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
 
+#include <cli-utils/cmdline.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")

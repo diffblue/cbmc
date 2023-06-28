@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 #define CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
 #include <util/validation_interface.h>
@@ -22,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/goto_check_c.h>
+#include <cli-utils/parse_options.h>
 #include <goto-checker/bmc_util.h>
 #include <goto-instrument/cover.h>
 #include <json/json_interface.h>

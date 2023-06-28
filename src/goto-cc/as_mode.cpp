@@ -19,13 +19,14 @@ Author: Michael Tautschnig
 #include <sysexits.h>
 #endif
 
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
 #include <util/tempdir.h>
 #include <util/version.h>
+
+#include <cli-utils/cmdline.h>
 
 #include "compile.h"
 #include "goto_cc_cmdline.h"

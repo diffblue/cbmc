@@ -2,11 +2,11 @@
 
 #include "api_options.h"
 
-#include <util/cmdline.h>
 #include <util/make_unique.h>
 #include <util/options.h>
 
 #include <ansi-c/goto_check_c.h>
+#include <cli-utils/cmdline.h>
 #include <goto-checker/solver_factory.h>
 
 api_optionst api_optionst::create()

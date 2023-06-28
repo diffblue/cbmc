@@ -2,7 +2,6 @@
 
 #include "api.h"
 
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/invariant.h>
 #include <util/message.h>
@@ -22,6 +21,7 @@
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/gcc_version.h>
 #include <assembler/remove_asm.h>
+#include <cli-utils/cmdline.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>
 #include <langapi/mode.h>

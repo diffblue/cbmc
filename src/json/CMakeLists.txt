@@ -10,4 +10,4 @@ add_library(json
 
 generic_includes(json)
 
-target_link_libraries(json util)
+target_link_libraries(json util cli-utils)

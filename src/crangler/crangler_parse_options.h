@@ -12,7 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CRANGLER_CRANGLER_PARSE_OPTIONS_H
 #define CPROVER_CRANGLER_CRANGLER_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
+#include <cli-utils/parse_options.h>
 
 class crangler_parse_optionst : public parse_options_baset
 {

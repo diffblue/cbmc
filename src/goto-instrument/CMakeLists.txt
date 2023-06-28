@@ -10,6 +10,7 @@ generic_includes(goto-instrument-lib)
 target_link_libraries(goto-instrument-lib
     ansi-c
     cpp
+    cli-utils
     linking
     big-int
     goto-programs

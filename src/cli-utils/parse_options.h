@@ -13,8 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 #include "cmdline.h"
-#include "message.h"
-#include "ui_message.h"
+#include "util/message.h"
+#include "util/ui_message.h"
 
 class parse_options_baset
 {

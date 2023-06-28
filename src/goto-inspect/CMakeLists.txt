@@ -9,6 +9,7 @@ generic_includes(goto-inspect)
 target_link_libraries(goto-inspect
   util
   goto-programs
+  cli-utils
 )
 
 install(TARGETS goto-inspect DESTINATION ${CMAKE_INSTALL_BINDIR})

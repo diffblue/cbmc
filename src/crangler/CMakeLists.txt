@@ -17,6 +17,7 @@ target_link_libraries(crangler-lib
     big-int
     util
     json
+    cli-utils
 )
 
 # Executable

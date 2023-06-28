@@ -10,6 +10,7 @@ generic_includes(goto-synthesizer-lib)
 target_link_libraries(goto-synthesizer-lib
     ansi-c
     cpp
+    cli-utils
     big-int
     goto-checker
     goto-instrument-lib

@@ -6,9 +6,10 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <array>
+#include <cli-utils/cmdline.h>
 #include <testing-utils/use_catch.h>
-#include <util/cmdline.h>
+
+#include <array>
 
 TEST_CASE("cmdlinet::has_option", "[core][util][cmdline]")
 {

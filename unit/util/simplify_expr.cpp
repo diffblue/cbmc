@@ -6,13 +6,10 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -21,6 +18,9 @@ Author: Michael Tautschnig
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
+
+#include <cli-utils/cmdline.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 {

@@ -6,17 +6,17 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
+
+#include <cli-utils/cmdline.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("Build subexpression to access element at offset into array")
 {

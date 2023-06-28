@@ -6,8 +6,8 @@ Author: Diffblue Ltd.
 
 \******************************************************************/
 
+#include <cli-utils/parse_options.h>
 #include <testing-utils/use_catch.h>
-#include <util/parse_options.h>
 
 TEST_CASE("align_center_with_border", "[core][util]")
 {

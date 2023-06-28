@@ -9,13 +9,13 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_GOTO_HARNESS_GOTO_HARNESS_PARSE_OPTIONS_H
 #define CPROVER_GOTO_HARNESS_GOTO_HARNESS_PARSE_OPTIONS_H
 
-#include <string>
-
-#include <util/parse_options.h>
+#include <cli-utils/parse_options.h>
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator_factory.h"
 #include "memory_snapshot_harness_generator_options.h"
+
+#include <string>
 
 // clang-format off
 #define GOTO_HARNESS_OPTIONS                                                   \

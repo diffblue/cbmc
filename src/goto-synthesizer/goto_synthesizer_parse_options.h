@@ -11,10 +11,10 @@ Author: Qinheping Hu
 
 #include <util/config.h>
 #include <util/options.h>
-#include <util/parse_options.h>
 
 #include <goto-programs/goto_model.h>
 
+#include <cli-utils/parse_options.h>
 #include <goto-checker/solver_factory.h>
 #include <goto-instrument/contracts/contracts.h>
 

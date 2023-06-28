@@ -219,6 +219,7 @@ cprover_default_properties(
     big-int
     cbmc
     cbmc-lib
+    cli-utils
     cpp
     cprover-api-cpp
     cprover

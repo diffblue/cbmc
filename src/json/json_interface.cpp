@@ -11,10 +11,11 @@ Author: Peter Schrammel
 
 #include "json_interface.h"
 
-#include <util/cmdline.h>
 #include <util/exception_utils.h>
 #include <util/json.h>
 #include <util/message.h>
+
+#include <cli-utils/cmdline.h>
 
 #include "json_parser.h"
 

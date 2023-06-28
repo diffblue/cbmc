@@ -12,12 +12,12 @@ Author: Peter Schrammel
 #ifndef CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
 #define CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
 #include <util/timestamper.h>
 
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
+#include <cli-utils/parse_options.h>
 #include <goto-instrument/cover.h>
 
 class goto_modelt;

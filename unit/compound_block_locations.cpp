@@ -8,7 +8,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include "compound_block_locations.h"
 
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/options.h>
 #include <util/std_code.h>
@@ -18,6 +17,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <ansi-c/ansi_c_language.h>
 #include <cbmc/cbmc_parse_options.h>
+#include <cli-utils/cmdline.h>
 #include <goto-instrument/goto_program2code.h>
 #include <langapi/mode.h>
 #include <testing-utils/use_catch.h>

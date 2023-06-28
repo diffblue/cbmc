@@ -8,9 +8,10 @@ Author: Daniel Poetzl
 
 #include "java_object_factory_parameters.h"
 
-#include <util/cmdline.h>
 #include <util/exception_utils.h>
 #include <util/options.h>
+
+#include <cli-utils/cmdline.h>
 
 void java_object_factory_parameterst::set(const optionst &options)
 {

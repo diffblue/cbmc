@@ -8,8 +8,9 @@ Author: Diffblue Ltd
 
 #include "object_factory_parameters.h"
 
-#include <util/cmdline.h>
 #include <util/options.h>
+
+#include <cli-utils/cmdline.h>
 
 void object_factory_parameterst::set(const optionst &options)
 {

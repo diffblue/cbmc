@@ -10,4 +10,4 @@ add_library(xml
 
 generic_includes(xml)
 
-target_link_libraries(xml util)
+target_link_libraries(xml util cli-utils)

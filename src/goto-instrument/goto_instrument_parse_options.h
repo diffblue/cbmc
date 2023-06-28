@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 
 #include <util/config.h>
-#include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
 #include <util/validation_interface.h>
@@ -27,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/goto_check_c.h>
+#include <cli-utils/parse_options.h>
 #include <pointer-analysis/goto_program_dereference.h>
 
 #include "aggressive_slicer.h"

@@ -48,7 +48,7 @@ add_dependencies(util generate_version_cpp)
 
 generic_includes(util)
 
-target_link_libraries(util big-int langapi)
+target_link_libraries(util big-int langapi cli-utils)
 if(WIN32)
   target_link_libraries(util dbghelp)
 endif()

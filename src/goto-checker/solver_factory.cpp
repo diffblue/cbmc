@@ -11,13 +11,14 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "solver_factory.h"
 
-#include <util/cmdline.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/make_unique.h>
 #include <util/message.h>
 #include <util/options.h>
 #include <util/version.h>
+
+#include <cli-utils/cmdline.h>
 
 #include <iostream>
 

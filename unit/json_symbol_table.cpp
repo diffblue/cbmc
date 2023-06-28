@@ -2,18 +2,17 @@
 
 /// \file json symbol table read/write consistency
 
-#include <goto-programs/goto_model.h>
-#include <goto-programs/show_symbol_table.h>
-
-#include <json-symtab-language/json_symbol_table.h>
-#include <json/json_parser.h>
-
-#include <util/cmdline.h>
 #include <util/json_stream.h>
 #include <util/message.h>
 #include <util/symbol_table.h>
 #include <util/ui_message.h>
 
+#include <goto-programs/goto_model.h>
+#include <goto-programs/show_symbol_table.h>
+
+#include <cli-utils/cmdline.h>
+#include <json-symtab-language/json_symbol_table.h>
+#include <json/json_parser.h>
 #include <testing-utils/get_goto_model_from_c.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>

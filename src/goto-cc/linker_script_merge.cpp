@@ -10,7 +10,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/cmdline.h>
 #include <util/expr_initializer.h>
 #include <util/magic.h>
 #include <util/pointer_expr.h>
@@ -21,6 +20,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 
+#include <cli-utils/cmdline.h>
 #include <json/json_parser.h>
 #include <linking/static_lifetime_init.h>
 

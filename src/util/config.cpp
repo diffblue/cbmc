@@ -8,8 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "config.h"
 
+#include <cli-utils/cmdline.h>
+
 #include "arith_tools.h"
-#include "cmdline.h"
 #include "cprover_prefix.h"
 #include "exception_utils.h"
 #include "namespace.h"

@@ -14,7 +14,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 #define CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
 
 #include <util/message.h>
-#include <util/parse_options.h>
+
+#include <cli-utils/parse_options.h>
 
 // clang-format off
 #define MEMORY_ANALYZER_OPTIONS \
