@@ -343,13 +343,8 @@ exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
   return expr;
 }
 
-static optionalt<smt_termt> get_identifier(
-  const exprt &expr,
-  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_handle_identifiers,
-  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_identifiers,
-  const namespacet &ns)
+optionalt<smt_termt>
+smt2_incremental_decision_proceduret::get_identifier(const exprt &expr) const
 {
   // Lookup the non-lowered form first.
   const auto handle_find_result = expression_handle_identifiers.find(expr);
@@ -457,23 +452,13 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   auto descriptor = [&]() -> optionalt<smt_termt> {
     if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
     {
-      const auto array = get_identifier(
-        index_expr->array(),
-        expression_handle_identifiers,
-        expression_identifiers,
-        ns);
-      const auto index = get_identifier(
-        index_expr->index(),
-        expression_handle_identifiers,
-        expression_identifiers,
-        ns);
+      const auto array = get_identifier(index_expr->array());
+      const auto index = get_identifier(index_expr->index());
       if(!array || !index)
         return {};
       return smt_array_theoryt::select(*array, *index);
     }
-    if(
-      auto identifier_descriptor = get_identifier(
-        expr, expression_handle_identifiers, expression_identifiers, ns))
+    if(auto identifier_descriptor = get_identifier(expr))
     {
       return identifier_descriptor;
     }
