@@ -184,7 +184,7 @@ protected:
   /// \param[inout] loop_latch Latch node of the loop.
   /// \param[out] assigns_instrs `goto_programt` that contains instructions of
   ///                       populating assigns into the loop write set.
-  /// \param[out] invariant Loop invariants.
+  /// \param[in] invariant Loop invariants.
   /// \param[in] assigns Assigns targets of the loop.
   /// \param[in] loop_write_set Stack allocated loop write set variable.
   /// \param[in] addr_of_loop_write_set Loop write set pointer variable.
@@ -250,7 +250,7 @@ protected:
     goto_programt::targett loop_head,
     goto_programt::targett loop_latch,
     goto_programt &havoc_instrs,
-    const exprt &invariant,
+    exprt &invariant,
     const exprt::operandst &decreases_clauses,
     const symbol_exprt &loop_write_set,
     const exprt &outer_write_set,
@@ -296,7 +296,7 @@ protected:
     symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
     goto_programt::targett loop_latch,
-    const exprt &invariant,
+    exprt &invariant,
     const exprt::operandst &decreases_clauses,
     const symbol_exprt &entered_loop,
     const symbol_exprt &in_base_case,
