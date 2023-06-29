@@ -97,7 +97,7 @@ protected:
   /// Performs a combination of transformations which reduces the set of
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
-  exprt lower(exprt expression);
+  exprt lower(exprt expression) const;
   optionalt<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.

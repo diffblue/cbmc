@@ -355,7 +355,7 @@ smt2_incremental_decision_proceduret::get_identifier(const exprt &expr) const
     return expr_find_result->second;
 
   // If that didn't yield any results, then try the lowered form.
-  const exprt lowered_expr = lower_enum(expr, ns);
+  const exprt lowered_expr = lower(expr);
   const auto lowered_handle_find_result =
     expression_handle_identifiers.find(lowered_expr);
   if(lowered_handle_find_result != expression_handle_identifiers.cend())
@@ -589,7 +589,7 @@ void smt2_incremental_decision_proceduret::define_object_properties()
   }
 }
 
-exprt smt2_incremental_decision_proceduret::lower(exprt expression)
+exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
 {
   const exprt lowered = struct_encoding.encode(
     lower_enum(lower_byte_operators(expression, ns), ns));
