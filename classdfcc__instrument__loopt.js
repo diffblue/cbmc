@@ -1,10 +1,10 @@
 var classdfcc__instrument__loopt =
 [
     [ "dfcc_instrument_loopt", "classdfcc__instrument__loopt.html#a5ee3068d023af3016a8248d20ebdb815", null ],
-    [ "add_body_instructions", "classdfcc__instrument__loopt.html#a41b3eb664d4f828be2d7b8dbd31efaa6", null ],
+    [ "add_body_instructions", "classdfcc__instrument__loopt.html#a60ee964a7128f88ed245c0567abe0411", null ],
     [ "add_exit_instructions", "classdfcc__instrument__loopt.html#a2b1d824b00be7788cf10c9bf88297ec6", null ],
     [ "add_prehead_instructions", "classdfcc__instrument__loopt.html#a95ff93f069102d8a6dc33cba2fa00f3f", null ],
-    [ "add_step_instructions", "classdfcc__instrument__loopt.html#a88a650236fa874a8bf7fcf41a8770222", null ],
+    [ "add_step_instructions", "classdfcc__instrument__loopt.html#ace7f9eabd756bbf57ddaf631d9f9d496", null ],
     [ "get_max_assigns_clause_size", "classdfcc__instrument__loopt.html#a9ae0dc5508b096210b994dec05e1b555", null ],
     [ "operator()", "classdfcc__instrument__loopt.html#aa0c6b59537501e86b4a634c685c10e31", null ],
     [ "contract_clauses_codegen", "classdfcc__instrument__loopt.html#aff1ae921538ba1154fe641cf03133add", null ],
