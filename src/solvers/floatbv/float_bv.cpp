@@ -458,7 +458,14 @@ exprt float_bvt::conversion(
     // if the number was denormal and is normal in the new format,
     // normalise it!
     if(dest_spec.e > src_spec.e)
+    {
       normalization_shift(result.fraction, result.exponent);
+      // normalization_shift unconditionally extends the exponent size to avoid
+      // arithmetic overflow, but this cannot have happened here as the exponent
+      // had already been extended to dest_spec's size
+      result.exponent =
+        typecast_exprt(result.exponent, signedbv_typet(dest_spec.e));
+    }
 
     // the flags get copied
     result.sign=unpacked_src.sign;
@@ -954,8 +961,8 @@ void float_bvt::normalization_shift(
 
   std::size_t depth = address_bits(fraction_bits - 1);
 
-  if(exponent_bits<depth)
-    exponent=typecast_exprt(exponent, signedbv_typet(depth));
+  exponent = typecast_exprt(
+    exponent, signedbv_typet(std::max(depth, exponent_bits + 1)));
 
   exprt exponent_delta=from_integer(0, exponent.type());
 
