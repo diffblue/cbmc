@@ -1,6 +1,5 @@
 var NAVTREEINDEX74 =
 {
-"cover__instrument__mcdc_8cpp.html#aae6996a0f1d7f374be6b7aca372859e7":[9,0,2,14,27,3],
 "cover__instrument__mcdc_8cpp.html#abc21955950aeaac9db5239eef7d1d15a":[9,0,2,14,27,10],
 "cover__instrument__mcdc_8cpp.html#ac4cea75708c80b226a7db902d73847ac":[9,0,2,14,27,6],
 "cover__instrument__mcdc_8cpp.html#ac5a9f47ca5d4e59aaf4d426ddfcc2045":[9,0,2,14,27,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX74 =
 "cpp__typecheck__expr_8cpp.html":[9,0,2,5,60],
 "cpp__typecheck__expr_8cpp.html#a1e72b2b0ddfadd09119eb89844da82ec":[9,0,2,5,60,1],
 "cpp__typecheck__expr_8cpp.html#ae10fde0e44b30124d4c25d9170ce8855":[9,0,2,5,60,2],
-"cpp__typecheck__expr_8cpp_source.html":[9,0,2,5,60]
+"cpp__typecheck__expr_8cpp_source.html":[9,0,2,5,60],
+"cpp__typecheck__fargs_8cpp.html":[9,0,2,5,61]
 };
