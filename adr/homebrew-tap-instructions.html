@@ -72,7 +72,7 @@ $(function() {
 <div class="textblock"><p>CBMC archives versions into a tap which you can use to quickly download and build various historical versions.</p>
 <p>The tap is available at <a href="https://github.com/diffblue/homebrew-cbmc">https://github.com/diffblue/homebrew-cbmc</a>.</p>
 <p>Any version installed from the tap will need to be built from source locally.</p>
-<h2><a class="anchor" id="autotoc_md0"></a>
+<h2><a class="anchor" id="autotoc_md3"></a>
 Managing &lt;tt&gt;brew tap&lt;/tt&gt;-based CBMC installations</h2>
 <ul>
 <li>Add the CBMC tap using the following command:</li>
@@ -90,7 +90,7 @@ Managing &lt;tt&gt;brew tap&lt;/tt&gt;-based CBMC installations</h2>
 <li>To remove the tap altogether, you need to issue</li>
 </ul>
 <div class="fragment"><div class="line">$ brew untap diffblue/cbmc</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md1"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4"></a>
 CBMC maintainer instructions</h2>
 <ul>
 <li>You can clone the <a href="https://github.com/diffblue/homebrew-cbmc">CBMC tap</a> locally by issuing:</li>
@@ -114,12 +114,12 @@ CBMC maintainer instructions</h2>
 <div class="fragment"><div class="line">$ brew edit cbmc@5.54.0</div>
 </div><!-- fragment --><p>with the appropriate version tag. This will open the formula on the default editor in your system to allow you to make changes.</p>
 <p>These changes are only going to be reflected locally - but you can <code>cd</code> to the repository, commit and then push to the tap (this is allowed only for people who have permission to push to the tap - mainly, the Diffblue open source team).</p>
-<h2><a class="anchor" id="autotoc_md2"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Notes</h2>
 <ul>
 <li>Bootstrapping the repository with <code>brew tap --new</code> created two github actions <code>.github/workflows/publish.yml</code> and <code>.github/workflows/tests.yml</code> which we are not using at the moment but could serve to make future automation easier.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3"></a>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Known Limitations</h2>
 <ul>
 <li>Different CBMC versions can co-exist in the same machine, but homebrew needs a symbolic link to be established because of how it manages the <code>$PATH</code> and installation directories for binaries.</li>
@@ -131,7 +131,7 @@ Known Limitations</h2>
 <div class="line">$ brew link --overwrite cbmc@5.55.0</div>
 <div class="line">$ cbmc --version</div>
 <div class="line">5.55.0</div>
-</div><!-- fragment --><p>Last modified: 2023-06-29 23:09:23 +0200 </p>
+</div><!-- fragment --><p>Last modified: 2023-06-30 15:59:32 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
