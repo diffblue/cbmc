@@ -100,4 +100,5 @@ void goto_bmc_parse_optionst::help()
     // NOLINTNEXTLINE(*)
     "goto-bmc [options] file.c ...    perform bounded model checking on symex-ready goto-binary\n";
   // clang-format on
+  log.status() << messaget::eom;
 }
