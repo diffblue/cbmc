@@ -38,7 +38,7 @@ int goto_bmc_parse_optionst::doit()
 
   api_sessiont api{api_options};
 
-  if(cmdline.args.size() > 1 && !api.is_goto_binary(cmdline.args[0]))
+  if(cmdline.args.size() != 1 || !api.is_goto_binary(cmdline.args[0]))
   {
     log.error() << "Please give exactly one binary file" << messaget::eom;
     return CPROVER_EXIT_INCORRECT_TASK;
