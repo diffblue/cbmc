@@ -76,11 +76,17 @@ api_sessiont::~api_sessiont() = default;
 struct api_messaget
 {
   std::string string;
+  unsigned level;
 };
 
 const char *api_message_get_string(const api_messaget &message)
 {
   return message.string.c_str();
+}
+
+bool api_message_is_error(const api_messaget &message)
+{
+  return message.level == messaget::message_levelt::M_ERROR;
 }
 
 class api_message_handlert : public message_handlert
@@ -115,7 +121,7 @@ void api_message_handlert::print(unsigned level, const std::string &message)
 {
   if(!callback)
     return;
-  api_messaget api_message{message};
+  api_messaget api_message{message, level};
   callback(api_message, context);
 }
 

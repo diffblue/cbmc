@@ -59,12 +59,16 @@ int goto_bmc_parse_optionst::doit()
   struct call_back_contextt
   {
     std::reference_wrapper<messaget> log;
+    bool error_seen;
   } call_back_context{log};
   const auto callback = [](
                           const api_messaget &message,
                           api_call_back_contextt api_call_back_context) {
     auto context = static_cast<call_back_contextt *>(api_call_back_context);
-    context->log.get().status()
+    const bool is_error_message = api_message_is_error(message);
+    context->error_seen |= is_error_message;
+    (is_error_message ? context->log.get().error()
+                      : context->log.get().status())
       << api_message_get_string(message) << messaget::eom;
   };
 
@@ -72,6 +76,8 @@ int goto_bmc_parse_optionst::doit()
 
   // Finally, we read the goto-binary the user supplied...
   api.read_goto_binary(filename);
+  if(call_back_context.error_seen)
+    return CPROVER_EXIT_PARSE_ERROR;
 
   // ... and run analysis on it.
   auto result = api.run_verifier();
