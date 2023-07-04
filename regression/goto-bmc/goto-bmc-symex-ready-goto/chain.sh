@@ -10,4 +10,4 @@ name=${*:$#}
 base_name=${name%.c}
 
 "${cbmc}" --export-symex-ready-goto "${base_name}.goto.symex_ready" "${name}"
-"${goto_bmc}" "${base_name}.goto.symex_ready" "${options}"
+"${goto_bmc}" "${base_name}.goto.symex_ready" ${options}
