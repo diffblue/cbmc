@@ -30,12 +30,6 @@ int goto_bmc_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.isset("help"))
-  {
-    help();
-    return CPROVER_EXIT_SUCCESS;
-  }
-
   api_sessiont api{api_options};
 
   if(cmdline.args.size() != 1 || !api.is_goto_binary(cmdline.args[0]))
