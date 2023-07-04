@@ -20,14 +20,6 @@ goto_bmc_parse_optionst::goto_bmc_parse_optionst(int argc, const char **argv)
 {
 }
 
-void print_messages_to_stdout(
-  const api_messaget &message,
-  api_call_back_contextt api_call_back_context)
-{
-  const messaget *log = static_cast<messaget *>(api_call_back_context);
-  log->status() << api_message_get_string(message) << messaget::eom;
-}
-
 int goto_bmc_parse_optionst::doit()
 {
   auto api_options = api_optionst::create();
@@ -64,7 +56,19 @@ int goto_bmc_parse_optionst::doit()
 
   // The API works with a callback for querying state - we for now just print
   // collected messages from the message buffer to stdout.
-  api.set_message_callback(print_messages_to_stdout, &log);
+  struct call_back_contextt
+  {
+    std::reference_wrapper<messaget> log;
+  } call_back_context{log};
+  const auto callback = [](
+                          const api_messaget &message,
+                          api_call_back_contextt api_call_back_context) {
+    auto context = static_cast<call_back_contextt *>(api_call_back_context);
+    context->log.get().status()
+      << api_message_get_string(message) << messaget::eom;
+  };
+
+  api.set_message_callback(callback, &call_back_context);
 
   // Finally, we read the goto-binary the user supplied...
   api.read_goto_binary(filename);
