@@ -1,0 +1,12 @@
+CORE
+not-goto-no-header.goto
+
+^EXIT=6$
+^SIGNAL=0$
+Please give exactly one binary file
+--
+not a goto binary
+Unable to read goto-binary from file not-goto-no-header\.goto
+--
+This test confirms that an appropriate error message is displayed in the case
+where a single input file is specified which does not pass the header check.

@@ -1,0 +1,16 @@
+CORE
+not-goto-with-header.goto
+
+^EXIT=2$
+^SIGNAL=0$
+Unable to read goto-binary from file not-goto-with-header\.goto
+--
+Please give exactly one binary file
+not a goto binary
+--
+This test confirms that an appropriate error message is displayed in the case
+where an input file is specified which passed the header check used to
+determine if the file is a goto binary or not, but which is not followed by
+data of a valid goto binary file. Note that the `is_goto_binary` check works
+based on checking if the first four bytes of the file are the byte 7F followed
+by the characters "GBF".

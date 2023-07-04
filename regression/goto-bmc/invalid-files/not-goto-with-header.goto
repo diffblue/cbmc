@@ -1,0 +1,3 @@
+GBF
+This is not a valid goto binary. It does have a header which should pass the
+`is_goto_binary` check though.
