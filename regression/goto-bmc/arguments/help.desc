@@ -1,0 +1,13 @@
+CORE
+
+--help
+^EXIT=0$
+^SIGNAL=0$
+goto-bmc \d\.\d+\.\d+
+Usage\:
+Purpose\:
+show help
+show version and exit
+--
+--
+Test that help is output when help argument is specified.
