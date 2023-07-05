@@ -73,7 +73,9 @@ TEST_CASE("struct encoding of types", "[core][smt2_incremental]")
 TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
 {
   const struct_union_typet::componentst component_types{
-    {"green", signedbv_typet{32}}, {"eggs", unsignedbv_typet{16}}};
+    {"green", signedbv_typet{32}},
+    {"eggs", unsignedbv_typet{16}},
+    {"ham", signedbv_typet{24}}};
   const struct_typet struct_type{component_types};
   const type_symbolt type_symbol{"my_structt", struct_type, ID_C};
   auto test = struct_encoding_test_environmentt::make();
@@ -82,7 +84,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
   const symbolt struct_value_symbol{"my_struct", struct_tag, ID_C};
   test.symbol_table.insert(struct_value_symbol);
   const auto symbol_expr = struct_value_symbol.symbol_expr();
-  const auto symbol_expr_as_bv = symbol_exprt{"my_struct", bv_typet{48}};
+  const auto symbol_expr_as_bv = symbol_exprt{"my_struct", bv_typet{72}};
   SECTION("struct typed symbol expression")
   {
     REQUIRE(test.struct_encoding.encode(symbol_expr) == symbol_expr_as_bv);
@@ -98,10 +100,12 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     const symbolt green_ham{"ham", signedbv_typet{32}, ID_C};
     test.symbol_table.insert(green_ham);
     const auto forty_two = from_integer(42, unsignedbv_typet{16});
-    const exprt::operandst components{green_ham.symbol_expr(), forty_two};
+    const auto minus_one = from_integer(-1, signedbv_typet{24});
+    const exprt::operandst components{
+      green_ham.symbol_expr(), forty_two, minus_one};
     const struct_exprt struct_expr{components, struct_tag};
     const concatenation_exprt expected_result{
-      {green_ham.symbol_expr(), forty_two}, bv_typet{48}};
+      {green_ham.symbol_expr(), forty_two, minus_one}, bv_typet{72}};
     REQUIRE(test.struct_encoding.encode(struct_expr) == expected_result);
   }
 }
