@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('structapi__sessiont.html',''); initRes
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="structapi__sessiont-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -129,7 +130,23 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa8a7742671eed31e88a14c44c0dfe8a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Validate the loaded goto model.  <a href="structapi__sessiont.html#aa8a7742671eed31e88a14c44c0dfe8a5">More...</a><br /></td></tr>
 <tr class="separator:aa8a7742671eed31e88a14c44c0dfe8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26220aaf6c8faefcedb47df8576e9425"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a26220aaf6c8faefcedb47df8576e9425">get_api_version</a> () const</td></tr>
+<tr class="memdesc:a26220aaf6c8faefcedb47df8576e9425"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple API version information function.  <a href="structapi__sessiont.html#a26220aaf6c8faefcedb47df8576e9425">More...</a><br /></td></tr>
 <tr class="separator:a26220aaf6c8faefcedb47df8576e9425"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fafaa8bf6d389b992008d40d2ee7a51"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a2fafaa8bf6d389b992008d40d2ee7a51">run_verifier</a> () const</td></tr>
+<tr class="memdesc:a2fafaa8bf6d389b992008d40d2ee7a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the model by running symex and the decision procedure.  <a href="structapi__sessiont.html#a2fafaa8bf6d389b992008d40d2ee7a51">More...</a><br /></td></tr>
+<tr class="separator:a2fafaa8bf6d389b992008d40d2ee7a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afaa63590a146835b657a93c0ac69c3af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#afaa63590a146835b657a93c0ac69c3af">read_goto_binary</a> (std::string &amp;file) const</td></tr>
+<tr class="memdesc:afaa63590a146835b657a93c0ac69c3af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a goto-binary from a given filename.  <a href="structapi__sessiont.html#afaa63590a146835b657a93c0ac69c3af">More...</a><br /></td></tr>
+<tr class="separator:afaa63590a146835b657a93c0ac69c3af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a703f70350e66e0be5597fa15852afe14"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a703f70350e66e0be5597fa15852afe14">is_goto_binary</a> (std::string &amp;file) const</td></tr>
+<tr class="memdesc:a703f70350e66e0be5597fa15852afe14"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if file is goto-binary.  <a href="structapi__sessiont.html#a703f70350e66e0be5597fa15852afe14">More...</a><br /></td></tr>
+<tr class="separator:a703f70350e66e0be5597fa15852afe14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a5e43feafe651b75a8deaef0066dee0ef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structapi__sessiont.html#a5e43feafe651b75a8deaef0066dee0ef">preprocess_model</a> () const</td></tr>
+<tr class="memdesc:a5e43feafe651b75a8deaef0066dee0ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement necessary transformations to reduce model to symex-ready-GOTO, before being fed to symex.  <a href="structapi__sessiont.html#a5e43feafe651b75a8deaef0066dee0ef">More...</a><br /></td></tr>
+<tr class="separator:a5e43feafe651b75a8deaef0066dee0ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -138,7 +155,7 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00053">53</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00056">56</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abd292e751c8cc99001ba4107745f6e96"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abd292e751c8cc99001ba4107745f6e96">&#9670;&nbsp;</a></span>api_sessiont() <span class="overload">[1/2]</span></h2>
@@ -155,7 +172,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00048">48</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00049">49</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -183,7 +200,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00052">52</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00053">53</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +247,7 @@ Private Attributes</h2></td></tr>
 
 <p>Drop unused functions from the loaded goto_model simplifying it. </p>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00187">187</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00234">234</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -249,7 +266,31 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00036">36</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p>A simple API version information function. </p>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00037">37</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a703f70350e66e0be5597fa15852afe14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a703f70350e66e0be5597fa15852afe14">&#9670;&nbsp;</a></span>is_goto_binary()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool api_sessiont::is_goto_binary </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramname"><em>file</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>True if file is goto-binary. </p>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00173">173</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +318,82 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00129">129</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00136">136</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5e43feafe651b75a8deaef0066dee0ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e43feafe651b75a8deaef0066dee0ef">&#9670;&nbsp;</a></span>preprocess_model()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool api_sessiont::preprocess_model </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implement necessary transformations to reduce model to symex-ready-GOTO, before being fed to symex. </p>
+<dl class="section return"><dt>Returns</dt><dd>The function returns <code>true</code> if it failed because CBMC produced an error. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00178">178</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="afaa63590a146835b657a93c0ac69c3af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afaa63590a146835b657a93c0ac69c3af">&#9670;&nbsp;</a></span>read_goto_binary()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void api_sessiont::read_goto_binary </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramname"><em>file</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read a goto-binary from a given filename. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Will error out if it reads a source file. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00156">156</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2fafaa8bf6d389b992008d40d2ee7a51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fafaa8bf6d389b992008d40d2ee7a51">&#9670;&nbsp;</a></span>run_verifier()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="structverification__resultt.html">verification_resultt</a> &gt; api_sessiont::run_verifier </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Process the model by running symex and the decision procedure. </p>
+<dl class="section return"><dt>Returns</dt><dd>a <code>unique_ptr</code> to the <code><a class="el" href="structverification__resultt.html">verification_resultt</a></code> summary. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00214">214</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +430,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00121">121</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00128">128</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -335,7 +451,7 @@ Private Attributes</h2></td></tr>
 
 <p>Validate the loaded goto model. </p>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00202">202</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00249">249</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -354,7 +470,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00136">136</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00143">143</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>
@@ -379,7 +495,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00086">86</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8h_source.html#l00100">100</a> of file <a class="el" href="api_8h_source.html">api.h</a>.</p>
 
 </div>
 </div>

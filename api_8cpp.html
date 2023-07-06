@@ -108,6 +108,7 @@ $(document).ready(function(){initNavTree('api_8cpp.html',''); initResizable(); }
 <code>#include &lt;<a class="el" href="initialize__goto__model_8h_source.html">goto-programs/initialize_goto_model.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="link__to__library_8h_source.html">goto-programs/link_to_library.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="process__goto__program_8h_source.html">goto-programs/process_goto_program.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="read__goto__binary_8h_source.html">goto-programs/read_goto_binary.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="remove__skip_8h_source.html">goto-programs/remove_skip.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="remove__unused__functions_8h_source.html">goto-programs/remove_unused_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="set__properties_8h_source.html">goto-programs/set_properties.h</a>&gt;</code><br />
@@ -127,7 +128,7 @@ $(document).ready(function(){initNavTree('api_8cpp.html',''); initResizable(); }
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="api_8cpp__incl.svg" width="4459" height="798"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="api_8cpp__incl.svg" width="3651" height="723"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -147,6 +148,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a4928511967c81658f0646ce20cb975d0"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="api_8cpp.html#a4928511967c81658f0646ce20cb975d0">api_message_get_string</a> (const <a class="el" href="structapi__messaget.html">api_messaget</a> &amp;message)</td></tr>
 <tr class="memdesc:a4928511967c81658f0646ce20cb975d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a <code>api_message</code>, this function returns that message expressed as a C language string.  <a href="api_8cpp.html#a4928511967c81658f0646ce20cb975d0">More...</a><br /></td></tr>
 <tr class="separator:a4928511967c81658f0646ce20cb975d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a540b3474ba3085f50e9e1a8f7fe85eb2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="api_8cpp.html#a540b3474ba3085f50e9e1a8f7fe85eb2">api_message_is_error</a> (const <a class="el" href="structapi__messaget.html">api_messaget</a> &amp;message)</td></tr>
+<tr class="separator:a540b3474ba3085f50e9e1a8f7fe85eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -173,7 +176,28 @@ Variables</h2></td></tr>
 <p>Given a <code>api_message</code>, this function returns that message expressed as a C language string. </p>
 <dl class="section note"><dt>Note</dt><dd>The memory for the returned string is owned by the message and as such does not need to be freed by users of the API. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00080">80</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00082">82</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a540b3474ba3085f50e9e1a8f7fe85eb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a540b3474ba3085f50e9e1a8f7fe85eb2">&#9670;&nbsp;</a></span>api_message_is_error()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool api_message_is_error </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structapi__messaget.html">api_messaget</a> &amp;&#160;</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>true is <code>message</code> is an error message, or false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="api_8cpp_source.html#l00087">87</a> of file <a class="el" href="api_8cpp_source.html">api.cpp</a>.</p>
 
 </div>
 </div>

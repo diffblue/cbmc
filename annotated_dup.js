@@ -553,6 +553,7 @@ var annotated_dup =
     [ "goal_filter_baset", "classgoal__filter__baset.html", "classgoal__filter__baset" ],
     [ "goal_filterst", "classgoal__filterst.html", "classgoal__filterst" ],
     [ "goto_analyzer_parse_optionst", "classgoto__analyzer__parse__optionst.html", "classgoto__analyzer__parse__optionst" ],
+    [ "goto_bmc_parse_optionst", "classgoto__bmc__parse__optionst.html", "classgoto__bmc__parse__optionst" ],
     [ "goto_cc_cmdlinet", "classgoto__cc__cmdlinet.html", "classgoto__cc__cmdlinet" ],
     [ "goto_cc_modet", "classgoto__cc__modet.html", "classgoto__cc__modet" ],
     [ "goto_check_ct", "classgoto__check__ct.html", "classgoto__check__ct" ],
