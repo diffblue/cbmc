@@ -228,6 +228,7 @@ cprover_default_properties(
     driver
     goto-analyzer
     goto-analyzer-lib
+    goto-bmc
     goto-cc
     goto-cc-lib
     goto-checker

@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+\[main\.assertion\.1\] line \d expected fail: 0 == 0: FAILURE
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--

@@ -30,6 +30,9 @@ struct api_messaget;
 /// does not need to be freed by users of the API.
 const char *api_message_get_string(const api_messaget &message);
 
+/// \returns true is \p message is an error message, or false otherwise.
+bool api_message_is_error(const api_messaget &message);
+
 /// The type of pointers to contextual data passed to the api_message_callback
 /// functions. These pointers point to api consumer data and are just passed
 /// through to the callback verbatim. These support users of the api to avoid
@@ -79,11 +82,28 @@ struct api_sessiont
   /// Validate the loaded goto model
   void validate_goto_model() const;
 
-  // A simple API version information function.
+  /// A simple API version information function.
   std::unique_ptr<std::string> get_api_version() const;
+
+  /// Process the model by running symex and the decision procedure.
+  /// @return a `unique_ptr` to the `verification_resultt` summary.
+  std::unique_ptr<verification_resultt> run_verifier() const;
+
+  /// Read a goto-binary from a given filename.
+  /// @warning Will error out if it reads a source file.
+  void read_goto_binary(std::string &file) const;
+
+  /// True if file is goto-binary.
+  bool is_goto_binary(std::string &file) const;
 
 private:
   std::unique_ptr<api_session_implementationt> implementation;
+
+  /// Implement necessary transformations to reduce model to symex-ready-GOTO,
+  /// before being fed to symex.
+  /// @return The function returns `true` if it failed because CBMC
+  ///         produced an error.
+  bool preprocess_model() const;
 };
 
 #endif

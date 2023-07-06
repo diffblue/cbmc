@@ -1,0 +1,9 @@
+CORE
+
+--version
+^EXIT=0$
+^SIGNAL=0$
+^\d\.\d+\.\d+
+--
+--
+Test that version is output when version argument is specified.

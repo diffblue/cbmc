@@ -1,0 +1,18 @@
+CORE
+main.c
+
+^EXIT=(127|134)$
+^SIGNAL=0$
+^Invariant check failed$
+^Reason: Check return value$
+--
+^warning: ignoring
+--
+This is the same file as in positive1/ but we want to make sure
+that we fail in some way, signalling that we don't support non
+symex-ready goto binaries as input.
+
+We expect the semantics of the test to remain the same as the
+program evolves, but some of the regexes above may fail as the
+program is enhanced with better capacity to detect non symex-ready
+goto binaries and report to the user appropriately.

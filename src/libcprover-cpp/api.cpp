@@ -14,6 +14,7 @@
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
+#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/set_properties.h>
@@ -75,11 +76,17 @@ api_sessiont::~api_sessiont() = default;
 struct api_messaget
 {
   std::string string;
+  unsigned level;
 };
 
 const char *api_message_get_string(const api_messaget &message)
 {
   return message.string.c_str();
+}
+
+bool api_message_is_error(const api_messaget &message)
+{
+  return message.level == messaget::message_levelt::M_ERROR;
 }
 
 class api_message_handlert : public message_handlert
@@ -114,7 +121,7 @@ void api_message_handlert::print(unsigned level, const std::string &message)
 {
   if(!callback)
     return;
-  api_messaget api_message{message};
+  api_messaget api_message{message, level};
   callback(api_message, context);
 }
 
@@ -137,6 +144,39 @@ std::unique_ptr<verification_resultt> api_sessiont::verify_model() const
 {
   PRECONDITION(implementation->model);
 
+  bool empty_result = preprocess_model();
+  if(empty_result)
+  {
+    return {};
+  }
+
+  return run_verifier();
+}
+
+void api_sessiont::read_goto_binary(std::string &file) const
+{
+  messaget log{*implementation->message_handler};
+  auto read_opt_val =
+    ::read_goto_binary(file, *implementation->message_handler);
+  if(read_opt_val.has_value())
+  {
+    implementation->model =
+      util_make_unique<goto_modelt>(std::move(read_opt_val.value()));
+  }
+  else
+  {
+    log.error() << "Unable to read goto-binary from file " << file
+                << messaget::eom;
+  }
+}
+
+bool api_sessiont::is_goto_binary(std::string &file) const
+{
+  return ::is_goto_binary(file, *implementation->message_handler);
+}
+
+bool api_sessiont::preprocess_model() const
+{
   // Remove inline assembler; this needs to happen before adding the library.
   remove_asm(*implementation->model);
 
@@ -153,7 +193,7 @@ std::unique_ptr<verification_resultt> api_sessiont::verify_model() const
   if(::process_goto_program(
        *implementation->model, *implementation->options, log))
   {
-    return {};
+    return true;
   }
 
   // add failed symbols
@@ -168,17 +208,24 @@ std::unique_ptr<verification_resultt> api_sessiont::verify_model() const
   label_properties(*implementation->model);
 
   remove_skip(*implementation->model);
+  return false;
+}
 
+std::unique_ptr<verification_resultt> api_sessiont::run_verifier() const
+{
   ui_message_handlert ui_message_handler(*implementation->message_handler);
   all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>
     verifier(
       *implementation->options, ui_message_handler, *implementation->model);
+
   verification_resultt result;
   auto results = verifier();
+
   // Print messages collected to callback buffer.
   verifier.report();
   // Set results object before returning.
   result.set_result(results);
+
   auto properties = verifier.get_properties();
   result.set_properties(properties);
   return util_make_unique<verification_resultt>(result);

@@ -1,0 +1,10 @@
+CORE
+
+
+^EXIT=6$
+^SIGNAL=0$
+Please give exactly one binary file
+--
+--
+Test that an appropriate error message is produced when no input goto binary is
+specified.
