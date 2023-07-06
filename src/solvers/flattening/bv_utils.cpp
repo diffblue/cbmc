@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_utils.h"
 
+#include <utility>
+
 bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
 {
   std::string n_str=integer2binary(n, width);
@@ -672,8 +674,8 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
                carry(a[bit-1], b[bit-1], c[bit-1]);
       }
 
-      new_pps.push_back(s);
-      new_pps.push_back(t);
+      new_pps.push_back(std::move(s));
+      new_pps.push_back(std::move(t));
     }
 
     // pass onwards up to two remaining partial products
