@@ -135,6 +135,7 @@ SRC += analyses/ai/ai.cpp \
        util/dense_integer_map.cpp \
        util/edit_distance.cpp \
        util/expr_cast/expr_cast.cpp \
+       util/expr_initializer.cpp \
        util/expr.cpp \
        util/expr_iterator.cpp \
        util/file_util.cpp \
