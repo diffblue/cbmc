@@ -1,6 +1,6 @@
 CORE new-smt-backend
 main.c
---big-endian -D__BIG_ENDIAN__
+--big-endian -DUSE_BIG_ENDIAN
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
