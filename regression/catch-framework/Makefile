@@ -6,4 +6,5 @@ test:
 tests.log: ../test.pl test
 
 clean:
+	find . -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) tests*.log

@@ -41,6 +41,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # these test for invalid command line handling
     ['bad_option', 'test_multiple.desc'],
     ['bad_option', 'test.desc'],
+    ['export-symex-ready-goto', 'test-bad-usage.desc'],
     ['unknown-argument-suggestion', 'test.desc'],
     ['sat-solver-error', 'test.desc'],
     # this one produces XML intermingled with main XML output when used with --xml-ui

@@ -114,9 +114,7 @@ test-parallel:
 
 .PHONY: clean
 clean:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			$(MAKE) -C "$$dir" clean; \
-		fi; \
+	@for dir in $(DIRS); do \
+		$(MAKE) -C "$$dir" clean; \
 	done;
 	$(RM) tests.log

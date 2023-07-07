@@ -34,10 +34,10 @@ tests.log: ../test.pl test
 
 clean:
 	@for dir in *; do \
-		$(RM) tests.log; \
 		if [ -d "$$dir" ]; then \
 			cd "$$dir"; \
 			$(RM) *.out *.gb *.smt2; \
 			cd ..; \
 		fi \
 	done
+	$(RM) tests*.log
