@@ -5,7 +5,7 @@ activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED
-<full_lhs>u8</full_lhs>\s*<full_lhs_value binary="01100001">97</full_lhs_value>
+<full_lhs>u8</full_lhs>\s*<full_lhs_value binary="01100001">(97|'a')</full_lhs_value>
 <full_lhs>u16</full_lhs>\s*<full_lhs_value binary="0{12}1000">8</full_lhs_value>
 <full_lhs>u32</full_lhs>\s*<full_lhs_value binary="0{27}10000">16ul?</full_lhs_value>
 <full_lhs>u64</full_lhs>\s*<full_lhs_value binary="0{58}100000">32ull?</full_lhs_value>
