@@ -14,6 +14,39 @@ Author:
 
 #include <istream>
 
+static void u16_to_native_endian_inplace(bool le_input, uint16_t &input)
+{
+  const uint8_t *input_as_bytes = reinterpret_cast<uint8_t *>(&input);
+  input = (((uint16_t)input_as_bytes[0]) << (le_input ? 0 : 8)) |
+          (((uint16_t)input_as_bytes[1]) << (le_input ? 8 : 0));
+}
+
+static void u32_to_native_endian_inplace(bool le_input, uint32_t &input)
+{
+  const uint8_t *input_as_bytes = reinterpret_cast<uint8_t *>(&input);
+  input = (((uint32_t)input_as_bytes[0]) << (le_input ? 0 : 24)) |
+          (((uint32_t)input_as_bytes[1]) << (le_input ? 8 : 16)) |
+          (((uint32_t)input_as_bytes[2]) << (le_input ? 16 : 8)) |
+          (((uint32_t)input_as_bytes[3]) << (le_input ? 24 : 0));
+}
+
+static void
+u64_to_native_endian_inplace(bool le_input, unsigned long long &input)
+{
+  static_assert(
+    sizeof(unsigned long long) == 8,
+    "unsigned long long expected to be 8 bytes");
+  const uint8_t *input_as_bytes = reinterpret_cast<uint8_t *>(&input);
+  input = (((unsigned long long)input_as_bytes[0]) << (le_input ? 0 : 56)) |
+          (((unsigned long long)input_as_bytes[1]) << (le_input ? 8 : 48)) |
+          (((unsigned long long)input_as_bytes[2]) << (le_input ? 16 : 40)) |
+          (((unsigned long long)input_as_bytes[3]) << (le_input ? 24 : 32)) |
+          (((unsigned long long)input_as_bytes[4]) << (le_input ? 32 : 24)) |
+          (((unsigned long long)input_as_bytes[5]) << (le_input ? 40 : 16)) |
+          (((unsigned long long)input_as_bytes[6]) << (le_input ? 48 : 8)) |
+          (((unsigned long long)input_as_bytes[7]) << (le_input ? 56 : 0));
+}
+
 elf_readert::elf_readert(std::istream &_in):in(_in)
 {
   // read 32-bit header
@@ -43,6 +76,20 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     else
       throw deserialization_exceptiont("ELF32 header malformed (EI_DATA)");
 
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_type);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_machine);
+    u32_to_native_endian_inplace(little_endian, elf32_header.e_version);
+    u32_to_native_endian_inplace(little_endian, elf32_header.e_entry);
+    u32_to_native_endian_inplace(little_endian, elf32_header.e_phoff);
+    u32_to_native_endian_inplace(little_endian, elf32_header.e_shoff);
+    u32_to_native_endian_inplace(little_endian, elf32_header.e_flags);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_ehsize);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_phentsize);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_phnum);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_shentsize);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_shnum);
+    u16_to_native_endian_inplace(little_endian, elf32_header.e_shstrndx);
+
     if(elf32_header.e_version!=1)
       throw deserialization_exceptiont("unknown ELF32 version");
 
@@ -64,6 +111,26 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       in.read(
         reinterpret_cast<char*>(&elf32_section_header_table[i]),
         sizeof(Elf32_Shdr));
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_name);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_type);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_flags);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_addr);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_offset);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_size);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_link);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_info);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_addralign);
+      u32_to_native_endian_inplace(
+        little_endian, elf32_section_header_table[i].sh_entsize);
     }
 
     // string table
@@ -89,6 +156,19 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       little_endian=false;
     else
       throw deserialization_exceptiont("ELF64 header malformed (EI_DATA)");
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_type);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_machine);
+    u32_to_native_endian_inplace(little_endian, elf64_header.e_version);
+    u64_to_native_endian_inplace(little_endian, elf64_header.e_entry);
+    u64_to_native_endian_inplace(little_endian, elf64_header.e_phoff);
+    u64_to_native_endian_inplace(little_endian, elf64_header.e_shoff);
+    u32_to_native_endian_inplace(little_endian, elf64_header.e_flags);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_ehsize);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_phentsize);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_phnum);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_shentsize);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_shnum);
+    u16_to_native_endian_inplace(little_endian, elf64_header.e_shstrndx);
 
     if(elf64_header.e_version!=1)
       throw deserialization_exceptiont("unknown ELF64 version");
@@ -111,6 +191,26 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       in.read(
         reinterpret_cast<char*>(&elf64_section_header_table[i]),
         sizeof(Elf64_Shdr));
+      u32_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_name);
+      u32_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_type);
+      u64_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_flags);
+      u64_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_addr);
+      u64_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_offset);
+      u64_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_size);
+      u32_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_link);
+      u32_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_info);
+      u64_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_addralign);
+      u64_to_native_endian_inplace(
+        little_endian, elf64_section_header_table[i].sh_entsize);
     }
 
     // string table
