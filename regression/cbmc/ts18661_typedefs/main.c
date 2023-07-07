@@ -19,7 +19,11 @@
 #    endif
 
 #    if __GNUC_PREREQ(4, FLOAT128_MINOR_VERSION)
-#      define HAS_FLOAT128
+// https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+#      if defined(__i386__) || defined(__x86_64__) || defined(__ia64__) ||     \
+        defined(__hppa__) || defined(__powerpc__)
+#        define HAS_FLOAT128
+#      endif
 #    endif
 
 #  endif
