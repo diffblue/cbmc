@@ -246,8 +246,11 @@ TEST_CASE(
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
   const pointer_typet pointer_type = ::pointer_type(void_type());
   const std::size_t pointer_width = pointer_type.get_width();
+  static_assert(
+    sizeof(unsigned long long) >= 8,
+    "unsigned long long  must be 64bits or wider");
   const constant_exprt invalid_ptr{
-    integer2bvrep(1ul << (pointer_width - object_bits), pointer_width),
+    integer2bvrep(1ull << (pointer_width - object_bits), pointer_width),
     pointer_type};
   const is_invalid_pointer_exprt is_invalid_ptr{invalid_ptr};
   const smt_termt expected_smt_term = smt_core_theoryt::equal(
