@@ -23,10 +23,10 @@ endif
 endif
 
 test:
-	if which clang ; then \
+	@if which clang ; then \
 	  ../test.pl -e -p -c "$(exe) --native-compiler clang" $(excluded_tests) ; \
 	fi
-	if which gcc ; then \
+	@if which gcc ; then \
 	  ../test.pl -e -p -c "$(exe) --native-compiler gcc" $(excluded_tests) \
 		  -X fake-gcc-version -X clang-only && \
 	  ../test.pl -e -p -c $(exe) $(excluded_tests) -I fake-gcc-version ; \

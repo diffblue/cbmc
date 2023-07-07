@@ -54,7 +54,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   endif
   LINKLIB = /usr/bin/libtool -static -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
   endif
@@ -66,7 +66,7 @@ else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS +=
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
   endif
@@ -77,7 +77,7 @@ else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
 else
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -o $@ $^
   ifeq ($(origin CC),default)
     CC     = gcc
     #CC     = icc
@@ -111,7 +111,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
   #CC = gcc
   CC = x86_64-w64-mingw32-gcc
@@ -141,7 +141,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CP_CXXFLAGS +=
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ /Z7 /nologo $^ DbgHelp.lib $(LIBS)
-  LINKNATIVE = $(HOSTCXX) /Fe$@ /nologo /EHsc $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) /Fe$@ /nologo /EHsc $^
 ifeq ($(origin CC),default)
   CC = cl
 endif
@@ -212,6 +212,7 @@ endif
 first_target: all
 
 HOSTCXX ?= $(CXX)
+HOSTLINKFLAGS ?= $(LINKFLAGS)
 
 CP_CFLAGS += $(CFLAGS) $(CP_EXTRA_CFLAGS) $(INCLUDES)
 CP_CXXFLAGS += $(CXXFLAGS) $(CP_EXTRA_CXXFLAGS) $(INCLUDES)
