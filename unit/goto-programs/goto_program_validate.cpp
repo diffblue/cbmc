@@ -10,12 +10,10 @@
 /// \file
 /// Unit tests for goto program validation
 
-#include <testing-utils/use_catch.h>
-
-#include <testing-utils/message.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/cmdline.h>
+#include <util/config.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
@@ -23,8 +21,16 @@
 #include <goto-programs/goto_model.h>
 #include <goto-programs/validate_goto_model.h>
 
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
+
 SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 {
+  // This test does require a proper architecture to be set so that C type
+  // widths are configured.
+  cmdlinet cmdline;
+  config.set(cmdline);
+
   goto_modelt goto_model;
 
   // void f(){int x = 1;}
@@ -54,8 +60,7 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
   goto_model.symbol_table.add(z);
 
   // pointer to fn call
-  symbolt fn_ptr{
-    "fn_ptr", pointer_typet(code_typet{{}, empty_typet()}, 64), ID_C};
+  symbolt fn_ptr{"fn_ptr", pointer_type(code_typet{{}, empty_typet()}), ID_C};
   goto_model.symbol_table.add(fn_ptr);
 
   symbolt entry_point{

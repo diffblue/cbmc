@@ -279,7 +279,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
       signedbv_typet(128),
       ieee_float_spect::single_precision().to_type(),
       // generates the correct value, but remains wrapped in a typecast
-      // pointer_typet(u64, 64),
+      // pointer_typet(u64, sizeof(void *) * CHAR_BIT),
       vector_typet(size_type(), u8, size),
       vector_typet(size_type(), u64, size),
       complex_typet(s16),
@@ -435,7 +435,7 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
       signedbv_typet(128),
       ieee_float_spect::single_precision().to_type(),
       // generates the correct value, but remains wrapped in a typecast
-      // pointer_typet(u64, 64),
+      // pointer_typet(u64, sizeof(void *) * CHAR_BIT),
       vector_typet(size_type(), u8, size),
       vector_typet(size_type(), u64, size),
       // complex_typet(s16),

@@ -17,6 +17,8 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
+#include <climits>
+
 typedef interpretert::mp_vectort mp_vectort;
 
 class interpreter_testt
@@ -46,7 +48,7 @@ SCENARIO("interpreter evaluation null pointer expressions")
   THEN("null pointer without operands")
   {
     unsignedbv_typet java_char(16);
-    pointer_typet pointer_type(java_char, 64);
+    pointer_typet pointer_type(java_char, sizeof(void *) * CHAR_BIT);
 
     null_pointer_exprt constant_expr{pointer_type};
 
@@ -56,13 +58,13 @@ SCENARIO("interpreter evaluation null pointer expressions")
   }
   THEN("null pointer with operands")
   {
-    pointer_typet outer_pointer_type(empty_typet(), 64);
+    pointer_typet outer_pointer_type(empty_typet(), sizeof(void *) * CHAR_BIT);
     constant_exprt outer_expression(
       "0000000000000000000000000000000000000000000000000000000000000000",
       outer_pointer_type);
 
-    outer_expression.add_to_operands(
-      null_pointer_exprt(pointer_typet(empty_typet(), 64)));
+    outer_expression.add_to_operands(null_pointer_exprt(
+      pointer_typet(empty_typet(), sizeof(void *) * CHAR_BIT)));
 
     mp_vectort mp_vector = interpreter_test.evaluate(outer_expression);
 
