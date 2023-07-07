@@ -109,14 +109,14 @@ static bool arg_is_type_compatible(
 
   // any integer-vs-enum-vs-pointer is ok
   if(
-    call_type.id() == ID_signedbv || call_type.id() == ID_unsigned ||
+    call_type.id() == ID_signedbv || call_type.id() == ID_unsignedbv ||
     call_type.id() == ID_bool || call_type.id() == ID_c_bool ||
     call_type.id() == ID_c_enum_tag || call_type.id() == ID_c_enum ||
     call_type.id() == ID_pointer)
   {
     return function_type.id() == ID_signedbv ||
-           function_type.id() == ID_unsigned || function_type.id() == ID_bool ||
-           function_type.id() == ID_c_bool ||
+           function_type.id() == ID_unsignedbv ||
+           function_type.id() == ID_bool || function_type.id() == ID_c_bool ||
            function_type.id() == ID_pointer ||
            function_type.id() == ID_c_enum ||
            function_type.id() == ID_c_enum_tag;
