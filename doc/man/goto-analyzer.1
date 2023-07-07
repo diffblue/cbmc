@@ -307,7 +307,7 @@ on a read.  More precise than this is \fBsmash\fR which stores one abstract
 element for all of the values.  This is relatively cheap but a lot more precise,
 particularly if used with \fBintervals\fR or \fBset-of-constants\fR.
 \fBup-to-n-elements\fR generalizes \fBsmash\fR by storing abstract objects for
-the first \fIn\fR elements of each array (\fIn\R defaults to \fB10\fR and can be
+the first \fIn\fR elements of each array (\fIn\fR defaults to \fB10\fR and can be
 controlled by \fB\-\-vsd\-array\-max\-elements\fR) and then condensing all other
 elements down to a single abstract object.  This allows reasonably fine-grained
 control over the amount of memory used and can give much more precise results
@@ -389,7 +389,7 @@ Output results in plain text to given file.
 Writes the output as a JSON object to \fIfile_name\fR.
 .TP
 \fB\-\-xml\fR \fIfile_name\fR
-Output results in XML format to \fIfile_name\R.
+Output results in XML format to \fIfile_name\fR.
 .TP
 \fB\-\-dot\fR \fIfile_name\fR
 Writes the output in \fBdot\fR(1) format to \fIfile_name\fR.  This is
