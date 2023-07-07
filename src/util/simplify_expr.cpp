@@ -2017,14 +2017,17 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   const auto val_size = pointer_offset_bits(value.type(), ns);
   const auto root_size = pointer_offset_bits(root.type(), ns);
 
+  const auto matching_byte_extract_id =
+    expr.id() == ID_byte_update_little_endian ? ID_byte_extract_little_endian
+                                              : ID_byte_extract_big_endian;
+
   // byte update of full object is byte_extract(new value)
   if(
     offset.is_zero() && val_size.has_value() && *val_size > 0 &&
     root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
   {
     byte_extract_exprt be(
-      expr.id() == ID_byte_update_little_endian ? ID_byte_extract_little_endian
-                                                : ID_byte_extract_big_endian,
+      matching_byte_extract_id,
       value,
       offset,
       expr.get_bits_per_byte(),
@@ -2075,14 +2078,11 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
    *             value)
    */
 
-  if(expr.id()!=ID_byte_update_little_endian)
-    return unchanged(expr);
-
   if(value.id()==ID_with)
   {
     const with_exprt &with=to_with_expr(value);
 
-    if(with.old().id()==ID_byte_extract_little_endian)
+    if(with.old().id() == matching_byte_extract_id)
     {
       const byte_extract_exprt &extract=to_byte_extract_expr(with.old());
 
@@ -2222,7 +2222,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
          *update_size > 0 && m_size_bytes > *update_size))
       {
         byte_update_exprt v(
-          ID_byte_update_little_endian,
+          expr.id(),
           member_exprt(root, component.get_name(), component.type()),
           from_integer(*offset_int - *m_offset, offset.type()),
           value,
@@ -2241,7 +2241,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       else
       {
         byte_extract_exprt v(
-          ID_byte_extract_little_endian,
+          matching_byte_extract_id,
           value,
           from_integer(*m_offset - *offset_int, offset.type()),
           expr.get_bits_per_byte(),
@@ -2287,7 +2287,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           bytes_req = (*val_size) / expr.get_bits_per_byte() - val_offset;
 
         byte_extract_exprt new_val(
-          ID_byte_extract_little_endian,
+          matching_byte_extract_id,
           value,
           from_integer(val_offset, offset.type()),
           expr.get_bits_per_byte(),
