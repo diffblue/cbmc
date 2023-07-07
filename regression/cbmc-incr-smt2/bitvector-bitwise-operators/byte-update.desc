@@ -1,7 +1,7 @@
 CORE
 byte-update.c
 
-\[main\.assertion\.1\] line \d+ assertion x == 256: SUCCESS
+\[main\.assertion\.1\] line \d+ assertion x == 256 \|\| x == 1: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$
 --

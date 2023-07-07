@@ -8,6 +8,6 @@ int main()
   x[1] = 0;
   uint16_t *y = x;
   *y = 258;
-  assert(x[0] == 2);
-  assert(x[1] == 1);
+  assert(x[0] == 2 || x[1] == 2);
+  assert(x[1] == 1 || x[0] == 1);
 }

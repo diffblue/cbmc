@@ -1,7 +1,7 @@
 CORE
 main.c
 --nan-check
-\[main.NaN.1\] line \d+ NaN on \+ in byte_extract_little_endian\(c, (0|0l|0ll), float\) \+ myzero: SUCCESS
+\[main.NaN.1\] line \d+ NaN on \+ in byte_extract_(big|little)_endian\(c, (0|0l|0ll), float\) \+ myzero: SUCCESS
 \[main.NaN.2\] line \d+ NaN on / in myzero / myzero: FAILURE
 \[main.NaN.3\] line \d+ NaN on / in \(float\)n / myinf: FAILURE
 \[main.NaN.4\] line \d+ NaN on \* in myinf \* myzero: FAILURE
@@ -9,8 +9,8 @@ main.c
 \[main.NaN.6\] line \d+ NaN on \+ in myinf \+ -myinf: FAILURE
 \[main.NaN.7\] line \d+ NaN on - in myinf - myinf: FAILURE
 \[main.NaN.8\] line \d+ NaN on - in -myinf - -myinf: FAILURE
-\[main.NaN.9\] line \d+ NaN on \+ in byte_extract_little_endian\(c, (0|0l|0ll), float\) \+ byte_extract_little_endian\(c, (0|0l|0ll), float\): SUCCESS
-\[main.NaN.10\] line \d+ NaN on / in byte_extract_little_endian\(c, (0|0l|0ll), float\) / myzero: SUCCESS
+\[main.NaN.9\] line \d+ NaN on \+ in byte_extract_(big|little)_endian\(c, (0|0l|0ll), float\) \+ byte_extract_(big|little)_endian\(c, (0|0l|0ll), float\): SUCCESS
+\[main.NaN.10\] line \d+ NaN on / in byte_extract_(big|little)_endian\(c, (0|0l|0ll), float\) / myzero: SUCCESS
 \[main.NaN.11\] line \d+ NaN on \* in mynan \* mynan: SUCCESS
 \[main.NaN.12\] line \d+ NaN on \+ in mynan \+ mynan: SUCCESS
 \[main.NaN.13\] line \d+ NaN on - in mynan - mynan: SUCCESS
