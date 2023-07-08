@@ -73,6 +73,20 @@ jobs:
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=2
+      - name: Check cleanup
+        run: |
+          make -C src clean IPASIR=$PWD/riss.git/riss
+          make -C jbmc/src clean IPASIR=$PWD/riss.git/riss
+          rm -r riss.git
+          rm src/goto-cc/goto-ld
+          make -C unit clean
+          make -C regression clean
+          make -C jbmc/unit clean
+          make -C jbmc/regression clean
+          if [[ $(git status --ignored --porcelain | grep -v .ccache/) ]] ; then
+            git status --ignored
+            exit 1
+          fi
 
   # This job takes approximately 25 to 34 minutes
   check-ubuntu-20_04-make-clang:
@@ -241,6 +255,17 @@ jobs:
           ls *.deb
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j2
+      - name: Check cleanup
+        run: |
+          rm -r build
+          rm scripts/bash-autocomplete/cbmc.sh
+          make -C unit clean
+          make -C regression clean
+          make -C jbmc/regression clean
+          if [[ $(git status --ignored --porcelain | grep -v .ccache/) ]] ; then
+            git status --ignored
+            exit 1
+          fi
 
   # This job takes approximately 34 to 38 minutes
   check-ubuntu-22_04-make-clang:
