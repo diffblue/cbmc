@@ -21,13 +21,14 @@ Author: Diffblue Ltd.
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
-#include <algorithm>
-#include <iterator>
-#include <set>
-
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator_factory.h"
 #include "recursive_initialization.h"
+
+#include <algorithm>
+#include <iterator>
+#include <set>
+#include <utility>
 
 /// This contains implementation details of
 /// function call harness generator to avoid
@@ -136,7 +137,8 @@ void function_call_harness_generatort::handle_option(
         {
           equal_param_set.insert(param_id);
         }
-        p_impl->function_parameters_to_treat_equal.push_back(equal_param_set);
+        p_impl->function_parameters_to_treat_equal.push_back(
+          std::move(equal_param_set));
       }
     }
   }
@@ -527,7 +529,8 @@ function_call_harness_generatort::implt::declare_arguments(
       cluster_argument_names.insert(
         parameter_name_to_argument_name[parameter_name]);
     }
-    function_arguments_to_treat_equal.push_back(cluster_argument_names);
+    function_arguments_to_treat_equal.push_back(
+      std::move(cluster_argument_names));
   }
 
   allocate_objects.declare_created_symbols(function_body);
