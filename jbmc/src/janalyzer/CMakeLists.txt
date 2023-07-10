@@ -10,6 +10,7 @@ generic_includes(janalyzer-lib)
 target_link_libraries(janalyzer-lib
     ansi-c
     java_bytecode
+    cli-utils
     linking
     big-int
     goto-analyzer-lib

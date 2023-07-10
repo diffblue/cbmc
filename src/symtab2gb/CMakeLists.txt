@@ -8,6 +8,7 @@ generic_includes(symtab2gb)
 target_link_libraries(symtab2gb
         util
         ansi-c
+        cli-utils
         goto-programs
         json-symtab-language)
 

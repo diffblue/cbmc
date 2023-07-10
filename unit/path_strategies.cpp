@@ -6,31 +6,24 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <path_strategies.h>
-
-#include <fstream>
-#include <functional>
-#include <string>
+#include <util/config.h>
+#include <util/tempfile.h>
 
 #include <ansi-c/ansi_c_language.h>
-
 #include <cbmc/cbmc_parse_options.h>
-
+#include <cli-utils/cmdline.h>
 #include <goto-checker/bmc_util.h>
 #include <goto-checker/goto_symex_property_decider.h>
 #include <goto-checker/symex_bmc.h>
-
-#include <goto-symex/path_storage.h>
-
 #include <goto-instrument/unwindset.h>
-
+#include <goto-symex/path_storage.h>
 #include <langapi/mode.h>
+#include <testing-utils/use_catch.h>
 
-#include <util/cmdline.h>
-#include <util/config.h>
-#include <util/tempfile.h>
+#include <fstream>
+#include <functional>
+#include <path_strategies.h>
+#include <string>
 
 // The actual test suite.
 //

@@ -9,7 +9,7 @@ Author: Diffblue Limited.
 #ifndef CPROVER_TESTING_UTILS_FREE_FORM_CMDLINE_H
 #define CPROVER_TESTING_UTILS_FREE_FORM_CMDLINE_H
 
-#include <util/cmdline.h>
+#include <cli-utils/cmdline.h>
 
 /// An implementation of cmdlinet to be used in tests. It does not require
 /// specifying exactly what flags are supported and instead allows setting any

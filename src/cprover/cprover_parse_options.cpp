@@ -16,10 +16,11 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/options.h>
-#include <util/parse_options.h>
 #include <util/signal_catcher.h>
 #include <util/ui_message.h>
 #include <util/version.h>
+
+#include <cli-utils/parse_options.h>
 
 #ifdef _WIN32
 #  include <util/unicode.h>

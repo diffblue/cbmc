@@ -14,7 +14,7 @@ Date:   April 2010
 #ifndef CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H
 #define CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H
 
-#include <util/cmdline.h>
+#include <cli-utils/cmdline.h>
 
 class goto_cc_cmdlinet:public cmdlinet
 {

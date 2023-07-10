@@ -9,6 +9,7 @@ generic_includes(memory-analyzer-lib)
 
 target_link_libraries(memory-analyzer-lib
     ansi-c
+    cli-utils
     goto-programs
     util
 )

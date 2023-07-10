@@ -3,7 +3,7 @@
 #ifndef CPROVER_GOTO_INSPECT_GOTO_INSPECT_PARSE_OPTIONS_H
 #define CPROVER_GOTO_INSPECT_GOTO_INSPECT_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
+#include <cli-utils/parse_options.h>
 
 // clang-format off
 #define GOTO_INSPECT_OPTIONS                                                   \

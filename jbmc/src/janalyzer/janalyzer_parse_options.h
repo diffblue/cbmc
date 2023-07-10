@@ -100,15 +100,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JANALYZER_JANALYZER_PARSE_OPTIONS_H
 #define CPROVER_JANALYZER_JANALYZER_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
 #include <util/timestamper.h>
-
-#include <langapi/language.h>
 
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
+#include <cli-utils/parse_options.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <langapi/language.h>
 
 class abstract_goto_modelt;
 class ai_baset;

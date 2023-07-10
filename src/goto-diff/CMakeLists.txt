@@ -11,6 +11,7 @@ target_link_libraries(goto-diff-lib
     ansi-c
     cpp
     linking
+    cli-utils
     big-int
     pointer-analysis
     goto-instrument-lib

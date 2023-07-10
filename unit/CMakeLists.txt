@@ -84,6 +84,7 @@ target_link_libraries(
         unit
         testing-utils
         ansi-c
+        cli-utils
         solvers
         goto-cc-lib
         goto-checker

@@ -13,7 +13,6 @@ Date: September 2011
 
 #include "nondet_volatile.h"
 
-#include <util/cmdline.h>
 #include <util/fresh_symbol.h>
 #include <util/options.h>
 #include <util/pointer_expr.h>
@@ -22,6 +21,8 @@ Date: September 2011
 #include <util/string_utils.h>
 
 #include <goto-programs/goto_model.h>
+
+#include <cli-utils/cmdline.h>
 
 class nondet_volatilet
 {

@@ -8,7 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ui_message.h"
 
-#include "cmdline.h"
+#include <cli-utils/cmdline.h>
+
 #include "cout_message.h"
 #include "json.h"
 #include "json_irep.h"

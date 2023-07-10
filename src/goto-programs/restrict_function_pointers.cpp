@@ -8,14 +8,13 @@ Author: Diffblue Ltd.
 
 #include "restrict_function_pointers.h"
 
-#include <ansi-c/expr2c.h>
-
-#include <json/json_parser.h>
-
-#include <util/cmdline.h>
 #include <util/options.h>
 #include <util/pointer_expr.h>
 #include <util/string_utils.h>
+
+#include <ansi-c/expr2c.h>
+#include <cli-utils/cmdline.h>
+#include <json/json_parser.h>
 
 #include "goto_model.h"
 #include "remove_function_pointers.h"

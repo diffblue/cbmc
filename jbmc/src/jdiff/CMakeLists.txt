@@ -10,6 +10,7 @@ generic_includes(jdiff-lib)
 target_link_libraries(jdiff-lib
     ansi-c
     linking
+    cli-utils
     big-int
     pointer-analysis
     goto-diff-lib

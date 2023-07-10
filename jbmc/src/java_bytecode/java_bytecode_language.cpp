@@ -6,14 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_convert_class.h"
 #include "java_bytecode_language.h"
 
-#include <fstream>
-#include <string>
-
-#include <linking/static_lifetime_init.h>
-
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/expr_iterator.h>
 #include <util/invariant.h>
@@ -23,14 +18,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/suffix.h>
 #include <util/symbol_table_builder.h>
 
-#include <json/json_parser.h>
-
 #include <goto-programs/class_hierarchy.h>
+
+#include <cli-utils/cmdline.h>
+#include <json/json_parser.h>
+#include <linking/static_lifetime_init.h>
 
 #include "ci_lazy_methods.h"
 #include "create_array_with_type_intrinsic.h"
+#include "expr2java.h"
 #include "java_bytecode_concurrency_instrumentation.h"
-#include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_instrument.h"
 #include "java_bytecode_internal_additions.h"
@@ -44,9 +41,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 #include "lambda_synthesis.h"
 #include "lift_clinit_calls.h"
-
-#include "expr2java.h"
 #include "load_method_by_regex.h"
+
+#include <fstream>
+#include <string>
 
 /// Parse options that are java bytecode specific.
 /// \param cmd: Command line

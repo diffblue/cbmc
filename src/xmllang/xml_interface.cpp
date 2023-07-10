@@ -11,13 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_interface.h"
 
-#include <iostream>
-
-#include <util/cmdline.h>
 #include <util/exception_utils.h>
 #include <util/message.h>
 
+#include <cli-utils/cmdline.h>
 #include <xmllang/xml_parser.h>
+
+#include <iostream>
 
 /// Parse commandline options from \p xml into \p cmdline
 static void get_xml_options(const xmlt &xml, cmdlinet &cmdline)

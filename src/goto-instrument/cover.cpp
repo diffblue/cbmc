@@ -13,13 +13,14 @@ Date: May 2016
 
 #include "cover.h"
 
-#include <util/message.h>
 #include <util/make_unique.h>
-#include <util/cmdline.h>
+#include <util/message.h>
 #include <util/options.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
+
+#include <cli-utils/cmdline.h>
 
 #include "cover_basic_blocks.h"
 

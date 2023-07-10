@@ -13,11 +13,6 @@ Date: June 2006
 
 #include "compile.h"
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
 #include <util/get_base_name.h>
@@ -27,6 +22,12 @@ Date: June 2006
 #include <util/tempdir.h>
 #include <util/tempfile.h>
 #include <util/version.h>
+
+#include <cli-utils/cmdline.h>
+
+#include <cstring>
+#include <fstream>
+#include <iostream>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>

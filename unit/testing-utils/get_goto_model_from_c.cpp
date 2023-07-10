@@ -8,20 +8,18 @@ Author: Daniel Poetzl
 
 #include "get_goto_model_from_c.h"
 
-#include <ansi-c/ansi_c_language.h>
-
-#include <goto-programs/goto_convert_functions.h>
-
-#include <langapi/language_file.h>
-#include <langapi/mode.h>
-
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/message.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/goto_convert_functions.h>
+
+#include <ansi-c/ansi_c_language.h>
+#include <cli-utils/cmdline.h>
+#include <langapi/language_file.h>
+#include <langapi/mode.h>
 #include <testing-utils/message.h>
 
 goto_modelt get_goto_model_from_c(std::istream &in)

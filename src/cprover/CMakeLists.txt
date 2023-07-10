@@ -13,6 +13,7 @@ target_link_libraries(cprover-lib
     assembler
     big-int
     cpp
+    cli-utils
     goto-checker
     goto-instrument-lib
     goto-programs

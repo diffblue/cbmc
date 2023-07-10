@@ -8,11 +8,12 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>
 
 #include "path_storage.h"
 
-#include <sstream>
-
-#include <util/cmdline.h>
 #include <util/exit_codes.h>
 #include <util/make_unique.h>
+
+#include <cli-utils/cmdline.h>
+
+#include <sstream>
 
 nondet_symbol_exprt symex_nondet_generatort::
 operator()(typet type, source_locationt location)

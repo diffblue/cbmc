@@ -23,8 +23,9 @@ Author: CM Wintersteiger, 2006
 
 #include <util/exception_utils.h>
 #include <util/message.h>
-#include <util/parse_options.h>
 #include <util/version.h>
+
+#include <cli-utils/parse_options.h>
 
 #include "goto_cc_cmdline.h"
 

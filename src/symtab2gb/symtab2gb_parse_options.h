@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_SYMTAB2GB_SYMTAB2GB_PARSE_OPTIONS_H
 #define CPROVER_SYMTAB2GB_SYMTAB2GB_PARSE_OPTIONS_H
 
-#include <util/parse_options.h>
+#include <cli-utils/parse_options.h>
 
 #define SYMTAB2GB_OUT_FILE_OPT "out"
 
