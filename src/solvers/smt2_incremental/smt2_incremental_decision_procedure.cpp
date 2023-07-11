@@ -4,7 +4,6 @@
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
-#include <util/expr.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>

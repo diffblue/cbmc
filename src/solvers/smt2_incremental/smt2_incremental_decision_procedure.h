@@ -6,8 +6,8 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 
+#include <util/expr.h> // Needed for `exprt` values. IWYU pragma: keep
 #include <util/message.h>
-#include <util/std_expr.h>
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/encoding/struct_encoding.h>
