@@ -613,6 +613,27 @@ std::string expr2ct::convert_rec(
 
     return q+dest+d;
   }
+  else if(src.id() == ID_mathematical_function)
+  {
+    const mathematical_function_typet &function_type =
+      to_mathematical_function_type(src);
+    std::string dest = CPROVER_PREFIX "map ";
+    bool first = true;
+    for(auto &t : function_type.domain())
+    {
+      if(first)
+        first = false;
+      else
+        dest += ", ";
+
+      dest += convert(t);
+    }
+
+    dest += " -> ";
+    dest += convert(function_type.codomain());
+
+    return q + dest + d;
+  }
   else if(src.id()==ID_constructor ||
           src.id()==ID_destructor)
   {
