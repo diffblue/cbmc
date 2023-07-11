@@ -1,0 +1,18 @@
+CORE
+large_array_of_struct_nondet_index.c
+--trace
+Passing problem to incremental SMT2 solving
+^EXIT=10$
+^SIGNAL=0$
+line 16 assertion struct_array\[x\]\.eggs \+ struct_array\[x\]\.ham != 10\: FAILURE
+line 17 assertion struct_array\[x\]\.eggs \+ struct_array\[x\]\.ham != 11\: FAILURE
+\{\s*\.eggs=\d+,\s*\.ham=7\s*\}
+\{\s*\.eggs=\d+,\s*\.ham=8\s*\}
+x=\d{1,4}\s
+struct_array\[\(signed long int\)x\]\.eggs=3
+--
+--
+This test covers support for examples with large arrays of structs using nondet
+indexes including trace generation. This combination of features is chosen in
+order to avoid array cell sensitivity or struct field sensitivity simplifying
+away the relevant `member_exprt` and `with_exprt` expressions.
