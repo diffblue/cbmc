@@ -4,7 +4,6 @@
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
-#include <util/expr.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>
@@ -343,13 +342,8 @@ exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
   return expr;
 }
 
-static optionalt<smt_termt> get_identifier(
-  const exprt &expr,
-  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_handle_identifiers,
-  const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
-    &expression_identifiers,
-  const namespacet &ns)
+optionalt<smt_termt>
+smt2_incremental_decision_proceduret::get_identifier(const exprt &expr) const
 {
   // Lookup the non-lowered form first.
   const auto handle_find_result = expression_handle_identifiers.find(expr);
@@ -360,7 +354,7 @@ static optionalt<smt_termt> get_identifier(
     return expr_find_result->second;
 
   // If that didn't yield any results, then try the lowered form.
-  const exprt lowered_expr = lower_enum(expr, ns);
+  const exprt lowered_expr = lower(expr);
   const auto lowered_handle_find_result =
     expression_handle_identifiers.find(lowered_expr);
   if(lowered_handle_find_result != expression_handle_identifiers.cend())
@@ -372,7 +366,7 @@ static optionalt<smt_termt> get_identifier(
   return {};
 }
 
-array_exprt smt2_incremental_decision_proceduret::get_expr(
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &array,
   const array_typet &type) const
 {
@@ -387,24 +381,46 @@ array_exprt smt2_incremental_decision_proceduret::get_expr(
   elements.reserve(*size);
   for(std::size_t index = 0; index < size; ++index)
   {
-    elements.push_back(get_expr(
-      smt_array_theoryt::select(
-        array,
-        ::convert_expr_to_smt(
-          from_integer(index, index_type),
-          object_map,
-          pointer_sizes_map,
-          object_size_function.make_application,
-          is_dynamic_object_function.make_application)),
-      type.element_type()));
+    const auto index_term = ::convert_expr_to_smt(
+      from_integer(index, index_type),
+      object_map,
+      pointer_sizes_map,
+      object_size_function.make_application,
+      is_dynamic_object_function.make_application);
+    auto element = get_expr(
+      smt_array_theoryt::select(array, index_term), type.element_type());
+    if(!element)
+      return {};
+    elements.push_back(std::move(*element));
   }
   return array_exprt{elements, type};
 }
 
-exprt smt2_incremental_decision_proceduret::get_expr(
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &struct_term,
+  const struct_tag_typet &type) const
+{
+  const auto encoded_result =
+    get_expr(struct_term, struct_encoding.encode(type));
+  if(!encoded_result)
+    return {};
+  return {struct_encoding.decode(*encoded_result, type)};
+}
+
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &descriptor,
   const typet &type) const
 {
+  if(const auto array_type = type_try_dynamic_cast<array_typet>(type))
+  {
+    if(array_type->is_incomplete())
+      return {};
+    return get_expr(descriptor, *array_type);
+  }
+  if(const auto struct_type = type_try_dynamic_cast<struct_tag_typet>(type))
+  {
+    return get_expr(descriptor, *struct_type);
+  }
   const smt_get_value_commandt get_value_command{descriptor};
   const smt_responset response = get_response_to_command(
     *solver_process, get_value_command, identifier_table);
@@ -457,23 +473,13 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   auto descriptor = [&]() -> optionalt<smt_termt> {
     if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
     {
-      const auto array = get_identifier(
-        index_expr->array(),
-        expression_handle_identifiers,
-        expression_identifiers,
-        ns);
-      const auto index = get_identifier(
-        index_expr->index(),
-        expression_handle_identifiers,
-        expression_identifiers,
-        ns);
+      const auto array = get_identifier(index_expr->array());
+      const auto index = get_identifier(index_expr->index());
       if(!array || !index)
         return {};
       return smt_array_theoryt::select(*array, *index);
     }
-    if(
-      auto identifier_descriptor = get_identifier(
-        expr, expression_handle_identifiers, expression_identifiers, ns))
+    if(auto identifier_descriptor = get_identifier(expr))
     {
       return identifier_descriptor;
     }
@@ -500,13 +506,9 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       irep_pretty_diagnosticst{expr});
     return build_expr_based_on_getting_operands(expr, *this);
   }
-  if(const auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
-  {
-    if(array_type->is_incomplete())
-      return expr;
-    return get_expr(*descriptor, *array_type);
-  }
-  return get_expr(*descriptor, expr.type());
+  if(auto result = get_expr(*descriptor, expr.type()))
+    return std::move(*result);
+  return expr;
 }
 
 void smt2_incremental_decision_proceduret::print_assignment(
@@ -604,7 +606,7 @@ void smt2_incremental_decision_proceduret::define_object_properties()
   }
 }
 
-exprt smt2_incremental_decision_proceduret::lower(exprt expression)
+exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
 {
   const exprt lowered = struct_encoding.encode(
     lower_enum(lower_byte_operators(expression, ns), ns));

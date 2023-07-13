@@ -6,8 +6,8 @@
 #ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT2_INCREMENTAL_DECISION_PROCEDURE_H
 
+#include <util/expr.h> // Needed for `exprt` values. IWYU pragma: keep
 #include <util/message.h>
-#include <util/std_expr.h>
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/encoding/struct_encoding.h>
@@ -54,8 +54,12 @@ public:
   /// Gets the value of \p descriptor from the solver and returns the solver
   /// response expressed as an exprt of type \p type. This is an implementation
   /// detail of the `get(exprt)` member function.
-  exprt get_expr(const smt_termt &descriptor, const typet &type) const;
-  array_exprt get_expr(const smt_termt &array, const array_typet &type) const;
+  optionalt<exprt>
+  get_expr(const smt_termt &descriptor, const typet &type) const;
+  optionalt<exprt>
+  get_expr(const smt_termt &struct_term, const struct_tag_typet &type) const;
+  optionalt<exprt>
+  get_expr(const smt_termt &array, const array_typet &type) const;
 
 protected:
   // Implementation of protected decision_proceduret member function.
@@ -97,7 +101,8 @@ protected:
   /// Performs a combination of transformations which reduces the set of
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
-  exprt lower(exprt expression);
+  exprt lower(exprt expression) const;
+  optionalt<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
   /// This includes the symbols defined outside of the decision procedure but
