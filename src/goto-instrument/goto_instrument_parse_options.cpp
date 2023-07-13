@@ -1158,6 +1158,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
   }
 
+  if(cmdline.isset("loop-contracts-file"))
+  {
+    const auto file_name = cmdline.get_value("loop-contracts-file");
+    contracts_wranglert contracts_wrangler(
+      goto_model, file_name, ui_message_handler);
+  }
+
   bool use_dfcc = cmdline.isset(FLAG_DFCC);
   if(use_dfcc)
   {
@@ -2012,6 +2019,7 @@ void goto_instrument_parse_optionst::help()
     HELP_DFCC
     HELP_LOOP_CONTRACTS
     HELP_LOOP_CONTRACTS_NO_UNWIND
+    HELP_LOOP_CONTRACTS_FILE
     HELP_REPLACE_CALL
     HELP_ENFORCE_CONTRACT
     HELP_ENFORCE_CONTRACT_REC

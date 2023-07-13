@@ -1,0 +1,13 @@
+{
+    "functions": [
+      {
+        "foo.*": [
+            {
+              "loop_id": "0",
+              "invariants": "i <= 8",
+              "symbol_map": "i, foo::1::1::i"
+            }
+          ]
+      }
+    ]
+  }

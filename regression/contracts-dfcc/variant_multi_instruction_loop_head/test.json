@@ -1,0 +1,14 @@
+{
+    "functions": [
+      {
+        "main": [
+            {
+              "loop_id": "0",
+              "invariants": "0 <= *y && *y <= 10",
+              "decreases": "10-x",
+              "symbol_map": "y,main::1::y;x,main::1::x"
+            }
+          ]
+      }
+    ]
+  }

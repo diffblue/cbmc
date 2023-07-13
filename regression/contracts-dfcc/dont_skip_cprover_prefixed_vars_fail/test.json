@@ -1,0 +1,15 @@
+{
+    "functions": [
+      {
+        "foo": [
+            {
+              "loop_id": "0",
+              "assigns": "i",
+              "invariants": "0 <= i && i <= 10",
+              "decreases": "i",
+              "symbol_map": "i,foo::1::1::i"
+            }
+          ]
+      }
+    ]
+  }

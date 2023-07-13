@@ -738,3 +738,44 @@ void annotate_assigns(
     condition.add(ID_C_spec_assigns) = assigns;
   }
 }
+
+void annotate_assigns(
+  const std::map<loop_idt, exprt> &assigns_map,
+  goto_modelt &goto_model)
+{
+  for(const auto &assigns_map_entry : assigns_map)
+  {
+    loop_idt loop_id = assigns_map_entry.first;
+    irep_idt function_id = loop_id.function_id;
+    unsigned int loop_number = loop_id.loop_number;
+
+    // get the last instruction of the target loop
+    auto &function = goto_model.goto_functions.function_map[function_id];
+    goto_programt::targett loop_end = get_loop_end(loop_number, function);
+
+    exprt &condition = loop_end->condition_nonconst();
+    condition.add(ID_C_spec_assigns) = assigns_map_entry.second;
+  }
+}
+
+void annotate_decreases(
+  const std::map<loop_idt, std::vector<exprt>> &decreases_map,
+  goto_modelt &goto_model)
+{
+  for(const auto &decreases_map_entry : decreases_map)
+  {
+    loop_idt loop_id = decreases_map_entry.first;
+    irep_idt function_id = loop_id.function_id;
+    unsigned int loop_number = loop_id.loop_number;
+
+    // get the last instruction of the target loop
+    auto &function = goto_model.goto_functions.function_map[function_id];
+    goto_programt::targett loop_end = get_loop_end(loop_number, function);
+
+    exprt &condition = loop_end->condition_nonconst();
+    auto decreases = exprt(ID_target_list);
+    for(const auto &e : decreases_map_entry.second)
+      decreases.add_to_operands(e);
+    condition.add(ID_C_spec_decreases) = decreases;
+  }
+}

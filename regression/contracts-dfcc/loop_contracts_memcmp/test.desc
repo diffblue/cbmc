@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that loop contracts work correctly on memcmp.
+This test fails the CI job check-vs-2019-cmake-build-and-test with
+the following error.
+`Function '_errno' must exist in the model.`
+
