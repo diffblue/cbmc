@@ -1,5 +1,12 @@
 var NAVTREEINDEX132 =
 {
+"structgdb__apit_1_1memory__addresst.html#af9e3c1d578837001e9d2ffbb517c3bd4":[8,0,524,0,3],
+"structgdb__apit_1_1pointer__valuet.html":[8,0,524,1],
+"structgdb__apit_1_1pointer__valuet.html#a07d6e041e8ff92b58810ee5a7cdc0457":[8,0,524,1,0],
+"structgdb__apit_1_1pointer__valuet.html#a1467a8e7ec97034dedb257ef1973792a":[8,0,524,1,6],
+"structgdb__apit_1_1pointer__valuet.html#a22d263c7ea54a329f10beac27185f92e":[8,0,524,1,2],
+"structgdb__apit_1_1pointer__valuet.html#a9b8e0295796fd3320b826d9d9b71d188":[8,0,524,1,1],
+"structgdb__apit_1_1pointer__valuet.html#aabd4146d8301cbb1782e2a1951583d46":[8,0,524,1,3],
 "structgdb__apit_1_1pointer__valuet.html#ad4eddd7d69994804dc2bf56ae3d4ceaa":[8,0,524,1,4],
 "structgdb__apit_1_1pointer__valuet.html#aef4f70381ec5852f9dce6daea5d8fc8f":[8,0,524,1,5],
 "structgdb__value__extractort_1_1memory__scopet.html":[8,0,526,0],
@@ -242,12 +249,5 @@ var NAVTREEINDEX132 =
 "structjava__bytecode__language__optionst.html#a3b1fd2391e8f2ae0f00093bd24803128":[8,0,687,14],
 "structjava__bytecode__language__optionst.html#a44f4493f13e13dc03c55e22695257c1e":[8,0,687,20],
 "structjava__bytecode__language__optionst.html#a49d32bc20a688382cca729df5892f284":[8,0,687,15],
-"structjava__bytecode__language__optionst.html#a50c727ee8995d25b1618a8d0554e1bd4":[8,0,687,7],
-"structjava__bytecode__language__optionst.html#a5b5f61e037cfcfcedad008137d5d6064":[8,0,687,10],
-"structjava__bytecode__language__optionst.html#a5fe52d682658316b7b3665a86ac07c38":[8,0,687,12],
-"structjava__bytecode__language__optionst.html#a6bb256860cd68f836713d7ffd02ac21e":[8,0,687,16],
-"structjava__bytecode__language__optionst.html#a775163efddaa5612d85a82122ee16888":[8,0,687,9],
-"structjava__bytecode__language__optionst.html#a79cf08bfda727645f534288a8a4b2b62":[8,0,687,17],
-"structjava__bytecode__language__optionst.html#a8f2945787a3267d58ac3de7041ed041b":[8,0,687,19],
-"structjava__bytecode__language__optionst.html#a9047cc7d6da45ae46516b25ab8cb35bf":[8,0,687,4]
+"structjava__bytecode__language__optionst.html#a50c727ee8995d25b1618a8d0554e1bd4":[8,0,687,7]
 };

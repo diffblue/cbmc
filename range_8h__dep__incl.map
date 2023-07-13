@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/range.h" name="/home/runner/work/cbmc/cbmc/src/util/range.h">
-<area shape="rect" id="node1" title="Ranges: pair of begin and end iterators, which can be initialized from containers,..." alt="" coords="4147,5,4331,47"/>
+<area shape="rect" id="node1" title="Ranges: pair of begin and end iterators, which can be initialized from containers,..." alt="" coords="4567,5,4751,47"/>
 <area shape="rect" id="node2" href="$c__typecheck__code_8cpp.html" title="C Language Type Checking." alt="" coords="5,102,217,158"/>
 <area shape="rect" id="node3" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="241,102,453,158"/>
 <area shape="rect" id="node4" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="477,102,687,158"/>
-<area shape="rect" id="node5" href="$static__verifier_8cpp.html" title=" " alt="" coords="579,540,763,596"/>
-<area shape="rect" id="node6" href="$interrupt_8cpp.html" title="Interrupt Instrumentation." alt="" coords="2212,102,2405,158"/>
-<area shape="rect" id="node7" href="$source__lines_8cpp.html" title="Set of source code lines contributing to a basic block." alt="" coords="2429,102,2623,158"/>
-<area shape="rect" id="node8" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="2647,102,2831,158"/>
-<area shape="rect" id="node9" href="$resolve__inherited__component_8cpp.html" title=" " alt="" coords="2856,102,3103,158"/>
-<area shape="rect" id="node10" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="3127,102,3341,158"/>
-<area shape="rect" id="node11" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3365,102,3580,158"/>
-<area shape="rect" id="node12" href="$jsil__entry__point_8cpp.html" title="Jsil Language." alt="" coords="3605,102,3789,158"/>
-<area shape="rect" id="node13" href="$value__set_8cpp.html" title="Value Set." alt="" coords="3813,102,4007,158"/>
-<area shape="rect" id="node14" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="381,213,583,269"/>
-<area shape="rect" id="node15" href="$boolbv__let_8cpp.html" title=" " alt="" coords="4031,102,4232,158"/>
-<area shape="rect" id="node16" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4257,102,4441,158"/>
-<area shape="rect" id="node17" href="$smt2__parser_8cpp.html" title=" " alt="" coords="4465,102,4649,158"/>
-<area shape="rect" id="node18" href="$smt__commands_8cpp.html" title=" " alt="" coords="4673,102,4939,158"/>
-<area shape="rect" id="node19" href="$smt__responses_8cpp.html" title=" " alt="" coords="4964,102,5224,158"/>
-<area shape="rect" id="node20" href="$smt__terms_8cpp.html" title=" " alt="" coords="5249,102,5481,158"/>
-<area shape="rect" id="node21" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5505,95,5701,165"/>
-<area shape="rect" id="node22" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="5726,95,5955,165"/>
-<area shape="rect" id="node23" href="$smt__response__validation_8cpp.html" title="Validation of smt response parse trees to produce either a strongly typed smt_responset representatio..." alt="" coords="5979,95,6182,165"/>
-<area shape="rect" id="node24" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="6207,95,6403,165"/>
-<area shape="rect" id="node25" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="6427,102,6676,158"/>
-<area shape="rect" id="node26" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="6701,102,6885,158"/>
-<area shape="rect" id="node27" href="$get__module_8cpp.html" title="Find module symbol using name." alt="" coords="6909,109,7127,151"/>
-<area shape="rect" id="node28" href="$interval__union_8cpp.html" title=" " alt="" coords="7151,102,7335,158"/>
-<area shape="rect" id="node29" href="$json_8h.html" title=" " alt="" coords="1953,109,2137,151"/>
-<area shape="rect" id="node57" href="$options_8cpp.html" title="Options." alt="" coords="4619,221,4807,262"/>
-<area shape="rect" id="node58" href="$simplify__expr__if_8cpp.html" title=" " alt="" coords="7359,102,7543,158"/>
-<area shape="rect" id="node59" href="$std__expr_8cpp.html" title=" " alt="" coords="7567,109,7762,151"/>
-<area shape="rect" id="node60" href="$structured__data_8cpp.html" title=" " alt="" coords="7786,102,7970,158"/>
-<area shape="rect" id="node30" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="579,443,763,485"/>
-<area shape="rect" id="node31" href="$ai__domain_8h.html" title="Abstract Interpretation Domain." alt="" coords="709,325,893,381"/>
-<area shape="rect" id="node32" href="$ai__history_8h.html" title="Abstract Interpretation history." alt="" coords="658,213,842,269"/>
-<area shape="rect" id="node33" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="1817,317,2043,388"/>
-<area shape="rect" id="node34" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="1131,436,1315,492"/>
-<area shape="rect" id="node35" href="$c__wrangler_8cpp.html" title="C Wrangler." alt="" coords="1557,221,1799,262"/>
-<area shape="rect" id="node36" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="1823,213,2007,269"/>
-<area shape="rect" id="node37" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="1366,325,1571,381"/>
-<area shape="rect" id="node38" href="$properties_8cpp.html" title="Properties." alt="" coords="1595,325,1779,381"/>
-<area shape="rect" id="node39" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="2093,436,2277,492"/>
-<area shape="rect" id="node40" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3902,325,4161,381"/>
-<area shape="rect" id="node41" href="$unwind_8h.html" title="Loop unwinding." alt="" coords="4069,213,4263,269"/>
-<area shape="rect" id="node42" href="$goto__inline_8h.html" title="Function Inlining This gives a number of different interfaces to the function inlining functionality ..." alt="" coords="3810,213,3994,269"/>
-<area shape="rect" id="node43" href="$goto__inline__class_8h.html" title="Function Inlining This is a class that encapsulates the state and functionality needed to do inline m..." alt="" coords="2290,213,2474,269"/>
-<area shape="rect" id="node44" href="$json__expr_8cpp.html" title="Expressions in JSON." alt="" coords="917,325,1101,381"/>
-<area shape="rect" id="node45" href="$json__expr_8h.html" title="Expressions in JSON." alt="" coords="967,213,1151,269"/>
-<area shape="rect" id="node46" href="$json__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="2067,325,2251,381"/>
-<area shape="rect" id="node47" href="$show__goto__functions__json_8h.html" title="Goto Program." alt="" coords="2499,213,2708,269"/>
-<area shape="rect" id="node48" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="4287,332,4525,373"/>
-<area shape="rect" id="node49" href="$json__parser_8h.html" title=" " alt="" coords="4287,221,4493,262"/>
-<area shape="rect" id="node50" href="$json__symbol__table_8cpp.html" title=" " alt="" coords="2834,213,3074,269"/>
-<area shape="rect" id="node51" href="$json__symtab__language_8h.html" title=" " alt="" coords="3098,213,3351,269"/>
-<area shape="rect" id="node52" href="$arrays_8cpp.html" title=" " alt="" coords="3376,213,3577,269"/>
-<area shape="rect" id="node53" href="$json_8cpp.html" title=" " alt="" coords="3602,221,3786,262"/>
-<area shape="rect" id="node54" href="$json__irep_8cpp.html" title="Util." alt="" coords="2537,332,2736,373"/>
-<area shape="rect" id="node55" href="$json__irep_8h.html" title="Util." alt="" coords="2082,221,2266,262"/>
-<area shape="rect" id="node56" href="$json__stream_8h.html" title=" " alt="" coords="1226,221,1431,262"/>
+<area shape="rect" id="node5" href="$static__verifier_8cpp.html" title=" " alt="" coords="1327,540,1511,596"/>
+<area shape="rect" id="node6" href="$interrupt_8cpp.html" title="Interrupt Instrumentation." alt="" coords="2523,102,2716,158"/>
+<area shape="rect" id="node7" href="$source__lines_8cpp.html" title="Set of source code lines contributing to a basic block." alt="" coords="2740,102,2933,158"/>
+<area shape="rect" id="node8" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="2958,102,3142,158"/>
+<area shape="rect" id="node9" href="$resolve__inherited__component_8cpp.html" title=" " alt="" coords="3167,102,3413,158"/>
+<area shape="rect" id="node10" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="3437,102,3652,158"/>
+<area shape="rect" id="node11" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3676,102,3891,158"/>
+<area shape="rect" id="node12" href="$jsil__entry__point_8cpp.html" title="Jsil Language." alt="" coords="3915,102,4099,158"/>
+<area shape="rect" id="node13" href="$value__set_8cpp.html" title="Value Set." alt="" coords="4124,102,4317,158"/>
+<area shape="rect" id="node14" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="719,213,920,269"/>
+<area shape="rect" id="node15" href="$boolbv__let_8cpp.html" title=" " alt="" coords="4341,102,4543,158"/>
+<area shape="rect" id="node16" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4567,102,4751,158"/>
+<area shape="rect" id="node17" href="$smt2__parser_8cpp.html" title=" " alt="" coords="4775,102,4959,158"/>
+<area shape="rect" id="node18" href="$smt__commands_8cpp.html" title=" " alt="" coords="4983,102,5250,158"/>
+<area shape="rect" id="node19" href="$smt__responses_8cpp.html" title=" " alt="" coords="5275,102,5535,158"/>
+<area shape="rect" id="node20" href="$smt__terms_8cpp.html" title=" " alt="" coords="5559,102,5791,158"/>
+<area shape="rect" id="node21" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5816,95,6012,165"/>
+<area shape="rect" id="node22" href="$struct__encoding_8cpp.html" title=" " alt="" coords="6037,95,6247,165"/>
+<area shape="rect" id="node23" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="6271,95,6501,165"/>
+<area shape="rect" id="node24" href="$smt__response__validation_8cpp.html" title="Validation of smt response parse trees to produce either a strongly typed smt_responset representatio..." alt="" coords="6525,95,6727,165"/>
+<area shape="rect" id="node25" href="$smt__to__smt2__string_8cpp.html" title=" " alt="" coords="6752,95,6948,165"/>
+<area shape="rect" id="node26" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="6972,102,7221,158"/>
+<area shape="rect" id="node27" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="7246,102,7430,158"/>
+<area shape="rect" id="node28" href="$get__module_8cpp.html" title="Find module symbol using name." alt="" coords="7455,109,7672,151"/>
+<area shape="rect" id="node29" href="$interval__union_8cpp.html" title=" " alt="" coords="7697,102,7881,158"/>
+<area shape="rect" id="node30" href="$json_8h.html" title=" " alt="" coords="2263,109,2447,151"/>
+<area shape="rect" id="node57" href="$options_8cpp.html" title="Options." alt="" coords="4727,221,4915,262"/>
+<area shape="rect" id="node58" href="$simplify__expr__if_8cpp.html" title=" " alt="" coords="7905,102,8089,158"/>
+<area shape="rect" id="node59" href="$std__expr_8cpp.html" title=" " alt="" coords="8113,109,8307,151"/>
+<area shape="rect" id="node60" href="$structured__data_8cpp.html" title=" " alt="" coords="8331,102,8515,158"/>
+<area shape="rect" id="node31" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="4481,443,4665,485"/>
+<area shape="rect" id="node32" href="$ai__domain_8h.html" title="Abstract Interpretation Domain." alt="" coords="4417,325,4601,381"/>
+<area shape="rect" id="node33" href="$ai__history_8h.html" title="Abstract Interpretation history." alt="" coords="4467,213,4651,269"/>
+<area shape="rect" id="node34" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="718,317,945,388"/>
+<area shape="rect" id="node35" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="3878,436,4062,492"/>
+<area shape="rect" id="node36" href="$c__wrangler_8cpp.html" title="C Wrangler." alt="" coords="1355,221,1598,262"/>
+<area shape="rect" id="node37" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="1622,213,1806,269"/>
+<area shape="rect" id="node38" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="969,325,1174,381"/>
+<area shape="rect" id="node39" href="$properties_8cpp.html" title="Properties." alt="" coords="1198,325,1382,381"/>
+<area shape="rect" id="node40" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1751,436,1935,492"/>
+<area shape="rect" id="node41" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2466,325,2725,381"/>
+<area shape="rect" id="node42" href="$unwind_8h.html" title="Loop unwinding." alt="" coords="3609,213,3803,269"/>
+<area shape="rect" id="node43" href="$goto__inline_8h.html" title="Function Inlining This gives a number of different interfaces to the function inlining functionality ..." alt="" coords="2374,213,2558,269"/>
+<area shape="rect" id="node44" href="$goto__inline__class_8h.html" title="Function Inlining This is a class that encapsulates the state and functionality needed to do inline m..." alt="" coords="1931,213,2115,269"/>
+<area shape="rect" id="node45" href="$json__expr_8cpp.html" title="Expressions in JSON." alt="" coords="3749,325,3933,381"/>
+<area shape="rect" id="node46" href="$json__expr_8h.html" title="Expressions in JSON." alt="" coords="3878,213,4062,269"/>
+<area shape="rect" id="node47" href="$json__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1881,325,2065,381"/>
+<area shape="rect" id="node48" href="$show__goto__functions__json_8h.html" title="Goto Program." alt="" coords="2140,213,2349,269"/>
+<area shape="rect" id="node49" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="4085,332,4324,373"/>
+<area shape="rect" id="node50" href="$json__parser_8h.html" title=" " alt="" coords="4086,221,4291,262"/>
+<area shape="rect" id="node51" href="$json__symbol__table_8cpp.html" title=" " alt="" coords="2633,213,2873,269"/>
+<area shape="rect" id="node52" href="$json__symtab__language_8h.html" title=" " alt="" coords="2897,213,3150,269"/>
+<area shape="rect" id="node53" href="$arrays_8cpp.html" title=" " alt="" coords="3175,213,3376,269"/>
+<area shape="rect" id="node54" href="$json_8cpp.html" title=" " alt="" coords="3401,221,3585,262"/>
+<area shape="rect" id="node55" href="$json__irep_8cpp.html" title="Util." alt="" coords="1507,332,1705,373"/>
+<area shape="rect" id="node56" href="$json__irep_8h.html" title="Util." alt="" coords="1097,221,1281,262"/>
 </map>

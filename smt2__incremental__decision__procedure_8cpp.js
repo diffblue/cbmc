@@ -2,7 +2,6 @@ var smt2__incremental__decision__procedure_8cpp =
 [
     [ "build_expr_based_on_getting_operands", "smt2__incremental__decision__procedure_8cpp.html#aab33bbc5ccfadb567d556f857c9d0593", null ],
     [ "gather_dependent_expressions", "smt2__incremental__decision__procedure_8cpp.html#a6d6ceb22083b221f19ffc67a74d9eaf7", null ],
-    [ "get_identifier", "smt2__incremental__decision__procedure_8cpp.html#a7b23b706518cc5ee405ede02802b207b", null ],
     [ "get_problem_messages", "smt2__incremental__decision__procedure_8cpp.html#a5a9eea028e10191a3abaa8e39526dfe4", null ],
     [ "get_response_to_command", "smt2__incremental__decision__procedure_8cpp.html#adc59c2c7d051b9a69bbacb59500a3faa", null ],
     [ "lookup_decision_procedure_result", "smt2__incremental__decision__procedure_8cpp.html#aa6ac0cc53181b1e03a26670d0a5e1f04", null ],
