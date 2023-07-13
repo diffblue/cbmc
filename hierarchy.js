@@ -313,6 +313,7 @@ var hierarchy =
     [ "constructor_oft< constructedt >", "classconstructor__oft.html", null ],
     [ "generic_parameter_specialization_mapt::container_paramt", "structgeneric__parameter__specialization__mapt_1_1container__paramt.html", null ],
     [ "contract_clausest", "structcontract__clausest.html", null ],
+    [ "contracts_wranglert", "classcontracts__wranglert.html", null ],
     [ "conversion_dependenciest", "structconversion__dependenciest.html", null ],
     [ "ci_lazy_methodst::convert_method_resultt", "structci__lazy__methodst_1_1convert__method__resultt.html", null ],
     [ "java_bytecode_convert_methodt::converted_instructiont", "structjava__bytecode__convert__methodt_1_1converted__instructiont.html", null ],
@@ -669,6 +670,7 @@ var hierarchy =
     [ "functions_in_scope_visitort", "classfunctions__in__scope__visitort.html", null ],
     [ "functionst", "classfunctionst.html", null ],
     [ "c_wranglert::functiont", "structc__wranglert_1_1functiont.html", null ],
+    [ "functiont", "structfunctiont.html", null ],
     [ "gcc_versiont", "classgcc__versiont.html", null ],
     [ "gdb_apit", "classgdb__apit.html", null ],
     [ "gdb_value_extractort", "classgdb__value__extractort.html", null ],
@@ -1038,6 +1040,7 @@ var hierarchy =
       [ "natural_loops_templatet< P, T, C >", "classnatural__loops__templatet.html", null ]
     ] ],
     [ "c_wranglert::loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", null ],
+    [ "loop_contracts_clauset", "structloop__contracts__clauset.html", null ],
     [ "loop_contracts_synthesizer_baset", "classloop__contracts__synthesizer__baset.html", [
       [ "enumerative_loop_contracts_synthesizert", "classenumerative__loop__contracts__synthesizert.html", null ]
     ] ],

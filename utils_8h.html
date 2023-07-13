@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('utils_8h.html',''); initResizable(); }
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8h__dep__incl.svg" width="4966" height="527"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8h__dep__incl.svg" width="5230" height="527"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -224,6 +224,11 @@ Functions</h2></td></tr>
 <tr class="memitem:aaeb6c0147c7354441c41b25a535e008a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#aaeb6c0147c7354441c41b25a535e008a">annotate_assigns</a> (const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::set&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;assigns_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
 <tr class="memdesc:aaeb6c0147c7354441c41b25a535e008a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the assigns in <code>assigns_map</code> to their corresponding loops.  <a href="utils_8h.html#aaeb6c0147c7354441c41b25a535e008a">More...</a><br /></td></tr>
 <tr class="separator:aaeb6c0147c7354441c41b25a535e008a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3efc5ac13d2416bd72f7f3199f6e546d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a3efc5ac13d2416bd72f7f3199f6e546d">annotate_assigns</a> (const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &amp;assigns_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
+<tr class="separator:a3efc5ac13d2416bd72f7f3199f6e546d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a683eff99f435909b5f1e4545a2ced17e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a683eff99f435909b5f1e4545a2ced17e">annotate_decreases</a> (const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;decreases_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
+<tr class="memdesc:a683eff99f435909b5f1e4545a2ced17e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the decreases in <code>decreases_map</code> to their corresponding loops.  <a href="utils_8h.html#a683eff99f435909b5f1e4545a2ced17e">More...</a><br /></td></tr>
+<tr class="separator:a683eff99f435909b5f1e4545a2ced17e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a39033a5b5a007b6d8a90f38c0c07d5ca"></a>
@@ -390,8 +395,38 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a3efc5ac13d2416bd72f7f3199f6e546d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3efc5ac13d2416bd72f7f3199f6e546d">&#9670;&nbsp;</a></span>annotate_assigns() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void annotate_assigns </td>
+          <td>(</td>
+          <td class="paramtype">const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>assigns_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00742">742</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aaeb6c0147c7354441c41b25a535e008a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaeb6c0147c7354441c41b25a535e008a">&#9670;&nbsp;</a></span>annotate_assigns()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aaeb6c0147c7354441c41b25a535e008a">&#9670;&nbsp;</a></span>annotate_assigns() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -420,6 +455,39 @@ Functions</h2></td></tr>
 <p>Corresponding loops are specified by keys of <code>assigns_map</code> </p>
 
 <p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00720">720</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a683eff99f435909b5f1e4545a2ced17e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a683eff99f435909b5f1e4545a2ced17e">&#9670;&nbsp;</a></span>annotate_decreases()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void annotate_decreases </td>
+          <td>(</td>
+          <td class="paramtype">const std::map&lt; <a class="el" href="structloop__idt.html">loop_idt</a>, std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>decreases_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Annotate the decreases in <code>decreases_map</code> to their corresponding loops. </p>
+<p>Corresponding loops are specified by keys of <code>decreases_map</code> </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00761">761</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>

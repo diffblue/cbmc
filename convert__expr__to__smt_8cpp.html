@@ -332,7 +332,7 @@ Functions</h2></td></tr>
 <tr class="memitem:aa9679ae401be39dcfcd7be83b0ba45c0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsmt__termt.html">smt_termt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> &amp;converted, const <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map, const <a class="el" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes, const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;call_object_size, const <a class="el" href="structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03">smt_is_dynamic_objectt::make_applicationt</a> &amp;apply_is_dynamic_object)</td></tr>
 <tr class="separator:aa9679ae401be39dcfcd7be83b0ba45c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac495613f13bab1346a8a0a75b95f1af2"><td class="memTemplParams" colspan="2">template&lt;typename functiont &gt; </td></tr>
-<tr class="memitem:ac495613f13bab1346a8a0a75b95f1af2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structat__scope__exitt.html">at_scope_exitt</a>&lt; functiont &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a> (functiont exit_function)</td></tr>
+<tr class="memitem:ac495613f13bab1346a8a0a75b95f1af2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structat__scope__exitt.html">at_scope_exitt</a>&lt; <a class="el" href="structfunctiont.html">functiont</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a> (<a class="el" href="structfunctiont.html">functiont</a> exit_function)</td></tr>
 <tr class="separator:ac495613f13bab1346a8a0a75b95f1af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a1246264a6dd3069e480a3610ed80e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a> (<a class="el" href="classexprt.html">exprt</a> expr)</td></tr>
 <tr class="memdesc:a4a1246264a6dd3069e480a3610ed80e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower the <code>address_of(array[idx])</code> sub expressions in <code>expr</code> to <code>idx + address_of(array)</code>, so that it can be fed to <code>convert_expr_to_smt</code>.  <a href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">More...</a><br /></td></tr>
@@ -374,9 +374,9 @@ Functions</h2></td></tr>
 template&lt;typename functiont &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structat__scope__exitt.html">at_scope_exitt</a>&lt;functiont&gt; at_scope_exit </td>
+          <td class="memname"><a class="el" href="structat__scope__exitt.html">at_scope_exitt</a>&lt;<a class="el" href="structfunctiont.html">functiont</a>&gt; at_scope_exit </td>
           <td>(</td>
-          <td class="paramtype">functiont&#160;</td>
+          <td class="paramtype"><a class="el" href="structfunctiont.html">functiont</a>&#160;</td>
           <td class="paramname"><em>exit_function</em></td><td>)</td>
           <td></td>
         </tr>

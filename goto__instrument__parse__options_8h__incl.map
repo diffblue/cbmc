@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/goto_instrument_parse_options.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/goto_instrument_parse_options.h">
-<area shape="rect" id="node1" title="Command Line Parsing." alt="" coords="2707,5,2949,61"/>
-<area shape="rect" id="node2" href="$config_8h.html" title=" " alt="" coords="1020,117,1119,143"/>
-<area shape="rect" id="node10" href="$parse__options_8h.html" title=" " alt="" coords="1922,117,2073,143"/>
-<area shape="rect" id="node14" href="$ui__message_8h.html" title=" " alt="" coords="3977,206,4089,233"/>
-<area shape="rect" id="node16" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="3865,295,3983,322"/>
-<area shape="rect" id="node17" href="$validation__interface_8h.html" title=" " alt="" coords="4425,117,4615,143"/>
-<area shape="rect" id="node18" href="$class__hierarchy_8h.html" title="Class Hierarchy." alt="" coords="1673,199,1828,240"/>
-<area shape="rect" id="node22" href="$remove__calls__no__body_8h.html" title="Remove calls to functions without a body." alt="" coords="2571,109,2743,151"/>
-<area shape="rect" id="node24" href="$remove__const__function__pointers_8h.html" title="Goto Programs." alt="" coords="3121,199,3317,240"/>
-<area shape="rect" id="node27" href="$restrict__function__pointers_8h.html" title="Given goto functions and a list of function parameters or globals that are function pointers with lis..." alt="" coords="2039,199,2207,240"/>
-<area shape="rect" id="node29" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="4639,109,4795,151"/>
-<area shape="rect" id="node30" href="$show__properties_8h.html" title="Show the properties." alt="" coords="434,288,590,329"/>
-<area shape="rect" id="node31" href="$ansi__c__language_8h.html" title=" " alt="" coords="4215,117,4401,143"/>
-<area shape="rect" id="node36" href="$goto__check__c_8h.html" title="Program Transformation." alt="" coords="2097,117,2263,143"/>
-<area shape="rect" id="node38" href="$goto__program__dereference_8h.html" title="Value Set." alt="" coords="2691,199,2872,240"/>
-<area shape="rect" id="node41" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="1296,117,1443,143"/>
-<area shape="rect" id="node45" href="$count__eloc_8h.html" title="Count effective lines of code." alt="" coords="4820,117,4924,143"/>
-<area shape="rect" id="node46" href="$document__properties_8h.html" title="Documentation of Properties." alt="" coords="2958,117,3130,143"/>
-<area shape="rect" id="node47" href="$dump__c_8h.html" title="Dump C from Goto Program." alt="" coords="3655,295,3740,322"/>
-<area shape="rect" id="node48" href="$generate__function__bodies_8h.html" title=" " alt="" coords="4007,295,4209,322"/>
-<area shape="rect" id="node50" href="$insert__final__assert__false_8h.html" title="Insert final assert false into a function." alt="" coords="3761,199,3903,240"/>
-<area shape="rect" id="node51" href="$nondet__volatile_8h.html" title="Volatile Variables." alt="" coords="3831,117,3966,143"/>
-<area shape="rect" id="node52" href="$reachability__slicer_8h.html" title="Slicing." alt="" coords="45,295,197,322"/>
-<area shape="rect" id="node53" href="$replace__calls_8h.html" title="Replace calls to given functions with calls to other given functions." alt="" coords="1095,295,1214,322"/>
-<area shape="rect" id="node54" href="$uninitialized_8h.html" title="Detection for Uninitialized Local Variables." alt="" coords="2819,117,2933,143"/>
-<area shape="rect" id="node55" href="$unwindset_8h.html" title="Loop unwinding." alt="" coords="665,295,767,322"/>
-<area shape="rect" id="node56" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="2389,117,2547,143"/>
-<area shape="rect" id="node59" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="3341,199,3534,240"/>
-<area shape="rect" id="node60" href="$weak__memory_8h.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="1597,117,1768,143"/>
-<area shape="rect" id="node3" title=" " alt="" coords="859,377,901,404"/>
-<area shape="rect" id="node4" href="$ieee__float_8h.html" title=" " alt="" coords="2997,206,3096,233"/>
-<area shape="rect" id="node8" href="$irep_8h.html" title=" " alt="" coords="1413,377,1472,404"/>
-<area shape="rect" id="node9" href="$optional_8h.html" title=" " alt="" coords="469,377,555,404"/>
-<area shape="rect" id="node5" title=" " alt="" coords="2928,377,2992,404"/>
-<area shape="rect" id="node6" href="$mp__arith_8h.html" title=" " alt="" coords="3099,295,3191,322"/>
-<area shape="rect" id="node7" title=" " alt="" coords="2921,452,2980,479"/>
-<area shape="rect" id="node11" href="$cmdline_8h.html" title=" " alt="" coords="323,295,410,322"/>
-<area shape="rect" id="node12" href="$src_2util_2message_8h.html" title=" " alt="" coords="3461,295,3555,322"/>
-<area shape="rect" id="node13" title=" " alt="" coords="3367,377,3454,404"/>
-<area shape="rect" id="node15" title=" " alt="" coords="4284,377,4361,404"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1739,377,1789,404"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2049,295,2173,322"/>
-<area shape="rect" id="node21" href="$graph_8h.html" title="A Template Class for Graphs." alt="" coords="1928,295,2024,322"/>
-<area shape="rect" id="node23" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="2299,295,2424,322"/>
-<area shape="rect" id="node25" title=" " alt="" coords="2448,295,2563,322"/>
-<area shape="rect" id="node26" href="$expr_8h.html" title=" " alt="" coords="3374,295,3437,322"/>
-<area shape="rect" id="node28" href="$exception__utils_8h.html" title=" " alt="" coords="3216,295,3349,322"/>
-<area shape="rect" id="node32" href="$make__unique_8h.html" title=" " alt="" coords="4436,206,4583,233"/>
-<area shape="rect" id="node33" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="4215,206,4361,233"/>
-<area shape="rect" id="node34" href="$ansi__c__parse__tree_8h.html" title=" " alt="" coords="893,206,1043,233"/>
-<area shape="rect" id="node35" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="4607,206,4830,233"/>
-<area shape="rect" id="node37" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1341,288,1491,329"/>
-<area shape="rect" id="node39" href="$dereference__callback_8h.html" title="Pointer Dereferencing." alt="" coords="2727,377,2900,404"/>
-<area shape="rect" id="node40" href="$value__set__dereference_8h.html" title="Pointer Dereferencing." alt="" coords="2587,295,2770,322"/>
-<area shape="rect" id="node42" href="$call__graph_8h.html" title="Function Call Graphs." alt="" coords="1852,206,2015,233"/>
-<area shape="rect" id="node43" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="1397,199,1547,240"/>
-<area shape="rect" id="node44" href="$namespace_8h.html" title=" " alt="" coords="1515,295,1650,322"/>
-<area shape="rect" id="node49" title=" " alt="" coords="4079,377,4137,404"/>
-<area shape="rect" id="node57" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="2231,199,2382,240"/>
-<area shape="rect" id="node58" href="$loop__utils_8h.html" title="Helper functions for k&#45;induction and loop invariants." alt="" coords="2406,199,2565,240"/>
+<area shape="rect" id="node1" title="Command Line Parsing." alt="" coords="2435,5,2678,61"/>
+<area shape="rect" id="node2" href="$config_8h.html" title=" " alt="" coords="1261,117,1359,143"/>
+<area shape="rect" id="node10" href="$parse__options_8h.html" title=" " alt="" coords="3491,117,3641,143"/>
+<area shape="rect" id="node14" href="$ui__message_8h.html" title=" " alt="" coords="4170,206,4282,233"/>
+<area shape="rect" id="node16" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="4215,295,4333,322"/>
+<area shape="rect" id="node17" href="$validation__interface_8h.html" title=" " alt="" coords="4610,117,4799,143"/>
+<area shape="rect" id="node18" href="$class__hierarchy_8h.html" title="Class Hierarchy." alt="" coords="1347,199,1502,240"/>
+<area shape="rect" id="node22" href="$remove__calls__no__body_8h.html" title="Remove calls to functions without a body." alt="" coords="2471,109,2643,151"/>
+<area shape="rect" id="node24" href="$remove__const__function__pointers_8h.html" title="Goto Programs." alt="" coords="2952,199,3148,240"/>
+<area shape="rect" id="node27" href="$restrict__function__pointers_8h.html" title="Given goto functions and a list of function parameters or globals that are function pointers with lis..." alt="" coords="1105,199,1273,240"/>
+<area shape="rect" id="node29" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="4824,109,4980,151"/>
+<area shape="rect" id="node30" href="$show__properties_8h.html" title="Show the properties." alt="" coords="411,288,567,329"/>
+<area shape="rect" id="node31" href="$ansi__c__language_8h.html" title=" " alt="" coords="4308,117,4493,143"/>
+<area shape="rect" id="node36" href="$goto__check__c_8h.html" title="Program Transformation." alt="" coords="662,117,827,143"/>
+<area shape="rect" id="node38" href="$goto__program__dereference_8h.html" title="Value Set." alt="" coords="2006,199,2187,240"/>
+<area shape="rect" id="node41" href="$aggressive__slicer_8h.html" title="Aggressive slicer Consider the control flow graph of the goto program and a criterion description of ..." alt="" coords="2297,117,2443,143"/>
+<area shape="rect" id="node45" href="$count__eloc_8h.html" title="Count effective lines of code." alt="" coords="5005,117,5109,143"/>
+<area shape="rect" id="node46" href="$document__properties_8h.html" title="Documentation of Properties." alt="" coords="3104,117,3276,143"/>
+<area shape="rect" id="node47" href="$dump__c_8h.html" title="Dump C from Goto Program." alt="" coords="3898,295,3983,322"/>
+<area shape="rect" id="node48" href="$generate__function__bodies_8h.html" title=" " alt="" coords="2718,117,2921,143"/>
+<area shape="rect" id="node50" href="$insert__final__assert__false_8h.html" title="Insert final assert false into a function." alt="" coords="3631,199,3773,240"/>
+<area shape="rect" id="node51" href="$nondet__volatile_8h.html" title="Volatile Variables." alt="" coords="2945,117,3080,143"/>
+<area shape="rect" id="node52" href="$reachability__slicer_8h.html" title="Slicing." alt="" coords="1114,295,1266,322"/>
+<area shape="rect" id="node53" href="$replace__calls_8h.html" title="Replace calls to given functions with calls to other given functions." alt="" coords="971,295,1089,322"/>
+<area shape="rect" id="node54" href="$uninitialized_8h.html" title="Detection for Uninitialized Local Variables." alt="" coords="3351,117,3466,143"/>
+<area shape="rect" id="node55" href="$unwindset_8h.html" title="Loop unwinding." alt="" coords="234,295,335,322"/>
+<area shape="rect" id="node56" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="1624,117,1783,143"/>
+<area shape="rect" id="node58" href="$contracts__wrangler_8h.html" title="Parse and annotate contracts." alt="" coords="1834,109,1981,151"/>
+<area shape="rect" id="node59" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="323,199,516,240"/>
+<area shape="rect" id="node60" href="$weak__memory_8h.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="2031,117,2202,143"/>
+<area shape="rect" id="node3" title=" " alt="" coords="2337,377,2379,404"/>
+<area shape="rect" id="node4" href="$ieee__float_8h.html" title=" " alt="" coords="3173,206,3271,233"/>
+<area shape="rect" id="node8" href="$irep_8h.html" title=" " alt="" coords="1477,377,1535,404"/>
+<area shape="rect" id="node9" href="$optional_8h.html" title=" " alt="" coords="323,377,409,404"/>
+<area shape="rect" id="node5" title=" " alt="" coords="3273,377,3337,404"/>
+<area shape="rect" id="node6" href="$mp__arith_8h.html" title=" " alt="" coords="3175,295,3267,322"/>
+<area shape="rect" id="node7" title=" " alt="" coords="2831,452,2890,479"/>
+<area shape="rect" id="node11" href="$cmdline_8h.html" title=" " alt="" coords="2315,295,2401,322"/>
+<area shape="rect" id="node12" href="$src_2util_2message_8h.html" title=" " alt="" coords="3393,295,3486,322"/>
+<area shape="rect" id="node13" title=" " alt="" coords="3119,377,3205,404"/>
+<area shape="rect" id="node15" title=" " alt="" coords="4283,377,4361,404"/>
+<area shape="rect" id="node19" title=" " alt="" coords="799,377,850,404"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1392,295,1516,322"/>
+<area shape="rect" id="node21" href="$graph_8h.html" title="A Template Class for Graphs." alt="" coords="2426,295,2522,322"/>
+<area shape="rect" id="node23" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="2647,295,2773,322"/>
+<area shape="rect" id="node25" title=" " alt="" coords="2847,295,2962,322"/>
+<area shape="rect" id="node26" href="$expr_8h.html" title=" " alt="" coords="3088,295,3151,322"/>
+<area shape="rect" id="node28" href="$exception__utils_8h.html" title=" " alt="" coords="26,295,159,322"/>
+<area shape="rect" id="node32" href="$make__unique_8h.html" title=" " alt="" coords="4703,206,4850,233"/>
+<area shape="rect" id="node33" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="3898,206,4045,233"/>
+<area shape="rect" id="node34" href="$ansi__c__parse__tree_8h.html" title=" " alt="" coords="2777,206,2928,233"/>
+<area shape="rect" id="node35" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="4356,206,4579,233"/>
+<area shape="rect" id="node37" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="693,288,844,329"/>
+<area shape="rect" id="node39" href="$dereference__callback_8h.html" title="Pointer Dereferencing." alt="" coords="2139,377,2313,404"/>
+<area shape="rect" id="node40" href="$value__set__dereference_8h.html" title="Pointer Dereferencing." alt="" coords="2005,295,2188,322"/>
+<area shape="rect" id="node42" href="$call__graph_8h.html" title="Function Call Graphs." alt="" coords="2313,206,2475,233"/>
+<area shape="rect" id="node43" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="1628,199,1779,240"/>
+<area shape="rect" id="node44" href="$namespace_8h.html" title=" " alt="" coords="1693,295,1828,322"/>
+<area shape="rect" id="node49" title=" " alt="" coords="3397,206,3455,233"/>
+<area shape="rect" id="node57" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="2500,199,2651,240"/>
 </map>

@@ -115,7 +115,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab2ac5e8c9e6a029492f674dca728d6b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structranget.html">ranget</a>&lt; <a class="el" href="classfilter__iteratort.html">filter_iteratort</a>&lt; iteratort &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structranget.html#ab2ac5e8c9e6a029492f674dca728d6b3">filter</a> (std::function&lt; bool(const <a class="el" href="structranget.html#ac9803a90739dfa8966ddf8bac2e1a281">value_type</a> &amp;)&gt; f)</td></tr>
 <tr class="separator:ab2ac5e8c9e6a029492f674dca728d6b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab3183fbf72c7eab02bd7866abe31a5a"><td class="memTemplParams" colspan="2">template&lt;typename functiont &gt; </td></tr>
-<tr class="memitem:aab3183fbf72c7eab02bd7866abe31a5a"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structranget.html#aab3183fbf72c7eab02bd7866abe31a5a">map</a> (functiont &amp;&amp;f) -&gt; <a class="el" href="structranget.html">ranget</a>&lt; <a class="el" href="classmap__iteratort.html">map_iteratort</a>&lt; iteratort, typename std::result_of&lt; functiont(<a class="el" href="structranget.html#ac9803a90739dfa8966ddf8bac2e1a281">value_type</a>)&gt;::type &gt;&gt;</td></tr>
+<tr class="memitem:aab3183fbf72c7eab02bd7866abe31a5a"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structranget.html#aab3183fbf72c7eab02bd7866abe31a5a">map</a> (<a class="el" href="structfunctiont.html">functiont</a> &amp;&amp;f) -&gt; <a class="el" href="structranget.html">ranget</a>&lt; <a class="el" href="classmap__iteratort.html">map_iteratort</a>&lt; iteratort, typename std::result_of&lt; <a class="el" href="structfunctiont.html">functiont</a>(<a class="el" href="structranget.html#ac9803a90739dfa8966ddf8bac2e1a281">value_type</a>)&gt;::type &gt;&gt;</td></tr>
 <tr class="memdesc:aab3183fbf72c7eab02bd7866abe31a5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of elements contained in the resulting range is deduced from the return type of <code>f</code>.  <a href="structranget.html#aab3183fbf72c7eab02bd7866abe31a5a">More...</a><br /></td></tr>
 <tr class="separator:aab3183fbf72c7eab02bd7866abe31a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0da3bc5abdd259a6632df8019448faf2"><td class="memTemplParams" colspan="2">template&lt;typename other_iteratort &gt; </td></tr>
@@ -494,11 +494,11 @@ template&lt;typename functiont &gt; </div>
         <tr>
           <td class="memname">auto <a class="el" href="structranget.html">ranget</a>&lt; iteratort &gt;::map </td>
           <td>(</td>
-          <td class="paramtype">functiont &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structfunctiont.html">functiont</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>f</em></td><td>)</td>
           <td> -&gt; <a class="el" href="structranget.html">ranget</a>&lt;<a class="el" href="classmap__iteratort.html">map_iteratort</a>&lt;
     iteratort,
-    typename std::result_of&lt;functiont(<a class="el" href="structranget.html#ac9803a90739dfa8966ddf8bac2e1a281">value_type</a>)&gt;::type&gt;&gt;
+    typename std::result_of&lt;<a class="el" href="structfunctiont.html">functiont</a>(<a class="el" href="structranget.html#ac9803a90739dfa8966ddf8bac2e1a281">value_type</a>)&gt;::type&gt;&gt;
   </td>
         </tr>
       </table>

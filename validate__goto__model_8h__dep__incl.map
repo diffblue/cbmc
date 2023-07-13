@@ -7,12 +7,12 @@
 <area shape="rect" id="node4" href="$unwindset_8cpp.html" title=" " alt="" coords="4515,213,4709,269"/>
 <area shape="rect" id="node58" href="$lazy__goto__model_8h.html" title="Author: Diffblue Ltd." alt="" coords="5,325,224,381"/>
 <area shape="rect" id="node59" href="$java__bmc__util_8cpp.html" title="Bounded Model Checking Utils for Java." alt="" coords="4272,213,4491,269"/>
-<area shape="rect" id="node6" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="8983,451,9167,492"/>
-<area shape="rect" id="node7" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4435,555,4619,611"/>
-<area shape="rect" id="node8" href="$static__simplifier_8cpp.html" title=" " alt="" coords="7788,555,7972,611"/>
-<area shape="rect" id="node9" href="$static__verifier_8cpp.html" title=" " alt="" coords="9072,555,9256,611"/>
+<area shape="rect" id="node6" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="9013,451,9197,492"/>
+<area shape="rect" id="node7" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4449,555,4633,611"/>
+<area shape="rect" id="node8" href="$static__simplifier_8cpp.html" title=" " alt="" coords="7803,555,7987,611"/>
+<area shape="rect" id="node9" href="$static__verifier_8cpp.html" title=" " alt="" coords="9103,555,9287,611"/>
 <area shape="rect" id="node10" href="$call__graph_8cpp.html" title="Function Call Graphs." alt="" coords="349,325,533,381"/>
-<area shape="rect" id="node11" href="$is__threaded_8h.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="8983,325,9167,381"/>
+<area shape="rect" id="node11" href="$is__threaded_8h.html" title="Over&#45;approximate Concurrency for Threaded Goto Programs." alt="" coords="9013,325,9197,381"/>
 <area shape="rect" id="node12" href="$lexical__loops_8h.html" title="Compute lexical loops in a goto_function." alt="" coords="341,443,534,499"/>
 <area shape="rect" id="node13" href="$loop__analysis_8h.html" title="Data structure representing a loop in a GOTO program and an interface shared by all analyses that fin..." alt="" coords="557,325,741,381"/>
 <area shape="rect" id="node14" href="$natural__loops_8h.html" title="Compute natural loops in a goto_function." alt="" coords="639,443,835,499"/>
@@ -41,22 +41,22 @@
 <area shape="rect" id="node37" href="$dfcc_8cpp.html" title=" " alt="" coords="4921,436,5119,507"/>
 <area shape="rect" id="node38" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="5143,436,5340,507"/>
 <area shape="rect" id="node39" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="6503,325,6697,381"/>
-<area shape="rect" id="node40" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="5364,436,5623,507"/>
-<area shape="rect" id="node41" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="5647,436,5854,507"/>
-<area shape="rect" id="node42" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="5879,436,6076,507"/>
-<area shape="rect" id="node43" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="6100,436,6297,507"/>
-<area shape="rect" id="node44" href="$dfcc__instrument__loop_8h.html" title="This class applies the loop contract transformation to a loop in a goto function." alt="" coords="6079,317,6276,388"/>
-<area shape="rect" id="node45" href="$dfcc__library_8cpp.html" title=" " alt="" coords="6721,317,6919,388"/>
-<area shape="rect" id="node46" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="6943,317,7185,388"/>
-<area shape="rect" id="node47" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="7209,317,7407,388"/>
-<area shape="rect" id="node48" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="6321,436,6519,507"/>
-<area shape="rect" id="node49" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="6543,436,6745,507"/>
-<area shape="rect" id="node50" href="$utils_8h.html" title=" " alt="" coords="5810,325,6003,381"/>
-<area shape="rect" id="node51" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="7431,325,7625,381"/>
-<area shape="rect" id="node52" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="7649,325,7842,381"/>
-<area shape="rect" id="node53" href="$document__properties_8cpp.html" title="Subgoal Documentation." alt="" coords="7866,325,8059,381"/>
-<area shape="rect" id="node54" href="$dot_8cpp.html" title="Dump Goto&#45;Program as DOT Graph." alt="" coords="8083,325,8277,381"/>
-<area shape="rect" id="node55" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="8301,325,8494,381"/>
-<area shape="rect" id="node56" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="8519,325,8740,381"/>
-<area shape="rect" id="node57" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="8765,325,8958,381"/>
+<area shape="rect" id="node40" href="$contracts__wrangler_8h.html" title="Parse and annotate contracts." alt="" coords="6721,325,6946,381"/>
+<area shape="rect" id="node41" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="5364,436,5623,507"/>
+<area shape="rect" id="node42" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="5647,436,5854,507"/>
+<area shape="rect" id="node43" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="5879,436,6076,507"/>
+<area shape="rect" id="node44" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="6100,436,6297,507"/>
+<area shape="rect" id="node45" href="$dfcc__instrument__loop_8h.html" title="This class applies the loop contract transformation to a loop in a goto function." alt="" coords="6079,317,6276,388"/>
+<area shape="rect" id="node46" href="$dfcc__library_8cpp.html" title=" " alt="" coords="6971,317,7168,388"/>
+<area shape="rect" id="node47" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="7193,317,7434,388"/>
+<area shape="rect" id="node48" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="7459,317,7656,388"/>
+<area shape="rect" id="node49" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="6321,436,6519,507"/>
+<area shape="rect" id="node50" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="6543,436,6745,507"/>
+<area shape="rect" id="node51" href="$utils_8h.html" title=" " alt="" coords="5810,325,6003,381"/>
+<area shape="rect" id="node52" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="7681,325,7874,381"/>
+<area shape="rect" id="node53" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="7898,325,8091,381"/>
+<area shape="rect" id="node54" href="$document__properties_8cpp.html" title="Subgoal Documentation." alt="" coords="8115,325,8309,381"/>
+<area shape="rect" id="node55" href="$dot_8cpp.html" title="Dump Goto&#45;Program as DOT Graph." alt="" coords="8333,325,8526,381"/>
+<area shape="rect" id="node56" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="8550,325,8743,381"/>
+<area shape="rect" id="node57" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="8768,325,8989,381"/>
 </map>

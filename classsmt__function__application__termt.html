@@ -157,15 +157,15 @@ Private Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-methods"></a>
 Static Private Member Functions</h2></td></tr>
 <tr class="memitem:a3a18b9646370c362d01ffc70ffbda320"><td class="memTemplParams" colspan="2">template&lt;class functiont &gt; </td></tr>
-<tr class="memitem:a3a18b9646370c362d01ffc70ffbda320"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classsmt__indext.html">smt_indext</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsmt__function__application__termt.html#a3a18b9646370c362d01ffc70ffbda320">indices</a> (const functiont &amp;function, const std::false_type &amp;has_indices)</td></tr>
+<tr class="memitem:a3a18b9646370c362d01ffc70ffbda320"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classsmt__indext.html">smt_indext</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsmt__function__application__termt.html#a3a18b9646370c362d01ffc70ffbda320">indices</a> (const <a class="el" href="structfunctiont.html">functiont</a> &amp;function, const std::false_type &amp;has_indices)</td></tr>
 <tr class="memdesc:a3a18b9646370c362d01ffc70ffbda320"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload for when <code>functiont</code> does not have indices.  <a href="classsmt__function__application__termt.html#a3a18b9646370c362d01ffc70ffbda320">More...</a><br /></td></tr>
 <tr class="separator:a3a18b9646370c362d01ffc70ffbda320"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a7f328f30190820f52b5c6798804f16"><td class="memTemplParams" colspan="2">template&lt;class functiont &gt; </td></tr>
-<tr class="memitem:a0a7f328f30190820f52b5c6798804f16"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classsmt__indext.html">smt_indext</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsmt__function__application__termt.html#a0a7f328f30190820f52b5c6798804f16">indices</a> (const functiont &amp;function, const std::true_type &amp;has_indices)</td></tr>
+<tr class="memitem:a0a7f328f30190820f52b5c6798804f16"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classsmt__indext.html">smt_indext</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsmt__function__application__termt.html#a0a7f328f30190820f52b5c6798804f16">indices</a> (const <a class="el" href="structfunctiont.html">functiont</a> &amp;function, const std::true_type &amp;has_indices)</td></tr>
 <tr class="memdesc:a0a7f328f30190820f52b5c6798804f16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload for when <code>functiont</code> has indices member function.  <a href="classsmt__function__application__termt.html#a0a7f328f30190820f52b5c6798804f16">More...</a><br /></td></tr>
 <tr class="separator:a0a7f328f30190820f52b5c6798804f16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1981d1c690cc0963ec4655a29bab83fc"><td class="memTemplParams" colspan="2">template&lt;class functiont &gt; </td></tr>
-<tr class="memitem:a1981d1c690cc0963ec4655a29bab83fc"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classsmt__indext.html">smt_indext</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsmt__function__application__termt.html#a1981d1c690cc0963ec4655a29bab83fc">indices</a> (const functiont &amp;function)</td></tr>
+<tr class="memitem:a1981d1c690cc0963ec4655a29bab83fc"><td class="memTemplItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classsmt__indext.html">smt_indext</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsmt__function__application__termt.html#a1981d1c690cc0963ec4655a29bab83fc">indices</a> (const <a class="el" href="structfunctiont.html">functiont</a> &amp;function)</td></tr>
 <tr class="memdesc:a1981d1c690cc0963ec4655a29bab83fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>function.indices</code> if <code>functiont</code> has an <code>indices</code> member function or returns an empty collection otherwise.  <a href="classsmt__function__application__termt.html#a1981d1c690cc0963ec4655a29bab83fc">More...</a><br /></td></tr>
 <tr class="separator:a1981d1c690cc0963ec4655a29bab83fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -411,7 +411,7 @@ template&lt;class functiont &gt; </div>
         <tr>
           <td class="memname">static std::vector&lt;<a class="el" href="classsmt__indext.html">smt_indext</a>&gt; smt_function_application_termt::indices </td>
           <td>(</td>
-          <td class="paramtype">const functiont &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structfunctiont.html">functiont</a> &amp;&#160;</td>
           <td class="paramname"><em>function</em></td><td>)</td>
           <td></td>
         </tr>
@@ -443,7 +443,7 @@ template&lt;class functiont &gt; </div>
         <tr>
           <td class="memname">static std::vector&lt;<a class="el" href="classsmt__indext.html">smt_indext</a>&gt; smt_function_application_termt::indices </td>
           <td>(</td>
-          <td class="paramtype">const functiont &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structfunctiont.html">functiont</a> &amp;&#160;</td>
           <td class="paramname"><em>function</em>, </td>
         </tr>
         <tr>
@@ -485,7 +485,7 @@ template&lt;class functiont &gt; </div>
         <tr>
           <td class="memname">static std::vector&lt;<a class="el" href="classsmt__indext.html">smt_indext</a>&gt; smt_function_application_termt::indices </td>
           <td>(</td>
-          <td class="paramtype">const functiont &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structfunctiont.html">functiont</a> &amp;&#160;</td>
           <td class="paramname"><em>function</em>, </td>
         </tr>
         <tr>

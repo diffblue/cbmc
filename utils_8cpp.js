@@ -2,7 +2,9 @@ var utils_8cpp =
 [
     [ "add_quantified_variable", "utils_8cpp.html#a294e2a465538cef6fe58910023492ac3", null ],
     [ "all_dereferences_are_valid", "utils_8cpp.html#a593dcf3d2c7f0c9332afe812cc5ec689", null ],
+    [ "annotate_assigns", "utils_8cpp.html#a3efc5ac13d2416bd72f7f3199f6e546d", null ],
     [ "annotate_assigns", "utils_8cpp.html#aaeb6c0147c7354441c41b25a535e008a", null ],
+    [ "annotate_decreases", "utils_8cpp.html#a683eff99f435909b5f1e4545a2ced17e", null ],
     [ "annotate_invariants", "utils_8cpp.html#aab60371e081d74195d69c087bb3b9543", null ],
     [ "append_safe_havoc_code_for_expr", "utils_8cpp.html#a1eaf14a5ee9f44eaa5d598bfcc709261", null ],
     [ "generate_history_variables_initialization", "utils_8cpp.html#a0e4c1d1b019f583c464308badc770bb2", null ],
