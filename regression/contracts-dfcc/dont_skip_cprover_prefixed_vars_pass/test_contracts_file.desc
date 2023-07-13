@@ -1,0 +1,15 @@
+CORE
+main.c
+--loop-contracts-file test.json --dfcc main --apply-loop-contracts
+^\[foo.assigns.\d+\] .* Check that nondet_var is assignable: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that __VERIFIER_var is assignable: SUCCESS$
+^\[foo.assigns.\d+\] .* Check that __CPROVER_var is assignable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that when program variables names have special prefixes
+__CPROVER_, __VERIFIER, or nondet, adding them to the write set makes them
+assignable.
+Using loop contracts from the contracts file.

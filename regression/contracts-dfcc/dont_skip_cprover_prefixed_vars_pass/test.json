@@ -1,0 +1,18 @@
+{
+    "functions": [
+      {
+        "foo": [
+            {
+              "loop_id": "0",
+              "assigns": "i,nondet_var, __VERIFIER_var, __CPROVER_var",
+              "invariants": "0 <= i && i <= 10",
+              "decreases": "i",
+              "symbol_map": "i,foo::1::1::i;
+                            nondet_var,foo::1::nondet_var;
+                            __VERIFIER_var, foo::1::__VERIFIER_var;
+                            __CPROVER_var,foo::1::__CPROVER_var"
+            }
+          ]
+      }
+    ]
+  }

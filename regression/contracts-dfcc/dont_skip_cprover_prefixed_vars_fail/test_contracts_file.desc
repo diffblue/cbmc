@@ -1,0 +1,14 @@
+CORE
+main.c
+--loop-contracts-file test.json --dfcc main --apply-loop-contracts
+^\[foo.assigns.\d+\] .* Check that nondet_var is assignable: FAILURE$
+^\[foo.assigns.\d+\] .* Check that __VERIFIER_var is assignable: FAILURE$
+^\[foo.assigns.\d+\] .* Check that __CPROVER_var is assignable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that program variables with special name prefixes
+__CPROVER_, __VERIFIER, or nondet do not escape assigns clause checking.
+Using loop contracts from the contracts file.

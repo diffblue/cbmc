@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwindset.h"
 
 #include "contracts/contracts.h"
+#include "contracts/contracts_wrangler.h"
 #include "contracts/dynamic-frames/dfcc.h"
 #include "wmm/weak_memory.h"
 
@@ -101,6 +102,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_DFCC \
   "(" FLAG_LOOP_CONTRACTS ")" \
   "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
+  "(" FLAG_LOOP_CONTRACTS_FILE "):" \
   "(" FLAG_REPLACE_CALL "):" \
   "(" FLAG_ENFORCE_CONTRACT "):" \
   OPT_ENFORCE_CONTRACT_REC \

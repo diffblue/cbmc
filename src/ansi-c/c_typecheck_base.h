@@ -65,6 +65,7 @@ public:
 
   virtual void typecheck()=0;
   virtual void typecheck_expr(exprt &expr);
+  virtual void typecheck_spec_assigns(exprt::operandst &targets);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -160,7 +161,6 @@ protected:
   /// is found in expr.
   virtual void check_was_freed(const exprt &expr, std::string &clause_type);
 
-  virtual void typecheck_spec_assigns(exprt::operandst &targets);
   virtual void typecheck_spec_frees(exprt::operandst &targets);
   virtual void typecheck_conditional_targets(
     exprt::operandst &targets,

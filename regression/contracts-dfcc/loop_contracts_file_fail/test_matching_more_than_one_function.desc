@@ -1,0 +1,10 @@
+CORE
+main.c
+--loop-contracts-file test_matching_more_than_one_function.json --dfcc main --apply-loop-contracts
+^function regex .* matches more than one function
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+This test checks that loop contracts wrangler correctly error out
+when there is more than one matched function.

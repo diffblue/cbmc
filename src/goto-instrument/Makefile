@@ -17,6 +17,7 @@ SRC = accelerate/accelerate.cpp \
       branch.cpp \
       call_sequences.cpp \
       contracts/contracts.cpp \
+      contracts/contracts_wrangler.cpp \
       contracts/dynamic-frames/dfcc_utils.cpp \
       contracts/dynamic-frames/dfcc_loop_nesting_graph.cpp \
       contracts/dynamic-frames/dfcc_contract_mode.cpp \

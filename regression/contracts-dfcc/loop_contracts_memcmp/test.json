@@ -1,0 +1,19 @@
+{
+    "functions": [
+      {
+        "memcmp": [
+            {
+              "loop_id": "0",
+              "invariants": "(n <= __CPROVER_loop_entry(n))&&(__CPROVER_same_object(sc1, __CPROVER_loop_entry(sc1)))&&
+                            (__CPROVER_same_object(sc2, __CPROVER_loop_entry(sc2)))&&
+                            (sc1 <= s1 + __CPROVER_loop_entry(n))&&
+                            (sc2 <= s2 + __CPROVER_loop_entry(n))&&
+                            (res == 0)&&
+                            (sc1 -(const unsigned char*)s1 == sc2 -(const unsigned char*)s2
+                            &&  sc1 -(const unsigned char*)s1== __CPROVER_loop_entry(n) - n)",
+              "symbol_map": "n,memcmp::n; sc1,memcmp::1::sc1; sc2,memcmp::1::sc2; res,memcmp::1::res; s1, memcmp::s1; s2, memcmp::s2"
+            }
+          ]
+      }
+    ]
+  }

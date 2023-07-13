@@ -1,0 +1,13 @@
+{
+    "functions": [
+      {
+        "main": [
+            {
+              "loop_id": "0",
+              "invariants": "x[0] == __CPROVER_loop_entry(x[0])",
+              "symbol_map": "x,main::1::x"
+            }
+          ]
+      }
+    ]
+  }

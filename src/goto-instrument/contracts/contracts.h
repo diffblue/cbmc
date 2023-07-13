@@ -40,6 +40,11 @@ Date: February 2016
   " --loop-contracts-no-unwind\n"                                              \
   "                              do not unwind transformed loops\n"
 
+#define FLAG_LOOP_CONTRACTS_FILE "loop-contracts-file"
+#define HELP_LOOP_CONTRACTS_FILE                                               \
+  " --loop-contracts-file <file>\n"                                            \
+  "                              parse and annotate loop contracts from files\n"
+
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
   " --replace-call-with-contract <function>[/contract]\n"                      \

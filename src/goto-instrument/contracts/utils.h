@@ -317,4 +317,14 @@ void annotate_assigns(
   const std::map<loop_idt, std::set<exprt>> &assigns_map,
   goto_modelt &goto_model);
 
+void annotate_assigns(
+  const std::map<loop_idt, exprt> &assigns_map,
+  goto_modelt &goto_model);
+
+/// Annotate the decreases in `decreases_map` to their corresponding
+/// loops. Corresponding loops are specified by keys of `decreases_map`
+void annotate_decreases(
+  const std::map<loop_idt, std::vector<exprt>> &decreases_map,
+  goto_modelt &goto_model);
+
 #endif // CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
