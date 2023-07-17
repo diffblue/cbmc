@@ -7,6 +7,7 @@ DIRS = analyses \
        cprover \
        crangler \
        goto-analyzer \
+       goto-bmc \
        goto-cc \
        goto-checker \
        goto-diff \
@@ -20,6 +21,7 @@ DIRS = analyses \
        json \
        json-symtab-language \
        langapi \
+       libcprover-cpp \
        linking \
        memory-analyzer \
        pointer-analysis \
@@ -34,6 +36,7 @@ all: cbmc.dir \
      cprover.dir \
      crangler.dir \
      goto-analyzer.dir \
+     goto-bmc.dir \
      goto-cc.dir \
      goto-diff.dir \
      goto-instrument.dir \
@@ -113,6 +116,10 @@ symtab2gb.dir: util.dir goto-programs.dir langapi.dir linking.dir \
 goto-synthesizer.dir: languages util.dir goto-programs.dir langapi.dir \
                     json.dir goto-checker.dir \
                     goto-instrument.dir
+
+goto-bmc.dir: libcprover-cpp.dir
+
+libcprover-cpp.dir: cbmc.dir
 
 # building for a particular directory
 
