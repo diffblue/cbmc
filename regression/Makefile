@@ -30,6 +30,9 @@ DIRS = cbmc-shadow-memory \
        goto-diff \
        test-script \
        goto-analyzer-taint \
+       goto-bmc/goto-bmc-symex-ready-goto \
+       goto-bmc/goto-bmc-non-symex-ready-goto \
+       goto-bmc \
        goto-gcc \
        goto-cl \
        goto-cc-cbmc \
