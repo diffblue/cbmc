@@ -62,6 +62,7 @@ DIRS = cbmc-shadow-memory \
        cbmc-sequentialization \
        cpp-linter \
        catch-framework \
+       libcprover-cpp \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)
