@@ -8,6 +8,7 @@
 #include <util/nodiscard.h>
 #include <util/range.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol.h>
 
 #include <solvers/smt2_incremental/ast/smt_commands.h>
@@ -74,7 +75,8 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &expr)
       can_cast_expr<symbol_exprt>(expr_node) ||
       can_cast_expr<array_exprt>(expr_node) ||
       can_cast_expr<array_of_exprt>(expr_node) ||
-      can_cast_expr<nondet_symbol_exprt>(expr_node))
+      can_cast_expr<nondet_symbol_exprt>(expr_node) ||
+      can_cast_expr<string_constantt>(expr_node))
     {
       dependent_expressions.push_back(expr_node);
     }
@@ -115,6 +117,13 @@ void smt2_incremental_decision_proceduret::initialize_array_elements(
       smt_array_theoryt::select(array_identifier, array_index_identifier),
       element_value)}};
   solver_process->send(elements_definition);
+}
+
+void smt2_incremental_decision_proceduret::initialize_array_elements(
+  const string_constantt &string,
+  const smt_identifier_termt &array_identifier)
+{
+  initialize_array_elements(string.to_array_expr(), array_identifier);
 }
 
 template <typename t_exprt>
@@ -208,6 +217,11 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
       const auto array_of_expr = expr_try_dynamic_cast<array_of_exprt>(current))
     {
       define_array_function(*array_of_expr);
+    }
+    else if(
+      const auto string = expr_try_dynamic_cast<string_constantt>(current))
+    {
+      define_array_function(*string);
     }
     else if(
       const auto nondet_symbol =

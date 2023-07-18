@@ -22,6 +22,7 @@
 
 class namespacet;
 class smt_base_solver_processt; // IWYU pragma: keep
+class string_constantt;
 
 class smt2_incremental_decision_proceduret final
   : public stack_decision_proceduret
@@ -86,6 +87,9 @@ protected:
   /// working on Z3 and CVC5.
   void initialize_array_elements(
     const array_of_exprt &array,
+    const smt_identifier_termt &array_identifier);
+  void initialize_array_elements(
+    const string_constantt &string,
     const smt_identifier_termt &array_identifier);
   /// \brief Defines any functions which \p expr depends on, which have not yet
   ///   been defined, along with their dependencies in turn.

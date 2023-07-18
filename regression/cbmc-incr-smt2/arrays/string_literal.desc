@@ -1,0 +1,13 @@
+CORE
+string_literal.c
+--trace
+Passing problem to incremental SMT2 solving
+line 10 assertion element \!\= \'o\'\: FAILURE
+index=4
+element='o'
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test of indexing into a string literal.

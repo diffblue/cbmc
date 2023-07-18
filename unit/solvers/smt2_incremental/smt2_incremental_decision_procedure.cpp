@@ -6,6 +6,7 @@
 #include <util/exception_utils.h>
 #include <util/make_unique.h>
 #include <util/namespace.h>
+#include <util/string_constant.h>
 #include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/ast/smt_commands.h>
@@ -681,6 +682,53 @@ TEST_CASE(
         foo_term, smt_array_theoryt::select(array_term, index_term))}};
     REQUIRE(test.sent_commands == expected_commands);
   }
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret string literal commands.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const string_constantt constant{"Chips"};
+  const typet array_type = constant.to_array_expr().type();
+  const symbolt fish{"fish", array_type, ID_C};
+  test.symbol_table.insert(fish);
+  test.sent_commands.clear();
+  test.procedure.set_to(equal_exprt{fish.symbol_expr(), constant}, true);
+  const smt_array_sortt expected_sort{
+    smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}};
+  const smt_identifier_termt expected_fish{"fish", expected_sort};
+  const smt_identifier_termt expected_chips{"array_0", expected_sort};
+  const std::vector<smt_commandt> expected_commands{
+    smt_declare_function_commandt{expected_fish, {}},
+    smt_declare_function_commandt{expected_chips, {}},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        expected_chips, smt_bit_vector_constant_termt{0, 32}),
+      smt_bit_vector_constant_termt{'C', 8})},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        expected_chips, smt_bit_vector_constant_termt{1, 32}),
+      smt_bit_vector_constant_termt{'h', 8})},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        expected_chips, smt_bit_vector_constant_termt{2, 32}),
+      smt_bit_vector_constant_termt{'i', 8})},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        expected_chips, smt_bit_vector_constant_termt{3, 32}),
+      smt_bit_vector_constant_termt{'p', 8})},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        expected_chips, smt_bit_vector_constant_termt{4, 32}),
+      smt_bit_vector_constant_termt{'s', 8})},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(
+        expected_chips, smt_bit_vector_constant_termt{5, 32}),
+      smt_bit_vector_constant_termt{'\0', 8})},
+    smt_assert_commandt{
+      smt_core_theoryt::equal(expected_fish, expected_chips)}};
+  REQUIRE(test.sent_commands == expected_commands);
 }
 
 TEST_CASE(
