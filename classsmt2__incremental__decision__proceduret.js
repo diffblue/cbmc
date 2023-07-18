@@ -19,6 +19,7 @@ var classsmt2__incremental__decision__proceduret =
     [ "handle", "classsmt2__incremental__decision__proceduret.html#a1d1569125e1afdee07d0b312d3b7d650", null ],
     [ "initialize_array_elements", "classsmt2__incremental__decision__proceduret.html#a5c5e32b8c28122940ff53675ddcfb647", null ],
     [ "initialize_array_elements", "classsmt2__incremental__decision__proceduret.html#a0f2e8638bbf9cce2a4d1a22963ec0b38", null ],
+    [ "initialize_array_elements", "classsmt2__incremental__decision__proceduret.html#a85d4e816d794df3ddedb93a489ca17da", null ],
     [ "lower", "classsmt2__incremental__decision__proceduret.html#a1ff609bb217d8a3d1f0c6f98b2ff3902", null ],
     [ "pop", "classsmt2__incremental__decision__proceduret.html#a860c271771929a61d93a59e77792b017", null ],
     [ "print_assignment", "classsmt2__incremental__decision__proceduret.html#a632c5481e95879e402064297f1b822a9", null ],
