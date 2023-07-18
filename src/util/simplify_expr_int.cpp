@@ -159,6 +159,12 @@ static bool mul_expr(
   return true;
 }
 
+// Work around spurious GCC 12 warning about c_sizeof_type being
+// uninitialised in its destructor (!).
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 simplify_exprt::resultt<> simplify_exprt::simplify_mult(const mult_exprt &expr)
 {
   // check to see if it is a number type
@@ -270,6 +276,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_mult(const mult_exprt &expr)
     return std::move(tmp);
   }
 }
+#pragma GCC diagnostic pop
 
 simplify_exprt::resultt<> simplify_exprt::simplify_div(const div_exprt &expr)
 {
