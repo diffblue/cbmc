@@ -346,39 +346,61 @@ optionalt<exprt> expr_initializer(
 /// Builds an expression of the given output type with each of its bytes
 /// initialized to the given initialization expression.
 /// Integer bitvector types are currently supported.
-/// For unsupported types the initialization expression is casted to the
+/// For unsupported `output_type` the initialization expression is casted to the
 /// output type.
 /// \param init_byte_expr The initialization expression
 /// \param output_type The output type
 /// \return The built expression
+/// \note `init_byte_expr` must be a boolean or a bitvector and must be of at
+///  most `size <= config.ansi_c.char_width`
 exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
 {
-  if(output_type.id() == ID_unsignedbv || output_type.id() == ID_signedbv)
+  const auto init_type_as_bitvector =
+    type_try_dynamic_cast<bitvector_typet>(init_byte_expr.type());
+  // Fail if `init_byte_expr` is not a bitvector of maximum 8 bits or a boolean.
+  PRECONDITION(
+    (init_type_as_bitvector &&
+     init_type_as_bitvector->get_width() <= config.ansi_c.char_width) ||
+    init_byte_expr.type().id() == ID_bool);
+  if(const auto output_bv = type_try_dynamic_cast<bitvector_typet>(output_type))
   {
-    const size_t size =
-      to_bitvector_type(output_type).get_width() / config.ansi_c.char_width;
+    const auto out_width = output_bv->get_width();
+    // Replicate `init_byte_expr` enough times until it completely fills
+    // `output_type`.
 
     // We've got a constant. So, precompute the value of the constant.
     if(init_byte_expr.is_constant())
     {
-      const mp_integer value =
-        numeric_cast_v<mp_integer>(to_constant_expr(init_byte_expr));
-      mp_integer duplicated_value = value;
-      for(size_t i = 1; i < size; ++i)
-      {
-        duplicated_value =
-          bitwise_or(duplicated_value << config.ansi_c.char_width, value);
-      }
-      return from_integer(duplicated_value, output_type);
+      const auto init_size = init_type_as_bitvector->get_width();
+      const irep_idt init_value = to_constant_expr(init_byte_expr).get_value();
+
+      // Create a new BV od `output_type` size with its representation being the
+      // replication of the init_byte_expr (padded with 0) enough times to fill.
+      const auto output_value =
+        make_bvrep(out_width, [&init_size, &init_value](std::size_t index) {
+          // Index modded by 8 to access the i-th bit of init_value
+          const auto source_index = index % config.ansi_c.char_width;
+          // If the modded i-th bit exists get it, otherwise add 0 padding.
+          return source_index < init_size &&
+                 get_bvrep_bit(init_value, init_size, source_index);
+        });
+
+      return constant_exprt{output_value, output_type};
     }
+
+    const size_t size =
+      (out_width + config.ansi_c.char_width - 1) / config.ansi_c.char_width;
 
     // We haven't got a constant. So, build the expression using shift-and-or.
     exprt::operandst values;
-    values.push_back(init_byte_expr);
+    // Let's cast init_byte_expr to output_type.
+    const exprt casted_init_byte_expr =
+      typecast_exprt::conditional_cast(init_byte_expr, output_type);
+    values.push_back(casted_init_byte_expr);
     for(size_t i = 1; i < size; ++i)
     {
       values.push_back(shl_exprt(
-        init_byte_expr,
+        casted_init_byte_expr,
         from_integer(config.ansi_c.char_width * i, size_type())));
     }
     if(values.size() == 1)
