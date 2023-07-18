@@ -1,14 +1,20 @@
 // Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
+#include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
+
+#include <iomanip>
+#include <sstream>
 
 /// Helper struct to hold useful test components.
 struct expr_initializer_test_environmentt
@@ -19,6 +25,10 @@ struct expr_initializer_test_environmentt
 
   static expr_initializer_test_environmentt make()
   {
+    // These config lines are necessary before construction because char size
+    // depend on the global configuration.
+    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+    config.ansi_c.set_arch_spec_x86_64();
     return {};
   }
 
@@ -68,24 +78,217 @@ create_tag_populate_env(const typet &type, symbol_tablet &symbol_table)
   UNREACHABLE;
 }
 
-TEST_CASE("nondet_initializer boolean", "[core][util][expr_initializer]")
+exprt replicate_expression(
+  const exprt &expr,
+  const typet &output_type,
+  std::size_t times)
+{
+  if(times == 1)
+  {
+    return expr;
+  }
+  exprt::operandst operands;
+  operands.push_back(expr);
+  for(std::size_t i = 1; i < times; ++i)
+  {
+    operands.push_back(
+      shl_exprt{expr, from_integer(config.ansi_c.char_width * i, size_type())});
+  }
+  return multi_ary_exprt{ID_bitor, operands, output_type};
+}
+
+TEST_CASE(
+  "duplicate_per_byte precondition works",
+  "[core][util][duplicate_per_byte]")
+{
+  auto test = expr_initializer_test_environmentt::make();
+  typet input_type = signedbv_typet{8};
+
+  SECTION("duplicate_per_byte fails when init type is not a bitvector")
+  {
+    const array_typet array_type{
+      bool_typet{}, from_integer(3, signedbv_typet{8})};
+
+    const cbmc_invariants_should_throwt invariants_throw;
+
+    REQUIRE_THROWS_MATCHES(
+      duplicate_per_byte(array_of_exprt{true_exprt{}, array_type}, input_type),
+      invariant_failedt,
+      invariant_failure_containing(
+        "Condition: (init_type_as_bitvector && "
+        "init_type_as_bitvector->get_width() <= config.ansi_c.char_width) || "
+        "init_byte_expr.type().id() == ID_bool"));
+  }
+
+  SECTION(
+    "duplicate_per_byte fails when init type is a bitvector larger than "
+    "char_width bits")
+  {
+    const cbmc_invariants_should_throwt invariants_throw;
+
+    REQUIRE_THROWS_MATCHES(
+      duplicate_per_byte(from_integer(0, unsignedbv_typet{10}), input_type),
+      invariant_failedt,
+      invariant_failure_containing(
+        "init_type_as_bitvector->get_width() <= config.ansi_c.char_width"));
+  }
+}
+
+std::string to_hex(unsigned int value)
+{
+  std::stringstream ss;
+  ss << "0x" << std::hex << value;
+  return ss.str();
+}
+
+TEST_CASE(
+  "duplicate_per_byte on unsigned_bv with constant",
+  "[core][util][duplicate_per_byte]")
+{
+  auto test = expr_initializer_test_environmentt::make();
+  // elements are init_expr_value, init_expr_size, output_expected_value, output_size
+  using rowt = std::tuple<std::size_t, unsigned int, std::size_t, unsigned int>;
+  unsigned int init_expr_value, output_expected_value;
+  std::size_t output_size, init_expr_size;
+  std::tie(
+    init_expr_value, init_expr_size, output_expected_value, output_size) =
+    GENERATE(
+      rowt{0xFF, 8, 0xFF, 8},    // same-type constant
+      rowt{0x2, 2, 0x02, 8},     // smaller-type constant gets promoted
+      rowt{0x11, 5, 0x11, 5},    // same-type constant
+      rowt{0x21, 8, 0x01, 5},    // bigger-type constant gets truncated
+      rowt{0x2, 3, 0x02, 5},     // smaller-type constant gets promoted
+      rowt{0xAB, 8, 0xABAB, 16}, // smaller-type constant gets replicated
+      rowt{0xAB, 8, 0xBABAB, 20} // smaller-type constant gets replicated
+    );
+  SECTION(
+    "Testing with output size " + std::to_string(output_size) + " init value " +
+    to_hex(init_expr_value) + " of size " + std::to_string(init_expr_size))
+  {
+    typet output_type = unsignedbv_typet{output_size};
+    const auto result = duplicate_per_byte(
+      from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
+      output_type);
+    const auto expected =
+      from_integer(output_expected_value, unsignedbv_typet{output_size});
+    REQUIRE(result == expected);
+
+    // Check that signed-bv values are replicated including the sign bit.
+    const auto result_with_signed_init_type = duplicate_per_byte(
+      from_integer(init_expr_value, signedbv_typet{init_expr_size}),
+      output_type);
+    REQUIRE(result_with_signed_init_type == result);
+  }
+}
+
+TEST_CASE(
+  "duplicate_per_byte on unsigned_bv with non-constant expr",
+  "[core][util][duplicate_per_byte]")
+{
+  auto test = expr_initializer_test_environmentt::make();
+  // elements are init_expr_size, output_size, replication_count
+  using rowt = std::tuple<std::size_t, std::size_t, std::size_t>;
+  std::size_t init_expr_size, output_size, replication_count;
+  std::tie(init_expr_size, output_size, replication_count) = GENERATE(
+    rowt{8, 8, 1},   // same-type expr no-cast
+    rowt{2, 2, 1},   // same-type expr no-cast
+    rowt{3, 8, 1},   // smaller-type gets promoted
+    rowt{8, 2, 1},   // bigger type gets truncated
+    rowt{8, 16, 2},  // replicated twice
+    rowt{8, 20, 3}); // replicated three times and truncated
+  SECTION(
+    "Testing with output size " + std::to_string(output_size) + " init size " +
+    std::to_string(init_expr_size))
+  {
+    typet output_type = signedbv_typet{output_size};
+
+    const auto init_expr = plus_exprt{
+      from_integer(1, unsignedbv_typet{init_expr_size}),
+      from_integer(2, unsignedbv_typet{init_expr_size})};
+    const auto result = duplicate_per_byte(init_expr, output_type);
+
+    const auto casted_init_expr =
+      typecast_exprt::conditional_cast(init_expr, output_type);
+    const auto expected =
+      replicate_expression(casted_init_expr, output_type, replication_count);
+
+    REQUIRE(result == expected);
+  }
+}
+
+TEST_CASE("expr_initializer boolean", "[core][util][expr_initializer]")
 {
   auto test = expr_initializer_test_environmentt::make();
   typet input = bool_typet{};
-  const auto result = nondet_initializer(input, test.loc, test.ns);
-  REQUIRE(result.has_value());
-  const auto expected = side_effect_expr_nondett{bool_typet{}, test.loc};
-  REQUIRE(result.value() == expected);
+  SECTION("nondet_initializer")
+  {
+    const auto result = nondet_initializer(input, test.loc, test.ns);
+    REQUIRE(result.has_value());
+    const auto expected = side_effect_expr_nondett{bool_typet{}, test.loc};
+    REQUIRE(result.value() == expected);
+  }
+  SECTION("zero_initializer")
+  {
+    const auto result = zero_initializer(input, test.loc, test.ns);
+    REQUIRE(result.has_value());
+    const auto expected = from_integer(0, bool_typet());
+    ;
+    REQUIRE(result.value() == expected);
+  }
+  SECTION("expr_initializer with same-type constant")
+  {
+    const auto result =
+      expr_initializer(input, test.loc, test.ns, true_exprt{});
+    REQUIRE(result.has_value());
+    const auto expected = true_exprt{};
+    REQUIRE(result.value() == expected);
+  }
+  SECTION("expr_initializer with other-type constant")
+  {
+    const auto result = expr_initializer(
+      input, test.loc, test.ns, from_integer(1, signedbv_typet{8}));
+    REQUIRE(result.has_value());
+    const auto expected =
+      typecast_exprt{from_integer(1, signedbv_typet{8}), bool_typet{}};
+    REQUIRE(result.value() == expected);
+  }
+  SECTION("expr_initializer with non-constant expr")
+  {
+    const auto result = expr_initializer(
+      input, test.loc, test.ns, or_exprt{true_exprt(), true_exprt{}});
+    REQUIRE(result.has_value());
+    const auto expected = or_exprt{true_exprt{}, true_exprt{}};
+    REQUIRE(result.value() == expected);
+  }
 }
 
-TEST_CASE("nondet_initializer signed_bv", "[core][util][expr_initializer]")
+TEST_CASE(
+  "nondet_initializer 8-bit signed_bv",
+  "[core][util][expr_initializer]")
 {
   auto test = expr_initializer_test_environmentt::make();
-  typet input = signedbv_typet{8};
-  const auto result = nondet_initializer(input, test.loc, test.ns);
-  REQUIRE(result.has_value());
-  const auto expected = side_effect_expr_nondett{signedbv_typet{8}, test.loc};
-  REQUIRE(result.value() == expected);
+  const std::size_t input_type_size = 8;
+  typet input_type = signedbv_typet{input_type_size};
+  SECTION("nondet_initializer")
+  {
+    const auto result = nondet_initializer(input_type, test.loc, test.ns);
+    REQUIRE(result.has_value());
+    const auto expected =
+      side_effect_expr_nondett{signedbv_typet{input_type_size}, test.loc};
+    REQUIRE(result.value() == expected);
+  }
+  SECTION("zero_initializer")
+  {
+    const auto result = zero_initializer(input_type, test.loc, test.ns);
+    REQUIRE(result.has_value());
+    const auto expected = from_integer(0, signedbv_typet{input_type_size});
+    REQUIRE(result.value() == expected);
+  }
+  SECTION("expr_initializer calls duplicate_per_byte")
+  {
+    // TODO: duplicate_per_byte is tested separately. Here we should check that
+    //  expr_initializer calls duplicate_per_byte.
+  }
 }
 
 TEST_CASE("nondet_initializer c_enum", "[core][util][expr_initializer]")
