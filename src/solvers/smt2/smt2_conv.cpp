@@ -1245,43 +1245,9 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     const bitnot_exprt &bitnot_expr = to_bitnot_expr(expr);
 
-    if(bitnot_expr.type().id() == ID_vector)
-    {
-      if(use_datatypes)
-      {
-        const std::string &smt_typename = datatype_map.at(bitnot_expr.type());
-
-        // extract elements
-        const vector_typet &vector_type = to_vector_type(bitnot_expr.type());
-
-        mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-        out << "(let ((?vectorop ";
-        convert_expr(bitnot_expr.op());
-        out << ")) ";
-
-        out << "(mk-" << smt_typename;
-
-        typet index_type=vector_type.size().type();
-
-        // do bitnot component-by-component
-        for(mp_integer i=0; i!=size; ++i)
-        {
-          out << " (bvnot (" << smt_typename << "." << (size-i-1)
-              << " ?vectorop))";
-        }
-
-        out << "))"; // mk-, let
-      }
-      else
-        SMT2_TODO("bitnot for vectors");
-    }
-    else
-    {
-      out << "(bvnot ";
-      convert_expr(bitnot_expr.op());
-      out << ")";
-    }
+    out << "(bvnot ";
+    convert_expr(bitnot_expr.op());
+    out << ")";
   }
   else if(expr.id()==ID_unary_minus)
   {
@@ -1307,39 +1273,6 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
         convert_floatbv(unary_minus_expr);
-    }
-    else if(unary_minus_expr.type().id() == ID_vector)
-    {
-      if(use_datatypes)
-      {
-        const std::string &smt_typename =
-          datatype_map.at(unary_minus_expr.type());
-
-        // extract elements
-        const vector_typet &vector_type =
-          to_vector_type(unary_minus_expr.type());
-
-        mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-        out << "(let ((?vectorop ";
-        convert_expr(unary_minus_expr.op());
-        out << ")) ";
-
-        out << "(mk-" << smt_typename;
-
-        typet index_type=vector_type.size().type();
-
-        // negate component-by-component
-        for(mp_integer i=0; i!=size; ++i)
-        {
-          out << " (bvneg (" << smt_typename << "." << (size-i-1)
-              << " ?vectorop))";
-        }
-
-        out << "))"; // mk-, let
-      }
-      else
-        SMT2_TODO("unary minus for vector");
     }
     else
     {
@@ -2384,35 +2317,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     convert_expr(quantifier_expr.where());
 
     out << ')';
-  }
-  else if(expr.id()==ID_vector)
-  {
-    const vector_exprt &vector_expr = to_vector_expr(expr);
-    const vector_typet &vector_type = to_vector_type(vector_expr.type());
-
-    mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-    DATA_INVARIANT(
-      size == vector_expr.operands().size(),
-      "size indicated by type shall be equal to the number of operands");
-
-    if(use_datatypes)
-    {
-      const std::string &smt_typename = datatype_map.at(vector_type);
-
-      out << "(mk-" << smt_typename;
-    }
-    else
-      out << "(concat";
-
-    // build component-by-component
-    for(const auto &op : vector_expr.operands())
-    {
-      out << " ";
-      convert_expr(op);
-    }
-
-    out << ")"; // mk-... or concat
   }
   else if(
     const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
@@ -3800,42 +3704,6 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
       convert_plus(to_plus_expr(make_binary(expr)));
     }
   }
-  else if(expr.type().id() == ID_vector)
-  {
-    const vector_typet &vector_type = to_vector_type(expr.type());
-
-    mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-    typet index_type = vector_type.size().type();
-
-    if(use_datatypes)
-    {
-      const std::string &smt_typename = datatype_map.at(vector_type);
-
-      out << "(mk-" << smt_typename;
-    }
-    else
-      out << "(concat";
-
-    // add component-by-component
-    for(mp_integer i = 0; i != size; ++i)
-    {
-      exprt::operandst summands;
-      summands.reserve(expr.operands().size());
-      for(const auto &op : expr.operands())
-        summands.push_back(index_exprt(
-          op,
-          from_integer(size - i - 1, index_type),
-          vector_type.element_type()));
-
-      plus_exprt tmp(std::move(summands), vector_type.element_type());
-
-      out << " ";
-      convert_expr(tmp);
-    }
-
-    out << ")"; // mk-... or concat
-  }
   else
     UNEXPECTEDCASE("unsupported type for +: " + expr.type().id_string());
 }
@@ -3907,9 +3775,7 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
   PRECONDITION(
     type.id() == ID_floatbv ||
     (type.id() == ID_complex &&
-     to_complex_type(type).subtype().id() == ID_floatbv) ||
-    (type.id() == ID_vector &&
-     to_vector_type(type).element_type().id() == ID_floatbv));
+     to_complex_type(type).subtype().id() == ID_floatbv));
 
   if(use_FPA_theory)
   {
@@ -3926,10 +3792,6 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
     else if(type.id()==ID_complex)
     {
       SMT2_TODO("+ for floatbv complex");
-    }
-    else if(type.id()==ID_vector)
-    {
-      SMT2_TODO("+ for floatbv vector");
     }
     else
       INVARIANT_WITH_DIAGNOSTICS(
@@ -4015,41 +3877,6 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       UNEXPECTEDCASE(
         "unsupported operand types for -: " + expr.op0().type().id_string() +
         " and " + expr.op1().type().id_string());
-  }
-  else if(expr.type().id()==ID_vector)
-  {
-    const vector_typet &vector_type=to_vector_type(expr.type());
-
-    mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-    typet index_type=vector_type.size().type();
-
-    if(use_datatypes)
-    {
-      const std::string &smt_typename = datatype_map.at(vector_type);
-
-      out << "(mk-" << smt_typename;
-    }
-    else
-      out << "(concat";
-
-    // subtract component-by-component
-    for(mp_integer i=0; i!=size; ++i)
-    {
-      exprt tmp(ID_minus, vector_type.element_type());
-      for(const auto &op : expr.operands())
-      {
-        tmp.copy_to_operands(index_exprt(
-          op,
-          from_integer(size - i - 1, index_type),
-          vector_type.element_type()));
-      }
-
-      out << " ";
-      convert_expr(tmp);
-    }
-
-    out << ")"; // mk-... or concat
   }
   else
     UNEXPECTEDCASE("unsupported type for -: "+expr.type().id_string());
@@ -4567,33 +4394,6 @@ void smt2_convt::convert_index(const index_exprt &expr)
       unflatten(wheret::END, array_type.element_type());
     }
   }
-  else if(array_op_type.id()==ID_vector)
-  {
-    const vector_typet &vector_type=to_vector_type(array_op_type);
-
-    if(use_datatypes)
-    {
-      const std::string &smt_typename = datatype_map.at(vector_type);
-
-      // this is easy for constant indicies
-
-      const auto index_int = numeric_cast<mp_integer>(expr.index());
-      if(!index_int.has_value())
-      {
-        SMT2_TODO("non-constant index on vectors");
-      }
-      else
-      {
-        out << "(" << smt_typename << "." << *index_int << " ";
-        convert_expr(expr.array());
-        out << ")";
-      }
-    }
-    else
-    {
-      SMT2_TODO("index on vectors");
-    }
-  }
   else
     INVARIANT(
       false, "index with unsupported array type: " + array_op_type.id_string());
@@ -4669,33 +4469,6 @@ void smt2_convt::flatten2bv(const exprt &expr)
     out << "(ite ";
     convert_expr(expr); // this returns a Bool
     out << " #b1 #b0)"; // this is a one-bit bit-vector
-  }
-  else if(type.id()==ID_vector)
-  {
-    if(use_datatypes)
-    {
-      const std::string &smt_typename = datatype_map.at(type);
-
-      // concatenate elements
-      const vector_typet &vector_type=to_vector_type(type);
-
-      mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-      out << "(let ((?vflop ";
-      convert_expr(expr);
-      out << ")) ";
-
-      out << "(concat";
-
-      for(mp_integer i=0; i!=size; ++i)
-      {
-        out << " (" << smt_typename << "." << i << " ?vflop)";
-      }
-
-      out << "))"; // concat, let
-    }
-    else
-      convert_expr(expr); // already a bv
   }
   else if(type.id()==ID_array)
   {
@@ -4787,46 +4560,6 @@ void smt2_convt::unflatten(
       out << "(= "; // produces a bool
     else
       out << " #b1)";
-  }
-  else if(type.id()==ID_vector)
-  {
-    if(use_datatypes)
-    {
-      const std::string &smt_typename = datatype_map.at(type);
-
-      // extract elements
-      const vector_typet &vector_type=to_vector_type(type);
-
-      std::size_t subtype_width = boolbv_width(vector_type.element_type());
-
-      mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-      if(where==wheret::BEGIN)
-        out << "(let ((?ufop" << nesting << " ";
-      else
-      {
-        out << ")) ";
-
-        out << "(mk-" << smt_typename;
-
-        std::size_t offset=0;
-
-        for(mp_integer i=0; i!=size; ++i, offset+=subtype_width)
-        {
-          out << " ";
-          unflatten(wheret::BEGIN, vector_type.element_type(), nesting + 1);
-          out << "((_ extract " << offset+subtype_width-1 << " "
-              << offset << ") ?ufop" << nesting << ")";
-          unflatten(wheret::END, vector_type.element_type(), nesting + 1);
-        }
-
-        out << "))"; // mk-, let
-      }
-    }
-    else
-    {
-      // nop, already a bv
-    }
   }
   else if(type.id() == ID_array)
   {
@@ -5743,19 +5476,6 @@ void smt2_convt::convert_type(const typet &type)
       out << "(_ BitVec " << width << ")";
     }
   }
-  else if(type.id()==ID_vector)
-  {
-    if(use_datatypes)
-    {
-      out << datatype_map.at(type);
-    }
-    else
-    {
-      std::size_t width=boolbv_width(type);
-
-      out << "(_ BitVec " << width << ")";
-    }
-  }
   else if(type.id()==ID_code)
   {
     // These may appear in structs.
@@ -5878,34 +5598,6 @@ void smt2_convt::find_symbols_rec(
       out << " (" << smt_typename << ".real ";
       convert_type(to_complex_type(type).subtype());
       out << ")";
-
-      out << "))))\n";
-    }
-  }
-  else if(type.id()==ID_vector)
-  {
-    find_symbols_rec(to_vector_type(type).element_type(), recstack);
-
-    if(use_datatypes &&
-       datatype_map.find(type)==datatype_map.end())
-    {
-      const vector_typet &vector_type=to_vector_type(type);
-
-      mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-      const std::string smt_typename =
-        "vector." + std::to_string(datatype_map.size());
-      datatype_map[type] = smt_typename;
-
-      out << "(declare-datatypes ((" << smt_typename << " 0)) "
-          << "(((mk-" << smt_typename;
-
-      for(mp_integer i=0; i!=size; ++i)
-      {
-        out << " (" << smt_typename << "." << i << " ";
-        convert_type(to_vector_type(type).element_type());
-        out << ")";
-      }
 
       out << "))))\n";
     }
