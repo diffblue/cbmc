@@ -302,11 +302,11 @@ protected:
   void get_value_set_rec(
     const exprt &expr,
     object_mapt &dest,
+    bool &includes_nondet_pointer,
     const std::string &suffix,
     const typet &original_type,
     const namespacet &ns,
     gvs_recursion_sett &recursion_set) const;
-
 
   void get_value_set(
     const exprt &expr,

@@ -78,6 +78,7 @@ public:
   void get_value_set_rec(
     const exprt &expr,
     object_mapt &dest,
+    bool &includes_nondet_pointer,
     const std::string &suffix,
     const typet &original_type,
     const namespacet &ns) const override
@@ -91,7 +92,7 @@ public:
     else
     {
       value_sett::get_value_set_rec(
-        expr, dest, suffix, original_type, ns);
+        expr, dest, includes_nondet_pointer, suffix, original_type, ns);
     }
   }
 

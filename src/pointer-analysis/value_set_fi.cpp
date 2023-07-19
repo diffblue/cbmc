@@ -361,12 +361,15 @@ void value_set_fit::get_value_set(
   simplify(tmp, ns);
 
   gvs_recursion_sett recset;
-  get_value_set_rec(tmp, dest, "", tmp.type(), ns, recset);
+  bool includes_nondet_pointer = false;
+  get_value_set_rec(
+    tmp, dest, includes_nondet_pointer, "", tmp.type(), ns, recset);
 }
 
 void value_set_fit::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
+  bool &includes_nondet_pointer,
   const std::string &suffix,
   const typet &original_type,
   const namespacet &ns,
@@ -390,6 +393,7 @@ void value_set_fit::get_value_set_rec(
         get_value_set_rec(
           object_numbering[object_entry.first],
           dest,
+          includes_nondet_pointer,
           suffix,
           original_type,
           ns,
@@ -417,6 +421,7 @@ void value_set_fit::get_value_set_rec(
       get_value_set_rec(
         to_index_expr(expr).array(),
         dest,
+        includes_nondet_pointer,
         "[]" + suffix,
         original_type,
         ns,
@@ -445,6 +450,7 @@ void value_set_fit::get_value_set_rec(
       get_value_set_rec(
         compound,
         dest,
+        includes_nondet_pointer,
         "." + component_name + suffix,
         original_type,
         ns,
@@ -478,6 +484,7 @@ void value_set_fit::get_value_set_rec(
     get_value_set_rec(
       to_if_expr(expr).true_case(),
       dest,
+      includes_nondet_pointer,
       suffix,
       original_type,
       ns,
@@ -485,6 +492,7 @@ void value_set_fit::get_value_set_rec(
     get_value_set_rec(
       to_if_expr(expr).false_case(),
       dest,
+      includes_nondet_pointer,
       suffix,
       original_type,
       ns,
@@ -509,8 +517,14 @@ void value_set_fit::get_value_set_rec(
       for(const auto &object_entry : object_map)
       {
         const exprt &object = object_numbering[object_entry.first];
-        get_value_set_rec(object, dest, suffix,
-                          original_type, ns, recursion_set);
+        get_value_set_rec(
+          object,
+          dest,
+          includes_nondet_pointer,
+          suffix,
+          original_type,
+          ns,
+          recursion_set);
       }
 
       return;
@@ -533,6 +547,7 @@ void value_set_fit::get_value_set_rec(
     get_value_set_rec(
       to_typecast_expr(expr).op(),
       dest,
+      includes_nondet_pointer,
       suffix,
       original_type,
       ns,
@@ -565,8 +580,14 @@ void value_set_fit::get_value_set_rec(
         throw "pointer type sum expected to have pointer operand";
 
       object_mapt pointer_expr_set;
-      get_value_set_rec(*ptr_operand, pointer_expr_set, "",
-                        ptr_operand->type(), ns, recursion_set);
+      get_value_set_rec(
+        *ptr_operand,
+        pointer_expr_set,
+        includes_nondet_pointer,
+        "",
+        ptr_operand->type(),
+        ns,
+        recursion_set);
 
       for(const auto &object_entry : pointer_expr_set.read())
       {
@@ -660,7 +681,16 @@ void value_set_fit::get_value_set_rec(
   {
     // an array constructor, possibly containing addresses
     for(const auto &op : expr.operands())
-      get_value_set_rec(op, dest, suffix, original_type, ns, recursion_set);
+    {
+      get_value_set_rec(
+        op,
+        dest,
+        includes_nondet_pointer,
+        suffix,
+        original_type,
+        ns,
+        recursion_set);
+    }
   }
   else if(expr.id()==ID_dynamic_object)
   {
@@ -802,9 +832,11 @@ void value_set_fit::get_reference_set_sharing_rec(
   {
     gvs_recursion_sett recset;
     object_mapt temp;
+    bool includes_nondet_pointer = false;
     get_value_set_rec(
       to_dereference_expr(expr).pointer(),
       temp,
+      includes_nondet_pointer,
       "",
       to_dereference_expr(expr).pointer().type(),
       ns,
@@ -1144,8 +1176,15 @@ void value_set_fit::assign_rec(
     const irep_idt &ident = lhs.get(ID_identifier);
     object_mapt temp;
     gvs_recursion_sett recset;
+    bool includes_nondet_pointer = false;
     get_value_set_rec(
-      lhs, temp, "", to_type_with_subtype(lhs.type()).subtype(), ns, recset);
+      lhs,
+      temp,
+      includes_nondet_pointer,
+      "",
+      to_type_with_subtype(lhs.type()).subtype(),
+      ns,
+      recset);
 
     if(recursion_set.find(ident)!=recursion_set.end())
     {
