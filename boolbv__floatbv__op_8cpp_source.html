@@ -210,7 +210,7 @@ $(document).ready(function(){initNavTree('boolbv__floatbv__op_8cpp_source.html',
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector || expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex)</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  {</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype = <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>();</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
@@ -223,8 +223,8 @@ $(document).ready(function(){initNavTree('boolbv__floatbv__op_8cpp_source.html',
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        sub_width &gt; 0 &amp;&amp; width % sub_width == 0,</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="stringliteral">&quot;width of a vector subtype must be positive and evenly divide the &quot;</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="stringliteral">&quot;width of the vector&quot;</span>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="stringliteral">&quot;width of a complex subtype must be positive and evenly divide the &quot;</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="stringliteral">&quot;width of the complex expression&quot;</span>);</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      std::size_t size=width/sub_width;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> result_bv;</div>
@@ -254,7 +254,7 @@ $(document).ready(function(){initNavTree('boolbv__floatbv__op_8cpp_source.html',
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;          sub_result_bv.size() == sub_width,</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;          <span class="stringliteral">&quot;we constructed a new vector of the right size&quot;</span>);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;          <span class="stringliteral">&quot;we constructed a new complex of the right size&quot;</span>);</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;          i * sub_width + sub_width - 1 &lt; result_bv.size(),</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;          <span class="stringliteral">&quot;the sub-bitvector fits into the result bitvector&quot;</span>);</div>

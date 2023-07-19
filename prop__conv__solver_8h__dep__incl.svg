@@ -53,9 +53,9 @@
 <path fill="none" stroke="midnightblue" d="M3937.5,-302.3C3937.5,-293.3 3937.5,-283.65 3937.5,-275.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3934,-302.43 3937.5,-312.43 3941,-302.43 3934,-302.43"/>
 </g>
-<!-- Node95 -->
+<!-- Node94 -->
 <g id="node60" class="node">
-<title>Node95</title>
+<title>Node94</title>
 <g id="a_node60"><a xlink:href="prop__conv__solver_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="4031.5,-234.5 4031.5,-275.5 4169.5,-275.5 4169.5,-234.5 4031.5,-234.5"/>
 <text text-anchor="start" x="4039.5" y="-263.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -64,9 +64,9 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node95 -->
+<!-- Node1&#45;&gt;Node94 -->
 <g id="edge59" class="edge">
-<title>Node1&#45;&gt;Node95</title>
+<title>Node1&#45;&gt;Node94</title>
 <path fill="none" stroke="midnightblue" d="M3988.57,-308.19C4011.12,-297.67 4037.3,-285.47 4058.67,-275.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3987.06,-305.03 3979.48,-312.43 3990.02,-311.37 3987.06,-305.03"/>
 </g>
@@ -172,9 +172,9 @@
 <path fill="none" stroke="midnightblue" d="M3937.5,-224.3C3937.5,-215.3 3937.5,-205.65 3937.5,-197.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3934,-224.43 3937.5,-234.43 3941,-224.43 3934,-224.43"/>
 </g>
-<!-- Node94 -->
+<!-- Node93 -->
 <g id="node59" class="node">
-<title>Node94</title>
+<title>Node93</title>
 <g id="a_node59"><a xlink:href="equality_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="4031,-156.5 4031,-197.5 4182,-197.5 4182,-156.5 4031,-156.5"/>
 <text text-anchor="start" x="4039" y="-185.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -183,9 +183,9 @@
 </a>
 </g>
 </g>
-<!-- Node8&#45;&gt;Node94 -->
+<!-- Node8&#45;&gt;Node93 -->
 <g id="edge58" class="edge">
-<title>Node8&#45;&gt;Node94</title>
+<title>Node8&#45;&gt;Node93</title>
 <path fill="none" stroke="midnightblue" d="M3990.45,-230.19C4013.83,-219.67 4040.97,-207.47 4063.13,-197.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3988.71,-227.13 3981.02,-234.43 3991.58,-233.52 3988.71,-227.13"/>
 </g>
@@ -991,11 +991,11 @@
 <!-- Node60 -->
 <g id="node57" class="node">
 <title>Node60</title>
-<g id="a_node57"><a xlink:href="boolbv__vector_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node57"><a xlink:href="boolbv__with_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="7665,-0.5 7665,-41.5 7816,-41.5 7816,-0.5 7665,-0.5"/>
 <text text-anchor="start" x="7673" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="7673" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/flattening</text>
-<text text-anchor="middle" x="7740.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/boolbv_vector.cpp</text>
+<text text-anchor="middle" x="7740.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/boolbv_with.cpp</text>
 </a>
 </g>
 </g>
@@ -1008,11 +1008,11 @@
 <!-- Node61 -->
 <g id="node58" class="node">
 <title>Node61</title>
-<g id="a_node58"><a xlink:href="boolbv__with_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="7834,-0.5 7834,-41.5 7985,-41.5 7985,-0.5 7834,-0.5"/>
+<g id="a_node58"><a xlink:href="bv__pointers_8h.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="red" points="7834,-0.5 7834,-41.5 7985,-41.5 7985,-0.5 7834,-0.5"/>
 <text text-anchor="start" x="7842" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="7842" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/flattening</text>
-<text text-anchor="middle" x="7909.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/boolbv_with.cpp</text>
+<text text-anchor="middle" x="7909.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/bv_pointers.h</text>
 </a>
 </g>
 </g>

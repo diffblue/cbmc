@@ -79,7 +79,6 @@ var classboolbvt =
     [ "convert_union", "classboolbvt.html#a7b1abc39beb7e8f997102233bcb1c1cf", null ],
     [ "convert_update", "classboolbvt.html#a97cd4177e12c6a4bce43bf0f8e637353", null ],
     [ "convert_update_rec", "classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da", null ],
-    [ "convert_vector", "classboolbvt.html#ac971ec0bfae4990d49c6bb0420471e3e", null ],
     [ "convert_verilog_case_equality", "classboolbvt.html#a75c553be56250ab5a0ae9129414f6b15", null ],
     [ "convert_with", "classboolbvt.html#a8c8bcc6125cfbf510cbe8775ce0c9b94", null ],
     [ "convert_with", "classboolbvt.html#a0326e0dfdcdd592422359881e00b503e", null ],

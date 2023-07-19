@@ -1,9 +1,5 @@
 var NAVTREEINDEX133 =
 {
-"structjava__bytecode__language__optionst.html#a50c727ee8995d25b1618a8d0554e1bd4":[8,0,687,7],
-"structjava__bytecode__language__optionst.html#a5b5f61e037cfcfcedad008137d5d6064":[8,0,687,10],
-"structjava__bytecode__language__optionst.html#a5fe52d682658316b7b3665a86ac07c38":[8,0,687,12],
-"structjava__bytecode__language__optionst.html#a6bb256860cd68f836713d7ffd02ac21e":[8,0,687,16],
 "structjava__bytecode__language__optionst.html#a775163efddaa5612d85a82122ee16888":[8,0,687,9],
 "structjava__bytecode__language__optionst.html#a79cf08bfda727645f534288a8a4b2b62":[8,0,687,17],
 "structjava__bytecode__language__optionst.html#a8f2945787a3267d58ac3de7041ed041b":[8,0,687,19],
@@ -249,5 +245,9 @@ var NAVTREEINDEX133 =
 "structlocal__bitvector__analysist_1_1flagst.html#a487b90a2a783f2ed3bd2a6fe8c40d647":[8,0,775,0,8],
 "structlocal__bitvector__analysist_1_1flagst.html#a521a6f3760c9a73b8c3d5cd364c1bb8a":[8,0,775,0,5],
 "structlocal__bitvector__analysist_1_1flagst.html#a6af73cffa3fbca0f5634dbfdf68fb503":[8,0,775,0,22],
-"structlocal__bitvector__analysist_1_1flagst.html#a74cebbd0c6d510bf75399bdee36569c6":[8,0,775,0,4]
+"structlocal__bitvector__analysist_1_1flagst.html#a74cebbd0c6d510bf75399bdee36569c6":[8,0,775,0,4],
+"structlocal__bitvector__analysist_1_1flagst.html#a76c6b4e03b6fb8daa13604fca8c00cfe":[8,0,775,0,0],
+"structlocal__bitvector__analysist_1_1flagst.html#a76c6b4e03b6fb8daa13604fca8c00cfea1f07d07b135733df023137caaafe72c9":[8,0,775,0,0,1],
+"structlocal__bitvector__analysist_1_1flagst.html#a76c6b4e03b6fb8daa13604fca8c00cfea5740e686246fa51fc53c582ea84f209b":[8,0,775,0,0,6],
+"structlocal__bitvector__analysist_1_1flagst.html#a76c6b4e03b6fb8daa13604fca8c00cfea7947da25defbd7658254dee386020851":[8,0,775,0,0,0]
 };

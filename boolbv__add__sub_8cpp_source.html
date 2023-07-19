@@ -115,210 +115,207 @@ $(document).ready(function(){initNavTree('boolbv__add__sub_8cpp_source.html','')
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_unsignedbv &amp;&amp;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;     type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_signedbv &amp;&amp;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;     type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_fixedbv &amp;&amp;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;     type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_floatbv &amp;&amp;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;     type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_range &amp;&amp;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;     type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_complex &amp;&amp;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;     type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()!=ID_vector)</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(expr);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  std::size_t width=<a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(type);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;operands=expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    !operands.empty(),</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="stringliteral">&quot;operator &quot;</span> + expr.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>() + <span class="stringliteral">&quot; takes at least one operand&quot;</span>);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op0 = <a class="code" href="std__expr_8h.html#a85799413406af5cdda0b28a7480e21f0">to_multi_ary_expr</a>(expr).<a class="code" href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">op0</a>();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    op0.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == type, <span class="stringliteral">&quot;add/sub with mixed types:\n&quot;</span> + expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(op0, width);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordtype">bool</span> subtract=(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_minus ||</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                 expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;no-overflow-minus&quot;</span>);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordtype">bool</span> no_overflow=(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;no-overflow-plus&quot;</span> ||</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;no-overflow-minus&quot;</span>);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <a class="code" href="classtypet.html">typet</a> arithmetic_type = (type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                            ? <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>()</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                            : type;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775">bv_utilst::representationt</a> rep=</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    (arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_signedbv ||</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;     arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_fixedbv)?<a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">bv_utilst::representationt::SIGNED</a>:</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                       <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">bv_utilst::representationt::UNSIGNED</a>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">for</span>(exprt::operandst::const_iterator</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      it=operands.begin()+1;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      it!=operands.end(); it++)</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      it-&gt;type() == type, <span class="stringliteral">&quot;add/sub with mixed types:\n&quot;</span> + expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_unsignedbv &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_signedbv &amp;&amp;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_fixedbv &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_floatbv &amp;&amp;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_range &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_complex)</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(expr);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  }</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  std::size_t width=<a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(type);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;operands=expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    !operands.empty(),</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="stringliteral">&quot;operator &quot;</span> + expr.<a class="code" href="classirept.html#a4ef2cece9d440ad16512c1bb767f31c7">id_string</a>() + <span class="stringliteral">&quot; takes at least one operand&quot;</span>);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;op0 = <a class="code" href="std__expr_8h.html#a85799413406af5cdda0b28a7480e21f0">to_multi_ary_expr</a>(expr).<a class="code" href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">op0</a>();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    op0.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == type, <span class="stringliteral">&quot;add/sub with mixed types:\n&quot;</span> + expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(op0, width);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordtype">bool</span> subtract=(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_minus ||</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                 expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;no-overflow-minus&quot;</span>);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordtype">bool</span> no_overflow=(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;no-overflow-plus&quot;</span> ||</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==<span class="stringliteral">&quot;no-overflow-minus&quot;</span>);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <a class="code" href="classtypet.html">typet</a> arithmetic_type =</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex ? <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>() : type;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775">bv_utilst::representationt</a> rep=</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    (arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_signedbv ||</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;     arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_fixedbv)?<a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">bv_utilst::representationt::SIGNED</a>:</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                                       <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">bv_utilst::representationt::UNSIGNED</a>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">for</span>(exprt::operandst::const_iterator</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      it=operands.begin()+1;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      it!=operands.end(); it++)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      it-&gt;type() == type, <span class="stringliteral">&quot;add/sub with mixed types:\n&quot;</span> + expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(*it, width);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(*it, width);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_vector || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_complex)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      std::size_t sub_width =</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype());</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(sub_width != 0, <span class="stringliteral">&quot;vector elements shall have nonzero bit width&quot;</span>);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        width % sub_width == 0,</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="stringliteral">&quot;total vector bit width shall be a multiple of the element bit width&quot;</span>);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      std::size_t size=width/sub_width;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      bv.resize(width);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;size; i++)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_op;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        tmp_op.resize(sub_width);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">for</span>(std::size_t j=0; j&lt;tmp_op.size(); j++)</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;          <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; op.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;          tmp_op[j] = op[index];</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        }</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_result;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        tmp_result.resize(sub_width);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keywordflow">for</span>(std::size_t j=0; j&lt;tmp_result.size(); j++)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;          <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;          tmp_result[j] = bv[index];</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        }</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype().<span class="keywordtype">id</span>() == ID_floatbv)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;          <span class="comment">// needs to change due to rounding mode</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;          <a class="code" href="classfloat__utilst.html">float_utilst</a> float_utils(</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>, <a class="code" href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype()));</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;          tmp_result=float_utils.<a class="code" href="classfloat__utilst.html#acc6bc5194bff75847380cefd1ab06134">add_sub</a>(tmp_result, tmp_op, subtract);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        }</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;          tmp_result=<a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#a96020e66743dba235e41e1fa6d9518d5">add_sub</a>(tmp_result, tmp_op, subtract);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;          tmp_result.size() == sub_width,</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;          <span class="stringliteral">&quot;applying the add/sub operation shall not change the bitwidth&quot;</span>);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">for</span>(std::size_t j=0; j&lt;tmp_result.size(); j++)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;          <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;          bv[index] = tmp_result[j];</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      }</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_floatbv)</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="comment">// needs to change due to rounding mode</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      <a class="code" href="classfloat__utilst.html">float_utilst</a> float_utils(<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>, <a class="code" href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a>(arithmetic_type));</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      bv=float_utils.<a class="code" href="classfloat__utilst.html#acc6bc5194bff75847380cefd1ab06134">add_sub</a>(bv, op, subtract);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(no_overflow)</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      bv=<a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#a6217a4580ed2790a45dfd020e2f104bc">add_sub_no_overflow</a>(bv, op, subtract, rep);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      bv=<a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#a96020e66743dba235e41e1fa6d9518d5">add_sub</a>(bv, op, subtract);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  }</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  <span class="keywordflow">return</span> bv;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno"><a class="line" href="classboolbvt.html#aac0461168684db02cd25c169d98b4af9">  143</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classboolbvt.html#aac0461168684db02cd25c169d98b4af9">boolbvt::convert_saturating_add_sub</a>(<span class="keyword">const</span> <a class="code" href="classbinary__exprt.html">binary_exprt</a> &amp;expr)</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;{</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_saturating_minus || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_saturating_plus);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_unsignedbv &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_signedbv &amp;&amp;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_fixedbv &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_complex &amp;&amp;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_vector)</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(expr);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      std::size_t sub_width =</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype());</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        sub_width != 0, <span class="stringliteral">&quot;complex elements shall have nonzero bit width&quot;</span>);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        width % sub_width == 0,</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="stringliteral">&quot;total complex bit width shall be a multiple of the element bit width&quot;</span>);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      std::size_t size=width/sub_width;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      bv.resize(width);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <span class="keywordflow">for</span>(std::size_t i=0; i&lt;size; i++)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_op;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        tmp_op.resize(sub_width);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordflow">for</span>(std::size_t j=0; j&lt;tmp_op.size(); j++)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;          <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; op.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          tmp_op[j] = op[index];</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_result;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        tmp_result.resize(sub_width);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">for</span>(std::size_t j=0; j&lt;tmp_result.size(); j++)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;          <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;          tmp_result[j] = bv[index];</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype().<span class="keywordtype">id</span>() == ID_floatbv)</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;          <span class="comment">// needs to change due to rounding mode</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;          <a class="code" href="classfloat__utilst.html">float_utilst</a> float_utils(</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>, <a class="code" href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype()));</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;          tmp_result=float_utils.<a class="code" href="classfloat__utilst.html#acc6bc5194bff75847380cefd1ab06134">add_sub</a>(tmp_result, tmp_op, subtract);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;          tmp_result=<a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#a96020e66743dba235e41e1fa6d9518d5">add_sub</a>(tmp_result, tmp_op, subtract);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;          tmp_result.size() == sub_width,</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;          <span class="stringliteral">&quot;applying the add/sub operation shall not change the bitwidth&quot;</span>);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">for</span>(std::size_t j=0; j&lt;tmp_result.size(); j++)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        {</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;          <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;          <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          bv[index] = tmp_result[j];</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        }</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      }</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    }</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_floatbv)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="comment">// needs to change due to rounding mode</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <a class="code" href="classfloat__utilst.html">float_utilst</a> float_utils(<a class="code" href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop</a>, <a class="code" href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a>(arithmetic_type));</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      bv=float_utils.<a class="code" href="classfloat__utilst.html#acc6bc5194bff75847380cefd1ab06134">add_sub</a>(bv, op, subtract);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(no_overflow)</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      bv=<a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#a6217a4580ed2790a45dfd020e2f104bc">add_sub_no_overflow</a>(bv, op, subtract, rep);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      bv=<a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#a96020e66743dba235e41e1fa6d9518d5">add_sub</a>(bv, op, subtract);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="keywordflow">return</span> bv;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;}</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="classboolbvt.html#aac0461168684db02cd25c169d98b4af9">  142</a></span>&#160;<a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> <a class="code" href="classboolbvt.html#aac0461168684db02cd25c169d98b4af9">boolbvt::convert_saturating_add_sub</a>(<span class="keyword">const</span> <a class="code" href="classbinary__exprt.html">binary_exprt</a> &amp;expr)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;{</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_saturating_minus || expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_saturating_plus);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type = expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_unsignedbv &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_signedbv &amp;&amp;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_fixedbv &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_complex)</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  {</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(expr);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  }</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  std::size_t width = <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(type);</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  std::size_t width = <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(type);</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == type &amp;&amp; expr.<a class="code" href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">rhs</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == type,</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="stringliteral">&quot;saturating add/sub with mixed types:\n&quot;</span> + expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == type &amp;&amp; expr.<a class="code" href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">rhs</a>().<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == type,</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="stringliteral">&quot;saturating add/sub with mixed types:\n&quot;</span> + expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> subtract = expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_saturating_minus;</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> subtract = expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_saturating_minus;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <a class="code" href="classtypet.html">typet</a> arithmetic_type = (type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;                            ? <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>()</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;                            : type;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775">bv_utilst::representationt</a> rep =</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    (arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_signedbv || arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_fixedbv)</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      ? <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">bv_utilst::representationt::SIGNED</a></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      : <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">bv_utilst::representationt::UNSIGNED</a>;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <a class="code" href="classtypet.html">typet</a> arithmetic_type =</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_complex ? <a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).<a class="code" href="classtype__with__subtypet.html#a125f9b1e5848c32d031a35532f3b5780">subtype</a>() : type;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775">bv_utilst::representationt</a> rep =</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    (arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_signedbv || arithmetic_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_fixedbv)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      ? <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775a6898b46a1cde8a1572e2722c44c5ab07">bv_utilst::representationt::SIGNED</a></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      : <a class="code" href="classbv__utilst.html#aa4d1c03546bab20a5344ba318a75f775aaf36b47f395cd01f48b8fc1013665054">bv_utilst::representationt::UNSIGNED</a>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>(), width);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(expr.<a class="code" href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">rhs</a>(), width);</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> bv = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(expr.<a class="code" href="classbinary__exprt.html#a63c08782a0df40613746d95adf8db773">lhs</a>(), width);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;op = <a class="code" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">convert_bv</a>(expr.<a class="code" href="classbinary__exprt.html#ac3fddb731e038db235b5b69edc110f39">rhs</a>(), width);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_complex)</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#afaa28ab00c8650a5e58337ee387ef7ab">saturating_add_sub</a>(bv, op, subtract, rep);</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_vector &amp;&amp; type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_complex)</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#afaa28ab00c8650a5e58337ee387ef7ab">saturating_add_sub</a>(bv, op, subtract, rep);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  std::size_t sub_width = <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype());</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(sub_width != 0, <span class="stringliteral">&quot;vector elements shall have nonzero bit width&quot;</span>);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    width % sub_width == 0,</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="stringliteral">&quot;total vector bit width shall be a multiple of the element bit width&quot;</span>);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  std::size_t size = width / sub_width;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; size; i++)</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  {</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_op;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    tmp_op.resize(sub_width);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">for</span>(std::size_t j = 0; j &lt; tmp_op.size(); j++)</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; op.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      tmp_op[j] = op[index];</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    }</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  std::size_t sub_width = <a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(<a class="code" href="type_8h.html#a6cc4de5c7bd632a9b0d55bd66889abf3">to_type_with_subtype</a>(type).subtype());</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(sub_width != 0, <span class="stringliteral">&quot;complex elements shall have nonzero bit width&quot;</span>);</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    width % sub_width == 0,</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="stringliteral">&quot;total complex bit width shall be a multiple of the element bit width&quot;</span>);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  std::size_t size = width / sub_width;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; size; i++)</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_op;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    tmp_op.resize(sub_width);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">for</span>(std::size_t j = 0; j &lt; tmp_op.size(); j++)</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    {</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; op.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      tmp_op[j] = op[index];</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    }</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_result;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    tmp_result.resize(sub_width);</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> tmp_result;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    tmp_result.resize(sub_width);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">for</span>(std::size_t j = 0; j &lt; tmp_result.size(); j++)</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    {</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      tmp_result[j] = bv[index];</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    }</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    tmp_result = <a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#afaa28ab00c8650a5e58337ee387ef7ab">saturating_add_sub</a>(tmp_result, tmp_op, subtract, rep);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      tmp_result.size() == sub_width,</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="stringliteral">&quot;applying the add/sub operation shall not change the bitwidth&quot;</span>);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">for</span>(std::size_t j = 0; j &lt; tmp_result.size(); j++)</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    {</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      bv[index] = tmp_result[j];</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  }</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">return</span> bv;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;}</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">for</span>(std::size_t j = 0; j &lt; tmp_result.size(); j++)</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;      tmp_result[j] = bv[index];</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    tmp_result = <a class="code" href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">bv_utils</a>.<a class="code" href="classbv__utilst.html#afaa28ab00c8650a5e58337ee387ef7ab">saturating_add_sub</a>(tmp_result, tmp_op, subtract, rep);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      tmp_result.size() == sub_width,</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="stringliteral">&quot;applying the add/sub operation shall not change the bitwidth&quot;</span>);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">for</span>(std::size_t j = 0; j &lt; tmp_result.size(); j++)</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keyword">const</span> std::size_t index = i * sub_width + j;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(index &lt; bv.size(), <span class="stringliteral">&quot;bit index shall be within bounds&quot;</span>);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      bv[index] = tmp_result[j];</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keywordflow">return</span> bv;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;}</div>
 <div class="ttc" id="abitvector__types_8h_html"><div class="ttname"><a href="bitvector__types_8h.html">bitvector_types.h</a></div><div class="ttdoc">Pre-defined bitvector types.</div></div>
 <div class="ttc" id="abitvector__types_8h_html_a223116435d62c3bd2178071c9028cdee"><div class="ttname"><a href="bitvector__types_8h.html#a223116435d62c3bd2178071c9028cdee">to_floatbv_type</a></div><div class="ttdeci">const floatbv_typet &amp; to_floatbv_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a floatbv_typet.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__types_8h_source.html#l00367">bitvector_types.h:367</a></div></div>
 <div class="ttc" id="aboolbv_8h_html"><div class="ttname"><a href="boolbv_8h.html">boolbv.h</a></div></div>
@@ -328,7 +325,7 @@ $(document).ready(function(){initNavTree('boolbv__add__sub_8cpp_source.html','')
 <div class="ttc" id="aclassboolbvt_html_a4830be5921881bdaeb2e859b21f62050"><div class="ttname"><a href="classboolbvt.html#a4830be5921881bdaeb2e859b21f62050">boolbvt::convert_add_sub</a></div><div class="ttdeci">virtual bvt convert_add_sub(const exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__add__sub_8cpp_source.html#l00016">boolbv_add_sub.cpp:16</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_a9defaf85fe63872f900b1abb38275de8"><div class="ttname"><a href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8">boolbvt::convert_bv</a></div><div class="ttdeci">virtual const bvt &amp; convert_bv(const exprt &amp;expr, const optionalt&lt; std::size_t &gt; expected_width={})</div><div class="ttdoc">Convert expression to vector of literalts, using an internal cache to speed up conversion if availabl...</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8cpp_source.html#l00038">boolbv.cpp:38</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_aa59a8da9af6503055d0082088819e8b2"><div class="ttname"><a href="classboolbvt.html#aa59a8da9af6503055d0082088819e8b2">boolbvt::bv_utils</a></div><div class="ttdeci">bv_utilst bv_utils</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8h_source.html#l00114">boolbv.h:114</a></div></div>
-<div class="ttc" id="aclassboolbvt_html_aac0461168684db02cd25c169d98b4af9"><div class="ttname"><a href="classboolbvt.html#aac0461168684db02cd25c169d98b4af9">boolbvt::convert_saturating_add_sub</a></div><div class="ttdeci">virtual bvt convert_saturating_add_sub(const binary_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__add__sub_8cpp_source.html#l00143">boolbv_add_sub.cpp:143</a></div></div>
+<div class="ttc" id="aclassboolbvt_html_aac0461168684db02cd25c169d98b4af9"><div class="ttname"><a href="classboolbvt.html#aac0461168684db02cd25c169d98b4af9">boolbvt::convert_saturating_add_sub</a></div><div class="ttdeci">virtual bvt convert_saturating_add_sub(const binary_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="boolbv__add__sub_8cpp_source.html#l00142">boolbv_add_sub.cpp:142</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_ac8296cf364960234058f1a489ffa5a8d"><div class="ttname"><a href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">boolbvt::conversion_failed</a></div><div class="ttdeci">bvt conversion_failed(const exprt &amp;expr)</div><div class="ttdoc">Print that the expression of x has failed conversion, then return a vector of x's width.</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8cpp_source.html#l00082">boolbv.cpp:82</a></div></div>
 <div class="ttc" id="aclassboolbvt_html_acdc06ffa22509ba146eea7ecbcbe0b49"><div class="ttname"><a href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbvt::boolbv_width</a></div><div class="ttdeci">virtual std::size_t boolbv_width(const typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="boolbv_8h_source.html#l00099">boolbv.h:99</a></div></div>
 <div class="ttc" id="aclassbv__utilst_html_a6217a4580ed2790a45dfd020e2f104bc"><div class="ttname"><a href="classbv__utilst.html#a6217a4580ed2790a45dfd020e2f104bc">bv_utilst::add_sub_no_overflow</a></div><div class="ttdeci">bvt add_sub_no_overflow(const bvt &amp;op0, const bvt &amp;op1, bool subtract, representationt rep)</div><div class="ttdef"><b>Definition:</b> <a href="bv__utils_8cpp_source.html#l00327">bv_utils.cpp:327</a></div></div>
