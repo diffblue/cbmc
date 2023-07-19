@@ -273,9 +273,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:affdf86b36171e42dbe83ecf7b4fa9024"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92698fdce0d43c7f1d425576d87629d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a92698fdce0d43c7f1d425576d87629d1">erase_struct_union_symbol</a> (const <a class="el" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_union_type, const std::string &amp;erase_prefix, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="separator:a92698fdce0d43c7f1d425576d87629d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedcee9fdba46b2478d8c129ae1a178f2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#aedcee9fdba46b2478d8c129ae1a178f2">get_value_set_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;dest, const std::string &amp;suffix, const <a class="el" href="classtypet.html">typet</a> &amp;original_type, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
-<tr class="memdesc:aedcee9fdba46b2478d8c129ae1a178f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass customisation point for recursion over RHS expression:  <a href="classvalue__sett.html#aedcee9fdba46b2478d8c129ae1a178f2">More...</a><br /></td></tr>
-<tr class="separator:aedcee9fdba46b2478d8c129ae1a178f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49670e50ab454ad45771d2f31d44cf45"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a49670e50ab454ad45771d2f31d44cf45">get_value_set_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;dest, bool &amp;includes_nondet_pointer, const std::string &amp;suffix, const <a class="el" href="classtypet.html">typet</a> &amp;original_type, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
+<tr class="memdesc:a49670e50ab454ad45771d2f31d44cf45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass customisation point for recursion over RHS expression.  <a href="classvalue__sett.html#a49670e50ab454ad45771d2f31d44cf45">More...</a><br /></td></tr>
+<tr class="separator:a49670e50ab454ad45771d2f31d44cf45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abee3b57b6c06fd65f68fbfc3a0dcb7d5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#abee3b57b6c06fd65f68fbfc3a0dcb7d5">assign_rec</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const <a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;values_rhs, const std::string &amp;suffix, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, bool add_to_sets)</td></tr>
 <tr class="memdesc:abee3b57b6c06fd65f68fbfc3a0dcb7d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclass customisation point for recursion over LHS expression:  <a href="classvalue__sett.html#abee3b57b6c06fd65f68fbfc3a0dcb7d5">More...</a><br /></td></tr>
 <tr class="separator:abee3b57b6c06fd65f68fbfc3a0dcb7d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -568,7 +568,7 @@ y = new B;
 <p>Subclass customisation point to filter or otherwise alter the value-set returned from get_value_set before it is passed into assign. </p>
 <p>For example, this is used in one subclass to tag and thus differentiate values that originated in a particular place, vs. those that have been copied. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00502">502</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00510">510</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -615,7 +615,7 @@ y = new B;
 <p>Subclass customisation point to apply global side-effects to this domain, after RHS values are read but before they are written. </p>
 <p>For example, this is used in a recency-analysis plugin to demote existing most-recent objects to general case ones. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00516">516</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00524">524</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -702,7 +702,7 @@ y = new B;
 
 <p>Subclass customisation point for applying code to this domain: </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01622">1622</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01761">1761</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -762,7 +762,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01292">1292</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01431">1431</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -821,7 +821,7 @@ y = new B;
 <p>Subclass customisation point for recursion over LHS expression: </p>
 <p>Do not take a reference to object_numbering's storage as we may call object_numbering.number(), which may reallocate it.</p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01436">1436</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01575">1575</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -889,7 +889,7 @@ y = new B;
 
 <p>Sets <code>dest</code> to <code>src</code> with any wrapping typecasts removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01099">1099</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01236">1236</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -928,7 +928,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01610">1610</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01749">1749</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -974,7 +974,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01564">1564</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01703">1703</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1018,7 +1018,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01814">1814</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01953">1953</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1048,7 +1048,7 @@ y = new B;
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01852">1852</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01991">1991</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1092,7 +1092,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01834">1834</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01973">1973</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1131,7 +1131,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01779">1779</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01918">1918</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1295,7 +1295,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The index if the symbol is known, else <code>nullopt</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00401">401</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00418">418</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1426,7 +1426,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01114">1114</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01251">1251</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1472,7 +1472,7 @@ y = new B;
 
 <p>See get_reference_set. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01129">1129</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01266">1266</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1571,8 +1571,8 @@ y = new B;
 
 </div>
 </div>
-<a id="aedcee9fdba46b2478d8c129ae1a178f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aedcee9fdba46b2478d8c129ae1a178f2">&#9670;&nbsp;</a></span>get_value_set_rec()</h2>
+<a id="a49670e50ab454ad45771d2f31d44cf45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49670e50ab454ad45771d2f31d44cf45">&#9670;&nbsp;</a></span>get_value_set_rec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1591,6 +1591,12 @@ y = new B;
           <td></td>
           <td class="paramtype"><a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;&#160;</td>
           <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool &amp;&#160;</td>
+          <td class="paramname"><em>includes_nondet_pointer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1623,10 +1629,21 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p>Subclass customisation point for recursion over RHS expression: </p>
+<p>Subclass customisation point for recursion over RHS expression. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">expr</td><td>RHS expression to get value set for. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">dest</td><td>value set for <code>expr</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">includes_nondet_pointer</td><td><code>expr</code> includes a non-deterministic value, and the caller may want to expand <code>dest</code> to reflect this. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">suffix</td><td>context to enable field sensitivity. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">original_type</td><td>type of <code>expr</code> when starting the recursion. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">ns</td><td>namespace. </td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Do not take a reference to object_numbering's storage as we may call object_numbering.number(), which may reallocate it.</p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00455">455</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00472">472</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1665,7 +1682,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01747">1747</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01886">1886</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
