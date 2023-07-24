@@ -1,27 +1,53 @@
 /* FUNCTION: abs */
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 #undef abs
 
 int abs(int i)
 {
+  // C99 Section 7.20.6.1:
+  // "If the result cannot be represented, the behavior is undefined."
+  __CPROVER_precondition(i != INT_MIN, "argument to abs must not be INT_MIN");
   return __CPROVER_abs(i);
 }
 
 /* FUNCTION: labs */
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 #undef labs
 
 long int labs(long int i)
 {
+  // C99 Section 7.20.6.1:
+  // "If the result cannot be represented, the behavior is undefined."
+  __CPROVER_precondition(
+    i != LONG_MIN, "argument to labs must not be LONG_MIN");
   return __CPROVER_labs(i);
 }
 
 /* FUNCTION: llabs */
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 #undef llabs
 
 long long int llabs(long long int i)
 {
+  // C99 Section 7.20.6.1:
+  // "If the result cannot be represented, the behavior is undefined."
+  __CPROVER_precondition(
+    i != LLONG_MIN, "argument to llabs must not be LLONG_MIN");
   return __CPROVER_llabs(i);
 }
 
@@ -32,12 +58,19 @@ long long int llabs(long long int i)
 #  define __CPROVER_INTTYPES_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 #undef imaxabs
 
 intmax_t __CPROVER_imaxabs(intmax_t);
 
 intmax_t imaxabs(intmax_t i)
 {
+  __CPROVER_precondition(
+    i != INTMAX_MIN, "argument to imaxabs must not be INTMAX_MIN");
   return __CPROVER_imaxabs(i);
 }
 

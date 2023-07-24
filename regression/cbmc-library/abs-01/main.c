@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -17,7 +18,8 @@ int main()
   assert(fabs(-1.0) == 1);
 
   iabs = (my_i < 0) ? -my_i : my_i;
-  assert(abs(my_i) == iabs);
+  if(my_i != INT_MIN)
+    assert(abs(my_i) == iabs);
 
   __CPROVER_assume(!isnan(my_d));
 
