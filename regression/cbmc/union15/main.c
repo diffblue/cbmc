@@ -50,13 +50,13 @@ int main()
   // following examples demonstrate.
   union B ub = {.c = 0xFF};
   ub.b = 0;
-  assert(ub.c == 0xFE);
+  assert(ub.c == 0xFE || ub.c == 0x7F);
 
   union C uc = {.i = 0xFFFFFFFF};
   uc.c = 0;
-  assert(uc.i == 0xFFFFFF00);
+  assert(uc.i == 0xFFFFFF00 || uc.i == 0x00FFFFFF);
 
   union A ua = {.i = 0xFFFFFFFF};
   ua.c = 0;
-  assert(ua.i == 0xFFFFFF00);
+  assert(ua.i == 0xFFFFFF00 || ua.i == 0x00FFFFFF);
 }

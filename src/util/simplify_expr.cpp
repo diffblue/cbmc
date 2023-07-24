@@ -150,16 +150,16 @@ simplify_exprt::simplify_popcount(const popcount_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_clz(const count_leading_zeros_exprt &expr)
 {
-  const auto const_bits_opt = expr2bits(
-    expr.op(),
-    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
-    ns);
+  const bool is_little_endian =
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+
+  const auto const_bits_opt = expr2bits(expr.op(), is_little_endian, ns);
 
   if(!const_bits_opt.has_value())
     return unchanged(expr);
 
-  // expr2bits generates a bit string starting with the least-significant bit
-  std::size_t n_leading_zeros = const_bits_opt->rfind('1');
+  std::size_t n_leading_zeros =
+    is_little_endian ? const_bits_opt->rfind('1') : const_bits_opt->find('1');
   if(n_leading_zeros == std::string::npos)
   {
     if(!expr.zero_permitted())
@@ -167,7 +167,7 @@ simplify_exprt::simplify_clz(const count_leading_zeros_exprt &expr)
 
     n_leading_zeros = const_bits_opt->size();
   }
-  else
+  else if(is_little_endian)
     n_leading_zeros = const_bits_opt->size() - n_leading_zeros - 1;
 
   return from_integer(n_leading_zeros, expr.type());
@@ -176,16 +176,16 @@ simplify_exprt::simplify_clz(const count_leading_zeros_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_ctz(const count_trailing_zeros_exprt &expr)
 {
-  const auto const_bits_opt = expr2bits(
-    expr.op(),
-    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
-    ns);
+  const bool is_little_endian =
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+
+  const auto const_bits_opt = expr2bits(expr.op(), is_little_endian, ns);
 
   if(!const_bits_opt.has_value())
     return unchanged(expr);
 
-  // expr2bits generates a bit string starting with the least-significant bit
-  std::size_t n_trailing_zeros = const_bits_opt->find('1');
+  std::size_t n_trailing_zeros =
+    is_little_endian ? const_bits_opt->find('1') : const_bits_opt->rfind('1');
   if(n_trailing_zeros == std::string::npos)
   {
     if(!expr.zero_permitted())
@@ -193,6 +193,8 @@ simplify_exprt::simplify_ctz(const count_trailing_zeros_exprt &expr)
 
     n_trailing_zeros = const_bits_opt->size();
   }
+  else if(!is_little_endian)
+    n_trailing_zeros = const_bits_opt->size() - n_trailing_zeros - 1;
 
   return from_integer(n_trailing_zeros, expr.type());
 }
@@ -200,20 +202,22 @@ simplify_exprt::simplify_ctz(const count_trailing_zeros_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_ffs(const find_first_set_exprt &expr)
 {
-  const auto const_bits_opt = expr2bits(
-    expr.op(),
-    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN,
-    ns);
+  const bool is_little_endian =
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+
+  const auto const_bits_opt = expr2bits(expr.op(), is_little_endian, ns);
 
   if(!const_bits_opt.has_value())
     return unchanged(expr);
 
-  // expr2bits generates a bit string starting with the least-significant bit
-  std::size_t first_one_bit = const_bits_opt->find('1');
+  std::size_t first_one_bit =
+    is_little_endian ? const_bits_opt->find('1') : const_bits_opt->rfind('1');
   if(first_one_bit == std::string::npos)
     first_one_bit = 0;
-  else
+  else if(is_little_endian)
     ++first_one_bit;
+  else
+    first_one_bit = const_bits_opt->size() - first_one_bit;
 
   return from_integer(first_one_bit, expr.type());
 }
@@ -2013,14 +2017,17 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   const auto val_size = pointer_offset_bits(value.type(), ns);
   const auto root_size = pointer_offset_bits(root.type(), ns);
 
+  const auto matching_byte_extract_id =
+    expr.id() == ID_byte_update_little_endian ? ID_byte_extract_little_endian
+                                              : ID_byte_extract_big_endian;
+
   // byte update of full object is byte_extract(new value)
   if(
     offset.is_zero() && val_size.has_value() && *val_size > 0 &&
     root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
   {
     byte_extract_exprt be(
-      expr.id() == ID_byte_update_little_endian ? ID_byte_extract_little_endian
-                                                : ID_byte_extract_big_endian,
+      matching_byte_extract_id,
       value,
       offset,
       expr.get_bits_per_byte(),
@@ -2071,14 +2078,11 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
    *             value)
    */
 
-  if(expr.id()!=ID_byte_update_little_endian)
-    return unchanged(expr);
-
   if(value.id()==ID_with)
   {
     const with_exprt &with=to_with_expr(value);
 
-    if(with.old().id()==ID_byte_extract_little_endian)
+    if(with.old().id() == matching_byte_extract_id)
     {
       const byte_extract_exprt &extract=to_byte_extract_expr(with.old());
 
@@ -2218,7 +2222,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
          *update_size > 0 && m_size_bytes > *update_size))
       {
         byte_update_exprt v(
-          ID_byte_update_little_endian,
+          expr.id(),
           member_exprt(root, component.get_name(), component.type()),
           from_integer(*offset_int - *m_offset, offset.type()),
           value,
@@ -2237,7 +2241,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       else
       {
         byte_extract_exprt v(
-          ID_byte_extract_little_endian,
+          matching_byte_extract_id,
           value,
           from_integer(*m_offset - *offset_int, offset.type()),
           expr.get_bits_per_byte(),
@@ -2283,7 +2287,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           bytes_req = (*val_size) / expr.get_bits_per_byte() - val_offset;
 
         byte_extract_exprt new_val(
-          ID_byte_extract_little_endian,
+          matching_byte_extract_id,
           value,
           from_integer(val_offset, offset.type()),
           expr.get_bits_per_byte(),

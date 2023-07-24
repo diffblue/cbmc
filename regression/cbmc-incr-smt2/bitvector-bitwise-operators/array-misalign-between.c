@@ -9,7 +9,7 @@ int main()
   x[2] = 0;
   uint8_t *c = x;
   c[1] = 1;
-  assert(x[0] == 256);
+  assert(x[0] == 256 || x[0] == 1);
   assert(x[0] == 0);
   assert(x[1] == 0);
   assert(x[2] == 0);

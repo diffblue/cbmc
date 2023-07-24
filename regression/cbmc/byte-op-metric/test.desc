@@ -5,11 +5,11 @@ main.c
 ^SIGNAL=0$
 ^Byte Extracts:$
 ^.*main\.c line 8 function main$
-^.* byte\_extract\_little\_endian\(.*\)$
+^.* byte\_extract\_(big|little)\_endian\(.*\)$
 ^Number of byte extracts: 1$
 ^Byte Updates:$
 ^.*main\.c line 8 function main$
-^.* byte\_update\_little\_endian\(.*\)$
+^.* byte\_update\_(big|little)\_endian\(.*\)$
 ^Number of byte updates: 1$
 --
 --

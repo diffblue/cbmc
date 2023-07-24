@@ -1,7 +1,7 @@
 CORE
 array-misalign-between.c
 
-\[main\.assertion\.1\] line \d+ assertion x\[0\] == 256: SUCCESS
+\[main\.assertion\.1\] line \d+ assertion x\[0\] == 256 \|\| x\[0\] == 1: SUCCESS
 \[main\.assertion\.2\] line \d+ assertion x\[0\] == 0: FAILURE
 \[main\.assertion\.3\] line \d+ assertion x\[1\] == 0: SUCCESS
 \[main\.assertion\.4\] line \d+ assertion x\[2\] == 0: SUCCESS
