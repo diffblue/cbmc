@@ -1,12 +1,12 @@
 CORE unix
 main.c
-
+--pointer-check --bounds-check --conversion-check
 ^\[main.assertion.\d+\] line \d+ ARG\_MAX is not supported: FAILURE$
 ^\[main.assertion.\d+\] line \d+ sysconf\(\) error: FAILURE$
 ^\[main.assertion.\d+\] line \d+ ARG\_MAX is supported: FAILURE$
-^\*\* 3 of 3 failed .*$
+^\*\* 3 of \d+ failed .*$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
-^WARNING: no body for function sysconf
+^\*\*\*\* WARNING: no body for function sysconf
