@@ -422,7 +422,7 @@ $(document).ready(function(){initNavTree('unistd_8c_source.html',''); initResiza
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
 <div class="line"><a name="l00330"></a><span class="lineno"><a class="line" href="unistd_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">  330</a></span>&#160;<span class="keywordtype">long</span> <a class="code" href="unistd_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00331"></a><span class="lineno"><a class="line" href="unistd_8c.html#ad6597781ce4e6c82e7553130797005e1">  331</a></span>&#160;<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="unistd_8c.html#ad6597781ce4e6c82e7553130797005e1">__VERIFIER_nondet_unsigned_int</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="keywordtype">int</span> <a class="code" href="unistd_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="keywordtype">long</span> <a class="code" href="unistd_8c.html#a67d58c6aa6eaeb9560972d86c1e001b7">sysconf</a>(<span class="keywordtype">int</span> name);</div>
 <div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
@@ -434,13 +434,13 @@ $(document).ready(function(){initNavTree('unistd_8c_source.html',''); initResiza
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  (void)name;</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <span class="keywordtype">long</span> retval = <a class="code" href="unistd_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a>();</div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160; </div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="comment">// We should keep errno as non-determinist as possible, since this model</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="comment">// nver takes into account the name input.</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  errno = <a class="code" href="unistd_8c.html#ad6597781ce4e6c82e7553130797005e1">__VERIFIER_nondet_unsigned_int</a>();</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="comment">// We should keep errno as non-deterministic as possible, since this model</span></div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="comment">// never takes into account the name input.</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  errno = <a class="code" href="unistd_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160; </div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="comment">// Spec states &quot;some returned values may be huge; they are not suitable</span></div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  <span class="comment">// for allocating memory&quot;. There aren&#39;t also guarantees about return</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="comment">// values being strickly equal or greater to -1.</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="comment">// values being strictly equal or greater to -1.</span></div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <span class="comment">// Thus, modelling it as non-deterministic.</span></div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <span class="keywordflow">return</span> retval;</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;}</div>
@@ -472,7 +472,6 @@ $(document).ready(function(){initNavTree('unistd_8c_source.html',''); initResiza
 <div class="ttc" id="aunistd_8c_html_a8e802c5738da4cae64bd23557a46226d"><div class="ttname"><a href="unistd_8c.html#a8e802c5738da4cae64bd23557a46226d">__CPROVER_pipe_offset</a></div><div class="ttdeci">const int __CPROVER_pipe_offset</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00102">unistd.c:102</a></div></div>
 <div class="ttc" id="aunistd_8c_html_a9e58c2a6f572a2d2cdad1306d7d2b802"><div class="ttname"><a href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a></div><div class="ttdeci">ssize_t write(int fildes, const void *buf, size_t nbyte)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00160">unistd.c:160</a></div></div>
 <div class="ttc" id="aunistd_8c_html_aacad1d135ca2779b583623678e36db7c"><div class="ttname"><a href="unistd_8c.html#aacad1d135ca2779b583623678e36db7c">close</a></div><div class="ttdeci">int close(int fildes)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00104">unistd.c:104</a></div></div>
-<div class="ttc" id="aunistd_8c_html_ad6597781ce4e6c82e7553130797005e1"><div class="ttname"><a href="unistd_8c.html#ad6597781ce4e6c82e7553130797005e1">__VERIFIER_nondet_unsigned_int</a></div><div class="ttdeci">unsigned int __VERIFIER_nondet_unsigned_int(void)</div></div>
 <div class="ttc" id="aunistd_8c_html_adead3ef83e9181db3b1d4d7d098a18c0"><div class="ttname"><a href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a></div><div class="ttdeci">#define size_type</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00312">unistd.c:312</a></div></div>
 <div class="ttc" id="aunistd_8c_html_ae0b3612f7987109a225666aebb5b8c2c"><div class="ttname"><a href="unistd_8c.html#ae0b3612f7987109a225666aebb5b8c2c">read</a></div><div class="ttdeci">ssize_t read(int fildes, void *buf, size_t nbyte)</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00240">unistd.c:240</a></div></div>
 <div class="ttc" id="aunistd_8c_html_ae43dae6b7c84d11ec3036b822b28a179"><div class="ttname"><a href="unistd_8c.html#ae43dae6b7c84d11ec3036b822b28a179">pipe</a></div><div class="ttdeci">int pipe(int fildes[2])</div><div class="ttdef"><b>Definition:</b> <a href="unistd_8c_source.html#l00055">unistd.c:55</a></div></div>

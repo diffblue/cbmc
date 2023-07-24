@@ -16,7 +16,6 @@ var unistd_8c =
     [ "__VERIFIER_nondet_ret_type", "unistd_8c.html#a834617f435eacc7f88d8a13c664a8dca", null ],
     [ "__VERIFIER_nondet_size_type", "unistd_8c.html#a4691022677f6a0bc06767597434e1c0f", null ],
     [ "__VERIFIER_nondet_unsigned", "unistd_8c.html#a3c28b9d0042faeba72099a7c4abde523", null ],
-    [ "__VERIFIER_nondet_unsigned_int", "unistd_8c.html#ad6597781ce4e6c82e7553130797005e1", null ],
     [ "_close", "unistd_8c.html#a5af2dad9b50913a0025ea80a8577bea8", null ],
     [ "_read", "unistd_8c.html#a6cfdb1d41006cb00b54a113c28dd3ab3", null ],
     [ "_sleep", "unistd_8c.html#a43681b82b59b8a109cb680be599fdba9", null ],
