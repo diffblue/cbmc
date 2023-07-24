@@ -29,7 +29,7 @@ var dir_807c5b2c83e0c14a10083f60cf67ca05 =
     [ "destructor.h", "destructor_8h.html", "destructor_8h" ],
     [ "destructor_tree.cpp", "destructor__tree_8cpp.html", null ],
     [ "destructor_tree.h", "destructor__tree_8h.html", "destructor__tree_8h" ],
-    [ "elf_reader.cpp", "elf__reader_8cpp.html", null ],
+    [ "elf_reader.cpp", "elf__reader_8cpp.html", "elf__reader_8cpp" ],
     [ "elf_reader.h", "elf__reader_8h.html", "elf__reader_8h" ],
     [ "ensure_one_backedge_per_target.cpp", "ensure__one__backedge__per__target_8cpp.html", "ensure__one__backedge__per__target_8cpp" ],
     [ "ensure_one_backedge_per_target.h", "ensure__one__backedge__per__target_8h.html", "ensure__one__backedge__per__target_8h" ],

@@ -1,5 +1,7 @@
 var NAVTREEINDEX135 =
 {
+"structpointer__arithmetict.html#a87d4e5d8bdc30fdfbd803105e9834276":[8,0,914,1],
+"structpointer__arithmetict.html#ab1c956b6a3f36713be258d22d9677bb4":[8,0,914,3],
 "structpointer__arithmetict.html#ae4df252f43f43855a258dc1a3456af84":[8,0,914,4],
 "structpointer__arithmetict.html#af26f37bf622b05608b742f0241c078f8":[8,0,914,0],
 "structpointer__logict_1_1pointert.html":[8,0,916,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX135 =
 "structsmt__bit__vector__theoryt_1_1nott.html#ab3783adc500ac99431d2ab31be1690f2":[8,0,1097,11,0],
 "structsmt__bit__vector__theoryt_1_1ort.html":[8,0,1097,12],
 "structsmt__bit__vector__theoryt_1_1ort.html#a0dd3520a561a4576df3652d4783bf989":[8,0,1097,12,2],
-"structsmt__bit__vector__theoryt_1_1ort.html#a730b4a0a9017de75826bbe87b30bb529":[8,0,1097,12,0],
-"structsmt__bit__vector__theoryt_1_1ort.html#ab6ff24224b16c76ce75b6787e5f5d630":[8,0,1097,12,1],
-"structsmt__bit__vector__theoryt_1_1repeatt.html":[8,0,1097,13]
+"structsmt__bit__vector__theoryt_1_1ort.html#a730b4a0a9017de75826bbe87b30bb529":[8,0,1097,12,0]
 };
