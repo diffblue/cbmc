@@ -328,7 +328,7 @@ ret_type _read(int fildes, void *buf, size_type nbyte)
 #endif
 
 long __VERIFIER_nondet_long(void);
-unsigned int __VERIFIER_nondet_unsigned_int(void);
+int __VERIFIER_nondet_int(void);
 
 long sysconf(int name);
 
@@ -340,13 +340,13 @@ __CPROVER_HIDE:;
   (void)name;
   long retval = __VERIFIER_nondet_long();
 
-  // We should keep errno as non-determinist as possible, since this model
-  // nver takes into account the name input.
-  errno = __VERIFIER_nondet_unsigned_int();
+  // We should keep errno as non-deterministic as possible, since this model
+  // never takes into account the name input.
+  errno = __VERIFIER_nondet_int();
 
   // Spec states "some returned values may be huge; they are not suitable
   // for allocating memory". There aren't also guarantees about return
-  // values being strickly equal or greater to -1.
+  // values being strictly equal or greater to -1.
   // Thus, modelling it as non-deterministic.
   return retval;
 }
