@@ -12,6 +12,8 @@ Author: Michael Tautschnig
 #include <util/nodiscard.h>
 #include <util/ssa_expr.h>
 
+#define ENABLE_ARRAY_FIELD_SENSITIVITY
+
 class namespacet;
 class goto_symex_statet;
 class symex_targett;
@@ -121,7 +123,10 @@ public:
   ///   applied to array cells
   /// \param should_simplify: simplify expressions
   field_sensitivityt(std::size_t max_array_size, bool should_simplify)
-    : max_field_sensitivity_array_size(max_array_size),
+    :
+#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
+      max_field_sensitivity_array_size(max_array_size),
+#endif
       should_simplify(should_simplify)
   {
   }
@@ -202,7 +207,9 @@ public:
   bool is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
 
 private:
+#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   const std::size_t max_field_sensitivity_array_size;
+#endif
 
   const bool should_simplify;
 
