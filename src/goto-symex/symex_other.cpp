@@ -68,7 +68,11 @@ void goto_symext::havoc_rec(
   }
   else
   {
-    // consider printing a warning
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "Attempted to symex havoc applied to unsupported expression",
+      state.source.pc->code().pretty(),
+      dest.pretty());
   }
 }
 
