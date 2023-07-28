@@ -1,5 +1,6 @@
 var NAVTREEINDEX62 =
 {
+"classsmt__termt.html#abc938ddba505d9e41a803c1f9295b978":[8,0,1146,1],
 "classsmt__termt.html#abece47f72d2223e0b9df6da83c77a6ef":[8,0,1146,6],
 "classsmt__termt_1_1storert.html":[8,0,1146,0],
 "classsmt__termt_1_1storert.html#a5c2aaf09429241d7c9c564861149f580":[8,0,1146,0,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX62 =
 "classstate__is__sentinel__dll__exprt.html#ad22f7267545bfd158eace26214063e17":[8,0,1172,6],
 "classstate__live__object__exprt.html":[8,0,1173],
 "classstate__live__object__exprt.html#a13e57dff06d407b1ee1a0457df5de28c":[8,0,1173,0],
-"classstate__live__object__exprt.html#a30723bae71d0c28dcc8062ba63ee9ed0":[8,0,1173,3],
-"classstate__live__object__exprt.html#a5d92c59d3807d779084a21302de8ca23":[8,0,1173,2]
+"classstate__live__object__exprt.html#a30723bae71d0c28dcc8062ba63ee9ed0":[8,0,1173,3]
 };

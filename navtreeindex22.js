@@ -1,5 +1,6 @@
 var NAVTREEINDEX22 =
 {
+"classcpp__namespace__spect.html#a2b0bae162e54d0aba3f2f74169318355":[8,0,311,7],
 "classcpp__namespace__spect.html#a3127b5b7897d30b60230995e88179405":[8,0,311,5],
 "classcpp__namespace__spect.html#a426c543adc53af0739333dcdb4ddf58b":[8,0,311,0],
 "classcpp__namespace__spect.html#a4bfd379985524e73a38ac63806b3225c":[8,0,311,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX22 =
 "classcpp__typecheckt.html#a29e2697ee091a5e39855053cc60024d4":[8,0,330,81],
 "classcpp__typecheckt.html#a2a59d0d47602ff0ab34131a0bfbb7b28":[8,0,330,19],
 "classcpp__typecheckt.html#a2a7ca0ed59cc7d85b97f089c68963ee0":[8,0,330,70],
-"classcpp__typecheckt.html#a2b5472a8eb37acd5117d95fa0f6831b5":[8,0,330,167],
-"classcpp__typecheckt.html#a2c550768268b37413221d29011244db4":[8,0,330,29]
+"classcpp__typecheckt.html#a2b5472a8eb37acd5117d95fa0f6831b5":[8,0,330,167]
 };
