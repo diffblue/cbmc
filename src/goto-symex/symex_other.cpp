@@ -46,11 +46,11 @@ void goto_symext::havoc_rec(
   {
     const if_exprt &if_expr=to_if_expr(dest);
 
-    guardt guard_t=state.guard;
+    guardt guard_t = guard;
     guard_t.add(if_expr.cond());
     havoc_rec(state, guard_t, if_expr.true_case());
 
-    guardt guard_f=state.guard;
+    guardt guard_f = guard;
     guard_f.add(not_exprt(if_expr.cond()));
     havoc_rec(state, guard_f, if_expr.false_case());
   }
@@ -68,7 +68,11 @@ void goto_symext::havoc_rec(
   }
   else
   {
-    // consider printing a warning
+    INVARIANT_WITH_DIAGNOSTICS(
+      false,
+      "Attempted to symex havoc applied to unsupported expression",
+      state.source.pc->code().pretty(),
+      dest.pretty());
   }
 }
 

@@ -1,0 +1,19 @@
+CORE new-smt-backend
+main.c
+
+\[main\.assertion\.1\] line \d+ assertion a \=\= \'a\'\: FAILURE
+\[main\.assertion\.2\] line \d+ assertion a \=\= \'a\'\: SUCCESS
+\[main\.assertion\.3\] line \d+ assertion b \=\= \'b\'\: FAILURE
+\[main\.assertion\.4\] line \d+ assertion b \=\= \'b\'\: SUCCESS
+\[main\.assertion\.5\] line \d+ assertion c \=\= \'c\'\: FAILURE
+\[main\.assertion\.6\] line \d+ assertion c \=\= \'c\'\: SUCCESS
+\[main\.assertion\.7\] line \d+ assertion d \=\= \'d\'\: FAILURE
+\[main\.assertion\.8\] line \d+ assertion d \=\= \'d\'\: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+In the case where __CPROVER_havoc_object is applied to a pointer which points
+to one of a selection of objects, only the one object which it pointed to should
+be reassigned. This test is to cover the specific case where the value of the
+pointer is expressed using nested ternary conditional expressions.
