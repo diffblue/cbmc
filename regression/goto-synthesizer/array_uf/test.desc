@@ -1,0 +1,11 @@
+CORE
+main.c
+--pointer-check _ --arrays-uf-always _ --arrays-uf-always
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Check if the flag --array-uf-always is correctly passed from the synthesizer
+to the verifier. Note that there is no loop contracts synthesized in this test.
