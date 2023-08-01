@@ -224,7 +224,7 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
 {
   const bool no_simplifier = options.get_bool_option("beautify") ||
                              !options.get_bool_option("sat-preprocessor") ||
-                             options.get_bool_option("refine") ||
+                             options.get_bool_option("refine-arithmetic") ||
                              options.get_bool_option("refine-strings");
 
   if(options.is_set("sat-solver"))
