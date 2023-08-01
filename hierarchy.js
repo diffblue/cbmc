@@ -554,7 +554,7 @@ var hierarchy =
     ] ],
     [ "expr2stlt", "classexpr2stlt.html", null ],
     [ "detail::expr_dynamic_cast_return_typet< Ret, T >", "structdetail_1_1expr__dynamic__cast__return__typet.html", null ],
-    [ "expr_initializert< nondet >", "classexpr__initializert.html", null ],
+    [ "expr_initializert", "classexpr__initializert.html", null ],
     [ "expr_queryt< T >", "classexpr__queryt.html", null ],
     [ "expr_skeletont", "classexpr__skeletont.html", null ],
     [ "detail::expr_try_dynamic_cast_return_typet< Ret, T >", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", null ],
