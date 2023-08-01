@@ -26,6 +26,7 @@ Author: Qinheping Hu
   "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
   OPT_CONFIG_BACKEND \
   OPT_SOLVER \
+  "(arrays-uf-always)(arrays-uf-never)" \
   "(verbosity):(version)(xml-ui)(json-ui)" \
   // empty last line
 

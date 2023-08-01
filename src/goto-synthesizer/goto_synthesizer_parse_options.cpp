@@ -195,12 +195,17 @@ optionst goto_synthesizer_parse_optionst::get_options()
   options.set_option("built-in-assertions", true);
   options.set_option("assertions", true);
   options.set_option("assumptions", true);
-  options.set_option("arrays-uf", "auto");
   options.set_option("depth", UINT32_MAX);
   options.set_option("exploration-strategy", "lifo");
   options.set_option("symex-cache-dereferences", false);
   options.set_option("rewrite-union", true);
   options.set_option("self-loops-to-assumptions", true);
+
+  options.set_option("arrays-uf", "auto");
+  if(cmdline.isset("arrays-uf-always"))
+    options.set_option("arrays-uf", "always");
+  else if(cmdline.isset("arrays-uf-never"))
+    options.set_option("arrays-uf", "never");
 
   // Generating trace for counterexamples.
   options.set_option("trace", true);
@@ -233,6 +238,8 @@ void goto_synthesizer_parse_optionst::help()
     HELP_CONFIG_BACKEND
     HELP_SOLVER
     "\n"
+    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
+    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
     "Other options:\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
