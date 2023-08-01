@@ -12,12 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_initializer.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
 #include "c_types.h"
+#include "config.h"
 #include "magic.h"
 #include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
 
-template <bool nondet>
 class expr_initializert
 {
 public:
@@ -25,10 +26,12 @@ public:
   {
   }
 
-  optionalt<exprt>
-  operator()(const typet &type, const source_locationt &source_location)
+  optionalt<exprt> operator()(
+    const typet &type,
+    const source_locationt &source_location,
+    const exprt &init_expr)
   {
-    return expr_initializer_rec(type, source_location);
+    return expr_initializer_rec(type, source_location, init_expr);
   }
 
 protected:
@@ -36,13 +39,14 @@ protected:
 
   optionalt<exprt> expr_initializer_rec(
     const typet &type,
-    const source_locationt &source_location);
+    const source_locationt &source_location,
+    const exprt &init_expr);
 };
 
-template <bool nondet>
-optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
+optionalt<exprt> expr_initializert::expr_initializer_rec(
   const typet &type,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  const exprt &init_expr)
 {
   const irep_idt &type_id=type.id();
 
@@ -57,10 +61,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
      type_id==ID_fixedbv)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = from_integer(0, type);
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -69,10 +75,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
           type_id==ID_real)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = constant_exprt(ID_0, type);
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -81,15 +89,17 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
           type_id==ID_verilog_unsignedbv)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
     {
       const std::size_t width = to_bitvector_type(type).get_width();
       std::string value(width, '0');
 
       result = constant_exprt(value, type);
     }
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -97,17 +107,19 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_complex)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
     {
-      auto sub_zero =
-        expr_initializer_rec(to_complex_type(type).subtype(), source_location);
+      auto sub_zero = expr_initializer_rec(
+        to_complex_type(type).subtype(), source_location, init_expr);
       if(!sub_zero.has_value())
         return {};
 
       result = complex_exprt(*sub_zero, *sub_zero, to_complex_type(type));
     }
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -127,8 +139,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     }
     else
     {
-      auto tmpval =
-        expr_initializer_rec(array_type.element_type(), source_location);
+      auto tmpval = expr_initializer_rec(
+        array_type.element_type(), source_location, init_expr);
       if(!tmpval.has_value())
         return {};
 
@@ -137,7 +149,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
         array_type.size().id() == ID_infinity || !array_size.has_value() ||
         *array_size > MAX_FLATTENED_ARRAY_SIZE)
       {
-        if(nondet)
+        if(init_expr.id() == ID_nondet)
           return side_effect_expr_nondett(type, source_location);
 
         array_of_exprt value(*tmpval, array_type);
@@ -159,8 +171,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    auto tmpval =
-      expr_initializer_rec(vector_type.element_type(), source_location);
+    auto tmpval = expr_initializer_rec(
+      vector_type.element_type(), source_location, init_expr);
     if(!tmpval.has_value())
       return {};
 
@@ -190,7 +202,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       DATA_INVARIANT(
         c.type().id() != ID_code, "struct member must not be of code type");
 
-      const auto member = expr_initializer_rec(c.type(), source_location);
+      const auto member =
+        expr_initializer_rec(c.type(), source_location, init_expr);
       if(!member.has_value())
         return {};
 
@@ -216,8 +229,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     if(!widest_member.has_value())
       return {};
 
-    auto component_value =
-      expr_initializer_rec(widest_member->first.type(), source_location);
+    auto component_value = expr_initializer_rec(
+      widest_member->first.type(), source_location, init_expr);
 
     if(!component_value.has_value())
       return {};
@@ -230,7 +243,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_c_enum_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_c_enum_tag_type(type)), source_location);
+      ns.follow_tag(to_c_enum_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -243,7 +256,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_struct_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_struct_tag_type(type)), source_location);
+      ns.follow_tag(to_struct_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -256,7 +269,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_union_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_union_tag_type(type)), source_location);
+      ns.follow_tag(to_union_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -269,10 +282,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_string)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = constant_exprt(irep_idt(), type);
+    else
+      result = duplicate_per_byte(init_expr, type);
 
     result.add_source_location()=source_location;
     return result;
@@ -292,7 +307,8 @@ optionalt<exprt> zero_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert<false>(ns)(type, source_location);
+  return expr_initializert(ns)(
+    type, source_location, constant_exprt(ID_0, char_type()));
 }
 
 /// Create a non-deterministic value for type `type`, with all subtypes
@@ -307,5 +323,91 @@ optionalt<exprt> nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert<true>(ns)(type, source_location);
+  return expr_initializert(ns)(type, source_location, exprt(ID_nondet));
+}
+
+/// Create a value for type `type`, with all subtype bytes
+/// initialized to the given value.
+/// \param type: Type of the target expression.
+/// \param source_location: Location to record in all created sub-expressions.
+/// \param ns: Namespace to perform type symbol/tag lookups.
+/// \param init_byte_expr: Value to be used for initialization.
+/// \return An expression if a byte-initialized expression of the input type
+///   can be built.
+optionalt<exprt> expr_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns,
+  const exprt &init_byte_expr)
+{
+  return expr_initializert(ns)(type, source_location, init_byte_expr);
+}
+
+/// Builds an expression of the given output type with each of its bytes
+/// initialized to the given initialization expression.
+/// Integer bitvector types are currently supported.
+/// For unsupported `output_type` the initialization expression is casted to the
+/// output type.
+/// \param init_byte_expr The initialization expression
+/// \param output_type The output type
+/// \return The built expression
+/// \note `init_byte_expr` must be a boolean or a bitvector and must be of at
+///  most `size <= config.ansi_c.char_width`
+exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
+{
+  const auto init_type_as_bitvector =
+    type_try_dynamic_cast<bitvector_typet>(init_byte_expr.type());
+  // Fail if `init_byte_expr` is not a bitvector of maximum 8 bits or a boolean.
+  PRECONDITION(
+    (init_type_as_bitvector &&
+     init_type_as_bitvector->get_width() <= config.ansi_c.char_width) ||
+    init_byte_expr.type().id() == ID_bool);
+  if(const auto output_bv = type_try_dynamic_cast<bitvector_typet>(output_type))
+  {
+    const auto out_width = output_bv->get_width();
+    // Replicate `init_byte_expr` enough times until it completely fills
+    // `output_type`.
+
+    // We've got a constant. So, precompute the value of the constant.
+    if(init_byte_expr.is_constant())
+    {
+      const auto init_size = init_type_as_bitvector->get_width();
+      const irep_idt init_value = to_constant_expr(init_byte_expr).get_value();
+
+      // Create a new BV od `output_type` size with its representation being the
+      // replication of the init_byte_expr (padded with 0) enough times to fill.
+      const auto output_value =
+        make_bvrep(out_width, [&init_size, &init_value](std::size_t index) {
+          // Index modded by 8 to access the i-th bit of init_value
+          const auto source_index = index % config.ansi_c.char_width;
+          // If the modded i-th bit exists get it, otherwise add 0 padding.
+          return source_index < init_size &&
+                 get_bvrep_bit(init_value, init_size, source_index);
+        });
+
+      return constant_exprt{output_value, output_type};
+    }
+
+    const size_t size =
+      (out_width + config.ansi_c.char_width - 1) / config.ansi_c.char_width;
+
+    // We haven't got a constant. So, build the expression using shift-and-or.
+    exprt::operandst values;
+    // Let's cast init_byte_expr to output_type.
+    const exprt casted_init_byte_expr =
+      typecast_exprt::conditional_cast(init_byte_expr, output_type);
+    values.push_back(casted_init_byte_expr);
+    for(size_t i = 1; i < size; ++i)
+    {
+      values.push_back(shl_exprt(
+        casted_init_byte_expr,
+        from_integer(config.ansi_c.char_width * i, size_type())));
+    }
+    if(values.size() == 1)
+      return values[0];
+    return multi_ary_exprt(ID_bitor, values, output_type);
+  }
+
+  // Anything else. We don't know what to do with it. So, just cast.
+  return typecast_exprt::conditional_cast(init_byte_expr, output_type);
 }
