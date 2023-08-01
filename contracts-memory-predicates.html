@@ -146,7 +146,7 @@ Semantics</h2>
 <div class="line">  *out = (uint32_t) result;</div>
 <div class="line">  *err_signal = SUCCESS;</div>
 <div class="line">}</div>
-<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00179">stdlib.c:179</a></div></div>
+<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00212">stdlib.c:212</a></div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md109"></a>
 Enforcement</h3>
 <p>When checking the contract abstracts a function a <code>__CPROVER_is_fresh</code> in a <em>requires</em> clause will cause fresh memory to be allocated. In an <em>ensures</em> clause it will check that memory was freshly allocated.</p>
