@@ -4,9 +4,9 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 main
-DECL main::1::arr : signedbv\[32\]\[5\]
+DECL main::1::arr : signedbv\[\d+\]\[5\]
 ASSIGN main::1::arr := \{ 0, 1, 2, 3, 4 \}
-ASSERT main::1::arr\[cast\(0, signedbv\[64\]\)\] ≠ 0 // Expected failure: 0 == 0
+ASSERT main::1::arr\[(0|cast\(0, signedbv\[\d+\]\))\] ≠ 0 // Expected failure: 0 == 0
 DEAD main::1::arr
 SET RETURN VALUE side_effect statement="nondet" is_nondet_nullable="1"
 END_FUNCTION
