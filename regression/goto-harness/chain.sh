@@ -24,6 +24,23 @@ fi
 args=${*:1:$#-1}
 
 
+cleanup()
+{
+  rm -f "$needs_cleaning"
+}
+
+needs_cleaning=""
+trap cleanup EXIT
+
+json_file=`echo $args | grep '\.json' | sed 's/\.json.*/.json/' | sed 's/.* //'`
+if [[ "x$json_file" != "x" ]]; then
+  bit_width=`$goto_harness -h | grep -- -bit | sed 's/-bit.*//' | sed 's/.* //'`
+  if [[ "$bit_width" != "64" ]]; then
+    needs_cleaning="$json_file.$bit_width"
+    sed "s/\"id\": \"64\"/\"id\": \"$bit_width\"/" "$json_file" > "$json_file.$bit_width"
+    args=${args/$json_file/$json_file.$bit_width}
+  fi
+fi
 
 if [[ "${is_windows}" == "true" ]]; then
   $goto_cc "$input_c_file" "/Fe$input_goto_binary"
