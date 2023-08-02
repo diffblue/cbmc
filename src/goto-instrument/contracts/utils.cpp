@@ -342,7 +342,7 @@ void widen_assigns(assignst &assigns, const namespacet &ns)
 {
   assignst result;
 
-  havoc_utils_is_constantt is_constant(assigns, ns);
+  havoc_utils_can_forward_propagatet is_constant(assigns, ns);
 
   for(const auto &e : assigns)
   {

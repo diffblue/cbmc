@@ -24,22 +24,25 @@ class goto_programt;
 typedef std::set<exprt> assignst;
 
 /// \brief A class containing utility functions for havocing expressions.
-class havoc_utils_is_constantt : public is_constantt
+class havoc_utils_can_forward_propagatet : public can_forward_propagatet
 {
 public:
-  explicit havoc_utils_is_constantt(const assignst &mod, const namespacet &ns)
-    : is_constantt(ns), assigns(mod)
+  explicit havoc_utils_can_forward_propagatet(
+    const assignst &mod,
+    const namespacet &ns)
+    : can_forward_propagatet(ns), assigns(mod)
   {
   }
 
   bool is_constant(const exprt &expr) const override
   {
-    // Besides the "usual" constants (checked in is_constantt::is_constant),
-    // we also treat unmodified symbols as constants
+    // Besides the "usual" constants (checked in
+    // can_forward_propagatet::is_constant), we also treat unmodified symbols as
+    // constants
     if(expr.id() == ID_symbol && assigns.find(expr) == assigns.end())
       return true;
 
-    return is_constantt::is_constant(expr);
+    return can_forward_propagatet::is_constant(expr);
   }
 
 protected:
@@ -102,7 +105,7 @@ public:
 
 protected:
   const assignst &assigns;
-  const havoc_utils_is_constantt is_constant;
+  const havoc_utils_can_forward_propagatet is_constant;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_HAVOC_UTILS_H

@@ -7,10 +7,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 \*******************************************************************/
 
 #include "goto_state.h"
-#include "goto_symex_is_constant.h"
-#include "goto_symex_state.h"
 
 #include <util/format_expr.h>
+
+#include "goto_symex_can_forward_propagate.h"
+#include "goto_symex_state.h"
 
 /// Print the constant propagation map in a human-friendly format.
 /// This is primarily for use from the debugger; please don't delete me just
@@ -91,7 +92,7 @@ void goto_statet::apply_condition(
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
-    if(is_ssa_expr(lhs) && goto_symex_is_constantt(ns)(rhs))
+    if(is_ssa_expr(lhs) && goto_symex_can_forward_propagatet(ns)(rhs))
     {
       const ssa_exprt &ssa_lhs = to_ssa_expr(lhs);
       INVARIANT(
@@ -141,7 +142,7 @@ void goto_statet::apply_condition(
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
-    if(!is_ssa_expr(lhs) || !goto_symex_is_constantt(ns)(rhs))
+    if(!is_ssa_expr(lhs) || !goto_symex_can_forward_propagatet(ns)(rhs))
       return;
 
     if(rhs.is_true())

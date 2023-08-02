@@ -66,7 +66,7 @@ assignst dfcc_infer_loop_assigns(
   // widen or drop targets that depend on loop-locals or are non-constant,
   // ie. depend on other locations assigned by the loop.
   // e.g: if the loop assigns {i, a[i]}, then a[i] is non-constant.
-  havoc_utils_is_constantt is_constant(assigns, ns);
+  havoc_utils_can_forward_propagatet is_constant(assigns, ns);
   assignst result;
   for(const auto &expr : assigns)
   {

@@ -1990,7 +1990,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   if(subexpr.has_value() && subexpr.value() != expr)
     return changed(simplify_rec(subexpr.value())); // recursive call
 
-  if(is_constantt(ns)(expr))
+  if(can_forward_propagatet(ns)(expr))
     return changed(simplify_rec(lower_byte_extract(expr, ns)));
 
   return unchanged(expr);
