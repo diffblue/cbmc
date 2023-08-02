@@ -1156,15 +1156,17 @@ bool configt::set(const cmdlinet &cmdline)
   else
   {
     // For other systems assume argc is no larger than the what would make argv
-    // consume all available memory space:
-    // 2^pointer_width / (pointer_width / char_width) is the maximum number of
-    // argv elements sysconf(ARG_MAX) is likely much lower than this, but we
-    // don't know that value for the verification target platform.
+    // the largest representable array (when using signed integers to represent
+    // array sizes):
+    // 2^(pointer_width - 1) / (pointer_width / char_width) is the maximum
+    // number of argv elements sysconf(ARG_MAX) is likely much lower than this,
+    // but we don't know that value for the verification target platform.
     const auto pointer_bits_2log =
       address_bits(ansi_c.pointer_width / ansi_c.char_width);
-    if(ansi_c.pointer_width - pointer_bits_2log <= ansi_c.int_width)
+    if(ansi_c.pointer_width - pointer_bits_2log - 1 <= ansi_c.int_width)
     {
-      ansi_c.max_argc = power(2, config.ansi_c.int_width - pointer_bits_2log);
+      ansi_c.max_argc =
+        power(2, config.ansi_c.int_width - pointer_bits_2log - 1);
     }
     // otherwise we leave argc unconstrained
   }

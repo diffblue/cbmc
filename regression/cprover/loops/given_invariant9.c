@@ -2,7 +2,7 @@ void *malloc(__CPROVER_size_t);
 
 int main()
 {
-  int n;
+  char n;
   __CPROVER_assume(n >= 0);
   int *array = malloc(sizeof(int) * n);
 

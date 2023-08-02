@@ -2,7 +2,7 @@ CORE new-smt-backend
 main.c
 --bounds-check --retain-trivial-checks
 ^Generated \d+ VCC\(s\), 0 remaining after simplification$
-^\[main.array_bounds.1\] line 4 array 'A' lower bound in A\[(\(signed (long (long )?)?int\))?1\]: SUCCESS$
+^\[main.array_bounds.1\] line 4 array 'A' (lower|upper) bound in A\[(\(signed (long (long )?)?int\))?1\]: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

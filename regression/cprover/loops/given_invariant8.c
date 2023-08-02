@@ -1,6 +1,6 @@
 int main()
 {
-  int n;
+  char n;
   __CPROVER_assume(n >= 0);
   int array[n];
 

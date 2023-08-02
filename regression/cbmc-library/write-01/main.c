@@ -13,6 +13,7 @@ int main()
 
   __CPROVER_assume(fd >= 0);
   __CPROVER_assume(nbytes < SIZE);
+  __CPROVER_assume(fd <= SSIZE_MAX / sizeof(struct __CPROVER_pipet));
 
   write(fd, ptr, nbytes);
 }
