@@ -6,10 +6,16 @@
 #include <stdint.h>
 
 extern size_t __CPROVER_max_malloc_size;
-int __builtin_clzll(unsigned long long);
 
+#if defined(_WIN32) && defined(_M_X64)
+int __builtin_clzll(unsigned long long);
 #define __nof_symex_objects                                                    \
   ((size_t)(1ULL << __builtin_clzll(__CPROVER_max_malloc_size)))
+#else
+int __builtin_clzl(unsigned long);
+#define __nof_symex_objects                                                    \
+  ((size_t)(1UL << __builtin_clzl(__CPROVER_max_malloc_size)))
+#endif
 
 typedef struct {
   size_t k;

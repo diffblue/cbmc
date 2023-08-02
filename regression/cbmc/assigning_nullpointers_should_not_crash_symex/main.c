@@ -6,9 +6,19 @@ struct linked_list
   struct linked_list *next;
 };
 
+#ifdef _WIN32
+#  ifdef _M_X64
+#    define POINTER_BYTES 8ul
+#  else
+#    define POINTER_BYTES 4ul
+#  endif
+#else
+#  define POINTER_BYTES __SIZEOF_POINTER__
+#endif
+
 int main(void)
 {
-  size_t list_sz = 8ul;
+  size_t list_sz = POINTER_BYTES;
   assert(list_sz == sizeof(struct linked_list));
   struct linked_list *list = malloc(list_sz);
   // this line makes symex crash for some reason
