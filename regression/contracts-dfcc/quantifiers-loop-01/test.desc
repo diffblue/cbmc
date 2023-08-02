@@ -6,7 +6,7 @@ main.c
 ^\[main.loop_invariant_step.\d+\] line 10 Check invariant after step for loop .*: SUCCESS$
 ^\[main.loop_step_unwinding.\d+\] line 10 Check step was unwound for loop .*: SUCCESS$
 ^\[main.assigns.\d+\] line .* Check that i is assignable: SUCCESS$
-^\[main.assigns.\d+\] line .* Check that a\[\(signed long (long )?int\)i\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] line .* Check that a\[(\(signed (long (long )?)?int\))?i\] is assignable: SUCCESS$
 ^\[main\.assertion\.\d+\] line .* assertion a\[10\] == 1: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

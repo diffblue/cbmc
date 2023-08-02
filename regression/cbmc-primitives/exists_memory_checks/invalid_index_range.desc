@@ -5,7 +5,7 @@ invalid_index_range.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 \[main\.assertion\.1\] line 9 assertion __CPROVER_exists \{ int i; \(0 <= i && i < 20\) && a\[i\] == i \*i \}: SUCCESS
-line 9 dereference failure: pointer outside object bounds in a\[\(signed (long|long long) int\)i\]: FAILURE
+line 9 dereference failure: pointer outside object bounds in a\[(\(signed (long|long long) int\))?i\]: FAILURE
 --
 --
 Check that memory checks fail for pointer dereferences inside an existential

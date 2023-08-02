@@ -1,8 +1,8 @@
 CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo _ --pointer-check
-^\[foo.assigns.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: (SUCCESS|FAILURE)$
-^\[foo.assigns.*\d+\].* line 8 Check that x\[\(.*\)1\] is assignable: FAILURE$
+^\[foo.assigns.*\d+\].* line 8 Check that x\[(\(.*\))?1\] is assignable: (SUCCESS|FAILURE)$
+^\[foo.assigns.*\d+\].* line 8 Check that x\[(\(.*\))?1\] is assignable: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

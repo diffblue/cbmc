@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.array_bounds\.[1-2]\] .*: SUCCESS$
-^\[main\.array_bounds\.3\] line 38 array.buffer (dynamic object )?upper bound in buffers\[\(signed long (long )?int\)0\]->buffer\[\(signed long (long )?int\)100\]: FAILURE$
+^\[main\.array_bounds\.3\] line 38 array.buffer (dynamic object )?upper bound in buffers\[(\(signed long (long )?int\))?0\]->buffer\[(\(signed long (long )?int\))?100\]: FAILURE$
 ^\*\* 1 of 3 failed
 ^VERIFICATION FAILED$
 --

@@ -4,12 +4,12 @@ main.c
 main.c function foo
 ^\[foo.assigns.\d+\] line 6 Check that __CPROVER_object_whole\(\(.* \*\)x\) is valid when a != FALSE: SUCCESS$
 ^\[foo.assigns.\d+\] line 7 Check that __CPROVER_object_whole\(\(.* \*\)y\) is valid when !\(a != FALSE\): SUCCESS$
-^\[foo.assigns.\d+\] line 13 Check that x\[\(signed (long )?long int\)0\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line 14 Check that y\[\(signed (long )?long int\)0\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line 18 Check that x\[\(signed (long )?long int\)0\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line 19 Check that y\[\(signed (long )?long int\)0\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line 22 Check that x\[\(signed (long )?long int\)0\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line 23 Check that y\[\(signed (long )?long int\)0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line 13 Check that x\[(\(signed (long )?long int\))?0\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 14 Check that y\[(\(signed (long )?long int\))?0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line 18 Check that x\[(\(signed (long )?long int\))?0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line 19 Check that y\[(\(signed (long )?long int\))?0\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line 22 Check that x\[(\(signed (long )?long int\))?0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line 23 Check that y\[(\(signed (long )?long int\))?0\] is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

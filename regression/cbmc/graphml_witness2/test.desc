@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-<data key="assumption">foo = \(\(unsigned long( long)? int \*\)0\);</data>
+<data key="assumption">foo = \(\(unsigned( long( long)?)? int \*\)0\);</data>
 <data key="assumption.scope">one</data>
 --
 ^warning: ignoring
