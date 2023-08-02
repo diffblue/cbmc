@@ -5,7 +5,7 @@ void main()
   assert(NULL != (NULL + 1));
   assert(NULL != (NULL - 1));
 
-  int offset;
+  signed char offset;
   __CPROVER_assume(offset != 0);
   assert(NULL != (NULL + offset));
 
