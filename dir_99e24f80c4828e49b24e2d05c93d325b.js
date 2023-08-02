@@ -28,8 +28,8 @@ var dir_99e24f80c4828e49b24e2d05c93d325b =
     ] ],
     [ "goto_symex.cpp", "goto__symex_8cpp.html", "goto__symex_8cpp" ],
     [ "goto_symex.h", "goto__symex_8h.html", "goto__symex_8h" ],
-    [ "goto_symex_is_constant.h", "goto__symex__is__constant_8h.html", [
-      [ "goto_symex_is_constantt", "classgoto__symex__is__constantt.html", "classgoto__symex__is__constantt" ]
+    [ "goto_symex_can_forward_propagate.h", "goto__symex__can__forward__propagate_8h.html", [
+      [ "goto_symex_can_forward_propagatet", "classgoto__symex__can__forward__propagatet.html", "classgoto__symex__can__forward__propagatet" ]
     ] ],
     [ "goto_symex_state.cpp", "goto__symex__state_8cpp.html", "goto__symex__state_8cpp" ],
     [ "goto_symex_state.h", "goto__symex__state_8h.html", [

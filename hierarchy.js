@@ -210,6 +210,11 @@ var hierarchy =
     [ "check_call_sequencet::call_stack_entryt", "structcheck__call__sequencet_1_1call__stack__entryt.html", null ],
     [ "call_validate_fullt< Base, T >", "structcall__validate__fullt.html", null ],
     [ "call_validatet< Base, T >", "structcall__validatet.html", null ],
+    [ "can_forward_propagatet", "classcan__forward__propagatet.html", [
+      [ "constant_propagator_can_forward_propagatet", "classconstant__propagator__can__forward__propagatet.html", null ],
+      [ "goto_symex_can_forward_propagatet", "classgoto__symex__can__forward__propagatet.html", null ],
+      [ "havoc_utils_can_forward_propagatet", "classhavoc__utils__can__forward__propagatet.html", null ]
+    ] ],
     [ "goto_program2codet::caset", "structgoto__program2codet_1_1caset.html", null ],
     [ "cbmc_invariants_should_throwt", "structcbmc__invariants__should__throwt.html", null ],
     [ "cegis_verifiert", "classcegis__verifiert.html", null ],
@@ -945,12 +950,7 @@ var hierarchy =
     [ "irep_pretty_diagnosticst", "structirep__pretty__diagnosticst.html", null ],
     [ "irep_serializationt", "classirep__serializationt.html", null ],
     [ "irep_serializationt::ireps_containert", "classirep__serializationt_1_1ireps__containert.html", null ],
-    [ "is_constantt", "classis__constantt.html", [
-      [ "constant_propagator_is_constantt", "classconstant__propagator__is__constantt.html", null ],
-      [ "goto_symex_is_constantt", "classgoto__symex__is__constantt.html", null ],
-      [ "havoc_utils_is_constantt", "classhavoc__utils__is__constantt.html", null ],
-      [ "is_compile_time_constantt", "classis__compile__time__constantt.html", null ]
-    ] ],
+    [ "is_compile_time_constantt", "classis__compile__time__constantt.html", null ],
     [ "is_fresh_baset", "classis__fresh__baset.html", [
       [ "is_fresh_enforcet", "classis__fresh__enforcet.html", null ],
       [ "is_fresh_replacet", "classis__fresh__replacet.html", null ]

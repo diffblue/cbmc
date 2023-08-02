@@ -1,6 +1,6 @@
 var expr__util_8h =
 [
-    [ "is_constantt", "classis__constantt.html", "classis__constantt" ],
+    [ "can_forward_propagatet", "classcan__forward__propagatet.html", "classcan__forward__propagatet" ],
     [ "boolean_negate", "expr__util_8h.html#a633c4ded5f61aedc4d024873c00e67c6", null ],
     [ "has_subexpr", "expr__util_8h.html#a3cd97ebf32899cff15f028d7bce7ef70", null ],
     [ "has_subexpr", "expr__util_8h.html#a870e353a1e33df2b8e51889648b5fa56", null ],
