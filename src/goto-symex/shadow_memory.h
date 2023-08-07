@@ -14,7 +14,6 @@ Author: Peter Schrammel
 
 #include <util/expr.h>
 #include <util/message.h>
-#include <util/std_expr.h>
 
 #include "shadow_memory_field_definitions.h"
 
@@ -30,6 +29,7 @@ class abstract_goto_modelt;
 class goto_symex_statet;
 class side_effect_exprt;
 class ssa_exprt;
+class symbol_exprt;
 
 /// \brief The shadow memory instrumentation performed during symbolic execution
 class shadow_memoryt
@@ -115,7 +115,7 @@ private:
   /// \param fields The field definition to be used
   void initialize_shadow_memory(
     goto_symex_statet &state,
-    const exprt &expr,
+    exprt expr,
     const shadow_memory_field_definitionst::field_definitiont &fields);
 
   /// Registers a shadow memory field for the given original memory
@@ -124,7 +124,7 @@ private:
   /// \param field_name The field name
   /// \param field_type The field type
   /// \return The resulting shadow memory symbol expression
-  symbol_exprt add_field(
+  const symbol_exprt &add_field(
     goto_symex_statet &state,
     const exprt &expr,
     const irep_idt &field_name,
