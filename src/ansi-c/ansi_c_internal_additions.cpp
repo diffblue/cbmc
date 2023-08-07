@@ -183,8 +183,15 @@ void ansi_c_internal_additions(std::string &code)
 
     CPROVER_PREFIX "size_t " CPROVER_PREFIX "max_malloc_size="+
     integer2string(max_malloc_size(config.ansi_c.pointer_width, config
-    .bv_encoding.object_bits))+";\n"
+    .bv_encoding.object_bits));
+  if(config.ansi_c.pointer_width==config.ansi_c.long_int_width)
+    code += "UL;\n";
+  else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
+    code += "ULL;\n";
+  else
+    code += "U;\n";
 
+  code+=
     // this is ANSI-C
     "extern " CPROVER_PREFIX "thread_local const char __func__["
       CPROVER_PREFIX "constant_infinity_uint];\n"
