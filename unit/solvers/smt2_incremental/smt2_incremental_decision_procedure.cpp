@@ -1044,4 +1044,18 @@ TEST_CASE(
   REQUIRE(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
   CHECK(test.sent_commands == expected_check_commands);
   test.sent_commands.clear();
+
+  INFO("Getting values involving empty structs.");
+  test.mock_responses.push_front(
+    smt_get_value_responset{{{expected_handle, smt_bool_literal_termt{true}}}});
+  CHECK(test.procedure.get(equality_expression) == true_exprt{});
+  test.mock_responses.push_front(smt_get_value_responset{
+    {{smt_identifier_termt{"foo", smt_bit_vector_sortt{8}},
+      smt_bit_vector_constant_termt{0, 8}}}});
+  const struct_exprt expected_empty{{}, type_reference};
+  CHECK(test.procedure.get(foo.symbol_expr()) == expected_empty);
+  const std::vector<smt_commandt> expected_get_commands{
+    smt_get_value_commandt{expected_handle},
+    smt_get_value_commandt{expected_foo}};
+  CHECK(test.sent_commands == expected_get_commands);
 }
