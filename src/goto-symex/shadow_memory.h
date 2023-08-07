@@ -14,7 +14,6 @@ Author: Peter Schrammel
 
 #include <util/expr.h>
 #include <util/message.h>
-#include <util/std_expr.h>
 
 #include "shadow_memory_field_definitions.h"
 
@@ -30,6 +29,7 @@ class abstract_goto_modelt;
 class goto_symex_statet;
 class side_effect_exprt;
 class ssa_exprt;
+class symbol_exprt;
 
 /// \brief The shadow memory instrumentation performed during symbolic execution
 class shadow_memoryt
