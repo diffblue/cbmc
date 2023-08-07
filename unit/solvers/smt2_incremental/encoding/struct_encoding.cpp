@@ -341,6 +341,34 @@ TEST_CASE("decoding into struct expressions.", "[core][smt2_incremental]")
   REQUIRE(test.struct_encoding.decode(encoded, struct_tag) == expected);
 }
 
+TEST_CASE("encoding of struct with no members", "[core][smt2_incremental]")
+{
+  auto test = struct_encoding_test_environmentt::make();
+  const struct_union_typet::componentst component_types{};
+  const type_symbolt type_symbol{"emptyt", struct_typet{component_types}, ID_C};
+  test.symbol_table.insert(type_symbol);
+  const struct_tag_typet type_reference{type_symbol.name};
+  const auto expected_type = bv_typet{8};
+  const auto expected_zero_byte = from_integer(0, expected_type);
+  SECTION("Type of empty struct")
+  {
+    REQUIRE(test.struct_encoding.encode(type_reference) == expected_type);
+  }
+  SECTION("Empty struct typed symbol expression")
+  {
+    const symbolt empty_value_symbol{"foo", type_reference, ID_C};
+    test.symbol_table.insert(empty_value_symbol);
+    const auto symbol_expr = empty_value_symbol.symbol_expr();
+    const exprt expected_symbol = symbol_exprt{"foo", expected_type};
+    REQUIRE(test.struct_encoding.encode(symbol_expr) == expected_symbol);
+  }
+  SECTION("Struct expression")
+  {
+    const struct_exprt empty{{}, type_reference};
+    REQUIRE(test.struct_encoding.encode(empty) == expected_zero_byte);
+  }
+}
+
 TEST_CASE(
   "encoding of single member struct expressions",
   "[core][smt2_incremental]")

@@ -34,7 +34,7 @@ add_test_pl_profile(
 add_test_pl_profile(
   "cbmc-new-smt-backend"
   "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
-  "-I;new-smt-backend;-s;new-smt-backend"
+  "${gcc_only_string}-I;new-smt-backend;-s;new-smt-backend"
   "CORE"
 )
 

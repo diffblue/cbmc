@@ -1000,3 +1000,62 @@ TEST_CASE(
 
   REQUIRE(returned == constant_exprt{"true", bool_typet{}});
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret getting value of empty struct",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const struct_union_typet::componentst component_types{};
+  const type_symbolt type_symbol{"emptyt", struct_typet{component_types}, ID_C};
+  test.symbol_table.insert(type_symbol);
+  const struct_tag_typet type_reference{type_symbol.name};
+  const symbolt foo{"foo", type_reference, ID_C};
+  test.symbol_table.insert(foo);
+  const symbolt bar{"bar", type_reference, ID_C};
+  test.symbol_table.insert(bar);
+
+  INFO("Sanity checking decision procedure and flushing size definitions");
+  test.mock_responses.push_front(smt_check_sat_responset{smt_sat_responset{}});
+  CHECK(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
+  test.sent_commands.clear();
+
+  INFO("Defining an equality over empty structs");
+  const auto equality_expression =
+    test.procedure.handle(equal_exprt{foo.symbol_expr(), bar.symbol_expr()});
+  test.procedure.set_to(equality_expression, true);
+  const smt_identifier_termt expected_foo{"foo", smt_bit_vector_sortt{8}};
+  const smt_identifier_termt expected_bar{"bar", smt_bit_vector_sortt{8}};
+  const smt_identifier_termt expected_handle{"B0", smt_bool_sortt{}};
+  const smt_termt expected_equality =
+    smt_core_theoryt::equal(expected_foo, expected_bar);
+  const std::vector<smt_commandt> expected_problem_commands{
+    smt_declare_function_commandt{expected_foo, {}},
+    smt_declare_function_commandt{expected_bar, {}},
+    smt_define_function_commandt{"B0", {}, expected_equality},
+    smt_assert_commandt{expected_equality}};
+  REQUIRE(test.sent_commands == expected_problem_commands);
+  test.sent_commands.clear();
+
+  INFO("Ensuring decision procedure is in suitable state for getting output.");
+  const std::vector<smt_commandt> expected_check_commands{
+    smt_check_sat_commandt{}};
+  test.mock_responses.push_front(smt_check_sat_responset{smt_sat_responset{}});
+  REQUIRE(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
+  CHECK(test.sent_commands == expected_check_commands);
+  test.sent_commands.clear();
+
+  INFO("Getting values involving empty structs.");
+  test.mock_responses.push_front(
+    smt_get_value_responset{{{expected_handle, smt_bool_literal_termt{true}}}});
+  CHECK(test.procedure.get(equality_expression) == true_exprt{});
+  test.mock_responses.push_front(smt_get_value_responset{
+    {{smt_identifier_termt{"foo", smt_bit_vector_sortt{8}},
+      smt_bit_vector_constant_termt{0, 8}}}});
+  const struct_exprt expected_empty{{}, type_reference};
+  CHECK(test.procedure.get(foo.symbol_expr()) == expected_empty);
+  const std::vector<smt_commandt> expected_get_commands{
+    smt_get_value_commandt{expected_handle},
+    smt_get_value_commandt{expected_foo}};
+  CHECK(test.sent_commands == expected_get_commands);
+}

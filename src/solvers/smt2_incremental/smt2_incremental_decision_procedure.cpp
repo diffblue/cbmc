@@ -497,14 +497,15 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
     {
       return identifier_descriptor;
     }
-    if(gather_dependent_expressions(expr).empty())
+    const exprt lowered = lower(expr);
+    if(gather_dependent_expressions(lowered).empty())
     {
       INVARIANT(
-        objects_are_already_tracked(expr, object_map),
+        objects_are_already_tracked(lowered, object_map),
         "Objects in expressions being read should already be tracked from "
         "point of being set/handled.");
       return ::convert_expr_to_smt(
-        expr,
+        lowered,
         object_map,
         pointer_sizes_map,
         object_size_function.make_application,
