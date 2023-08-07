@@ -95,6 +95,7 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp.html',''); initR
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>&quot;</code><br />
+<code>#include &lt;<a class="el" href="arith__tools_8h_source.html">util/arith_tools.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="bitvector__expr_8h_source.html">util/bitvector_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="bitvector__types_8h_source.html">util/bitvector_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="make__unique_8h_source.html">util/make_unique.h</a>&gt;</code><br />
@@ -110,7 +111,7 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp.html',''); initR
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="struct__encoding_8cpp__incl.svg" width="1555" height="992"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="struct__encoding_8cpp__incl.svg" width="1862" height="992"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -124,6 +125,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a4f884ff13ac8f98ed17dab3e5fed335d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a4f884ff13ac8f98ed17dab3e5fed335d">encode</a> (const <a class="el" href="classwith__exprt.html">with_exprt</a> &amp;with, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="separator:a4f884ff13ac8f98ed17dab3e5fed335d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0424907d2e9dd13f9e263bc89d73e12a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">encode</a> (const <a class="el" href="classstruct__exprt.html">struct_exprt</a> &amp;struct_expr)</td></tr>
+<tr class="memdesc:a0424907d2e9dd13f9e263bc89d73e12a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Non-empty structs are flattened into a large bit vector using concatenation to express all the member operands of <code>struct_expr</code>.  <a href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">More...</a><br /></td></tr>
 <tr class="separator:a0424907d2e9dd13f9e263bc89d73e12a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a707c59c8f036c046b91e1792a102dd0e"><td class="memItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a707c59c8f036c046b91e1792a102dd0e">count_trailing_bit_width</a> (const <a class="el" href="classstruct__typet.html">struct_typet</a> &amp;type, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> name, const <a class="el" href="classboolbv__widtht.html">boolbv_widtht</a> &amp;boolbv_width)</td></tr>
 <tr class="separator:a707c59c8f036c046b91e1792a102dd0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,7 +171,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00115">115</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00126">126</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -197,7 +199,13 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00105">105</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p>Non-empty structs are flattened into a large bit vector using concatenation to express all the member operands of <code>struct_expr</code>. </p>
+<p>Empty structs are encoded as a zero byte. This has useful properties such as -</p><ul>
+<li>A zero byte is valid SMT, unlike zero length bit vectors.</li>
+<li>Any two zero byte instances are always equal. This property would not be true of two instances of a non-det byte for instance. </li>
+</ul>
+
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00117">117</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -235,7 +243,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00085">85</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00091">91</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -266,7 +274,7 @@ Functions</h2></td></tr>
 <p>Extracts the component/field names and new values from a <code><a class="el" href="classwith__exprt.html" title="Operator to update elements in structs and arrays.">with_exprt</a></code> which expresses a new struct value where one or more members of a struct have had their values substituted with new values. </p>
 <dl class="section note"><dt>Note</dt><dd>This is implemented using direct access to the operands and other underlying irept interfaces, because the interface for <code><a class="el" href="classwith__exprt.html" title="Operator to update elements in structs and arrays.">with_exprt</a></code> only supports a single <code>where</code> / <code>new_value</code> pair and does not support extracting the name from the <code>where</code> operand. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00062">62</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00068">68</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
