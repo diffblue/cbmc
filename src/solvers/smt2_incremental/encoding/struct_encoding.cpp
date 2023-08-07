@@ -2,6 +2,7 @@
 
 #include "struct_encoding.h"
 
+#include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/make_unique.h>
@@ -38,9 +39,14 @@ typet struct_encodingt::encode(typet type) const
     work_queue.pop();
     if(const auto struct_tag = type_try_dynamic_cast<struct_tag_typet>(current))
     {
-      const auto width = (*boolbv_width)(*struct_tag);
+      auto width = (*boolbv_width)(*struct_tag);
+      // The bit vector theory of SMT disallows zero bit length length bit
+      // vectors. C++ gives a minimum size for a struct (even an empty struct)
+      // as being one byte; in order to ensure that structs have unique memory
+      // locations. Therefore encoding empty structs as having 8 bits / 1 byte
+      // is a reasonable solution in this case.
       if(width == 0)
-        UNIMPLEMENTED_FEATURE("support for zero bit width structs.");
+        width = 8;
       current = bv_typet{width};
     }
     if(const auto array = type_try_dynamic_cast<array_typet>(current))
@@ -102,11 +108,16 @@ static exprt encode(const with_exprt &with, const namespacet &ns)
   return struct_exprt{components, tag_type};
 }
 
+/// Non-empty structs are flattened into a large bit vector using concatenation
+/// to express all the member operands of \p struct_expr. Empty structs are
+/// encoded as a zero byte. This has useful properties such as -
+///   * A zero byte is valid SMT, unlike zero length bit vectors.
+///   * Any two zero byte instances are always equal. This property would not
+///     be true of two instances of a non-det byte for instance.
 static exprt encode(const struct_exprt &struct_expr)
 {
-  INVARIANT(
-    !struct_expr.operands().empty(),
-    "empty structs may not be encoded into SMT terms.");
+  if(struct_expr.operands().empty())
+    return from_integer(0, bv_typet{8});
   if(struct_expr.operands().size() == 1)
     return struct_expr.operands().front();
   return concatenation_exprt{struct_expr.operands(), struct_expr.type()};
