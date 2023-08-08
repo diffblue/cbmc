@@ -4,7 +4,7 @@ main.c
 ^\[foo.precondition.\d+\] line \d+ Check requires clause of foo in main: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
-\[main\.assertion\.1\] line 35 expecting SUCCESS: SUCCESS$
+\[main\.assertion\.1\] line 36 expecting SUCCESS: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 This test checks that objects of size zero or of __CPROVER_max_malloc_size
