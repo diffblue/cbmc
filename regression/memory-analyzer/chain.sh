@@ -12,5 +12,10 @@ args=$(echo $cmd | cut -d ' ' -f 2-)
 name=${name%.gb}
 opts=${*:3:$#-3}
 
-$goto_gcc -g -std=c11 -o "${name}.gb" "${name}.c"
+bit_width=`$memory_analyzer -h | grep -- -bit | sed 's/-bit.*//' | sed 's/.* //'`
+if [[ "$bit_width" != "64" ]] && [[ $(uname -m) = "x86_64" ]]; then
+  $goto_gcc -g -m32 -std=c11 -o "${name}.gb" "${name}.c"
+else
+  $goto_gcc -g -std=c11 -o "${name}.gb" "${name}.c"
+fi
 $memory_analyzer $opts "${name}.gb" $args
