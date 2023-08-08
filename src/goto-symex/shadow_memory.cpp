@@ -50,8 +50,6 @@ void shadow_memoryt::initialize_shadow_memory(
     else
     {
       exprt init_expr = field_pair.second;
-      if(init_expr.id() == ID_typecast)
-        init_expr = to_typecast_expr(field_pair.second).op();
       const auto init_value =
         expr_initializer(type, expr.source_location(), ns, init_expr);
       CHECK_RETURN(init_value.has_value());
