@@ -80,4 +80,47 @@ void log_cond(
   const char *cond_text,
   const exprt &cond);
 
+// TODO: doxygen
+void replace_invalid_object_by_null(exprt &expr);
+
+// TODO: doxygen
+const exprt &
+get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state);
+
+// TODO: doxygen?
+std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
+  const namespacet &ns,
+  const messaget &log,
+  const exprt &matched_object,
+  const std::vector<shadow_memory_statet::shadowed_addresst> &addresses,
+  const typet &field_type,
+  const exprt &expr,
+  const typet &lhs_type,
+  bool &exact_match);
+
+// TODO: doxygen
+bool contains_null_or_invalid(
+  const std::vector<exprt> &value_set,
+  const exprt &address);
+
+// TODO: doxygen
+exprt compute_or_over_cells(
+  const exprt &expr,
+  const typet &field_type,
+  const namespacet &ns,
+  const messaget &log,
+  const bool is_union);
+
+// TODO: doxygen
+exprt compute_max_over_cells(
+  const exprt &expr,
+  const typet &field_type,
+  const namespacet &ns,
+  const messaget &log,
+  const bool is_union);
+
+// TODO: doxygen?
+exprt build_if_else_expr(
+  const std::vector<std::pair<exprt, exprt>> &conds_values);
+
 #endif // CPROVER_GOTO_SYMEX_SHADOW_MEMORY_UTIL_H
