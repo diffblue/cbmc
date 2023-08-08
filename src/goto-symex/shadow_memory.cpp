@@ -95,12 +95,151 @@ void shadow_memoryt::symex_set_field(
   // To be implemented
 }
 
+// Function synopsis
+// value_set = get_value_set(expr)
+// foreach object in value_set:
+//   if(object invalid) continue;
+//  get_field(&exact_match)
+//  if(exact_match)
+//    return;
+// return;
 void shadow_memoryt::symex_get_field(
   goto_symex_statet &state,
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  // To be implemented
+  INVARIANT(
+    arguments.size() == 2, CPROVER_PREFIX "get_field requires 2 arguments");
+  irep_idt field_name = extract_field_name(arguments[1]);
+
+  exprt expr = arguments[0];
+  typet expr_type = expr.type();
+  DATA_INVARIANT(
+    expr_type.id() == ID_pointer,
+    "shadow memory requires a pointer expression");
+  log_get_field(ns, log, field_name, expr);
+
+  INVARIANT(
+    state.shadow_memory.address_fields.count(field_name) == 1,
+    id2string(field_name) + " should exist");
+  const auto &addresses = state.shadow_memory.address_fields.at(field_name);
+
+  // Return null (invalid object) instead of auto-object or invalid-object.
+  // This will "polish" expr from invalid and auto-obj
+  replace_invalid_object_by_null(expr);
+
+  std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
+  log_value_set(ns, log, value_set);
+
+  std::vector<std::pair<exprt, exprt>> rhs_conds_values;
+  const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
+  // Used to give a default value for invalid pointers and other usages
+  const exprt &field_init_expr = get_field_init_expr(field_name, state);
+
+  if(contains_null_or_invalid(value_set, null_pointer))
+  {
+    log_value_set_match(ns, log, null_pointer, expr);
+    // If we have an invalid pointer, then return the default value of the
+    // shadow memory as dereferencing it would fail
+    rhs_conds_values.emplace_back(
+      true_exprt(),
+      typecast_exprt::conditional_cast(field_init_expr, lhs.type()));
+  }
+
+  for(const auto &matched_object : value_set)
+  {
+    // Ignore "unknown"
+    if(matched_object.id() != ID_object_descriptor)
+    {
+      log.warning() << "Shadow memory: value set contains unknown for "
+                    << format(expr) << messaget::eom;
+      continue;
+    }
+    // Ignore "integer_address"
+    if(
+      to_object_descriptor_expr(matched_object).root_object().id() ==
+      ID_integer_address)
+    {
+      log.warning() << "Shadow memory: value set contains integer_address for "
+                    << format(expr) << messaget::eom;
+      continue;
+    }
+    // Ignore "ID_C_is_failed_symbol" (another incarnation of invalid pointer)
+    // TODO: check if this is obsolete (or removed by
+    //  replace_invalid_object_by_null) or add default value
+    if(matched_object.type().get_bool(ID_C_is_failed_symbol))
+    {
+      log.warning() << "Shadow memory: value set contains failed symbol for "
+                    << format(expr) << messaget::eom;
+      continue;
+    }
+
+    bool exact_match = false;
+
+    // List of condition ==> value (read condition implies values)
+    auto per_matched_object_conds_values = get_shadow_dereference_candidates(
+      ns,
+      log,
+      matched_object,
+      addresses,
+      field_init_expr.type(),
+      expr,
+      lhs.type(),
+      exact_match);
+
+    // If we have an exact match we discard all the previous conditions and
+    // create an assignment. Then we'll break
+    if(exact_match)
+    {
+      rhs_conds_values.clear();
+    }
+    // Process this match (exact will contain only one set of conditions).
+    rhs_conds_values.insert(
+      rhs_conds_values.end(),
+      per_matched_object_conds_values.begin(),
+      per_matched_object_conds_values.end());
+    if(exact_match)
+    {
+      break;
+    }
+  }
+
+  // If we have at least a condition ==> value
+  if(!rhs_conds_values.empty())
+  {
+    // Build the rhs expression from the shadow memory (big switch for all
+    // condition ==> value)
+    exprt rhs = typecast_exprt::conditional_cast(
+      build_if_else_expr(rhs_conds_values), lhs.type());
+    const size_t mux_size = rhs_conds_values.size() - 1;
+    // Don't debug if the switch is too big
+    if(mux_size >= 10)
+    {
+      log.warning() << "Shadow memory: mux size get_field: " << mux_size
+                    << messaget::eom;
+    }
+    else
+    {
+      log.debug() << "Shadow memory: mux size get_field: " << mux_size
+                  << messaget::eom;
+    }
+#ifdef DEBUG_SM
+    log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
+#endif
+    // TODO: create the assignment of __CPROVER_shadow_memory_get_field
+    symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
+  }
+  else
+  {
+    // We don't have any condition ==> value for the pointer, so we fall-back to
+    // the initialization value of the shadow-memory.
+    log.warning() << "Shadow memory: cannot get_field for " << format(expr)
+                  << messaget::eom;
+    symex_assign(
+      state,
+      lhs,
+      typecast_exprt::conditional_cast(field_init_expr, lhs.type()));
+  }
 }
 
 // TODO: the following 4 functions (`symex_field_static_init`,
