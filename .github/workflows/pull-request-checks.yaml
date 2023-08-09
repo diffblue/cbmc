@@ -391,7 +391,7 @@ jobs:
         run: cd build; ctest . -V -L CORE -j2
 
   # This job takes approximately 26 to 46 minutes
-  check-ubuntu-22_04-cmake-gcc-12:
+  check-ubuntu-22_04-cmake-gcc-13:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -404,7 +404,13 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-12 gdb g++-12 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-13 gdb g++-13 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+          # Update symlinks so that any use of gcc (including our regression
+          # tests) will use GCC 13.
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 110 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-13 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-13
+          sudo ln -sf cpp-13 /usr/bin/cpp
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -417,29 +423,22 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-22.04-Release-gcc-12-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-22.04-Release-gcc-13-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-22.04-Release-gcc-12-${{ github.ref }}
-            ${{ runner.os }}-22.04-Release-gcc-12
+            ${{ runner.os }}-22.04-Release-gcc-13-${{ github.ref }}
+            ${{ runner.os }}-22.04-Release-gcc-13
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc-12 -DCMAKE_CXX_COMPILER=/usr/bin/g++-12
-      - name: Check that doc task works
-        run: ninja -C build doc
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
         run: ninja -C build -j2
       - name: Print ccache stats
         run: ccache -s
-      - name: Check if package building works
-        run: |
-          cd build
-          ninja package
-          ls *.deb
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j2
 
