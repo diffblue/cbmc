@@ -65,10 +65,4 @@ banner_string(const std::string &front_end, const std::string &version);
 /// ```
 std::string align_center_with_border(const std::string &text);
 
-std::string help_entry(
-  const std::string &option,
-  const std::string &description,
-  const std::size_t left_margin = 30,
-  const std::size_t width = 80);
-
 #endif // CPROVER_UTIL_PARSE_OPTIONS_H
