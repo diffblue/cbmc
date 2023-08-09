@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/version.h>
@@ -935,91 +936,82 @@ void cbmc_parse_optionst::help()
             << align_center_with_border("Daniel Kroening, Edmund Clarke") << '\n' // NOLINT(*)
             << align_center_with_border("Carnegie Mellon University, Computer Science Department") << '\n' // NOLINT(*)
             << align_center_with_border("kroening@kroening.com") << '\n' // NOLINT(*)
-            << align_center_with_border("Protected in part by U.S. patent 7,225,417") << '\n' // NOLINT(*)
-            <<
+            << align_center_with_border("Protected in part by U.S. patent 7,225,417") << '\n'; // NOLINT(*)
+
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " cbmc [-?] [-h] [--help]      show help\n"
-    " cbmc --version               show version and exit\n"
-    " cbmc [options] file.c ...    perform bounded model checking\n"
+    " {bcbmc} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bcbmc} {y--version} \t show version and exit\n"
+    " {bcbmc} [options] {ufile.c} {u...} \t perform bounded model checking\n"
     "\n"
     "Analysis options:\n"
-    << HELP_SHOW_PROPERTIES
-    << help_entry(
-      "--symex-coverage-report f",
-      "generate a Cobertura XML coverage report in f")
-    << help_entry("--property id", "only check one specific property")
-    << help_entry(
-      "--trace",
-      "give a counterexample trace for failed properties")
-    << help_entry(
-      "--stop-on-fail",
-      "stop analysis once a failed property is detected (implies --trace)")
-    << help_entry("--localize-faults", "localize faults (experimental)")
-    << "\n"
+    HELP_SHOW_PROPERTIES
+    " {y--symex-coverage-report} {uf} \t generate a Cobertura XML coverage"
+    " report in {uf}\n"
+    " {y--property} {uid} \t only check one specific property\n"
+    " {y--trace} \t give a counterexample trace for failed properties\n"
+    " {y--stop-on-fail} \t stop analysis once a failed property is detected"
+    " (implies {y--trace})\n"
+    " {y--localize-faults} \t localize faults (experimental)\n"
+    "\n"
     "C/C++ frontend options:\n"
-    << help_entry("--preprocess", "stop after preprocessing")
-    << help_entry(
-      "--test-preprocessor", "stop after preprocessing, discard output")
-    << HELP_CONFIG_C_CPP
-    << HELP_ANSI_C_LANGUAGE
-    << HELP_FUNCTIONS
-    << "\n"
+    " {y--preprocess} \t stop after preprocessing\n"
+    " {y--test-preprocessor} \t stop after preprocessing, discard output\n"
+    HELP_CONFIG_C_CPP
+    HELP_ANSI_C_LANGUAGE
+    HELP_FUNCTIONS
+    "\n"
     "Platform options:\n"
-    << HELP_CONFIG_PLATFORM
-    << "\n"
+    HELP_CONFIG_PLATFORM
+    "\n"
     "Program representations:\n"
-    << help_entry("--show-parse-tree", "show parse tree")
-    << help_entry("--show-symbol-table", "show loaded symbol table")
-    << HELP_SHOW_GOTO_FUNCTIONS
-    << HELP_VALIDATE
-    << "\n"
+    " {y--show-parse-tree} \t show parse tree\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    HELP_SHOW_GOTO_FUNCTIONS
+    HELP_VALIDATE
+    " {y--export-symex-ready-goto} {uf} \t "
+    "serialise goto-program in symex-ready-goto form in {uf}\n"
+    "\n"
     "Program instrumentation options:\n"
-    << HELP_GOTO_CHECK
-    << HELP_COVER
-    << help_entry(
-      "--mm MM",
-      "memory consistency model for concurrent programs (default: sc)")
-    << HELP_CONFIG_LIBRARY
-    << HELP_REACHABILITY_SLICER
-    << help_entry("--full-slice", "run full slicer (experimental)")
-    << help_entry(
-      "--drop-unused-functions",
-      "drop functions trivially unreachable from main function")
-    << help_entry(
-      "--havoc-undefined-functions",
-      "for any function that has no body, assign non-deterministic values to "
-      "any parameters passed as non-const pointers and the return value")
-    << "\n"
+    HELP_GOTO_CHECK
+    HELP_COVER
+    " {y--mm} {uMM} \t memory consistency model for concurrent programs"
+    " (default: {ysc})\n"
+    HELP_CONFIG_LIBRARY
+    HELP_REACHABILITY_SLICER
+    " {y--full-slice} \t run full slicer (experimental)\n"
+    " {y--drop-unused-functions} \t drop functions trivially unreachable from"
+    " main function\n"
+    " {y--havoc-undefined-functions} \t for any function that has no body,"
+    " assign non-deterministic values to any parameters passed as non-const"
+    " pointers and the return value\n"
+    "\n"
     "Semantic transformations:\n"
-    << help_entry(
-      "--nondet-static",
-      "add nondeterministic initialization of variables with static lifetime")
-    << "\n"
+    " {y--nondet-static} \t add nondeterministic initialization of variables"
+    " with static lifetime\n"
+    "\n"
     "BMC options:\n"
-    << HELP_BMC
-    << "\n"
+    HELP_BMC
+    "\n"
     "Backend options:\n"
-    << HELP_CONFIG_BACKEND
-    << HELP_SOLVER
-    << HELP_STRING_REFINEMENT_CBMC
-    << help_entry(
-      "--arrays-uf-never", "never turn arrays into uninterpreted functions")
-    << help_entry(
-      "--arrays-uf-always", "always turn arrays into uninterpreted functions")
-    << help_entry(
-      "--show-array-constraints",
-      "show array theory constraints added during post processing. Requires "
-      "--json-ui.")
-    << "\n"
+    HELP_CONFIG_BACKEND
+    HELP_SOLVER
+    HELP_STRING_REFINEMENT_CBMC
+    " {y--arrays-uf-never} \t never turn arrays into uninterpreted functions\n"
+    " {y--arrays-uf-always} \t always turn arrays into uninterpreted"
+    " functions\n"
+    " {y--show-array-constraints} \t show array theory constraints added"
+    " during post processing. Requires {y--json-ui}.\n"
+    "\n"
     "User-interface options:\n"
-    << HELP_XML_INTERFACE
-    << HELP_JSON_INTERFACE
-    << HELP_GOTO_TRACE
-    << HELP_FLUSH
-    << help_entry("--verbosity #", "verbosity level")
-    << HELP_TIMESTAMP
-    << "\n";
+    HELP_XML_INTERFACE
+    HELP_JSON_INTERFACE
+    HELP_GOTO_TRACE
+    HELP_FLUSH
+    " {y--verbosity} {u#} \t verbosity level\n"
+    HELP_TIMESTAMP
+    "\n");
   // clang-format on
 }

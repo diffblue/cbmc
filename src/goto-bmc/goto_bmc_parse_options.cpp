@@ -3,6 +3,7 @@
 #include "goto_bmc_parse_options.h"
 
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/message.h>
 #include <util/version.h>
 
@@ -81,18 +82,18 @@ int goto_bmc_parse_optionst::doit()
 
 void goto_bmc_parse_optionst::help()
 {
-  // clang-format off
-  log.status() << '\n' << banner_string("goto-bmc", CBMC_VERSION) << '\n'
+  log.status() << '\n'
+               << banner_string("goto-bmc", CBMC_VERSION) << '\n'
                << align_center_with_border("Copyright (C) 2023") << '\n'
-               << align_center_with_border("Diffblue Ltd.") << '\n' // NOLINT(*)
-               <<
+               << align_center_with_border("Diffblue Ltd.") << '\n';
+
+  log.status() << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    "goto-bmc [-?] [-h] [--help]      show help\n"
-    "goto-bmc --version               show version and exit\n"
-    // NOLINTNEXTLINE(*)
-    "goto-bmc [options] file.c ...    perform bounded model checking on symex-ready goto-binary\n";
-  // clang-format on
+    " {bgoto-bmc} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-bmc} {y--version} \t show version and exit\n"
+    " {bgoto-bmc} [options] {ufile_name} \t perform bounded model checking on"
+    " symex-ready goto-binary {ufile_name}\n");
   log.status() << messaget::eom;
 }

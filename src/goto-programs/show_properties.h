@@ -27,7 +27,7 @@ class ui_message_handlert;
   "(show-properties)"
 
 #define HELP_SHOW_PROPERTIES                                                   \
-  help_entry("--show-properties", "show the properties, but don't run analysis")
+  " {y--show-properties} \t show the properties, but don't run analysis\n"
 
 void show_properties(
   const goto_modelt &,

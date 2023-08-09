@@ -5,6 +5,7 @@
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/version.h>
 
 #include <goto-programs/goto_model.h>
@@ -76,16 +77,17 @@ void goto_inspect_parse_optionst::help()
             << banner_string("Goto-Inspect", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2023") << '\n'
             << align_center_with_border("Diffblue Ltd.") << '\n'
-            << align_center_with_border("info@diffblue.com") << '\n'
-            << '\n'
-            << "Usage:                       Purpose:\n"
-            << '\n'
-            << " goto-inspect [-?] [-h] [--help]     show help\n"
-            << " goto-inspect --version              show version\n"
-            << " goto-inspect --show-goto-functions  show code for "
-               "goto-functions present in goto-binary\n"
-            << "\n"
-            << "<in>                       goto binary to read from\n";
+            << align_center_with_border("info@diffblue.com") << '\n';
+
+  std::cout << help_formatter(
+    "\n"
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {bgoto-inspect} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-inspect} {y--version} \t show version and exit\n"
+    " {bgoto-inspect} {y--show-goto-functions} {ufile_name} \t show code for"
+    " goto-functions present in goto-binary {ufile_name}\n"
+    "\n");
 }
 
 goto_inspect_parse_optionst::goto_inspect_parse_optionst(

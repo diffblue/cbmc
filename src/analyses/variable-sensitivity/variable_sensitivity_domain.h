@@ -83,25 +83,22 @@
   "(vsd-liveness)"
 
 #define HELP_VSD                                                               \
-  help_entry(                                                                  \
-    "--vsd-values [constants|intervals|set-of-constants]", "value tracking")   \
-    << help_entry(                                                             \
-         "--vsd-structs [top-bottom|every-field]",                             \
-         "struct field sensitive analysis")                                    \
-    << help_entry(                                                             \
-         "--vsd-arrays [top-bottom|smash|up-to-n-elements|every-element]",     \
-         "array entry sensitive analysis")                                     \
-    << help_entry(                                                             \
-         "--vsd-array-max-elements N",                                         \
-         "set the n in --vsd-arrays up-to-n-elements (defaults to 10 if not "  \
-         "given)")                                                             \
-    << help_entry(                                                             \
-         "--vsd-pointers [top-bottom|constants|value-set]",                    \
-         "pointer sensitive analysis")                                         \
-    << help_entry("--vsd-unions [top-bottom]", "union sensitive analysis")     \
-    << help_entry("--vsd-data-dependencies", "track data dependencies")        \
-    << help_entry("--vsd-liveness", "track variable liveness")                 \
-    << help_entry("--vsd-flow-insensitive", "disables flow sensitivity")
+  " {y--vsd-values} [{yconstants}|{yintervals}|{yset-of-constants}] \t "       \
+  "value tracking\n"                                                           \
+  " {y--vsd-structs} [{ytop-bottom}|{yevery-field}] \t "                       \
+  "struct field sensitive analysis\n"                                          \
+  " {y--vsd-arrays} [[ytop-bottom}|{ysmash}|{yup-to-n-elements}|"              \
+  "{yevery-element}] \t "                                                      \
+  "array entry sensitive analysis\n"                                           \
+  " {y--vsd-array-max-elements} {uN} \t "                                      \
+  "set the {un} in {y--vsd-arrays} {yup-to-n-elements} (defaults to 10 if "    \
+  "not given)\n"                                                               \
+  " {y--vsd-pointers} [{ytop-bottom}|{yconstants}|{yvalue-set}] \t "           \
+  "pointer sensitive analysis\n"                                               \
+  " {y--vsd-unions} [{ytop-bottom}] \t union sensitive analysis\n"             \
+  " {y--vsd-data-dependencies} \t track data dependencies\n"                   \
+  " {y--vsd-liveness} \t track variable liveness\n"                            \
+  " {y--vsd-flow-insensitive} \t disables flow sensitivity\n"
 
 #define PARSE_OPTIONS_VSD(cmdline, options)                                    \
   options.set_option("values", cmdline.get_value("vsd-values"));               \

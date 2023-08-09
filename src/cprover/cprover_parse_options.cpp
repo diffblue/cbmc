@@ -313,7 +313,6 @@ void cprover_parse_optionst::help()
             << banner_string("CPROVER", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright 2022") << '\n';
 
-  // clang-format off
   std::cout << help_formatter(
     "\n"
     "Usage:                     \tPurpose:\n"

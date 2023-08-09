@@ -14,6 +14,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/message.h>
 #include <util/version.h>
 
@@ -164,25 +165,29 @@ int memory_analyzer_parse_optionst::doit()
 
 void memory_analyzer_parse_optionst::help()
 {
-  std::cout
-    << '\n'
-    << banner_string("Memory-Analyzer", CBMC_VERSION) << '\n'
-    << align_center_with_border("Copyright (C) 2019") << '\n'
-    << align_center_with_border("Malte Mues, Diffblue Ltd.") << '\n'
-    << align_center_with_border("info@diffblue.com") << '\n'
-    << '\n'
-    << "Usage:                       Purpose:\n"
-    << '\n'
-    << " memory-analyzer [-?] [-h] [--help]                         show help\n"
-    << " memory-analyzer --version                                  show"
-    << " version\n"
-    << " memory-analyzer --symbols <symbol-list> <options> <binary> analyze"
-    << " binary\n"
-    << "\n"
-    << help_entry("--core-file <file>", "analyze from core file")
-    << help_entry("--breakpoint <breakpoint>", "analyze from breakpoint")
-    << help_entry("--symbols <symbol-list>", "list of symbols to analyze")
-    << help_entry("--symtab-snapshot", "output snapshot as symbol table")
-    << help_entry("--output-file <file>", "write snapshot to file")
-    << help_entry("--json-ui", "output snapshot in JSON format") << '\n';
+  std::cout << '\n'
+            << banner_string("Memory-Analyzer", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2019") << '\n'
+            << align_center_with_border("Malte Mues, Diffblue Ltd.") << '\n'
+            << align_center_with_border("info@diffblue.com") << '\n';
+
+  // clang-format off
+  std::cout << help_formatter(
+    "\n"
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {bmemory-analyzer} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bmemory-analyzer} {y--version} \t show version\n"
+    " {bmemory-analyzer} [options] {y--symbols} {usymbol-list} {ubinary} \t"
+    " analyze {ubinary}\n"
+    "\n"
+    "Main options:\n"
+    " {y--core-file} {ufile_name} \t analyze from core file {ufile_name}\n"
+    " {y--breakpoint {uname} \t analyze from breakpoint {uname}\n"
+    " {y--symbols {usymbol-list} \t list of symbols to analyze\n"
+    " {y--symtab-snapshot} \t output snapshot as symbol table\n"
+    " {y--output-file} {ufile_name} \t write snapshot to file {ufile_name}\n"
+    " {y--json-ui} \t output snapshot in JSON format\n"
+    "\n");
+  // clang-format on
 }

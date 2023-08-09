@@ -22,8 +22,8 @@ class ui_message_handlert;
   "(list-goto-functions)"
 
 #define HELP_SHOW_GOTO_FUNCTIONS                                               \
-  help_entry("--show-goto-functions", "show loaded goto program")              \
-    << help_entry("--list-goto-functions", "list loaded goto functions")
+  " {y--show-goto-functions} \t show loaded goto program\n"                    \
+  " {y--list-goto-functions} \t list loaded goto functions\n"
 
 void show_goto_functions(
   const namespacet &ns,

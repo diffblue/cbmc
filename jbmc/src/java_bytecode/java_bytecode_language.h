@@ -52,96 +52,75 @@ Author: Daniel Kroening, kroening@kroening.com
   "(static-values):" \
   "(java-lift-clinit-calls)"
 
-#define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/ \
-  help_entry( \
-    "--disable-uncaught-exception-check", \
-    "ignore uncaught exceptions and errors") \
-  << help_entry( \
-    "--throw-assertion-error", \
-    "throw java.lang.AssertionError on violated assert statements instead of " \
-    "failing at the location of the assert statement") \
-  << help_entry( \
-    "--throw-runtime-exceptions", \
-    "make implicit runtime exceptions explicit") \
-  << help_entry( \
-    "--assert-no-exceptions-thrown", \
-    "transform `throw` instructions into `assert FALSE` followed by `assume " \
-    "FALSE`.") \
-  << help_entry( \
-    "--max-nondet-array-length N", \
-    "limit nondet (e.g. input) array size to <= N") \
-  << help_entry( \
-    "--max-nondet-tree-depth N", \
-    "limit size of nondet (e.g. input) object tree; at level N references " \
-    "are set to null") \
-  << help_entry( \
-    "--java-assume-inputs-non-null", \
-    "never initialize reference-typed parameter to the entry point with null") \
-  << help_entry( \
-    "--java-assume-inputs-interval [L:U] or [L:] or [:U]", \
-    "force numerical primitive-typed inputs (byte, short, int, long, float, " \
-    "double) to be initialized within the given range; lower bound L and " \
-    "upper bound U must be integers; does not work for arrays;") \
-  << help_entry( \
-    "--java-assume-inputs-integral", \
-    "force float and double inputs to have integer values; does not work for " \
-    "arrays;") \
-  << help_entry( \
-    "--java-max-vla-length N", \
-    "limit the length of user-code-created arrays") \
-  << help_entry( \
-    "--java-cp-include-files r", \
-    "regexp or JSON list of files to load (with '@' prefix)") \
-  << help_entry( \
-    "--java-load-class CLASS", \
-    "also load code from class CLASS") \
-  << help_entry( \
-    "--java-no-load-class_CLASS", \
-    "never load code from class CLASS") \
-  << help_entry( \
-    "--ignore-manifest-main-class", \
-    "ignore Main-Class entries in JAR manifest files. If this option is " \
-    "specified and the options --function and --main-class are not, we can " \
-    "be certain that all classes in the JAR file are loaded.") \
-  << help_entry( \
-    "--context-include i", \
-    "only analyze code matching specification i that") \
-  << help_entry( \
-    "--context-exclude e", \
-    "does not match specification e. All other methods are excluded, i.e. we " \
-    "load their signatures and meta-information, but not their bodies. A " \
-    "specification is any prefix of a package, class or method name, e.g. " \
-    "\"org.cprover.\" or \"org.cprover.MyClass.\" or " \
-    "\"org.cprover.MyClass.methodToStub:(I)Z\". These options can be given " \
-    "multiple times. The default for context-include is 'all included'; " \
-    "default for context-exclude is 'nothing excluded'.") \
-  << help_entry( \
-    "--no-lazy-methods", \
-    "load and translate all methods given on the command line and in " \
-    "--classpath. Default is to load methods that appear to be reachable " \
-    "from the --function entry point or main class Note that " \
-    "--show-symbol-table, --show-goto-functions and --show-properties output " \
-    "are restricted to loaded methods by default.") \
-  << help_entry( \
-    "--lazy-methods-extra-entry-point METHODNAME", \
-    "treat METHODNAME as a possible program entry point for the purpose of " \
-    "lazy method loading METHODNAME can be a regex that will be matched " \
-    "against all symbols. If missing a java:: prefix will be added. If no " \
-    "descriptor is found, all overloads of a method will also be added.") \
-  << help_entry( \
-    "--static-values f", \
-    "Load initial values of static fields from the given JSON file. We " \
-    "assign static fields to these values instead of calling the normal " \
-    "static initializer (clinit) method. The argument can be a relative or " \
-    "absolute path to the file.") \
-  << help_entry( \
-    "--java-lift-clinit-calls", \
-    "Lifts clinit calls in function bodies to the top of the function. This " \
-    "may reduce the overall cost of static initialisation, but may be " \
-    "unsound if there are cyclic dependencies between static initializers " \
-    "due to potentially changing their order of execution, or if static " \
-    "initializers have side-effects such as updating another class' static " \
-    "field.") \
+#define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP \
+  " {y--disable-uncaught-exception-check} \t " \
+  "ignore uncaught exceptions and errors\n" \
+  " {y--throw-assertion-error} \t " \
+  "throw java.lang.AssertionError on violated assert statements instead of " \
+  "failing at the location of the assert statement\n" \
+  " {y--throw-runtime-exceptions} \t " \
+  "make implicit runtime exceptions explicit\n" \
+  " {y--assert-no-exceptions-thrown} \t " \
+  "transform `throw` instructions into `assert FALSE` followed by " \
+  "`assume FALSE`.\n" \
+  " {y--max-nondet-array-length} {uN} \t " \
+  "limit nondet (e.g. input) array size to <= {uN}\n" \
+  " {y--max-nondet-tree-depth} {uN} \t " \
+  "limit size of nondet (e.g. input) object tree; at level {uN} references " \
+  "are set to null\n" \
+  " {y--java-assume-inputs-non-null} \t " \
+  "never initialize reference-typed parameter to the entry point with null\n" \
+  " {y--java-assume-inputs-interval} {y[}{uL}{y:}{uU}|{uL}{y:}|{y:}{uU}{y]} " \
+  "\t " \
+  "force numerical primitive-typed inputs (byte, short, int, long, float, " \
+  "double) to be initialized within the given range; lower bound {uL} and " \
+  "upper bound {uU} must be integers; does not work for arrays\n" \
+  " {y--java-assume-inputs-integral} \t " \
+  "force float and double inputs to have integer values; does not work for " \
+  "arrays\n" \
+  " {y--java-max-vla-length} {uN} \t " \
+  "limit the length of user-code-created arrays\n" \
+  " {y--java-cp-include-files} {ur} \t " \
+  "regexp or JSON list of files to load (with '@' prefix)\n" \
+  " {y--java-load-class} {uCLASS} \t also load code from class {uCLASS}\n" \
+  " {y--java-no-load-class} {uCLASS} \t never load code from class " \
+  "{uCLASS}\n" \
+  " {y--ignore-manifest-main-class} \t " \
+  "ignore Main-Class entries in JAR manifest files. If this option is " \
+  "specified and the options {y--function} and {y--main-class} are not, we " \
+  "can be certain that all classes in the JAR file are loaded.\n" \
+  " {y--context-include} {ui} \t " \
+  "only analyze code matching specification {ui}\n" \
+  " {y--context-exclude} {ue} \t " \
+  "only analyze code does not match specification {ue}. All other methods " \
+  "are excluded, i.e. we load their signatures and meta-information, but not " \
+  "their bodies. A specification is any prefix of a package, class or method " \
+  "name, e.g. \"org.cprover.\" or \"org.cprover.MyClass.\" or " \
+  "\"org.cprover.MyClass.methodToStub:(I)Z\". These options can be given " \
+  "multiple times. The default for context-include is 'all included'; " \
+  "default for context-exclude is 'nothing excluded'.\n" \
+  " {y--no-lazy-methods} \t " \
+  "load and translate all methods given on the command line and in " \
+  "{y--classpath}. Default is to load methods that appear to be reachable " \
+  "from the {y--function} entry point or main class Note that " \
+  "{y--show-symbol-table}, {y--show-goto-functions} and " \
+  "{y--show-properties} output are restricted to loaded methods by default.\n" \
+  " {y--lazy-methods-extra-entry-point} {uMETHODNAME} \t " \
+  "treat {uMETHODNAME} as a possible program entry point for the purpose of " \
+  "lazy method loading {uMETHODNAME} can be a regex that will be matched " \
+  "against all symbols. If missing a java:: prefix will be added. If no " \
+  "descriptor is found, all overloads of a method will also be added.\n" \
+  " {y--static-values} {uf} \t " \
+  "Load initial values of static fields from the given JSON file {uf}. We " \
+  "assign static fields to these values instead of calling the normal " \
+  "static initializer (clinit) method. The argument can be a relative or " \
+  "absolute path to the file.\n" \
+  " {y--java-lift-clinit-calls} \t " \
+  "Lifts clinit calls in function bodies to the top of the function. This " \
+  "may reduce the overall cost of static initialisation, but may be unsound " \
+  "if there are cyclic dependencies between static initializers due to " \
+  "potentially changing their order of execution, or if static initializers " \
+  "have side-effects such as updating another class' static field.\n" \
 
 #ifdef _WIN32
   #define JAVA_CLASSPATH_SEPARATOR ";"
@@ -149,47 +128,43 @@ Author: Daniel Kroening, kroening@kroening.com
   #define JAVA_CLASSPATH_SEPARATOR ":"
 #endif
 
-#define HELP_JAVA_CLASSPATH /* NOLINT(*) */ \
-  help_entry( \
-    "-classpath dirs/jars, -cp dirs/jars, --classpath dirs/jars", \
-    "set class search path of directories and jar files to a " \
-    JAVA_CLASSPATH_SEPARATOR "-separated list of directories and JAR " \
-    "archives to search for class files") \
-  << help_entry("--main-class class-name", "set the name of the main class")
+#define HELP_JAVA_CLASSPATH \
+  " {y-classpath} {udirs/jars}, {y-cp} {udirs/jars}, " \
+  "{y--classpath} {udirs/jars} \t " \
+  "set class search path of directories and jar files to a " \
+  JAVA_CLASSPATH_SEPARATOR "-separated list of directories and JAR " \
+  "archives to search for class files\n" \
+  " {y--main-class} {uclass-name} \t set the name of the main class\n"
 
-#define HELP_JAVA_METHOD_NAME /* NOLINT(*) */ \
-  help_entry( \
-    "method-name", \
-    "fully qualified name of method  used as entry point, e.g. " \
-    "mypackage.Myclass.foo:(I)Z")
+#define HELP_JAVA_METHOD_NAME \
+  "  {umethod-name} \t " \
+  "fully qualified name of method  used as entry point, e.g. " \
+  "mypackage.Myclass.foo:(I)Z\n"
 
-#define HELP_JAVA_CLASS_NAME /* NOLINT(*) */ \
-  help_entry( \
-    "class-name", \
-    "name of class. The entry point is the method specified by --function, " \
-    "or otherwise, the public static void main(String[]) method of the given " \
-    "class.")
+#define HELP_JAVA_CLASS_NAME \
+  "  {uclass-name} \t " \
+  "name of class. The entry point is the method specified by --function, " \
+  "or otherwise, the public static void main(String[]) method of the given " \
+  "class.\n"
 
-#define OPT_JAVA_JAR /* NOLINT(*) */ \
+#define OPT_JAVA_JAR \
   "(jar):"
 
-#define HELP_JAVA_JAR /* NOLINT(*) */ \
-  help_entry( \
-    "-jar jarfile", \
-    "JAR file to be checked. The entry point is the method specified by " \
-    "--function or otherwise, the public static void main(String[]) method " \
-    "of the class specified by --main-class or the main class specified in " \
-    "the JAR manifes (checked in this order).")
+#define HELP_JAVA_JAR \
+  " {y-jar} {ujarfile} \t " \
+  "JAR file to be checked. The entry point is the method specified by " \
+  "{y--function} or otherwise, the public static void main(String[]) method " \
+  "of the class specified by {y--main-class} or the main class specified in " \
+  "the JAR manifest (checked in this order).\n"
 
-#define OPT_JAVA_GOTO_BINARY /* NOLINT(*) */ \
+#define OPT_JAVA_GOTO_BINARY \
   "(gb):"
 
-#define HELP_JAVA_GOTO_BINARY /* NOLINT(*) */ \
-  help_entry( \
-    "--gb goto-binary", \
-    "goto-binary file to be checked. The entry point is the method specified " \
-    "by --function, or otherwise, the public static void main(String[]) of " \
-    "the class specified by --main-class (checked in this order).")
+#define HELP_JAVA_GOTO_BINARY \
+  " {y--gb} {ugoto-binary} \t " \
+  "goto-binary file to be checked. The entry point is the method specified " \
+  "by {y--function}, or otherwise, the public static void main(String[]) of " \
+  "the class specified by {y--main-class} (checked in this order).\n"
 // clang-format on
 
 enum lazy_methods_modet

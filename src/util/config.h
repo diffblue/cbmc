@@ -30,63 +30,55 @@ class symbol_table_baset;
   "(no-library)"
 
 #define HELP_CONFIG_C_CPP                                                      \
-  help_entry("-I path", "set include path (C/C++)")                            \
-    << help_entry("--include file", "set include file (C/C++)")                \
-    << help_entry("-D macro", "define preprocessor macro (C/C++)")             \
-    << help_entry(                                                             \
-         "--c89, --c99, --c11",                                                \
-         "set C language standard (default: " +                                \
-           std::string(                                                        \
-             configt::ansi_ct::default_c_standard() ==                         \
-                 configt::ansi_ct::c_standardt::C89                            \
-               ? "c89"                                                         \
-             : configt::ansi_ct::default_c_standard() ==                       \
-                 configt::ansi_ct::c_standardt::C99                            \
-               ? "c99"                                                         \
-             : configt::ansi_ct::default_c_standard() ==                       \
-                 configt::ansi_ct::c_standardt::C11                            \
-               ? "c11"                                                         \
-               : "") +                                                         \
-           ")")                                                                \
-    << help_entry(                                                             \
-         "--cpp98, --cpp03, --cpp11",                                          \
-         "set C++ language standard (default: " +                              \
-           std::string(                                                        \
-             configt::cppt::default_cpp_standard() ==                          \
-                 configt::cppt::cpp_standardt::CPP98                           \
-               ? "cpp98"                                                       \
-             : configt::cppt::default_cpp_standard() ==                        \
-                 configt::cppt::cpp_standardt::CPP03                           \
-               ? "cpp03"                                                       \
-             : configt::cppt::default_cpp_standard() ==                        \
-                 configt::cppt::cpp_standardt::CPP11                           \
-               ? "cpp11"                                                       \
-               : "") +                                                         \
-           ")")                                                                \
-    << help_entry("--unsigned-char", "make \"char\" unsigned by default")      \
-    << help_entry(                                                             \
-         "--round-to-nearest, --round-to-even",                                \
-         "rounding towards nearest even (default)")                            \
-    << help_entry("--round-to-plus-inf", "rounding towards plus infinity")     \
-    << help_entry("--round-to-minus-inf", "rounding towards minus infinity")   \
-    << help_entry("--round-to-zero", "rounding towards zero")                  \
-    << help_entry("--no-library", "disable built-in abstract C library")
+  " {y-I} {upath} \t set include path (C/C++)\n"                               \
+  " {y--include} {ufile} \t set include file (C/C++)\n"                        \
+  " {y-D} {umacro} \t define preprocessor macro (C/C++)\n"                     \
+  " {y--c89}, {y--c99}, {y--c11} \t "                                          \
+  "set C language standard (default: " +                                       \
+    std::string(                                                               \
+      configt::ansi_ct::default_c_standard() ==                                \
+          configt::ansi_ct::c_standardt::C89                                   \
+        ? "c89"                                                                \
+      : configt::ansi_ct::default_c_standard() ==                              \
+          configt::ansi_ct::c_standardt::C99                                   \
+        ? "c99"                                                                \
+      : configt::ansi_ct::default_c_standard() ==                              \
+          configt::ansi_ct::c_standardt::C11                                   \
+        ? "c11"                                                                \
+        : "") +                                                                \
+    ")\n"                                                                      \
+    " {y--cpp98}, {y--cpp03}, {y--cpp11} \t "                                  \
+    "set C++ language standard (default: " +                                   \
+    std::string(                                                               \
+      configt::cppt::default_cpp_standard() ==                                 \
+          configt::cppt::cpp_standardt::CPP98                                  \
+        ? "cpp98"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP03                                  \
+        ? "cpp03"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP11                                  \
+        ? "cpp11"                                                              \
+        : "") +                                                                \
+    ")\n"                                                                      \
+    " {y--unsigned-char} \t make \"char\" unsigned by default\n"               \
+    " {y--round-to-nearest}, {y--round-to-even} \t "                           \
+    "rounding towards nearest even (default)\n"                                \
+    " {y--round-to-plus-inf} \t rounding towards plus infinity\n"              \
+    " {y--round-to-minus-inf} \t rounding towards minus infinity\n"            \
+    " {y--round-to-zero} \t rounding towards zero\n"                           \
+    " {y--no-library} \t disable built-in abstract C library\n"
 
 #define OPT_CONFIG_LIBRARY                                                     \
   "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \
   "(string-abstraction)"
 
 #define HELP_CONFIG_LIBRARY                                                    \
-  help_entry(                                                                  \
-    "--malloc-may-fail", "allow malloc calls to return a null pointer")        \
-    << help_entry(                                                             \
-         "--malloc-fail-assert",                                               \
-         "set malloc failure mode to assert-then-assume")                      \
-    << help_entry(                                                             \
-         "--malloc-fail-null", "set malloc failure mode to return null")       \
-    << help_entry(                                                             \
-         "--string-abstraction",                                               \
-         "track C string lengths and zero-termination")
+  " {y--malloc-may-fail} \t allow malloc calls to return a null pointer\n"     \
+  " {y--malloc-fail-assert} \t "                                               \
+  "set malloc failure mode to assert-then-assume\n"                            \
+  " {y--malloc-fail-null} \t set malloc failure mode to return null\n"         \
+  " {y--string-abstraction} \t track C string lengths and zero-termination\n"
 
 #define OPT_CONFIG_JAVA "(classpath)(cp)(main-class)"
 
@@ -100,38 +92,36 @@ class symbol_table_baset;
   "(gcc)"
 
 #define HELP_CONFIG_PLATFORM                                                   \
-  help_entry(                                                                  \
-    "--arch",                                                                  \
-    "set architecture (default: " + id2string(configt::this_architecture()) +  \
-      ") to one of: alpha, arm, arm64, armel, armhf, hppa, i386, ia64, mips, " \
-      "mips64, mips64el, mipsel, mipsn32, mipsn32el, powerpc, ppc64, "         \
-      "ppc64le, riscv64, s390, s390x, sh4, sparc, sparc64, v850, x32, "        \
-      "x86_64, or none")                                                       \
-    << help_entry(                                                             \
-         "--os",                                                               \
-         "set operating system (default: " +                                   \
-           id2string(configt::this_operating_system()) +                       \
-           ") to one of: freebsd, linux, macos, solaris, or windows")          \
-    << help_entry(                                                             \
-         "--i386-linux, --i386-win32, --i386-macos, --ppc-macos, --win32, "    \
-         "--winx64",                                                           \
-         "set architecture and operating system")                              \
-    << help_entry(                                                             \
-         "--LP64, --ILP64, --LLP64, --ILP32, --LP32",                          \
-         "set width of int, long and pointers, but don't override default "    \
-         "architecture and operating system")                                  \
-    << help_entry(                                                             \
-         "--16, --32, --64",                                                   \
-         "equivalent to --LP32, --ILP32, --LP64 (on Windows: --LLP64)")        \
-    << help_entry(                                                             \
-         "--little-endian", "allow little-endian word-byte conversions")       \
-    << help_entry("--big-endian", "allow big-endian word-byte conversions")    \
-    << help_entry("--gcc", "use GCC as preprocessor")
+  " {y--arch} {uarch_name} \t "                                                \
+  "set architecture (default: " +                                              \
+    id2string(configt::this_architecture()) +                                  \
+    ") to one of: {yalpha}, {yarm}, {yarm64}, {yarmel}, {yarmhf}, {yhppa}, "   \
+    "{yi386}, {yia64}, {ymips}, {ymips64}, {ymips64el}, {ymipsel}, "           \
+    "{ymipsn32}, "                                                             \
+    "{ymipsn32el}, {ypowerpc}, {yppc64}, {yppc64le}, {yriscv64}, {ys390}, "    \
+    "{ys390x}, {ysh4}, {ysparc}, {ysparc64}, {yv850}, {yx32}, {yx86_64}, or "  \
+    "{ynone}\n"                                                                \
+    " {y--os} {uos_name} \t "                                                  \
+    "set operating system (default: " +                                        \
+    id2string(configt::this_operating_system()) +                              \
+    ") to one of: {yfreebsd}, {ylinux}, {ymacos}, {ysolaris}, or {ywindows}\n" \
+    " {y--i386-linux}, {y--i386-win32}, {y--i386-macos}, {y--ppc-macos}, "     \
+    "{y--win32}, {y--winx64} \t "                                              \
+    "set architecture and operating system\n"                                  \
+    " {y--LP64}, {y--ILP64}, {y--LLP64}, {y--ILP32}, {y--LP32} \t "            \
+    "set width of int, long and pointers, but don't override default "         \
+    "architecture and operating system\n"                                      \
+    " {y--16}, {y--32}, {y--64} \t "                                           \
+    "equivalent to {y--LP32}, {y--ILP32}, {y--LP64} (on Windows: "             \
+    "{y--LLP64})\n"                                                            \
+    " {y--little-endian} \t allow little-endian word-byte conversions\n"       \
+    " {y--big-endian} \t allow big-endian word-byte conversions\n"             \
+    " {y--gcc} \t use GCC as preprocessor\n"
 
 #define OPT_CONFIG_BACKEND "(object-bits):"
 
 #define HELP_CONFIG_BACKEND                                                    \
-  help_entry("--object-bits n", "number of bits used for object addresses")
+  " {y--object-bits} {un} \t number of bits used for object addresses\n"
 
 /*! \brief Globally accessible architectural configuration
 */

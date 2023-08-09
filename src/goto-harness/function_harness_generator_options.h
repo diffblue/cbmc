@@ -40,35 +40,36 @@ Author: Diffblue Ltd.
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT ")"
 
 #define FUNCTION_HARNESS_GENERATOR_HELP                                        \
-  "function harness generator (--harness-type call-function):\n"               \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT " <function-name>",      \
-         "the function the harness should call")                               \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT,                   \
-         "set global variables to non-deterministic values in harness")        \
-    << COMMON_HARNESS_GENERATOR_HELP                                           \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT " p",      \
-         "treat the function parameter with the name `p' as an array")         \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT              \
-         " p,q,r[;s,t]",                                                       \
-         "treat the function parameters `q,r' equal to parameter `p'; `s` to " \
-         "`t` and so on")                                                      \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT,       \
-         "function parameters equality is non-deterministic")                  \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT             \
-         " array_name:size_name",                                              \
-         "set the parameter <size_name> to the size of the array "             \
-         "<array_name> (implies "                                              \
-         "-- " FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT           \
-         " <array_name>)")                                                     \
-    << help_entry(                                                             \
-         "--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING " p",        \
-         "treat the function parameter with the name `p' as a string of "      \
-         "characters")
+  "function harness generator ({y--harness-type} {ycall-function}):\n"         \
+  " {y--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                              \
+  "} {ufunction_name} \t "                                                     \
+  "the function the harness should call\n"                                     \
+  " {y--" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                        \
+  "} \t "                                                                      \
+  "set global variables to non-deterministic values in "                       \
+  "harness\n" COMMON_HARNESS_GENERATOR_HELP                                    \
+  " {y--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                \
+  "} {up} \t "                                                                 \
+  "treat the function parameter with the name {up} as an array\n"              \
+  " {y--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                  \
+  "} "                                                                         \
+  "{up}{y,}{uq}{y,}{ur}[{y;}{us}{y,}{ut}] \t "                                 \
+  "treat the function parameters {uq}{y,}{ur} equal to parameter {up}; "       \
+  "{us} to {ut} and so on\n"                                                   \
+  " {y--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT            \
+  "} \t "                                                                      \
+  "function parameters equality is non-deterministic\n"                        \
+  " {y--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                 \
+  "} "                                                                         \
+  "{uarray_name}{y:}{usize_name} \t "                                          \
+  "set the parameter {usize_name} to the size of the array {uarray_name} "     \
+  "(implies "                                                                  \
+  "{y-- " FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                \
+  "} "                                                                         \
+  "{uarray_name})\n"                                                           \
+  " {y--" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                  \
+  "} {up} \t "                                                                 \
+  "treat the function parameter with the name {up} as a string of "            \
+  "characters\n"
 
 #endif // CPROVER_GOTO_HARNESS_FUNCTION_HARNESS_GENERATOR_OPTIONS_H

@@ -45,19 +45,16 @@ void reachability_slicer(
 #define OPT_REACHABILITY_SLICER "(reachability-slice)(reachability-slice-fb)"
 
 #define HELP_FP_REACHABILITY_SLICER                                            \
-  help_entry(                                                                  \
-    "--fp-reachability-slice f",                                               \
-    "remove instructions that cannot appear on a trace that visits all given " \
-    "functions. The list of functions has to be given as a comma separated "   \
-    "list f.")                                                                 \
-    << help_entry(                                                             \
-         "--reachability-slice",                                               \
-         "remove instructions that cannot appear on a trace from entry point " \
-         "to a property")
+  " {y--fp-reachability-slice} {uf} \t "                                       \
+  "remove instructions that cannot appear on a trace that visits all given "   \
+  "functions. The list of functions has to be given as a comma separated "     \
+  "list {uf}.\n"                                                               \
+  " {y--reachability-slice} \t "                                               \
+  "remove instructions that cannot appear on a trace from entry point to a "   \
+  "property\n"
 #define HELP_REACHABILITY_SLICER                                               \
-  help_entry(                                                                  \
-    "--reachability-slice-fb",                                                 \
-    "remove instructions that cannot appear on a trace from entry point "      \
-    "through a property")
+  " {y--reachability-slice-fb} \t "                                            \
+  "remove instructions that cannot appear on a trace from entry point "        \
+  "through a property\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H

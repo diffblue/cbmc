@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/json.h>
 #include <util/options.h>
 #include <util/string2int.h>
@@ -1856,256 +1857,198 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 /// display command line help
 void goto_instrument_parse_optionst::help()
 {
-  // clang-format off
-  std::cout << '\n' << banner_string("Goto-Instrument", CBMC_VERSION) << '\n'
+  std::cout << '\n'
+            << banner_string("Goto-Instrument", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2008-2013") << '\n'
             << align_center_with_border("Daniel Kroening") << '\n'
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            <<
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  // clang-format off
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " goto-instrument [-?] [-h] [--help]  show help\n"
-    " goto-instrument --version           show version and exit\n"
-    " goto-instrument [options] in [out]  perform analysis or instrumentation\n"
+    " {bgoto-instrument} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-instrument} {y--version} \t show version and exit\n"
+    " {bgoto-instrument} [options] {uin} [{uout}] \t perform analysis or"
+    " instrumentation\n"
     "\n"
     "Dump Source:\n"
-    << HELP_DUMP_C
-    << help_entry("--horn", "print program as constrained horn clauses")
-    << "\n"
+    HELP_DUMP_C
+    " {y--horn} \t print program as constrained horn clauses\n"
+    "\n"
     "Diagnosis:\n"
-    << HELP_SHOW_PROPERTIES
-    << HELP_DOCUMENT_PROPERTIES
-    << help_entry("--show-symbol-table", "show loaded symbol table")
-    << help_entry("--list-symbols", "list symbols with type information")
-    << HELP_SHOW_GOTO_FUNCTIONS
-    << HELP_GOTO_PROGRAM_STATS
-    << help_entry("--show-locations", "show all source locations")
-    << help_entry("--dot", "generate CFG graph in DOT format")
-    << help_entry(
-      "--print-internal-representation",
-      "show verbose internal representation of the program")
-    << help_entry("--list-undefined-functions", "list functions without body")
-    << help_entry(
-      "--list-calls-args",
-      "list all function calls with their arguments")
-    << help_entry("--call-graph", "show graph of function calls")
-    << help_entry(
-      "--reachable-call-graph",
-      "show graph of function calls potentially reachable from main function")
-    << HELP_SHOW_CLASS_HIERARCHY
-    << HELP_VALIDATE
-    << help_entry(
-      "--validate-goto-binary",
-      "check the well-formedness of the passed in goto binary and then exit")
-    << help_entry("--interpreter", "do concrete execution")
-    << "\n"
+    HELP_SHOW_PROPERTIES
+    HELP_DOCUMENT_PROPERTIES
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    " {y--list-symbols} \t list symbols with type information\n"
+    HELP_SHOW_GOTO_FUNCTIONS
+    HELP_GOTO_PROGRAM_STATS
+    " {y--show-locations} \t show all source locations\n"
+    " {y--dot} \t generate CFG graph in DOT format\n"
+    " {y--print-internal-representation} \t show verbose internal"
+    " representation of the program\n"
+    " {y--list-undefined-functions} \t list functions without body\n"
+    " {y--list-calls-args} \t list all function calls with their arguments\n"
+    " {y--call-graph} \t show graph of function calls\n"
+    " {y--reachable-call-graph} \t show graph of function calls potentially"
+    " reachable from main function\n"
+    HELP_SHOW_CLASS_HIERARCHY
+    HELP_VALIDATE
+    " {y--validate-goto-binary} \t check the well-formedness of the passed in"
+    " goto binary and then exit\n"
+    " {y--interpreter} \t do concrete execution\n"
+    "\n"
     "Data-flow analyses:\n"
-    << help_entry(
-      "--show-struct-alignment",
-      "show struct members that might be concurrently accessed")
-    << help_entry(
-      "--show-threaded",
-      "show instructions that may be executed by more than one thread")
-    << help_entry(
-      "--show-local-safe-pointers",
-      "show pointer expressions that are trivially dominated by a not-null "
-      "check")
-    << help_entry(
-      "--show-safe-dereferences",
-      "show pointer expressions that are trivially dominated by a not-null "
-      "check *and* used as a dereference operand")
-    << help_entry(
-      "--show-value-sets",
-      "show points-to information (using value sets)")
-    << help_entry(
-      "--show-global-may-alias",
-      "show may-alias information over globals")
-    << help_entry(
-      "--show-local-bitvector-analysis",
-      "show procedure-local pointer analysis")
-    << help_entry(
-      "--escape-analysis",
-      "perform escape analysis")
-    << help_entry(
-      "--show-escape-analysis",
-      "show results of escape analysis")
-    << help_entry(
-      "--custom-bitvector-analysis",
-      "perform configurable bitvector analysis")
-    << help_entry(
-      "--show-custom-bitvector-analysis",
-      "show results of configurable bitvector analysis")
-    << help_entry("--interval-analysis", "perform interval analysis")
-    << help_entry("--show-intervals", "show results of interval analysis")
-    << help_entry("--show-uninitialized", "show maybe-uninitialized variables")
-    << help_entry("--show-points-to", "show points-to information")
-    << help_entry("--show-rw-set", "show read-write sets")
-    << help_entry("--show-call-sequences", "show function call sequences")
-    << help_entry("--show-reaching-definitions", "show reaching definitions")
-    << help_entry("--show-dependence-graph", "show program-dependence graph")
-    << help_entry(
-      "--show-sese-regions",
-      "show single-entry-single-exit regions")
-    << "\n"
+    " {y--show-struct-alignment} \t show struct members that might be"
+    " concurrently accessed\n"
+    " {y--show-threaded} \t show instructions that may be executed by more than"
+    " one thread\n"
+    " {y--show-local-safe-pointers} \t show pointer expressions that are"
+    " trivially dominated by a not-null check\n"
+    " {y--show-safe-dereferences} \t show pointer expressions that are"
+    " trivially dominated by a not-null check *and* used as a dereference"
+    " operand\n"
+    " {y--show-value-sets} \t show points-to information (using value sets)\n"
+    " {y--show-global-may-alias} \t show may-alias information over globals\n"
+    " {y--show-local-bitvector-analysis} \t show procedure-local pointer"
+    " analysis\n"
+    " {y--escape-analysis} \t perform escape analysis\n"
+    " {y--show-escape-analysis} \t show results of escape analysis\n"
+    " {y--custom-bitvector-analysis} \t perform configurable bitvector"
+    " analysis\n"
+    " {y--show-custom-bitvector-analysis} \t show results of configurable"
+    " bitvector analysis\n"
+    " {y--interval-analysis} \t perform interval analysis\n"
+    " {y--show-intervals} \t show results of interval analysis\n"
+    " {y--show-uninitialized} \t show maybe-uninitialized variables\n"
+    " {y--show-points-to} \t show points-to information\n"
+    " {y--show-rw-set} \t show read-write sets\n"
+    " {y--show-call-sequences} \t show function call sequences\n"
+    " {y--show-reaching-definitions} \t show reaching definitions\n"
+    " {y--show-dependence-graph} \t show program-dependence graph\n"
+    " {y--show-sese-regions} \t show single-entry-single-exit regions\n"
+    "\n"
     "Safety checks:\n"
-    << help_entry("--no-assertions", "ignore user assertions")
-    << HELP_GOTO_CHECK
-    << HELP_UNINITIALIZED_CHECK
-    << help_entry(
-      "--stack-depth n",
-      "add check that call stack size of non-inlined functions never exceeds n")
-    << help_entry("--race-check", "add floating-point data race checks")
-    << "\n"
+    " {y--no-assertions} \t ignore user assertions\n"
+    HELP_GOTO_CHECK
+    HELP_UNINITIALIZED_CHECK
+    " {y--stack-depth} {un} \t add check that call stack size of non-inlined"
+    " functions never exceeds {un}\n"
+    " {y--race-check} \t add floating-point data race checks\n"
+    "\n"
     "Semantic transformations:\n"
-    << HELP_NONDET_VOLATILE
-    << help_entry(
-      "--isr <function>",
-      "instruments an interrupt service routine")
-    << help_entry("--mmio", "instruments memory-mapped I/O")
-    << help_entry(
-      "--nondet-static",
-      "add nondeterministic initialization of variables with static lifetime")
-    << help_entry(
-      "--nondet-static-exclude e",
-      "same as nondet-static except for the variable e (use multiple times if "
-      "required)")
-    << help_entry("--nondet-static-matching r", "add nondeterministic initialization of variables with static lifetime matching regex r")
-    << help_entry(
-      "--function-enter <f>, --function-exit <f>, --branch <f>",
-      "instruments a call to <f> at the beginning, the exit, or a branch "
-      "point, respectively")
-    << help_entry(
-      "--splice-call caller,callee",
-      "prepends a call to callee in the body of caller")
-    << help_entry(
-      "--check-call-sequence <seq>",
-      "instruments checks to assert that all call sequences match <seq>")
-    << help_entry(
-      "--undefined-function-is-assume-false",
-      "convert each call to an undefined function to assume(false)")
-    << HELP_INSERT_FINAL_ASSERT_FALSE
-    << HELP_REPLACE_FUNCTION_BODY
-    << HELP_RESTRICT_FUNCTION_POINTER
-    << HELP_REMOVE_CALLS_NO_BODY
-    << help_entry("--add-library", "add models of C library functions")
-    << HELP_CONFIG_LIBRARY
-    << help_entry(
-      "--model-argc-argv <n>",
-      "model up to <n> command line arguments")
-    << help_entry(
-      "--remove-function-body <f>",
-      "remove the implementation of function <f> (may be repeated)")
-    << HELP_REPLACE_CALLS
-    << HELP_ANSI_C_LANGUAGE
-    << "\n"
+    HELP_NONDET_VOLATILE
+    " {y--isr} {ufunction} \t instruments an interrupt service routine\n"
+    " {y--mmio} \t instruments memory-mapped I/O\n"
+    " {y--nondet-static} \t add nondeterministic initialization of variables"
+    " with static lifetime\n"
+    " {y--nondet-static-exclude} {ue} \t same as nondet-static except for the"
+    " variable {ue} (use multiple times if required)\n"
+    " {y--nondet-static-matching} {ur} \t add nondeterministic initialization"
+    " of variables with static lifetime matching regex {ur}\n"
+    " {y--function-enter} {uf}, {y--function-exit} {uf}, {y--branch} {uf} \t"
+    " instruments a call to {uf} at the beginning, the exit, or a branch point,"
+    " respectively\n"
+    " {y--splice-call} {ucaller},{ucallee} \t prepends a call to {ucallee} in"
+    " the body of {ucaller}\n"
+    " {y--check-call-sequence} {useq} \t instruments checks to assert that all"
+    " call sequences match {useq}\n"
+    " {y--undefined-function-is-assume-false} \t convert each call to an"
+    " undefined function to assume(false)\n"
+    HELP_INSERT_FINAL_ASSERT_FALSE
+    HELP_REPLACE_FUNCTION_BODY
+    HELP_RESTRICT_FUNCTION_POINTER
+    HELP_REMOVE_CALLS_NO_BODY
+    " {y--add-library} \t add models of C library functions\n"
+    HELP_CONFIG_LIBRARY
+    " {y--model-argc-argv} {un} \t model up to {un} command line arguments\n"
+    " {y--remove-function-body} {uf} remove the implementation of function {uf}"
+    " (may be repeated)\n"
+    HELP_REPLACE_CALLS
+    HELP_ANSI_C_LANGUAGE
+    "\n"
     "Semantics-preserving transformations:\n"
-    << help_entry(
-      "--ensure-one-backedge-per-target",
-      "transform loop bodies such that there is a single edge back to the loop "
-      "head")
-    << help_entry(
-      "--drop-unused-functions",
-      "drop functions trivially unreachable from main function")
-    << HELP_REMOVE_POINTERS
-    << help_entry(
-      "--constant-propagator",
-      "propagate constants and simplify expressions")
-    << help_entry("--inline", "perform full inlining")
-    << help_entry("--partial-inline", "perform partial inlining")
-    << help_entry(
-      "--function-inline <function>",
-      "transitively inline all calls <function> makes")
-    << help_entry(
-      "--no-caching",
-      "disable caching of intermediate results during transitive function "
-      "inlining")
-    << help_entry(
-      "--log <file>", "log in json format which code segments were inlined, "
-      "use with --function-inline")
-    << help_entry(
-      "--remove-function-pointers",
-      "replace function pointers by case statement over function calls")
-    << HELP_REMOVE_CONST_FUNCTION_POINTERS
-    << help_entry(
-      "--value-set-fi-fp-removal",
-      "build flow-insensitive value set and replace function pointers by a "
-      "case statement over the possible assignments. If the set of possible "
-      "assignments is empty the function pointer is removed using the standard "
-      "remove-function-pointers pass.")
-    << "\n"
+    " {y--ensure-one-backedge-per-target} \t transform loop bodies such that"
+    " there is a single edge back to the loop head\n"
+    " {y--drop-unused-functions} \t drop functions trivially unreachable from"
+    " main function\n"
+    HELP_REMOVE_POINTERS
+    " {y--constant-propagator} \t propagate constants and simplify"
+    " expressions\n"
+    " {y--inline} \t perform full inlining\n"
+    " {y--partial-inline} \t perform partial inlining\n"
+    " {y--function-inline} {ufunction} \t transitively inline all calls"
+    " {ufunction} makes\n"
+    " {y--no-caching} \t disable caching of intermediate results during"
+    " transitive function inlining\n"
+    " {y--log} {ufile} \t log in JSON format which code segments were inlined,"
+    " use with {y--function-inline}\n"
+    " {y--remove-function-pointers} \t replace function pointers by case"
+    " statement over function calls\n"
+    HELP_REMOVE_CONST_FUNCTION_POINTERS
+    " {y--value-set-fi-fp-removal} \t build flow-insensitive value set and"
+    " replace function pointers by a case statement over the possible"
+    " assignments. If the set of possible assignments is empty the function"
+    " pointer is removed using the standard remove-function-pointers pass.\n"
+    "\n"
     "Loop information and transformations:\n"
-    << HELP_UNWINDSET
-    << help_entry("--unwindset-file_<file>", "read unwindset from file")
-    << help_entry("--partial-loops", "permit paths with partial loops")
-    << help_entry("--unwinding-assertions", "generate unwinding assertions")
-    << help_entry(
-      "--continue-as-loops",
-      "add loop for remaining iterations after unwound part")
-    << help_entry("--k-induction <k>", "check loops with k-induction")
-    << help_entry("--step-case", "k-induction: do step-case")
-    << help_entry("--base-case", "k-induction: do base-case")
-    << help_entry("--havoc-loops", "over-approximate all loops")
-    << help_entry("--accelerate", "add loop accelerators")
-    << help_entry("--z3", "use Z3 when computing loop accelerators")
-    << help_entry(
-      "--skip-loops <loop-ids>",
-      "add gotos to skip selected loops during execution")
-    << help_entry(
-      "--show-lexical-loops",
-      "show single-entry-single-back-edge loops")
-    << help_entry("--show-natural-loops", "show natural loop heads")
-    << "\n"
+    HELP_UNWINDSET
+    " {y--unwindset-file_<file>} \t read unwindset from file\n"
+    " {y--partial-loops} \t permit paths with partial loops\n"
+    " {y--unwinding-assertions} \t generate unwinding assertions\n"
+    " {y--continue-as-loops} \t add loop for remaining iterations after"
+    " unwound part\n"
+    " {y--k-induction} {uk} \t check loops with k-induction\n"
+    " {y--step-case} \t k-induction: do step-case\n"
+    " {y--base-case} \t k-induction: do base-case\n"
+    " {y--havoc-loops} \t over-approximate all loops\n"
+    " {y--accelerate} \t add loop accelerators\n"
+    " {y--z3} \t use Z3 when computing loop accelerators\n"
+    " {y--skip-loops {uloop-ids} \t add gotos to skip selected loops during"
+    " execution\n"
+    " {y--show-lexical-loops} \t show single-entry-single-back-edge loops\n"
+    " {y--show-natural-loops} \t show natural loop heads\n"
+    "\n"
     "Memory model instrumentations:\n"
-    << HELP_WMM_FULL
-    << "\n"
+    HELP_WMM_FULL
+    "\n"
     "Slicing:\n"
-    << HELP_REACHABILITY_SLICER
-    << HELP_FP_REACHABILITY_SLICER
-    << help_entry(
-      "--full-slice",
-      "slice away instructions that don't affect assertions")
-    << help_entry(
-      "--property id",
-      "slice with respect to specific property only")
-    << help_entry(
-      "--slice-global-inits",
-      "slice away initializations of unused global variables")
-    << help_entry(
-      "--aggressive-slice",
-      "remove bodies of any functions not on the shortest path between "
-      "the start function and the function containing the property(s)")
-    << help_entry(
-      "--aggressive-slice-call-depth <n>",
-      "used with aggressive-slice, preserves all functions within <n> function "
-      "calls of the functions on the shortest path")
-    << help_entry(
-      "--aggressive-slice-preserve-function <f>",
-      "force the aggressive slicer to preserve function <f>")
-    << help_entry(
-      "--aggressive-slice-preserve-functions-containing <f>",
-      "force the aggressive slicer to preserve all functions with names "
-      "containing <f>")
-    << help_entry(
-      "--aggressive-slice-preserve-all-direct-paths",
-      "force aggressive slicer to preserve all direct paths")
-    << "\n"
+    HELP_REACHABILITY_SLICER
+    HELP_FP_REACHABILITY_SLICER
+    " {y--full-slice} \t slice away instructions that don't affect assertions\n"
+    " {y--property} {uid} \t slice with respect to specific property only\n"
+    " {y--slice-global-inits} \t slice away initializations of unused global"
+    " variables\n"
+    " {y--aggressive-slice} \t remove bodies of any functions not on the"
+    " shortest path between the start function and the function containing the"
+    " property/properties\n"
+    " {y--aggressive-slice-call-depth} {un} \t used with aggressive-slice,"
+    " preserves all functions within {un} function calls of the functions on"
+    " the shortest path\n"
+    " {y--aggressive-slice-preserve-function} {uf} \t force the aggressive"
+    " slicer to preserve function {uf}\n"
+    " {y--aggressive-slice-preserve-functions-containing} {uf} \t force the"
+    " aggressive slicer to preserve all functions with names containing {uf}\n"
+    " {y--aggressive-slice-preserve-all-direct-paths} \t force aggressive"
+    " slicer to preserve all direct paths\n"
+    "\n"
     "Code contracts:\n"
-    << HELP_DFCC
-    << HELP_LOOP_CONTRACTS
-    << HELP_LOOP_CONTRACTS_NO_UNWIND
-    << HELP_LOOP_CONTRACTS_FILE
-    << HELP_REPLACE_CALL
-    << HELP_ENFORCE_CONTRACT
-    << HELP_ENFORCE_CONTRACT_REC
-    << "\n"
+    HELP_DFCC
+    HELP_LOOP_CONTRACTS
+    HELP_LOOP_CONTRACTS_NO_UNWIND
+    HELP_LOOP_CONTRACTS_FILE
+    HELP_REPLACE_CALL
+    HELP_ENFORCE_CONTRACT
+    HELP_ENFORCE_CONTRACT_REC
+    "\n"
     "User-interface options:\n"
-    << HELP_FLUSH
-    << help_entry("--xml", "output files in XML where supported")
-    << help_entry("--xml-ui", "use XML-formatted output")
-    << help_entry("--json-ui", "use JSON-formatted output")
-    << help_entry("--verbosity #", "verbosity level")
-    << HELP_TIMESTAMP
-    << "\n";
+    HELP_FLUSH
+    " {y--xml} \t output files in XML where supported\n"
+    " {y--xml-ui} \t use XML-formatted output\n"
+    " {y--json-ui} \t use JSON-formatted output\n"
+    " {y--verbosity} {u#} \t verbosity level\n"
+    HELP_TIMESTAMP
+    "\n");
   // clang-format on
 }

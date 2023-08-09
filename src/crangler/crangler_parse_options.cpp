@@ -13,13 +13,14 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <util/cout_message.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/version.h>
 
 #include <json/json_parser.h>
 
-#include <iostream>
-
 #include "c_wrangler.h"
+
+#include <iostream>
 
 int crangler_parse_optionst::doit()
 {
@@ -49,12 +50,13 @@ void crangler_parse_optionst::process_crangler_json(
 
 void crangler_parse_optionst::help()
 {
-  std::cout << '\n'
-            << banner_string("CRANGLER", CBMC_VERSION) << '\n'
-            << "\n"
-               "Usage:                       Purpose:\n"
-               "\n"
-               " crangler [-?] [-h] [--help]  show help\n"
-               " crangler file.json ...       configuration file names\n"
-               "\n";
+  std::cout << '\n' << banner_string("CRANGLER", CBMC_VERSION) << '\n';
+
+  std::cout << help_formatter(
+    "\n"
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {bcrangler} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bcrangler} {ufile.json} ... \t configuration file names\n"
+    "\n");
 }

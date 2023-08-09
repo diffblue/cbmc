@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/options.h>
 #include <util/version.h>
 
@@ -720,93 +721,81 @@ void janalyzer_parse_optionst::help()
   std::cout << '\n' << banner_string("JANALYZER", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2016-2018") << '\n'
             << align_center_with_border("Daniel Kroening, Diffblue") << '\n'
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            <<
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " janalyzer [-?] [-h] [--help] show help\n"
-    " janalyzer\n"
-    << HELP_JAVA_METHOD_NAME
-    << " janalyzer\n"
-    << HELP_JAVA_CLASS_NAME
-    << " janalyzer\n"
-    << HELP_JAVA_JAR
-    << " janalyzer\n"
-    << HELP_JAVA_GOTO_BINARY
-    << "\n"
-    << HELP_JAVA_CLASSPATH
-    << HELP_FUNCTIONS
-    << "\n"
+    " {bjanalyzer} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bjanalyzer}\n"
+    HELP_JAVA_METHOD_NAME
+    " {bjanalyzer}\n"
+    HELP_JAVA_CLASS_NAME
+    " {bjanalyzer}\n"
+    HELP_JAVA_JAR
+    " {bjanalyzer}\n"
+    HELP_JAVA_GOTO_BINARY
+    "\n"
+    HELP_JAVA_CLASSPATH
+    HELP_FUNCTIONS
+    "\n"
     "Task options:\n"
-    << help_entry("--show", "display the abstract domains")
-    << help_entry("--verify", "use the abstract domains to check assertions")
-    << help_entry(
-      "--simplify file_name",
-      "use the abstract domains to simplify the program")
-    << help_entry(
-      "--no-simplify-slicing",
-      "do not remove instructions from which no property can be reached (use "
-      "with --simplify)")
-    << help_entry("--unreachable-instructions", "list dead code")
-    << help_entry(
-      "--unreachable-functions",
-      "list functions unreachable from the entry point")
-    << help_entry(
-      "--reachable-functions", "list functions reachable from the entry point")
-    << "\n"
+    " {y--show} \t display the abstract domains\n"
+    " {y--verify} \t use the abstract domains to check assertions\n"
+    " {y--simplify} {ufile_name} \t use the abstract domains to simplify the"
+    " program\n"
+    " {y--no-simplify-slicing} \t do not remove instructions from which no"
+    " property can be reached (use with {y--simplify})\n"
+    " {y--unreachable-instructions} \t list dead code\n"
+    " {y--unreachable-functions} \t list functions unreachable from the entry"
+    " point"
+    " {y--reachable-functions} \t list functions reachable from the entry point"
+    "\n"
     "Abstract interpreter options:\n"
-    << help_entry(
-      "--location-sensitive", "use location-sensitive abstract interpreter")
-    << help_entry("--concurrent", "use concurrency-aware abstract interpreter")
-    << "\n"
+    " {y--location-sensitive} \t use location-sensitive abstract interpreter"
+    " {y--concurrent} \t use concurrency-aware abstract interpreter\n"
+    "\n"
     "Domain options:\n"
-    << help_entry("--constants", "constant domain")
-    << help_entry("--intervals", "interval domain")
-    << help_entry("--non-null", "non-null domain")
-    << help_entry(
-      "--dependence-graph",
-      "data and control dependencies between instructions")
-    << "\n"
+    " {y--constants} \t constant domain\n"
+    " {y--intervals} \t interval domain\n"
+    " {y--non-null} \t non-null domain\n"
+    " {y--dependence-graph} \t data and control dependencies between"
+    " instructions"
+    "\n"
     "Output options:\n"
-    << help_entry(
-      "--text file_name", "output results in plain text to given file")
-    << help_entry(
-      "--json file_name", "output results in JSON format to given file")
-    << help_entry(
-      "--xml file_name", "output results in XML format to given file")
-    << help_entry(
-      "--dot file_name", "output results in DOT format to given file")
-    << "\n"
+    " {y--text} {ufile_name} \t output results in plain text to given file\n"
+    " {y--json} {ufile_name} \t output results in JSON format to given file\n"
+    " {y--xml} {ufile_name} \t output results in XML format to given file\n"
+    " {y--dot} {ufile_name} \t output results in DOT format to given file\n"
+    "\n"
     "Specific analyses:\n"
-    << help_entry(
-      "--taint file_name", "perform taint analysis using rules in given file")
-    << help_entry(
-      "--show-taint", "print taint analysis results on stdout")
-    << help_entry(
-      "--show-local-may-alias", "perform procedure-local may alias analysis")
-    << "\n"
+    " {y--taint} {ufile_name} \t perform taint analysis using rules in given"
+    " file\n"
+    " {y--show-taint} \t print taint analysis results on stdout\n"
+    " {y--show-local-may-alias} \t perform procedure-local may alias analysis\n"
+    "\n"
     "Java Bytecode frontend options:\n"
-    << JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
-    << "\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    "\n"
     "Platform options:\n"
-    << HELP_CONFIG_PLATFORM
-    << "\n"
+    HELP_CONFIG_PLATFORM
+    "\n"
     "Program representations:\n"
-    << help_entry("--show-parse-tree", "show parse tree")
-    << help_entry("--show-symbol-table", "show loaded symbol table")
-    << HELP_SHOW_GOTO_FUNCTIONS
-    << HELP_SHOW_PROPERTIES
-    << "\n"
+    " {y--show-parse-tree} \t show parse tree\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_PROPERTIES
+    "\n"
     "Program instrumentation options:\n"
-    << help_entry("--no-assertions", "ignore user assertions")
-    << help_entry("--no-assumptions", "ignore user assumptions")
-    << help_entry("--property id", "enable selected properties only")
-    << "\n"
+    " {y--no-assertions} \t ignore user assertions\n"
+    " {y--no-assumptions} \t ignore user assumptions\n"
+    " {y--property} {uid} \t enable selected properties only\n"
+    "\n"
     "Other options:\n"
-    << help_entry("--version", "show version and exit")
-    << help_entry("--verbosity #", "verbosity level")
-    << HELP_TIMESTAMP
-    << "\n";
+    " {y--version} \t show version and exit\n"
+    " {y--verbosity {u#} \t verbosity level\n"
+    HELP_TIMESTAMP
+    "\n");
   // clang-format on
 }

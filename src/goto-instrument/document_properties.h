@@ -29,10 +29,7 @@ void document_properties_html(
   "(document-properties-latex)(document-properties-html)"
 
 #define HELP_DOCUMENT_PROPERTIES                                               \
-  help_entry(                                                                  \
-    "--document-properties-html", "generate HTML property documentation")      \
-    << help_entry(                                                             \
-         "--document-properties-latex",                                        \
-         "generate Latex property documentation")
+  " {y--document-properties-html} \t generate HTML property documentation\n"   \
+  " {y--document-properties-latex} \t generate LaTeX property documentation\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_DOCUMENT_PROPERTIES_H

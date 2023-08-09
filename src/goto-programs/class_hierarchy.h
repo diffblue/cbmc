@@ -25,7 +25,7 @@ Date: April 2016
   "(show-class-hierarchy)"
 
 #define HELP_SHOW_CLASS_HIERARCHY                                              \
-  help_entry("--show-class-hierarchy", "show the class hierarchy")
+  " {y--show-class-hierarchy} \t show the class hierarchy\n"
 
 class symbol_table_baset;
 class json_stream_arrayt;

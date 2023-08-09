@@ -9,6 +9,7 @@ Author: Qinheping Hu
 #include "goto_synthesizer_parse_options.h"
 
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/version.h>
 
 #include <goto-programs/read_goto_binary.h>
@@ -218,33 +219,32 @@ optionst goto_synthesizer_parse_optionst::get_options()
 /// display command line help
 void goto_synthesizer_parse_optionst::help()
 {
-  // clang-format off
-  std::cout << '\n' << banner_string("Goto-synthesizer", CBMC_VERSION) << '\n'
+  std::cout << '\n'
+            << banner_string("Goto-synthesizer", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2022") << '\n'
             << align_center_with_border("Qinheping Hu") << '\n'
-            << align_center_with_border("qinhh@amazon.com") << '\n'
-            <<
+            << align_center_with_border("qinhh@amazon.com") << '\n';
+
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " goto-synthesizer [-?] [-h] [--help]  show help\n"
-    " goto-synthesizer in out              synthesize and apply loop invariants.\n" // NOLINT(*)
+    " {bgoto-synthesizer} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-synthesizer} {y--version} \t show version and exit\n"
+    " {bgoto-synthesizer} {uin} {uout} \t synthesize and apply loop"
+    " invariants.\n"
     "\n"
-    "Main options:\n"
-    << HELP_DUMP_LOOP_CONTRACTS
-    << HELP_LOOP_CONTRACTS_NO_UNWIND
-    << "\n"
-    "Backend options:\n"
-    << HELP_CONFIG_BACKEND
-    << HELP_SOLVER
-    << "\n"
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
+    "Main options:\n" HELP_DUMP_LOOP_CONTRACTS HELP_LOOP_CONTRACTS_NO_UNWIND
+    "\n"
+    "Backend options:\n" HELP_CONFIG_BACKEND HELP_SOLVER
+    "\n"
+    " {y--arrays-uf-never} \t never turn arrays into uninterpreted functions\n"
+    " {y--arrays-uf-always} \t always turn arrays into uninterpreted"
+    " functions\n"
+    "\n"
     "Other options:\n"
-    " --version                    show version and exit\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --json-ui                    use JSON-formatted output\n"
-    " --verbosity #                verbosity level\n"
-    "\n";
-  // clang-format on
+    " {y--xml-ui} \t use XML-formatted output\n"
+    " {y--json-ui} \t use JSON-formatted output\n"
+    " {y--verbosity} {u#} \t verbosity level\n"
+    "\n");
 }

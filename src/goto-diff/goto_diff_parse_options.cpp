@@ -13,6 +13,7 @@ Author: Peter Schrammel
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/options.h>
 #include <util/version.h>
 
@@ -220,34 +221,34 @@ void goto_diff_parse_optionst::help()
   std::cout << '\n' << banner_string("GOTO_DIFF", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2016") << '\n'
             << align_center_with_border("Daniel Kroening, Peter Schrammel") << '\n' // NOLINT (*)
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            <<
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " goto_diff [-?] [-h] [--help]      show help\n"
-    " goto_diff old new                 goto binaries to be compared\n"
+    " {bgoto-diff} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-diff} {uold} {unew} \t compare two goto binaries\n"
     "\n"
     "Diff options:\n"
-    << HELP_SHOW_GOTO_FUNCTIONS
-    << HELP_SHOW_PROPERTIES
-    << help_entry("--show-loops", "show the loops in the programs")
-    << help_entry("-u, --unified", "output unified diff")
-    << help_entry(
-      "--change-impact, --forward-impact, --backward-impact",
-      "output unified diff with forward&backward/forward/backward dependencies")
-    << help_entry("--compact-output", "output dependencies in compact mode")
-    << "\n"
+    HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_PROPERTIES
+    " {y--show-loops} \t show the loops in the programs\n"
+    " {y-u}, {y--unified} \t output unified diff\n"
+    " {y--change-impact}, {y--forward-impact}, {y--backward-impact} \t output"
+    " unified diff with forward&backward/forward/backward dependencies\n"
+    " {y--compact-output} \t output dependencies in compact mode\n"
+    "\n"
     "Program instrumentation options:\n"
-    << HELP_GOTO_CHECK
-    << HELP_COVER
-    << "\n"
+    HELP_GOTO_CHECK
+    HELP_COVER
+    "\n"
     "Other options:\n"
-    << help_entry("--version", "show version and exit")
-    << help_entry("--json-ui", "use JSON-formatted output")
-    << HELP_FLUSH
-    << help_entry("--verbosity #", "verbosity level")
-    << HELP_TIMESTAMP
-    << "\n";
+    " {y--version} \t show version and exit\n"
+    " {y--json-ui} \t use JSON-formatted output\n"
+    HELP_FLUSH
+    " {y--verbosity} {u#} \t verbosity level\n"
+    HELP_TIMESTAMP
+    "\n");
   // clang-format on
 }

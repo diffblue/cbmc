@@ -32,27 +32,27 @@ Author: Diffblue Ltd.
   "(" COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT "):"
 
 #define COMMON_HARNESS_GENERATOR_HELP                                          \
-  help_entry(                                                                  \
-    "--" COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT " N",                \
-    "minimum level at which a pointer can first be NULL in a recursively "     \
-    "nondet initialized struct")                                               \
-    << help_entry(                                                             \
-         "--" COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT " N",         \
-         "limit size of nondet (e.g. input) object tree; at level N pointers " \
-         "are set to null")                                                    \
-    << help_entry(                                                             \
-         "--" COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT " N",                \
-         "minimum size of dynamically created arrays (default: 1)")            \
-    << help_entry(                                                             \
-         "--" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT " N",                \
-         "maximum size of dynamically created arrays (default: 2)")            \
-    << help_entry(                                                             \
-         "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT        \
-         " <function-name>",                                                   \
-         "name of the function(s) pointer parameters that can be NULL "        \
-         "pointing")                                                           \
-    << help_entry(                                                             \
-         "--" COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT " <member-expr>",      \
-         "path to the member to be havoced")
+  " {y--" COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT                     \
+  "} {uN} \t "                                                                 \
+  "minimum level at which a pointer can first be NULL in a recursively "       \
+  "nondet initialized struct\n"                                                \
+  " {y--" COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT                   \
+  "} {uN} \t "                                                                 \
+  "limit size of nondet (e.g. input) object tree; at level {uN} pointers "     \
+  "are set to null\n"                                                          \
+  " {y--" COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT                          \
+  "} {uN} \t "                                                                 \
+  "minimum size of dynamically created arrays (default: 1)\n"                  \
+  " {y--" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT                          \
+  "} {uN} \t "                                                                 \
+  "maximum size of dynamically created arrays (default: 2)\n"                  \
+  " {y--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT            \
+  "} "                                                                         \
+  "{ufunction_name} \t "                                                       \
+  "name of the function(s) pointer parameters that can be NULL "               \
+  "pointing\n"                                                                 \
+  " {y--" COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT                            \
+  "} {umember_expr} \t "                                                       \
+  "path to the member to be havocked\n"
 
 #endif // CPROVER_GOTO_HARNESS_COMMON_HARNESS_GENERATOR_OPTIONS_H

@@ -90,42 +90,30 @@ void introduce_temporaries(
   OPT_WMM_MISC
 
 #define HELP_WMM_FULL                                                          \
-  help_entry("--mm <tso,pso,rmo,power>", "instruments a weak memory model")    \
-    << help_entry(                                                             \
-         "--scc", "detects critical cycles per SCC (one thread per SCC)")      \
-    << help_entry(                                                             \
-         "--one-event-per-cycle", "only instruments one event per cycle")      \
-    << help_entry(                                                             \
-         "--minimum-interference", "instruments an optimal number of events")  \
-    << help_entry(                                                             \
-         "--my-events",                                                        \
-         "only instruments events whose ids appear in inst.evt")               \
-    << help_entry(                                                             \
-         "--read-first, --write-first",                                        \
-         "only instrument cycles where a read or  write occurs as first "      \
-         "event, respectively")                                                \
-    << help_entry("--max-var N", "limit cycles to N variables read/written")   \
-    << help_entry("--max-po-trans N", "limit cycles to N program-order edges") \
-    << help_entry("--ignore-arrays", "instrument arrays as a single object")   \
-    << help_entry(                                                             \
-         "--cav11",                                                            \
-         "always instrument shared variables, even when they are not part of " \
-         "any cycle")                                                          \
-    << help_entry(                                                             \
-         "--force-loop-duplication, --no-loop-duplication",                    \
-         "optional program transformation to construct cycles in program "     \
-         "loops")                                                              \
-    << help_entry(                                                             \
-         "--cfg-kill",                                                         \
-         "enables symbolic execution used to reduce spurious cycles")          \
-    << help_entry("--no-dependencies", "no dependency analysis")               \
-    << help_entry(                                                             \
-         "--no-po-rendering", "no representation of the threads in the dot")   \
-    << help_entry(                                                             \
-         "--hide-internals",                                                   \
-         "do not include thread-internal (Rfi) events in dot output")          \
-    << help_entry("--render-cluster-file", "clusterises the dot by files")     \
-    << help_entry(                                                             \
-         "--render-cluster-function", "clusterises the dot by functions")
+  " {y--mm} [{ytso}|{ypso}|{yrmo}|{ypower}] \t "                               \
+  "instruments a weak memory model\n"                                          \
+  " {y--scc} \t detects critical cycles per SCC (one thread per SCC)\n"        \
+  " {y--one-event-per-cycle} \t only instruments one event per cycle\n"        \
+  " {y--minimum-interference} \t instruments an optimal number of events\n"    \
+  " {y--my-events} \t only instruments events whose ids appear in inst.evt\n"  \
+  " {y--read-first}, {y--write-first} \t "                                     \
+  "only instrument cycles where a read or write occurs as first event, "       \
+  "respectively\n"                                                             \
+  " {y--max-var} {uN} \t limit cycles to {uN} variables read/written\n"        \
+  " {y--max-po-trans} {uN} \t limit cycles to {uN} program-order edges\n"      \
+  " {y--ignore-arrays} \t instrument arrays as a single object\n"              \
+  " {y--cav11} \t "                                                            \
+  "always instrument shared variables, even when they are not part of "        \
+  "any cycle\n"                                                                \
+  " {y--force-loop-duplication}, {y--no-loop-duplication} \t "                 \
+  "optional program transformation to construct cycles in program loops\n"     \
+  " {y--cfg-kill} \t enables symbolic execution used to reduce spurious "      \
+  "cycles\n"                                                                   \
+  " {y--no-dependencies} \t no dependency analysis\n"                          \
+  " {y--no-po-rendering} \t no representation of the threads in the dot\n"     \
+  " {y--hide-internals} \t do not include thread-internal (Rfi) events in "    \
+  "dot output\n"                                                               \
+  " {y--render-cluster-file} \t clusterises the dot by files\n"                \
+  " {y--render-cluster-function} \t clusterises the dot by functions\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H

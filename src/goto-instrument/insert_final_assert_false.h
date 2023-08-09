@@ -50,8 +50,7 @@ bool insert_final_assert_false(
   "(insert-final-assert-false):"
 
 #define HELP_INSERT_FINAL_ASSERT_FALSE                                         \
-  help_entry(                                                                  \
-    "--insert-final-assert-false <function>",                                  \
-    "generate assert(false) at end of function")
+  " {y--insert-final-assert-false} {ufunction} \t "                            \
+  "generate assert(false) at end of function {ufunction}\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_INSERT_FINAL_ASSERT_FALSE_H

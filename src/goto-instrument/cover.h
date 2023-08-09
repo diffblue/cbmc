@@ -31,18 +31,16 @@ class symbol_tablet;
   "(show-test-suite)"
 
 #define HELP_COVER                                                             \
-  help_entry(                                                                  \
-    "--cover CC",                                                              \
-    "create test-suite with coverage criterion CC, where CC is one of "        \
-    "assertion[s], assume[s], branch[es], condition[s], cover, decision[s], "  \
-    "location[s], or mcdc")                                                    \
-    << help_entry(                                                             \
-         "--cover-failed-assertions",                                          \
-         "do not stop coverage checking at failed assertions (this is the "    \
-         "default for --cover assertions)")                                    \
-    << help_entry(                                                             \
-         "--show-test-suite",                                                  \
-         "print test suite for coverage criterion (requires --cover)")
+  " {y--cover} {uCC} \t "                                                      \
+  "create test-suite with coverage criterion {uCC}, where {uCC} is one of "    \
+  "{yassertion}[{ys}], {yassume}[{ys}], {ybranch}[{yes}], "                    \
+  "{ycondition}[{ys}], {ycover}, {decision}[{ys}], {ylocation}[{ys}], "        \
+  "or {ymcdc}\n"                                                               \
+  " {y--cover-failed-assertions} \t "                                          \
+  "do not stop coverage checking at failed assertions (this is the default "   \
+  "for {y--cover} {yassertions})\n"                                            \
+  " {y--show-test-suite} \t "                                                  \
+  "print test suite for coverage criterion (requires {y--cover})\n"
 
 enum class coverage_criteriont
 {

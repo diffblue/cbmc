@@ -76,11 +76,10 @@ protected:
   "(unwindset):"
 
 #define HELP_UNWINDSET                                                         \
-  help_entry("--show-loops", "show the loops in the program")                  \
-    << help_entry("--unwind nr", "unwind nr times")                            \
-    << help_entry(                                                             \
-         "--unwindset [T:]L:B,...",                                            \
-         "unwind loop L with a bound of B (optionally restricted to thread "   \
-         "T) (use --show-loops to get the loop IDs)")
+  " {y--show-loops} \t show the loops in the program\n"                        \
+  " {y--unwind} {unr} \t unwind loops {unr} times\n"                           \
+  " {y--unwindset} [{uT}{y:}]{uL}{y:}{uB},... \t "                             \
+  "unwind loop {uL} with a bound of {uB} (optionally restricted to thread "    \
+  "{uT}) (use {y--show-loops} to get the loop IDs)\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_UNWINDSET_H

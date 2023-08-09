@@ -110,8 +110,7 @@ void remove_pointers(
 #define OPT_REMOVE_POINTERS "(remove-pointers)"
 
 #define HELP_REMOVE_POINTERS                                                   \
-  help_entry(                                                                  \
-    "--remove-pointers",                                                       \
-    "converts pointer arithmetic to base+offset expressions")
+  " {y--remove-pointers} \t "                                                  \
+  "converts pointer arithmetic to base+offset expressions\n"
 
 #endif // CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H

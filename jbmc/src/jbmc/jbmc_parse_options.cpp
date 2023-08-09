@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/version.h>
@@ -960,101 +961,92 @@ void jbmc_parse_optionst::help()
             << align_center_with_border("Copyright (C) 2001-2018") << '\n'
             << align_center_with_border("Daniel Kroening, Edmund Clarke") << '\n' // NOLINT(*)
             << align_center_with_border("Carnegie Mellon University, Computer Science Department") << '\n' // NOLINT(*)
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            << "\n"
-    "Usage:                       Purpose:\n"
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  std::cout << help_formatter(
     "\n"
-    " jbmc [-?] [-h] [--help]      show help\n"
-    " jbmc\n"
-    << HELP_JAVA_METHOD_NAME
-    << " jbmc\n"
-    << HELP_JAVA_CLASS_NAME
-    << " jbmc\n"
-    << HELP_JAVA_JAR
-    << " jbmc\n"
-    << HELP_JAVA_GOTO_BINARY
-    << "\n"
-    << HELP_JAVA_CLASSPATH
-    << HELP_FUNCTIONS
-    << "\n"
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {bjbmc} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bjbmc}\n"
+    HELP_JAVA_METHOD_NAME
+    " {bjbmc}\n"
+    HELP_JAVA_CLASS_NAME
+    " {bjbmc}\n"
+    HELP_JAVA_JAR
+    " {bjbmc}\n"
+    HELP_JAVA_GOTO_BINARY
+    "\n"
+    HELP_JAVA_CLASSPATH
+    HELP_FUNCTIONS
+    "\n"
     "Analysis options:\n"
-    << HELP_SHOW_PROPERTIES
-    << help_entry(
-      "--symex-coverage-report f",
-      "generate a Cobertura XML coverage report in f")
-    << help_entry("--property id", "only check one specific property")
-    << help_entry(
-      "--trace", "give a counterexample trace for failed properties")
-    << help_entry(
-      "--stop-on-fail",
-      "stop analysis once a failed property is detected (implies --trace)")
-    << help_entry("--localize-faults", "localize faults (experimental)")
-    << HELP_JAVA_TRACE_VALIDATION
-    << "\n"
+    HELP_SHOW_PROPERTIES
+    " {y--symex-coverage-report} {uf} \t generate a Cobertura XML coverage"
+    " report in {uf}\n"
+    " {y--property} {uid} \t only check one specific property\n"
+    " {y--trace} \t give a counterexample trace for failed properties\n"
+    " {y--stop-on-fail} \t stop analysis once a failed property is detected"
+    " (implies {y--trace})\n"
+    " {y--localize-faults} \t localize faults (experimental)\n"
+    HELP_JAVA_TRACE_VALIDATION
+    "\n"
     "Platform options:\n"
-    << HELP_CONFIG_PLATFORM
-    << "\n"
+    HELP_CONFIG_PLATFORM
+    "\n"
     "Program representations:\n"
-    << help_entry("--show-parse-tree", "show parse tree")
-    << help_entry("--show-symbol-table", "show loaded symbol table")
-    << help_entry("--list-symbols", "list symbols with type information")
-    << HELP_SHOW_GOTO_FUNCTIONS
-    << help_entry(
-      "--drop-unused-functions",
-      "drop functions trivially unreachable from main function")
-    << HELP_SHOW_CLASS_HIERARCHY
-    << "\n"
+    " {y--show-parse-tree} \t show parse tree\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    " {y--list-symbols} \t list symbols with type information\n"
+    HELP_SHOW_GOTO_FUNCTIONS
+    " {y--drop-unused-functions} \t drop functions trivially unreachable"
+    " from main function\n"
+    HELP_SHOW_CLASS_HIERARCHY
+    "\n"
     "Program instrumentation options:\n"
-    << help_entry("--no-assertions", "ignore user assertions")
-    << help_entry("--no-assumptions", "ignore user assumptions")
-    << help_entry("--mm MM", "memory consistency model for concurrent programs")
-    << HELP_REACHABILITY_SLICER
-    << help_entry("--full-slice", "run full slicer (experimental)")
-    << "\n"
+    " {y--no-assertions} \t ignore user assertions\n"
+    " {y--no-assumptions} \t ignore user assumptions\n"
+    " {y--mm} {uMM} \t memory consistency model for concurrent programs\n"
+    HELP_REACHABILITY_SLICER
+    " {y--full-slice} \t run full slicer (experimental)\n"
+    "\n"
     "Java Bytecode frontend options:\n"
-    << JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
-    << help_entry(
-      "--java-threading",
-      "enable java multi-threading support (experimental)")
-    << help_entry(
-      "--java-unwind-enum-static",
-      "unwind loops in static initialization of enums")
-    // Currently only supported in the JBMC frontend:
-    << help_entry(
-      "--symex-driven-lazy-loading",
-      "only load functions when first entered by symbolic execution. Note that "
-      "--show-symbol-table, --show-goto-functions/properties output will be "
-      "restricted to loaded methods in this case, and only output after the "
-      "symex phase.")
-    << "\n"
+    " {y--java-threading} \t enable java multi-threading support"
+    " (experimental)\n"
+    " {y--java-unwind-enum-static} \t unwind loops in static initialization of"
+    " enums\n"
+    " {y--symex-driven-lazy-loading} \t only load functions when first entered"
+    " by symbolic execution. Note that {y--show-symbol-table},"
+    " {y--show-goto-functions}, {y--show-properties} output will be restricted"
+    " to loaded methods in this case, and only output after the symex phase.\n"
+    "\n"
     "Semantic transformations:\n"
-    << help_entry(
-      "--nondet-static",
-      "add nondeterministic initialization of variables with static lifetime")
-    << "\n"
+    " {y--nondet-static} \t add nondeterministic initialization of variables"
+    " with static lifetime\n"
+    "\n"
     "BMC options:\n"
-    << HELP_BMC
-    << "\n"
+    HELP_BMC
+    "\n"
     "Backend options:\n"
-    << HELP_CONFIG_BACKEND
-    << HELP_SOLVER
-    << HELP_STRING_REFINEMENT
-    << help_entry(
-      "--arrays-uf-never", "never turn arrays into uninterpreted functions")
-    << help_entry(
-      "--arrays-uf-always", "always turn arrays into uninterpreted functions")
-    << "\n"
+    HELP_CONFIG_BACKEND
+    HELP_SOLVER
+    HELP_STRING_REFINEMENT
+    " {y--arrays-uf-never} \t never turn arrays into uninterpreted functions\n"
+    " {y--arrays-uf-always} \t always turn arrays into uninterpreted"
+    " functions\n"
+    "\n"
     "Other options:\n"
-    << help_entry("--version", "show version and exit")
-    << HELP_XML_INTERFACE
-    << HELP_JSON_INTERFACE
-    << HELP_VALIDATE
-    << HELP_GOTO_TRACE
-    << HELP_FLUSH
-    << help_entry("--verbosity #", "verbosity level")
-    << HELP_TIMESTAMP
-    << "\n";
+    " {y--version} \t show version and exit\n"
+    HELP_XML_INTERFACE
+    HELP_JSON_INTERFACE
+    HELP_VALIDATE
+    HELP_GOTO_TRACE
+    HELP_FLUSH
+    " {y--verbosity} {u#} \t verbosity level\n"
+    HELP_TIMESTAMP
+    "\n");
   // clang-format on
 }

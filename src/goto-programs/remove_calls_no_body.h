@@ -42,7 +42,6 @@ public:
 #define OPT_REMOVE_CALLS_NO_BODY "(remove-calls-no-body)"
 
 #define HELP_REMOVE_CALLS_NO_BODY                                              \
-  help_entry(                                                                  \
-    "--remove-calls-no-body", "remove calls to functions without a body")
+  " {y--remove-calls-no-body} \t remove calls to functions without a body\n"
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_CALLS_NO_BODY_H

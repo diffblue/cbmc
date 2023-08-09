@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/options.h>
 #include <util/version.h>
 
@@ -681,134 +682,110 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 /// display command line help
 void goto_analyzer_parse_optionst::help()
 {
-  // clang-format off
-  std::cout << '\n' << banner_string("GOTO-ANALYZER", CBMC_VERSION) << '\n'
+  std::cout << '\n'
+            << banner_string("GOTO-ANALYZER", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2017-2018") << '\n'
             << align_center_with_border("Daniel Kroening, Diffblue") << '\n'
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            <<
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  // clang-format off
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " goto-analyzer [-?|-h|--help] show help\n"
-    " goto-analyzer file.c ...     source file names\n"
+    " {bgoto-analyzer} [{y-?}|{y-h}|{y--help}] \t show this help\n"
+    " {bgoto-analyzer} {ufile.c...} \t source file names\n"
     "\n"
     "Task options:\n"
-    << help_entry("--show", "display the abstract states on the goto program")
-    << help_entry(
-      "--show-on-source", "display the abstract states on the source")
-    << help_entry("--verify", "use the abstract domains to check assertions")
-    << help_entry(
-      "--simplify file_name",
-      "use the abstract domains to simplify the program")
-    << help_entry(
-      "--no-simplify-slicing",
-      "do not remove instructions from which no property can be reached (use "
-      "with --simplify)")
-    << help_entry("--unreachable-instructions", "list dead code")
-    << help_entry(
-      "--unreachable-functions",
-      "list functions unreachable from the entry point")
-    << help_entry(
-      "--reachable-functions", "list functions reachable from the entry point")
-    << "\n"
+    " {y--show} \t display the abstract states on the goto program\n"
+    " {y--show-on-source} \t display the abstract states on the source\n"
+    " {y--verify} \t use the abstract domains to check assertions\n"
+    " {y--simplify} {ufile_name} \t use the abstract domains to simplify the"
+    " program\n"
+    " {y--no-simplify-slicing} \t do not remove instructions from which no"
+    " property can be reached (use with {y--simplify})\n"
+    " {y--unreachable-instructions} \t list dead code\n"
+    " {y--unreachable-functions} \t list functions unreachable from the entry"
+    " point\n"
+    " {y--reachable-functions} \t list functions reachable from the entry"
+    " point\n"
+    "\n"
     "Abstract interpreter options:\n"
-    << help_entry(
-      "--legacy-ait", "recursion for function and one domain per location")
-    << help_entry(
-      "--recursive-interprocedural",
-      "use recursion to handle interprocedural reasoning")
-    << help_entry(
-      "--three-way-merge",
-      "use VSD's three-way merge on return from function call")
-    << help_entry(
-      "--legacy-concurrent",
-      "legacy-ait with an extended fixed-point for concurrency")
-    << help_entry(
-      "--location-sensitive", "use location-sensitive abstract interpreter")
-    << "\n"
+    " {y--legacy-ait} \t recursion for function and one domain per location\n"
+    " {y--recursive-interprocedural} \t use recursion to handle interprocedural"
+    " reasoning\n"
+    " {y--three-way-merge} \t use VSD's three-way merge on return from function"
+    " call\n"
+    " {y--legacy-concurrent} \t legacy-ait with an extended fixed-point for"
+    " concurrency\n"
+    " {y--location-sensitive} \t use location-sensitive abstract interpreter\n"
+    "\n"
     "History options:\n"
-    << help_entry(
-      "--ahistorical", "the most basic history, tracks locations only")
-    << help_entry(
-      "--call-stack n",
-      "track the calling location stack for each function limiting to at most "
-      "n recursive loops, 0 to disable")
-    << help_entry(
-      "--loop-unwind n", "track the number of loop iterations within a "
-      "function limited to n histories per location, 0 is unlimited")
-    << help_entry(
-      "--branching n",
-      "track the forwards jumps (if, switch, etc.) within a function limited "
-      "to n histories per location, 0 is unlimited")
-    << help_entry(
-      "--loop-unwind-and-branching n",
-      "track all local control flow limited to n histories per location, 0 is "
-      "unlimited")
-    << "\n"
+    " {y--ahistorical} \t the most basic history, tracks locations only\n"
+    " {y--call-stack} {un} \t track the calling location stack for each"
+    " function limiting to at most {un} recursive loops, 0 to disable\n"
+    " {y--loop-unwind} {un} \t track the number of loop iterations within a"
+    " function limited to {un} histories per location, 0 is unlimited\n"
+    " {y--branching} {un} \t track the forwards jumps (if, switch, etc.) within"
+    " a function limited to {un} histories per location, 0 is unlimited\n"
+    " {y--loop-unwind-and-branching} {un} \t track all local control flow"
+    " limited to {un} histories per location, 0 is unlimited\n"
+    "\n"
     "Domain options:\n"
-    << help_entry("--constants", "a constant for each variable if possible")
-    << help_entry("--intervals", "an interval for each variable")
-    << help_entry("--non-null", "tracks which pointers are non-null")
-    << help_entry(
-      "--dependence-graph",
-      "data and control dependencies between instructions")
-    << help_entry(
-      "--vsd, --variable-sensitivity", "a configurable non-relational domain")
-    << help_entry(
-      "--dependence-graph-vs", "dependencies between instructions using VSD")
-    << "\n"
+    " {y--constants} \t a constant for each variable if possible\n"
+    " {y--intervals} \t an interval for each variable\n"
+    " {y--non-null} \t tracks which pointers are non-null\n"
+    " {y--dependence-graph} \t data and control dependencies between"
+    " instructions\n"
+    " {y--vsd}, {y--variable-sensitivity} \t a configurable non-relational"
+    " domain\n"
+    " {y--dependence-graph-vs} \t dependencies between instructions using VSD\n"
+    "\n"
     "Variable sensitivity domain (VSD) options:\n"
-    << HELP_VSD
-    << "\n"
+    HELP_VSD
+    "\n"
     "Storage options:\n"
-    << help_entry(
-      "--one-domain-per-location", "stores a domain for each location reached")
-    << help_entry(
-      "--one-domain-per-history",
-      "stores a domain for each history object created")
-    << "\n"
+    " {y--one-domain-per-location} \t stores a domain for each location"
+    " reached\n"
+    " {y--one-domain-per-history} \t stores a domain for each history object"
+    " created\n"
+    "\n"
     "Output options:\n"
-    << help_entry(
-      "--text file_name", "output results in plain text to given file")
-    << help_entry(
-      "--json file_name", "output results in JSON format to given file")
-    << help_entry(
-      "--xml file_name", "output results in XML format to given file")
-    << help_entry(
-      "--dot file_name", "output results in DOT format to given file")
-    << "\n"
+    " {y--text} {ufile_name} \t output results in plain text to given file\n"
+    " {y--json} {ufile_name} \t output results in JSON format to given file\n"
+    " {y--xml} {ufile_name} \t output results in XML format to given file\n"
+    " {y--dot} {ufile_name} \t output results in DOT format to given file\n"
+    "\n"
     "Specific analyses:\n"
-    << help_entry(
-      "--taint file_name", "perform taint analysis using rules in given file")
-    << help_entry("--show-taint", "print taint analysis results on stdout")
-    << help_entry(
-      "--show-local-may-alias", "perform procedure-local may alias analysis")
-    << "\n"
+    " {y--taint} {ufile_name} \t perform taint analysis using rules in given"
+    " file\n"
+    " {y--show-taint} \t print taint analysis results on stdout\n"
+    " {y--show-local-may-alias} \t perform procedure-local may alias analysis\n"
+    "\n"
     "C/C++ frontend options:\n"
-    << HELP_CONFIG_C_CPP
-    << HELP_FUNCTIONS
-    << "\n"
+    HELP_CONFIG_C_CPP
+    HELP_FUNCTIONS
+    "\n"
     "Platform options:\n"
-    << HELP_CONFIG_PLATFORM
-    << "\n"
+    HELP_CONFIG_PLATFORM
+    "\n"
     "Program representations:\n"
-    << help_entry("--show-parse-tree", "show parse tree")
-    << help_entry("--show-symbol-table", "show loaded symbol table")
-    << HELP_SHOW_GOTO_FUNCTIONS
-    << HELP_SHOW_PROPERTIES
-    << "\n"
+    " {y--show-parse-tree} \t show parse tree\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    HELP_SHOW_GOTO_FUNCTIONS
+    HELP_SHOW_PROPERTIES
+    "\n"
     "Program instrumentation options:\n"
-    << help_entry("--property id", "enable selected properties only")
-    << HELP_GOTO_CHECK
-    << HELP_CONFIG_LIBRARY
-    << "\n"
+    " {y--property} {uid} \t enable selected properties only\n"
+    HELP_GOTO_CHECK
+    HELP_CONFIG_LIBRARY
+    "\n"
     "Other options:\n"
-    << HELP_VALIDATE
-    << help_entry("--version", "show version and exit")
-    << HELP_FLUSH
-    << help_entry("--verbosity #", "verbosity level")
-    << HELP_TIMESTAMP
-    << "\n";
+    HELP_VALIDATE
+    " {y--version} \t show version and exit\n"
+    HELP_FLUSH
+    " {y--verbosity} {u#} \t verbosity level\n"
+    HELP_TIMESTAMP
+    "\n");
   // clang-format on
 }

@@ -105,6 +105,6 @@ protected:
 
 #define OPT_FLUSH "(flush)"
 
-#define HELP_FLUSH help_entry("--flush", "flush every line of output")
+#define HELP_FLUSH " {y--flush} \t flush every line of output\n"
 
 #endif // CPROVER_UTIL_UI_MESSAGE_H
