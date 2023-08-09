@@ -19,6 +19,7 @@ Date: June 2006
 class ms_cl_cmdlinet:public goto_cc_cmdlinet
 {
 public:
+  using cmdlinet::parse;
   virtual bool parse(int, const char **);
 
   ms_cl_cmdlinet()
