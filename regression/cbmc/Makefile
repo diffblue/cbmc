@@ -39,4 +39,5 @@ tests.log: ../test.pl test
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.smt2' -execdir $(RM) '{}' \;
+	$(RM) export-symex-ready-goto/exported.symex.ready.goto
 	$(RM) tests*.log

@@ -30,6 +30,9 @@ DIRS = cbmc-shadow-memory \
        goto-diff \
        test-script \
        goto-analyzer-taint \
+       goto-bmc/goto-bmc-symex-ready-goto \
+       goto-bmc/goto-bmc-non-symex-ready-goto \
+       goto-bmc \
        goto-gcc \
        goto-cl \
        goto-cc-cbmc \
@@ -59,6 +62,7 @@ DIRS = cbmc-shadow-memory \
        cbmc-sequentialization \
        cpp-linter \
        catch-framework \
+       libcprover-cpp \
        # Empty last line
 
 ifeq ($(OS),Windows_NT)
@@ -110,9 +114,7 @@ test-parallel:
 
 .PHONY: clean
 clean:
-	@for dir in *; do \
-		if [ -d "$$dir" ]; then \
-			$(MAKE) -C "$$dir" clean; \
-		fi; \
+	@for dir in $(DIRS); do \
+		$(MAKE) -C "$$dir" clean; \
 	done;
 	$(RM) tests.log

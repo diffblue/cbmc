@@ -64,4 +64,4 @@ build_goto_binaries:
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
 	find . -name '*.gb' -execdir $(RM) '{}' \;
-	$(RM) tests.log tests-c++-front-end.log
+	$(RM) tests*.log

@@ -303,7 +303,7 @@ memory-analyzer/test.inc: memory-analyzer/test.c
 memory-analyzer/gdb_api$(OBJEXT): memory-analyzer/input.inc memory-analyzer/test.inc
 
 CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT) \
-             memory-analyzer/input.inc memory-analyzer/test.inc
+             memory-analyzer/input.inc memory-analyzer/test.inc gdb.txt
 
 # only add a dependency for libraries to avoid triggering implicit rules, which
 # would cause unnecessary rebuilds

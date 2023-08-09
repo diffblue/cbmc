@@ -26,3 +26,4 @@ clean:
 			cd ..; \
 		fi \
 	done
+	$(RM) ../cbmc/Recursion6/*.gb

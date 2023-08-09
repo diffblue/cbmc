@@ -16,4 +16,5 @@ tests.log: ../test.pl test
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.json' -execdir $(RM) '{}' \;
 	$(RM) tests.log

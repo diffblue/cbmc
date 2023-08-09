@@ -11,4 +11,4 @@ tests.log: ../test.pl
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
-	$(RM) tests.log
+	$(RM) tests*.log

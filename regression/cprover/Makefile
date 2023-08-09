@@ -10,4 +10,5 @@ test-no-p:
 	@../test.pl -e -c '../../../src/cprover/cprover'
 
 clean:
+	find . -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) tests.log
