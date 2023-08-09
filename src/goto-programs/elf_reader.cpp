@@ -10,8 +10,10 @@ Author:
 /// Read ELF
 
 #include "elf_reader.h"
+
 #include <util/exception_utils.h>
 
+#include <cstdint>
 #include <istream>
 
 static void u16_to_native_endian_inplace(bool le_input, uint16_t &input)
