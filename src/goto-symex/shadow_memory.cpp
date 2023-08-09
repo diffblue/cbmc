@@ -90,7 +90,91 @@ void shadow_memoryt::symex_set_field(
   goto_symex_statet &state,
   const exprt::operandst &arguments)
 {
-  // To be implemented
+  // parse set_field call
+  INVARIANT(
+    arguments.size() == 3, CPROVER_PREFIX "set_field requires 3 arguments");
+  irep_idt field_name = extract_field_name(arguments[1]);
+
+  exprt expr = arguments[0];
+  typet expr_type = expr.type();
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    expr_type.id() == ID_pointer,
+    "shadow memory requires a pointer expression",
+    irep_pretty_diagnosticst{expr_type});
+
+  exprt value = arguments[2];
+  log_set_field(ns, log, field_name, expr, value);
+  INVARIANT(
+    state.shadow_memory.address_fields.count(field_name) == 1,
+    id2string(field_name) + " should exist");
+  const auto &addresses = state.shadow_memory.address_fields.at(field_name);
+
+  // get value set
+  replace_invalid_object_by_null(expr);
+#ifdef DEBUG_SM
+  log_set_field(ns, log, field_name, expr, value);
+#endif
+  std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
+  log_value_set(ns, log, value_set);
+  if(set_field_check_null(ns, log, value_set, expr))
+  {
+    log.warning() << "Shadow memory: cannot set shadow memory of NULL"
+                  << messaget::eom;
+    return;
+  }
+
+  // build lhs
+  const exprt &rhs = value;
+  size_t mux_size = 0;
+  optionalt<exprt> maybe_lhs =
+    get_shadow_memory(expr, value_set, addresses, ns, log, mux_size);
+
+  // add to equation
+  if(maybe_lhs.has_value())
+  {
+    if(mux_size >= 10)
+    {
+      log.warning() << "Shadow memory: mux size set_field: " << mux_size
+                    << messaget::eom;
+    }
+    else
+    {
+      log.debug() << "Shadow memory: mux size set_field: " << mux_size
+                  << messaget::eom;
+    }
+    const exprt lhs = deref_expr(*maybe_lhs);
+#ifdef DEBUG_SM
+    log.debug() << "Shadow memory: LHS: " << format(lhs) << messaget::eom;
+#endif
+    if(lhs.type().id() == ID_empty)
+    {
+      std::stringstream s;
+      s << "Shadow memory: cannot set shadow memory via type void* for "
+        << format(expr)
+        << ". Insert a cast to the type that you want to access.";
+      throw invalid_input_exceptiont(s.str());
+    }
+    // We replicate the rhs value on each byte of the value that we set.
+    // This allows the get_field or/max semantics to operate correctly
+    // on unions.
+    const auto per_byte_rhs =
+      expr_initializer(lhs.type(), expr.source_location(), ns, rhs);
+    CHECK_RETURN(per_byte_rhs.has_value());
+
+#ifdef DEBUG_SM
+    log.debug() << "Shadow memory: RHS: " << format(per_byte_rhs.value())
+                << messaget::eom;
+#endif
+    symex_assign(
+      state,
+      lhs,
+      typecast_exprt::conditional_cast(per_byte_rhs.value(), lhs.type()));
+  }
+  else
+  {
+    log.warning() << "Shadow memory: cannot set_field for " << format(expr)
+                  << messaget::eom;
+  }
 }
 
 // Function synopsis
