@@ -154,11 +154,18 @@ void shadow_memoryt::symex_set_field(
         << ". Insert a cast to the type that you want to access.";
       throw invalid_input_exceptiont(s.str());
     }
+
+    // Get the type of the shadow memory for this field
+    const typet &sm_field_type = get_field_init_type(field_name, state);
+    // Add a conditional cast to the shadow memory field type if `rhs` is not of
+    // the expected type
+    const exprt casted_rhs =
+      typecast_exprt::conditional_cast(rhs, sm_field_type);
     // We replicate the rhs value on each byte of the value that we set.
     // This allows the get_field or/max semantics to operate correctly
     // on unions.
     const auto per_byte_rhs =
-      expr_initializer(lhs.type(), expr.source_location(), ns, rhs);
+      expr_initializer(lhs.type(), expr.source_location(), ns, casted_rhs);
     CHECK_RETURN(per_byte_rhs.has_value());
 
 #ifdef DEBUG_SM

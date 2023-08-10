@@ -110,6 +110,10 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
   bool &exact_match);
 
 // TODO: doxygen
+const typet &
+get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state);
+
+// TODO: doxygen
 bool contains_null_or_invalid(
   const std::vector<exprt> &value_set,
   const exprt &address);

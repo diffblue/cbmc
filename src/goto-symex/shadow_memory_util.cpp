@@ -256,6 +256,13 @@ get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state)
   return field_type_it->second;
 }
 
+const typet &
+get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state)
+{
+  const exprt &field_init_expr = get_field_init_expr(field_name, state);
+  return field_init_expr.type();
+}
+
 /// Given a pointer expression `address` checks if any expr in value_set is
 /// compatible
 bool contains_null_or_invalid(
