@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/bitvector_expr.h" name="/home/runner/work/cbmc/cbmc/src/util/bitvector_expr.h">
-<area shape="rect" id="node1" title="API to expression classes for bitvectors." alt="" coords="4325,5,4509,61"/>
+<area shape="rect" id="node1" title="API to expression classes for bitvectors." alt="" coords="4465,5,4649,61"/>
 <area shape="rect" id="node2" href="$goto__rw_8cpp.html" title=" " alt="" coords="131,117,315,173"/>
 <area shape="rect" id="node3" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="339,117,551,173"/>
 <area shape="rect" id="node4" href="$expr2c__class_8h.html" title=" " alt="" coords="576,117,760,173"/>
@@ -8,36 +8,37 @@
 <area shape="rect" id="node27" href="$overflow__instrumenter_8cpp.html" title="Loop Acceleration." alt="" coords="1229,117,1499,173"/>
 <area shape="rect" id="node28" href="$goto__convert__side__effect_8cpp.html" title="Program Transformation." alt="" coords="1524,117,1740,173"/>
 <area shape="rect" id="node29" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="1764,117,1951,173"/>
-<area shape="rect" id="node30" href="$value__set_8cpp.html" title="Value Set." alt="" coords="1975,117,2169,173"/>
-<area shape="rect" id="node31" href="$boolbv_8cpp.html" title=" " alt="" coords="2193,117,2394,173"/>
-<area shape="rect" id="node32" href="$boolbv__bitreverse_8cpp.html" title=" " alt="" coords="2418,117,2619,173"/>
-<area shape="rect" id="node33" href="$boolbv__bitwise_8cpp.html" title=" " alt="" coords="2643,117,2845,173"/>
-<area shape="rect" id="node34" href="$boolbv__bswap_8cpp.html" title=" " alt="" coords="2869,117,3070,173"/>
-<area shape="rect" id="node35" href="$boolbv__concatenation_8cpp.html" title=" " alt="" coords="3094,117,3295,173"/>
-<area shape="rect" id="node36" href="$boolbv__extractbit_8cpp.html" title=" " alt="" coords="3319,117,3521,173"/>
-<area shape="rect" id="node37" href="$boolbv__extractbits_8cpp.html" title=" " alt="" coords="3545,117,3746,173"/>
-<area shape="rect" id="node38" href="$boolbv__overflow_8cpp.html" title=" " alt="" coords="3770,117,3971,173"/>
-<area shape="rect" id="node39" href="$boolbv__replication_8cpp.html" title=" " alt="" coords="3995,117,4197,173"/>
-<area shape="rect" id="node40" href="$float__bv_8cpp.html" title=" " alt="" coords="4221,117,4405,173"/>
-<area shape="rect" id="node41" href="$qdimacs__core_8cpp.html" title=" " alt="" coords="4429,117,4613,173"/>
-<area shape="rect" id="node42" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4637,117,4821,173"/>
-<area shape="rect" id="node43" href="$smt2__parser_8cpp.html" title=" " alt="" coords="4845,117,5029,173"/>
-<area shape="rect" id="node44" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5054,109,5250,180"/>
-<area shape="rect" id="node45" href="$struct__encoding_8cpp.html" title=" " alt="" coords="5275,109,5485,180"/>
-<area shape="rect" id="node46" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="5509,109,5715,180"/>
-<area shape="rect" id="node47" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5739,117,5989,173"/>
-<area shape="rect" id="node48" href="$bitvector__expr_8cpp.html" title=" " alt="" coords="6013,117,6197,173"/>
-<area shape="rect" id="node49" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="6222,124,6458,165"/>
-<area shape="rect" id="node50" href="$expr__util_8cpp.html" title=" " alt="" coords="6483,124,6680,165"/>
-<area shape="rect" id="node51" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="6704,117,6888,173"/>
-<area shape="rect" id="node52" href="$interval_8cpp.html" title=" " alt="" coords="6913,124,7103,165"/>
-<area shape="rect" id="node53" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="7127,117,7313,173"/>
-<area shape="rect" id="node54" href="$simplify__expr_8cpp.html" title=" " alt="" coords="7337,117,7521,173"/>
-<area shape="rect" id="node55" href="$simplify__expr__int_8cpp.html" title=" " alt="" coords="7545,117,7729,173"/>
-<area shape="rect" id="node56" href="$validate__expressions_8cpp.html" title=" " alt="" coords="7753,117,7937,173"/>
-<area shape="rect" id="node57" href="$character__refine__preprocess_8cpp.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="7962,117,8198,173"/>
-<area shape="rect" id="node58" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="8221,117,8483,173"/>
-<area shape="rect" id="node59" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="8507,117,8759,173"/>
+<area shape="rect" id="node30" href="$shadow__memory__util_8cpp.html" title="Symex Shadow Memory Instrumentation Utilities." alt="" coords="1975,117,2195,173"/>
+<area shape="rect" id="node31" href="$value__set_8cpp.html" title="Value Set." alt="" coords="2219,117,2413,173"/>
+<area shape="rect" id="node32" href="$boolbv_8cpp.html" title=" " alt="" coords="2437,117,2638,173"/>
+<area shape="rect" id="node33" href="$boolbv__bitreverse_8cpp.html" title=" " alt="" coords="2662,117,2863,173"/>
+<area shape="rect" id="node34" href="$boolbv__bitwise_8cpp.html" title=" " alt="" coords="2887,117,3089,173"/>
+<area shape="rect" id="node35" href="$boolbv__bswap_8cpp.html" title=" " alt="" coords="3113,117,3314,173"/>
+<area shape="rect" id="node36" href="$boolbv__concatenation_8cpp.html" title=" " alt="" coords="3338,117,3539,173"/>
+<area shape="rect" id="node37" href="$boolbv__extractbit_8cpp.html" title=" " alt="" coords="3563,117,3765,173"/>
+<area shape="rect" id="node38" href="$boolbv__extractbits_8cpp.html" title=" " alt="" coords="3789,117,3990,173"/>
+<area shape="rect" id="node39" href="$boolbv__overflow_8cpp.html" title=" " alt="" coords="4014,117,4215,173"/>
+<area shape="rect" id="node40" href="$boolbv__replication_8cpp.html" title=" " alt="" coords="4239,117,4441,173"/>
+<area shape="rect" id="node41" href="$float__bv_8cpp.html" title=" " alt="" coords="4465,117,4649,173"/>
+<area shape="rect" id="node42" href="$qdimacs__core_8cpp.html" title=" " alt="" coords="4673,117,4857,173"/>
+<area shape="rect" id="node43" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="4881,117,5065,173"/>
+<area shape="rect" id="node44" href="$smt2__parser_8cpp.html" title=" " alt="" coords="5089,117,5273,173"/>
+<area shape="rect" id="node45" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5298,109,5494,180"/>
+<area shape="rect" id="node46" href="$struct__encoding_8cpp.html" title=" " alt="" coords="5519,109,5729,180"/>
+<area shape="rect" id="node47" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="5753,109,5959,180"/>
+<area shape="rect" id="node48" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5983,117,6233,173"/>
+<area shape="rect" id="node49" href="$bitvector__expr_8cpp.html" title=" " alt="" coords="6257,117,6441,173"/>
+<area shape="rect" id="node50" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="6466,124,6702,165"/>
+<area shape="rect" id="node51" href="$expr__util_8cpp.html" title=" " alt="" coords="6727,124,6924,165"/>
+<area shape="rect" id="node52" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="6948,117,7132,173"/>
+<area shape="rect" id="node53" href="$interval_8cpp.html" title=" " alt="" coords="7157,124,7347,165"/>
+<area shape="rect" id="node54" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="7371,117,7557,173"/>
+<area shape="rect" id="node55" href="$simplify__expr_8cpp.html" title=" " alt="" coords="7581,117,7765,173"/>
+<area shape="rect" id="node56" href="$simplify__expr__int_8cpp.html" title=" " alt="" coords="7789,117,7973,173"/>
+<area shape="rect" id="node57" href="$validate__expressions_8cpp.html" title=" " alt="" coords="7997,117,8181,173"/>
+<area shape="rect" id="node58" href="$character__refine__preprocess_8cpp.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="8206,117,8442,173"/>
+<area shape="rect" id="node59" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="8465,117,8727,173"/>
+<area shape="rect" id="node60" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="8751,117,9003,173"/>
 <area shape="rect" id="node5" href="$expr2c_8cpp.html" title=" " alt="" coords="5,235,208,277"/>
 <area shape="rect" id="node6" href="$expr2cpp_8cpp.html" title=" " alt="" coords="232,235,435,277"/>
 <area shape="rect" id="node7" href="$expr2jsil_8cpp.html" title="Jsil Language." alt="" coords="459,235,653,277"/>

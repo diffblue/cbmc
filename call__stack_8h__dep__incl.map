@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/call_stack.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/call_stack.h">
-<area shape="rect" id="node1" title=" " alt="" coords="2429,5,2622,61"/>
-<area shape="rect" id="node2" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="2309,117,2507,173"/>
-<area shape="rect" id="node60" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="2531,109,2754,180"/>
-<area shape="rect" id="node3" href="$complexity__limiter_8cpp.html" title=" " alt="" coords="2616,451,2859,507"/>
-<area shape="rect" id="node4" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="1727,235,1926,291"/>
-<area shape="rect" id="node5" href="$goto__state_8cpp.html" title=" " alt="" coords="1950,235,2149,291"/>
-<area shape="rect" id="node6" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="2173,235,2371,291"/>
-<area shape="rect" id="node7" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="1533,451,1731,507"/>
-<area shape="rect" id="node44" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="2445,235,2677,291"/>
-<area shape="rect" id="node45" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="2702,235,2922,291"/>
-<area shape="rect" id="node46" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="2946,235,3161,291"/>
-<area shape="rect" id="node47" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="3185,228,3399,299"/>
-<area shape="rect" id="node8" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="488,911,693,967"/>
-<area shape="rect" id="node9" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="1247,673,1431,744"/>
-<area shape="rect" id="node16" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="927,1015,1119,1071"/>
-<area shape="rect" id="node19" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="430,555,615,625"/>
-<area shape="rect" id="node21" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="985,673,1172,744"/>
-<area shape="rect" id="node22" href="$single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="855,555,1041,625"/>
-<area shape="rect" id="node28" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="1376,562,1595,618"/>
-<area shape="rect" id="node35" href="$path__storage_8cpp.html" title=" " alt="" coords="106,562,305,618"/>
-<area shape="rect" id="node36" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2198,562,2413,618"/>
-<area shape="rect" id="node37" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3274,681,3489,737"/>
-<area shape="rect" id="node38" href="$symex__decl_8cpp.html" title="Symbolic Execution." alt="" coords="2437,562,2651,618"/>
-<area shape="rect" id="node39" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3035,681,3250,737"/>
-<area shape="rect" id="node40" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2675,562,2890,618"/>
-<area shape="rect" id="node41" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="2914,562,3129,618"/>
-<area shape="rect" id="node42" href="$symex__main_8cpp.html" title="Symbolic Execution." alt="" coords="1721,562,1935,618"/>
-<area shape="rect" id="node43" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="1959,562,2174,618"/>
-<area shape="rect" id="node10" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="1659,799,1874,855"/>
-<area shape="rect" id="node17" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="1451,792,1635,863"/>
-<area shape="rect" id="node18" href="$java__multi__path__symex__only__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="1208,792,1427,863"/>
-<area shape="rect" id="node11" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="1413,911,1643,967"/>
-<area shape="rect" id="node12" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="1668,911,1865,967"/>
-<area shape="rect" id="node13" href="$api_8cpp.html" title=" " alt="" coords="1204,911,1388,967"/>
-<area shape="rect" id="node14" href="$java__multi__path__symex__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="1889,911,2140,967"/>
-<area shape="rect" id="node15" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="1882,1015,2147,1071"/>
-<area shape="rect" id="node20" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="430,673,615,744"/>
-<area shape="rect" id="node23" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="639,681,859,737"/>
-<area shape="rect" id="node27" href="$java__single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="911,792,1134,863"/>
-<area shape="rect" id="node24" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="653,799,888,855"/>
-<area shape="rect" id="node25" href="$java__single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="49,799,303,855"/>
-<area shape="rect" id="node26" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="49,911,319,967"/>
-<area shape="rect" id="node29" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="1714,681,1907,737"/>
-<area shape="rect" id="node30" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1931,673,2125,744"/>
-<area shape="rect" id="node31" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="2149,673,2398,744"/>
-<area shape="rect" id="node32" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="2423,681,2700,737"/>
-<area shape="rect" id="node33" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="2725,681,2987,737"/>
-<area shape="rect" id="node34" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="1455,681,1689,737"/>
-<area shape="rect" id="node48" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="3171,347,3413,403"/>
-<area shape="rect" id="node49" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="3202,451,3401,507"/>
-<area shape="rect" id="node50" href="$symex__bmc_8h.html" title="Bounded Model Checking for ANSI&#45;C." alt="" coords="1117,562,1301,618"/>
-<area shape="rect" id="node51" href="$auto__objects_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4398,562,4597,618"/>
-<area shape="rect" id="node52" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="4621,562,4819,618"/>
-<area shape="rect" id="node53" href="$symex__atomic__section_8cpp.html" title="Symbolic Execution." alt="" coords="4843,562,5058,618"/>
-<area shape="rect" id="node54" href="$symex__catch_8cpp.html" title="Symbolic Execution." alt="" coords="5134,562,5349,618"/>
-<area shape="rect" id="node55" href="$symex__dead_8cpp.html" title="Symbolic Execution." alt="" coords="3443,562,3658,618"/>
-<area shape="rect" id="node56" href="$symex__dereference__state_8h.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3205,562,3419,618"/>
-<area shape="rect" id="node57" href="$symex__other_8cpp.html" title="Symbolic Execution." alt="" coords="3682,562,3897,618"/>
-<area shape="rect" id="node58" href="$symex__set__return__value_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3921,562,4135,618"/>
-<area shape="rect" id="node59" href="$symex__throw_8cpp.html" title="Symbolic Execution." alt="" coords="4159,562,4374,618"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2283,5,2477,61"/>
+<area shape="rect" id="node2" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="2163,117,2362,173"/>
+<area shape="rect" id="node60" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="2386,109,2609,180"/>
+<area shape="rect" id="node3" href="$complexity__limiter_8cpp.html" title=" " alt="" coords="2413,451,2656,507"/>
+<area shape="rect" id="node4" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="1506,235,1705,291"/>
+<area shape="rect" id="node5" href="$goto__state_8cpp.html" title=" " alt="" coords="1729,235,1927,291"/>
+<area shape="rect" id="node6" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="1951,235,2150,291"/>
+<area shape="rect" id="node7" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="1357,451,1555,507"/>
+<area shape="rect" id="node42" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="2224,235,2456,291"/>
+<area shape="rect" id="node43" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="2383,347,2603,403"/>
+<area shape="rect" id="node44" href="$shadow__memory__util_8h.html" title="Symex Shadow Memory Instrumentation Utilities." alt="" coords="2531,235,2751,291"/>
+<area shape="rect" id="node46" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="2775,235,2990,291"/>
+<area shape="rect" id="node47" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="3014,228,3229,299"/>
+<area shape="rect" id="node8" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="291,918,496,974"/>
+<area shape="rect" id="node9" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="963,673,1147,744"/>
+<area shape="rect" id="node15" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="704,1029,896,1085"/>
+<area shape="rect" id="node18" href="$single__loop__incremental__symex__checker_8h.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="94,555,279,625"/>
+<area shape="rect" id="node20" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="701,673,888,744"/>
+<area shape="rect" id="node21" href="$single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="457,555,644,625"/>
+<area shape="rect" id="node26" href="$scratch__program_8h.html" title="Loop Acceleration." alt="" coords="1200,562,1419,618"/>
+<area shape="rect" id="node33" href="$path__storage_8cpp.html" title=" " alt="" coords="718,562,917,618"/>
+<area shape="rect" id="node34" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2738,562,2953,618"/>
+<area shape="rect" id="node35" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3966,681,4181,737"/>
+<area shape="rect" id="node36" href="$symex__decl_8cpp.html" title="Symbolic Execution." alt="" coords="1545,562,1759,618"/>
+<area shape="rect" id="node37" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2883,681,3098,737"/>
+<area shape="rect" id="node38" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="1783,562,1998,618"/>
+<area shape="rect" id="node39" href="$symex__goto_8cpp.html" title="Symbolic Execution." alt="" coords="2022,562,2237,618"/>
+<area shape="rect" id="node40" href="$symex__main_8cpp.html" title="Symbolic Execution." alt="" coords="2261,562,2475,618"/>
+<area shape="rect" id="node41" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="2499,562,2714,618"/>
+<area shape="rect" id="node10" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="1342,799,1557,855"/>
+<area shape="rect" id="node16" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="1581,792,1765,863"/>
+<area shape="rect" id="node17" href="$java__multi__path__symex__only__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="837,911,1056,981"/>
+<area shape="rect" id="node11" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="1510,918,1741,974"/>
+<area shape="rect" id="node12" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="1080,918,1277,974"/>
+<area shape="rect" id="node13" href="$api_8cpp.html" title=" " alt="" coords="1301,918,1485,974"/>
+<area shape="rect" id="node14" href="$java__multi__path__symex__checker_8h.html" title="Goto Checker using Bounded Model Checking for Java." alt="" coords="1765,918,2016,974"/>
+<area shape="rect" id="node19" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="94,673,279,744"/>
+<area shape="rect" id="node22" href="$single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="406,681,626,737"/>
+<area shape="rect" id="node25" href="$java__single__path__symex__only__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="1045,792,1267,863"/>
+<area shape="rect" id="node23" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="736,799,971,855"/>
+<area shape="rect" id="node24" href="$java__single__path__symex__checker_8h.html" title="Goto Checker using Single Path Symbolic Execution for Java." alt="" coords="457,799,711,855"/>
+<area shape="rect" id="node27" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="1430,681,1623,737"/>
+<area shape="rect" id="node28" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1647,673,1841,744"/>
+<area shape="rect" id="node29" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="1865,673,2114,744"/>
+<area shape="rect" id="node30" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="2139,681,2416,737"/>
+<area shape="rect" id="node31" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="2441,681,2703,737"/>
+<area shape="rect" id="node32" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="1171,681,1405,737"/>
+<area shape="rect" id="node45" href="$shadow__memory__util_8cpp.html" title="Symex Shadow Memory Instrumentation Utilities." alt="" coords="2627,347,2847,403"/>
+<area shape="rect" id="node48" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="3000,347,3243,403"/>
+<area shape="rect" id="node49" href="$goto__symex_8h.html" title="Symbolic Execution." alt="" coords="3025,451,3223,507"/>
+<area shape="rect" id="node50" href="$symex__bmc_8h.html" title="Bounded Model Checking for ANSI&#45;C." alt="" coords="941,562,1125,618"/>
+<area shape="rect" id="node51" href="$auto__objects_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4971,562,5170,618"/>
+<area shape="rect" id="node52" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="3027,562,3226,618"/>
+<area shape="rect" id="node53" href="$symex__atomic__section_8cpp.html" title="Symbolic Execution." alt="" coords="3250,562,3465,618"/>
+<area shape="rect" id="node54" href="$symex__catch_8cpp.html" title="Symbolic Execution." alt="" coords="3489,562,3703,618"/>
+<area shape="rect" id="node55" href="$symex__dead_8cpp.html" title="Symbolic Execution." alt="" coords="3727,562,3942,618"/>
+<area shape="rect" id="node56" href="$symex__dereference__state_8h.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3966,562,4181,618"/>
+<area shape="rect" id="node57" href="$symex__other_8cpp.html" title="Symbolic Execution." alt="" coords="4205,562,4419,618"/>
+<area shape="rect" id="node58" href="$symex__set__return__value_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4443,562,4658,618"/>
+<area shape="rect" id="node59" href="$symex__throw_8cpp.html" title="Symbolic Execution." alt="" coords="4682,562,4897,618"/>
 </map>
