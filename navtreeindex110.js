@@ -1,5 +1,6 @@
 var NAVTREEINDEX110 =
 {
+"jsil__internal__additions_8h_source.html":[9,0,2,19,7],
 "jsil__language_8cpp.html":[9,0,2,19,8],
 "jsil__language_8cpp.html#aacc6c3c6aca4b9c3545bef4dad0ee357":[9,0,2,19,8,0],
 "jsil__language_8cpp_source.html":[9,0,2,19,8],
@@ -248,6 +249,5 @@ var NAVTREEINDEX110 =
 "lazy__goto__functions__map_8h_source.html":[9,0,1,0,1,93],
 "lazy__goto__model_8cpp.html":[9,0,1,0,1,94],
 "lazy__goto__model_8cpp_source.html":[9,0,1,0,1,94],
-"lazy__goto__model_8h.html":[9,0,1,0,1,95],
-"lazy__goto__model_8h_source.html":[9,0,1,0,1,95]
+"lazy__goto__model_8h.html":[9,0,1,0,1,95]
 };
