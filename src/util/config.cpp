@@ -1364,7 +1364,7 @@ irep_idt configt::this_architecture()
     #else
     this_arch = "arm";
     #endif
-  #elif defined(__mipsel__)
+  #elif defined(_MIPSEL)
     #if _MIPS_SIM==_ABIO32
     this_arch = "mipsel";
     #elif _MIPS_SIM==_ABIN32
