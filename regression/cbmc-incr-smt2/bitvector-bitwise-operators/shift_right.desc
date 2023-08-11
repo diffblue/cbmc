@@ -5,7 +5,7 @@ shift_right.c
 \[main\.assertion\.2\] line \d+ Right shifting a positive number has a lower bound of 0: SUCCESS
 \[main\.assertion\.3\] line \d+ Right shifting a negative number has a lower bound value of -1: SUCCESS
 second=128
-result_unsigned=64
+result_unsigned=(64|'@')
 ^EXIT=10$
 ^SIGNAL=0$
 --
